@@ -55,7 +55,13 @@ namespace KustoExecutionEngine.Core.Expressions
             {
                 SyntaxKind.NameReference => new StirlingNameReferenceExpression(engine, (NameReference)expression),
                 SyntaxKind.PipeExpression => new StirlingPipeExpression(engine, (PipeExpression)expression),
-                SyntaxKind.AddExpression or SyntaxKind.SubtractExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
+                SyntaxKind.SimpleNamedExpression => new StirlingSimpleNamedExpression(engine, (SimpleNamedExpression)expression),
+
+                SyntaxKind.AddExpression or
+                SyntaxKind.SubtractExpression or
+                SyntaxKind.MultiplyExpression or
+                SyntaxKind.DivideExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
+
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };
         }

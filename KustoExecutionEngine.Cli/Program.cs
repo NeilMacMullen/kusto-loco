@@ -3,6 +3,7 @@ using KustoExecutionEngine.Core;
 
 var query = @"
 MyTable
+| project a, c=a+1, d=a*2
 | where a > 1
 | summarize by a
 ";
