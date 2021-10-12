@@ -24,14 +24,22 @@ namespace KustoExecutionEngine.Core.Expressions
         private sealed class StirlingAddBinaryExpression
             : StirlingBinaryExpression
         {
+            StirlingExpression _left;
+            StirlingExpression _right;
+
             public StirlingAddBinaryExpression(StirlingEngine engine, BinaryExpression expression)
                 : base(engine, expression)
             {
+                _left = StirlingExpression.Build(engine, expression.Left);
+                _right = StirlingExpression.Build(engine, expression.Right);
             }
 
             protected override object EvaluateInternal()
             {
-                throw new NotImplementedException();
+                var a = _left.Evaluate();
+                var b = _right.Evaluate();
+
+                return (double)a + (double)b;
             }
         }
 
