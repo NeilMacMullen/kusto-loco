@@ -3,9 +3,9 @@
     internal class DerivedTabularSource : ITabularSource
     {
         private readonly ITabularSource _source;
-        private readonly Func<IRow, IRow> _mapFn;
+        private readonly Func<IRow, IRow?> _mapFn;
 
-        public DerivedTabularSource(ITabularSource source, Func<IRow, IRow> mapFn)
+        public DerivedTabularSource(ITabularSource source, Func<IRow, IRow?> mapFn)
         {
             _source = source;
             _mapFn = mapFn;

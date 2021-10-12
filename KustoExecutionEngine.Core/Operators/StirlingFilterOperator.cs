@@ -15,9 +15,19 @@ namespace KustoExecutionEngine.Core.Operators
                 input,
                 row =>
                 {
-                    // TODO: Implement project
-                    return row;
+                    if (SelectThisRow(row))
+                    {
+                        return row;
+                    }
+
+                    return null;
                 });
+
+            bool SelectThisRow(IRow row)
+            {
+                // TODO: Implement filter
+                return true;
+            }
         }
     }
 }
