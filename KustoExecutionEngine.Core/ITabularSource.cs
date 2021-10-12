@@ -5,7 +5,8 @@
         IRow? GetNextRow();
     }
 
-    public interface IRow
+    public interface IRow : IEnumerable<KeyValuePair<string, object?>>
     {
+        object? this[string columnName] { get; }
     }
 }

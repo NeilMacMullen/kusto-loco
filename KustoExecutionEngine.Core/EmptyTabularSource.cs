@@ -2,7 +2,7 @@
 {
     internal class EmptyTabularSource : ITabularSource
     {
-        public IRow GetNextRow()
+        public IRow? GetNextRow()
         {
             return null;
         }

@@ -3,9 +3,7 @@ using KustoExecutionEngine.Core;
 
 var query = @"
 MyTable
-| project a, c=a+1, d=a*2
-| where a > 1
-| summarize by a
+| project a
 ";
 
 var playground = new ParserPlayground();
@@ -14,7 +12,14 @@ playground.DumpTree(query);
 
 
 var engine = new StirlingEngine();
-engine.Evaluate(query);
-
+var result = engine.Evaluate(query);
+if (result is ITabularSource tabularResult)
+{
+    IRow? row;
+    while ((row = tabularResult.GetNextRow()) != null)
+    {
+        Console.WriteLine(string.Join(", ", row.Select(r => $"{r.Key}={r.Value}")));
+    }
+}
 
 Console.WriteLine("Done");

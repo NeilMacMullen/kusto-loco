@@ -23,8 +23,35 @@ namespace KustoExecutionEngine.Core.Operators
                 input,
                 row =>
                 {
-                    // TODO: Implement project
-                    return row;
+                    _engine.PushRowContext(row);
+                    try
+                    {
+                        var values = new List<KeyValuePair<string, object?>>(_expressions.Count);
+                        foreach (var expression in _expressions)
+                        {
+                            string name;
+                            if (expression is StirlingNameReferenceExpression nameReferenceExpression)
+                            {
+                                name = nameReferenceExpression.Name;
+                            }
+                            else if (expression is StirlingSimpleNamedExpression simpleNamedExpression)
+                            {
+                                name = simpleNamedExpression.Name;
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException($"Unsupported expression type inside project operator: {TypeNameHelper.GetTypeDisplayName(expression)}");
+                            }
+
+                            var value = expression.Evaluate();
+                            values.Add(new KeyValuePair<string, object?>(name, value));
+                        }
+                        return new Row(values);
+                    }
+                    finally
+                    {
+                        _engine.LeaveExecutionContext();
+                    }
                 });
         }
     }

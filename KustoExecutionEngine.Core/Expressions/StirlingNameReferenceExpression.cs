@@ -9,10 +9,22 @@ namespace KustoExecutionEngine.Core.Expressions
         {
         }
 
+        public string Name => ((NameReference)_expression).Name.SimpleName;
+
         protected override object EvaluateInternal()
         {
-            // TODO: Return real data.
-            return new EmptyTabularSource();
+            if (!_engine.ExecutionContext.TryGetBinding(Name, out var value))
+            {
+                throw new InvalidOperationException($"Could not find binding for name '{Name}' in current scope.");
+            }
+
+            if (value is null)
+            {
+                // TODO: Is this always bad?
+                throw new InvalidOperationException($"Found null value for name '{Name}' in current scope.");
+            }
+
+            return value;
         }
     }
 }
