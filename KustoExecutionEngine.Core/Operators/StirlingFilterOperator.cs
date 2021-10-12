@@ -2,7 +2,7 @@
 
 namespace KustoExecutionEngine.Core.Operators
 {
-    internal sealed class StirlingFilterOperator : StirlingOperator
+    internal sealed class StirlingFilterOperator : StirlingOperator<FilterOperator>
     {
         public StirlingFilterOperator(StirlingEngine engine, FilterOperator expression)
             : base(engine, expression)

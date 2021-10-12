@@ -2,7 +2,7 @@
 
 namespace KustoExecutionEngine.Core.Operators
 {
-    internal sealed class StirlingSummarizeOperator : StirlingOperator
+    internal sealed class StirlingSummarizeOperator : StirlingOperator<SummarizeOperator>
     {
         public StirlingSummarizeOperator(StirlingEngine engine, SummarizeOperator expression)
             : base(engine, expression)

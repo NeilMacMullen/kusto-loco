@@ -2,7 +2,19 @@
 
 namespace KustoExecutionEngine.Core.Operators
 {
-    internal abstract partial class StirlingOperator
+    internal abstract class StirlingOperator<T> : StirlingOperator
+        where T : QueryOperator
+    {
+        protected readonly T _operator;
+
+        protected StirlingOperator(StirlingEngine engine, T @operator)
+            : base(engine)
+        {
+            _operator = @operator;
+        }
+    }
+
+    internal abstract class StirlingOperator
     {
 #if DEBUG
         static int DebugIndent = 0;
@@ -10,12 +22,10 @@ namespace KustoExecutionEngine.Core.Operators
 
         protected bool _initialized = true;
         protected readonly StirlingEngine _engine;
-        protected readonly QueryOperator _operator;
 
-        protected StirlingOperator(StirlingEngine engine, QueryOperator @operator)
+        protected StirlingOperator(StirlingEngine engine)
         {
             _engine = engine;
-            _operator = @operator;
         }
 
         public ITabularSource Evaluate(ITabularSource input)
@@ -27,7 +37,7 @@ namespace KustoExecutionEngine.Core.Operators
             }
 
 #if DEBUG
-            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)}");
+            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating operator {TypeNameHelper.GetTypeDisplayName(this)}");
             DebugIndent++;
             try
             {
