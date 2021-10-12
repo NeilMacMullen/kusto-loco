@@ -4,11 +4,11 @@ using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core
 {
-    public class KqlEngine
+    public class ParserPlayground
     {
         private GlobalState _globals;
 
-        public KqlEngine()
+        public ParserPlayground()
         {
             var db = new DatabaseSymbol(
                     "MyDb",
@@ -39,8 +39,6 @@ namespace KustoExecutionEngine.Core
             Console.WriteLine("Analyzing query:");
             Console.WriteLine(query);
             Console.WriteLine();
-
-            LetStatement a;
 
             var code = KustoCode.ParseAndAnalyze(query, _globals);
 
