@@ -4,6 +4,10 @@ namespace KustoExecutionEngine.Core.Expressions
 {
     internal abstract class SterlingExpression
     {
+#if DEBUG
+        static int DebugIndent = 0;
+#endif
+
         protected bool _initialized = true;
 
         protected readonly SterlingEngine _engine;
@@ -23,7 +27,20 @@ namespace KustoExecutionEngine.Core.Expressions
                 _initialized = true;
             }
 
-            return EvaluateInternal();
+#if DEBUG
+            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)}");
+            DebugIndent++;
+            try
+            {
+#endif
+                return EvaluateInternal();
+#if DEBUG
+            }
+            finally
+            {
+                DebugIndent--;
+            }
+#endif
         }
 
         protected virtual void Initialize()
