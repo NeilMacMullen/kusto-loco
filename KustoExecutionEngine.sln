@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KustoExecutionEngine.Cli", "KustoExecutionEngine.Cli\KustoExecutionEngine.Cli.csproj", "{A73B096E-8F66-41C3-AE45-A6588D1382FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KustoExecutionEngine.Core", "KustoExecutionEngine.Core\KustoExecutionEngine.Core.csproj", "{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
+	EndGlobalSection
+EndGlobal
