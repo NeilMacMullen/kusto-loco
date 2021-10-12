@@ -2,7 +2,7 @@
 
 namespace KustoExecutionEngine.Core.Expressions
 {
-    internal abstract class SterlingExpression
+    internal abstract class StirlingExpression
     {
 #if DEBUG
         static int DebugIndent = 0;
@@ -10,10 +10,10 @@ namespace KustoExecutionEngine.Core.Expressions
 
         protected bool _initialized = true;
 
-        protected readonly SterlingEngine _engine;
+        protected readonly StirlingEngine _engine;
         protected internal readonly Expression _expression;
 
-        public SterlingExpression(SterlingEngine engine, Expression expression)
+        public StirlingExpression(StirlingEngine engine, Expression expression)
         {
             _engine = engine;
             _expression = expression;
@@ -49,13 +49,13 @@ namespace KustoExecutionEngine.Core.Expressions
 
         protected abstract object EvaluateInternal();
 
-        protected internal static SterlingExpression Build(SterlingEngine engine, Expression expression)
+        protected internal static StirlingExpression Build(StirlingEngine engine, Expression expression)
         {
             return expression.Kind switch
             {
-                SyntaxKind.NameReference => new SterlingNameReferenceExpression(engine, (NameReference)expression),
-                SyntaxKind.PipeExpression => new SterlingPipeExpression(engine, (PipeExpression)expression),
-                SyntaxKind.AddExpression or SyntaxKind.SubtractExpression => SterlingBinaryExpression.Build(engine, (BinaryExpression)expression),
+                SyntaxKind.NameReference => new StirlingNameReferenceExpression(engine, (NameReference)expression),
+                SyntaxKind.PipeExpression => new StirlingPipeExpression(engine, (PipeExpression)expression),
+                SyntaxKind.AddExpression or SyntaxKind.SubtractExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };
         }

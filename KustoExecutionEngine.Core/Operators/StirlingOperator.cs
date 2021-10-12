@@ -2,17 +2,17 @@
 
 namespace KustoExecutionEngine.Core.Operators
 {
-    internal abstract partial class SterlingOperator
+    internal abstract partial class StirlingOperator
     {
 #if DEBUG
         static int DebugIndent = 0;
 #endif
 
         protected bool _initialized = true;
-        protected readonly SterlingEngine _engine;
+        protected readonly StirlingEngine _engine;
         protected readonly QueryOperator _operator;
 
-        protected SterlingOperator(SterlingEngine engine, QueryOperator @operator)
+        protected StirlingOperator(StirlingEngine engine, QueryOperator @operator)
         {
             _engine = engine;
             _operator = @operator;
@@ -48,12 +48,12 @@ namespace KustoExecutionEngine.Core.Operators
 
         protected abstract ITabularSource EvaluateInternal(ITabularSource input);
 
-        internal static SterlingOperator Build(SterlingEngine engine, QueryOperator @operator)
+        internal static StirlingOperator Build(StirlingEngine engine, QueryOperator @operator)
         {
             return @operator.Kind switch
             {
-                SyntaxKind.FilterOperator => new SterlingFilterOperator(engine, (FilterOperator)@operator),
-                SyntaxKind.SummarizeOperator => new SterlingSummarizeOperator(engine, (SummarizeOperator)@operator),
+                SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)@operator),
+                SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)@operator),
                 _ => throw new InvalidOperationException($"Unsupported operator kind '{@operator.Kind}'."),
             };
         }

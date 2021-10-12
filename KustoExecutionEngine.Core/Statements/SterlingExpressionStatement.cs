@@ -3,14 +3,14 @@ using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Statements
 {
-    internal class SterlingExpressionStatement : SterlingStatement<ExpressionStatement>
+    internal class StirlingExpressionStatement : StirlingStatement<ExpressionStatement>
     {
-        private readonly SterlingExpression _expression;
+        private readonly StirlingExpression _expression;
 
-        public SterlingExpressionStatement(SterlingEngine engine, ExpressionStatement statement)
+        public StirlingExpressionStatement(StirlingEngine engine, ExpressionStatement statement)
             : base(engine, statement)
         {
-            _expression = SterlingExpression.Build(engine, statement.Expression);
+            _expression = StirlingExpression.Build(engine, statement.Expression);
         }
 
         protected override object ExecuteInternal()

@@ -2,24 +2,24 @@
 
 namespace KustoExecutionEngine.Core.Statements
 {
-    internal abstract class SterlingStatement<T> : SterlingStatement
+    internal abstract class StirlingStatement<T> : StirlingStatement
         where T : Statement
     {
         private readonly T _statement;
 
-        protected SterlingStatement(SterlingEngine engine, T statement)
+        protected StirlingStatement(StirlingEngine engine, T statement)
             : base(engine)
         {
             _statement = statement;
         }
     }
 
-    internal abstract class SterlingStatement
+    internal abstract class StirlingStatement
     {
-        protected readonly SterlingEngine _engine;
+        protected readonly StirlingEngine _engine;
         protected bool _initialized = true;
 
-        internal SterlingStatement(SterlingEngine engine)
+        internal StirlingStatement(StirlingEngine engine)
         {
             _engine = engine;
         }
@@ -41,11 +41,11 @@ namespace KustoExecutionEngine.Core.Statements
 
         protected abstract object ExecuteInternal();
 
-        protected internal static SterlingStatement Build(SterlingEngine engine, Statement statement)
+        protected internal static StirlingStatement Build(StirlingEngine engine, Statement statement)
         {
             return statement.Kind switch
             {
-                SyntaxKind.ExpressionStatement => new SterlingExpressionStatement(engine, (ExpressionStatement)statement),
+                SyntaxKind.ExpressionStatement => new StirlingExpressionStatement(engine, (ExpressionStatement)statement),
                 _ => throw new InvalidOperationException($"Unsupported statement type '{statement.Kind}'."),
             };
         }

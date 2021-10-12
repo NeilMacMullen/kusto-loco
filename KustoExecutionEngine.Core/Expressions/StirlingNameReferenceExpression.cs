@@ -2,9 +2,9 @@
 
 namespace KustoExecutionEngine.Core.Expressions
 {
-    internal class SterlingNameReferenceExpression : SterlingExpression
+    internal class StirlingNameReferenceExpression : StirlingExpression
     {
-        public SterlingNameReferenceExpression(SterlingEngine engine, NameReference expression)
+        public StirlingNameReferenceExpression(StirlingEngine engine, NameReference expression)
             : base(engine, expression)
         {
         }

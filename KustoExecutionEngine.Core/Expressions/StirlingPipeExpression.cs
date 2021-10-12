@@ -3,16 +3,16 @@ using KustoExecutionEngine.Core.Operators;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
-    internal class SterlingPipeExpression : SterlingExpression
+    internal class StirlingPipeExpression : StirlingExpression
     {
-        private readonly SterlingExpression _leftExpression;
-        private readonly SterlingOperator _operator;
+        private readonly StirlingExpression _leftExpression;
+        private readonly StirlingOperator _operator;
 
-        public SterlingPipeExpression(SterlingEngine engine, PipeExpression expression)
+        public StirlingPipeExpression(StirlingEngine engine, PipeExpression expression)
             : base(engine, expression)
         {
-            _leftExpression = SterlingExpression.Build(engine, expression.Expression);
-            _operator = SterlingOperator.Build(engine, expression.Operator);
+            _leftExpression = StirlingExpression.Build(engine, expression.Expression);
+            _operator = StirlingOperator.Build(engine, expression.Operator);
         }
 
         protected override object EvaluateInternal()

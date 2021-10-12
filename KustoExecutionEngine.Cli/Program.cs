@@ -12,7 +12,7 @@ var playground = new ParserPlayground();
 playground.DumpTree(query);
 
 
-var engine = new SterlingEngine();
+var engine = new StirlingEngine();
 engine.Evaluate(query);
 
 
