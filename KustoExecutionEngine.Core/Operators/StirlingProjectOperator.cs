@@ -11,8 +11,13 @@ namespace KustoExecutionEngine.Core.Operators
 
         protected override ITabularSource EvaluateInternal(ITabularSource input)
         {
-            // TODO: Implement project
-            return new EmptyTabularSource();
+            return new DerivedTabularSource(
+                input,
+                row =>
+                {
+                    // TODO: Implement project
+                    return row;
+                });
         }
     }
 }

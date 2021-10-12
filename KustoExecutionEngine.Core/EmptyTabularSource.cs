@@ -4,7 +4,7 @@
     {
         public IRow GetNextRow()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }
