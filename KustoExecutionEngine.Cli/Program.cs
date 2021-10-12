@@ -3,7 +3,7 @@ using KustoExecutionEngine.Core;
 
 var query = @"
 MyTable
-| project d=a+a+a+a
+| project d=a+a+a+a, a+a
 ";
 
 var playground = new ParserPlayground();
