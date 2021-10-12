@@ -64,6 +64,7 @@ namespace KustoExecutionEngine.Core.Operators
             {
                 SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)@operator),
                 SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)@operator),
+                SyntaxKind.ProjectOperator => new StirlingProjectOperator(engine, (ProjectOperator)@operator),
                 _ => throw new InvalidOperationException($"Unsupported operator kind '{@operator.Kind}'."),
             };
         }
