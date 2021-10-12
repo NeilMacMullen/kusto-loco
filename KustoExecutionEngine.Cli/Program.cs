@@ -5,7 +5,6 @@ var query = @"
 MyTable
 | where a > 1
 | summarize by a
-| where a > 1
 ";
 
 var playground = new ParserPlayground();

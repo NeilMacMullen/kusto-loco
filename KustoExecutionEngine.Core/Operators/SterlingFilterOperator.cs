@@ -1,0 +1,18 @@
+﻿using Kusto.Language.Syntax;
+
+namespace KustoExecutionEngine.Core.Operators
+{
+    internal sealed class SterlingFilterOperator : SterlingOperator
+    {
+        public SterlingFilterOperator(SterlingEngine engine, FilterOperator expression)
+            : base(engine, expression)
+        {
+        }
+
+        protected override ITabularSource EvaluateInternal(ITabularSource input)
+        {
+            // TODO: Implement filter
+            return new EmptyTabularSource();
+        }
+    }
+}
