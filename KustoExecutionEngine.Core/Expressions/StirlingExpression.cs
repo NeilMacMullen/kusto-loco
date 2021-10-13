@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Expressions.Operators;
 
@@ -34,7 +35,8 @@ namespace KustoExecutionEngine.Core.Expressions
             }
 
 #if DEBUG
-            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)} ({_expression.ToString(IncludeTrivia.SingleLine)})");
+            Console.WriteLine(
+                $"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)} ({_expression.ToString(IncludeTrivia.SingleLine)})");
             DebugIndent++;
             try
             {
@@ -61,28 +63,33 @@ namespace KustoExecutionEngine.Core.Expressions
             {
                 SyntaxKind.NameReference => new StirlingNameReferenceExpression(engine, (NameReference)expression),
                 SyntaxKind.PipeExpression => new StirlingPipeExpression(engine, (PipeExpression)expression),
-                SyntaxKind.SimpleNamedExpression => new StirlingSimpleNamedExpression(engine, (SimpleNamedExpression)expression),
+                SyntaxKind.SimpleNamedExpression => new StirlingSimpleNamedExpression(engine,
+                    (SimpleNamedExpression)expression),
 
                 SyntaxKind.AddExpression or
-                SyntaxKind.SubtractExpression or
-                SyntaxKind.MultiplyExpression or
-                SyntaxKind.DivideExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
+                    SyntaxKind.SubtractExpression or
+                    SyntaxKind.MultiplyExpression or
+                    SyntaxKind.DivideExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
 
                 SyntaxKind.BooleanLiteralExpression or
-                SyntaxKind.IntLiteralExpression or
-                SyntaxKind.LongLiteralExpression or
-                SyntaxKind.RealLiteralExpression or
-                SyntaxKind.DecimalLiteralExpression or
-                SyntaxKind.DateTimeLiteralExpression or
-                SyntaxKind.TimespanLiteralExpression or
-                SyntaxKind.GuidLiteralExpression or
-                SyntaxKind.StringLiteralExpression or
-                SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
+                    SyntaxKind.IntLiteralExpression or
+                    SyntaxKind.LongLiteralExpression or
+                    SyntaxKind.RealLiteralExpression or
+                    SyntaxKind.DecimalLiteralExpression or
+                    SyntaxKind.DateTimeLiteralExpression or
+                    SyntaxKind.TimespanLiteralExpression or
+                    SyntaxKind.GuidLiteralExpression or
+                    SyntaxKind.StringLiteralExpression or
+                    SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine,
+                        (LiteralExpression)expression),
 
-                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
+                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine,
+                    (ParenthesizedExpression)expression),
 
-                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
-                SyntaxKind.FunctionCallExpression => new StirlingFunctionExpression(engine, (FunctionCallExpression) expression),
+                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine,
+                    (DataTableExpression)expression),
+                SyntaxKind.FunctionCallExpression => new StirlingFunctionExpression(engine,
+                    (FunctionCallExpression)expression),
 
                 SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)expression),
                 SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)expression),
@@ -96,14 +103,22 @@ namespace KustoExecutionEngine.Core.Expressions
 
     internal class StirlingFunctionExpression : StirlingExpression
     {
-        public StirlingFunctionExpression(StirlingEngine engine, FunctionCallExpression expression):base(engine, expression)
+        private readonly FunctionCallExpression _expression1;
+
+        public StirlingFunctionExpression(StirlingEngine engine, FunctionCallExpression expression) : base(engine,
+            expression)
         {
-            throw new NotImplementedException();
+            _expression1 = expression;
         }
 
         protected override object EvaluateInternal(object? input)
         {
-            throw new NotImplementedException();
+            if (_expression1.Name.SimpleName == "count" && input is IList<IRow> table)
+            {
+                return table.Count;
+            }
+
+            throw new NotSupportedException($"Not supported function call: {_expression1}");
         }
     }
 }

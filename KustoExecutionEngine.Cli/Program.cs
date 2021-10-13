@@ -28,7 +28,7 @@ engine.AddGlobalTable(
             new[]
             {
                 new KeyValuePair<string, object?>("a", 1.5),
-                new KeyValuePair<string, object?>("b", 2.5),
+                new KeyValuePair<string, object?>("b", 2.0),
             }),
     });
 var result = engine.Evaluate(query);

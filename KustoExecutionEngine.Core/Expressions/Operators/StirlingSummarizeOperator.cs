@@ -7,17 +7,17 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingSummarizeOperator : StirlingOperator<SummarizeOperator>
     {
-        private readonly List<string?> _byExpressions;
+        private readonly List<string> _byExpressions;
         private readonly List<(string Name, StirlingExpression)> _aggregationExpressions;
 
         public StirlingSummarizeOperator(StirlingEngine engine, SummarizeOperator expression)
             : base(engine, expression)
         {
             _aggregationExpressions =
-                _operator.Aggregates.Select((s, i) =>
+                expression.Aggregates.Select((s, i) =>
                     (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
-            _byExpressions = _operator.ByClause.Expressions
-                .Select(s => StirlingExpression.Build(engine, s.Element).Evaluate(null).ToString())
+            _byExpressions = expression.ByClause.Expressions
+                .Select(s => s.Element).Cast<NameReference>().Select(s => s.SimpleName)
                 .ToList();
         }
 
@@ -27,7 +27,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             IRow? nextRow = input.GetNextRow();
             while (nextRow != null)
             {
-                var aggKeyList = new List<object>();
+                var aggKeyList = new List<object?>();
                 foreach (string columnName in _byExpressions)
                 {
                     aggKeyList.Add(nextRow[columnName]);
@@ -45,7 +45,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             }
 
             var summarizedTable = new List<IRow>();
-            foreach ((int key, var rows) in dictionary)
+            foreach ((int _, var rows) in dictionary)
             {
                 var row = new Dictionary<string, object?>();
                 foreach (var (columnName, aggregationExpression) in _aggregationExpressions)
@@ -56,13 +56,12 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 summarizedTable.Add(new Row(row));
             }
 
-            // TODO: Implement summarize
             return new InMemoryTabularSource(summarizedTable.ToArray());
         }
 
-        private int GetListHashCode(List<object> objects)
+        private static int GetListHashCode(IEnumerable<object?> objects)
         {
-            return objects.Aggregate(0, (x, y) => x.GetHashCode() ^ y.GetHashCode());
+            return objects.Aggregate(0, (x, y) => x.GetHashCode() ^ y?.GetHashCode() ?? 0);
         }
     }
 }
