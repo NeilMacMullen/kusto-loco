@@ -81,9 +81,23 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
                 SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
+                SyntaxKind.FunctionCallExpression => new StirlingFunctionExpression(engine, (FunctionCallExpression) expression),
 
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };
+        }
+    }
+
+    internal class StirlingFunctionExpression : StirlingExpression
+    {
+        public StirlingFunctionExpression(StirlingEngine engine, FunctionCallExpression expression):base(engine, expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override object EvaluateInternal(object? input)
+        {
+            throw new NotImplementedException();
         }
     }
 }
