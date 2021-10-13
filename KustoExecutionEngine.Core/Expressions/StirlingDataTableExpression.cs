@@ -3,9 +3,9 @@ using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
-    internal class StirlingDataTableExpressions : StirlingExpression
+    internal class StirlingDataTableExpression : StirlingExpression
     {
-        public StirlingDataTableExpressions(StirlingEngine engine, DataTableExpression expression)
+        public StirlingDataTableExpression(StirlingEngine engine, DataTableExpression expression)
             : base(engine, expression)
         {
             throw new NotImplementedException();

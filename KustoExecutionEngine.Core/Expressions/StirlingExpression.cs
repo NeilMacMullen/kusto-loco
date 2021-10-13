@@ -81,7 +81,9 @@ namespace KustoExecutionEngine.Core.Expressions
 
                 SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
-                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
+                SyntaxKind.DataTableExpression => new StirlingDataTableExpression(engine, (DataTableExpression)expression),
+
+                SyntaxKind.FunctionCallExpression => new StirlingFunctionCallExpression(engine, (FunctionCallExpression)expression),
 
                 SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)expression),
                 SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)expression),
