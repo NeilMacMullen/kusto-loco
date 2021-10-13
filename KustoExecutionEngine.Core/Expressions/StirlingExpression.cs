@@ -80,16 +80,12 @@ namespace KustoExecutionEngine.Core.Expressions
                     SyntaxKind.TimespanLiteralExpression or
                     SyntaxKind.GuidLiteralExpression or
                     SyntaxKind.StringLiteralExpression or
-                    SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine,
-                        (LiteralExpression)expression),
+                    SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
 
-                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine,
-                    (ParenthesizedExpression)expression),
+                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
-                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine,
-                    (DataTableExpression)expression),
-                SyntaxKind.FunctionCallExpression => new StirlingFunctionExpression(engine,
-                    (FunctionCallExpression)expression),
+                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
+                SyntaxKind.FunctionCallExpression => new StirlingFunctionExpression(engine, (FunctionCallExpression)expression),
 
                 SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)expression),
                 SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)expression),
