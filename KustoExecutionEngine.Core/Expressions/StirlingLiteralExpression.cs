@@ -30,7 +30,7 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private sealed class StirlingLiteralAnyExpression : StirlingLiteralExpression
         {
-            object _value;
+            private readonly object _value;
 
             public StirlingLiteralAnyExpression(StirlingEngine engine, LiteralExpression expression)
                 : base(engine, expression)

@@ -2,12 +2,12 @@
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Statements;
-using System.Linq;
 
 namespace KustoExecutionEngine.Core
 {
     public class StirlingEngine
     {
+        private readonly List<(string TableName, IEnumerable<string> ColumnNames, IEnumerable<IRow> Rows)> _globalTables = new();
         private readonly Stack<ExecutionContext> _executionContexts;
 
         public StirlingEngine()
@@ -15,7 +15,6 @@ namespace KustoExecutionEngine.Core
             _executionContexts = new Stack<ExecutionContext>();
         }
 
-        private List<(string TableName, IEnumerable<string> ColumnNames, IEnumerable<IRow> Rows)> _globalTables = new();
         public void AddGlobalTable(string tableName, IEnumerable<string> columnNames, IEnumerable<IRow> rows)
         {
             _globalTables.Add((tableName, columnNames, rows));
