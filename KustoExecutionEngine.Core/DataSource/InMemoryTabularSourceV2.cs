@@ -9,9 +9,9 @@ namespace KustoExecutionEngine.Core.DataSource
 {
     public class InMemoryTabularSourceV2 : ITabularSourceV2
     {
-        private readonly List<ITableChunk> _data;
+        private readonly IEnumerable<ITableChunk> _data;
 
-        public InMemoryTabularSourceV2(TableSchema schema, List<ITableChunk> tableChunks)
+        public InMemoryTabularSourceV2(TableSchema schema, IEnumerable<ITableChunk> tableChunks)
         {
             this.Schema = schema;
             this._data = tableChunks;

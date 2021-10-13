@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
@@ -21,8 +23,9 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 .ToList();
         }
 
-        protected override ITabularSource EvaluateInternal(ITabularSource input)
+        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
         {
+            /*
             var dictionary = new Dictionary<int, List<IRow>>();
             IRow? nextRow = input.GetNextRow();
             while (nextRow != null)
@@ -57,6 +60,8 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             }
 
             return new InMemoryTabularSource(summarizedTable.ToArray());
+            */
+            return new EmptyTabularSourceV2();
         }
 
         private static int GetListHashCode(IEnumerable<object?> objects)

@@ -15,6 +15,8 @@ namespace KustoExecutionEngine.Core.DataSource
             this._data = new object[size];
         }
 
+        public int Size => this._data.Length;
+
         public object this[int index]
         {
             get => this._data[index];

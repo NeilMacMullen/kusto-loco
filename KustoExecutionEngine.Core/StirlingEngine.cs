@@ -4,13 +4,14 @@ using System.Linq;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Statements;
 
 namespace KustoExecutionEngine.Core
 {
     public class StirlingEngine
     {
-        private readonly List<(string TableName, IEnumerable<string> ColumnNames, IEnumerable<IRow> Rows)> _globalTables = new();
+        private readonly List<(string TableName, TableSchema tableSchema, ITableChunk tableChunk)> _globalTables = new();
         private readonly Stack<ExecutionContext> _executionContexts;
 
         public StirlingEngine()
@@ -18,9 +19,9 @@ namespace KustoExecutionEngine.Core
             _executionContexts = new Stack<ExecutionContext>();
         }
 
-        public void AddGlobalTable(string tableName, IEnumerable<string> columnNames, IEnumerable<IRow> rows)
+        public void AddGlobalTable(string tableName, TableSchema tableSchema, ITableChunk tableChunk)
         {
-            _globalTables.Add((tableName, columnNames, rows));
+            _globalTables.Add((tableName, tableSchema, tableChunk));
         }
 
         internal ExecutionContext ExecutionContext => _executionContexts.Peek();
@@ -33,7 +34,7 @@ namespace KustoExecutionEngine.Core
                 _globalTables.Select(
                     tableDef => new TableSymbol(
                         tableDef.TableName,
-                        "(" + string.Join(",", tableDef.ColumnNames.Select(c => $"{c}: real")) + ")")
+                        "(" + string.Join(",", tableDef.tableSchema.ColumnDefinitions.Select(c => $"{c.ColumnName}: {c.ValueKind.ToString().ToLower()}")) + ")")
                 ).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
@@ -41,7 +42,7 @@ namespace KustoExecutionEngine.Core
                 .Select(globalTable =>
                     new KeyValuePair<string, object?>(
                         globalTable.TableName,
-                        new InMemoryTabularSource(globalTable.Rows.ToArray())))
+                        new InMemoryTabularSourceV2(globalTable.tableSchema, Enumerable.Repeat(globalTable.tableChunk, 1))))
                 .ToArray();
             _executionContexts.Push(new ExecutionContext(null, globalObjects));
 

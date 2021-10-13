@@ -1,4 +1,5 @@
 ﻿using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {
@@ -9,15 +10,10 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
         {
         }
 
-        protected override ITabularSource EvaluateInternal(ITabularSource input)
+        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
         {
             // TODO: Implement join
-            return new DerivedTabularSource(
-                input,
-                row =>
-                {
-                    return row;
-                });
+            return new EmptyTabularSourceV2();
         }
     }
 }

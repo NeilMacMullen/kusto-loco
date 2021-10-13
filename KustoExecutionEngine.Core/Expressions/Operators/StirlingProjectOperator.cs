@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingProjectOperator : StirlingOperator<ProjectOperator>
     {
-        private readonly List<(string ColumnName, StirlingExpression Expression)> _expressions;
+        private readonly List<(string ColumnName, KustoValueKind ColumnValueType, StirlingExpression Expression)> _expressions;
 
         public StirlingProjectOperator(StirlingEngine engine, ProjectOperator projectOperator)
             : base(engine, projectOperator)
@@ -14,40 +15,59 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             var resultType = projectOperator.ResultType;
             var expressions = projectOperator.Expressions;
 
-            _expressions = new List<(string ColumnName, StirlingExpression Expression)>(expressions.Count);
+            _expressions = new List<(string ColumnName, KustoValueKind ColumnValueType, StirlingExpression Expression)>(expressions.Count);
             for (int i = 0; i < expressions.Count; i++)
             {
-                var expression = expressions[i];
+                var expression = expressions[i].Element;
                 var columnName = resultType.Members[i].Name;
+                var columnValueType = expression.ResultType.ToKustoValueKind();
 
-                var builtExpression = StirlingExpression.Build(engine, expression.Element);
-                _expressions.Add((columnName, builtExpression));
+                var builtExpression = StirlingExpression.Build(engine, expression);
+                _expressions.Add((columnName, columnValueType, builtExpression));
             }
         }
 
-        protected override ITabularSource EvaluateInternal(ITabularSource input)
+        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
         {
-            return new DerivedTabularSource(
+            var newColumnDefinitions = new List<ColumnDefinition>();
+            foreach (var expression in _expressions)
+            {
+                newColumnDefinitions.Add(new ColumnDefinition(expression.ColumnName, expression.ColumnValueType));
+            }
+            var newSchema = new TableSchema(newColumnDefinitions);
+            return new DerivedTabularSourceV2(
                 input,
-                row =>
+                newSchema,
+                oldTableChunk =>
                 {
-                    // TODO: Shouldn't push context here, this would be passed as an arg to Evaluate below.
-                    _engine.PushRowContext(row);
-                    try
+                    var columns = new Column[newSchema.ColumnDefinitions.Count];
+                    for (var i = 0; i < columns.Length; i++)
                     {
-                        var values = new List<KeyValuePair<string, object?>>(_expressions.Count);
-                        foreach (var expression in _expressions)
+                        columns[i] = new Column(oldTableChunk.Columns[0].Size);
+                    }
+
+                    var newTableChunk = new TableChunk(newSchema, columns);
+                    for (int i = 0; i < oldTableChunk.Columns[0].Size; i++)
+                    {
+                        _engine.PushRowContext(oldTableChunk.GetRow(i));
+                        try
                         {
-                            // TODO: Shouldn't pass the row here, instead should pass the table or a chunk of it...
-                            var value = expression.Expression.Evaluate(row);
-                            values.Add(new KeyValuePair<string, object?>(expression.ColumnName, value));
+                            var values = new List<KeyValuePair<string, object?>>(_expressions.Count);
+                            foreach (var expression in _expressions)
+                            {
+                                var value = expression.Expression.Evaluate(null);
+                                values.Add(new KeyValuePair<string, object?>(expression.ColumnName, value));
+                            }
+
+                            newTableChunk.SetRow(new Row(values), i);
                         }
-                        return new Row(values);
+                        finally
+                        {
+                            _engine.LeaveExecutionContext();
+                        }
                     }
-                    finally
-                    {
-                        _engine.LeaveExecutionContext();
-                    }
+
+                    return newTableChunk;
                 });
         }
     }

@@ -11,5 +11,9 @@ namespace KustoExecutionEngine.Core.DataSource
         TableSchema Schema { get; }
 
         Column[] Columns { get; }
+
+        IRow GetRow(int index);
+
+        void SetRow(IRow row, int index);
     }
 }
