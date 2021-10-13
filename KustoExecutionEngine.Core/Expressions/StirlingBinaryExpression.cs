@@ -1,4 +1,5 @@
-﻿using Kusto.Language.Symbols;
+﻿using System;
+using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions

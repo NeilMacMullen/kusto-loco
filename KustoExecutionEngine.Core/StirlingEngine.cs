@@ -1,4 +1,7 @@
-﻿using Kusto.Language;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Statements;
