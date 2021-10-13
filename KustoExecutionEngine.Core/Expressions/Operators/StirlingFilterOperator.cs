@@ -1,6 +1,6 @@
 ﻿using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Operators
+namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingFilterOperator : StirlingOperator<FilterOperator>
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Expressions;
 
-namespace KustoExecutionEngine.Core.Operators
+namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingSummarizeOperator : StirlingOperator<SummarizeOperator>
     {
