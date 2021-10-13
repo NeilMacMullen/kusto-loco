@@ -12,7 +12,7 @@ namespace KustoExecutionEngine.Core.Expressions
             _inner = StirlingExpression.Build(engine, expression.Expression);
         }
 
-        protected override object EvaluateInternal(object? input)
+        protected override object? EvaluateInternal(object? input)
         {
             return _inner.Evaluate(input);
         }

@@ -13,14 +13,19 @@ namespace KustoExecutionEngine.Core.Expressions
 
         public string Name => ((NameReference)_expression).Name.SimpleName;
 
-        protected override object EvaluateInternal(object? input)
+        protected override object? EvaluateRowInputInternal(IRow row)
         {
             // TODO: This is horrendous
-            if (input is IRow row && row.ToArray().Any(kvp => kvp.Key == Name))
+            if (row.ToArray().Any(kvp => kvp.Key == Name))
             {
                 return row[Name]!;
             }
 
+            return EvaluateNullInputInternal();
+        }
+
+        protected override object? EvaluateNullInputInternal()
+        {
             if (!_engine.ExecutionContext.TryGetBinding(Name, out var value))
             {
                 throw new InvalidOperationException($"Could not find binding for name '{Name}' in current scope.");

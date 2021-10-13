@@ -10,12 +10,5 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             : base(engine, @operator)
         {
         }
-
-        protected sealed override object EvaluateInternal(object? input)
-        {
-            return EvaluateInternal((ITabularSourceV2)input!);
-        }
-
-        protected abstract object EvaluateInternal(ITabularSourceV2 input);
     }
 }

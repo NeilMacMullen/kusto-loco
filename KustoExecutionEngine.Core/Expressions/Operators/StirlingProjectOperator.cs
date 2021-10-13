@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.DataSource;
-using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {
@@ -27,7 +26,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             }
         }
 
-        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
+        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
             var newColumnDefinitions = new List<ColumnDefinition>();
             foreach (var expression in _expressions)

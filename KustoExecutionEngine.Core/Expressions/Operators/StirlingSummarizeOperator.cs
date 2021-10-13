@@ -23,7 +23,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 .ToList();
         }
 
-        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
+        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
             /*
             var dictionary = new Dictionary<int, List<IRow>>();

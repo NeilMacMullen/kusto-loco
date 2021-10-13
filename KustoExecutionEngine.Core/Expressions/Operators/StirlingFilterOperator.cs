@@ -10,22 +10,16 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
         {
         }
 
-        protected override ITabularSourceV2 EvaluateInternal(ITabularSourceV2 input)
+        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
             // TODO implement filter
             return new DerivedTabularSourceV2(
                 input,
                 input.Schema,
-                tableChunk =>
+                chunk =>
                 {
-                    return null;
+                    return chunk;
                 });
-
-            bool SelectThisRow(IRow row)
-            {
-                // TODO: Implement filter
-                return true;
-            }
         }
     }
 }

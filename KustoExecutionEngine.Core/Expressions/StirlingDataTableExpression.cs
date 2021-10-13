@@ -11,7 +11,7 @@ namespace KustoExecutionEngine.Core.Expressions
             throw new NotImplementedException();
         }
 
-        protected override object EvaluateInternal(object? input)
+        protected override object? EvaluateInternal(object? input)
         {
             throw new NotImplementedException();
         }

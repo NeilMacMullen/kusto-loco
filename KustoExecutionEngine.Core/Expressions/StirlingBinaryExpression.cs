@@ -25,7 +25,7 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private sealed class StirlingAddBinaryExpression : StirlingBinaryExpression
         {
-            delegate object AddImpl(object leftVal, object rightVal);
+            delegate object? AddImpl(object? leftVal, object? rightVal);
 
             private readonly StirlingExpression _left;
             private readonly StirlingExpression _right;
@@ -51,15 +51,15 @@ namespace KustoExecutionEngine.Core.Expressions
                 }
             }
 
-            protected override object EvaluateInternal(object? input)
+            protected override object? EvaluateInternal(object? input)
             {
                 var leftVal = _left.Evaluate(input);
                 var rightVal = _right.Evaluate(input);
                 return _impl(leftVal, rightVal);
             }
 
-            static object ImplDouble(object leftVal, object rightVal) => Convert.ToDouble(leftVal) + Convert.ToDouble(rightVal);
-            static object ImplLong(object leftVal, object rightVal) => Convert.ToInt64(leftVal) + Convert.ToInt64(rightVal);
+            static object? ImplDouble(object? leftVal, object? rightVal) => Convert.ToDouble(leftVal) + Convert.ToDouble(rightVal);
+            static object? ImplLong(object? leftVal, object? rightVal) => Convert.ToInt64(leftVal) + Convert.ToInt64(rightVal);
         }
 
         private sealed class StirlingSubtractBinaryExpression : StirlingBinaryExpression

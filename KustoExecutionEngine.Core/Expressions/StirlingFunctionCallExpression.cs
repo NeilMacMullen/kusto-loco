@@ -8,7 +8,7 @@ namespace KustoExecutionEngine.Core.Expressions
 {
     internal class StirlingFunctionCallExpression : StirlingExpression
     {
-        private delegate object Impl(object? input);
+        private delegate object? Impl(object? input);
         private readonly Impl _impl;
 
         private readonly StirlingExpression[] _argumentExpressions;
@@ -49,18 +49,18 @@ namespace KustoExecutionEngine.Core.Expressions
             }
         }
 
-        protected override object EvaluateInternal(object? input)
+        protected override object? EvaluateInternal(object? input)
         {
             return _impl(input);
         }
 
-        private object ToLongImpl(object? input)
+        private object? ToLongImpl(object? input)
         {
             var argValue = _argumentExpressions[0].Evaluate(input);
             return Convert.ToInt64(argValue);
         }
 
-        private object CountImpl(object? input)
+        private object? CountImpl(object? input)
         {
             if (input is not IList<IRow> table)
             {
@@ -70,7 +70,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return table.Count;
         }
 
-        private object SumImpl(object? input)
+        private object? SumImpl(object? input)
         {
             if (input is not IList<IRow> table)
             {

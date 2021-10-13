@@ -1,5 +1,6 @@
 using System;
 using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Expressions.Operators;
 
 namespace KustoExecutionEngine.Core.Expressions
@@ -53,7 +54,31 @@ namespace KustoExecutionEngine.Core.Expressions
         {
         }
 
-        protected abstract object EvaluateInternal(object? input);
+        protected virtual object? EvaluateInternal(object? input)
+        {
+            return input switch
+            {
+                ITabularSourceV2 table => EvaluateTableInputInternal(table),
+                IRow row => EvaluateRowInputInternal(row),
+                null => EvaluateNullInputInternal(),
+                _ => throw new InvalidOperationException($"Unexpected input type to evaluate '{TypeNameHelper.GetTypeDisplayName(input)}'."),
+            };
+        }
+
+        protected virtual object? EvaluateTableInputInternal(ITabularSourceV2 table)
+        {
+            throw new NotImplementedException($"{nameof(EvaluateTableInputInternal)} not implemented for {TypeNameHelper.GetTypeDisplayName(this)}.");
+        }
+
+        protected virtual object? EvaluateRowInputInternal(IRow row)
+        {
+            throw new NotImplementedException($"{nameof(EvaluateRowInputInternal)} not implemented for {TypeNameHelper.GetTypeDisplayName(this)}.");
+        }
+
+        protected virtual object? EvaluateNullInputInternal()
+        {
+            throw new NotImplementedException($"{nameof(EvaluateNullInputInternal)} not implemented for {TypeNameHelper.GetTypeDisplayName(this)}.");
+        }
 
         protected internal static StirlingExpression Build(StirlingEngine engine, Expression expression)
         {

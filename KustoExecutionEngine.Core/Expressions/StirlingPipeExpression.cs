@@ -14,7 +14,7 @@ namespace KustoExecutionEngine.Core.Expressions
             _operator = StirlingExpression.Build(engine, expression.Operator);
         }
 
-        protected override object EvaluateInternal(object? input)
+        protected override object? EvaluateInternal(object? input)
         {
             var leftValue = _leftExpression.Evaluate(input);
             return _operator.Evaluate(leftValue);
