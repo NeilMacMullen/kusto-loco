@@ -8,8 +8,8 @@ using KustoExecutionEngine.Core;
 var query = @"
 let c=10.0;
 MyTable
-| project a+c,b=tolong(a+c)
-| summarize count() by b 
+| project a+c,b,d=tolong(a+c)
+| summarize count() by b
 ";
 
 

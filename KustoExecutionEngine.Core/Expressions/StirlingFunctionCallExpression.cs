@@ -67,7 +67,7 @@ namespace KustoExecutionEngine.Core.Expressions
                 throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
             }
 
-            throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+            return table.Count;
         }
 
         private object SumImpl(object? input)
