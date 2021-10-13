@@ -21,8 +21,7 @@ namespace KustoExecutionEngine.Core.Expressions
             };
         }
 
-        private sealed class StirlingAddBinaryExpression
-            : StirlingBinaryExpression
+        private sealed class StirlingAddBinaryExpression : StirlingBinaryExpression
         {
             StirlingExpression _left;
             StirlingExpression _right;
@@ -43,8 +42,7 @@ namespace KustoExecutionEngine.Core.Expressions
             }
         }
 
-        private sealed class StirlingSubtractBinaryExpression
-            : StirlingBinaryExpression
+        private sealed class StirlingSubtractBinaryExpression : StirlingBinaryExpression
         {
             public StirlingSubtractBinaryExpression(StirlingEngine engine, BinaryExpression expression)
                 : base(engine, expression)
@@ -57,8 +55,7 @@ namespace KustoExecutionEngine.Core.Expressions
             }
         }
 
-        private sealed class StirlingDivideBinaryExpression
-            : StirlingBinaryExpression
+        private sealed class StirlingDivideBinaryExpression : StirlingBinaryExpression
         {
             public StirlingDivideBinaryExpression(StirlingEngine engine, BinaryExpression expression)
                 : base(engine, expression)
@@ -71,8 +68,7 @@ namespace KustoExecutionEngine.Core.Expressions
             }
         }
 
-        private sealed class StirlingMultiplyBinaryExpression
-            : StirlingBinaryExpression
+        private sealed class StirlingMultiplyBinaryExpression : StirlingBinaryExpression
         {
             public StirlingMultiplyBinaryExpression(StirlingEngine engine, BinaryExpression expression)
                 : base(engine, expression)

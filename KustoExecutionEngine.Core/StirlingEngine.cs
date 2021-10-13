@@ -44,18 +44,35 @@ namespace KustoExecutionEngine.Core
 
         internal ExecutionContext ExecutionContext => _executionContexts.Peek();
 
-        public object Evaluate(string query)
+        public object? Evaluate(string query)
         {
             var code = KustoCode.ParseAndAnalyze(query, _globals);
 
-            var firstExpressionStatement = code.Syntax.GetFirstDescendant<ExpressionStatement>();
-            var sterlingStatement = StirlingStatement.Build(this, firstExpressionStatement);
-            return sterlingStatement.Execute();
+            if (code.Syntax is not QueryBlock queryBlock)
+            {
+                throw new InvalidOperationException($"Only QueryBlocks are supported as top level syntax elements, found {TypeNameHelper.GetTypeDisplayName(code.Syntax)}");
+            }
+
+            object? lastResult = null;
+            foreach (var statementEntry in queryBlock.Statements)
+            {
+                var statement = statementEntry.Element;
+                var sterlingStatement = StirlingStatement.Build(this, statement);
+                lastResult = sterlingStatement.Execute();
+            }
+
+            return lastResult;
         }
 
         internal void PushRowContext(IRow row)
         {
             var context = new ExecutionContext(_executionContexts.Peek(), row.ToArray());
+            _executionContexts.Push(context);
+        }
+
+        internal void PushDeclarationsContext(string name, object? value)
+        {
+            var context = new ExecutionContext(_executionContexts.Peek(), new KeyValuePair<string, object?>(name, value));
             _executionContexts.Push(context);
         }
 

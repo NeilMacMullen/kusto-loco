@@ -24,7 +24,7 @@ namespace KustoExecutionEngine.Core.Statements
             _engine = engine;
         }
 
-        public object Execute()
+        public object? Execute()
         {
             if (!_initialized)
             {
@@ -39,12 +39,13 @@ namespace KustoExecutionEngine.Core.Statements
         {
         }
 
-        protected abstract object ExecuteInternal();
+        protected abstract object? ExecuteInternal();
 
         protected internal static StirlingStatement Build(StirlingEngine engine, Statement statement)
         {
             return statement.Kind switch
             {
+                SyntaxKind.LetStatement => new StirlingLetStatement(engine, (LetStatement)statement),
                 SyntaxKind.ExpressionStatement => new StirlingExpressionStatement(engine, (ExpressionStatement)statement),
                 _ => throw new InvalidOperationException($"Unsupported statement type '{statement.Kind}'."),
             };

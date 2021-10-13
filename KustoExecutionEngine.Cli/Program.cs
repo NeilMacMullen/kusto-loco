@@ -2,8 +2,9 @@
 using KustoExecutionEngine.Core;
 
 var query = @"
+let c=10.0;
 MyTable
-| project d=a+a+a+a, a+a
+| project plus10=a+c, mulBy2=a+a
 ";
 
 var playground = new ParserPlayground();

@@ -28,7 +28,7 @@ namespace KustoExecutionEngine.Core.Expressions
             }
 
 #if DEBUG
-            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)}");
+            Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)} ({_expression.ToString(IncludeTrivia.SingleLine)})");
             DebugIndent++;
             try
             {
@@ -61,6 +61,18 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.SubtractExpression or
                 SyntaxKind.MultiplyExpression or
                 SyntaxKind.DivideExpression => StirlingBinaryExpression.Build(engine, (BinaryExpression)expression),
+
+                SyntaxKind.BooleanLiteralExpression or
+                SyntaxKind.IntLiteralExpression or
+                SyntaxKind.LongLiteralExpression or
+                SyntaxKind.RealLiteralExpression or
+                SyntaxKind.DecimalLiteralExpression or
+                SyntaxKind.DateTimeLiteralExpression or
+                SyntaxKind.TimespanLiteralExpression or
+                SyntaxKind.GuidLiteralExpression or
+                SyntaxKind.StringLiteralExpression or
+                SyntaxKind.NullLiteralExpression or
+                SyntaxKind.LongLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
 
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };

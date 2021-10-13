@@ -13,7 +13,7 @@ namespace KustoExecutionEngine.Core.Statements
             _expression = StirlingExpression.Build(engine, statement.Expression);
         }
 
-        protected override object ExecuteInternal()
+        protected override object? ExecuteInternal()
         {
             return _expression.Evaluate();
         }
