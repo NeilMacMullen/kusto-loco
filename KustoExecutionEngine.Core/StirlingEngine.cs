@@ -44,9 +44,9 @@ namespace KustoExecutionEngine.Core
             _executionContexts.Push(new ExecutionContext(null, globalObjects));
 
             var code = KustoCode.ParseAndAnalyze(query, globals);
+            DumpTree(code);
 
             var diagnostics = code.GetDiagnostics();
-
             if (diagnostics.Count > 0)
             {
                 foreach (var diag in diagnostics)
@@ -71,6 +71,26 @@ namespace KustoExecutionEngine.Core
             }
 
             return lastResult;
+
+            static void DumpTree(KustoCode code)
+            {
+                int indent = 0;
+                SyntaxElement.WalkNodes(
+                    code.Syntax,
+                    fnBefore: node =>
+                    {
+                        Console.Write(new string(' ', indent));
+                        Console.WriteLine($"{node.Kind} ({TypeNameHelper.GetTypeDisplayName(node.GetType())}): {node.ToString(IncludeTrivia.SingleLine)}");
+                        indent++;
+                    },
+                    fnAfter: node =>
+                    {
+                        indent--;
+                    });
+
+                Console.WriteLine();
+                Console.WriteLine();
+            }
         }
 
         internal void PushRowContext(IRow row)
