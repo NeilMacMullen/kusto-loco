@@ -75,6 +75,8 @@ namespace KustoExecutionEngine.Core.Expressions
 
                 SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
+                SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
+
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };
         }
