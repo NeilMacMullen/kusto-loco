@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions
@@ -14,7 +15,11 @@ namespace KustoExecutionEngine.Core.Expressions
 
         protected override object EvaluateInternal(object? input)
         {
-            // TODO: This should do something different when `input` is provided!
+            // TODO: This is horrendous
+            if (input is IRow row && row.ToArray().Any(kvp => kvp.Key == Name))
+            {
+                return row[Name]!;
+            }
 
             if (!_engine.ExecutionContext.TryGetBinding(Name, out var value))
             {
