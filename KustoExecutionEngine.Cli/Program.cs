@@ -8,7 +8,8 @@ using KustoExecutionEngine.Core;
 var query = @"
 let c=10.0;
 MyTable
-| project Column1=1,tolong(a+c)
+| project a+c,b=tolong(a+c)
+| summarize count() by b 
 ";
 
 
@@ -28,7 +29,7 @@ engine.AddGlobalTable(
             new[]
             {
                 new KeyValuePair<string, object?>("a", 1.5),
-                new KeyValuePair<string, object?>("b", 2.5),
+                new KeyValuePair<string, object?>("b", 2.0),
             }),
     });
 var result = engine.Evaluate(query);
