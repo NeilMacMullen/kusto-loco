@@ -1,4 +1,6 @@
-﻿namespace KustoExecutionEngine.Core
+﻿using System;
+
+namespace KustoExecutionEngine.Core
 {
     internal class DerivedTabularSource : ITabularSource
     {

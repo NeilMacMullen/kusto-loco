@@ -1,4 +1,5 @@
-﻿using Kusto.Language.Syntax;
+﻿using System.Collections.Generic;
+using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Operators

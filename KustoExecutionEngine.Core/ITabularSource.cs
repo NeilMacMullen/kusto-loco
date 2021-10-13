@@ -1,4 +1,6 @@
-﻿namespace KustoExecutionEngine.Core
+﻿using System.Collections.Generic;
+
+namespace KustoExecutionEngine.Core
 {
     public interface ITabularSource
     {

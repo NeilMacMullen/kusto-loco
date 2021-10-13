@@ -1,4 +1,5 @@
-﻿using Kusto.Language.Syntax;
+﻿using System;
+using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Statements
 {
