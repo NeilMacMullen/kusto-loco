@@ -30,6 +30,11 @@ namespace KustoExecutionEngine.Core.Expressions
                 CheckExpectedArgumentsCount(0);
                 _impl = CountImpl;
             }
+            else if (ReferenceEquals(expression.ReferencedSymbol, Aggregates.Sum))
+            {
+                CheckExpectedArgumentsCount(1);
+                _impl = SumImpl;
+            }
             else
             {
                 throw new InvalidOperationException($"Unsupported function {expression}.");
@@ -57,10 +62,26 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private object CountImpl(object? input)
         {
-            if (input is IList<IRow> table)
+            if (input is not IList<IRow> table)
             {
-                return table.Count;
+                throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
             }
+
+            throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+        }
+
+        private object SumImpl(object? input)
+        {
+            if (input is not IList<IRow> table)
+            {
+                throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+            }
+
+            // TODO: Implement sum
+            //return table.Select(r => _argumentExpressions[0].Evaluate(r)).Aggregate((x, y) =>
+            //    StirlingBinaryExpression.StirlingAddBinaryExpression.GetDecimalResultTypeImpl(_expressionResultType)
+            //        .Invoke(x, y));
+            return 0.0;
 
             throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
         }
