@@ -1,4 +1,5 @@
-﻿using Kusto.Language.Syntax;
+﻿using Kusto.Language.Symbols;
+using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
@@ -23,23 +24,41 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private sealed class StirlingAddBinaryExpression : StirlingBinaryExpression
         {
-            StirlingExpression _left;
-            StirlingExpression _right;
+            delegate object AddImpl(object leftVal, object rightVal);
+
+            private readonly StirlingExpression _left;
+            private readonly StirlingExpression _right;
+            private readonly AddImpl _impl;
 
             public StirlingAddBinaryExpression(StirlingEngine engine, BinaryExpression expression)
                 : base(engine, expression)
             {
                 _left = StirlingExpression.Build(engine, expression.Left);
                 _right = StirlingExpression.Build(engine, expression.Right);
+
+                if (ReferenceEquals(expression.ResultType, ScalarTypes.Real))
+                {
+                    _impl = ImplDouble;
+                }
+                else if (ReferenceEquals(expression.ResultType, ScalarTypes.Long))
+                {
+                    _impl = ImplLong;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unsupported return type {expression.ResultType}.");
+                }
             }
 
             protected override object EvaluateInternal()
             {
-                var a = _left.Evaluate();
-                var b = _right.Evaluate();
-
-                return (double)a + (double)b;
+                var leftVal = _left.Evaluate();
+                var rightVal = _right.Evaluate();
+                return _impl(leftVal, rightVal);
             }
+
+            static object ImplDouble(object leftVal, object rightVal) => Convert.ToDouble(leftVal) + Convert.ToDouble(rightVal);
+            static object ImplLong(object leftVal, object rightVal) => Convert.ToInt64(leftVal) + Convert.ToInt64(rightVal);
         }
 
         private sealed class StirlingSubtractBinaryExpression : StirlingBinaryExpression
