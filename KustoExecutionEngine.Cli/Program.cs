@@ -7,10 +7,6 @@ MyTable
 | project plus10=a+c, mulBy2=a+a
 ";
 
-var playground = new ParserPlayground();
-
-playground.DumpTree(query);
-
 
 var engine = new StirlingEngine();
 engine.AddGlobalTable(
