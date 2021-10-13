@@ -31,7 +31,7 @@ namespace KustoExecutionEngine.Core
                 _globalTables.Select(
                     tableDef => new TableSymbol(
                         tableDef.TableName,
-                        "(", string.Join(",", tableDef.ColumnNames.Select(c => $"{c}: real")))
+                        "(" + string.Join(",", tableDef.ColumnNames.Select(c => $"{c}: real")) + ")")
                 ).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
@@ -44,6 +44,18 @@ namespace KustoExecutionEngine.Core
             _executionContexts.Push(new ExecutionContext(null, globalObjects));
 
             var code = KustoCode.ParseAndAnalyze(query, globals);
+
+            var diagnostics = code.GetDiagnostics();
+
+            if (diagnostics.Count > 0)
+            {
+                foreach (var diag in diagnostics)
+                {
+                    Console.WriteLine($"Kusto diagnostics: {diag}");
+                }
+
+                throw new InvalidOperationException("Query is malformed.");
+            }
 
             if (code.Syntax is not QueryBlock queryBlock)
             {

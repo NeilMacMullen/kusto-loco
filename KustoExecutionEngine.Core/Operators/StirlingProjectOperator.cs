@@ -10,38 +10,16 @@ namespace KustoExecutionEngine.Core.Operators
         public StirlingProjectOperator(StirlingEngine engine, ProjectOperator projectOperator)
             : base(engine, projectOperator)
         {
-            var usedColumnNames = new HashSet<string>();
-            _expressions = new List<(string ColumnName, StirlingExpression Expression)>(projectOperator.Expressions.Count);
-            int generatedColumns = 0;
-            foreach (var expression in projectOperator.Expressions)
+            var resultType = projectOperator.ResultType;
+            var expressions = projectOperator.Expressions;
+
+            _expressions = new List<(string ColumnName, StirlingExpression Expression)>(expressions.Count);
+            for (int i = 0; i < expressions.Count; i++)
             {
+                var expression = expressions[i];
+                var columnName = resultType.Members[i].Name;
+
                 var builtExpression = StirlingExpression.Build(engine, expression.Element);
-
-                string? columnName = null;
-                if (builtExpression is StirlingNameReferenceExpression nameReferenceExpression)
-                {
-                    columnName = nameReferenceExpression.Name;
-                }
-                else if (builtExpression is StirlingSimpleNamedExpression simpleNamedExpression)
-                {
-                    columnName = simpleNamedExpression.Name;
-                }
-                else
-                {
-                    columnName = $"Column{++generatedColumns}";
-                }
-
-                if (!usedColumnNames.Add(columnName))
-                {
-                    int suffix = 1;
-                    string attempt;
-                    do
-                    {
-                        attempt = $"{columnName}{suffix++}";
-                    } while (!usedColumnNames.Add(attempt));
-                    columnName = attempt;
-                }
-
                 _expressions.Add((columnName, builtExpression));
             }
         }
