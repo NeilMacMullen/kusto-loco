@@ -1,4 +1,5 @@
 ﻿using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.Expressions.Operators;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
@@ -80,6 +81,11 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
                 SyntaxKind.DataTableExpression => new StirlingDataTableExpressions(engine, (DataTableExpression)expression),
+
+                SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)expression),
+                SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)expression),
+                SyntaxKind.ProjectOperator => new StirlingProjectOperator(engine, (ProjectOperator)expression),
+                SyntaxKind.JoinOperator => new StirlingJoinOperator(engine, (JoinOperator)expression),
 
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };

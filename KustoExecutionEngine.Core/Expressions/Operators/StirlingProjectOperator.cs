@@ -1,7 +1,7 @@
 ﻿using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.Expressions;
 
-namespace KustoExecutionEngine.Core.Operators
+namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingProjectOperator : StirlingOperator<ProjectOperator>
     {
