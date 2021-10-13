@@ -8,45 +8,42 @@ namespace KustoExecutionEngine.Core
 {
     public class StirlingEngine
     {
-        private readonly GlobalState _globals;
         private readonly Stack<ExecutionContext> _executionContexts;
 
         public StirlingEngine()
         {
-            var db = new DatabaseSymbol(
-                    "MyDb",
-                    new[]
-                    {
-                        new TableSymbol("MyTable", "(a: real, b: real)"),
-                    });
-            _globals = GlobalState.Default.WithDatabase(db);
-
             _executionContexts = new Stack<ExecutionContext>();
+        }
 
-            var myTable = new InMemoryTabularSource(
-                new[]
-                {
-                    new Row(
-                        new[]
-                        {
-                            new KeyValuePair<string, object?>("a", 1.0),
-                            new KeyValuePair<string, object?>("b", 2.0),
-                        }),
-                    new Row(
-                        new[]
-                        {
-                            new KeyValuePair<string, object?>("a", 1.5),
-                            new KeyValuePair<string, object?>("b", 2.5),
-                        }),
-                });
-            _executionContexts.Push(new ExecutionContext(null, new KeyValuePair<string, object?>("MyTable", myTable)));
+        private List<(string TableName, IEnumerable<string> ColumnNames, IEnumerable<IRow> Rows)> _globalTables = new();
+        public void AddGlobalTable(string tableName, IEnumerable<string> columnNames, IEnumerable<IRow> rows)
+        {
+            _globalTables.Add((tableName, columnNames, rows));
         }
 
         internal ExecutionContext ExecutionContext => _executionContexts.Peek();
 
         public object? Evaluate(string query)
         {
-            var code = KustoCode.ParseAndAnalyze(query, _globals);
+            // TODO: davidni: Set up global state somehwere proper where it would be done just once
+            var db = new DatabaseSymbol(
+                "MyDb",
+                _globalTables.Select(
+                    tableDef => new TableSymbol(
+                        tableDef.TableName,
+                        "(", string.Join(",", tableDef.ColumnNames.Select(c => $"{c}: real")))
+                ).ToArray());
+            GlobalState globals = GlobalState.Default.WithDatabase(db);
+
+            var globalObjects = _globalTables
+                .Select(globalTable =>
+                    new KeyValuePair<string, object?>(
+                        globalTable.TableName,
+                        new InMemoryTabularSource(globalTable.Rows.ToArray())))
+                .ToArray();
+            _executionContexts.Push(new ExecutionContext(null, globalObjects));
+
+            var code = KustoCode.ParseAndAnalyze(query, globals);
 
             if (code.Syntax is not QueryBlock queryBlock)
             {

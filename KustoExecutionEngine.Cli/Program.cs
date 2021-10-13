@@ -13,6 +13,24 @@ playground.DumpTree(query);
 
 
 var engine = new StirlingEngine();
+engine.AddGlobalTable(
+    "MyTable",
+    new[] { "a", "b" },
+    new[]
+    {
+        new Row(
+            new[]
+            {
+                new KeyValuePair<string, object?>("a", 1.0),
+                new KeyValuePair<string, object?>("b", 2.0),
+            }),
+        new Row(
+            new[]
+            {
+                new KeyValuePair<string, object?>("a", 1.5),
+                new KeyValuePair<string, object?>("b", 2.5),
+            }),
+    });
 var result = engine.Evaluate(query);
 if (result is ITabularSource tabularResult)
 {
