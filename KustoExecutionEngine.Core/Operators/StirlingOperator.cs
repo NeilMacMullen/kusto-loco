@@ -28,7 +28,7 @@ namespace KustoExecutionEngine.Core.Operators
             _engine = engine;
         }
 
-        public ITabularSource Evaluate(ITabularSource input)
+        public ITabularSource Evaluate(object? input)
         {
             if (!_initialized)
             {
@@ -42,7 +42,8 @@ namespace KustoExecutionEngine.Core.Operators
             try
             {
 #endif
-                return EvaluateInternal(input);
+                // TODO: Shouldn't be casting here!
+                return EvaluateInternal((ITabularSource)input!);
 #if DEBUG
             }
             finally

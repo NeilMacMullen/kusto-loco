@@ -30,13 +30,15 @@ namespace KustoExecutionEngine.Core.Operators
                 input,
                 row =>
                 {
+                    // TODO: Shouldn't push context here, this would be passed as an arg to Evaluate below.
                     _engine.PushRowContext(row);
                     try
                     {
                         var values = new List<KeyValuePair<string, object?>>(_expressions.Count);
                         foreach (var expression in _expressions)
                         {
-                            var value = expression.Expression.Evaluate();
+                            // TODO: Shouldn't pass the row here, instead should pass the table or a chunk of it...
+                            var value = expression.Expression.Evaluate(row);
                             values.Add(new KeyValuePair<string, object?>(expression.ColumnName, value));
                         }
                         return new Row(values);

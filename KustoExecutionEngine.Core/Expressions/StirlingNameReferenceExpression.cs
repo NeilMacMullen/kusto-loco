@@ -11,8 +11,10 @@ namespace KustoExecutionEngine.Core.Expressions
 
         public string Name => ((NameReference)_expression).Name.SimpleName;
 
-        protected override object EvaluateInternal()
+        protected override object EvaluateInternal(object? input)
         {
+            // TODO: This should do something different when `input` is provided!
+
             if (!_engine.ExecutionContext.TryGetBinding(Name, out var value))
             {
                 throw new InvalidOperationException($"Could not find binding for name '{Name}' in current scope.");

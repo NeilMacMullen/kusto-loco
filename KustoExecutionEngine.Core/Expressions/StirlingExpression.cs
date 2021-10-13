@@ -19,7 +19,11 @@ namespace KustoExecutionEngine.Core.Expressions
             _expression = expression;
         }
 
-        public object Evaluate()
+        /// <summary>
+        /// Evaluates the expression.
+        /// <paramref name="input"/> can be null, a scalar or an <see cref="ITabularSource"/>.
+        /// </summary>
+        public object Evaluate(object? input)
         {
             if (!_initialized)
             {
@@ -33,7 +37,7 @@ namespace KustoExecutionEngine.Core.Expressions
             try
             {
 #endif
-                return EvaluateInternal();
+                return EvaluateInternal(input);
 #if DEBUG
             }
             finally
@@ -47,7 +51,7 @@ namespace KustoExecutionEngine.Core.Expressions
         {
         }
 
-        protected abstract object EvaluateInternal();
+        protected abstract object EvaluateInternal(object? input);
 
         protected internal static StirlingExpression Build(StirlingEngine engine, Expression expression)
         {

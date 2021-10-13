@@ -15,7 +15,8 @@ namespace KustoExecutionEngine.Core.Statements
 
         protected override object? ExecuteInternal()
         {
-            return _expression.Evaluate();
+            // TODO: Shouldn't be hardcoding `null` below
+            return _expression.Evaluate(null);
         }
     }
 }

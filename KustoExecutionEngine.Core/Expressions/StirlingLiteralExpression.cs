@@ -38,7 +38,7 @@ namespace KustoExecutionEngine.Core.Expressions
                 _value = expression.LiteralValue;
             }
 
-            protected override object EvaluateInternal()
+            protected override object EvaluateInternal(object? input)
             {
                 return _value;
             }

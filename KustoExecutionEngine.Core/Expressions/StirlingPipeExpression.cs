@@ -15,15 +15,10 @@ namespace KustoExecutionEngine.Core.Expressions
             _operator = StirlingOperator.Build(engine, expression.Operator);
         }
 
-        protected override object EvaluateInternal()
+        protected override object EvaluateInternal(object? input)
         {
-            var input = _leftExpression.Evaluate();
-            if (input is not ITabularSource tabularSource)
-            {
-                throw new InvalidOperationException($"Pipe expression expects left side to produce tabular data.");
-            }
-
-            return _operator.Evaluate(tabularSource);
+            var leftValue = _leftExpression.Evaluate(input);
+            return _operator.Evaluate(leftValue);
         }
     }
 }

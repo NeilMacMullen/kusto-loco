@@ -16,9 +16,9 @@ namespace KustoExecutionEngine.Core.Expressions
 
         public string Name => _name;
 
-        protected override object EvaluateInternal()
+        protected override object EvaluateInternal(object? input)
         {
-            return _rightExpression.Evaluate();
+            return _rightExpression.Evaluate(input);
         }
     }
 }

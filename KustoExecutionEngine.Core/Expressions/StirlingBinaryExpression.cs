@@ -50,10 +50,10 @@ namespace KustoExecutionEngine.Core.Expressions
                 }
             }
 
-            protected override object EvaluateInternal()
+            protected override object EvaluateInternal(object? input)
             {
-                var leftVal = _left.Evaluate();
-                var rightVal = _right.Evaluate();
+                var leftVal = _left.Evaluate(input);
+                var rightVal = _right.Evaluate(input);
                 return _impl(leftVal, rightVal);
             }
 
@@ -68,7 +68,7 @@ namespace KustoExecutionEngine.Core.Expressions
             {
             }
 
-            protected override object EvaluateInternal()
+            protected override object EvaluateInternal(object? input)
             {
                 throw new NotImplementedException();
             }
@@ -81,7 +81,7 @@ namespace KustoExecutionEngine.Core.Expressions
             {
             }
 
-            protected override object EvaluateInternal()
+            protected override object EvaluateInternal(object? input)
             {
                 throw new NotImplementedException();
             }
@@ -94,7 +94,7 @@ namespace KustoExecutionEngine.Core.Expressions
             {
             }
 
-            protected override object EvaluateInternal()
+            protected override object EvaluateInternal(object? input)
             {
                 throw new NotImplementedException();
             }
