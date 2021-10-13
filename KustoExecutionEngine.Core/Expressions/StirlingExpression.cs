@@ -71,8 +71,9 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.TimespanLiteralExpression or
                 SyntaxKind.GuidLiteralExpression or
                 SyntaxKind.StringLiteralExpression or
-                SyntaxKind.NullLiteralExpression or
-                SyntaxKind.LongLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
+                SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
+
+                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };

@@ -4,7 +4,7 @@ using KustoExecutionEngine.Core;
 var query = @"
 let c=10.0;
 MyTable
-| project Column1=1,a + c
+| project Column1=1,(a+c)
 ";
 
 
