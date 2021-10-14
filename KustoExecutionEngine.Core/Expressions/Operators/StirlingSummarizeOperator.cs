@@ -88,7 +88,6 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 var resultsData = new object?[_byExpressions.Count + _aggregationExpressions.Count][];
                 for (int i = 0; i < resultsData.Length; i++)
                 {
-                    var a = resultsData[i];
                     resultsData[i] = new object?[bucketizedTables.Count];
                 }
 

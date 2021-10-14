@@ -28,6 +28,14 @@ namespace KustoExecutionEngine.Core.Expressions
             Divide = (left, right) => Convert.ToInt32(left) / Convert.ToInt32(right),
         };
 
+        private static BasicOperands BoolOperands = new BasicOperands
+        {
+            Equal = (left, right) =>
+            {
+                return Convert.ToString(left) == Convert.ToString(right);
+            },
+        };
+
         internal static BasicOperands GetOperandsByResultType(KustoValueKind kind)
         {
             return kind switch
@@ -35,6 +43,7 @@ namespace KustoExecutionEngine.Core.Expressions
                 KustoValueKind.Real => DoubleOperands,
                 KustoValueKind.Long => LongOperands,
                 KustoValueKind.Int => IntOperands,
+                KustoValueKind.Bool => BoolOperands,
                 _ => throw new InvalidOperationException($"Math operators not supported for type {kind}.")
             };
         }
@@ -47,6 +56,7 @@ namespace KustoExecutionEngine.Core.Expressions
             internal Impl Subtract;
             internal Impl Multiply;
             internal Impl Divide;
+            internal Impl Equal;
         }
     }
 }

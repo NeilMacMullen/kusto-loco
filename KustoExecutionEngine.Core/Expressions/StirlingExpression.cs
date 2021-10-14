@@ -92,7 +92,8 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.AddExpression or
                 SyntaxKind.SubtractExpression or
                 SyntaxKind.MultiplyExpression or
-                SyntaxKind.DivideExpression => new StirlingBinaryExpression(engine, (BinaryExpression)expression),
+                SyntaxKind.DivideExpression or
+                SyntaxKind.EqualExpression => new StirlingBinaryExpression(engine, (BinaryExpression)expression),
 
                 SyntaxKind.BooleanLiteralExpression or
                 SyntaxKind.IntLiteralExpression or
