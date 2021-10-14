@@ -1,30 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Kusto.Language;
-using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
     internal class StirlingFunctionCallExpression : StirlingExpression
     {
-        private delegate object? RowFunctionImpl(StirlingExpression[] argumentExpressions, IRow row);
-        private static readonly Dictionary<Symbol, RowFunctionImpl> RowFunctionsMap = new()
-        {
-            [Functions.ToLong] = ToLongImpl,
-        };
-
-        private delegate object? AggregationFunctionImpl(StirlingExpression[] argumentExpressions, ITableSource table);
-        private static readonly Dictionary<Symbol, AggregationFunctionImpl> AggregationFunctionsMap = new()
-        {
-            [Aggregates.Count] = CountImpl,
-            [Aggregates.Sum] = SumImpl,
-            [Aggregates.Avg] = AvgImpl,
-        };
-
-        private readonly RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
-        private readonly AggregationFunctionImpl _aggImpl = (_, _) => throw new NotSupportedException();
+        private readonly IntrinsicRowFunctions.RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
+        private readonly IntrinsicAggregationFunctions.AggregationFunctionImpl _aggImpl = (_, _) => throw new NotSupportedException();
 
         private readonly StirlingExpression[] _argumentExpressions;
 
@@ -35,11 +18,11 @@ namespace KustoExecutionEngine.Core.Expressions
                 .Select(e => StirlingExpression.Build(engine, e.Element))
                 .ToArray();
 
-            if (RowFunctionsMap.TryGetValue(expression.ReferencedSymbol, out var rowImpl))
+            if (IntrinsicRowFunctions.TryGetImpl(expression.ReferencedSymbol, out var rowImpl))
             {
                 _rowImpl = rowImpl;
             }
-            else if (AggregationFunctionsMap.TryGetValue(expression.ReferencedSymbol, out var aggImpl))
+            else if (IntrinsicAggregationFunctions.TryGetImpl(expression.ReferencedSymbol, out var aggImpl))
             {
                 _aggImpl = aggImpl;
             }
@@ -58,57 +41,6 @@ namespace KustoExecutionEngine.Core.Expressions
         protected override object? EvaluateTableInputInternal(ITableSource table)
         {
             return _aggImpl(_argumentExpressions, table);
-        }
-
-        private static object? ToLongImpl(StirlingExpression[] argumentExpressions, object? input)
-        {
-            var argValue = argumentExpressions[0].Evaluate(input);
-            return Convert.ToInt64(argValue);
-        }
-
-        private static object? CountImpl(StirlingExpression[] argumentExpressions, ITableSource table)
-        {
-            long count = 0;
-            foreach (var chunk in table.GetData())
-            {
-                count += chunk.RowCount;
-            }
-
-            return count;
-        }
-
-        private static object? SumImpl(StirlingExpression[] argumentExpressions, ITableSource table)
-        {
-            double sum = 0;
-            foreach (var chunk in table.GetData())
-            {
-                for (int i = 0; i < chunk.RowCount; i++)
-                {
-                    var row = chunk.GetRow(i);
-                    var value = argumentExpressions[0].Evaluate(row);
-                    sum += Convert.ToDouble(value);
-                }
-            }
-
-            return sum;
-        }
-
-        private static object? AvgImpl(StirlingExpression[] argumentExpressions, ITableSource table)
-        {
-            double sum = 0;
-            long count = 0;
-            foreach (var chunk in table.GetData())
-            {
-                count += chunk.RowCount;
-                for (int i = 0; i < chunk.RowCount; i++)
-                {
-                    var row = chunk.GetRow(i);
-                    var value = argumentExpressions[0].Evaluate(row);
-                    sum += Convert.ToDouble(value);
-                }
-            }
-
-            return sum / count;
         }
     }
 }
