@@ -1,0 +1,115 @@
+﻿@page "/file-upload"
+@using System
+@using System.IO
+@using BabyKusto.Core
+@using BabyKusto.Core.Extensions
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@inject ILogger<FileUpload> Logger
+@inject IWebHostEnvironment Environment
+@using BabyKusto.BlazorApp.Data
+@inject FileProcessor fileProcessor
+
+<p>
+    <label>Please upload your file with your query:</label>
+</p>
+
+<p>
+    <label>
+        KQL query:
+        <input type="textbox" @bind="CurrentQueryValue" />
+
+        <InputFile @onclick="GetValue" OnChange="@LoadFiles" />
+    </label>
+</p>
+
+
+@if (isLoading)
+{
+    <p>Uploading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var resultData in resultToDisplay)
+        {
+            <li>
+                <ul>
+                    <li>@resultData</li>
+                </ul>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<string> resultToDisplay = new List<string>();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    private string CurrentQueryValue { get; set; }
+
+    private string QueryValue { get; set; }
+
+    private void GetValue()
+
+    {
+        QueryValue = CurrentQueryValue;
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        resultToDisplay.Clear();
+
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var trustedFileNameForFileStorage = file.Name;
+
+                var fileDirectory = Path.Combine(Environment.ContentRootPath,
+                                        Environment.EnvironmentName);
+
+                CreateDirectory(fileDirectory);
+
+                var uploadFileDirectory = Path.Combine(fileDirectory, "Uploaded Files");
+
+                CreateDirectory(uploadFileDirectory);
+
+                var uploadFilePath = Path.Combine(uploadFileDirectory, trustedFileNameForFileStorage);
+
+                // Store file at the upload file location
+                await using FileStream fs = new(uploadFilePath, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                fs.Close();
+
+                resultToDisplay.Add("Your uploaded file has been stored: " + uploadFilePath);
+
+                var result = fileProcessor.fileProcessor(trustedFileNameForFileStorage.Split('.')[0], uploadFilePath, QueryValue);
+
+                if (result is ITableSource tableResult)
+                {
+                    resultToDisplay.Add("Query result: " + tableResult.DumpToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("File: {Filename} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private void CreateDirectory(string fileDirectory)
+    {
+        if (!Directory.Exists(fileDirectory))
+        {
+            Directory.CreateDirectory(fileDirectory);
+        }
+    }
+
+}
