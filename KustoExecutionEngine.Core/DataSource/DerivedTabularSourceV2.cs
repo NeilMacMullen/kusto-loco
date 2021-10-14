@@ -22,9 +22,9 @@ namespace KustoExecutionEngine.Core.DataSource
 
         public TableSchema Schema => this._newSchema;
 
-        public IEnumerator<ITableChunk> GetEnumerator()
+        public IEnumerable<ITableChunk> GetData()
         {
-            foreach (var chunk in this._source)
+            foreach (var chunk in this._source.GetData())
             {
                 var newChunk = _mapFn(chunk);
                 if (newChunk != null)
@@ -32,11 +32,6 @@ namespace KustoExecutionEngine.Core.DataSource
                     yield return newChunk;
                 }
             }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
         }
     }
 }

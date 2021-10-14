@@ -28,7 +28,7 @@ engine.AddGlobalTable("MyTable", tableSchema, tableChunk);
 var result = engine.Evaluate(query);
 if (result is ITabularSourceV2 tabularResult)
 {
-    foreach (var resultChunk in tabularResult)
+    foreach (var resultChunk in tabularResult.GetData())
     {
         for (int i = 0; i < resultChunk.Columns[0].Size; i++)
         {

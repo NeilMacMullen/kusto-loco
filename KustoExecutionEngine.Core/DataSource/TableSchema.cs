@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace KustoExecutionEngine.Core.DataSource
 {
     public class TableSchema
     {
+        public static readonly TableSchema Empty = new TableSchema(new List<ColumnDefinition>());
+
         public TableSchema(List<ColumnDefinition> columnDefinitions)
         {
             this.ColumnDefinitions = columnDefinitions;

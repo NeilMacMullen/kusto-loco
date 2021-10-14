@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace KustoExecutionEngine.Core.DataSource
 {
-    public interface ITabularSourceV2 : IEnumerable<ITableChunk>
+    public interface ITabularSourceV2
     {
         TableSchema Schema { get; }
+
+        IEnumerable<ITableChunk> GetData();
     }
 }

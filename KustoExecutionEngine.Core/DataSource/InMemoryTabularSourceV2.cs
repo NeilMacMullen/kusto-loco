@@ -19,17 +19,6 @@ namespace KustoExecutionEngine.Core.DataSource
 
         public TableSchema Schema { get; private set; }
 
-        public IEnumerator<ITableChunk> GetEnumerator()
-        {
-            foreach (var chunk in this._data)
-            {
-                yield return chunk;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        public IEnumerable<ITableChunk> GetData() => _data;
     }
 }

@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace KustoExecutionEngine.Core.DataSource
 {
     internal class EmptyTabularSourceV2 : ITabularSourceV2
     {
-        public TableSchema Schema => throw new NotImplementedException();
+        public TableSchema Schema => TableSchema.Empty;
 
-        public IEnumerator<ITableChunk> GetEnumerator()
-        {
-            yield break;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        public IEnumerable<ITableChunk> GetData() => Enumerable.Empty<ITableChunk>();
     }
 }

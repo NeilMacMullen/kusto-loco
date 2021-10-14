@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.DataSource;
-using KustoExecutionEngine.Core.Expressions;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {
@@ -25,6 +24,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 
         protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
+            return new SummarizeResultTable(input);
             /*
             var dictionary = new Dictionary<int, List<IRow>>();
             IRow? nextRow = input.GetNextRow();
@@ -61,12 +61,31 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 
             return new InMemoryTabularSource(summarizedTable.ToArray());
             */
-            return new EmptyTabularSourceV2();
         }
 
         private static int GetListHashCode(IEnumerable<object?> objects)
         {
             return objects.Aggregate(0, (x, y) => x.GetHashCode() ^ y?.GetHashCode() ?? 0);
+        }
+
+        internal class SummarizeResultTable : ITabularSourceV2
+        {
+            private readonly ITabularSourceV2 _input;
+
+            public SummarizeResultTable(ITabularSourceV2 input)
+            {
+                this._input = input;
+            }
+
+            public TableSchema Schema => throw new NotImplementedException();
+
+            public IEnumerable<ITableChunk> GetData()
+            {
+                foreach (var chunk in _input.GetData())
+                {
+                    yield return chunk;
+                }
+            }
         }
     }
 }
