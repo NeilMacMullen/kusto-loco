@@ -6,12 +6,12 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingFilterOperator : StirlingOperator<FilterOperator>
     {
-        private readonly StirlingExpression conditionExpression;
+        private readonly StirlingExpression _conditionExpression;
 
         public StirlingFilterOperator(StirlingEngine engine, FilterOperator expression)
             : base(engine, expression)
         {
-            this.conditionExpression = StirlingExpression.Build(engine, expression.Condition);
+            _conditionExpression = StirlingExpression.Build(engine, expression.Condition);
         }
 
         protected override ITableSource EvaluateTableInputInternal(ITableSource input)
@@ -21,31 +21,28 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 input.Schema,
                 chunk =>
                 {
-                    var filterResult = new List<IRow?>();
-                    for(int i = 0; i < chunk.RowCount; i++)
+                    int numColumns = input.Schema.ColumnDefinitions.Count;
+                    var resultsData = new List<object?>[numColumns];
+                    for (int i = 0; i < numColumns; i++)
+                    {
+                        resultsData[i] = new List<object?>();
+                    }
+
+                    for (int i = 0; i < chunk.RowCount; i++)
                     {
                         var row = chunk.GetRow(i);
-                        if ((bool)this.conditionExpression.Evaluate(row))
+
+                        // TODO: Should we throw if `_conditionExpression` evaluates to a different data type?
+                        if (_conditionExpression.Evaluate(row) is bool boolResult && boolResult)
                         {
-                            filterResult.Add(row);
+                            for (int j = 0; j < numColumns; j++)
+                            {
+                                resultsData[j].Add(row.Values[j]);
+                            }
                         }
                     }
 
-                    var resultsData = new object?[input.Schema.ColumnDefinitions.Count][];
-                    for (int i = 0; i < resultsData.Length; i++)
-                    {
-                        resultsData[i] = new object?[filterResult.Count];
-                    }
-
-                    for (int i = 0; i < filterResult.Count; i++)
-                    {
-                        for (int j = 0; j < filterResult[i].Values.Length; j++)
-                        {
-                            resultsData[j][i] = filterResult[i].Values[j];
-                        }
-                    }
-
-                    return new TableChunk(input.Schema, resultsData.Select(c => new Column(c)).ToArray());
+                    return new TableChunk(input.Schema, resultsData.Select(c => new Column(c.ToArray())).ToArray());
                 });
         }
     }
