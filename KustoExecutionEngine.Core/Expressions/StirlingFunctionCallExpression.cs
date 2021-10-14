@@ -2,14 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language;
+using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core.Expressions
 {
     internal class StirlingFunctionCallExpression : StirlingExpression
     {
-        private delegate object? Impl(object? input);
-        private readonly Impl _impl;
+        private delegate object? RowFunctionImpl(StirlingExpression[] argumentExpressions, IRow row);
+        private static readonly Dictionary<Symbol, RowFunctionImpl> RowFunctionsMap = new()
+        {
+            [Functions.ToLong] = ToLongImpl,
+        };
+
+        private delegate object? AggregationFunctionImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table);
+        private static readonly Dictionary<Symbol, AggregationFunctionImpl> AggregationFunctionsMap = new()
+        {
+            [Aggregates.Count] = CountImpl,
+            //[Aggregates.Sum] = SumImpl,
+        };
+
+        private readonly RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
+        private readonly AggregationFunctionImpl _aggImpl = (_, _) => throw new NotSupportedException();
 
         private readonly StirlingExpression[] _argumentExpressions;
 
@@ -20,54 +35,44 @@ namespace KustoExecutionEngine.Core.Expressions
                 .Select(e => StirlingExpression.Build(engine, e.Element))
                 .ToArray();
 
-            if (ReferenceEquals(expression.ReferencedSymbol, Functions.ToLong))
+            if (RowFunctionsMap.TryGetValue(expression.ReferencedSymbol, out var rowImpl))
             {
-                CheckExpectedArgumentsCount(1);
-                _impl = ToLongImpl;
+                _rowImpl = rowImpl;
             }
-            else if (ReferenceEquals(expression.ReferencedSymbol, Aggregates.Count))
+            else if (AggregationFunctionsMap.TryGetValue(expression.ReferencedSymbol, out var aggImpl))
             {
-                CheckExpectedArgumentsCount(0);
-                _impl = CountImpl;
-            }
-            else if (ReferenceEquals(expression.ReferencedSymbol, Aggregates.Sum))
-            {
-                CheckExpectedArgumentsCount(1);
-                _impl = SumImpl;
+                _aggImpl = aggImpl;
             }
             else
             {
                 throw new InvalidOperationException($"Unsupported function {expression}.");
             }
-
-            void CheckExpectedArgumentsCount(int expected)
-            {
-                if (_argumentExpressions.Length != expected)
-                {
-                    throw new InvalidOperationException($"Mismatched arguments count. Function {expression.Name} expects {expected}, found {_argumentExpressions.Length}.");
-                }
-            }
         }
 
-        protected override object? EvaluateInternal(object? input)
+        protected override object? EvaluateRowInputInternal(IRow row)
         {
-            return _impl(input);
+            return _rowImpl(_argumentExpressions, row);
         }
 
-        private object? ToLongImpl(object? input)
+        protected override object? EvaluateTableInputInternal(ITabularSourceV2 table)
         {
-            var argValue = _argumentExpressions[0].Evaluate(input);
+            return _aggImpl(_argumentExpressions, table);
+        }
+
+        private static object? ToLongImpl(StirlingExpression[] argumentExpressions, object? input)
+        {
+            var argValue = argumentExpressions[0].Evaluate(input);
             return Convert.ToInt64(argValue);
         }
 
-        private object? CountImpl(object? input)
+        private static object? CountImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
         {
-            if (input is not IList<IRow> table)
+            long count = 0;
+            foreach (var chunk in table.GetData())
             {
-                throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+                count += chunk.RowCount;
             }
-
-            return table.Count;
+            return count;
         }
 
         private object? SumImpl(object? input)
