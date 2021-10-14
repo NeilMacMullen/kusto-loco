@@ -21,6 +21,7 @@ namespace KustoExecutionEngine.Core.Expressions
         {
             [Aggregates.Count] = CountImpl,
             [Aggregates.Sum] = SumImpl,
+            [Aggregates.Avg] = AvgImpl,
         };
 
         private readonly RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
@@ -91,6 +92,24 @@ namespace KustoExecutionEngine.Core.Expressions
             }
 
             return sum;
+        }
+
+        private static object? AvgImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
+        {
+            double sum = 0;
+            long count = 0;
+            foreach (var chunk in table.GetData())
+            {
+                count += chunk.RowCount;
+                for (int i = 0; i < chunk.RowCount; i++)
+                {
+                    var row = chunk.GetRow(i);
+                    var value = argumentExpressions[0].Evaluate(row);
+                    sum += Convert.ToDouble(value);
+                }
+            }
+
+            return sum / count;
         }
     }
 }

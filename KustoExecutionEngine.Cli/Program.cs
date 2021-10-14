@@ -7,10 +7,10 @@ using KustoExecutionEngine.Core.DataSource;
 using ColumnDefinition = KustoExecutionEngine.Core.DataSource.ColumnDefinition;
 
 var query = @"
-let c=10.0;
+let c=100.0;
 MyTable
-| project Column1=1,(a+c)
-| summarize count(), sum(Column1) by Column1
+| project frac=CounterValue, AppMachine, CounterName
+| summarize avg(frac) by CounterName
 ";
 
 var engine = new StirlingEngine();
@@ -18,13 +18,15 @@ var myTable = new InMemoryTabularSourceV2(
     new TableSchema(
         new List<ColumnDefinition>()
         {
-            new ColumnDefinition("a", KustoValueKind.Real),
-            new ColumnDefinition("b", KustoValueKind.Real),
+            new ColumnDefinition("AppMachine",   KustoValueKind.String),
+            new ColumnDefinition("CounterName",  KustoValueKind.String),
+            new ColumnDefinition("CounterValue", KustoValueKind.Real),
         }),
         new[]
         {
-            new Column(new object?[] { 1.0, 2.0 }),
-            new Column(new object?[] { 1.5, 2.5 }),
+            new Column(new object?[] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
+            new Column(new object?[] { "cpu", "mem", "cpu", "mem", "cpu" }),
+            new Column(new object?[] {  50.0,  30.0,  20.0,  5.0,   100.0 }),
         });
 engine.AddGlobalTable("MyTable", myTable);
 var result = engine.Evaluate(query);
