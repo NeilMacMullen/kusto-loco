@@ -1,14 +1,61 @@
-# Project
+_⚠ This is a hackathon project with no support or quality guarantee_
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+# BabyKusto
 
-As the maintainer of this project, please make a few updates:
+Welcome to BabyKusto. BabyKusto is a self-contained KQL (Kusto) engine
+with partial support for the [Kusto language](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/).
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## Example usage
+
+```cs
+ // Get your source data from somewhere.
+ // Could be from a file on disk, hardcoded in memory, a real database, etc.
+ITableSource myTable = /*...*/;
+
+var engine = new BabyKustoEngine();
+engine.AddGlobalTable("MyTable", myTable);
+
+var result = engine.Evaluate(@"
+    MyTable
+    | summarize numSamples = count(),
+                v = avg(CounterValue/100)
+                by AppMachine");
+
+result.Dump(Console.Out);
+```
+
+## Example output from `BabyKusto.Cli`:
+
+```
+Welcome to BabyKusto, the little self-contained Kusto execution engine!
+-----------------------------------------------------------------------
+
+MyTable:
+    AppMachine; CounterName; CounterValue;
+    ------------------
+    vm0; cpu; 50;
+    vm0; mem; 30;
+    vm1; cpu; 20;
+    vm1; mem; 5;
+    vm2; cpu; 100;
+
+Query:
+
+let c=100.0;
+MyTable
+| where AppMachine != 'vm1'
+| project frac=CounterValue/c, AppMachine, CounterName
+| summarize avg(frac) by CounterName
+| project CounterName, avgRoundedPercent=tolong(avg_frac*100)
+
+
+Result:
+    CounterName; avgRoundedPercent;
+    ------------------
+    cpu; 75;
+    mem; 30;
+```
+
 
 ## Contributing
 
