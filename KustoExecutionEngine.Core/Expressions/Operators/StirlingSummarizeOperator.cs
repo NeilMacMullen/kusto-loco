@@ -8,8 +8,8 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingSummarizeOperator : StirlingOperator<SummarizeOperator>
     {
-        private readonly List<string> _byExpressions;
-        private readonly List<(string Name, StirlingExpression)> _aggregationExpressions;
+        private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
+        private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
 
         public StirlingSummarizeOperator(StirlingEngine engine, SummarizeOperator expression)
             : base(engine, expression)
@@ -17,14 +17,13 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             _aggregationExpressions =
                 expression.Aggregates.Select((s, i) =>
                     (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
-            _byExpressions = expression.ByClause.Expressions
-                .Select(s => s.Element).Cast<NameReference>().Select(s => s.SimpleName)
-                .ToList();
+            _byExpressions = expression.ByClause.Expressions.Select((s, i) =>
+                    (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
         }
 
         protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
-            return new SummarizeResultTable(input);
+            return new SummarizeResultTable(_engine, input, _byExpressions, _aggregationExpressions);
             /*
             var dictionary = new Dictionary<int, List<IRow>>();
             IRow? nextRow = input.GetNextRow();
@@ -70,17 +69,38 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 
         internal class SummarizeResultTable : ITabularSourceV2
         {
+            private readonly StirlingEngine _engine;
             private readonly ITabularSourceV2 _input;
+            private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
+            private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
 
-            public SummarizeResultTable(ITabularSourceV2 input)
+            public SummarizeResultTable(
+                StirlingEngine engine,
+                ITabularSourceV2 input,
+                List<(string Name, StirlingExpression Expression)> byExpressions,
+                List<(string Name, StirlingExpression Expression)> aggregationExpressions)
             {
-                this._input = input;
+                _engine = engine;
+                _input = input;
+                _byExpressions = byExpressions;
+                _aggregationExpressions = aggregationExpressions;
             }
 
-            public TableSchema Schema => throw new NotImplementedException();
+            public TableSchema Schema => TableSchema.Empty; // TODO
 
             public IEnumerable<ITableChunk> GetData()
             {
+                // TODO: Implement summarize
+                // Open questions:
+                //   * How to avoid hydrating data from _input more than once
+                //   * How to bucket rows from `_input` as they come into each summarize bucket.
+
+                foreach (var aggregationExpression in _aggregationExpressions)
+                {
+                    OperatorHelpers.ProjectColumn(_engine, _input, aggregationExpression.Expression);
+                }
+
+                // For now, just pass-through the source. Oops..
                 foreach (var chunk in _input.GetData())
                 {
                     yield return chunk;
