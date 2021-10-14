@@ -8,7 +8,7 @@ using KustoExecutionEngine.Core.Extensions;
 var query = @"
 let c=100.0;
 MyTable
-| where (AppMachine != 'vm1' and CounterValue <= 50) or AppMachine == 'vm2'
+| where AppMachine != 'vm1'
 | project frac=CounterValue/c, AppMachine, CounterName
 | summarize avg(frac) by CounterName
 | project CounterName, avgRoundedPercent=tolong(avg_frac*100)
@@ -32,6 +32,11 @@ var myTable = new InMemoryTableSource(
 engine.AddGlobalTable("MyTable", myTable);
 
 var result = engine.Evaluate(query);
+
+Console.WriteLine("----------------------------------------------------------------------------");
+Console.WriteLine("Welcome to StirlingEngine, the little self-contained Kusto execution engine!");
+Console.WriteLine("----------------------------------------------------------------------------");
+Console.WriteLine();
 
 Console.WriteLine("MyTable:");
 myTable.Dump(Console.Out, indent: 4);

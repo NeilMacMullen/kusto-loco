@@ -43,7 +43,10 @@ namespace KustoExecutionEngine.Core
             _executionContexts.Push(new ExecutionContext(null, globalObjects));
 
             var code = KustoCode.ParseAndAnalyze(query, globals);
-            DumpTree(code);
+            if (false)
+            {
+                DumpTree(code);
+            }
 
             var diagnostics = code.GetDiagnostics();
             if (diagnostics.Count > 0)
