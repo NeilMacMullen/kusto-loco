@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
     internal static class ExpressionMathHelper
     {

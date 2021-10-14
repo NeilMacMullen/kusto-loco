@@ -1,18 +1,18 @@
-﻿using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.Expressions;
+﻿using BabyKusto.Core.Expressions;
+using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Statements
+namespace BabyKusto.Core.Statements
 {
-    internal class StirlingLetStatement : StirlingStatement<LetStatement>
+    internal class BabyKustoLetStatement : BabyKustoStatement<LetStatement>
     {
         private readonly string _name;
-        private readonly StirlingExpression _expression;
+        private readonly BabyKustoExpression _expression;
 
-        public StirlingLetStatement(StirlingEngine engine, LetStatement statement)
+        public BabyKustoLetStatement(BabyKustoEngine engine, LetStatement statement)
             : base(engine, statement)
         {
             _name = statement.Name.SimpleName;
-            _expression = StirlingExpression.Build(engine, statement.Expression);
+            _expression = BabyKustoExpression.Build(engine, statement.Expression);
         }
 
         public string Name => _name;

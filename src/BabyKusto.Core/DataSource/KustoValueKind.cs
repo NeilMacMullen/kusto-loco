@@ -1,7 +1,7 @@
 ﻿using System;
 using Kusto.Language.Symbols;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     public enum KustoValueKind
     {

@@ -2,16 +2,16 @@
 using System.Linq;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions.Operators
+namespace BabyKusto.Core.Expressions.Operators
 {
-    internal sealed class StirlingFilterOperator : StirlingOperator<FilterOperator>
+    internal sealed class BabyKustoFilterOperator : BabyKustoOperator<FilterOperator>
     {
-        private readonly StirlingExpression _conditionExpression;
+        private readonly BabyKustoExpression _conditionExpression;
 
-        public StirlingFilterOperator(StirlingEngine engine, FilterOperator expression)
+        public BabyKustoFilterOperator(BabyKustoEngine engine, FilterOperator expression)
             : base(engine, expression)
         {
-            _conditionExpression = StirlingExpression.Build(engine, expression.Condition);
+            _conditionExpression = BabyKustoExpression.Build(engine, expression.Condition);
         }
 
         protected override ITableSource EvaluateTableInputInternal(ITableSource input)

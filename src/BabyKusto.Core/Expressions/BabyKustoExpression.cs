@@ -1,12 +1,13 @@
 //#define DEBUG_EXPRESSIONS
 
 using System;
+using BabyKusto.Core.Expressions.Operators;
 using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.Expressions.Operators;
+using Microsoft.Extensions.Internal;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal abstract class StirlingExpression
+    internal abstract class BabyKustoExpression
     {
 #if DEBUG_EXPRESSIONS
         static int DebugIndent = 0;
@@ -14,10 +15,10 @@ namespace KustoExecutionEngine.Core.Expressions
 
         protected bool _initialized = true;
 
-        protected readonly StirlingEngine _engine;
+        protected readonly BabyKustoEngine _engine;
         protected internal readonly Expression _expression;
 
-        public StirlingExpression(StirlingEngine engine, Expression expression)
+        public BabyKustoExpression(BabyKustoEngine engine, Expression expression)
         {
             _engine = engine;
             _expression = expression;
@@ -81,13 +82,13 @@ namespace KustoExecutionEngine.Core.Expressions
             throw new NotImplementedException($"{nameof(EvaluateNullInputInternal)} not implemented for {TypeNameHelper.GetTypeDisplayName(this)}.");
         }
 
-        protected internal static StirlingExpression Build(StirlingEngine engine, Expression expression)
+        protected internal static BabyKustoExpression Build(BabyKustoEngine engine, Expression expression)
         {
             return expression.Kind switch
             {
-                SyntaxKind.NameReference => new StirlingNameReferenceExpression(engine, (NameReference)expression),
-                SyntaxKind.PipeExpression => new StirlingPipeExpression(engine, (PipeExpression)expression),
-                SyntaxKind.SimpleNamedExpression => new StirlingSimpleNamedExpression(engine, (SimpleNamedExpression)expression),
+                SyntaxKind.NameReference => new BabyKustoNameReferenceExpression(engine, (NameReference)expression),
+                SyntaxKind.PipeExpression => new BabyKustoPipeExpression(engine, (PipeExpression)expression),
+                SyntaxKind.SimpleNamedExpression => new BabyKustoSimpleNamedExpression(engine, (SimpleNamedExpression)expression),
 
                 SyntaxKind.AddExpression or
                 SyntaxKind.SubtractExpression or
@@ -100,7 +101,7 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.LessThanExpression or
                 SyntaxKind.LessThanOrEqualExpression or
                 SyntaxKind.AndExpression or
-                SyntaxKind.OrExpression => new StirlingBinaryExpression(engine, (BinaryExpression)expression),
+                SyntaxKind.OrExpression => new BabyKustoBinaryExpression(engine, (BinaryExpression)expression),
 
                 SyntaxKind.BooleanLiteralExpression or
                 SyntaxKind.IntLiteralExpression or
@@ -111,18 +112,18 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.TimespanLiteralExpression or
                 SyntaxKind.GuidLiteralExpression or
                 SyntaxKind.StringLiteralExpression or
-                SyntaxKind.NullLiteralExpression => StirlingLiteralExpression.Build(engine, (LiteralExpression)expression),
+                SyntaxKind.NullLiteralExpression => BabyKustoLiteralExpression.Build(engine, (LiteralExpression)expression),
 
-                SyntaxKind.ParenthesizedExpression => new StirlingParenthesizedExpression(engine, (ParenthesizedExpression)expression),
+                SyntaxKind.ParenthesizedExpression => new BabyKustoParenthesizedExpression(engine, (ParenthesizedExpression)expression),
 
-                SyntaxKind.DataTableExpression => new StirlingDataTableExpression(engine, (DataTableExpression)expression),
+                SyntaxKind.DataTableExpression => new BabyKustoDataTableExpression(engine, (DataTableExpression)expression),
 
-                SyntaxKind.FunctionCallExpression => new StirlingFunctionCallExpression(engine, (FunctionCallExpression)expression),
+                SyntaxKind.FunctionCallExpression => new BabyKustoFunctionCallExpression(engine, (FunctionCallExpression)expression),
 
-                SyntaxKind.FilterOperator => new StirlingFilterOperator(engine, (FilterOperator)expression),
-                SyntaxKind.SummarizeOperator => new StirlingSummarizeOperator(engine, (SummarizeOperator)expression),
-                SyntaxKind.ProjectOperator => new StirlingProjectOperator(engine, (ProjectOperator)expression),
-                SyntaxKind.JoinOperator => new StirlingJoinOperator(engine, (JoinOperator)expression),
+                SyntaxKind.FilterOperator => new BabyKustoFilterOperator(engine, (FilterOperator)expression),
+                SyntaxKind.SummarizeOperator => new BabyKustoSummarizeOperator(engine, (SummarizeOperator)expression),
+                SyntaxKind.ProjectOperator => new BabyKustoProjectOperator(engine, (ProjectOperator)expression),
+                SyntaxKind.JoinOperator => new BabyKustoJoinOperator(engine, (JoinOperator)expression),
 
                 _ => throw new InvalidOperationException($"Unsupported expression kind '{expression.Kind}'."),
             };

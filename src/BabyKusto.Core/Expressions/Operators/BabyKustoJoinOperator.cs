@@ -1,10 +1,10 @@
 ﻿using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions.Operators
+namespace BabyKusto.Core.Expressions.Operators
 {
-    internal sealed class StirlingJoinOperator : StirlingOperator<JoinOperator>
+    internal sealed class BabyKustoJoinOperator : BabyKustoOperator<JoinOperator>
     {
-        public StirlingJoinOperator(StirlingEngine engine, JoinOperator projectOperator)
+        public BabyKustoJoinOperator(BabyKustoEngine engine, JoinOperator projectOperator)
             : base(engine, projectOperator)
         {
         }

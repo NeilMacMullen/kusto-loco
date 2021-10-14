@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
     internal static class IntrinsicAggregationFunctions
     {
-        internal delegate object? AggregationFunctionImpl(StirlingExpression[] argumentExpressions, ITableSource table);
+        internal delegate object? AggregationFunctionImpl(BabyKustoExpression[] argumentExpressions, ITableSource table);
         private static readonly Dictionary<Symbol, AggregationFunctionImpl> AggregationFunctionsMap = new()
         {
             [Aggregates.Count] = CountImpl,
@@ -20,7 +20,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return AggregationFunctionsMap.TryGetValue(functionSymbol, out impl);
         }
 
-        private static object? CountImpl(StirlingExpression[] argumentExpressions, ITableSource table)
+        private static object? CountImpl(BabyKustoExpression[] argumentExpressions, ITableSource table)
         {
             long count = 0;
             foreach (var chunk in table.GetData())
@@ -31,7 +31,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return count;
         }
 
-        private static object? SumImpl(StirlingExpression[] argumentExpressions, ITableSource table)
+        private static object? SumImpl(BabyKustoExpression[] argumentExpressions, ITableSource table)
         {
             double sum = 0;
             foreach (var chunk in table.GetData())
@@ -47,7 +47,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return sum;
         }
 
-        private static object? AvgImpl(StirlingExpression[] argumentExpressions, ITableSource table)
+        private static object? AvgImpl(BabyKustoExpression[] argumentExpressions, ITableSource table)
         {
             double sum = 0;
             long count = 0;

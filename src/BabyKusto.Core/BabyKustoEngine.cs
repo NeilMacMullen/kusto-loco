@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BabyKusto.Core.Statements;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.Statements;
+using Microsoft.Extensions.Internal;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
-    public class StirlingEngine
+    public class BabyKustoEngine
     {
         private readonly List<(string TableName, ITableSource Source)> _globalTables = new();
         private readonly Stack<ExecutionContext> _executionContexts;
 
-        public StirlingEngine()
+        public BabyKustoEngine()
         {
             _executionContexts = new Stack<ExecutionContext>();
         }
@@ -68,7 +69,7 @@ namespace KustoExecutionEngine.Core
             foreach (var statementEntry in queryBlock.Statements)
             {
                 var statement = statementEntry.Element;
-                var sterlingStatement = StirlingStatement.Build(this, statement);
+                var sterlingStatement = BabyKustoStatement.Build(this, statement);
                 lastResult = sterlingStatement.Execute();
             }
 

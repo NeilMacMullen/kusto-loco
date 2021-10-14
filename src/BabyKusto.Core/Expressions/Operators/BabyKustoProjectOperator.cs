@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions.Operators
+namespace BabyKusto.Core.Expressions.Operators
 {
-    internal sealed class StirlingProjectOperator : StirlingOperator<ProjectOperator>
+    internal sealed class BabyKustoProjectOperator : BabyKustoOperator<ProjectOperator>
     {
-        private readonly List<StirlingExpression> _expressions;
+        private readonly List<BabyKustoExpression> _expressions;
         private readonly TableSchema _resultSchema;
 
-        public StirlingProjectOperator(StirlingEngine engine, ProjectOperator projectOperator)
+        public BabyKustoProjectOperator(BabyKustoEngine engine, ProjectOperator projectOperator)
             : base(engine, projectOperator)
         {
             var resultType = projectOperator.ResultType;
             var expressions = projectOperator.Expressions;
 
-            _expressions = new List<StirlingExpression>(expressions.Count);
+            _expressions = new List<BabyKustoExpression>(expressions.Count);
             var resultSchemaColumns = new List<ColumnDefinition>(expressions.Count);
             for (int i = 0; i < expressions.Count; i++)
             {
@@ -22,7 +22,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 var columnName = resultType.Members[i].Name;
                 var columnValueType = expression.ResultType.ToKustoValueKind();
 
-                var builtExpression = StirlingExpression.Build(engine, expression);
+                var builtExpression = BabyKustoExpression.Build(engine, expression);
                 _expressions.Add(builtExpression);
 
                 resultSchemaColumns.Add(new ColumnDefinition(columnName, columnValueType));

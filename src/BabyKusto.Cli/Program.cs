@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using KustoExecutionEngine.Core;
-using KustoExecutionEngine.Core.Extensions;
+using BabyKusto.Core;
+using BabyKusto.Core.Extensions;
 
 var query = @"
 let c=100.0;
@@ -14,7 +14,7 @@ MyTable
 | project CounterName, avgRoundedPercent=tolong(avg_frac*100)
 ";
 
-var engine = new StirlingEngine();
+var engine = new BabyKustoEngine();
 var myTable = new InMemoryTableSource(
     new TableSchema(
         new List<ColumnDefinition>()
@@ -33,9 +33,9 @@ engine.AddGlobalTable("MyTable", myTable);
 
 var result = engine.Evaluate(query);
 
-Console.WriteLine("----------------------------------------------------------------------------");
-Console.WriteLine("Welcome to StirlingEngine, the little self-contained Kusto execution engine!");
-Console.WriteLine("----------------------------------------------------------------------------");
+Console.WriteLine("-----------------------------------------------------------------------");
+Console.WriteLine("Welcome to BabyKusto, the little self-contained Kusto execution engine!");
+Console.WriteLine("-----------------------------------------------------------------------");
 Console.WriteLine();
 
 Console.WriteLine("MyTable:");

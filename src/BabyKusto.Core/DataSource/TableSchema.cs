@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     public class TableSchema
     {

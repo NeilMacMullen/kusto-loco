@@ -1,11 +1,11 @@
 ﻿using System;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal class StirlingNameReferenceExpression : StirlingExpression
+    internal class BabyKustoNameReferenceExpression : BabyKustoExpression
     {
-        public StirlingNameReferenceExpression(StirlingEngine engine, NameReference expression)
+        public BabyKustoNameReferenceExpression(BabyKustoEngine engine, NameReference expression)
             : base(engine, expression)
         {
         }

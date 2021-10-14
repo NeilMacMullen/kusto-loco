@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     public class DerivedTableSource : ITableSource
     {

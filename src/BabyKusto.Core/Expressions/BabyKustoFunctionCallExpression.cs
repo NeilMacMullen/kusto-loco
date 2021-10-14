@@ -2,20 +2,20 @@
 using System.Linq;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal class StirlingFunctionCallExpression : StirlingExpression
+    internal class BabyKustoFunctionCallExpression : BabyKustoExpression
     {
         private readonly IntrinsicRowFunctions.RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
         private readonly IntrinsicAggregationFunctions.AggregationFunctionImpl _aggImpl = (_, _) => throw new NotSupportedException();
 
-        private readonly StirlingExpression[] _argumentExpressions;
+        private readonly BabyKustoExpression[] _argumentExpressions;
 
-        public StirlingFunctionCallExpression(StirlingEngine engine, FunctionCallExpression expression)
+        public BabyKustoFunctionCallExpression(BabyKustoEngine engine, FunctionCallExpression expression)
             : base(engine, expression)
         {
             _argumentExpressions = expression.ArgumentList.Expressions
-                .Select(e => StirlingExpression.Build(engine, e.Element))
+                .Select(e => BabyKustoExpression.Build(engine, e.Element))
                 .ToArray();
 
             if (IntrinsicRowFunctions.TryGetImpl(expression.ReferencedSymbol, out var rowImpl))

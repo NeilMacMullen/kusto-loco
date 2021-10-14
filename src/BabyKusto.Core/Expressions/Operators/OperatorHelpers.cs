@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace KustoExecutionEngine.Core.Expressions.Operators
+namespace BabyKusto.Core.Expressions.Operators
 {
     internal static class OperatorHelpers
     {
-        internal static Column ProjectColumn(StirlingEngine engine, ITableChunk chunk, StirlingExpression expression)
+        internal static Column ProjectColumn(BabyKustoEngine engine, ITableChunk chunk, BabyKustoExpression expression)
         {
             var data = new object?[chunk.RowCount];
             for (int i = 0; i < chunk.RowCount; i++)
@@ -17,19 +17,19 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             return new Column(data);
         }
 
-        internal static ITableSource ProjectColumn(StirlingEngine engine, ITableSource source, StirlingExpression expression, string? name = null)
+        internal static ITableSource ProjectColumn(BabyKustoEngine engine, ITableSource source, BabyKustoExpression expression, string? name = null)
         {
             return new ProjectColumnTable(engine, source, expression, name);
         }
 
         private class ProjectColumnTable : ITableSource
         {
-            private readonly StirlingEngine _engine;
+            private readonly BabyKustoEngine _engine;
             private readonly ITableSource _source;
-            private readonly StirlingExpression _expression;
+            private readonly BabyKustoExpression _expression;
             private readonly TableSchema _schema;
 
-            public ProjectColumnTable(StirlingEngine engine, ITableSource source, StirlingExpression expression, string? name = null)
+            public ProjectColumnTable(BabyKustoEngine engine, ITableSource source, BabyKustoExpression expression, string? name = null)
             {
                 _engine = engine;
                 _source = source;

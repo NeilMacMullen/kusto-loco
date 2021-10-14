@@ -1,11 +1,11 @@
 ﻿using System;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal class StirlingDataTableExpression : StirlingExpression
+    internal class BabyKustoDataTableExpression : BabyKustoExpression
     {
-        public StirlingDataTableExpression(StirlingEngine engine, DataTableExpression expression)
+        public BabyKustoDataTableExpression(BabyKustoEngine engine, DataTableExpression expression)
             : base(engine, expression)
         {
             throw new NotImplementedException();

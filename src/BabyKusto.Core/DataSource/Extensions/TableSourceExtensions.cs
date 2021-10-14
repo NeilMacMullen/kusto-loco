@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace KustoExecutionEngine.Core.Extensions
+namespace BabyKusto.Core.Extensions
 {
     public static class TableSourceExtensions
     {

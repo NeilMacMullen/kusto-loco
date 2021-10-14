@@ -1,8 +1,8 @@
+using BabyKusto.Core;
+using BabyKusto.Core.Extensions;
 using FluentAssertions;
-using KustoExecutionEngine.Core.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace KustoExecutionEngine.Core.Tests
@@ -14,7 +14,7 @@ namespace KustoExecutionEngine.Core.Tests
         {
             /*
             // Arrange
-            var engine = new StirlingEngine();
+            var engine = new BabyKustoEngine();
             engine.AddGlobalTable(
                 "MyTable",
                 new[] { "a", "b" },
@@ -55,7 +55,7 @@ namespace KustoExecutionEngine.Core.Tests
         {
             /*
             // Arrange
-            var engine = new StirlingEngine();
+            var engine = new BabyKustoEngine();
             engine.AddGlobalTable(
                 "MyTable",
                 new[] { "a", "b" },
@@ -102,7 +102,7 @@ MyTable
         public void Example1_Works()
         {
             // Arrange
-            var engine = new StirlingEngine();
+            var engine = new BabyKustoEngine();
             var myTable = new InMemoryTableSource(
                 new TableSchema(
                     new List<ColumnDefinition>()

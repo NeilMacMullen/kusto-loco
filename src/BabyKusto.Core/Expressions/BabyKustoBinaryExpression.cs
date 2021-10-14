@@ -1,19 +1,19 @@
 ﻿using System;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal class StirlingBinaryExpression : StirlingExpression
+    internal class BabyKustoBinaryExpression : BabyKustoExpression
     {
-        private readonly StirlingExpression _left;
-        private readonly StirlingExpression _right;
+        private readonly BabyKustoExpression _left;
+        private readonly BabyKustoExpression _right;
         private readonly ExpressionMathHelper.BasicOperators.Impl _impl;
 
-        public StirlingBinaryExpression(StirlingEngine engine, BinaryExpression expression)
+        public BabyKustoBinaryExpression(BabyKustoEngine engine, BinaryExpression expression)
             : base(engine, expression)
         {
-            _left = StirlingExpression.Build(engine, expression.Left);
-            _right = StirlingExpression.Build(engine, expression.Right);
+            _left = BabyKustoExpression.Build(engine, expression.Left);
+            _right = BabyKustoExpression.Build(engine, expression.Right);
 
             var operands = ExpressionMathHelper.GetOperandsByResultType(expression.ResultType.ToKustoValueKind());
             _impl = expression.Kind switch

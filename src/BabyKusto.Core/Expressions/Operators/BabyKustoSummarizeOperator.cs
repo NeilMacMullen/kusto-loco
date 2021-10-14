@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions.Operators
+namespace BabyKusto.Core.Expressions.Operators
 {
-    internal sealed class StirlingSummarizeOperator : StirlingOperator<SummarizeOperator>
+    internal sealed class BabyKustoSummarizeOperator : BabyKustoOperator<SummarizeOperator>
     {
-        private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
-        private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
+        private readonly List<(string Name, BabyKustoExpression Expression)> _byExpressions;
+        private readonly List<(string Name, BabyKustoExpression Expression)> _aggregationExpressions;
         private readonly TableSchema _resultSchema;
 
-        public StirlingSummarizeOperator(StirlingEngine engine, SummarizeOperator expression)
+        public BabyKustoSummarizeOperator(BabyKustoEngine engine, SummarizeOperator expression)
             : base(engine, expression)
         {
             _aggregationExpressions =
                 expression.Aggregates.Select((s, i) =>
-                    (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
+                    (expression.ResultType.Members[i].Name, BabyKustoExpression.Build(engine, s.Element))).ToList();
             _byExpressions = expression.ByClause.Expressions.Select((s, i) =>
-                    (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
+                    (expression.ResultType.Members[i].Name, BabyKustoExpression.Build(engine, s.Element))).ToList();
 
             _resultSchema = new TableSchema(
                 expression.ResultType.Members.Select(m => new ColumnDefinition(m.Name, KustoValueKind.Real)).ToList());
@@ -32,14 +32,14 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
         internal class SummarizeResultTable : ITableSource
         {
             private readonly ITableSource _input;
-            private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
-            private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
+            private readonly List<(string Name, BabyKustoExpression Expression)> _byExpressions;
+            private readonly List<(string Name, BabyKustoExpression Expression)> _aggregationExpressions;
             private readonly TableSchema _resultSchema;
 
             public SummarizeResultTable(
                 ITableSource input,
-                List<(string Name, StirlingExpression Expression)> byExpressions,
-                List<(string Name, StirlingExpression Expression)> aggregationExpressions,
+                List<(string Name, BabyKustoExpression Expression)> byExpressions,
+                List<(string Name, BabyKustoExpression Expression)> aggregationExpressions,
                 TableSchema resultSchema)
             {
                 _input = input;

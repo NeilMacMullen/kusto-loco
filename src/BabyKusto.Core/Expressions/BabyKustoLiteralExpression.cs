@@ -1,16 +1,16 @@
 ﻿using System;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
-    internal abstract class StirlingLiteralExpression : StirlingExpression
+    internal abstract class BabyKustoLiteralExpression : BabyKustoExpression
     {
-        private StirlingLiteralExpression(StirlingEngine engine, LiteralExpression expression)
+        private BabyKustoLiteralExpression(BabyKustoEngine engine, LiteralExpression expression)
             : base(engine, expression)
         {
         }
 
-        internal static StirlingLiteralExpression Build(StirlingEngine engine, LiteralExpression expression)
+        internal static BabyKustoLiteralExpression Build(BabyKustoEngine engine, LiteralExpression expression)
         {
             return expression.Kind switch
             {
@@ -24,16 +24,16 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.GuidLiteralExpression or
                 SyntaxKind.StringLiteralExpression or
                 SyntaxKind.NullLiteralExpression or
-                SyntaxKind.LongLiteralExpression => new StirlingLiteralAnyExpression(engine, expression),
+                SyntaxKind.LongLiteralExpression => new BabyKustoLiteralAnyExpression(engine, expression),
                 _ => throw new InvalidOperationException($"Unsupported literal expression kind '{expression.Kind}'."),
             };
         }
 
-        private sealed class StirlingLiteralAnyExpression : StirlingLiteralExpression
+        private sealed class BabyKustoLiteralAnyExpression : BabyKustoLiteralExpression
         {
             private readonly object _value;
 
-            public StirlingLiteralAnyExpression(StirlingEngine engine, LiteralExpression expression)
+            public BabyKustoLiteralAnyExpression(BabyKustoEngine engine, LiteralExpression expression)
                 : base(engine, expression)
             {
                 _value = expression.LiteralValue;

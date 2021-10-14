@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 
-namespace KustoExecutionEngine.Core.Expressions
+namespace BabyKusto.Core.Expressions
 {
     internal static class IntrinsicRowFunctions
     {
-        internal delegate object? RowFunctionImpl(StirlingExpression[] argumentExpressions, IRow row);
+        internal delegate object? RowFunctionImpl(BabyKustoExpression[] argumentExpressions, IRow row);
         internal static readonly Dictionary<Symbol, RowFunctionImpl> RowFunctionsMap = new()
         {
             [Functions.ToLong] = ToLongImpl,
@@ -18,7 +18,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return RowFunctionsMap.TryGetValue(functionSymbol, out impl);
         }
 
-        private static object? ToLongImpl(StirlingExpression[] argumentExpressions, object? input)
+        private static object? ToLongImpl(BabyKustoExpression[] argumentExpressions, object? input)
         {
             var argValue = argumentExpressions[0].Evaluate(input);
             return Convert.ToInt64(argValue);

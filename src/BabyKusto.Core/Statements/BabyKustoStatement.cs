@@ -1,26 +1,26 @@
 ﻿using System;
 using Kusto.Language.Syntax;
 
-namespace KustoExecutionEngine.Core.Statements
+namespace BabyKusto.Core.Statements
 {
-    internal abstract class StirlingStatement<T> : StirlingStatement
+    internal abstract class BabyKustoStatement<T> : BabyKustoStatement
         where T : Statement
     {
         private readonly T _statement;
 
-        protected StirlingStatement(StirlingEngine engine, T statement)
+        protected BabyKustoStatement(BabyKustoEngine engine, T statement)
             : base(engine)
         {
             _statement = statement;
         }
     }
 
-    internal abstract class StirlingStatement
+    internal abstract class BabyKustoStatement
     {
-        protected readonly StirlingEngine _engine;
+        protected readonly BabyKustoEngine _engine;
         protected bool _initialized = true;
 
-        internal StirlingStatement(StirlingEngine engine)
+        internal BabyKustoStatement(BabyKustoEngine engine)
         {
             _engine = engine;
         }
@@ -42,12 +42,12 @@ namespace KustoExecutionEngine.Core.Statements
 
         protected abstract object? ExecuteInternal();
 
-        protected internal static StirlingStatement Build(StirlingEngine engine, Statement statement)
+        protected internal static BabyKustoStatement Build(BabyKustoEngine engine, Statement statement)
         {
             return statement.Kind switch
             {
-                SyntaxKind.LetStatement => new StirlingLetStatement(engine, (LetStatement)statement),
-                SyntaxKind.ExpressionStatement => new StirlingExpressionStatement(engine, (ExpressionStatement)statement),
+                SyntaxKind.LetStatement => new BabyKustoLetStatement(engine, (LetStatement)statement),
+                SyntaxKind.ExpressionStatement => new BabyKustoExpressionStatement(engine, (ExpressionStatement)statement),
                 _ => throw new InvalidOperationException($"Unsupported statement type '{statement.Kind}'."),
             };
         }

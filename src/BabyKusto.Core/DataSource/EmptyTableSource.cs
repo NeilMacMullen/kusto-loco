@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     internal class EmptyTableSource : ITableSource
     {

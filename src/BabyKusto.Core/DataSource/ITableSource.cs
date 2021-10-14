@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     public interface ITableSource
     {

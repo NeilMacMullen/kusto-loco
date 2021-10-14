@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace KustoExecutionEngine.Core
+namespace BabyKusto.Core
 {
     internal class ExecutionContext
     {

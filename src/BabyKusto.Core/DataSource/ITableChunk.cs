@@ -1,4 +1,4 @@
-﻿namespace KustoExecutionEngine.Core
+﻿namespace BabyKusto.Core
 {
     public interface ITableChunk
     {
