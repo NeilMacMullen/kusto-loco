@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace KustoExecutionEngine.Core.DataSource
+namespace KustoExecutionEngine.Core
 {
     internal class EmptyTabularSourceV2 : ITabularSourceV2
     {

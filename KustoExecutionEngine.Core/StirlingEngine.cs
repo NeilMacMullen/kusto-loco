@@ -4,7 +4,6 @@ using System.Linq;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Statements;
 
 namespace KustoExecutionEngine.Core

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Kusto.Language.Syntax;
 
 namespace KustoExecutionEngine.Core.Expressions

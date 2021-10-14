@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {

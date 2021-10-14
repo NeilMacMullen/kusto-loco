@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Kusto.Language.Symbols;
 
-namespace KustoExecutionEngine.Core.DataSource
+namespace KustoExecutionEngine.Core
 {
     public enum KustoValueKind
     {

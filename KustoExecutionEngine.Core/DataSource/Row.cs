@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using KustoExecutionEngine.Core.DataSource;
-
-namespace KustoExecutionEngine.Core
+﻿namespace KustoExecutionEngine.Core
 {
     public class Row : IRow
     {

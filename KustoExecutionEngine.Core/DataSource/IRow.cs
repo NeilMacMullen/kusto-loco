@@ -1,6 +1,4 @@
-﻿using KustoExecutionEngine.Core.DataSource;
-
-namespace KustoExecutionEngine.Core
+﻿namespace KustoExecutionEngine.Core
 {
     public interface IRow
     {

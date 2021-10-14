@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace KustoExecutionEngine.Core.DataSource
+namespace KustoExecutionEngine.Core
 {
     public class InMemoryTabularSourceV2 : ITabularSourceV2
     {

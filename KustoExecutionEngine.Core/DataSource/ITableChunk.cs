@@ -1,4 +1,4 @@
-﻿namespace KustoExecutionEngine.Core.DataSource
+﻿namespace KustoExecutionEngine.Core
 {
     public interface ITableChunk
     {

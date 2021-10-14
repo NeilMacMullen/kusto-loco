@@ -1,5 +1,4 @@
 ﻿using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {

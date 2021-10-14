@@ -2,7 +2,6 @@
 
 using System;
 using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.DataSource;
 using KustoExecutionEngine.Core.Expressions.Operators;
 
 namespace KustoExecutionEngine.Core.Expressions

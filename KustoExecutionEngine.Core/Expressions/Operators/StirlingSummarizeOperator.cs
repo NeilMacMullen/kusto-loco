@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Syntax;
-using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core.Expressions.Operators
 {

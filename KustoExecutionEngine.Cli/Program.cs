@@ -3,8 +3,6 @@
 using System;
 using System.Collections.Generic;
 using KustoExecutionEngine.Core;
-using KustoExecutionEngine.Core.DataSource;
-using ColumnDefinition = KustoExecutionEngine.Core.DataSource.ColumnDefinition;
 
 var query = @"
 let c=100.0;
