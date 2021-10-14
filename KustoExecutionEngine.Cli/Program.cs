@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using KustoExecutionEngine.Cli;
 using KustoExecutionEngine.Core;
+using KustoExecutionEngine.Core.Extensions;
 
 var query = @"
 let c=100.0;
@@ -33,7 +33,7 @@ engine.AddGlobalTable("MyTable", myTable);
 var result = engine.Evaluate(query);
 
 Console.WriteLine("MyTable:");
-myTable.DumpToConsole(indent: 4);
+myTable.Dump(Console.Out, indent: 4);
 
 Console.WriteLine();
 Console.WriteLine("Query:");
@@ -44,7 +44,5 @@ Console.WriteLine("Result:");
 
 if (result is ITableSource tableResult)
 {
-    tableResult.DumpToConsole(indent: 4);
+    tableResult.Dump(Console.Out, indent: 4);
 }
-
-Console.WriteLine("Done");

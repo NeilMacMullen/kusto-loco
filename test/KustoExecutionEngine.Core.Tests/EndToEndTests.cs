@@ -1,4 +1,6 @@
 using FluentAssertions;
+using KustoExecutionEngine.Core.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -94,6 +96,47 @@ MyTable
             row0cols[2].Key.Should().Be("d");
             row0cols[2].Value.Should().Be(11.0);
             */
+        }
+
+        [Fact]
+        public void Example1_Works()
+        {
+            // Arrange
+            var engine = new StirlingEngine();
+            var myTable = new InMemoryTableSource(
+                new TableSchema(
+                    new List<ColumnDefinition>()
+                    {
+                        new ColumnDefinition("AppMachine",   KustoValueKind.String),
+                        new ColumnDefinition("CounterName",  KustoValueKind.String),
+                        new ColumnDefinition("CounterValue", KustoValueKind.Real),
+                    }),
+                    new[]
+                    {
+                        new Column(new object?[] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
+                        new Column(new object?[] { "cpu", "mem", "cpu", "mem", "cpu" }),
+                        new Column(new object?[] {  50.0,  30.0,  20.0,  5.0,   100.0 }),
+                    });
+            engine.AddGlobalTable("MyTable", myTable);
+            var query = @"
+let c=100.0;
+MyTable
+| project frac=CounterValue/c, AppMachine, CounterName
+| summarize avg(frac) by CounterName
+| project CounterName, avgRoundedPercent=tolong(avg_frac*100)
+";
+
+            // Act
+            var result = engine.Evaluate(query) as ITableSource;
+
+            // Assert
+            result.Should().NotBeNull();
+            var dumped = result!.DumpToString();
+            dumped.Should().Be(
+                "CounterName; avgRoundedPercent; " + Environment.NewLine +
+                "------------------" + Environment.NewLine +
+                "cpu; 57; " + Environment.NewLine +
+                "mem; 18; " + Environment.NewLine);
         }
     }
 }
