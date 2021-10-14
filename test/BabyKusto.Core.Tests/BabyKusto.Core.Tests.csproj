@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\KustoExecutionEngine.Core\KustoExecutionEngine.Core.csproj" />
+    <ProjectReference Include="..\..\src\BabyKusto.Core\BabyKusto.Core.csproj" />
   </ItemGroup>
 
 </Project>
