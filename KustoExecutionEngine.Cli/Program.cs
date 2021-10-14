@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using KustoExecutionEngine.Cli;
 using KustoExecutionEngine.Core;
 
 var query = @"
@@ -9,6 +10,7 @@ let c=100.0;
 MyTable
 | project frac=CounterValue/c, AppMachine, CounterName
 | summarize avg(frac) by CounterName
+| project CounterName, avgRoundedPercent=tolong(avg_frac*100)
 ";
 
 var engine = new StirlingEngine();
@@ -27,31 +29,22 @@ var myTable = new InMemoryTableSource(
             new Column(new object?[] {  50.0,  30.0,  20.0,  5.0,   100.0 }),
         });
 engine.AddGlobalTable("MyTable", myTable);
-var result = engine.Evaluate(query);
-if (result is ITableSource tabularResult)
-{
-    foreach (var columnDef in tabularResult.Schema.ColumnDefinitions)
-    {
-        Console.Write(columnDef.ColumnName);
-        Console.Write("; ");
-    }
-    Console.WriteLine();
-    Console.WriteLine("------------------");
 
-    foreach (var chunk in tabularResult.GetData())
-    {
-        for (int i = 0; i < chunk.RowCount; i++)
-        {
-            var row = chunk.GetRow(i);
-            for (int j = 0; j < row.Values.Length; j++)
-            {
-                Console.Write(row.Values[j]);
-                Console.Write("; ");
-            }
-            Console.WriteLine();
-        }
-    }
-    Console.WriteLine();
+var result = engine.Evaluate(query);
+
+Console.WriteLine("MyTable:");
+myTable.DumpToConsole(indent: 4);
+
+Console.WriteLine();
+Console.WriteLine("Query:");
+Console.WriteLine(query);
+
+Console.WriteLine();
+Console.WriteLine("Result:");
+
+if (result is ITableSource tableResult)
+{
+    tableResult.DumpToConsole(indent: 4);
 }
 
 Console.WriteLine("Done");
