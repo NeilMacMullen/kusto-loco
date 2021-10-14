@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using KustoExecutionEngine.Core;
 using KustoExecutionEngine.Core.DataSource;
 using ColumnDefinition = KustoExecutionEngine.Core.DataSource.ColumnDefinition;
@@ -15,17 +14,19 @@ MyTable
 ";
 
 var engine = new StirlingEngine();
-var tableSchema = new TableSchema(new List<ColumnDefinition>()
-{
-    new ColumnDefinition("a", KustoValueKind.Real),
-    new ColumnDefinition("b", KustoValueKind.Real),
-});
-var tableChunk = new TableChunk(tableSchema, new Column[] { new Column(2), new Column(2) });
-tableChunk.Columns[0][0] = 1.0;
-tableChunk.Columns[0][1] = 1.5;
-tableChunk.Columns[1][0] = 2.0;
-tableChunk.Columns[1][1] = 2.5;
-engine.AddGlobalTable("MyTable", tableSchema, tableChunk);
+var myTable = new InMemoryTabularSourceV2(
+    new TableSchema(
+        new List<ColumnDefinition>()
+        {
+            new ColumnDefinition("a", KustoValueKind.Real),
+            new ColumnDefinition("b", KustoValueKind.Real),
+        }),
+        new[]
+        {
+            new Column(new object?[] { 1.0, 2.0 }),
+            new Column(new object?[] { 1.5, 2.5 }),
+        });
+engine.AddGlobalTable("MyTable", myTable);
 var result = engine.Evaluate(query);
 if (result is ITabularSourceV2 tabularResult)
 {
@@ -34,6 +35,7 @@ if (result is ITabularSourceV2 tabularResult)
         Console.Write(columnDef.ColumnName);
         Console.Write("; ");
     }
+    Console.WriteLine();
     Console.WriteLine("------------------");
 
     foreach (var chunk in tabularResult.GetData())

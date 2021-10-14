@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace KustoExecutionEngine.Core.DataSource
 {
     public class InMemoryTabularSourceV2 : ITabularSourceV2
     {
-        private readonly IEnumerable<ITableChunk> _data;
+        private readonly ITableChunk[] _data;
 
-        public InMemoryTabularSourceV2(TableSchema schema, IEnumerable<ITableChunk> tableChunks)
+        public InMemoryTabularSourceV2(TableSchema schema, Column[] columns)
         {
             this.Schema = schema;
-            this._data = tableChunks;
+            this._data = new ITableChunk[] { new TableChunk(Schema, columns) };
         }
 
         public TableSchema Schema { get; private set; }

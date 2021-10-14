@@ -4,9 +4,9 @@
     {
         private readonly object?[] _data;
 
-        public Column(int size)
+        public Column(object?[] data)
         {
-            _data = new object?[size];
+            _data = data;
         }
 
         public int RowCount => _data.Length;

@@ -10,6 +10,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
     {
         private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
         private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
+        private readonly TableSchema _resultSchema;
 
         public StirlingSummarizeOperator(StirlingEngine engine, SummarizeOperator expression)
             : base(engine, expression)
@@ -19,85 +20,45 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                     (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
             _byExpressions = expression.ByClause.Expressions.Select((s, i) =>
                     (expression.ResultType.Members[i].Name, StirlingExpression.Build(engine, s.Element))).ToList();
+
+            _resultSchema = new TableSchema(
+                expression.ResultType.Members.Select(m => new ColumnDefinition(m.Name, KustoValueKind.Real)).ToList());
         }
 
         protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
-            return new SummarizeResultTable(_engine, input, _byExpressions, _aggregationExpressions);
-            /*
-            var dictionary = new Dictionary<int, List<IRow>>();
-            IRow? nextRow = input.GetNextRow();
-            while (nextRow != null)
-            {
-                var aggKeyList = new List<object?>();
-                foreach (string columnName in _byExpressions)
-                {
-                    aggKeyList.Add(nextRow[columnName]);
-                }
-
-                int listHashCode = GetListHashCode(aggKeyList);
-                if (!dictionary.TryGetValue(listHashCode, out var rows))
-                {
-                    rows = new List<IRow>();
-                    dictionary[listHashCode] = rows;
-                }
-
-                rows.Add(nextRow);
-                nextRow = input.GetNextRow();
-            }
-
-            var summarizedTable = new List<IRow>();
-            foreach ((int _, var rows) in dictionary)
-            {
-                var row = new Dictionary<string, object?>();
-                foreach (var (columnName, aggregationExpression) in _aggregationExpressions)
-                {
-                    row[columnName] = aggregationExpression.Evaluate(rows);
-                }
-
-                summarizedTable.Add(new Row(row));
-            }
-
-            return new InMemoryTabularSource(summarizedTable.ToArray());
-            */
-        }
-
-        private static int GetListHashCode(IEnumerable<object?> objects)
-        {
-            return objects.Aggregate(0, (x, y) => x.GetHashCode() ^ y?.GetHashCode() ?? 0);
+            return new SummarizeResultTable(input, _byExpressions, _aggregationExpressions, _resultSchema);
         }
 
         internal class SummarizeResultTable : ITabularSourceV2
         {
-            private readonly StirlingEngine _engine;
             private readonly ITabularSourceV2 _input;
             private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
             private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
+            private readonly TableSchema _resultSchema;
 
             public SummarizeResultTable(
-                StirlingEngine engine,
                 ITabularSourceV2 input,
                 List<(string Name, StirlingExpression Expression)> byExpressions,
-                List<(string Name, StirlingExpression Expression)> aggregationExpressions)
+                List<(string Name, StirlingExpression Expression)> aggregationExpressions,
+                TableSchema resultSchema)
             {
-                _engine = engine;
                 _input = input;
                 _byExpressions = byExpressions;
                 _aggregationExpressions = aggregationExpressions;
+                _resultSchema = resultSchema;
             }
 
-            public TableSchema Schema => TableSchema.Empty; // TODO
+            public TableSchema Schema => _resultSchema;
 
             public IEnumerable<ITableChunk> GetData()
             {
-                // TODO: Implement summarize
-                // Open questions:
-                //   * How to avoid hydrating data from _input more than once
-                //   * How to bucket rows from `_input` as they come into each summarize bucket.
+                // TODO: This is horribly inefficient
+                //  * Copies all data, even columns that aren't used
+                //  * Composite key calculation involves lots of string allocations and escapings
 
-
-                var bucketizedTables = new Dictionary<string, List<object?>[]>();
-                // For now, just pass-through the source. Oops..
+                var bucketizedTables = new Dictionary<string, (List<object?> ByValues, List<object?>[] OriginalData)>();
+                int numInputColumns = _input.Schema.ColumnDefinitions.Count;
                 foreach (var chunk in _input.GetData())
                 {
                     for (int i = 0; i < chunk.RowCount; i++)
@@ -111,22 +72,49 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                         var key = string.Join("|", byValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
                         if (!bucketizedTables.TryGetValue(key, out var bucket))
                         {
-                            bucketizedTables[key] = bucket = new List<object?>[_input.Schema.ColumnDefinitions.Count];
-                            for (int j = 0; j < _input.Schema.ColumnDefinitions.Count; j++)
+                            bucketizedTables[key] = bucket = (byValues, new List<object?>[numInputColumns]);
+                            for (int j = 0; j < numInputColumns; j++)
                             {
-                                bucket[j] = new List<object?>();
+                                bucket.OriginalData[j] = new List<object?>();
                             }
                         }
 
-                        for (int j = 0; j < bucket.Length; j++)
+                        for (int j = 0; j < numInputColumns; j++)
                         {
-                            bucket[j].Add(row.Values[j]);
+                            bucket.OriginalData[j].Add(row.Values[j]);
                         }
                     }
-                    yield return chunk;
                 }
 
-                yield break;
+                var resultsData = new object?[_byExpressions.Count + _aggregationExpressions.Count][];
+                for (int i = 0; i < resultsData.Length; i++)
+                {
+                    var a = resultsData[i];
+                    resultsData[i] = new object?[bucketizedTables.Count];
+                }
+
+                int resultRow = 0;
+                foreach (var tableData in bucketizedTables.Values)
+                {
+                    for (int i = 0; i < tableData.ByValues.Count; i++)
+                    {
+                        resultsData[i][resultRow] = tableData.ByValues[i];
+                    }
+
+                    var tableForAggregation = new InMemoryTabularSourceV2(_input.Schema, tableData.OriginalData.Select(c => new Column(c.ToArray())).ToArray());
+
+                    for (int i = 0; i < _aggregationExpressions.Count; i++)
+                    {
+                        var aggregationExpression = _aggregationExpressions[i];
+                        var aggregation = aggregationExpression.Expression.Evaluate(tableForAggregation);
+                        resultsData[tableData.ByValues.Count + i][resultRow] = aggregation;
+                    }
+
+                    resultRow++;
+                }
+
+                var resultChunk = new TableChunk(_resultSchema, resultsData.Select(c => new Column(c)).ToArray());
+                yield return resultChunk;
             }
         }
     }

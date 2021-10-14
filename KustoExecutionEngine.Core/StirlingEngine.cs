@@ -11,7 +11,7 @@ namespace KustoExecutionEngine.Core
 {
     public class StirlingEngine
     {
-        private readonly List<(string TableName, TableSchema tableSchema, ITableChunk tableChunk)> _globalTables = new();
+        private readonly List<(string TableName, ITabularSourceV2 Source)> _globalTables = new();
         private readonly Stack<ExecutionContext> _executionContexts;
 
         public StirlingEngine()
@@ -19,9 +19,9 @@ namespace KustoExecutionEngine.Core
             _executionContexts = new Stack<ExecutionContext>();
         }
 
-        public void AddGlobalTable(string tableName, TableSchema tableSchema, ITableChunk tableChunk)
+        public void AddGlobalTable(string tableName, ITabularSourceV2 source)
         {
-            _globalTables.Add((tableName, tableSchema, tableChunk));
+            _globalTables.Add((tableName, source));
         }
 
         internal ExecutionContext ExecutionContext => _executionContexts.Peek();
@@ -34,15 +34,12 @@ namespace KustoExecutionEngine.Core
                 _globalTables.Select(
                     tableDef => new TableSymbol(
                         tableDef.TableName,
-                        "(" + string.Join(",", tableDef.tableSchema.ColumnDefinitions.Select(c => $"{c.ColumnName}: {c.ValueKind.ToString().ToLower()}")) + ")")
+                        "(" + string.Join(",", tableDef.Source.Schema.ColumnDefinitions.Select(c => $"{c.ColumnName}: {c.ValueKind.ToString().ToLower()}")) + ")")
                 ).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
             var globalObjects = _globalTables
-                .Select(globalTable =>
-                    new KeyValuePair<string, object?>(
-                        globalTable.TableName,
-                        new InMemoryTabularSourceV2(globalTable.tableSchema, Enumerable.Repeat(globalTable.tableChunk, 1))))
+                .Select(globalTable => new KeyValuePair<string, object?>(globalTable.TableName, globalTable.Source))
                 .ToArray();
             _executionContexts.Push(new ExecutionContext(null, globalObjects));
 

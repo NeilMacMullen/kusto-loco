@@ -7,7 +7,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
     {
         internal static Column ProjectColumn(StirlingEngine engine, ITableChunk chunk, StirlingExpression expression)
         {
-            var result = new Column(chunk.RowCount);
+            var data = new object?[chunk.RowCount];
             for (int i = 0; i < chunk.RowCount; i++)
             {
                 engine.PushRowContext(chunk.GetRow(i));
@@ -15,7 +15,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 {
                     var value = expression.Evaluate(null);
 
-                    result[i] = value;
+                    data[i] = value;
                 }
                 finally
                 {
@@ -23,7 +23,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 }
             }
 
-            return result;
+            return new Column(data);
         }
 
         internal static ITabularSourceV2 ProjectColumn(StirlingEngine engine, ITabularSourceV2 source, StirlingExpression expression, string? name = null)
