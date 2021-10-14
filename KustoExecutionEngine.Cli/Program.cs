@@ -9,7 +9,7 @@ using ColumnDefinition = KustoExecutionEngine.Core.DataSource.ColumnDefinition;
 var query = @"
 let c=100.0;
 MyTable
-| project frac=CounterValue, AppMachine, CounterName
+| project frac=CounterValue/c, AppMachine, CounterName
 | summarize avg(frac) by CounterName
 ";
 
