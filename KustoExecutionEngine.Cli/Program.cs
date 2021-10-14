@@ -8,7 +8,7 @@ using KustoExecutionEngine.Core.Extensions;
 var query = @"
 let c=100.0;
 MyTable
-| where AppMachine != 'vm1'
+| where (AppMachine != 'vm1' and CounterValue <= 50) or AppMachine == 'vm2'
 | project frac=CounterValue/c, AppMachine, CounterName
 | summarize avg(frac) by CounterName
 | project CounterName, avgRoundedPercent=tolong(avg_frac*100)

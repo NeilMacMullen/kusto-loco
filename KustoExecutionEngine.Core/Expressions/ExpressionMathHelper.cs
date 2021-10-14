@@ -30,8 +30,16 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private static BasicOperators BoolOperators = new BasicOperators
         {
-            Equal = (left, right) => Object.Equals(left, right),
-            NotEqual = (left, right) => !Object.Equals(left, right),
+            Equal = (left, right) => Equals(left, right),
+            NotEqual = (left, right) => !Equals(left, right),
+
+            // TODO: This is obviously wrong. For boolean operators, picking the operator based solely on the result type (bool) is silly.
+            GreaterThan = (left, right) => Convert.ToDouble(left) > Convert.ToDouble(right),
+            GreaterThanOrEqual = (left, right) => Convert.ToDouble(left) >= Convert.ToDouble(right),
+            LessThan = (left, right) => Convert.ToDouble(left) < Convert.ToDouble(right),
+            LessThanOrEqual = (left, right) => Convert.ToDouble(left) <= Convert.ToDouble(right),
+            And = (left, right) => Convert.ToBoolean(left) && Convert.ToBoolean(right),
+            Or = (left, right) => Convert.ToBoolean(left) || Convert.ToBoolean(right),
         };
 
         internal static BasicOperators GetOperandsByResultType(KustoValueKind kind)
@@ -56,6 +64,12 @@ namespace KustoExecutionEngine.Core.Expressions
             internal Impl Divide;
             internal Impl Equal;
             internal Impl NotEqual;
+            internal Impl GreaterThan;
+            internal Impl GreaterThanOrEqual;
+            internal Impl LessThan;
+            internal Impl LessThanOrEqual;
+            internal Impl And;
+            internal Impl Or;
         }
     }
 }

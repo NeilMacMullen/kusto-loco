@@ -24,8 +24,19 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.MultiplyExpression => operands.Multiply,
                 SyntaxKind.EqualExpression => operands.Equal,
                 SyntaxKind.NotEqualExpression => operands.NotEqual,
+                SyntaxKind.GreaterThanExpression => operands.GreaterThan,
+                SyntaxKind.GreaterThanOrEqualExpression => operands.GreaterThanOrEqual,
+                SyntaxKind.LessThanExpression => operands.LessThan,
+                SyntaxKind.LessThanOrEqualExpression => operands.LessThanOrEqual,
+                SyntaxKind.AndExpression => operands.And,
+                SyntaxKind.OrExpression => operands.Or,
                 _ => throw new InvalidOperationException($"Unsupported binary operation kind '{expression.Kind}'."),
             };
+
+            if (_impl is null)
+            {
+                throw new InvalidOperationException($"Unsupported binary expression '{expression.Kind}' for result type '{expression.ResultType.ToKustoValueKind()}'.");
+            }
         }
 
         protected override object? EvaluateInternal(object? input)
