@@ -20,7 +20,7 @@ namespace KustoExecutionEngine.Core.Expressions
         private static readonly Dictionary<Symbol, AggregationFunctionImpl> AggregationFunctionsMap = new()
         {
             [Aggregates.Count] = CountImpl,
-            //[Aggregates.Sum] = SumImpl,
+            [Aggregates.Sum] = SumImpl,
         };
 
         private readonly RowFunctionImpl _rowImpl = (_, _) => throw new NotSupportedException();
@@ -45,6 +45,7 @@ namespace KustoExecutionEngine.Core.Expressions
             }
             else
             {
+                // TODO: Support user functions
                 throw new InvalidOperationException($"Unsupported function {expression}.");
             }
         }
@@ -72,23 +73,24 @@ namespace KustoExecutionEngine.Core.Expressions
             {
                 count += chunk.RowCount;
             }
+
             return count;
         }
 
-        private object? SumImpl(object? input)
+        private static object? SumImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
         {
-            if (input is not IList<IRow> table)
+            double sum = 0;
+            foreach (var chunk in table.GetData())
             {
-                throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+                for (int i = 0; i < chunk.RowCount; i++)
+                {
+                    var row = chunk.GetRow(i);
+                    var value = argumentExpressions[0].Evaluate(row);
+                    sum += Convert.ToDouble(value);
+                }
             }
 
-            // TODO: Implement sum
-            //return table.Select(r => _argumentExpressions[0].Evaluate(r)).Aggregate((x, y) =>
-            //    StirlingBinaryExpression.StirlingAddBinaryExpression.GetDecimalResultTypeImpl(_expressionResultType)
-            //        .Invoke(x, y));
-            return 0.0;
-
-            throw new NotSupportedException($"Unexpected input type, expected IList<IRow>, got {TypeNameHelper.GetTypeDisplayName(input)}.");
+            return sum;
         }
     }
 }

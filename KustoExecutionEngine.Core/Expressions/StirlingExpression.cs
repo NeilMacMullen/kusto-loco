@@ -26,7 +26,7 @@ namespace KustoExecutionEngine.Core.Expressions
 
         /// <summary>
         /// Evaluates the expression.
-        /// <paramref name="input"/> can be null, a scalar or an <see cref="ITabularSource"/>.
+        /// <paramref name="input"/> can be null, an <see cref="IRow"/>, or an <see cref="ITabularSourceV2"/>.
         /// </summary>
         public object? Evaluate(object? input)
         {

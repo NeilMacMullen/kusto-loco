@@ -10,7 +10,7 @@ var query = @"
 let c=10.0;
 MyTable
 | project Column1=1,(a+c)
-| summarize count() by Column1
+| summarize count(), sum(Column1) by Column1
 ";
 
 var engine = new StirlingEngine();
