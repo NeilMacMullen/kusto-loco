@@ -17,7 +17,7 @@
 <p>
     <label>
         KQL query:
-        <input type="textbox" @bind="CurrentQueryValue" />
+        <textarea @bind="CurrentQueryValue" />
 
         <InputFile @onclick="GetValue" OnChange="@LoadFiles" />
     </label>
