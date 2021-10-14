@@ -23,6 +23,7 @@ namespace KustoExecutionEngine.Core.Expressions
                 SyntaxKind.DivideExpression => operands.Divide,
                 SyntaxKind.MultiplyExpression => operands.Multiply,
                 SyntaxKind.EqualExpression => operands.Equal,
+                SyntaxKind.NotEqualExpression => operands.NotEqual,
                 _ => throw new InvalidOperationException($"Unsupported binary operation kind '{expression.Kind}'."),
             };
         }

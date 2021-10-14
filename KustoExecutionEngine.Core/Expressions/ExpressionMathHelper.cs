@@ -30,10 +30,8 @@ namespace KustoExecutionEngine.Core.Expressions
 
         private static BasicOperators BoolOperators = new BasicOperators
         {
-            Equal = (left, right) =>
-            {
-                return Convert.ToString(left) == Convert.ToString(right);
-            },
+            Equal = (left, right) => Object.Equals(left, right),
+            NotEqual = (left, right) => !Object.Equals(left, right),
         };
 
         internal static BasicOperators GetOperandsByResultType(KustoValueKind kind)
@@ -57,6 +55,7 @@ namespace KustoExecutionEngine.Core.Expressions
             internal Impl Multiply;
             internal Impl Divide;
             internal Impl Equal;
+            internal Impl NotEqual;
         }
     }
 }
