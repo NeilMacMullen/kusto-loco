@@ -7,7 +7,7 @@ namespace KustoExecutionEngine.Core.Expressions
     {
         private readonly StirlingExpression _left;
         private readonly StirlingExpression _right;
-        private readonly ExpressionMathHelper.BasicOperands.Impl _impl;
+        private readonly ExpressionMathHelper.BasicOperators.Impl _impl;
 
         public StirlingBinaryExpression(StirlingEngine engine, BinaryExpression expression)
             : base(engine, expression)
