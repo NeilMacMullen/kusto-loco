@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace KustoExecutionEngine.Core
 {
-    public class DerivedTabularSourceV2 : ITabularSourceV2
+    public class DerivedTableSource : ITableSource
     {
-        private readonly ITabularSourceV2 _source;
+        private readonly ITableSource _source;
         private readonly TableSchema _newSchema;
         private readonly Func<ITableChunk, ITableChunk?> _mapFn;
 
-        public DerivedTabularSourceV2(ITabularSourceV2 source, TableSchema newSchema, Func<ITableChunk, ITableChunk?> mapFn)
+        public DerivedTableSource(ITableSource source, TableSchema newSchema, Func<ITableChunk, ITableChunk?> mapFn)
         {
             _source = source;
             _newSchema = newSchema;
@@ -23,8 +24,9 @@ namespace KustoExecutionEngine.Core
             foreach (var chunk in this._source.GetData())
             {
                 var newChunk = _mapFn(chunk);
-                if (newChunk != null)
+                if (newChunk is not null)
                 {
+                    Debug.Assert(ReferenceEquals(newChunk.Schema, _newSchema));
                     yield return newChunk;
                 }
             }

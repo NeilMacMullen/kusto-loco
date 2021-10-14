@@ -24,20 +24,20 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 expression.ResultType.Members.Select(m => new ColumnDefinition(m.Name, KustoValueKind.Real)).ToList());
         }
 
-        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
+        protected override ITableSource EvaluateTableInputInternal(ITableSource input)
         {
             return new SummarizeResultTable(input, _byExpressions, _aggregationExpressions, _resultSchema);
         }
 
-        internal class SummarizeResultTable : ITabularSourceV2
+        internal class SummarizeResultTable : ITableSource
         {
-            private readonly ITabularSourceV2 _input;
+            private readonly ITableSource _input;
             private readonly List<(string Name, StirlingExpression Expression)> _byExpressions;
             private readonly List<(string Name, StirlingExpression Expression)> _aggregationExpressions;
             private readonly TableSchema _resultSchema;
 
             public SummarizeResultTable(
-                ITabularSourceV2 input,
+                ITableSource input,
                 List<(string Name, StirlingExpression Expression)> byExpressions,
                 List<(string Name, StirlingExpression Expression)> aggregationExpressions,
                 TableSchema resultSchema)
@@ -100,7 +100,7 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                         resultsData[i][resultRow] = tableData.ByValues[i];
                     }
 
-                    var tableForAggregation = new InMemoryTabularSourceV2(_input.Schema, tableData.OriginalData.Select(c => new Column(c.ToArray())).ToArray());
+                    var tableForAggregation = new InMemoryTableSource(_input.Schema, tableData.OriginalData.Select(c => new Column(c.ToArray())).ToArray());
 
                     for (int i = 0; i < _aggregationExpressions.Count; i++)
                     {

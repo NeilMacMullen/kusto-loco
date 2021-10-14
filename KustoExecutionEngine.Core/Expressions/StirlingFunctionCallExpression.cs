@@ -15,7 +15,7 @@ namespace KustoExecutionEngine.Core.Expressions
             [Functions.ToLong] = ToLongImpl,
         };
 
-        private delegate object? AggregationFunctionImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table);
+        private delegate object? AggregationFunctionImpl(StirlingExpression[] argumentExpressions, ITableSource table);
         private static readonly Dictionary<Symbol, AggregationFunctionImpl> AggregationFunctionsMap = new()
         {
             [Aggregates.Count] = CountImpl,
@@ -55,7 +55,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return _rowImpl(_argumentExpressions, row);
         }
 
-        protected override object? EvaluateTableInputInternal(ITabularSourceV2 table)
+        protected override object? EvaluateTableInputInternal(ITableSource table)
         {
             return _aggImpl(_argumentExpressions, table);
         }
@@ -66,7 +66,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return Convert.ToInt64(argValue);
         }
 
-        private static object? CountImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
+        private static object? CountImpl(StirlingExpression[] argumentExpressions, ITableSource table)
         {
             long count = 0;
             foreach (var chunk in table.GetData())
@@ -77,7 +77,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return count;
         }
 
-        private static object? SumImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
+        private static object? SumImpl(StirlingExpression[] argumentExpressions, ITableSource table)
         {
             double sum = 0;
             foreach (var chunk in table.GetData())
@@ -93,7 +93,7 @@ namespace KustoExecutionEngine.Core.Expressions
             return sum;
         }
 
-        private static object? AvgImpl(StirlingExpression[] argumentExpressions, ITabularSourceV2 table)
+        private static object? AvgImpl(StirlingExpression[] argumentExpressions, ITableSource table)
         {
             double sum = 0;
             long count = 0;

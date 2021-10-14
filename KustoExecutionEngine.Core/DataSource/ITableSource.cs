@@ -2,7 +2,7 @@
 
 namespace KustoExecutionEngine.Core
 {
-    public interface ITabularSourceV2
+    public interface ITableSource
     {
         TableSchema Schema { get; }
 

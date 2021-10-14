@@ -2,11 +2,11 @@
 
 namespace KustoExecutionEngine.Core
 {
-    public class InMemoryTabularSourceV2 : ITabularSourceV2
+    public class InMemoryTableSource : ITableSource
     {
         private readonly ITableChunk[] _data;
 
-        public InMemoryTabularSourceV2(TableSchema schema, Column[] columns)
+        public InMemoryTableSource(TableSchema schema, Column[] columns)
         {
             this.Schema = schema;
             this._data = new ITableChunk[] { new TableChunk(Schema, columns) };

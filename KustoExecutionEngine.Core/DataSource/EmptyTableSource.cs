@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace KustoExecutionEngine.Core
 {
-    internal class EmptyTabularSourceV2 : ITabularSourceV2
+    internal class EmptyTableSource : ITableSource
     {
         public TableSchema Schema => TableSchema.Empty;
 

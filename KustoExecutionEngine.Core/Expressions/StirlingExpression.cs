@@ -25,7 +25,7 @@ namespace KustoExecutionEngine.Core.Expressions
 
         /// <summary>
         /// Evaluates the expression.
-        /// <paramref name="input"/> can be null, an <see cref="IRow"/>, or an <see cref="ITabularSourceV2"/>.
+        /// <paramref name="input"/> can be null, an <see cref="IRow"/>, or an <see cref="ITableSource"/>.
         /// </summary>
         public object? Evaluate(object? input)
         {
@@ -59,14 +59,14 @@ namespace KustoExecutionEngine.Core.Expressions
         {
             return input switch
             {
-                ITabularSourceV2 table => EvaluateTableInputInternal(table),
+                ITableSource table => EvaluateTableInputInternal(table),
                 IRow row => EvaluateRowInputInternal(row),
                 null => EvaluateNullInputInternal(),
                 _ => throw new InvalidOperationException($"Unexpected input type to evaluate '{TypeNameHelper.GetTypeDisplayName(input)}'."),
             };
         }
 
-        protected virtual object? EvaluateTableInputInternal(ITabularSourceV2 table)
+        protected virtual object? EvaluateTableInputInternal(ITableSource table)
         {
             throw new NotImplementedException($"{nameof(EvaluateTableInputInternal)} not implemented for {TypeNameHelper.GetTypeDisplayName(this)}.");
         }

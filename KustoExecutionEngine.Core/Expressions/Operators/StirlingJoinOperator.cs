@@ -9,10 +9,10 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
         {
         }
 
-        protected override object? EvaluateTableInputInternal(ITabularSourceV2 input)
+        protected override object? EvaluateTableInputInternal(ITableSource input)
         {
             // TODO: Implement join
-            return new EmptyTabularSourceV2();
+            return new EmptyTableSource();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace KustoExecutionEngine.Core
 {
     public class StirlingEngine
     {
-        private readonly List<(string TableName, ITabularSourceV2 Source)> _globalTables = new();
+        private readonly List<(string TableName, ITableSource Source)> _globalTables = new();
         private readonly Stack<ExecutionContext> _executionContexts;
 
         public StirlingEngine()
@@ -18,7 +18,7 @@ namespace KustoExecutionEngine.Core
             _executionContexts = new Stack<ExecutionContext>();
         }
 
-        public void AddGlobalTable(string tableName, ITabularSourceV2 source)
+        public void AddGlobalTable(string tableName, ITableSource source)
         {
             _globalTables.Add((tableName, source));
         }

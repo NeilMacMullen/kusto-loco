@@ -17,19 +17,19 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             return new Column(data);
         }
 
-        internal static ITabularSourceV2 ProjectColumn(StirlingEngine engine, ITabularSourceV2 source, StirlingExpression expression, string? name = null)
+        internal static ITableSource ProjectColumn(StirlingEngine engine, ITableSource source, StirlingExpression expression, string? name = null)
         {
             return new ProjectColumnTable(engine, source, expression, name);
         }
 
-        private class ProjectColumnTable : ITabularSourceV2
+        private class ProjectColumnTable : ITableSource
         {
             private readonly StirlingEngine _engine;
-            private readonly ITabularSourceV2 _source;
+            private readonly ITableSource _source;
             private readonly StirlingExpression _expression;
             private readonly TableSchema _schema;
 
-            public ProjectColumnTable(StirlingEngine engine, ITabularSourceV2 source, StirlingExpression expression, string? name = null)
+            public ProjectColumnTable(StirlingEngine engine, ITableSource source, StirlingExpression expression, string? name = null)
             {
                 _engine = engine;
                 _source = source;

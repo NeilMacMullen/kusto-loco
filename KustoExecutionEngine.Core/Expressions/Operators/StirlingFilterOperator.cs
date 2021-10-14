@@ -9,10 +9,10 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
         {
         }
 
-        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
+        protected override ITableSource EvaluateTableInputInternal(ITableSource input)
         {
             // TODO implement filter
-            return new DerivedTabularSourceV2(
+            return new DerivedTableSource(
                 input,
                 input.Schema,
                 chunk =>

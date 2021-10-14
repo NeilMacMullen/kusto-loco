@@ -12,7 +12,7 @@ MyTable
 ";
 
 var engine = new StirlingEngine();
-var myTable = new InMemoryTabularSourceV2(
+var myTable = new InMemoryTableSource(
     new TableSchema(
         new List<ColumnDefinition>()
         {
@@ -28,7 +28,7 @@ var myTable = new InMemoryTabularSourceV2(
         });
 engine.AddGlobalTable("MyTable", myTable);
 var result = engine.Evaluate(query);
-if (result is ITabularSourceV2 tabularResult)
+if (result is ITableSource tabularResult)
 {
     foreach (var columnDef in tabularResult.Schema.ColumnDefinitions)
     {

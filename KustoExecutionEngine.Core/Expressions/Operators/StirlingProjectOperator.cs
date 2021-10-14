@@ -31,9 +31,9 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             _resultSchema = new TableSchema(resultSchemaColumns);
         }
 
-        protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
+        protected override ITableSource EvaluateTableInputInternal(ITableSource input)
         {
-            return new DerivedTabularSourceV2(
+            return new DerivedTableSource(
                 input,
                 _resultSchema,
                 chunk =>
