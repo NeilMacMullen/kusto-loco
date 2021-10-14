@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace KustoExecutionEngine.Core.DataSource
 {
@@ -10,20 +6,22 @@ namespace KustoExecutionEngine.Core.DataSource
     {
         public TableChunk(TableSchema schema, Column[] columns)
         {
-            this.Schema = schema;
-            this.Columns = columns;
+            Schema = schema;
+            Columns = columns;
         }
 
-        public TableSchema Schema { get; private set; }
+        public TableSchema Schema { get; }
 
-        public Column[] Columns { get; private set; }
+        public Column[] Columns { get; }
+
+        public int RowCount => Columns.Length == 0 ? 0 : Columns[0].RowCount;
 
         public IRow GetRow(int index)
         {
-            var values = new KeyValuePair<string, object?>[this.Schema.ColumnDefinitions.Count];
-            for (int i = 0; i < this.Schema.ColumnDefinitions.Count; i++)
+            var values = new KeyValuePair<string, object?>[Schema.ColumnDefinitions.Count];
+            for (int i = 0; i < Schema.ColumnDefinitions.Count; i++)
             {
-                values[i] = new KeyValuePair<string, object?>(this.Schema.ColumnDefinitions[i].ColumnName, this.Columns[i][index]);
+                values[i] = new KeyValuePair<string, object?>(Schema.ColumnDefinitions[i].ColumnName, Columns[i][index]);
             }
 
             return new Row(values);
@@ -33,7 +31,7 @@ namespace KustoExecutionEngine.Core.DataSource
         {
             foreach (var kvp in row)
             {
-                this.Columns[this.Schema.GetColumnIndex(kvp.Key)][index] = kvp.Value;
+                Columns[Schema.GetColumnIndex(kvp.Key)][index] = kvp.Value;
             }
         }
     }

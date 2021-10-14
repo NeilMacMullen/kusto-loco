@@ -31,7 +31,7 @@ if (result is ITabularSourceV2 tabularResult)
 {
     foreach (var resultChunk in tabularResult.GetData())
     {
-        for (int i = 0; i < resultChunk.Columns[0].Size; i++)
+        for (int i = 0; i < resultChunk.RowCount; i++)
         {
             Console.WriteLine(string.Join(", ", resultChunk.GetRow(i).Select(r => $"{r.Key}={r.Value}")));
         }
