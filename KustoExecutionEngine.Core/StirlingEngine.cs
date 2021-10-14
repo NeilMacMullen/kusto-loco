@@ -51,7 +51,7 @@ namespace KustoExecutionEngine.Core
             {
                 foreach (var diag in diagnostics)
                 {
-                    Console.WriteLine($"Kusto diagnostics: {diag}");
+                    Console.WriteLine($"Kusto diagnostics: {diag.Severity} {diag.Code} {diag.Message} {diag.Description}");
                 }
 
                 throw new InvalidOperationException("Query is malformed.");
