@@ -29,13 +29,27 @@ engine.AddGlobalTable("MyTable", tableSchema, tableChunk);
 var result = engine.Evaluate(query);
 if (result is ITabularSourceV2 tabularResult)
 {
-    foreach (var resultChunk in tabularResult.GetData())
+    foreach (var columnDef in tabularResult.Schema.ColumnDefinitions)
     {
-        for (int i = 0; i < resultChunk.RowCount; i++)
+        Console.Write(columnDef.ColumnName);
+        Console.Write("; ");
+    }
+    Console.WriteLine("------------------");
+
+    foreach (var chunk in tabularResult.GetData())
+    {
+        for (int i = 0; i < chunk.RowCount; i++)
         {
-            Console.WriteLine(string.Join(", ", resultChunk.GetRow(i).Select(r => $"{r.Key}={r.Value}")));
+            var row = chunk.GetRow(i);
+            for (int j = 0; j < row.Values.Length; j++)
+            {
+                Console.Write(row.Values[j]);
+                Console.Write("; ");
+            }
+            Console.WriteLine();
         }
     }
+    Console.WriteLine();
 }
 
 Console.WriteLine("Done");

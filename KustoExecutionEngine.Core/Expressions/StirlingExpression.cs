@@ -1,3 +1,5 @@
+//#define DEBUG_EXPRESSIONS
+
 using System;
 using Kusto.Language.Syntax;
 using KustoExecutionEngine.Core.DataSource;
@@ -7,7 +9,7 @@ namespace KustoExecutionEngine.Core.Expressions
 {
     internal abstract class StirlingExpression
     {
-#if DEBUG
+#if DEBUG_EXPRESSIONS
         static int DebugIndent = 0;
 #endif
 
@@ -26,7 +28,7 @@ namespace KustoExecutionEngine.Core.Expressions
         /// Evaluates the expression.
         /// <paramref name="input"/> can be null, a scalar or an <see cref="ITabularSource"/>.
         /// </summary>
-        public object Evaluate(object? input)
+        public object? Evaluate(object? input)
         {
             if (!_initialized)
             {
@@ -34,14 +36,14 @@ namespace KustoExecutionEngine.Core.Expressions
                 _initialized = true;
             }
 
-#if DEBUG
+#if DEBUG_EXPRESSIONS
             Console.WriteLine($"{new string(' ', DebugIndent)}Evaluating expression {TypeNameHelper.GetTypeDisplayName(this)} ({_expression.ToString(IncludeTrivia.SingleLine)})");
             DebugIndent++;
             try
             {
 #endif
-                return EvaluateInternal(input);
-#if DEBUG
+            return EvaluateInternal(input);
+#if DEBUG_EXPRESSIONS
             }
             finally
             {

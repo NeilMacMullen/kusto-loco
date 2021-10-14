@@ -26,5 +26,10 @@ namespace KustoExecutionEngine.Core.DataSource
         {
             return _columnMap[columnName];
         }
+
+        public bool TryGetColumnIndex(string columnName, out int index)
+        {
+            return _columnMap.TryGetValue(columnName, out index);
+        }
     }
 }

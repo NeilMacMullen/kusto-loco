@@ -1,30 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core
 {
     public class Row : IRow
     {
-        private readonly Dictionary<string, object?> _values;
-
-        public Row(IEnumerable<KeyValuePair<string, object?>> values)
+        public Row(TableSchema schema, object?[] values)
         {
-            _values = new Dictionary<string, object?>(values);
+            Schema = schema;
+            Values = values;
         }
 
-        public object? this[string columnName] => _values[columnName];
-
-        public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
-        {
-            foreach (var kvp in _values)
-            {
-                yield return kvp;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        public TableSchema Schema { get; }
+        public object?[] Values { get; }
     }
 }

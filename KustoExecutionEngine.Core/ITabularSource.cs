@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KustoExecutionEngine.Core.DataSource;
 
 namespace KustoExecutionEngine.Core
 {
@@ -7,8 +8,10 @@ namespace KustoExecutionEngine.Core
         IRow? GetNextRow();
     }
 
-    public interface IRow : IEnumerable<KeyValuePair<string, object?>>
+    public interface IRow
     {
-        object? this[string columnName] { get; }
+        TableSchema Schema { get; }
+
+        object?[] Values { get; }
     }
 }

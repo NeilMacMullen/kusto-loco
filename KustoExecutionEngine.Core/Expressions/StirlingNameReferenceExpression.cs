@@ -15,10 +15,11 @@ namespace KustoExecutionEngine.Core.Expressions
 
         protected override object? EvaluateRowInputInternal(IRow row)
         {
-            // TODO: This is horrendous
-            if (row.ToArray().Any(kvp => kvp.Key == Name))
+            // TODO: Shouldn't need to find column index for each row, as it's always the same...
+            // Could we do it in the constructor?
+            if (row.Schema.TryGetColumnIndex(Name, out var index))
             {
-                return row[Name]!;
+                return row.Values[index];
             }
 
             return EvaluateNullInputInternal();

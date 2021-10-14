@@ -95,16 +95,38 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 //   * How to avoid hydrating data from _input more than once
                 //   * How to bucket rows from `_input` as they come into each summarize bucket.
 
-                foreach (var aggregationExpression in _aggregationExpressions)
-                {
-                    OperatorHelpers.ProjectColumn(_engine, _input, aggregationExpression.Expression);
-                }
 
+                var bucketizedTables = new Dictionary<string, List<object?>[]>();
                 // For now, just pass-through the source. Oops..
                 foreach (var chunk in _input.GetData())
                 {
+                    for (int i = 0; i < chunk.RowCount; i++)
+                    {
+                        var row = chunk.GetRow(i);
+
+                        var byValues = _byExpressions.Select(e => e.Expression.Evaluate(row)).ToList();
+
+                        // TODO: Should nulls be treated differently than empty string?
+                        // TODO: Use a less expensive composite key computation
+                        var key = string.Join("|", byValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
+                        if (!bucketizedTables.TryGetValue(key, out var bucket))
+                        {
+                            bucketizedTables[key] = bucket = new List<object?>[_input.Schema.ColumnDefinitions.Count];
+                            for (int j = 0; j < _input.Schema.ColumnDefinitions.Count; j++)
+                            {
+                                bucket[j] = new List<object?>();
+                            }
+                        }
+
+                        for (int j = 0; j < bucket.Length; j++)
+                        {
+                            bucket[j].Add(row.Values[j]);
+                        }
+                    }
                     yield return chunk;
                 }
+
+                yield break;
             }
         }
     }

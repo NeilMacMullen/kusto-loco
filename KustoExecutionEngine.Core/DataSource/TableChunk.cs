@@ -18,21 +18,13 @@ namespace KustoExecutionEngine.Core.DataSource
 
         public IRow GetRow(int index)
         {
-            var values = new KeyValuePair<string, object?>[Schema.ColumnDefinitions.Count];
+            var values = new object?[Schema.ColumnDefinitions.Count];
             for (int i = 0; i < Schema.ColumnDefinitions.Count; i++)
             {
-                values[i] = new KeyValuePair<string, object?>(Schema.ColumnDefinitions[i].ColumnName, Columns[i][index]);
+                values[i] = Columns[i][index];
             }
 
-            return new Row(values);
-        }
-
-        public void SetRow(IRow row, int index)
-        {
-            foreach (var kvp in row)
-            {
-                Columns[Schema.GetColumnIndex(kvp.Key)][index] = kvp.Value;
-            }
+            return new Row(Schema, values);
         }
     }
 }

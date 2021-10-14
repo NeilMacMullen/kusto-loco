@@ -9,7 +9,5 @@
         int RowCount { get; }
 
         IRow GetRow(int index);
-
-        void SetRow(IRow row, int index);
     }
 }

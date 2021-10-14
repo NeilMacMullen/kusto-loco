@@ -98,7 +98,14 @@ namespace KustoExecutionEngine.Core
 
         internal void PushRowContext(IRow row)
         {
-            var context = new ExecutionContext(_executionContexts.Peek(), row.ToArray());
+            var bindings = new KeyValuePair<string, object?>[row.Schema.ColumnDefinitions.Count];
+            for (int i = 0; i < row.Schema.ColumnDefinitions.Count; i++)
+            {
+                var columnDef = row.Schema.ColumnDefinitions[i];
+                bindings[i] = new KeyValuePair<string, object?>(columnDef.ColumnName, row.Values[i]);
+            }
+
+            var context = new ExecutionContext(_executionContexts.Peek(), bindings);
             _executionContexts.Push(context);
         }
 
