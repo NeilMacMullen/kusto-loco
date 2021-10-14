@@ -4,7 +4,7 @@ namespace KustoExecutionEngine.Core.Expressions
 {
     internal static class ExpressionMathHelper
     {
-        private static BasicOperands DoubleOperands = new BasicOperands
+        private static BasicOperators DoubleOperators = new BasicOperators
         {
             Add = (left, right) => Convert.ToDouble(left) + Convert.ToDouble(right),
             Subtract = (left, right) => Convert.ToDouble(left) - Convert.ToDouble(right),
@@ -12,7 +12,7 @@ namespace KustoExecutionEngine.Core.Expressions
             Divide = (left, right) => Convert.ToDouble(left) / Convert.ToDouble(right),
         };
 
-        private static BasicOperands LongOperands = new BasicOperands
+        private static BasicOperators LongOperators = new BasicOperators
         {
             Add = (left, right) => Convert.ToInt64(left) + Convert.ToInt64(right),
             Subtract = (left, right) => Convert.ToInt64(left) - Convert.ToInt64(right),
@@ -20,7 +20,7 @@ namespace KustoExecutionEngine.Core.Expressions
             Divide = (left, right) => Convert.ToInt64(left) / Convert.ToInt64(right),
         };
 
-        private static BasicOperands IntOperands = new BasicOperands
+        private static BasicOperators IntOperators = new BasicOperators
         {
             Add = (left, right) => Convert.ToInt32(left) + Convert.ToInt32(right),
             Subtract = (left, right) => Convert.ToInt32(left) - Convert.ToInt32(right),
@@ -28,18 +28,18 @@ namespace KustoExecutionEngine.Core.Expressions
             Divide = (left, right) => Convert.ToInt32(left) / Convert.ToInt32(right),
         };
 
-        internal static BasicOperands GetOperandsByResultType(KustoValueKind kind)
+        internal static BasicOperators GetOperandsByResultType(KustoValueKind kind)
         {
             return kind switch
             {
-                KustoValueKind.Real => DoubleOperands,
-                KustoValueKind.Long => LongOperands,
-                KustoValueKind.Int => IntOperands,
+                KustoValueKind.Real => DoubleOperators,
+                KustoValueKind.Long => LongOperators,
+                KustoValueKind.Int => IntOperators,
                 _ => throw new InvalidOperationException($"Math operators not supported for type {kind}.")
             };
         }
 
-        internal struct BasicOperands
+        internal struct BasicOperators
         {
             internal delegate object? Impl(object? left, object? right);
 
