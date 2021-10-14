@@ -10,17 +10,9 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             var data = new object?[chunk.RowCount];
             for (int i = 0; i < chunk.RowCount; i++)
             {
-                engine.PushRowContext(chunk.GetRow(i));
-                try
-                {
-                    var value = expression.Evaluate(null);
-
-                    data[i] = value;
-                }
-                finally
-                {
-                    engine.LeaveExecutionContext();
-                }
+                var row = chunk.GetRow(i);
+                var value = expression.Evaluate(row);
+                data[i] = value;
             }
 
             return new Column(data);
