@@ -1,4 +1,7 @@
-﻿using Kusto.Language.Syntax;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using Kusto.Language.Syntax;
 
 namespace BabyKusto.Core.Expressions
 {

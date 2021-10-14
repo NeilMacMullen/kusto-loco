@@ -1,4 +1,7 @@
-﻿namespace BabyKusto.Core
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+namespace BabyKusto.Core
 {
     public class ColumnDefinition
     {

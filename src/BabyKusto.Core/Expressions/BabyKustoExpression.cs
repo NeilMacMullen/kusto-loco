@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 //#define DEBUG_EXPRESSIONS
 
 using System;

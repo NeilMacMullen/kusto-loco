@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using BabyKusto.Core;
 using BabyKusto.Core.Extensions;
 using FluentAssertions;
