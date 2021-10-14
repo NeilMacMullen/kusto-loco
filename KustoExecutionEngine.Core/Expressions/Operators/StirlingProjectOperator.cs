@@ -6,7 +6,8 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
 {
     internal sealed class StirlingProjectOperator : StirlingOperator<ProjectOperator>
     {
-        private readonly List<(string ColumnName, KustoValueKind ColumnValueType, StirlingExpression Expression)> _expressions;
+        private readonly List<StirlingExpression> _expressions;
+        private readonly TableSchema _resultSchema;
 
         public StirlingProjectOperator(StirlingEngine engine, ProjectOperator projectOperator)
             : base(engine, projectOperator)
@@ -14,7 +15,8 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
             var resultType = projectOperator.ResultType;
             var expressions = projectOperator.Expressions;
 
-            _expressions = new List<(string ColumnName, KustoValueKind ColumnValueType, StirlingExpression Expression)>(expressions.Count);
+            _expressions = new List<StirlingExpression>(expressions.Count);
+            var resultSchemaColumns = new List<ColumnDefinition>(expressions.Count);
             for (int i = 0; i < expressions.Count; i++)
             {
                 var expression = expressions[i].Element;
@@ -22,51 +24,28 @@ namespace KustoExecutionEngine.Core.Expressions.Operators
                 var columnValueType = expression.ResultType.ToKustoValueKind();
 
                 var builtExpression = StirlingExpression.Build(engine, expression);
-                _expressions.Add((columnName, columnValueType, builtExpression));
+                _expressions.Add(builtExpression);
+
+                resultSchemaColumns.Add(new ColumnDefinition(columnName, columnValueType));
             }
+
+            _resultSchema = new TableSchema(resultSchemaColumns);
         }
 
         protected override ITabularSourceV2 EvaluateTableInputInternal(ITabularSourceV2 input)
         {
-            var newColumnDefinitions = new List<ColumnDefinition>();
-            foreach (var expression in _expressions)
-            {
-                newColumnDefinitions.Add(new ColumnDefinition(expression.ColumnName, expression.ColumnValueType));
-            }
-            var newSchema = new TableSchema(newColumnDefinitions);
             return new DerivedTabularSourceV2(
                 input,
-                newSchema,
-                oldTableChunk =>
+                _resultSchema,
+                chunk =>
                 {
-                    var columns = new Column[newSchema.ColumnDefinitions.Count];
-                    for (var i = 0; i < columns.Length; i++)
+                    var columns = new Column[_expressions.Count];
+                    for (var i = 0; i < _expressions.Count; i++)
                     {
-                        columns[i] = new Column(oldTableChunk.Columns[0].Size);
+                        columns[i] = OperatorHelpers.ProjectColumn(_engine, chunk, _expressions[i]);
                     }
 
-                    var newTableChunk = new TableChunk(newSchema, columns);
-                    for (int i = 0; i < oldTableChunk.Columns[0].Size; i++)
-                    {
-                        _engine.PushRowContext(oldTableChunk.GetRow(i));
-                        try
-                        {
-                            var values = new List<KeyValuePair<string, object?>>(_expressions.Count);
-                            foreach (var expression in _expressions)
-                            {
-                                var value = expression.Expression.Evaluate(null);
-                                values.Add(new KeyValuePair<string, object?>(expression.ColumnName, value));
-                            }
-
-                            newTableChunk.SetRow(new Row(values), i);
-                        }
-                        finally
-                        {
-                            _engine.LeaveExecutionContext();
-                        }
-                    }
-
-                    return newTableChunk;
+                    return new TableChunk(_resultSchema, columns);
                 });
         }
     }

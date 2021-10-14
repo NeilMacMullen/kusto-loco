@@ -10,7 +10,7 @@ namespace KustoExecutionEngine.Core.DataSource
     {
         public TableSchema(List<ColumnDefinition> columnDefinitions)
         {
-            this.ColumnDefinitions = columnDefinitions; ;
+            this.ColumnDefinitions = columnDefinitions;
         }
 
         public List<ColumnDefinition> ColumnDefinitions { get; }
