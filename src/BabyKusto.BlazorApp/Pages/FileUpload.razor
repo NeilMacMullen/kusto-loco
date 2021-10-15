@@ -15,7 +15,8 @@
 <p>
     <label>
         KQL query:
-        <textarea rows="10" cols="50" @oninput="@GetValue" placeholder="Please use 'Data' as your query table name." />
+        <textarea spellcheck="false" rows="10" cols="50" @oninput="@GetValue" placeholder="Please use 'Data' as your query table name.">Data | project AppMachine, CounterName, v=CounterValue/100
+        </textarea>
         <InputFile OnChange="@LoadFiles" />
     </label>
 </p>
@@ -69,6 +70,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        queryValue = "Data | project AppMachine, CounterName, v=CounterValue/100";
         queryTable();
     }
 
