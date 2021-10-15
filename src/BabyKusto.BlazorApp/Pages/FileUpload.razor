@@ -15,8 +15,9 @@
 <p>
     <label>
         KQL query:
-        <textarea spellcheck="false" rows="10" cols="50" @oninput="@GetValue" placeholder="Please use 'Data' as your query table name.">Data | project AppMachine, CounterName, v=CounterValue/100
-        </textarea>
+        <textarea spellcheck="false" rows="10" cols="50"
+            style="font-family: monospace;"
+            value="@queryValue" @oninput="@GetValue" placeholder="Please use 'Data' as your query table name."></textarea>
         <InputFile OnChange="@LoadFiles" />
     </label>
 </p>
@@ -68,10 +69,15 @@ else
         return myTable;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        queryValue = "Data | project AppMachine, CounterName, v=CounterValue/100";
+        queryValue = 
+            "Data\n" +
+            "| project AppMachine,\n" +
+            "          CounterName,\n" +
+            "          v=CounterValue/100\n";
         queryTable();
+        return Task.CompletedTask;
     }
 
     private void GetValue(ChangeEventArgs e)
