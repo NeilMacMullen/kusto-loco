@@ -7,19 +7,17 @@
 @using Microsoft.Extensions.Logging
 @inject ILogger<FileUpload> Logger
 @inject IWebHostEnvironment Environment
-@using BabyKusto.BlazorApp.Data
-@inject FileProcessor fileProcessor
 
 <p>
-    <label>Please upload your file with your query:</label>
+    <label>Please upload a CSV file with your data</label><br />
+    <label>* Default result is based on Query = 'Data', File = a default table.</label>
 </p>
 
 <p>
     <label>
         KQL query:
-        <textarea @bind="CurrentQueryValue" />
-
-        <InputFile @onclick="GetValue" OnChange="@LoadFiles" />
+        <textarea rows="10" cols="50" @oninput="@GetValue" placeholder="Please use 'Data' as your query table name." />
+        <InputFile OnChange="@LoadFiles" />
     </label>
 </p>
 
@@ -35,6 +33,7 @@ else
         {
             <li>
                 <ul>
+                    <li>Query result:</li>
                     <li><pre>@resultData</pre></li>
                 </ul>
             </li>
@@ -47,51 +46,54 @@ else
     private long maxFileSize = 1024 * 15;
     private int maxAllowedFiles = 3;
     private bool isLoading;
+    private InMemoryTableSource myTable = GetDefaultTable();
+    private string queryValue = "Data";
 
-    private string CurrentQueryValue { get; set; }
-
-    private string QueryValue { get; set; }
-
-    private void GetValue()
-
+    private static InMemoryTableSource GetDefaultTable()
     {
-        QueryValue = CurrentQueryValue;
+        var myTable = new InMemoryTableSource(
+                      new TableSchema(
+                      new List<ColumnDefinition>()
+                        {
+                        new ColumnDefinition("AppMachine",   KustoValueKind.String),
+                        new ColumnDefinition("CounterName",  KustoValueKind.String),
+                        new ColumnDefinition("CounterValue", KustoValueKind.Real),
+                        }),
+                        new[]
+                        {
+                        new Column(new object?[] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
+                        new Column(new object?[] { "cpu", "mem", "cpu", "mem", "cpu" }),
+                        new Column(new object?[] {  50.0,  30.0,  20.0,  5.0,   100.0 }),
+                        });
+        return myTable;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        queryTable();
+    }
+
+    private void GetValue(ChangeEventArgs e)
+    {
+        queryValue = e.Value.ToString();
+        if (myTable != null)
+        {
+            queryTable();
+        }
     }
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
         isLoading = true;
-        resultToDisplay.Clear();
 
         foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
         {
             try
             {
-                var trustedFileNameForFileStorage = file.Name;
-
-                var fileDirectory = Path.Combine(Environment.ContentRootPath,
-                                        Environment.EnvironmentName);
-
-                CreateDirectory(fileDirectory);
-
-                var uploadFileDirectory = Path.Combine(fileDirectory, "Uploaded Files");
-
-                CreateDirectory(uploadFileDirectory);
-
-                var uploadFilePath = Path.Combine(uploadFileDirectory, trustedFileNameForFileStorage);
-
-                // Store file at the upload file location
-                await using FileStream fs = new(uploadFilePath, FileMode.Create);
-                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
-                fs.Close();
-
-                resultToDisplay.Add("Your uploaded file has been stored: " + uploadFilePath);
-
-                var result = fileProcessor.fileProcessor(trustedFileNameForFileStorage.Split('.')[0], uploadFilePath, QueryValue);
-
-                if (result is ITableSource tableResult)
+                myTable = (InMemoryTableSource)await fileProcessor(file);
+                if (queryValue != null)
                 {
-                    resultToDisplay.Add("Query result: " + tableResult.DumpToString());
+                    queryTable();
                 }
             }
             catch (Exception ex)
@@ -104,12 +106,92 @@ else
         isLoading = false;
     }
 
-    private void CreateDirectory(string fileDirectory)
+    private async Task<object?> fileProcessor(IBrowserFile file)
     {
-        if (!Directory.Exists(fileDirectory))
+        var columnName = Array.Empty<string>();
+        var rowValues = Array.Empty<object?>();
+        var columns = new List<List<object?>>();
+
+        try
         {
-            Directory.CreateDirectory(fileDirectory);
+            using (StreamReader sr = new StreamReader(file.OpenReadStream(maxFileSize)))
+            {
+                string? line;
+
+                // Read line by line
+                var rowNum = 0;
+                while ((line = await sr.ReadLineAsync()) != null)
+                {
+                    if (rowNum == 0)
+                    {
+                        // ['a', 'b']
+                        columnName = line.Split(',');
+
+                        // Initialize column list
+                        var c = 0;
+                        while (c < columnName.Length)
+                        {
+                            columns.Add(new List<object?>());
+                            c++;
+                        }
+                    }
+                    else
+                    {
+                        // [1.0, 2.0]
+                        rowValues = line.Split(',');
+
+                        // Fill column array
+                        var r = 0;
+                        while (r < rowValues.Length)
+                        {
+                            columns[r].Add(rowValues[r]);
+                            r++;
+                        }
+                    }
+                    rowNum++;
+                }
+            }
+
+            // Generate ColumnDefinition
+            var tableSchema = new List<ColumnDefinition>();
+
+            foreach (var colmunValue in columnName)
+            {
+                tableSchema.Add(new ColumnDefinition(colmunValue, KustoValueKind.Real));
+            }
+
+            return new InMemoryTableSource(
+                new TableSchema(
+                tableSchema),
+                columns.Select(c => new Column(c.ToArray())).ToArray());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("The file could not be read:");
+            Console.WriteLine(e.Message);
+            return "Please refer console for more details.";
         }
     }
 
+    private void queryTable()
+    {
+        resultToDisplay.Clear();
+        try
+        {
+            var engine = new BabyKustoEngine();
+            engine.AddGlobalTable(
+            "Data",
+            myTable);
+
+            var result = engine.Evaluate(queryValue);
+            if (result is ITableSource tableResult)
+            {
+                resultToDisplay.Add(tableResult.DumpToString());
+            }
+        }
+        catch (Exception e)
+        {
+            resultToDisplay.Add("Please refer console for more details.");
+        }
+    }
 }
