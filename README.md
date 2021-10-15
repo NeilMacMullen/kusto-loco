@@ -57,9 +57,9 @@ Result:
 ```
 
 ## A simple UI that you can upload your csv file and query against it:
-![image](https://user-images.githubusercontent.com/92544828/137518750-0eee9b0f-1cb4-4c28-a72e-57d5e96bf429.png)
+![image](https://user-images.githubusercontent.com/92544828/137521390-4c2168a8-40f1-40b3-b410-a81e9db2bd1e.png)
 
-To bring up the APP, just build the solution, and run dotnet watch run inside BabyKusto.BlazerApp directory:
+To bring up the APP, just build the solution, and run dotnet watch run inside the BabyKusto.BlazerApp directory:
 ![image](https://user-images.githubusercontent.com/92544828/137518974-3cba9d4f-dbcc-4d52-abde-1d99e34107f7.png)
 
 ## Contributing
