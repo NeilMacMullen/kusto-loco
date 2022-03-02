@@ -21,39 +21,41 @@ var result = engine.Evaluate(@"
                 v = avg(CounterValue/100)
                 by AppMachine");
 
-result.Dump(Console.Out);
+if (result is TabularResult tabularResult)
+{
+    tabularResult.Value.Dump(Console.Out, indent: 4);
+}
 ```
 
 ## Example output from `BabyKusto.Cli`:
 
 ```
+-----------------------------------------------------------------------
 Welcome to BabyKusto, the little self-contained Kusto execution engine!
 -----------------------------------------------------------------------
 
 MyTable:
-    AppMachine; CounterName; CounterValue;
+    AppMachine:string; CounterName:string; CounterValue:real
     ------------------
-    vm0; cpu; 50;
-    vm0; mem; 30;
-    vm1; cpu; 20;
-    vm1; mem; 5;
-    vm2; cpu; 100;
+    vm0; cpu; 50
+    vm0; mem; 30
+    vm1; cpu; 20
+    vm1; mem; 5
+    vm2; cpu; 100
 
 Query:
-
 let c=100.0;
 MyTable
-| where AppMachine != 'vm1'
+| where AppMachine == 'vm1'
 | project frac=CounterValue/c, AppMachine, CounterName
 | summarize avg(frac) by CounterName
-| project CounterName, avgRoundedPercent=tolong(avg_frac*100)
 
 
 Result:
-    CounterName; avgRoundedPercent;
+    CounterName:string; avg_frac:real
     ------------------
-    cpu; 75;
-    mem; 30;
+    cpu; 0.2
+    mem; 0.05
 ```
 
 ## A simple UI that you can upload your csv file and query against it:

@@ -5,12 +5,10 @@ namespace BabyKusto.Core
 {
     public interface ITableChunk
     {
-        TableSchema Schema { get; }
+        ITableSource Table { get; }
 
         Column[] Columns { get; }
 
         int RowCount { get; }
-
-        IRow GetRow(int index);
     }
 }

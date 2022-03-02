@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.IO;
 
 namespace BabyKusto.Core.Extensions
@@ -10,10 +11,17 @@ namespace BabyKusto.Core.Extensions
         public static void Dump(this ITableSource table, TextWriter writer, int indent = 0)
         {
             WriteIndent(writer, indent);
-            foreach (var columnDef in table.Schema.ColumnDefinitions)
+
+            for (int i = 0; i < table.Type.Columns.Count; i++)
             {
-                writer.Write(columnDef.ColumnName);
-                writer.Write("; ");
+                if (i > 0)
+                {
+                    writer.Write("; ");
+                }
+
+                writer.Write(table.Type.Columns[i].Name);
+                writer.Write(":");
+                writer.Write(table.Type.Columns[i].Type.Display);
             }
             writer.WriteLine();
 
@@ -25,11 +33,20 @@ namespace BabyKusto.Core.Extensions
                 for (int i = 0; i < chunk.RowCount; i++)
                 {
                     WriteIndent(writer, indent);
-                    var row = chunk.GetRow(i);
-                    for (int j = 0; j < row.Values.Length; j++)
+                    for (int j = 0; j < chunk.Columns.Length; j++)
                     {
-                        writer.Write(row.Values[j]);
-                        writer.Write("; ");
+                        if (j > 0)
+                        {
+                            writer.Write("; ");
+                        }
+
+                        var v = chunk.Columns[j].RawData.GetValue(i);
+                        writer.Write(
+                            v switch
+                            {
+                                DateTime dateTime => dateTime.ToString("u"),
+                                _ => v,
+                            });
                     }
                     writer.WriteLine();
                 }
@@ -42,7 +59,6 @@ namespace BabyKusto.Core.Extensions
             table.Dump(writer, indent);
             return writer.ToString();
         }
-
 
         private static void WriteIndent(TextWriter writer, int indent)
         {
