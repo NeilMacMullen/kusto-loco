@@ -4,52 +4,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BabyKusto.Core.Statements;
+using BabyKusto.Core.Evaluation;
+using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
-using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core
 {
     public class BabyKustoEngine
     {
         private readonly List<(string TableName, ITableSource Source)> _globalTables = new();
-        private readonly Stack<ExecutionContext> _executionContexts;
-
-        public BabyKustoEngine()
-        {
-            _executionContexts = new Stack<ExecutionContext>();
-        }
 
         public void AddGlobalTable(string tableName, ITableSource source)
         {
             _globalTables.Add((tableName, source));
         }
 
-        internal ExecutionContext ExecutionContext => _executionContexts.Peek();
-
-        public object? Evaluate(string query)
+        public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
         {
             // TODO: davidni: Set up global state somehwere proper where it would be done just once
             var db = new DatabaseSymbol(
                 "MyDb",
-                _globalTables.Select(
-                    tableDef => new TableSymbol(
-                        tableDef.TableName,
-                        "(" + string.Join(",", tableDef.Source.Schema.ColumnDefinitions.Select(c => $"{c.ColumnName}: {c.ValueKind.ToString().ToLower()}")) + ")")
-                ).ToArray());
+                _globalTables.Select(table => table.Source.Type).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
-            var globalObjects = _globalTables
-                .Select(globalTable => new KeyValuePair<string, object?>(globalTable.TableName, globalTable.Source))
-                .ToArray();
-            _executionContexts.Push(new ExecutionContext(null, globalObjects));
-
             var code = KustoCode.ParseAndAnalyze(query, globals);
-            if (false)
+            if (dumpKustoTree)
             {
-                DumpTree(code);
+                Console.WriteLine("Kusto tree:");
+                DumpKustoTree(code);
+                Console.WriteLine();
             }
 
             var diagnostics = code.GetDiagnostics();
@@ -63,22 +48,26 @@ namespace BabyKusto.Core
                 throw new InvalidOperationException("Query is malformed.");
             }
 
-            if (code.Syntax is not QueryBlock queryBlock)
+            var irVisitor = new IRTranslator();
+            var ir = code.Syntax.Accept(irVisitor);
+
+            if (dumpIRTree)
             {
-                throw new InvalidOperationException($"Only QueryBlocks are supported as top level syntax elements, found {TypeNameHelper.GetTypeDisplayName(code.Syntax)}");
+                Console.WriteLine("Internal representation:");
+                DumpIRTree(ir);
+                Console.WriteLine();
             }
 
-            object? lastResult = null;
-            foreach (var statementEntry in queryBlock.Statements)
+            var scope = new LocalScope();
+            for (int i = 0; i < _globalTables.Count; i++)
             {
-                var statement = statementEntry.Element;
-                var sterlingStatement = BabyKustoStatement.Build(this, statement);
-                lastResult = sterlingStatement.Execute();
+                scope.AddSymbol(db.Tables[i], new TabularResult(_globalTables[i].Source));
             }
 
-            return lastResult;
+            var result = BabyKustoEvaluator.Evaluate(ir, scope);
+            return result;
 
-            static void DumpTree(KustoCode code)
+            static void DumpKustoTree(KustoCode code)
             {
                 int indent = 0;
                 SyntaxElement.WalkNodes(
@@ -86,7 +75,7 @@ namespace BabyKusto.Core
                     fnBefore: node =>
                     {
                         Console.Write(new string(' ', indent));
-                        Console.WriteLine($"{node.Kind} ({TypeNameHelper.GetTypeDisplayName(node.GetType())}): {node.ToString(IncludeTrivia.SingleLine)}");
+                        Console.WriteLine($"{node.Kind}: {node.ToString(IncludeTrivia.SingleLine)}: {(node as Expression)?.ResultType?.Display}");
                         indent++;
                     },
                     fnAfter: node =>
@@ -97,17 +86,51 @@ namespace BabyKusto.Core
                 Console.WriteLine();
                 Console.WriteLine();
             }
-        }
 
-        internal void PushDeclarationsContext(string name, object? value)
-        {
-            var context = new ExecutionContext(_executionContexts.Peek(), new KeyValuePair<string, object?>(name, value));
-            _executionContexts.Push(context);
-        }
+            static void DumpIRTree(IRNode node)
+            {
+                DumpTreeInternal(node, "");
 
-        internal void LeaveExecutionContext()
-        {
-            _executionContexts.Pop();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                static void DumpTreeInternal(IRNode node, string indent, bool isLast = true)
+                {
+                    var oldColor = Console.ForegroundColor;
+                    try
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+
+                        Console.Write(indent);
+                        Console.Write(isLast ? " └─" : " ├─");
+
+                        Console.ForegroundColor = node switch
+                        {
+                            IRListNode => ConsoleColor.DarkGray,
+                            IRStatementNode => ConsoleColor.White,
+                            IRQueryOperatorNode => ConsoleColor.DarkBlue,
+                            IRLiteralExpressionNode => ConsoleColor.Magenta,
+                            IRNameReferenceNode => ConsoleColor.Green,
+                            IRExpressionNode => ConsoleColor.Cyan,
+                            _ => ConsoleColor.Gray,
+                        };
+
+                        Console.WriteLine(node);
+                    }
+                    finally
+                    {
+                        Console.ForegroundColor = oldColor;
+                    }
+
+                    indent += isLast ? "   " : " | ";
+
+                    for (int i = 0; i < node.ChildCount; i++)
+                    {
+                        var child = node.GetChild(i);
+                        DumpTreeInternal(child, indent, i == node.ChildCount - 1);
+                    }
+                }
+            }
         }
     }
 }
