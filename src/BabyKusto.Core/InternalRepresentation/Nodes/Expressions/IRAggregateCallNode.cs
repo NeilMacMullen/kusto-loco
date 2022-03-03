@@ -11,7 +11,7 @@ namespace BabyKusto.Core.InternalRepresentation
     internal class IRAggregateCallNode : IRExpressionNode
     {
         public IRAggregateCallNode(Signature signature, AggregateOverloadInfo overloadInfo, IReadOnlyList<Parameter> parameters, IRListNode<IRExpressionNode> arguments, TypeSymbol resultType)
-            : base(resultType, GetResultKind(arguments))
+            : base(resultType, EvaluatedExpressionKind.Scalar)
         {
             Signature = signature ?? throw new ArgumentNullException(nameof(signature));
             OverloadInfo = overloadInfo ?? throw new ArgumentNullException(nameof(overloadInfo));

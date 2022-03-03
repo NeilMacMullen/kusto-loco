@@ -218,6 +218,53 @@ vAvg:real; vCount:long; vSum:real
         }
 
         [Fact]
+        public void BuiltInAggregates_countif()
+        {
+            // Arrange
+            string query = @"
+datatable(a: bool)
+[
+    true, true, false, true
+]
+| summarize v=countif(a)
+";
+
+            string expected = @"
+v:long
+------------------
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_sumif_Long()
+        {
+            // Arrange
+            string query = @"
+datatable(v:long, include: bool)
+[
+    1, true,
+    2, false,
+    4, true,
+    8, true,
+]
+| summarize v=sumif(v, include)
+";
+
+            string expected = @"
+v:long
+------------------
+13
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Take_Works()
         {
             // Arrange
@@ -572,6 +619,96 @@ v:string
 ------------------
 a-123
 b-456
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_strlen_Scalar()
+        {
+            // Arrange
+            string query = @"
+print v=strlen('abc')
+";
+
+            string expected = @"
+v:long
+------------------
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_strlen_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string)
+[
+    'a',
+    'abc',
+]
+| project v = strlen(a)
+";
+
+            string expected = @"
+v:long
+------------------
+1
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_bin_Long()
+        {
+            // Arrange
+            string query = @"
+datatable(a:long, b:long)
+[
+  -1, 3,
+   0, 3,
+   1, 3,
+   2, 3,
+   3, 3,
+   4, 3,
+]
+| project v1 = bin(a, b), v2 = floor(a, b)";
+
+            string expected = @"
+v1:long; v2:long
+------------------
+-3; -3
+0; 0
+0; 0
+0; 0
+3; 3
+3; 3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_bin_DateTime()
+        {
+            // Arrange
+            string query = @"
+print v=bin(datetime(2022-03-02 23:04), 1h)";
+
+            string expected = @"
+v:datetime
+------------------
+2022-03-02 23:00:00Z
 ";
 
             // Act & Assert
@@ -939,6 +1076,230 @@ b
         }
 
         [Fact]
+        public void BinOp_LogicalAnd()
+        {
+            // Arrange
+            string query = @"
+datatable(a:bool, b:bool)
+[
+    false, false,
+    false, true,
+    true, false,
+    true, true,
+]
+| project v = a and b
+";
+
+            string expected = @"
+v:bool
+------------------
+False
+False
+False
+True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_LogicalOr()
+        {
+            // Arrange
+            string query = @"
+datatable(a:bool, b:bool)
+[
+    false, false,
+    false, true,
+    true, false,
+    true, true,
+]
+| project v = a or b
+";
+
+            string expected = @"
+v:bool
+------------------
+False
+True
+True
+True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_StringContains()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'a',
+    'ac',
+    'bc',
+    'BC',
+]
+| project v = 'abcd' contains v, notV = 'abcd' !contains v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+False; True
+True; False
+True; False
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_StringContainsCs()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'a',
+    'ac',
+    'bc',
+    'BC',
+]
+| project v = 'abcd' contains_cs v, notV = 'abcd' !contains_cs v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+False; True
+True; False
+False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_StringStartsWith()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'a',
+    'ab',
+    'ABC',
+    'bc',
+]
+| project v = 'abcd' startswith v, notV = 'abcd' !startswith v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+True; False
+True; False
+False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_StringStartsWithCs()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'a',
+    'ab',
+    'ABC',
+    'bc',
+]
+| project v = 'abcd' startswith_cs v, notV = 'abcd' !startswith_cs v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+True; False
+False; True
+False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_StringEndsWith()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'd',
+    'cd',
+    'BCD',
+    'bc',
+]
+| project v = 'abcd' endswith v, notV = 'abcd' !endswith v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+True; False
+True; False
+False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact(Skip = "Kusto library bug, see: https://github.com/microsoft/Kusto-Query-Language/issues/66")]
+        public void BinOp_StringEndsWithCs()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string)
+[
+    'd',
+    'cd',
+    'BCD',
+    'bc',
+]
+| project v = 'abcd' endswith_cs v, notV = 'abcd' !endswith_cs v
+";
+
+            string expected = @"
+v:bool; notV:bool
+------------------
+True; False
+True; False
+False; True
+False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void ToScalar_Tabular()
         {
             // Arrange
@@ -968,6 +1329,25 @@ print v=toscalar(1.5)
 v:real
 ------------------
 1.5
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void AggregateFunctionResultKind()
+        {
+            // Arrange
+            string query = @"
+datatable(a:long) [ 1, 2, 3 ]
+| summarize v=100 * count()
+";
+
+            string expected = @"
+v:long
+------------------
+300
 ";
 
             // Act & Assert

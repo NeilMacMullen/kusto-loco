@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using BabyKusto.Core.InternalRepresentation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation
@@ -12,7 +13,7 @@ namespace BabyKusto.Core.Evaluation
     {
         public override EvaluationResult VisitCastExpression(IRCastExpressionNode node, EvaluationContext context)
         {
-            var impl = node.GetOrSetCache(
+            var impl = node.GetOrSetCache<Func<EvaluationResult[], EvaluationResult>>(
                 () =>
                 {
                     if (node.ResultKind == EvaluatedExpressionKind.Scalar)
@@ -22,7 +23,7 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return (EvaluationResult)new ScalarResult(node.ResultType, Convert.ToInt32(((ScalarResult)arguments[0]).Value));
+                                return new ScalarResult(node.ResultType, Convert.ToInt32(((ScalarResult)arguments[0]).Value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Long)
@@ -30,7 +31,7 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return (EvaluationResult)new ScalarResult(node.ResultType, Convert.ToInt64(((ScalarResult)arguments[0]).Value));
+                                return new ScalarResult(node.ResultType, Convert.ToInt64(((ScalarResult)arguments[0]).Value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Real)
@@ -38,7 +39,7 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return (EvaluationResult)new ScalarResult(node.ResultType, Convert.ToDouble(((ScalarResult)arguments[0]).Value));
+                                return new ScalarResult(node.ResultType, Convert.ToDouble(((ScalarResult)arguments[0]).Value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.String)
@@ -46,7 +47,7 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return (EvaluationResult)new ScalarResult(node.ResultType, Convert.ToString(((ScalarResult)arguments[0]).Value));
+                                return new ScalarResult(node.ResultType, Convert.ToString(((ScalarResult)arguments[0]).Value));
                             };
                         }
                         else
@@ -64,7 +65,7 @@ namespace BabyKusto.Core.Evaluation
                                 var columnResult = (ColumnarResult)arguments[0];
                                 var builder = new ColumnBuilder<int>(node.ResultType);
                                 columnResult.Column.ForEach(item => builder.Add(Convert.ToInt32(item)));
-                                return (EvaluationResult)new ColumnarResult(builder.ToColumn());
+                                return new ColumnarResult(builder.ToColumn());
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Long)
@@ -75,7 +76,7 @@ namespace BabyKusto.Core.Evaluation
                                 var columnResult = (ColumnarResult)arguments[0];
                                 var builder = new ColumnBuilder<long>(node.ResultType);
                                 columnResult.Column.ForEach(item => builder.Add(Convert.ToInt64(item)));
-                                return (EvaluationResult)new ColumnarResult(builder.ToColumn());
+                                return new ColumnarResult(builder.ToColumn());
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Real)
@@ -86,7 +87,7 @@ namespace BabyKusto.Core.Evaluation
                                 var columnResult = (ColumnarResult)arguments[0];
                                 var builder = new ColumnBuilder<double>(node.ResultType);
                                 columnResult.Column.ForEach(item => builder.Add(Convert.ToDouble(item)));
-                                return (EvaluationResult)new ColumnarResult(builder.ToColumn());
+                                return new ColumnarResult(builder.ToColumn());
                             };
                         }
                         else if (node.ResultType == ScalarTypes.String)
@@ -97,7 +98,7 @@ namespace BabyKusto.Core.Evaluation
                                 var columnResult = (ColumnarResult)arguments[0];
                                 var builder = new ColumnBuilder<string>(node.ResultType);
                                 columnResult.Column.ForEach(item => builder.Add(Convert.ToString(item)));
-                                return (EvaluationResult)new ColumnarResult(builder.ToColumn());
+                                return new ColumnarResult(builder.ToColumn());
                             };
                         }
                         else

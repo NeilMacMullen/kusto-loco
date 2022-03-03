@@ -25,6 +25,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new ScalarOverloadInfo(new MinOfDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
 
             functions.Add(Functions.Now, new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
+            functions.Add(Functions.Ago, new ScalarFunctionInfo(new ScalarOverloadInfo(new AgoFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.TimeSpan)));
 
             // TODO: Support N-ary functions properly
             functions.Add(
@@ -35,6 +36,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String),
                     new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String),
                     new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
+
+            functions.Add(Functions.Strlen, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrlenFunctionImpl(), ScalarTypes.Long, ScalarTypes.String)));
+
+            var binFunctionInfo = new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new BinIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
+                new ScalarOverloadInfo(new BinLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BinDateTimeTimeSpanFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan));
+            functions.Add(Functions.Bin, binFunctionInfo);
+            functions.Add(Functions.Floor, binFunctionInfo);
         }
 
         public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)

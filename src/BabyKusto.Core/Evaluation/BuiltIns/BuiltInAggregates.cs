@@ -18,6 +18,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         static BuiltInAggregates()
         {
             aggregates.Add(Aggregates.Count, new AggregateInfo(new AggregateOverloadInfo(new CountFunctionImpl(), ScalarTypes.Long)));
+            
+            aggregates.Add(Aggregates.CountIf, new AggregateInfo(new AggregateOverloadInfo(new CountIfFunctionImpl(), ScalarTypes.Long, ScalarTypes.Bool)));
+
+            aggregates.Add(
+                Aggregates.SumIf,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new SumIfIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new SumIfLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new SumIfDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Bool)));
 
             aggregates.Add(
                 Aggregates.Avg,

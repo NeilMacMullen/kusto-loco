@@ -45,7 +45,7 @@ namespace BabyKusto.Core
                     Console.WriteLine($"Kusto diagnostics: {diag.Severity} {diag.Code} {diag.Message} {diag.Description}");
                 }
 
-                throw new InvalidOperationException("Query is malformed.");
+                throw new InvalidOperationException($"Query is malformed.\r\n{string.Join("\r\n", diagnostics.Select(diag => $"{diag.Severity} {diag.Code} {diag.Message} {diag.Description}"))}");
             }
 
             var irVisitor = new IRTranslator();

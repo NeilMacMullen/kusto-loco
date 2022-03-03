@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation

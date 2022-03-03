@@ -6,9 +6,9 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Util
 {
-    internal static class ColumnHelpers
+    public static class ColumnHelpers
     {
-        internal static Column CreateFromObjectArray(object[] data, TypeSymbol typeSymbol)
+        public static Column CreateFromObjectArray(object[] data, TypeSymbol typeSymbol)
         {
             if (typeSymbol == ScalarTypes.Int)
             {
@@ -22,9 +22,9 @@ namespace BabyKusto.Core.Util
             {
                 return CreateFromDoublesObjectArray(data, typeSymbol);
             }
-            else if (typeSymbol == ScalarTypes.DateTime)
+            else if (typeSymbol == ScalarTypes.Bool)
             {
-                return CreateFromObjectArray<DateTime>(data, typeSymbol);
+                return CreateFromBoolsObjectArray(data, typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.String)
             {
@@ -34,6 +34,10 @@ namespace BabyKusto.Core.Util
             {
                 return CreateFromObjectArray<DateTime>(data, typeSymbol);
             }
+            else if (typeSymbol == ScalarTypes.TimeSpan)
+            {
+                return CreateFromObjectArray<TimeSpan>(data, typeSymbol);
+            }
             else
             {
                 // TODO: Support all data types
@@ -41,7 +45,7 @@ namespace BabyKusto.Core.Util
             }
         }
 
-        internal static Column CreateFromScalar(object value, TypeSymbol typeSymbol, int numRows)
+        public static Column CreateFromScalar(object value, TypeSymbol typeSymbol, int numRows)
         {
             if (typeSymbol == ScalarTypes.Int)
             {
@@ -58,10 +62,6 @@ namespace BabyKusto.Core.Util
             else if (typeSymbol == ScalarTypes.Bool)
             {
                 return CreateFromBool(value, typeSymbol, numRows);
-            }
-            else if (typeSymbol == ScalarTypes.DateTime)
-            {
-                return CreateFromScalar<DateTime>((DateTime)value, typeSymbol, numRows);
             }
             else if (typeSymbol == ScalarTypes.String)
             {
@@ -82,7 +82,7 @@ namespace BabyKusto.Core.Util
             }
         }
 
-        internal static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
+        public static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
         {
             if (typeSymbol == ScalarTypes.Int)
             {
@@ -100,13 +100,13 @@ namespace BabyKusto.Core.Util
             {
                 return new ColumnBuilder<bool>(typeSymbol);
             }
-            else if (typeSymbol == ScalarTypes.DateTime)
-            {
-                return new ColumnBuilder<DateTime>(typeSymbol);
-            }
             else if (typeSymbol == ScalarTypes.String)
             {
                 return new ColumnBuilder<string>(typeSymbol);
+            }
+            else if (typeSymbol == ScalarTypes.DateTime)
+            {
+                return new ColumnBuilder<DateTime>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
@@ -158,6 +158,17 @@ namespace BabyKusto.Core.Util
             for (int i = 0; i < data.Length; i++)
             {
                 columnData[i] = Convert.ToDouble(data[i]);
+            }
+
+            return Column.Create(typeSymbol, columnData);
+        }
+
+        private static Column<bool> CreateFromBoolsObjectArray(object[] data, TypeSymbol typeSymbol)
+        {
+            var columnData = new bool[data.Length];
+            for (int i = 0; i < data.Length; i++)
+            {
+                columnData[i] = Convert.ToBoolean(data[i]);
             }
 
             return Column.Create(typeSymbol, columnData);

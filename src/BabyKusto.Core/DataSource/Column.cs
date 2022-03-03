@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 

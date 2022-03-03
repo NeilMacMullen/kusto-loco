@@ -4,15 +4,15 @@
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core
+namespace BabyKusto.Core.Util
 {
-    internal abstract class ColumnBuilder
+    public abstract class ColumnBuilder
     {
         public abstract void Add(object value);
         public abstract Column ToColumn();
     }
 
-    internal class ColumnBuilder<T> : ColumnBuilder
+    public class ColumnBuilder<T> : ColumnBuilder
     {
         private readonly List<T> _data = new();
 
