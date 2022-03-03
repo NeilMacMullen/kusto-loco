@@ -38,8 +38,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             aggregates.Add(
                 Aggregates.Sum,
                 new AggregateInfo(
-                    new AggregateOverloadInfo(new SumAggregateIntImpl(), ScalarTypes.Real, ScalarTypes.Int),
-                    new AggregateOverloadInfo(new SumAggregateLongImpl(), ScalarTypes.Real, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new SumAggregateIntImpl(), ScalarTypes.Int, ScalarTypes.Int),
+                    new AggregateOverloadInfo(new SumAggregateLongImpl(), ScalarTypes.Long, ScalarTypes.Long),
                     new AggregateOverloadInfo(new SumAggregateDoubleImpl(), ScalarTypes.Real, ScalarTypes.Real)));
 
             aggregates.Add(
