@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 {
-    internal class IntAscNullsFirstComparer : IComparer
+    internal class DateTimeAscNullsFirstComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -16,11 +17,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? 1
                     : b == null
                         ? -1
-                        : ((int)a).CompareTo((int)b);
+                        : ((DateTime)a).CompareTo((DateTime)b);
         }
     }
 
-    internal class IntAscNullsLastComparer : IComparer
+    internal class DateTimeAscNullsLastComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -31,11 +32,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? -1
                     : b == null
                         ? 1
-                        : ((int)a).CompareTo((int)b);
+                        : ((DateTime)a).CompareTo((DateTime)b);
         }
     }
 
-    internal class IntDescNullsFirstComparer : IComparer
+    internal class DateTimeDescNullsFirstComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -46,11 +47,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? 1
                     : b == null
                         ? -1
-                        : ((int)b).CompareTo((int)a);
+                        : ((DateTime)b).CompareTo((DateTime)a);
         }
     }
 
-    internal class IntDescNullsLastComparer : IComparer
+    internal class DateTimeDescNullsLastComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -61,7 +62,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? -1
                     : b == null
                         ? 1
-                        : ((int)b).CompareTo((int)a);
+                        : ((DateTime)b).CompareTo((DateTime)a);
         }
     }
 }

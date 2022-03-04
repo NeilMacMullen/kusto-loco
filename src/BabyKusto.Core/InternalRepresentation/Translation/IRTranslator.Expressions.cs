@@ -158,13 +158,13 @@ namespace BabyKusto.Core.InternalRepresentation
             var functionSymbol = (FunctionSymbol)signature.Symbol;
             if (BuiltInFunctions.TryGetOverload(functionSymbol, irArguments, parameters, out var functionOverload))
             {
-                ApplyTypeCoercions(irArguments, functionOverload);
-                return new IRBuiltInFunctionCallNode(signature, functionOverload, parameters, IRListNode.From(irArguments), node.ResultType);
+                ApplyTypeCoercions(irArguments, functionOverload!);
+                return new IRBuiltInFunctionCallNode(signature, functionOverload!, parameters, IRListNode.From(irArguments), node.ResultType);
             }
             else if (BuiltInAggregates.TryGetOverload(functionSymbol, irArguments, parameters, out var aggregateOverload))
             {
-                ApplyTypeCoercions(irArguments, aggregateOverload);
-                return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments), node.ResultType);
+                ApplyTypeCoercions(irArguments, aggregateOverload!);
+                return new IRAggregateCallNode(signature, aggregateOverload!, parameters, IRListNode.From(irArguments), node.ResultType);
             }
             else
             {

@@ -8,7 +8,7 @@ namespace BabyKusto.Core.Util
 {
     public static class ColumnHelpers
     {
-        public static Column CreateFromObjectArray(object[] data, TypeSymbol typeSymbol)
+        public static Column CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
             if (typeSymbol == ScalarTypes.Int)
             {
@@ -32,11 +32,11 @@ namespace BabyKusto.Core.Util
             }
             else if (typeSymbol == ScalarTypes.DateTime)
             {
-                return CreateFromObjectArray<DateTime>(data, typeSymbol);
+                return CreateFromObjectArray<DateTime?>(data, typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
-                return CreateFromObjectArray<TimeSpan>(data, typeSymbol);
+                return CreateFromObjectArray<TimeSpan?>(data, typeSymbol);
             }
             else
             {
@@ -45,7 +45,7 @@ namespace BabyKusto.Core.Util
             }
         }
 
-        public static Column CreateFromScalar(object value, TypeSymbol typeSymbol, int numRows)
+        public static Column CreateFromScalar(object? value, TypeSymbol typeSymbol, int numRows)
         {
             if (typeSymbol == ScalarTypes.Int)
             {
@@ -65,15 +65,15 @@ namespace BabyKusto.Core.Util
             }
             else if (typeSymbol == ScalarTypes.String)
             {
-                return CreateFromScalar<string>((string)value, typeSymbol, numRows);
+                return CreateFromScalar<string?>((string?)value, typeSymbol, numRows);
             }
             else if (typeSymbol == ScalarTypes.DateTime)
             {
-                return CreateFromScalar<DateTime>((DateTime)value, typeSymbol, numRows);
+                return CreateFromScalar<DateTime?>((DateTime?)value, typeSymbol, numRows);
             }
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
-                return CreateFromScalar<TimeSpan>((TimeSpan)value, typeSymbol, numRows);
+                return CreateFromScalar<TimeSpan?>((TimeSpan?)value, typeSymbol, numRows);
             }
             else
             {
@@ -86,31 +86,31 @@ namespace BabyKusto.Core.Util
         {
             if (typeSymbol == ScalarTypes.Int)
             {
-                return new ColumnBuilder<int>(typeSymbol);
+                return new ColumnBuilder<int?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.Long)
             {
-                return new ColumnBuilder<long>(typeSymbol);
+                return new ColumnBuilder<long?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.Real)
             {
-                return new ColumnBuilder<double>(typeSymbol);
+                return new ColumnBuilder<double?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.Bool)
             {
-                return new ColumnBuilder<bool>(typeSymbol);
+                return new ColumnBuilder<bool?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.String)
             {
-                return new ColumnBuilder<string>(typeSymbol);
+                return new ColumnBuilder<string?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.DateTime)
             {
-                return new ColumnBuilder<DateTime>(typeSymbol);
+                return new ColumnBuilder<DateTime?>(typeSymbol);
             }
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
-                return new ColumnBuilder<TimeSpan>(typeSymbol);
+                return new ColumnBuilder<TimeSpan?>(typeSymbol);
             }
             else
             {
@@ -119,56 +119,60 @@ namespace BabyKusto.Core.Util
             }
         }
 
-        private static Column<T> CreateFromObjectArray<T>(object[] data, TypeSymbol typeSymbol)
+        private static Column<T> CreateFromObjectArray<T>(object?[] data, TypeSymbol typeSymbol)
         {
-            var columnData = new T[data.Length];
+            var columnData = new T?[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                columnData[i] = (T)data[i];
+                columnData[i] = (T?)data[i];
             }
 
             return new Column<T>(typeSymbol, columnData);
         }
 
-        private static Column<int> CreateFromIntsObjectArray(object[] data, TypeSymbol typeSymbol)
+        private static Column<int?> CreateFromIntsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
-            var columnData = new int[data.Length];
+            var columnData = new int?[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                columnData[i] = Convert.ToInt32(data[i]);
+                var item = data[i];
+                columnData[i] = item == null ? null : Convert.ToInt32(item);
             }
 
             return Column.Create(typeSymbol, columnData);
         }
 
-        private static Column<long> CreateFromLongsObjectArray(object[] data, TypeSymbol typeSymbol)
+        private static Column<long?> CreateFromLongsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
-            var columnData = new long[data.Length];
+            var columnData = new long?[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                columnData[i] = Convert.ToInt64(data[i]);
+                var item = data[i];
+                columnData[i] = item == null ? null : Convert.ToInt64(item);
             }
 
             return Column.Create(typeSymbol, columnData);
         }
 
-        private static Column<double> CreateFromDoublesObjectArray(object[] data, TypeSymbol typeSymbol)
+        private static Column<double?> CreateFromDoublesObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
-            var columnData = new double[data.Length];
+            var columnData = new double?[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                columnData[i] = Convert.ToDouble(data[i]);
+                var item = data[i];
+                columnData[i] = item == null ? null : Convert.ToDouble(item);
             }
 
             return Column.Create(typeSymbol, columnData);
         }
 
-        private static Column<bool> CreateFromBoolsObjectArray(object[] data, TypeSymbol typeSymbol)
+        private static Column<bool?> CreateFromBoolsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
-            var columnData = new bool[data.Length];
+            var columnData = new bool?[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
-                columnData[i] = Convert.ToBoolean(data[i]);
+                var item = data[i];
+                columnData[i] = item == null ? null : Convert.ToBoolean(item);
             }
 
             return Column.Create(typeSymbol, columnData);
@@ -185,24 +189,24 @@ namespace BabyKusto.Core.Util
             return new Column<T>(typeSymbol, columnData);
         }
 
-        private static Column<int> CreateFromInt(object value, TypeSymbol typeSymbol, int rowCount)
+        private static Column<int?> CreateFromInt(object? value, TypeSymbol typeSymbol, int rowCount)
         {
-            return CreateFromScalar<int>(Convert.ToInt32(value), typeSymbol, rowCount);
+            return CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), typeSymbol, rowCount);
         }
 
-        private static Column<long> CreateFromLong(object value, TypeSymbol typeSymbol, int rowCount)
+        private static Column<long?> CreateFromLong(object? value, TypeSymbol typeSymbol, int rowCount)
         {
-            return CreateFromScalar<long>(Convert.ToInt64(value), typeSymbol, rowCount);
+            return CreateFromScalar<long?>(value == null ? null : Convert.ToInt64(value), typeSymbol, rowCount);
         }
 
-        private static Column<double> CreateFromDouble(object value, TypeSymbol typeSymbol, int rowCount)
+        private static Column<double?> CreateFromDouble(object? value, TypeSymbol typeSymbol, int rowCount)
         {
-            return CreateFromScalar<double>(Convert.ToDouble(value), typeSymbol, rowCount);
+            return CreateFromScalar<double?>(value == null ? null : Convert.ToDouble(value), typeSymbol, rowCount);
         }
 
-        private static Column<bool> CreateFromBool(object value, TypeSymbol typeSymbol, int rowCount)
+        private static Column<bool?> CreateFromBool(object? value, TypeSymbol typeSymbol, int rowCount)
         {
-            return CreateFromScalar<bool>(Convert.ToBoolean(value), typeSymbol, rowCount);
+            return CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), typeSymbol, rowCount);
         }
     }
 }

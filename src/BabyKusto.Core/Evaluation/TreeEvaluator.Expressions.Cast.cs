@@ -11,7 +11,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitCastExpression(IRCastExpressionNode node, EvaluationContext context)
+        public override EvaluationResult? VisitCastExpression(IRCastExpressionNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache<Func<EvaluationResult[], EvaluationResult>>(
                 () =>
@@ -23,7 +23,8 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return new ScalarResult(node.ResultType, Convert.ToInt32(((ScalarResult)arguments[0]).Value));
+                                var value = ((ScalarResult)arguments[0]).Value;
+                                return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt32(value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Long)
@@ -31,7 +32,8 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return new ScalarResult(node.ResultType, Convert.ToInt64(((ScalarResult)arguments[0]).Value));
+                                var value = ((ScalarResult)arguments[0]).Value;
+                                return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt64(value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.Real)
@@ -39,7 +41,8 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return new ScalarResult(node.ResultType, Convert.ToDouble(((ScalarResult)arguments[0]).Value));
+                                var value = ((ScalarResult)arguments[0]).Value;
+                                return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDouble(value));
                             };
                         }
                         else if (node.ResultType == ScalarTypes.String)
@@ -47,7 +50,8 @@ namespace BabyKusto.Core.Evaluation
                             return (EvaluationResult[] arguments) =>
                             {
                                 Debug.Assert(arguments.Length == 1);
-                                return new ScalarResult(node.ResultType, Convert.ToString(((ScalarResult)arguments[0]).Value));
+                                var value = ((ScalarResult)arguments[0]).Value;
+                                return new ScalarResult(node.ResultType, value == null ? null : Convert.ToString(value));
                             };
                         }
                         else
@@ -63,8 +67,8 @@ namespace BabyKusto.Core.Evaluation
                             {
                                 Debug.Assert(arguments.Length == 1);
                                 var columnResult = (ColumnarResult)arguments[0];
-                                var builder = new ColumnBuilder<int>(node.ResultType);
-                                columnResult.Column.ForEach(item => builder.Add(Convert.ToInt32(item)));
+                                var builder = new ColumnBuilder<int?>(node.ResultType);
+                                columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToInt32(item)));
                                 return new ColumnarResult(builder.ToColumn());
                             };
                         }
@@ -74,8 +78,8 @@ namespace BabyKusto.Core.Evaluation
                             {
                                 Debug.Assert(arguments.Length == 1);
                                 var columnResult = (ColumnarResult)arguments[0];
-                                var builder = new ColumnBuilder<long>(node.ResultType);
-                                columnResult.Column.ForEach(item => builder.Add(Convert.ToInt64(item)));
+                                var builder = new ColumnBuilder<long?>(node.ResultType);
+                                columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToInt64(item)));
                                 return new ColumnarResult(builder.ToColumn());
                             };
                         }
@@ -85,8 +89,8 @@ namespace BabyKusto.Core.Evaluation
                             {
                                 Debug.Assert(arguments.Length == 1);
                                 var columnResult = (ColumnarResult)arguments[0];
-                                var builder = new ColumnBuilder<double>(node.ResultType);
-                                columnResult.Column.ForEach(item => builder.Add(Convert.ToDouble(item)));
+                                var builder = new ColumnBuilder<double?>(node.ResultType);
+                                columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToDouble(item)));
                                 return new ColumnarResult(builder.ToColumn());
                             };
                         }
@@ -96,8 +100,8 @@ namespace BabyKusto.Core.Evaluation
                             {
                                 Debug.Assert(arguments.Length == 1);
                                 var columnResult = (ColumnarResult)arguments[0];
-                                var builder = new ColumnBuilder<string>(node.ResultType);
-                                columnResult.Column.ForEach(item => builder.Add(Convert.ToString(item)));
+                                var builder = new ColumnBuilder<string?>(node.ResultType);
+                                columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToString(item)));
                                 return new ColumnarResult(builder.ToColumn());
                             };
                         }

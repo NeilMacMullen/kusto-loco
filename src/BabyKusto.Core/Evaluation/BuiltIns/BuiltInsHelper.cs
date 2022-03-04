@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 {
     internal static class BuiltInsHelper
     {
-        internal static T PickOverload<T>(IReadOnlyList<T> overloads, IRExpressionNode[] arguments)
+        internal static T? PickOverload<T>(IReadOnlyList<T> overloads, IRExpressionNode[] arguments)
             where T : OverloadInfoBase
         {
             foreach (var overload in overloads)

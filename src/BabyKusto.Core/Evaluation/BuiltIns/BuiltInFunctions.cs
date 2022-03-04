@@ -54,9 +54,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new NotImplementedException($"Function {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
             }
 
-            return overload;
+            return overload!;
         }
-        public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out ScalarOverloadInfo overload)
+        public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out ScalarOverloadInfo? overload)
         {
             if (!functions.TryGetValue(symbol, out var functionInfo))
             {

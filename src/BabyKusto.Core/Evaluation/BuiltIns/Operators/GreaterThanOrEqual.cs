@@ -12,20 +12,23 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Bool, (int)arguments[0].Value >= (int)arguments[1].Value);
+            var left = (int?)arguments[0].Value;
+            var right = (int?)arguments[1].Value;
+            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left >= right : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<int>)(arguments[0].Column);
-            var right = (Column<int>)(arguments[1].Column);
+            var leftCol = (Column<int?>)(arguments[0].Column);
+            var rightCol = (Column<int?>)(arguments[1].Column);
 
-            var data = new bool[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            var data = new bool?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
             {
-                data[i] = left[i] >= right[i];
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left >= right : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }
@@ -36,20 +39,23 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Bool, (long)arguments[0].Value >= (long)arguments[1].Value);
+            var left = (long?)arguments[0].Value;
+            var right = (long?)arguments[1].Value;
+            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left >= right : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<long>)(arguments[0].Column);
-            var right = (Column<long>)(arguments[1].Column);
+            var leftCol = (Column<long?>)(arguments[0].Column);
+            var rightCol = (Column<long?>)(arguments[1].Column);
 
-            var data = new bool[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            var data = new bool?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
             {
-                data[i] = left[i] >= right[i];
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left >= right : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }
@@ -60,20 +66,23 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Bool, (double)arguments[0].Value >= (double)arguments[1].Value);
+            var left = (double?)arguments[0].Value;
+            var right = (double?)arguments[1].Value;
+            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left >= right : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<double>)(arguments[0].Column);
-            var right = (Column<double>)(arguments[1].Column);
+            var leftCol = (Column<double?>)(arguments[0].Column);
+            var rightCol = (Column<double?>)(arguments[1].Column);
 
-            var data = new bool[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            var data = new bool?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
             {
-                data[i] = left[i] >= right[i];
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left >= right : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }
@@ -84,20 +93,23 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Bool, (TimeSpan)arguments[0].Value >= (TimeSpan)arguments[1].Value);
+            var left = (TimeSpan?)arguments[0].Value;
+            var right = (TimeSpan?)arguments[1].Value;
+            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left >= right : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<TimeSpan>)(arguments[0].Column);
-            var right = (Column<TimeSpan>)(arguments[1].Column);
+            var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
+            var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
 
-            var data = new bool[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            var data = new bool?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
             {
-                data[i] = left[i] >= right[i];
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left >= right : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }
@@ -108,20 +120,23 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Bool, (DateTime)arguments[0].Value >= (DateTime)arguments[1].Value);
+            var left = (DateTime?)arguments[0].Value;
+            var right = (DateTime?)arguments[1].Value;
+            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left >= right : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<DateTime>)(arguments[0].Column);
-            var right = (Column<DateTime>)(arguments[1].Column);
+            var leftCol = (Column<DateTime?>)(arguments[0].Column);
+            var rightCol = (Column<DateTime?>)(arguments[1].Column);
 
-            var data = new bool[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            var data = new bool?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
             {
-                data[i] = left[i] >= right[i];
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left >= right : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }

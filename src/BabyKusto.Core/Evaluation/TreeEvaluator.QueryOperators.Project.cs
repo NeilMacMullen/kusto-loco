@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -11,8 +12,9 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Left != null);
             var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
             for (int i = 0; i < node.Columns.ChildCount; i++)
             {
@@ -40,7 +42,7 @@ namespace BabyKusto.Core.Evaluation
 
             public override TableSymbol Type { get; }
 
-            protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
+            protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
             {
                 var outputColumns = new Column[_columns.Count];
                 var chunkContext = _context with { Chunk = chunk };

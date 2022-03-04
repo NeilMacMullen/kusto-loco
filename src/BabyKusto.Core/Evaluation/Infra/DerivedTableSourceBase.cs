@@ -75,10 +75,10 @@ namespace BabyKusto.Core.Evaluation
         }
 
         protected virtual TContext Init() => default;
-        protected abstract (TContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(TContext context, ITableChunk chunk);
-        protected virtual ITableChunk ProcessLastChunk(TContext context) => null;
+        protected abstract (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TContext context, ITableChunk chunk);
+        protected virtual ITableChunk? ProcessLastChunk(TContext context) => null;
 
-        private (TContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context, ITableChunk chunk)
+        private (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context, ITableChunk chunk)
         {
             var (newContext, newChunk, shouldBreak) = ProcessChunk(context, chunk);
             if (newChunk != null && newChunk.Table != this)
@@ -89,7 +89,7 @@ namespace BabyKusto.Core.Evaluation
             return (newContext, newChunk, shouldBreak);
         }
 
-        private ITableChunk ProcessLastChunkInternal(TContext context)
+        private ITableChunk? ProcessLastChunkInternal(TContext context)
         {
             var newChunk = ProcessLastChunk(context);
             if (newChunk != null && newChunk.Table != this)

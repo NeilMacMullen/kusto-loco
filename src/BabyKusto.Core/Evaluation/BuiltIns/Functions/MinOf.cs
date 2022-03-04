@@ -11,22 +11,41 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
     {
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Int, Math.Min((int)arguments[0].Value, (int)arguments[1].Value));
+            int? min = null;
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                var item = (int?)arguments[i].Value;
+                if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                {
+                    min = item.Value;
+                }
+            }
+
+            return new ScalarResult(ScalarTypes.Int, min);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<int>)(arguments[0].Column);
-            var right = (Column<int>)(arguments[1].Column);
+            Debug.Assert(arguments.Length > 0);
 
-            var data = new int[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            int numRows = arguments[0].Column.RowCount;
+            var data = new int?[numRows];
+            for (int j = 0; j < numRows; j++)
             {
-                data[i] = Math.Min(left[i], right[i]);
+                int? min = null;
+                for (int i = 0; i < arguments.Length; i++)
+                {
+                    var column = (Column<int?>)arguments[i].Column;
+                    var item = column[j];
+                    if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                    {
+                        min = item.Value;
+                    }
+                }
+
+                data[j] = min;
             }
+
             return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
         }
     }
@@ -35,22 +54,41 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
     {
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Long, Math.Min((long)arguments[0].Value, (long)arguments[1].Value));
+            long? min = null;
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                var item = (long?)arguments[i].Value;
+                if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                {
+                    min = item.Value;
+                }
+            }
+
+            return new ScalarResult(ScalarTypes.Long, min);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<long>)(arguments[0].Column);
-            var right = (Column<long>)(arguments[1].Column);
+            Debug.Assert(arguments.Length > 0);
 
-            var data = new long[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            int numRows = arguments[0].Column.RowCount;
+            var data = new long?[numRows];
+            for (int j = 0; j < numRows; j++)
             {
-                data[i] = Math.Min(left[i], right[i]);
+                long? min = null;
+                for (int i = 0; i < arguments.Length; i++)
+                {
+                    var column = (Column<long?>)arguments[i].Column;
+                    var item = column[j];
+                    if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                    {
+                        min = item.Value;
+                    }
+                }
+
+                data[j] = min;
             }
+
             return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
         }
     }
@@ -59,22 +97,41 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
     {
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            return new ScalarResult(ScalarTypes.Real, Math.Min((double)arguments[0].Value, (double)arguments[1].Value));
+            double? min = null;
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                var item = (double?)arguments[i].Value;
+                if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                {
+                    min = item.Value;
+                }
+            }
+
+            return new ScalarResult(ScalarTypes.Real, min);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<double>)(arguments[0].Column);
-            var right = (Column<double>)(arguments[1].Column);
+            Debug.Assert(arguments.Length > 0);
 
-            var data = new double[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            int numRows = arguments[0].Column.RowCount;
+            var data = new double?[numRows];
+            for (int j = 0; j < numRows; j++)
             {
-                data[i] = Math.Min(left[i], right[i]);
+                double? min = null;
+                for (int i = 0; i < arguments.Length; i++)
+                {
+                    var column = (Column<double?>)arguments[i].Column;
+                    var item = column[j];
+                    if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                    {
+                        min = item.Value;
+                    }
+                }
+
+                data[j] = min;
             }
+
             return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
         }
     }

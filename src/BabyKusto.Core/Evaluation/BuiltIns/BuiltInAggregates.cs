@@ -68,10 +68,10 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new NotImplementedException($"Aggregate function {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
             }
 
-            return overload;
+            return overload!;
         }
 
-        public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out AggregateOverloadInfo overload)
+        public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out AggregateOverloadInfo? overload)
         {
             if (!aggregates.TryGetValue(symbol, out var aggregateInfo))
             {

@@ -9,10 +9,10 @@ namespace BabyKusto.Core.Evaluation
 {
     internal class LocalScope
     {
-        private readonly LocalScope _outer;
+        private readonly LocalScope? _outer;
         private readonly Dictionary<string, (Symbol Symbol, EvaluationResult Value)> _locals = new();
 
-        public LocalScope(LocalScope outer = null)
+        public LocalScope(LocalScope? outer = null)
         {
             _outer = outer;
         }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
@@ -12,8 +13,9 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Left != null);
             var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
             return new TabularResult(result);
         }
@@ -35,20 +37,20 @@ namespace BabyKusto.Core.Evaluation
 
             public override TableSymbol Type { get; }
 
-            protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
+            protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
             {
                 var chunkContext = _context with { Chunk = chunk };
                 var evaluated = _condition.Accept(_owner, chunkContext);
 
                 if (evaluated is ScalarResult scalar)
                 {
-                    if (!Convert.ToBoolean(scalar.Value))
+                    // Scalar will evaluate to the same value for any chunk, so wecan process the entire chunk at once
+                    if ((bool?)scalar.Value == true)
                     {
-                        // Scalar will evaluate to the same value for any chunk, so might as well stop now
-                        return (default, null, false);
+                        return (default, chunk.ReParent(this), false);
                     }
 
-                    return (default, chunk.ReParent(this), false);
+                    return (default, null, false);
                 }
                 else if (evaluated is ColumnarResult columnar)
                 {
@@ -58,9 +60,10 @@ namespace BabyKusto.Core.Evaluation
                         resultColumns[j] = chunk.Columns[j].CreateBuilder();
                     }
 
-                    for (int i = 0; i < chunk.RowCount; i++)
+                    var predicateColumn = (Column<bool?>)columnar.Column;
+                    for (int i = 0; i < predicateColumn.RowCount; i++)
                     {
-                        if (Convert.ToBoolean(columnar.Column.RawData.GetValue(i)))
+                        if (predicateColumn[i] == true)
                         {
                             for (int j = 0; j < chunk.Columns.Length; j++)
                             {

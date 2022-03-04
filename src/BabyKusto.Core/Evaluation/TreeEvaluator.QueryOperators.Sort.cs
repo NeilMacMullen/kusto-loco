@@ -16,8 +16,9 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Left != null);
             var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];
             for (int i = 0; i < node.Expressions.ChildCount; i++)
             {
@@ -48,16 +49,16 @@ namespace BabyKusto.Core.Evaluation
 
             public IEnumerable<ITableChunk> GetData()
             {
-                var allData = new List<object>[_input.Type.Columns.Count];
+                var allData = new List<object?>[_input.Type.Columns.Count];
                 for (int i = 0; i < allData.Length; i++)
                 {
-                    allData[i] = new List<object>();
+                    allData[i] = new List<object?>();
                 }
 
-                var sortColumnsData = new List<object>[_sortColumns.Length];
+                var sortColumnsData = new List<object?>[_sortColumns.Length];
                 for (int i = 0; i < _sortColumns.Length; i++)
                 {
-                    sortColumnsData[i] = new List<object>();
+                    sortColumnsData[i] = new List<object?>();
                 }
 
                 foreach (var chunk in _input.GetData())

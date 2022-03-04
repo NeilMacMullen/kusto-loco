@@ -16,20 +16,40 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
         static BuiltInComparers()
         {
-            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Int), new IntAscComparer());
-            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Int), new IntDescComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Int), new IntAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Int), new IntAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Int), new IntDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Int), new IntDescNullsLastComparer());
 
-            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Long), new LongAscComparer());
-            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Long), new LongDescComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Long), new LongAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Long), new LongAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Long), new LongDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Long), new LongDescNullsLastComparer());
 
-            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Real), new DoubleAscComparer());
-            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Real), new DoubleDescComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Real), new DoubleAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Real), new DoubleAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Real), new DoubleDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Real), new DoubleDescNullsLastComparer());
 
-            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Bool), new BoolAscComparer());
-            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Bool), new BoolDescComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Bool), new BoolAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Bool), new BoolAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Bool), new BoolDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Bool), new BoolDescNullsLastComparer());
 
-            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.String), new StringAscComparer());
-            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.String), new StringDescComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.String), new StringAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.String), new StringAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.String), new StringDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.String), new StringDescNullsLastComparer());
+
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.TimeSpan), new TimeSpanAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.TimeSpan), new TimeSpanAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.TimeSpan), new TimeSpanDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.TimeSpan), new TimeSpanDescNullsLastComparer());
+
+            comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.DateTime), new DateTimeAscNullsFirstComparer());
+            comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.DateTime), new DateTimeAscNullsLastComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.DateTime), new DateTimeDescNullsFirstComparer());
+            comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.DateTime), new DateTimeDescNullsLastComparer());
         }
 
         public static IComparer GetComparer(SortDirections direction, NullsDirections nullsDirections, TypeSymbol type)

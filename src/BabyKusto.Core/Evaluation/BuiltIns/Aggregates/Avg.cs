@@ -11,13 +11,19 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<int>)arguments[0].Column;
+            var column = (Column<int?>)arguments[0].Column;
             double sum = 0;
+            int count = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                    count++;
+                }
             }
-            return new ScalarResult(ScalarTypes.Real, sum / chunk.RowCount);
+            return new ScalarResult(ScalarTypes.Real, count == 0 ? null : sum / count);
         }
     }
 
@@ -26,13 +32,19 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<long>)arguments[0].Column;
+            var column = (Column<long?>)arguments[0].Column;
             double sum = 0;
+            int count = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                    count++;
+                }
             }
-            return new ScalarResult(ScalarTypes.Real, sum / chunk.RowCount);
+            return new ScalarResult(ScalarTypes.Real, count == 0 ? null : sum / count);
         }
     }
 
@@ -41,13 +53,19 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<double>)arguments[0].Column;
+            var column = (Column<double?>)arguments[0].Column;
             double sum = 0;
+            int count = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                    count++;
+                }
             }
-            return new ScalarResult(ScalarTypes.Real, sum / chunk.RowCount);
+            return new ScalarResult(ScalarTypes.Real, count == 0 ? null : sum / count);
         }
     }
 }

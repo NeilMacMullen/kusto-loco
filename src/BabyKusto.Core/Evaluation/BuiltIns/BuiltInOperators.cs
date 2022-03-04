@@ -154,9 +154,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new NotImplementedException($"Operator {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
             }
 
-            return overload;
+            return overload!;
         }
-        public static bool TryGetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out ScalarOverloadInfo overload)
+        public static bool TryGetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out ScalarOverloadInfo? overload)
         {
             if (!operators.TryGetValue(symbol, out var operatorInfo))
             {

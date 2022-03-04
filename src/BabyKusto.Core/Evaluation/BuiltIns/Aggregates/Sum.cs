@@ -11,11 +11,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<int>)arguments[0].Column;
+            var column = (Column<int?>)arguments[0].Column;
             int sum = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                }
             }
             return new ScalarResult(ScalarTypes.Int, sum);
         }
@@ -26,11 +30,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<long>)arguments[0].Column;
+            var column = (Column<long?>)arguments[0].Column;
             long sum = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                }
             }
             return new ScalarResult(ScalarTypes.Long, sum);
         }
@@ -41,11 +49,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<double>)arguments[0].Column;
+            var column = (Column<double?>)arguments[0].Column;
             double sum = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
-                sum += column[i];
+                var item = column[i];
+                if (item.HasValue)
+                {
+                    sum += item.Value;
+                }
             }
             return new ScalarResult(ScalarTypes.Real, sum);
         }

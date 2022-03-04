@@ -12,7 +12,7 @@ namespace BabyKusto.Core.InternalRepresentation
     internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     {
         private readonly Dictionary<string, EvaluatedExpressionKind> _inScopeSymbolInfos = new();
-        private TableSymbol _rowScope;
+        private TableSymbol? _rowScope;
 
         internal IRTranslator()
         {

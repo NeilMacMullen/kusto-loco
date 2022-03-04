@@ -8,7 +8,7 @@ namespace BabyKusto.Core.InternalRepresentation
 {
     internal class IRDataTableExpression : IRExpressionNode
     {
-        public IRDataTableExpression(object[] data, TypeSymbol resultType)
+        public IRDataTableExpression(object?[] data, TypeSymbol resultType)
             : base(resultType, EvaluatedExpressionKind.Table)
         {
             Data = data ?? throw new ArgumentNullException(nameof(data));
@@ -18,7 +18,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
         }
 
-        public object[] Data { get; }
+        public object?[] Data { get; }
 
         public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
         {

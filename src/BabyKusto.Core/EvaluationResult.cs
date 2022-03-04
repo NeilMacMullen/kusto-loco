@@ -27,7 +27,7 @@ namespace BabyKusto.Core.Evaluation
 
     public sealed class ScalarResult : EvaluationResult
     {
-        public ScalarResult(TypeSymbol type, object value)
+        public ScalarResult(TypeSymbol type, object? value)
             : base(type)
         {
             if (!type.IsScalar)
@@ -38,7 +38,7 @@ namespace BabyKusto.Core.Evaluation
             Value = value;
         }
 
-        public object Value { get; }
+        public object? Value { get; }
     }
 
     public sealed class ColumnarResult : EvaluationResult

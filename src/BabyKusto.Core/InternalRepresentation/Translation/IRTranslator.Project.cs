@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
@@ -27,6 +28,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override IRNode VisitProjectRenameOperator(ProjectRenameOperator node)
         {
+            Debug.Assert(_rowScope != null);
             var resultTypeMember = node.ResultType.Members;
 
             var renamedColumns = new Dictionary<ColumnSymbol, ColumnSymbol>();
@@ -78,6 +80,7 @@ namespace BabyKusto.Core.InternalRepresentation
         /// </summary>
         private IRNode EasyProjectImpl(TypeSymbol resultType)
         {
+            Debug.Assert(_rowScope != null);
             var resultTypeMember = resultType.Members;
 
             var columns = new List<IROutputColumnNode>();
@@ -103,6 +106,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         private IRNode HandleExtendOperatorInternal(SyntaxList<SeparatedElement<Expression>> expressions, TypeSymbol resultType)
         {
+            Debug.Assert(_rowScope != null);
             var pendingExpressions = new LinkedList<IRExpressionNode>();
             var namedExtendedColumns = new Dictionary<ColumnSymbol, LinkedListNode<IRExpressionNode>>();
             foreach (var element in expressions)

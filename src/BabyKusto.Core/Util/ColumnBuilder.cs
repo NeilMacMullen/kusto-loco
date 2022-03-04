@@ -8,13 +8,13 @@ namespace BabyKusto.Core.Util
 {
     public abstract class ColumnBuilder
     {
-        public abstract void Add(object value);
+        public abstract void Add(object? value);
         public abstract Column ToColumn();
     }
 
     public class ColumnBuilder<T> : ColumnBuilder
     {
-        private readonly List<T> _data = new();
+        private readonly List<T?> _data = new();
 
         public ColumnBuilder(TypeSymbol type)
         {
@@ -27,9 +27,9 @@ namespace BabyKusto.Core.Util
         {
             _data.Add(value);
         }
-        public override void Add(object value)
+        public override void Add(object? value)
         {
-            _data.Add((T)value);
+            _data.Add((T?)value);
         }
 
         public override Column ToColumn()

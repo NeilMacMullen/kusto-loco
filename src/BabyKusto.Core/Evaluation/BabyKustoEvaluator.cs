@@ -7,7 +7,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal static class BabyKustoEvaluator
     {
-        internal static EvaluationResult Evaluate(IRNode root, LocalScope scope)
+        internal static EvaluationResult? Evaluate(IRNode root, LocalScope scope)
         {
             var evaluator = new TreeEvaluator();
             return root.Accept(evaluator, new EvaluationContext(scope));

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
@@ -12,8 +13,9 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Left != null);
             var byExpressions = new List<IRExpressionNode>();
             for (int i = 0; i < node.ByColumns.ChildCount; i++)
             {
@@ -57,7 +59,7 @@ namespace BabyKusto.Core.Evaluation
                 };
             }
 
-            protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
+            protected override (SummarizeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
             {
                 // TODO: This is horribly inefficient
                 //  * Copies all data, even columns that aren't used
@@ -102,7 +104,7 @@ namespace BabyKusto.Core.Evaluation
                 return (context, null, false);
             }
 
-            protected override ITableChunk ProcessLastChunk(SummarizeResultTableContext context)
+            protected override ITableChunk? ProcessLastChunk(SummarizeResultTableContext context)
             {
                 var resultsData = new ColumnBuilder[_byExpressions.Count + _aggregationExpressions.Count];
                 for (int i = 0; i < resultsData.Length; i++)

@@ -19,9 +19,8 @@ namespace BabyKusto.Core
         public abstract int RowCount { get; }
         public abstract Array RawData { get; }
 
-
         public abstract Column Slice(int start, int end);
-        public abstract void ForEach(Action<object> action);
+        public abstract void ForEach(Action<object?> action);
         internal abstract ColumnBuilder CreateBuilder();
 
         public static Column<T> Create<T>(TypeSymbol type, T[] data)
@@ -32,9 +31,9 @@ namespace BabyKusto.Core
 
     public class Column<T> : Column
     {
-        private readonly T[] _data;
+        private readonly T?[] _data;
 
-        public Column(TypeSymbol type, T[] data)
+        public Column(TypeSymbol type, T?[] data)
             : base(type)
         {
             ValidateTypes(type, typeof(T));
@@ -46,19 +45,19 @@ namespace BabyKusto.Core
             bool valid = false;
             if (typeSymbol == ScalarTypes.Int)
             {
-                valid = type == typeof(int);
+                valid = type == typeof(int?);
             }
             else if (typeSymbol == ScalarTypes.Long)
             {
-                valid = type == typeof(long);
+                valid = type == typeof(long?);
             }
             else if (typeSymbol == ScalarTypes.Real)
             {
-                valid = type == typeof(double);
+                valid = type == typeof(double?);
             }
             else if (typeSymbol == ScalarTypes.Bool)
             {
-                valid = type == typeof(bool);
+                valid = type == typeof(bool?);
             }
             else if (typeSymbol == ScalarTypes.String)
             {
@@ -66,29 +65,29 @@ namespace BabyKusto.Core
             }
             else if (typeSymbol == ScalarTypes.DateTime)
             {
-                valid = type == typeof(DateTime);
+                valid = type == typeof(DateTime?);
             }
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
-                valid = type == typeof(TimeSpan);
+                valid = type == typeof(TimeSpan?);
             }
 
             if (!valid)
             {
-                throw new InvalidOperationException($"Invalid column type {TypeNameHelper.GetTypeDisplayName(type)} for type symbol {typeSymbol.Display}.");
+                throw new InvalidOperationException($"Invalid column type {TypeNameHelper.GetTypeDisplayName(type)} for type symbol {typeSymbol.Display}. Types must be nullable.");
             }
         }
 
         public override int RowCount => _data.Length;
         public override Array RawData => _data;
 
-        public T this[int index]
+        public T? this[int index]
         {
             get => _data[index];
             set => _data[index] = value;
         }
 
-        public Span<T> GetSpan(int start, int length)
+        public Span<T?> GetSpan(int start, int length)
         {
             return _data.AsSpan(start, length);
         }
@@ -98,7 +97,7 @@ namespace BabyKusto.Core
             return Column.Create(Type, GetSpan(start, length).ToArray());
         }
 
-        public override void ForEach(Action<object> action)
+        public override void ForEach(Action<object?> action)
         {
             foreach (var item in _data)
             {

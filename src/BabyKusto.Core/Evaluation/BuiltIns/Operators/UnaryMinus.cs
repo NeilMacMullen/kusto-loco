@@ -12,15 +12,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Int, -(int)arguments[0].Value);
+            return new ScalarResult(ScalarTypes.Int, -(int?)arguments[0].Value);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<int>)(arguments[0].Column);
+            var column = (Column<int?>)(arguments[0].Column);
 
-            var data = new int[column.RowCount];
+            var data = new int?[column.RowCount];
             for (int i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
@@ -34,15 +34,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Long, -(long)arguments[0].Value);
+            return new ScalarResult(ScalarTypes.Long, -(long?)arguments[0].Value);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<long>)(arguments[0].Column);
+            var column = (Column<long?>)(arguments[0].Column);
 
-            var data = new long[column.RowCount];
+            var data = new long?[column.RowCount];
             for (int i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
@@ -56,15 +56,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Real, -(double)arguments[0].Value);
+            return new ScalarResult(ScalarTypes.Real, -(double?)arguments[0].Value);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<double>)(arguments[0].Column);
+            var column = (Column<double?>)(arguments[0].Column);
 
-            var data = new double[column.RowCount];
+            var data = new double?[column.RowCount];
             for (int i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
@@ -78,15 +78,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.TimeSpan, -(TimeSpan)arguments[0].Value);
+            return new ScalarResult(ScalarTypes.TimeSpan, -(TimeSpan?)arguments[0].Value);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var column = (Column<TimeSpan>)(arguments[0].Column);
+            var column = (Column<TimeSpan?>)(arguments[0].Column);
 
-            var data = new TimeSpan[column.RowCount];
+            var data = new TimeSpan?[column.RowCount];
             for (int i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];

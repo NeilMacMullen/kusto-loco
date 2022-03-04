@@ -60,7 +60,7 @@ else
             {
                 Column.Create(ScalarTypes.String, new [] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
                 Column.Create(ScalarTypes.String, new [] { "cpu", "mem", "cpu", "mem", "cpu" }),
-                Column.Create(ScalarTypes.Real, new [] { 50.0, 30.0, 20.0, 5.0, 100.0 }),
+                Column.Create(ScalarTypes.Real, new double?[] { 50.0, 30.0, 20.0, 5.0, 100.0 }),
             });
         return myTable;
     }

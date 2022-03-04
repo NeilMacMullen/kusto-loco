@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -10,7 +11,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
+        public override EvaluationResult? VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
         {
             var lookup = context.Scope.Lookup(node.ReferencedSymbol.Name);
             if (lookup == null)
@@ -27,18 +28,19 @@ namespace BabyKusto.Core.Evaluation
             return value;
         }
 
-        public override EvaluationResult VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, EvaluationContext context)
+        public override EvaluationResult? VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Chunk != null);
             var column = context.Chunk.Columns[node.ReferencedColumnIndex];
             return new ColumnarResult(column);
         }
 
-        public override EvaluationResult VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
+        public override EvaluationResult? VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
         {
             return new ScalarResult(node.ResultType, node.Value);
         }
 
-        public override EvaluationResult VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
+        public override EvaluationResult? VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
         {
             var left = (TabularResult)node.Expression.Accept(this, context);
             if (left == null)
@@ -49,7 +51,7 @@ namespace BabyKusto.Core.Evaluation
             return node.Operator.Accept(this, context with { Left = left });
         }
 
-        public override EvaluationResult VisitDataTableExpression(IRDataTableExpression node, EvaluationContext context)
+        public override EvaluationResult? VisitDataTableExpression(IRDataTableExpression node, EvaluationContext context)
         {
             var tableSymbol = (TableSymbol)node.ResultType;
 
@@ -59,7 +61,7 @@ namespace BabyKusto.Core.Evaluation
             var columns = new Column[numColumns];
             for (int j = 0; j < numColumns; j++)
             {
-                var columnData = new object[numRows];
+                var columnData = new object?[numRows];
                 for (int i = 0; i < numRows; i++)
                 {
                     columnData[i] = node.Data[i * numColumns + j];

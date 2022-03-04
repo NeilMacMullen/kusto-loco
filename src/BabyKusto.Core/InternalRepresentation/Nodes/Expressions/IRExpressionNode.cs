@@ -17,7 +17,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
     internal abstract class IRExpressionNode : IRNode
     {
-        private Dictionary<Type, object> _cache;
+        private Dictionary<Type, object>? _cache;
 
         public IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
         {
@@ -38,7 +38,7 @@ namespace BabyKusto.Core.InternalRepresentation
             var typeKey = typeof(T);
             if (!_cache.TryGetValue(typeKey, out var item))
             {
-                item = factoryFunc();
+                item = factoryFunc()!;
                 _cache.Add(typeKey, item);
             }
 

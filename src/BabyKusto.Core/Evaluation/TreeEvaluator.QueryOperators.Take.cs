@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
@@ -10,10 +11,11 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
         {
+            Debug.Assert(context.Left != null);
             var count = (ScalarResult)node.Expression.Accept(this, context);
-            var result = new TakeResultTable(context.Left.Value, Convert.ToInt32(count.Value));
+            var result = new TakeResultTable(context.Left.Value, count.Value == null ? 0 : Convert.ToInt32(count.Value));
             return new TabularResult(result);
         }
 
@@ -37,7 +39,7 @@ namespace BabyKusto.Core.Evaluation
                 };
             }
 
-            protected override (TakeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(TakeResultTableContext context, ITableChunk chunk)
+            protected override (TakeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TakeResultTableContext context, ITableChunk chunk)
             {
                 if (context.Remaining >= chunk.RowCount)
                 {

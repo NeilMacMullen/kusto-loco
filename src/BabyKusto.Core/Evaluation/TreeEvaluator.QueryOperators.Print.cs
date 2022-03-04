@@ -9,7 +9,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult VisitPrintOperator(IRPrintOperatorNode node, EvaluationContext context)
+        public override EvaluationResult? VisitPrintOperator(IRPrintOperatorNode node, EvaluationContext context)
         {
             var tableSymbol = (TableSymbol)node.ResultType;
 

@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 {
-    internal class IntAscNullsFirstComparer : IComparer
+    internal class TimeSpanAscNullsFirstComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -16,11 +17,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? 1
                     : b == null
                         ? -1
-                        : ((int)a).CompareTo((int)b);
+                        : ((TimeSpan)a).CompareTo((TimeSpan)b);
         }
     }
 
-    internal class IntAscNullsLastComparer : IComparer
+    internal class TimeSpanAscNullsLastComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -31,11 +32,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? -1
                     : b == null
                         ? 1
-                        : ((int)a).CompareTo((int)b);
+                        : ((TimeSpan)a).CompareTo((TimeSpan)b);
         }
     }
 
-    internal class IntDescNullsFirstComparer : IComparer
+    internal class TimeSpanDescNullsFirstComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -46,11 +47,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? 1
                     : b == null
                         ? -1
-                        : ((int)b).CompareTo((int)a);
+                        : ((TimeSpan)b).CompareTo((TimeSpan)a);
         }
     }
 
-    internal class IntDescNullsLastComparer : IComparer
+    internal class TimeSpanDescNullsLastComparer : IComparer
     {
         public int Compare(object? a, object? b)
         {
@@ -61,7 +62,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     ? -1
                     : b == null
                         ? 1
-                        : ((int)b).CompareTo((int)a);
+                        : ((TimeSpan)b).CompareTo((TimeSpan)a);
         }
     }
 }

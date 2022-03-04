@@ -15,7 +15,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var builder = new StringBuilder();
             for (int i = 0; i < arguments.Length; i++)
             {
-                builder.Append((string)arguments[i].Value);
+                builder.Append((string?)arguments[i].Value);
             }
 
             return new ScalarResult(ScalarTypes.String, builder.ToString());
@@ -24,13 +24,13 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length > 0);
-            var columns = new Column<string>[arguments.Length];
+            var columns = new Column<string?>[arguments.Length];
             for (int i = 0; i < arguments.Length; i++)
             {
-                columns[i] = (Column<string>)arguments[i].Column;
+                columns[i] = (Column<string?>)arguments[i].Column;
             }
 
-            var data = new string[columns[0].RowCount];
+            var data = new string?[columns[0].RowCount];
             var builder = new StringBuilder();
             for (int i = 0; i < columns[0].RowCount; i++)
             {
