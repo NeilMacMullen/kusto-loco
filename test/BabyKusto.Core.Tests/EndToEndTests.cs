@@ -218,6 +218,55 @@ vAvg:real; vCount:long; vSum:real
         }
 
         [Fact]
+        public void Sort_DefaultDesc()
+        {
+            // Arrange
+            string query = @"
+datatable(a: long, b: int)
+[
+    3, 9,
+    2, 8,
+    1, 7,
+    4, 6,
+]
+| order by a
+";
+
+            string expected = @"
+a:long; b:int
+------------------
+4; 6
+3; 9
+2; 8
+1; 7
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Sort_Asc()
+        {
+            // Arrange
+            string query = @"
+datatable(a: double) [ 1.5, 1, 3 ]
+| order by a asc
+";
+
+            string expected = @"
+a:real
+------------------
+1
+1.5
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltInAggregates_countif()
         {
             // Arrange
