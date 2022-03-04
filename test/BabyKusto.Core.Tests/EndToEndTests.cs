@@ -1496,6 +1496,162 @@ v:long
             Test(query, expected);
         }
 
+        [Fact]
+        public void Cast_ToInt_String_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=toint(''), b=toint('123')
+";
+
+            string expected = @"
+a:int; b:int
+------------------
+(null); 123
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToInt_String_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string) [ '', '123', 'nan' ]
+| project a=toint(v)
+";
+
+            string expected = @"
+a:int
+------------------
+(null)
+123
+(null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToLong_String_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=tolong(''), b=tolong('123')
+";
+
+            string expected = @"
+a:long; b:long
+------------------
+(null); 123
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToLong_String_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string) [ '', '123', 'nan' ]
+| project a=tolong(v)
+";
+
+            string expected = @"
+a:long
+------------------
+(null)
+123
+(null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToDouble_String_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=todouble(''), b=todouble('123.5')
+";
+
+            string expected = @"
+a:real; b:real
+------------------
+(null); 123.5
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToDouble_String_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string) [ '', '123.5', 'nan' ]
+| project a=todouble(v)
+";
+
+            string expected = @"
+a:real
+------------------
+(null)
+123.5
+NaN
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToReal_String_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=toreal(''), b=toreal('123.5')
+";
+
+            string expected = @"
+a:real; b:real
+------------------
+(null); 123.5
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToReal_String_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(v:string) [ '', '123.5', 'nan' ]
+| project a=toreal(v)
+";
+
+            string expected = @"
+a:real
+------------------
+(null)
+123.5
+NaN
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         private static void Test(string query, string expectedOutput)
         {
             var engine = new BabyKustoEngine();

@@ -45,6 +45,13 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 new ScalarOverloadInfo(new BinDateTimeTimeSpanFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan));
             functions.Add(Functions.Bin, binFunctionInfo);
             functions.Add(Functions.Floor, binFunctionInfo);
+
+            functions.Add(Functions.ToInt, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToIntStringFunctionImpl(), ScalarTypes.Int, ScalarTypes.String)));
+            functions.Add(Functions.ToLong, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToLongStringFunctionImpl(), ScalarTypes.Long, ScalarTypes.String)));
+            var toDoubleFunctionInfo = new ScalarFunctionInfo(new ScalarOverloadInfo(new ToDoubleStringFunctionImpl(), ScalarTypes.Real, ScalarTypes.String));
+            functions.Add(Functions.ToReal, toDoubleFunctionInfo);
+            functions.Add(Functions.ToDouble, toDoubleFunctionInfo);
+            functions.Add(Functions.ToBool, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToBoolStringFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
         }
 
         public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)
