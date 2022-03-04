@@ -117,6 +117,7 @@ namespace BabyKusto.Core.Evaluation
                 });
 
             var expressionResult = node.Expression.Accept(this, context);
+            Debug.Assert(expressionResult != null);
             return impl(new[] { expressionResult });
         }
     }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Diagnostics;
 using BabyKusto.Core.InternalRepresentation;
 
 namespace BabyKusto.Core.Evaluation

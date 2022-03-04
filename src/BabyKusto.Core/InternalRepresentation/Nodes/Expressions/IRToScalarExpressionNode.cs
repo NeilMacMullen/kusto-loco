@@ -24,7 +24,8 @@ namespace BabyKusto.Core.InternalRepresentation
                 _ => throw new ArgumentOutOfRangeException(nameof(index)),
             };
 
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        public override TResult? Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+            where TResult : class
         {
             return visitor.VisitToScalarExpressionNode(this, context);
         }

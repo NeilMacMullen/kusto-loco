@@ -72,7 +72,9 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _byExpressions.Count; i++)
                     {
                         var byExpression = _byExpressions[i];
-                        byValuesColumns.Add((ColumnarResult)byExpression.Accept(_owner, chunkContext));
+                        var byExpressionResult = byExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(byExpressionResult != null);
+                        byValuesColumns.Add((ColumnarResult)byExpressionResult);
                     }
                 }
 
@@ -125,7 +127,9 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _aggregationExpressions.Count; i++)
                     {
                         var aggregationExpression = _aggregationExpressions[i];
-                        var aggregation = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
+                        var aggregationResult = aggregationExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(aggregationResult != null);
+                        var aggregation = (ScalarResult)aggregationResult;
                         resultsData[tableData.ByValues.Count + i].Add(aggregation.Value);
                     }
 

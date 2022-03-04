@@ -14,7 +14,10 @@ namespace BabyKusto.Core.Evaluation
         public override EvaluationResult? VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
-            var count = (ScalarResult)node.Expression.Accept(this, context);
+
+            var countExpressionResult = node.Expression.Accept(this, context);
+            Debug.Assert(countExpressionResult != null);
+            var count = (ScalarResult)countExpressionResult;
             var result = new TakeResultTable(context.Left.Value, count.Value == null ? 0 : Convert.ToInt32(count.Value));
             return new TabularResult(result);
         }

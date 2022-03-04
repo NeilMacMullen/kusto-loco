@@ -10,6 +10,7 @@ namespace BabyKusto.Core.InternalRepresentation
         public virtual int ChildCount => 0;
         public virtual IRNode GetChild(int index) => throw new ArgumentOutOfRangeException();
 
-        public abstract TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context);
+        public abstract TResult? Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+            where TResult: class;
     }
 }

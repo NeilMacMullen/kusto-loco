@@ -10,14 +10,14 @@ namespace BabyKusto.Core.Evaluation
     internal class LocalScope
     {
         private readonly LocalScope? _outer;
-        private readonly Dictionary<string, (Symbol Symbol, EvaluationResult Value)> _locals = new();
+        private readonly Dictionary<string, (Symbol Symbol, EvaluationResult? Value)> _locals = new();
 
         public LocalScope(LocalScope? outer = null)
         {
             _outer = outer;
         }
 
-        public void AddSymbol(Symbol symbol, EvaluationResult value)
+        public void AddSymbol(Symbol symbol, EvaluationResult? value)
         {
             if (Lookup(symbol.Name) != null)
             {
@@ -27,7 +27,7 @@ namespace BabyKusto.Core.Evaluation
             _locals.Add(symbol.Name, (symbol, value));
         }
 
-        public (Symbol Symbol, EvaluationResult Value)? Lookup(string name)
+        public (Symbol Symbol, EvaluationResult? Value)? Lookup(string name)
         {
             if (_locals.TryGetValue(name, out var symbol))
             {

@@ -12,7 +12,8 @@ namespace BabyKusto.Core.InternalRepresentation
         {
         }
 
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        public override TResult? Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+            where TResult : class
         {
             return visitor.VisitFunctionDeclaration(this, context);
         }

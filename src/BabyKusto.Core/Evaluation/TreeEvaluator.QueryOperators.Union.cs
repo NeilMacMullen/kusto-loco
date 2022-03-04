@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using BabyKusto.Core.InternalRepresentation;
@@ -23,7 +24,9 @@ namespace BabyKusto.Core.Evaluation
             for (int i = 0; i < node.Expressions.ChildCount; i++)
             {
                 var expression = node.Expressions.GetChild(i);
-                var tableResult = (TabularResult)expression.Accept(this, context);
+                var expressionResult = expression.Accept(this, context);
+                Debug.Assert(expressionResult != null);
+                var tableResult = (TabularResult)expressionResult;
                 tables.Add(tableResult.Value);
             }
 

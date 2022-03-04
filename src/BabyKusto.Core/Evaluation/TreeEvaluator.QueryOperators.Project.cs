@@ -50,6 +50,7 @@ namespace BabyKusto.Core.Evaluation
                 {
                     var expression = _columns[i].Expression;
                     var evaluatedExpression = expression.Accept(_owner, chunkContext);
+                    Debug.Assert(evaluatedExpression != null);
                     outputColumns[i] = ColumnizeResult(evaluatedExpression, chunk.RowCount);
                 }
 

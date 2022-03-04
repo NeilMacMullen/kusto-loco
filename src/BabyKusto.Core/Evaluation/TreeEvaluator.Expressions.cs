@@ -42,7 +42,7 @@ namespace BabyKusto.Core.Evaluation
 
         public override EvaluationResult? VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
         {
-            var left = (TabularResult)node.Expression.Accept(this, context);
+            var left = (TabularResult?)node.Expression.Accept(this, context);
             if (left == null)
             {
                 throw new InvalidOperationException($"Left expression produced null result");

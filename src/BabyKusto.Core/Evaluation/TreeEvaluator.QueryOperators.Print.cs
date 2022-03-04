@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Diagnostics;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -17,7 +18,9 @@ namespace BabyKusto.Core.Evaluation
             for (int i = 0; i < node.Expressions.ChildCount; i++)
             {
                 var expression = node.Expressions.GetChild(i);
-                var scalarResult = (ScalarResult)expression.Accept(this, context);
+                var expressionResult = expression.Accept(this, context);
+                Debug.Assert(expressionResult != null);
+                var scalarResult = (ScalarResult)expressionResult;
                 columns[i] = ColumnHelpers.CreateFromScalar(scalarResult.Value, tableSymbol.Columns[i].Type, 1);
             }
 

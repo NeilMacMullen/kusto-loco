@@ -31,7 +31,9 @@ namespace BabyKusto.Core.Evaluation
             var arguments = new EvaluationResult[node.Arguments.ChildCount];
             for (int i = 0; i < node.Arguments.ChildCount; i++)
             {
-                arguments[i] = node.Arguments.GetChild(i).Accept(this, context);
+                var argVal = node.Arguments.GetChild(i).Accept(this, context);
+                Debug.Assert(argVal != null);
+                arguments[i] = argVal;
             }
 
             return impl(arguments);
@@ -55,7 +57,9 @@ namespace BabyKusto.Core.Evaluation
             var arguments = new ColumnarResult[node.Arguments.ChildCount];
             for (int i = 0; i < node.Arguments.ChildCount; i++)
             {
-                arguments[i] = (ColumnarResult)node.Arguments.GetChild(i).Accept(this, context);
+                var argResult = node.Arguments.GetChild(i).Accept(this, context);
+                Debug.Assert(argResult != null);
+                arguments[i] = (ColumnarResult)argResult;
             }
 
             return impl.Invoke(context.Chunk, arguments);
@@ -80,12 +84,13 @@ namespace BabyKusto.Core.Evaluation
             var functionCallScope = new LocalScope(context.Scope);
             for (int i = 0; i < node.Arguments.ChildCount; i++)
             {
-                var argValue = node.Arguments.GetChild(i).Accept(this, context);
                 if (signature.Parameters[i].DeclaredTypes.Count != 1)
                 {
                     throw new NotSupportedException($"Not sure how to deal with parameters having >1 DeclaredTypes (found {signature.Parameters[i].DeclaredTypes.Count} for function {functionSymbol.Name}.");
                 }
 
+                var argValue = node.Arguments.GetChild(i).Accept(this, context);
+                Debug.Assert(argValue != null);
                 functionCallScope.AddSymbol(node.ParamSymbols[i], argValue);
             }
 

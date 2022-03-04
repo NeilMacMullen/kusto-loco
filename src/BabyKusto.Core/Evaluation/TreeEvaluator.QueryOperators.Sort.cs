@@ -76,7 +76,9 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _sortColumns.Length; i++)
                     {
                         var sortExpression = _sortColumns[i].Expression;
-                        var sortedChunkColumn = ((ColumnarResult)sortExpression.Accept(_evaluator, chunkContext)).Column;
+                        var sortExpressionResult = sortExpression.Accept(_evaluator, chunkContext);
+                        Debug.Assert(sortExpressionResult != null);
+                        var sortedChunkColumn = ((ColumnarResult)sortExpressionResult).Column;
                         for (int j = 0; j < sortedChunkColumn.RowCount; j++)
                         {
                             sortColumnsData[i].Add(sortedChunkColumn.RawData.GetValue(j));

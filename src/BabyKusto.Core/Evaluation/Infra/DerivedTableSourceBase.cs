@@ -74,7 +74,7 @@ namespace BabyKusto.Core.Evaluation
             }
         }
 
-        protected virtual TContext Init() => default;
+        protected virtual TContext Init() => default!;
         protected abstract (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TContext context, ITableChunk chunk);
         protected virtual ITableChunk? ProcessLastChunk(TContext context) => null;
 

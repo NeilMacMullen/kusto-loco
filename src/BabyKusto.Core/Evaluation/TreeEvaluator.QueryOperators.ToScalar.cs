@@ -12,6 +12,7 @@ namespace BabyKusto.Core.Evaluation
         public override EvaluationResult? VisitToScalarExpressionNode(IRToScalarExpressionNode node, EvaluationContext context)
         {
             var result = node.Expression.Accept(this, context);
+            Debug.Assert(result != null);
 
             if (node.Expression.ResultKind == EvaluatedExpressionKind.Table)
             {
