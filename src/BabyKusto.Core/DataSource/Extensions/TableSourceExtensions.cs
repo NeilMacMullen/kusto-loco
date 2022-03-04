@@ -45,6 +45,7 @@ namespace BabyKusto.Core.Extensions
                             v switch
                             {
                                 DateTime dateTime => dateTime.ToString("u"),
+                                null => "(null)",
                                 _ => v,
                             });
                     }

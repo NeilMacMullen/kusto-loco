@@ -218,7 +218,7 @@ vAvg:real; vCount:long; vSum:real
         }
 
         [Fact]
-        public void Sort_DefaultDesc()
+        public void Sort_Desc()
         {
             // Arrange
             string query = @"
@@ -227,6 +227,7 @@ datatable(a: long, b: int)
     3, 9,
     2, 8,
     1, 7,
+    long(null), 42,
     4, 6,
 ]
 | order by a
@@ -239,6 +240,7 @@ a:long; b:int
 3; 9
 2; 8
 1; 7
+(null); 42
 ";
 
             // Act & Assert
@@ -246,12 +248,64 @@ a:long; b:int
         }
 
         [Fact]
-        public void Sort_Asc()
+        public void Sort_DescNullsFirst()
         {
             // Arrange
             string query = @"
-datatable(a: double) [ 1.5, 1, 3 ]
+datatable(a: long, b: int)
+[
+    3, 9,
+    2, 8,
+    1, 7,
+    long(null), 42,
+    4, 6,
+]
+| order by a nulls first
+";
+
+            string expected = @"
+a:long; b:int
+------------------
+(null); 42
+4; 6
+3; 9
+2; 8
+1; 7
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Sort_AscNullsFirst()
+        {
+            // Arrange
+            string query = @"
+datatable(a: double) [ 1.5, 1, double(null), 3 ]
 | order by a asc
+";
+
+            string expected = @"
+a:real
+------------------
+(null)
+1
+1.5
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Sort_AscNullsLast()
+        {
+            // Arrange
+            string query = @"
+datatable(a: double) [ 1.5, 1, double(null), 3 ]
+| order by a asc nulls last
 ";
 
             string expected = @"
@@ -260,6 +314,7 @@ a:real
 1
 1.5
 3
+(null)
 ";
 
             // Act & Assert
@@ -1174,6 +1229,44 @@ False
 True
 True
 True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_LogicalAnd_NullHandling()
+        {
+            // Arrange
+            string query = @"
+let nil=bool(null);
+print a = nil and nil, b = nil and true, c = nil and false
+";
+
+            string expected = @"
+a:bool; b:bool; c:bool
+------------------
+(null); (null); False
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_LogicalOr_NullHandling()
+        {
+            // Arrange
+            string query = @"
+let nil=bool(null);
+print a = nil or nil, b = nil or true, c = nil or false
+";
+
+            string expected = @"
+a:bool; b:bool; c:bool
+------------------
+(null); True; (null)
 ";
 
             // Act & Assert
