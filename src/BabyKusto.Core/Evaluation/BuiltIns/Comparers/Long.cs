@@ -13,9 +13,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 (a == null && b == null)
                 ? 0
                 : a == null
-                    ? 1
+                    ? -1
                     : b == null
-                        ? -1
+                        ? 1
                         : ((long)a).CompareTo((long)b);
         }
     }
@@ -28,9 +28,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 (a == null && b == null)
                 ? 0
                 : a == null
-                    ? -1
+                    ? 1
                     : b == null
-                        ? 1
+                        ? -1
                         : ((long)a).CompareTo((long)b);
         }
     }
@@ -43,9 +43,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 (a == null && b == null)
                 ? 0
                 : a == null
-                    ? 1
+                    ? -1
                     : b == null
-                        ? -1
+                        ? 1
                         : ((long)b).CompareTo((long)a);
         }
     }
@@ -58,9 +58,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 (a == null && b == null)
                 ? 0
                 : a == null
-                    ? -1
+                    ? 1
                     : b == null
-                        ? 1
+                        ? -1
                         : ((long)b).CompareTo((long)a);
         }
     }
