@@ -23,7 +23,7 @@ namespace BabyKusto.Core.InternalRepresentation
             return this.DefaultVisit(node, context);
         }
 
-        public override TResult? VisitBuiltInFunctionCall(IRBuiltInFunctionCallNode node, TContext context)
+        public override TResult? VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node, TContext context)
         {
             return this.DefaultVisit(node, context);
         }
@@ -154,6 +154,11 @@ namespace BabyKusto.Core.InternalRepresentation
         }
 
         public override TResult? VisitUserFunctionCall(IRUserFunctionCallNode node, TContext context)
+        {
+            return this.DefaultVisit(node, context);
+        }
+
+        public override TResult? VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context)
         {
             return this.DefaultVisit(node, context);
         }

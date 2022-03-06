@@ -7,7 +7,7 @@ namespace BabyKusto.Core.InternalRepresentation
     {
         public abstract TResult? VisitAggregateCallNode(IRAggregateCallNode node, TContext context);
         public abstract TResult? VisitBinaryExpression(IRBinaryExpressionNode node, TContext context);
-        public abstract TResult? VisitBuiltInFunctionCall(IRBuiltInFunctionCallNode node, TContext context);
+        public abstract TResult? VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node, TContext context);
         public abstract TResult? VisitCastExpression(IRCastExpressionNode node, TContext context);
         public abstract TResult? VisitDataTableExpression(IRDataTableExpression node, TContext context);
         public abstract TResult? VisitExpressionStatement(IRExpressionStatementNode node, TContext context);
@@ -34,5 +34,6 @@ namespace BabyKusto.Core.InternalRepresentation
         public abstract TResult? VisitUnaryExpression(IRUnaryExpressionNode node, TContext context);
         public abstract TResult? VisitUnionOperator(IRUnionOperatorNode node, TContext context);
         public abstract TResult? VisitUserFunctionCall(IRUserFunctionCallNode node, TContext context);
+        public abstract TResult? VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context);
     }
 }

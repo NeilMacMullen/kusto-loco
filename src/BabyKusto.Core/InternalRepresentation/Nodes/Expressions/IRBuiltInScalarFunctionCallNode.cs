@@ -8,9 +8,9 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.InternalRepresentation
 {
-    internal class IRBuiltInFunctionCallNode : IRExpressionNode
+    internal class IRBuiltInScalarFunctionCallNode : IRExpressionNode
     {
-        public IRBuiltInFunctionCallNode(Signature signature, ScalarOverloadInfo overloadInfo, IReadOnlyList<Parameter> parameters, IRListNode<IRExpressionNode> arguments, TypeSymbol resultType)
+        public IRBuiltInScalarFunctionCallNode(Signature signature, ScalarOverloadInfo overloadInfo, IReadOnlyList<Parameter> parameters, IRListNode<IRExpressionNode> arguments, TypeSymbol resultType)
             : base(resultType, GetResultKind(arguments))
         {
             Signature = signature ?? throw new ArgumentNullException(nameof(signature));
@@ -35,12 +35,12 @@ namespace BabyKusto.Core.InternalRepresentation
         public override TResult? Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
             where TResult : class
         {
-            return visitor.VisitBuiltInFunctionCall(this, context);
+            return visitor.VisitBuiltInScalarFunctionCall(this, context);
         }
 
         public override string ToString()
         {
-            return $"BuiltInFunctionCall({Signature.Display}): {ResultType.Display}";
+            return $"BuiltInScalarFunctionCall({Signature.Display}): {ResultType.Display}";
         }
     }
 }

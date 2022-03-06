@@ -18,7 +18,7 @@ namespace BabyKusto.Core.Evaluation
                     var impl = node.OverloadInfo.ScalarImpl;
                     var resultKind = node.ResultKind;
 
-                    return BuiltInsHelper.GetImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
                 });
 
             var val = node.Expression.Accept(this, context);
@@ -36,7 +36,7 @@ namespace BabyKusto.Core.Evaluation
                     var impl = node.OverloadInfo.ScalarImpl;
                     var resultKind = node.ResultKind;
 
-                    return BuiltInsHelper.GetImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
                 });
 
             var leftVal = node.Left.Accept(this, context);

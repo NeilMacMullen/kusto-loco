@@ -52,7 +52,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         }
 
         // TODO: Support named parameters
-        public static Func<EvaluationResult[], EvaluationResult> GetImplementation(IRExpressionNode[] argumentExpressions, IScalarFunctionImpl impl, EvaluatedExpressionKind resultKind)
+        public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IRExpressionNode[] argumentExpressions, IScalarFunctionImpl impl, EvaluatedExpressionKind resultKind)
         {
             if (resultKind == EvaluatedExpressionKind.Scalar)
             {
@@ -119,6 +119,64 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             {
                 throw new InvalidOperationException($"Unexpected result kind {resultKind}");
             }
+        }
+
+        public static Func<EvaluationResult[], EvaluationResult> GetWindowImplementation(IRExpressionNode[] argumentExpressions, IWindowFunctionImpl impl, EvaluatedExpressionKind resultKind)
+        {
+            if (resultKind != EvaluatedExpressionKind.Columnar)
+            {
+                throw new InvalidOperationException($"Unexpected result kind {resultKind}");
+            }
+
+            int firstColumnarArgIndex = -1;
+            var argNeedsExpansion = new bool[argumentExpressions.Length];
+            for (int i = 0; i < argumentExpressions.Length; i++)
+            {
+                if (argumentExpressions[i].ResultKind == EvaluatedExpressionKind.Columnar)
+                {
+                    if (firstColumnarArgIndex < 0)
+                    {
+                        firstColumnarArgIndex = i;
+                    }
+                }
+                else
+                {
+                    argNeedsExpansion[i] = true;
+                }
+            }
+
+            Debug.Assert(firstColumnarArgIndex >= 0);
+            if (firstColumnarArgIndex < 0)
+            {
+                throw new InvalidOperationException();
+            }
+
+            ColumnarResult[]? lastWindowArgs = null;
+            ColumnarResult? previousResult = null;
+            return (EvaluationResult[] arguments) =>
+            {
+                Debug.Assert(arguments.Length == argNeedsExpansion.Length);
+
+                var numRows = ((ColumnarResult)arguments[firstColumnarArgIndex]).Column.RowCount;
+                var columnarArgs = new ColumnarResult[arguments.Length];
+                for (int i = 0; i < arguments.Length; i++)
+                {
+                    if (!argNeedsExpansion[i])
+                    {
+                        columnarArgs[i] = (ColumnarResult)arguments[i];
+                    }
+                    else
+                    {
+                        var scalarValue = (ScalarResult)arguments[i];
+                        columnarArgs[i] = new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type, numRows));
+                    }
+                }
+
+                var result = impl.InvokeWindow(columnarArgs, lastWindowArgs, previousResult);
+                lastWindowArgs = columnarArgs;
+                previousResult = result;
+                return result;
+            };
         }
     }
 }

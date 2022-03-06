@@ -1652,6 +1652,81 @@ NaN
             Test(query, expected);
         }
 
+        [Fact]
+        public void Window_RowCumSum_SingleChunk()
+        {
+            // Arrange
+            string query = @"
+datatable(v:long) [ 1, 2, 3, 4 ]
+| project cs = row_cumsum(v, false)
+";
+
+            string expected = @"
+cs:long
+------------------
+1
+3
+6
+10
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Window_RowCumSum_TwoChunks()
+        {
+            // Arrange
+            string query = @"
+let t = datatable(v:long) [ 1, 2, 3 ];
+union t,t
+| project cs = row_cumsum(v, false)
+";
+
+            string expected = @"
+cs:long
+------------------
+1
+3
+6
+7
+9
+12
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Window_RowCumSum_Restart()
+        {
+            // Arrange
+            string query = @"
+datatable(v:int, r:bool)
+[
+    1, false,
+    2, false,
+    3, true,
+    4, false,
+]
+| project cs = row_cumsum(v, r)
+";
+
+            string expected = @"
+cs:int
+------------------
+1
+3
+3
+7
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         private static void Test(string query, string expectedOutput)
         {
             var engine = new BabyKustoEngine();

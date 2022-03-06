@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns.Impl;
 using BabyKusto.Core.InternalRepresentation;
@@ -68,7 +69,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new NotImplementedException($"Aggregate function {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
             }
 
-            return overload!;
+            Debug.Assert(overload != null);
+            return overload;
         }
 
         public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out AggregateOverloadInfo? overload)

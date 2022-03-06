@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitBuiltInFunctionCall(IRBuiltInFunctionCallNode node, EvaluationContext context)
+        public override EvaluationResult? VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache(
                 () =>
@@ -25,7 +25,34 @@ namespace BabyKusto.Core.Evaluation
 
                     var impl = node.OverloadInfo.ScalarImpl;
                     var resultKind = node.ResultKind;
-                    return BuiltInsHelper.GetImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
+                });
+
+            var arguments = new EvaluationResult[node.Arguments.ChildCount];
+            for (int i = 0; i < node.Arguments.ChildCount; i++)
+            {
+                var argVal = node.Arguments.GetChild(i).Accept(this, context);
+                Debug.Assert(argVal != null);
+                arguments[i] = argVal;
+            }
+
+            return impl(arguments);
+        }
+
+        public override EvaluationResult? VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, EvaluationContext context)
+        {
+            var impl = node.GetOrSetCache(
+                () =>
+                {
+                    var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
+                    for (int i = 0; i < node.Arguments.ChildCount; i++)
+                    {
+                        argumentExpressions[i] = node.Arguments.GetChild(i);
+                    }
+
+                    var impl = node.OverloadInfo.Impl;
+                    var resultKind = node.ResultKind;
+                    return BuiltInsHelper.GetWindowImplementation(argumentExpressions, impl, resultKind);
                 });
 
             var arguments = new EvaluationResult[node.Arguments.ChildCount];

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
@@ -156,15 +157,23 @@ namespace BabyKusto.Core.InternalRepresentation
             }
 
             var functionSymbol = (FunctionSymbol)signature.Symbol;
-            if (BuiltInFunctions.TryGetOverload(functionSymbol, irArguments, parameters, out var functionOverload))
+            if (BuiltInScalarFunctions.TryGetOverload(functionSymbol, irArguments, parameters, out var functionOverload))
             {
-                ApplyTypeCoercions(irArguments, functionOverload!);
-                return new IRBuiltInFunctionCallNode(signature, functionOverload!, parameters, IRListNode.From(irArguments), node.ResultType);
+                Debug.Assert(functionOverload != null);
+                ApplyTypeCoercions(irArguments, functionOverload);
+                return new IRBuiltInScalarFunctionCallNode(signature, functionOverload, parameters, IRListNode.From(irArguments), node.ResultType);
             }
             else if (BuiltInAggregates.TryGetOverload(functionSymbol, irArguments, parameters, out var aggregateOverload))
             {
-                ApplyTypeCoercions(irArguments, aggregateOverload!);
-                return new IRAggregateCallNode(signature, aggregateOverload!, parameters, IRListNode.From(irArguments), node.ResultType);
+                Debug.Assert(aggregateOverload != null);
+                ApplyTypeCoercions(irArguments, aggregateOverload);
+                return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments), node.ResultType);
+            }
+            else if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, irArguments, parameters, out var windowFunctionOverload))
+            {
+                Debug.Assert(windowFunctionOverload != null);
+                ApplyTypeCoercions(irArguments, windowFunctionOverload);
+                return new IRBuiltInWindowFunctionCallNode(signature, windowFunctionOverload, parameters, IRListNode.From(irArguments), node.ResultType);
             }
             else
             {

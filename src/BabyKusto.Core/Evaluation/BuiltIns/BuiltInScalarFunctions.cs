@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns.Impl;
 using BabyKusto.Core.InternalRepresentation;
@@ -11,11 +12,11 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns
 {
-    internal static class BuiltInFunctions
+    internal static class BuiltInScalarFunctions
     {
         private static Dictionary<FunctionSymbol, ScalarFunctionInfo> functions = new();
 
-        static BuiltInFunctions()
+        static BuiltInScalarFunctions()
         {
             functions.Add(
                 Functions.MinOf,
@@ -61,7 +62,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new NotImplementedException($"Function {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
             }
 
-            return overload!;
+            Debug.Assert(overload != null);
+            return overload;
         }
         public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters, out ScalarOverloadInfo? overload)
         {
