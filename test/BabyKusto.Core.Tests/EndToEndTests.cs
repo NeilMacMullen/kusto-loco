@@ -983,13 +983,13 @@ v:long
         {
             // Arrange
             string query = @"
-print a=2-1, b=4-3.5, c=6.5-5, d=8.0-7.5
+print a=2-1, b=4-3.5, c=6.5-5, d=8.0-7.5, e=10s-1s, f=datetime(2022-03-06T20:00)-5m
 ";
 
             string expected = @"
-a:long; b:real; c:real; d:real
+a:long; b:real; c:real; d:real; e:timespan; f:datetime
 ------------------
-1; 0.5; 1.5; 0.5
+1; 0.5; 1.5; 0.5; 00:00:09; 2022-03-06 19:55:00Z
 ";
 
             // Act & Assert
@@ -1019,13 +1019,13 @@ a:long; b:real; c:real; d:real
         {
             // Arrange
             string query = @"
-print a=6/2, b=5/0.5, c=10./5, d=2.5/0.5
+print a=6/2, b=5/0.5, c=10./5, d=2.5/0.5, e=15ms/10ms
 ";
 
             string expected = @"
-a:long; b:real; c:real; d:real
+a:long; b:real; c:real; d:real; e:real
 ------------------
-3; 10; 2; 5
+3; 10; 2; 5; 1.5
 ";
 
             // Act & Assert

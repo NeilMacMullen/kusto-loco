@@ -41,7 +41,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new ScalarOverloadInfo(new SubtractLongOperatorImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
                     new ScalarOverloadInfo(new SubtractDoubleOperatorImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real),
                     new ScalarOverloadInfo(new SubtractTimeSpanOperatorImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
-                    new ScalarOverloadInfo(new SubtractDateTimeTimeSpanOperatorImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan)));
+                    new ScalarOverloadInfo(new SubtractDateTimeTimeSpanOperatorImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan),
+                    new ScalarOverloadInfo(new SubtractDateTimeOperatorImpl(), ScalarTypes.TimeSpan, ScalarTypes.DateTime, ScalarTypes.DateTime)));
 
             operators.Add(
                 Operators.Multiply,

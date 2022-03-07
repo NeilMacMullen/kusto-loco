@@ -145,4 +145,32 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             return new ColumnarResult(Column.Create(ScalarTypes.DateTime, data));
         }
     }
+
+    internal class SubtractDateTimeOperatorImpl : IScalarFunctionImpl
+    {
+        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        {
+            Debug.Assert(arguments.Length == 2);
+            var left = (DateTime?)arguments[0].Value;
+            var right = (DateTime?)arguments[1].Value;
+
+            return new ScalarResult(ScalarTypes.TimeSpan, left.HasValue && right.HasValue ? left.Value - right.Value : null);
+        }
+
+        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+        {
+            Debug.Assert(arguments.Length == 2);
+            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+            var leftCol = (Column<DateTime?>)(arguments[0].Column);
+            var rightCol = (Column<DateTime?>)(arguments[1].Column);
+
+            var data = new TimeSpan?[leftCol.RowCount];
+            for (int i = 0; i < leftCol.RowCount; i++)
+            {
+                var (left, right) = (leftCol[i], rightCol[i]);
+                data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
+            }
+            return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+        }
+    }
 }
