@@ -8,19 +8,19 @@ namespace BabyKusto.Core.InternalRepresentation
 {
     internal class IRMaterializeExpressionNode : IRExpressionNode
     {
-        private readonly IRExpressionNode _expression;
-
         public IRMaterializeExpressionNode(IRExpressionNode expression, TypeSymbol resultType)
             : base(resultType, expression.ResultKind)
         {
-            _expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
+
+        public IRExpressionNode Expression { get; }
 
         public override int ChildCount => 1;
         public override IRNode GetChild(int index) =>
             index switch
             {
-                0 => _expression,
+                0 => Expression,
                 _ => throw new ArgumentOutOfRangeException(nameof(index)),
             };
 

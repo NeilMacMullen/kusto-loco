@@ -1727,6 +1727,55 @@ cs:int
             Test(query, expected);
         }
 
+        [Fact(Skip = "Known bug in window function implementations where a table is evaluated more than once. For now, using materialize() works around this")]
+        public void Window_RowCumSum_MultipleEvaluations()
+        {
+            // Arrange
+            string query = @"
+let d=
+    datatable(v:int) [ 10, 10 ]
+    | project cs = row_cumsum(v, false);
+let a = toscalar(d | summarize max(cs));
+d
+| extend normalized = todouble(cs) / a
+";
+
+            string expected = @"
+cs:int; normalized:real
+------------------
+10; 0.5
+20; 1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Materialize()
+        {
+            // Arrange
+            string query = @"
+let d = materialize(
+    datatable(v:int) [ 10, 10 ]
+    | project cs = row_cumsum(v, false)
+);
+let a = toscalar(d | summarize max(cs));
+d
+| extend normalized = todouble(cs) / a
+";
+
+            string expected = @"
+cs:int; normalized:real
+------------------
+10; 0.5
+20; 1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         private static void Test(string query, string expectedOutput)
         {
             var engine = new BabyKustoEngine();
