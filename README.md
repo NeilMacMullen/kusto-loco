@@ -2,69 +2,60 @@ _⚠ This is a hackathon project with no support or quality guarantee_
 
 # BabyKusto
 
-Welcome to BabyKusto. BabyKusto is a self-contained KQL (Kusto) engine
-with partial support for the [Kusto language](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/).
+BabyKusto is a self-contained execution engine for the [Kusto Query Language](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/) (KQL). See a [live demo](https://babykusto.azurewebsites.net/).
 
-## Example usage
+
+## How to use
 
 ```cs
- // Get your source data from somewhere.
- // Could be from a file on disk, hardcoded in memory, a real database, etc.
+ // Get your source data.
 ITableSource myTable = /*...*/;
 
 var engine = new BabyKustoEngine();
 engine.AddGlobalTable("MyTable", myTable);
 
-var result = engine.Evaluate(@"
-    MyTable
-    | summarize numSamples = count(),
-                v = avg(CounterValue/100)
-                by AppMachine");
+var query = @"MyTable
+              | summarize numSamples = count(),
+                          v = avg(CounterValue/100)
+                by AppMachine";
 
+var result = engine.Evaluate(query);
 if (result is TabularResult tabularResult)
 {
-    tabularResult.Value.Dump(Console.Out, indent: 4);
+    tabularResult.Value.Dump(Console.Out);
 }
 ```
 
-## Example output from `BabyKusto.Cli`:
+This repo ships with two samples to showcase BabyKusto in action.
+
+* [**BabyKusto.ProcessQuerier**](./samples/BabyKusto.ProcessQuerier): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
+  ```
+  Processes
+  | project name, memMB=workingSet/1024/1024
+  | order by memMB desc
+  | take 1
+  ```
+
+* [**BabyKusto.BlazorApp**](./samples/BabyKusto.BlazorApp): a web-facing demo that lets you query an arbitrary CSV file using KQL queries. [Live demo](https://babykusto.azurewebsites.net/).
+
+
+## How it works
+
+BabyKusto leverages the official [`Microsoft.Azure.Kusto.Language`](https://www.nuget.org/packages/Microsoft.Azure.Kusto.Language/) package for parsing and semantic analysis of KQL queries.
+
+The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](./src/BabyKusto.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](./src/BabyKusto.Core/Evaluation/BabyKustoEvaluator.cs).
+
+You can explore the internal representation of a query by setting `dumpIRTree: true` when calling `BabyKustoEngine.Evaluate`.
+Below is an example of the internal representation for the query:
 
 ```
------------------------------------------------------------------------
-Welcome to BabyKusto, the little self-contained Kusto execution engine!
------------------------------------------------------------------------
-
-MyTable:
-    AppMachine:string; CounterName:string; CounterValue:real
-    ------------------
-    vm0; cpu; 50
-    vm0; mem; 30
-    vm1; cpu; 20
-    vm1; mem; 5
-    vm2; cpu; 100
-
-Query:
-let c=100.0;
-MyTable
-| where AppMachine == 'vm1'
-| project frac=CounterValue/c, AppMachine, CounterName
-| summarize avg(frac) by CounterName
-
-
-Result:
-    CounterName:string; avg_frac:real
-    ------------------
-    cpu; 0.2
-    mem; 0.05
+Processes
+| project name, memMB=workingSet/1024/1024
+| order by memMB desc
+| take 1
 ```
 
-## A simple UI that you can upload your csv file and query against it:
-https://babykusto.azurewebsites.net/
-
-![image](https://user-images.githubusercontent.com/92544828/137521390-4c2168a8-40f1-40b3-b410-a81e9db2bd1e.png)
-
-To bring up the APP in local, just build the solution, and run dotnet watch run inside the BabyKusto.BlazorApp directory:
-![image](https://user-images.githubusercontent.com/92544828/137518974-3cba9d4f-dbcc-4d52-abde-1d99e34107f7.png)
+![Internal representation outputs](./docs/internal-representation.png)
 
 ## Contributing
 

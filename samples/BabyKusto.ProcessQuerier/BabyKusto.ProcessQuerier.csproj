@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BabyKusto.Core\BabyKusto.Core.csproj" />
+    <ProjectReference Include="..\..\src\BabyKusto.Core\BabyKusto.Core.csproj" />
   </ItemGroup>
 
 </Project>

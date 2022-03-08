@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.Cli", "src\BabyKusto.Cli\BabyKusto.Cli.csproj", "{A73B096E-8F66-41C3-AE45-A6588D1382FA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.Core", "src\BabyKusto.Core\BabyKusto.Core.csproj", "{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.Core.Tests", "test\BabyKusto.Core.Tests\BabyKusto.Core.Tests.csproj", "{F3E251D0-8E63-43AD-96D7-955744B5A1D7}"
@@ -13,7 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{932C804C-F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{17CA2597-13D2-4A89-AFCC-B5E7170DB32F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.BlazorApp", "src\BabyKusto.BlazorApp\BabyKusto.BlazorApp.csproj", "{2825A29C-D334-4989-A7A9-D883F47F2343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.ProcessQuerier", "samples\BabyKusto.ProcessQuerier\BabyKusto.ProcessQuerier.csproj", "{A73B096E-8F66-41C3-AE45-A6588D1382FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.BlazorApp", "samples\BabyKusto.BlazorApp\BabyKusto.BlazorApp.csproj", "{2825A29C-D334-4989-A7A9-D883F47F2343}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{48CD2752-9462-473A-8699-7AD8B146742F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +31,10 @@ Global
 		{F3E251D0-8E63-43AD-96D7-955744B5A1D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3E251D0-8E63-43AD-96D7-955744B5A1D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3E251D0-8E63-43AD-96D7-955744B5A1D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,10 +44,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A73B096E-8F66-41C3-AE45-A6588D1382FA} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{F3E251D0-8E63-43AD-96D7-955744B5A1D7} = {932C804C-F6B7-4361-8360-E5238938E464}
-		{2825A29C-D334-4989-A7A9-D883F47F2343} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{A73B096E-8F66-41C3-AE45-A6588D1382FA} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{2825A29C-D334-4989-A7A9-D883F47F2343} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
