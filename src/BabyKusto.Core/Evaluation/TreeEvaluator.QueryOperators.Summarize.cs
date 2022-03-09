@@ -19,13 +19,13 @@ namespace BabyKusto.Core.Evaluation
             var byExpressions = new List<IRExpressionNode>();
             for (int i = 0; i < node.ByColumns.ChildCount; i++)
             {
-                byExpressions.Add(node.ByColumns.GetChild(i));
+                byExpressions.Add(node.ByColumns.GetTypedChild(i));
             }
 
             var aggregationExpressions = new List<IRExpressionNode>();
             for (int i = 0; i < node.Aggregations.ChildCount; i++)
             {
-                aggregationExpressions.Add(node.Aggregations.GetChild(i));
+                aggregationExpressions.Add(node.Aggregations.GetTypedChild(i));
             }
 
             var result = new SummarizeResultTable(this, context.Left.Value, context, byExpressions, aggregationExpressions, (TableSymbol)node.ResultType);
@@ -80,7 +80,7 @@ namespace BabyKusto.Core.Evaluation
 
                 for (int i = 0; i < chunk.RowCount; i++)
                 {
-                    var byValues = byValuesColumns.Select(c => c.Column.RawData.GetValue(i)).ToList();
+                    var byValues = byValuesColumns.Select(c => (object?)c.Column.RawData.GetValue(i)).ToList();
 
                     // TODO: Should nulls be treated differently than empty string?
                     // TODO: Use a less expensive composite key computation

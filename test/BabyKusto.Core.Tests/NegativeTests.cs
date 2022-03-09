@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Extensions;
@@ -37,7 +38,8 @@ Table2 | where Column != 123 | project d = f(Column)
         private static void Test(string query, string expectedOutput)
         {
             var engine = new BabyKustoEngine();
-            var result = (TabularResult)engine.Evaluate(query);
+            var result = (TabularResult?)engine.Evaluate(query);
+            Debug.Assert(result != null);
             var stringified = result.Value.DumpToString();
 
             var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");
