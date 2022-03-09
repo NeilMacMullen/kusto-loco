@@ -26,7 +26,7 @@ namespace BabyKusto.Core
             // TODO: davidni: Set up global state somehwere proper where it would be done just once
             var db = new DatabaseSymbol(
                 "MyDb",
-                _globalTables.Select(table => table.Source.Type).ToArray());
+                _globalTables.Select(table => table.Source.Type.WithName(table.TableName)).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
             var code = KustoCode.ParseAndAnalyze(query, globals);

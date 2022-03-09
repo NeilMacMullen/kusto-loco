@@ -55,7 +55,7 @@ else
     private static InMemoryTableSource GetDefaultTable()
     {
         var myTable = new InMemoryTableSource(
-            TableSymbol.From("(AppMachine:string, CounterName:string, CounterValue:real)").WithName("MyTable"),
+            TableSymbol.From("(AppMachine:string, CounterName:string, CounterValue:real)"),
             new Column[]
             {
                 Column.Create(ScalarTypes.String, new [] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
@@ -156,7 +156,7 @@ else
             }
 
             return new InMemoryTableSource(
-                new TableSymbol(columnName.Select(c => new ColumnSymbol(c, ScalarTypes.String))).WithName("MyTable"),
+                new TableSymbol(columnName.Select(c => new ColumnSymbol(c, ScalarTypes.String))),
                 columns.Select(c => new Column<string>(ScalarTypes.String, c.Select(v => v.ToString()).ToArray())).ToArray());
         }
         catch (Exception e)

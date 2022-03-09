@@ -108,10 +108,8 @@ static InMemoryTableSource GetProcessesTable()
         workingSets.Add(workingSet);
     }
 
-    var tableSymbol = TableSymbol.From("(name:string, numThreads:int, workingSet:long)").WithName("Processes");
-
     var myTable = new InMemoryTableSource(
-        tableSymbol,
+        TableSymbol.From("(name:string, numThreads:int, workingSet:long)"),
         new Column[] { names.ToColumn(), numThreads.ToColumn(), workingSets.ToColumn() });
     return myTable;
 }
