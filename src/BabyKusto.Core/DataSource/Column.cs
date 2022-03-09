@@ -87,14 +87,11 @@ namespace BabyKusto.Core
             set => _data[index] = value;
         }
 
-        public Span<T?> GetSpan(int start, int length)
-        {
-            return _data.AsSpan(start, length);
-        }
-
         public override Column Slice(int start, int length)
         {
-            return Column.Create(Type, GetSpan(start, length).ToArray());
+            var slicedData = new T[length];
+            Array.Copy(_data, start, slicedData, 0, length);
+            return Column.Create(Type, slicedData);
         }
 
         public override void ForEach(Action<object?> action)

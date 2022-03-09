@@ -95,7 +95,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 2);
             var left = (TimeSpan?)arguments[0].Value;
             var right = (TimeSpan?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Real, left.HasValue && right.HasValue && right.Value.Ticks != 0 ? left.Value / right.Value : null);
+            return new ScalarResult(ScalarTypes.Real, left.HasValue && right.HasValue && right.Value.Ticks != 0 ? (double)left.Value.Ticks / right.Value.Ticks : null);
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -109,7 +109,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             for (int i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue && right.Value.Ticks != 0 ? left.Value / right.Value : null;
+                data[i] = left.HasValue && right.HasValue && right.Value.Ticks != 0 ? (double)left.Value.Ticks / right.Value.Ticks : null;
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
         }

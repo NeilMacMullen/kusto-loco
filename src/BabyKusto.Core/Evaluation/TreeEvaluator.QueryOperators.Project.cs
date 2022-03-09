@@ -18,7 +18,7 @@ namespace BabyKusto.Core.Evaluation
             var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
             for (int i = 0; i < node.Columns.ChildCount; i++)
             {
-                columns.Add(node.Columns.GetChild(i));
+                columns.Add(node.Columns.GetTypedChild(i));
             }
 
             var result = new ProjectTableResult(this, context.Left.Value, context, columns, (TableSymbol)node.ResultType);

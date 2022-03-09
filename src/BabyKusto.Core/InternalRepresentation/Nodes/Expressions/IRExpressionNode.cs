@@ -85,7 +85,7 @@ namespace BabyKusto.Core.InternalRepresentation
             EvaluatedExpressionKind? resultKind = null;
             for (int i = 0; i < arguments.ChildCount; i++)
             {
-                var argument = arguments.GetChild(i);
+                var argument = arguments.GetTypedChild(i);
                 if (argument.ResultKind == EvaluatedExpressionKind.Table)
                 {
                     // Tabular inputs are special and don't participate in row-scope result kind decisions

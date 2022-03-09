@@ -20,7 +20,7 @@ namespace BabyKusto.Core.Evaluation
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
                     for (int i = 0; i < node.Arguments.ChildCount; i++)
                     {
-                        argumentExpressions[i] = node.Arguments.GetChild(i);
+                        argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
 
                     var impl = node.OverloadInfo.ScalarImpl;
@@ -47,7 +47,7 @@ namespace BabyKusto.Core.Evaluation
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
                     for (int i = 0; i < node.Arguments.ChildCount; i++)
                     {
-                        argumentExpressions[i] = node.Arguments.GetChild(i);
+                        argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
 
                     var impl = node.OverloadInfo.Impl;
@@ -75,7 +75,7 @@ namespace BabyKusto.Core.Evaluation
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
                     for (int i = 0; i < node.Arguments.ChildCount; i++)
                     {
-                        argumentExpressions[i] = node.Arguments.GetChild(i);
+                        argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
 
                     return node.OverloadInfo.AggregateImpl;

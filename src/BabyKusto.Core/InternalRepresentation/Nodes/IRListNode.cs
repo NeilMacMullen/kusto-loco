@@ -34,7 +34,8 @@ namespace BabyKusto.Core.InternalRepresentation
         }
 
         public override int ChildCount => _children.Count;
-        public override T GetChild(int index) => _children[index];
+        public override IRNode GetChild(int index) => GetTypedChild(index);
+        public T GetTypedChild(int index) => _children[index];
 
         public override string ToString()
         {

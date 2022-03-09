@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation
             var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];
             for (int i = 0; i < node.Expressions.ChildCount; i++)
             {
-                var orderedExpression = node.Expressions.GetChild(i);
+                var orderedExpression = node.Expressions.GetTypedChild(i);
                 sortColumns[i] = (orderedExpression.Expression, BuiltInComparers.GetComparer(orderedExpression.SortDirection, orderedExpression.NullsDirection, orderedExpression.Expression.ResultType));
             }
 

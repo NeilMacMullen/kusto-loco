@@ -34,7 +34,9 @@ namespace Microsoft.Extensions.Internal
             { typeof(ushort), "ushort" }
         };
 
+#if NETSTANDARD2_1_OR_GREATER
         [return: NotNullIfNotNull("item")]
+#endif
         public static string? GetTypeDisplayName(object? item, bool fullName = true)
         {
             return item == null ? null : GetTypeDisplayName(item.GetType(), fullName);
