@@ -40,6 +40,12 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
             functions.Add(Functions.Strlen, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrlenFunctionImpl(), ScalarTypes.Long, ScalarTypes.String)));
 
+            // TODO: Signature should be `string substring(string, int, int)`. But const literals are evaluated as long's by default and we do not support narrowing at this time.
+            functions.Add(
+                Functions.Substring,
+                new ScalarFunctionInfo(
+                    new ScalarOverloadInfo(new SubstringFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.Long, ScalarTypes.Long)));
+
             var binFunctionInfo = new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new BinIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
                 new ScalarOverloadInfo(new BinLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),

@@ -773,6 +773,58 @@ v:long
         }
 
         [Fact]
+        public void BuiltIns_substring_Scalar()
+        {
+            // Arrange
+            string query = @"
+print abc1 = substring('abc', 0, 3),
+      abc2 = substring('abc', -1, 20),
+      bc1  = substring('abc', 1, 2),
+      bc2  = substring('abc', 1, 20),
+      b1   = substring('abc', 1, 1),
+      n1   = substring('abc', 2, 0),
+      n2   = substring('abc', 10, 1)
+";
+
+            string expected = @"
+abc1:string; abc2:string; bc1:string; bc2:string; b1:string; n1:string; n2:string
+------------------
+abc; abc; bc; bc; b; ;
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_substring_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string)
+[
+    '0',
+    '01',
+    '012',
+    '0123',
+]
+| project v = substring(a,1,2)
+";
+
+            string expected = @"
+v:string
+------------------
+
+1
+12
+12
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_bin_Long()
         {
             // Arrange
