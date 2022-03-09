@@ -44,7 +44,7 @@ namespace BabyKusto.Core.Extensions
                         writer.Write(
                             v switch
                             {
-                                DateTime dateTime => dateTime.ToString("u"),
+                                DateTime dateTime => dateTime.ToString("O"),
                                 null => "(null)",
                                 _ => v,
                             });

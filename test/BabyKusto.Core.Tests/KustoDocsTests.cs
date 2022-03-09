@@ -29,7 +29,7 @@ Table2 | where Column != 123 | project d = f(10)
             string expected = @"
 d:datetime
 ------------------
-2022-02-20 05:00:00Z
+2022-02-20T05:00:00.0000000
 ";
 
             // Act & Assert
@@ -55,7 +55,7 @@ Table2 | where Column != 123 | project d = f(10)
             string expected = @"
 d:datetime
 ------------------
-2022-02-19 19:00
+2022-02-19T19:00:00.0000000
 ";
 
             // Act & Assert

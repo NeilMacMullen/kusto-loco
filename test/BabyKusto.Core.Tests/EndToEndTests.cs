@@ -812,7 +812,7 @@ print v=bin(datetime(2022-03-02 23:04), 1h)";
             string expected = @"
 v:datetime
 ------------------
-2022-03-02 23:00:00Z
+2022-03-02T23:00:00.0000000
 ";
 
             // Act & Assert
@@ -989,7 +989,7 @@ print a=2-1, b=4-3.5, c=6.5-5, d=8.0-7.5, e=10s-1s, f=datetime(2022-03-06T20:00)
             string expected = @"
 a:long; b:real; c:real; d:real; e:timespan; f:datetime
 ------------------
-1; 0.5; 1.5; 0.5; 00:00:09; 2022-03-06 19:55:00Z
+1; 0.5; 1.5; 0.5; 00:00:09; 2022-03-06T19:55:00.0000000
 ";
 
             // Act & Assert
