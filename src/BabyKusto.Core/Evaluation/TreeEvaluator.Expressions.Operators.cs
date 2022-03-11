@@ -15,10 +15,7 @@ namespace BabyKusto.Core.Evaluation
                 () =>
                 {
                     var argumentExpressions = new IRExpressionNode[] { node.Expression };
-                    var impl = node.OverloadInfo.ScalarImpl;
-                    var resultKind = node.ResultKind;
-
-                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl, node.ResultKind, node.ResultType);
                 });
 
             var val = node.Expression.Accept(this, context);
@@ -33,10 +30,7 @@ namespace BabyKusto.Core.Evaluation
                 () =>
                 {
                     var argumentExpressions = new IRExpressionNode[] { node.Left, node.Right };
-                    var impl = node.OverloadInfo.ScalarImpl;
-                    var resultKind = node.ResultKind;
-
-                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl, node.ResultKind, node.ResultType);
                 });
 
             var leftVal = node.Left.Accept(this, context);

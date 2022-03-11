@@ -52,7 +52,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         }
 
         // TODO: Support named parameters
-        public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IRExpressionNode[] argumentExpressions, IScalarFunctionImpl impl, EvaluatedExpressionKind resultKind)
+        public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IRExpressionNode[] argumentExpressions, IScalarFunctionImpl impl, EvaluatedExpressionKind resultKind, TypeSymbol expectedResultType)
         {
             if (resultKind == EvaluatedExpressionKind.Scalar)
             {
@@ -65,7 +65,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     {
                         scalarArgs[i] = (ScalarResult)arguments[i];
                     }
-                    return impl.InvokeScalar(scalarArgs);
+                    var result = impl.InvokeScalar(scalarArgs);
+                    Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
+                    return result;
                 };
             }
             else if (resultKind == EvaluatedExpressionKind.Columnar)
@@ -112,7 +114,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                         }
                     }
 
-                    return impl.InvokeColumnar(columnarArgs);
+                    var result = impl.InvokeColumnar(columnarArgs);
+                    Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
+                    return result;
                 };
             }
             else
@@ -121,7 +125,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             }
         }
 
-        public static Func<EvaluationResult[], EvaluationResult> GetWindowImplementation(IRExpressionNode[] argumentExpressions, IWindowFunctionImpl impl, EvaluatedExpressionKind resultKind)
+        public static Func<EvaluationResult[], EvaluationResult> GetWindowImplementation(IRExpressionNode[] argumentExpressions, IWindowFunctionImpl impl, EvaluatedExpressionKind resultKind, TypeSymbol expectedResultType)
         {
             if (resultKind != EvaluatedExpressionKind.Columnar)
             {
@@ -173,6 +177,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 }
 
                 var result = impl.InvokeWindow(columnarArgs, lastWindowArgs, previousResult);
+                Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
                 lastWindowArgs = columnarArgs;
                 previousResult = result;
                 return result;

@@ -23,9 +23,7 @@ namespace BabyKusto.Core.Evaluation
                         argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
 
-                    var impl = node.OverloadInfo.ScalarImpl;
-                    var resultKind = node.ResultKind;
-                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl, node.ResultKind, node.ResultType);
                 });
 
             var arguments = new EvaluationResult[node.Arguments.ChildCount];
@@ -50,9 +48,7 @@ namespace BabyKusto.Core.Evaluation
                         argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
 
-                    var impl = node.OverloadInfo.Impl;
-                    var resultKind = node.ResultKind;
-                    return BuiltInsHelper.GetWindowImplementation(argumentExpressions, impl, resultKind);
+                    return BuiltInsHelper.GetWindowImplementation(argumentExpressions, node.OverloadInfo.Impl, node.ResultKind, node.ResultType);
                 });
 
             var arguments = new EvaluationResult[node.Arguments.ChildCount];

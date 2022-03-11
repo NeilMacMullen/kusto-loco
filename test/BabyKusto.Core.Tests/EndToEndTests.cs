@@ -872,6 +872,26 @@ v:datetime
             Test(query, expected);
         }
 
+        [Fact(Skip = "See: https://github.com/microsoft/Kusto-Query-Language/issues/67")]
+        public void BuiltIns_bin_Narrowing()
+        {
+            // Arrange
+            string query = @"
+datatable(a:int) [ 9, 10, 11 ]
+| project v = bin(a, 10)";
+
+            string expected = @"
+v:long
+------------------
+0
+10
+10
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         [Fact]
         public void UserDefinedFunction1()
         {

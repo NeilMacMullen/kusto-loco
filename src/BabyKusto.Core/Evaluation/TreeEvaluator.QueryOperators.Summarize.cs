@@ -66,21 +66,21 @@ namespace BabyKusto.Core.Evaluation
                 //  * Composite key calculation involves lots of string allocations and escapings
 
                 int numInputColumns = Source.Type.Columns.Count;
-                var byValuesColumns = new List<ColumnarResult>(_byExpressions.Count);
+                var byValuesColumns = new List<Column>(_byExpressions.Count);
                 {
                     var chunkContext = _context with { Chunk = chunk };
                     for (int i = 0; i < _byExpressions.Count; i++)
                     {
                         var byExpression = _byExpressions[i];
-                        var byExpressionResult = byExpression.Accept(_owner, chunkContext);
-                        Debug.Assert(byExpressionResult != null);
-                        byValuesColumns.Add((ColumnarResult)byExpressionResult);
+                        var byExpressionResult = (ColumnarResult)byExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(byExpressionResult.Type == byExpression.ResultType, $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
+                        byValuesColumns.Add(byExpressionResult.Column);
                     }
                 }
 
                 for (int i = 0; i < chunk.RowCount; i++)
                 {
-                    var byValues = byValuesColumns.Select(c => (object?)c.Column.RawData.GetValue(i)).ToList();
+                    var byValues = byValuesColumns.Select(c => (object?)c.RawData.GetValue(i)).ToList();
 
                     // TODO: Should nulls be treated differently than empty string?
                     // TODO: Use a less expensive composite key computation
@@ -127,10 +127,9 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _aggregationExpressions.Count; i++)
                     {
                         var aggregationExpression = _aggregationExpressions[i];
-                        var aggregationResult = aggregationExpression.Accept(_owner, chunkContext);
-                        Debug.Assert(aggregationResult != null);
-                        var aggregation = (ScalarResult)aggregationResult;
-                        resultsData[tableData.ByValues.Count + i].Add(aggregation.Value);
+                        var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(aggregationResult.Type == aggregationExpression.ResultType, $"Aggregation expression produced wrong type {aggregationResult.Type}, expected {aggregationExpression.ResultType}.");
+                        resultsData[tableData.ByValues.Count + i].Add(aggregationResult.Value);
                     }
 
                     resultRow++;
