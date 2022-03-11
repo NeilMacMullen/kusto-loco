@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.BlazorApp", "samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{48CD2752-9462-473A-8699-7AD8B146742F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.HelloWorld", "samples\BabyKusto.HelloWorld\BabyKusto.HelloWorld.csproj", "{A13576D6-6910-4298-9BDB-176E2341EC6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2825A29C-D334-4989-A7A9-D883F47F2343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A13576D6-6910-4298-9BDB-176E2341EC6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A13576D6-6910-4298-9BDB-176E2341EC6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A13576D6-6910-4298-9BDB-176E2341EC6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A13576D6-6910-4298-9BDB-176E2341EC6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{F3E251D0-8E63-43AD-96D7-955744B5A1D7} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{A73B096E-8F66-41C3-AE45-A6588D1382FA} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{2825A29C-D334-4989-A7A9-D883F47F2343} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{A13576D6-6910-4298-9BDB-176E2341EC6B} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}

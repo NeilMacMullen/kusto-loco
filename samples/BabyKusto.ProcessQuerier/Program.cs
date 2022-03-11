@@ -72,15 +72,10 @@ static void ExecuteReplQuery(string query)
     var processesTable = GetProcessesTable();
     var engine = new BabyKustoEngine();
     engine.AddGlobalTable("Processes", processesTable);
-    var result = engine.Evaluate(query, dumpIRTree: true); // Set dumpIRTree = true to see the internal tree representation
+    var result = engine.Evaluate(query, dumpIRTree: false); // Set dumpIRTree = true to see the internal tree representation
 
     Console.WriteLine();
-
-    if (result is TabularResult tabularResult)
-    {
-        tabularResult.Value.Dump(Console.Out);
-    }
-
+    result.Dump(Console.Out);
     Console.WriteLine();
 }
 

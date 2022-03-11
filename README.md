@@ -7,28 +7,37 @@ BabyKusto is a self-contained execution engine for the [Kusto Query Language](ht
 
 ## How to use
 
-```cs
- // Get your source data.
-ITableSource myTable = /*...*/;
+Queries that don't rely on any external data can be evaluated with as little as two lines of code:
 
+```cs
+var query = "print hello='world'";
+
+var engine = new BabyKustoEngine();
+var result = engine.Evaluate(query);
+result.Dump(Console.Out);
+```
+
+Most real world scenarios will want to operate on real data sourced from elsewhere.
+For that, BabyKusto allows you to register an `ITableSource` with any name in the global scope.
+The [**ProcessQuerier**](./samples/BabyKusto.ProcessQuerier) sample
+shows how to feed live data to BabyKusto with this mechanism.
+
+```cs
+var query = @"MyTable | summarize c = count() by AppMachine";
+
+ITableSource myTable = /*...*/; // Get your data from anywhere
 var engine = new BabyKustoEngine();
 engine.AddGlobalTable("MyTable", myTable);
 
-var query = @"MyTable
-              | summarize numSamples = count(),
-                          v = avg(CounterValue/100)
-                by AppMachine";
-
 var result = engine.Evaluate(query);
-if (result is TabularResult tabularResult)
-{
-    tabularResult.Value.Dump(Console.Out);
-}
+result.Dump(Console.Out);
 ```
 
-This repo ships with two samples to showcase BabyKusto in action.
+This repo ships with three ready-to-run samples that showcase BabyKusto in action.
 
-* [**BabyKusto.ProcessQuerier**](./samples/BabyKusto.ProcessQuerier): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
+* [**HelloWorld**](./samples/BabyKusto.HelloWorld): as simple as it gets, shows how to run a self-contained quer similar to the examples above.
+
+* [**ProcessQuerier**](./samples/BabyKusto.ProcessQuerier): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
   ```
   Processes
   | project name, memMB=workingSet/1024/1024
@@ -36,7 +45,7 @@ This repo ships with two samples to showcase BabyKusto in action.
   | take 1
   ```
 
-* [**BabyKusto.BlazorApp**](./samples/BabyKusto.BlazorApp): a web-facing demo that lets you query an arbitrary CSV file using KQL queries. [Live demo](https://babykusto.azurewebsites.net/).
+* [**BlazorApp**](./samples/BabyKusto.BlazorApp): a web-facing demo that lets you query an arbitrary CSV file using KQL queries. [Live demo](https://babykusto.azurewebsites.net/).
 
 
 ## How it works
