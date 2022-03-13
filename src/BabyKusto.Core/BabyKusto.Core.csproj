@@ -9,6 +9,16 @@
     <LangVersion>10</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageVersion>0.0.1-preview</PackageVersion>
+    <PackageTags>kusto;kql</PackageTags>
+    <Description>
+      A self-contained execution engine for the Kusto Query Language (KQL) written in C#.
+    </Description>
+    <RepositoryUrl>https://github.com/davidnx/baby-kusto-csharp</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="BabyKusto.Core.Tests" />
   </ItemGroup>
