@@ -72,7 +72,8 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _byExpressions.Count; i++)
                     {
                         var byExpression = _byExpressions[i];
-                        var byExpressionResult = (ColumnarResult)byExpression.Accept(_owner, chunkContext);
+                        var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(byExpressionResult != null);
                         Debug.Assert(byExpressionResult.Type == byExpression.ResultType, $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
                         byValuesColumns.Add(byExpressionResult.Column);
                     }
@@ -127,7 +128,8 @@ namespace BabyKusto.Core.Evaluation
                     for (int i = 0; i < _aggregationExpressions.Count; i++)
                     {
                         var aggregationExpression = _aggregationExpressions[i];
-                        var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
+                        var aggregationResult = (ScalarResult?)aggregationExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(aggregationResult != null);
                         Debug.Assert(aggregationResult.Type == aggregationExpression.ResultType, $"Aggregation expression produced wrong type {aggregationResult.Type}, expected {aggregationExpression.ResultType}.");
                         resultsData[tableData.ByValues.Count + i].Add(aggregationResult.Value);
                     }
