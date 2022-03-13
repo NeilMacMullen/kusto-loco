@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using BabyKusto.Core.Evaluation;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.InternalRepresentation
 {
-    public enum EvaluatedExpressionKind
+    internal enum EvaluatedExpressionKind
     {
         Scalar,
         Columnar,
