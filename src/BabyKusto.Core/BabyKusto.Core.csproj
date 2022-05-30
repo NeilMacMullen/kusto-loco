@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.0.1-preview</PackageVersion>
+    <PackageVersion>0.0.2-preview</PackageVersion>
     <PackageTags>kusto;kql</PackageTags>
     <Description>
       A self-contained execution engine for the Kusto Query Language (KQL) written in C#.
