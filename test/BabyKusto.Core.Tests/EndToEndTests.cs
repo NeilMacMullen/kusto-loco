@@ -1747,6 +1747,65 @@ NaN
         }
 
         [Fact]
+        public void Iff_Scalar()
+        {
+            // Arrange
+            string query = @"
+print 
+      bool1 = iff(2 > 1, true, false),
+      bool2 = iif(2 < 1, true, false),
+      int1  = iff(2 > 1, int(1), int(2)),
+      int2  = iff(2 < 1, int(1), int(2)),
+      long1 = iff(2 > 1, long(1), long(2)),
+      long2 = iff(2 < 1, long(1), long(2)),
+      real1 = iff(2 > 1, real(1), real(2)),
+      real2 = iff(2 < 1, real(1), real(2)),
+      string1 = iff(2 > 1, 'ifTrue', 'ifFalse'),
+      string2 = iff(2 < 1, 'ifTrue', 'ifFalse'),
+      datetime1 = iff(2 > 1, datetime(2022-01-01), datetime(2022-01-02)),
+      datetime2 = iff(2 < 1, datetime(2022-01-01), datetime(2022-01-02)),
+      timespan1 = iff(2 > 1, 1s, 2s),
+      timespan2 = iff(2 < 1, 1s, 2s)
+";
+
+            string expected = @"
+bool1:bool; bool2:bool; int1:int; int2:int; long1:long; long2:long; real1:real; real2:real; string1:string; string2:string; datetime1:datetime; datetime2:datetime; timespan1:timespan; timespan2:timespan
+------------------
+True; False; 1; 2; 1; 2; 1; 2; ifTrue; ifFalse; 2022-01-01T00:00:00.0000000; 2022-01-02T00:00:00.0000000; 00:00:01; 00:00:02
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Iff_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(predicates:bool) [ true, false ]
+| project
+      bool1 = iff(predicates, true, false),
+      int1  = iff(predicates, int(1), int(2)),
+      long1 = iff(predicates, long(1), long(2)),
+      real1 = iff(predicates, real(1), real(2)),
+      string1 = iff(predicates, 'ifTrue', 'ifFalse'),
+      datetime1 = iff(predicates, datetime(2022-01-01), datetime(2022-01-02)),
+      timespan1 = iff(predicates, 1s, 2s)
+";
+
+            string expected = @"
+bool1:bool; int1:int; long1:long; real1:real; string1:string; datetime1:datetime; timespan1:timespan
+------------------
+True; 1; 1; 1; ifTrue; 2022-01-01T00:00:00.0000000; 00:00:01
+False; 2; 2; 2; ifFalse; 2022-01-02T00:00:00.0000000; 00:00:02
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Window_RowCumSum_SingleChunk()
         {
             // Arrange

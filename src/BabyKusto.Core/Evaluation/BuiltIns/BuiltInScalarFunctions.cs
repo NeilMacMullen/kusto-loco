@@ -53,6 +53,17 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.Bin, binFunctionInfo);
             functions.Add(Functions.Floor, binFunctionInfo);
 
+            var iffFunctionInfo = new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool, ScalarTypes.Bool, ScalarTypes.Bool),
+                new ScalarOverloadInfo(new IffIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Bool, ScalarTypes.Int, ScalarTypes.Int),
+                new ScalarOverloadInfo(new IffLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Bool, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new IffRealFunctionImpl(), ScalarTypes.Real, ScalarTypes.Bool, ScalarTypes.Real, ScalarTypes.Real),
+                new ScalarOverloadInfo(new IffDateTimeFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.Bool, ScalarTypes.DateTime, ScalarTypes.DateTime),
+                new ScalarOverloadInfo(new IffTimeSpanFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.Bool, ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
+                new ScalarOverloadInfo(new IffStringFunctionImpl(), ScalarTypes.String, ScalarTypes.Bool, ScalarTypes.String, ScalarTypes.String));
+            functions.Add(Functions.Iff, iffFunctionInfo);
+            functions.Add(Functions.Iif, iffFunctionInfo);
+
             functions.Add(Functions.ToInt, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToIntStringFunctionImpl(), ScalarTypes.Int, ScalarTypes.String)));
             functions.Add(Functions.ToLong, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToLongStringFunctionImpl(), ScalarTypes.Long, ScalarTypes.String)));
             var toDoubleFunctionInfo = new ScalarFunctionInfo(new ScalarOverloadInfo(new ToDoubleStringFunctionImpl(), ScalarTypes.Real, ScalarTypes.String));
