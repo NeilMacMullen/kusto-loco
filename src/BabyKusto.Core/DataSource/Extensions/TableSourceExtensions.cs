@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace BabyKusto.Core.Extensions
@@ -56,7 +57,7 @@ namespace BabyKusto.Core.Extensions
 
         public static string DumpToString(this ITableSource table, int indent = 0)
         {
-            using var writer = new StringWriter();
+            using var writer = new StringWriter(CultureInfo.InvariantCulture);
             table.Dump(writer, indent);
             return writer.ToString();
         }
