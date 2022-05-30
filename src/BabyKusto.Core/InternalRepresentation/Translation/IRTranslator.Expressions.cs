@@ -137,9 +137,14 @@ namespace BabyKusto.Core.InternalRepresentation
                 }
 
                 var paramSymbols = new VariableSymbol[arguments.Length];
-                for (int i = 0; i < arguments.Length; i++)
+                for (int i = 0; i < parameters.Count; i++)
                 {
-                    paramSymbols[i] = new VariableSymbol(parameters[i].Name, arguments[i].ResultType);
+                    if (parameters[i].DeclaredTypes.Count != 1)
+                    {
+                        throw new InvalidOperationException($"Parameters with more than one declared type is not supported, found {parameters[i].DeclaredTypes.Count}.");
+                    }
+
+                    paramSymbols[i] = new VariableSymbol(parameters[i].Name, parameters[i].DeclaredTypes.Single());
                 }
 
                 IRFunctionBodyNode irFunctionBody;
@@ -147,6 +152,12 @@ namespace BabyKusto.Core.InternalRepresentation
                     var nestedTranslator = new IRTranslator();
                     for (int i = 0; i < arguments.Length; i++)
                     {
+                        // NOTE: For now we only support type coercions for scalars. Bad things may happen for tabular inputs, oh well...
+                        if (irArguments[i].ResultType is ScalarSymbol && paramSymbols[i].Type != irArguments[i].ResultType)
+                        {
+                            irArguments[i] = new IRCastExpressionNode(irArguments[i], paramSymbols[i].Type);
+                        }
+
                         nestedTranslator.SetInScopeSymbolInfo(paramSymbols[i].Name, irArguments[i].ResultKind);
                     }
 

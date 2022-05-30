@@ -169,6 +169,27 @@ a:long; b:long
         }
 
         [Fact]
+        public void Summarize_1()
+        {
+            // Arrange
+            string query = @"
+let input = datatable(a:long) [ 1, 2, 3 ];
+input
+| summarize count() by bin(a, 2)
+";
+
+            string expected = @"
+a:long; count_:long
+------------------
+0; 1
+2; 2
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Summarize_NoByExpressions1()
         {
             // Arrange
@@ -872,7 +893,7 @@ v:datetime
             Test(query, expected);
         }
 
-        [Fact(Skip = "See: https://github.com/microsoft/Kusto-Query-Language/issues/67")]
+        [Fact]
         public void BuiltIns_bin_Narrowing()
         {
             // Arrange
@@ -1486,7 +1507,7 @@ False; True
             Test(query, expected);
         }
 
-        [Fact(Skip = "Kusto library bug, see: https://github.com/microsoft/Kusto-Query-Language/issues/66")]
+        [Fact]
         public void BinOp_StringEndsWithCs()
         {
             // Arrange
