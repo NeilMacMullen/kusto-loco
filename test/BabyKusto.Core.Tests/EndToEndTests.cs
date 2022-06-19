@@ -877,6 +877,53 @@ v1:long; v2:long
         }
 
         [Fact]
+        public void BuiltIns_bin_Real()
+        {
+            // Arrange
+            string query = @"
+datatable(a:real, b:real)
+[
+  -1, 3,
+   0, 3,
+   1, 3,
+   2, 3,
+   3, 3,
+   4, 3,
+   0.3, 0.5,
+   0.5, 0.5,
+   0.9, 0.5,
+   1.0, 0.5,
+   1.1, 0.5,
+   -0.1, 0.5,
+   -0.5, 0.5,
+   -0.6, 0.5,
+]
+| project v1 = bin(a, b), v2 = floor(a, b)";
+
+            string expected = @"
+v1:real; v2:real
+------------------
+-3; -3
+0; 0
+0; 0
+0; 0
+3; 3
+3; 3
+0; 0
+0.5; 0.5
+0.5; 0.5
+1; 1
+1; 1
+-0.5; -0.5
+-0.5; -0.5
+-1; -1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_bin_DateTime()
         {
             // Arrange
@@ -1662,6 +1709,24 @@ a:long
 (null)
 123
 (null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToLong_Real_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=tolong(123.5)
+";
+
+            string expected = @"
+a:long
+------------------
+123
 ";
 
             // Act & Assert

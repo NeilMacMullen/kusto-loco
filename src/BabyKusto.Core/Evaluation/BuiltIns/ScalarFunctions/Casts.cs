@@ -32,7 +32,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int? Impl(string? input)
         {
-            return int.TryParse(input, out var parsedResult) ? parsedResult : null;
+            return int.TryParse(input, out var parsedResult)
+                ? parsedResult
+                : (double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) && !double.IsInfinity(parsedDouble))
+                    ? (int)parsedDouble
+                    : null;
         }
     }
 
@@ -61,7 +65,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long? Impl(string? input)
         {
-            return long.TryParse(input, out var parsedResult) ? parsedResult : null;
+            return long.TryParse(input, out var parsedResult)
+                ? parsedResult
+                : (double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) && !double.IsInfinity(parsedDouble))
+                    ? (long)parsedDouble
+                    : null;
         }
     }
 
@@ -119,7 +127,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool? Impl(string? input)
         {
-            return bool.TryParse(input, out var parsedResult) ? parsedResult : null;
+            return bool.TryParse(input, out var parsedResult)
+                ? parsedResult
+                : long.TryParse(input, out var parsedLong)
+                    ? parsedLong != 0
+                    : null;
         }
     }
 }

@@ -49,6 +49,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             var binFunctionInfo = new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new BinIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
                 new ScalarOverloadInfo(new BinLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BinDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real),
                 new ScalarOverloadInfo(new BinDateTimeTimeSpanFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan));
             functions.Add(Functions.Bin, binFunctionInfo);
             functions.Add(Functions.Floor, binFunctionInfo);
