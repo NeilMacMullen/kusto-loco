@@ -391,6 +391,32 @@ v:long
         }
 
         [Fact]
+        public void BuiltInAggregates_any_String()
+        {
+            // Arrange
+            string query = @"
+datatable(x:long, val:string)
+[
+    0, 'first',
+    1, 'second',
+    2, 'third',
+    3, 'fourth',
+]
+| summarize any(val) by bin(x, 2)
+";
+
+            string expected = @"
+x:long; any_val:string
+------------------
+0; first
+2; third
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Take_Works()
         {
             // Arrange

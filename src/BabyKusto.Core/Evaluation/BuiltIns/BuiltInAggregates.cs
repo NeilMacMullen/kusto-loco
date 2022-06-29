@@ -60,6 +60,17 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new MaxAggregateDoubleImpl(), ScalarTypes.Real, ScalarTypes.Real),
                     new AggregateOverloadInfo(new MaxAggregateDateTimeImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime),
                     new AggregateOverloadInfo(new MaxAggregateTimeSpanImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan)));
+
+            aggregates.Add(
+                Aggregates.Any,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
+                    new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
         }
 
         public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)
