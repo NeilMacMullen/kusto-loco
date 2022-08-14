@@ -1,4 +1,4 @@
-_⚠ This is a hackathon project with no support or quality guarantee_
+[![NuGet Gallery | BabyKusto.Core](https://img.shields.io/nuget/v/BabyKusto.Core?style=plastic)](https://www.nuget.org/packages/BabyKusto.Core)
 
 # BabyKusto
 
