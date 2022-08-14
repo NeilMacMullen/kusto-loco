@@ -40,6 +40,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
             functions.Add(Functions.Strlen, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrlenFunctionImpl(), ScalarTypes.Long, ScalarTypes.String)));
 
+            functions.Add(Functions.ReplaceString, new ScalarFunctionInfo(new ScalarOverloadInfo(new ReplaceStringFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
+
             // TODO: Signature should be `string substring(string, int, int)`. But const literals are evaluated as long's by default and we do not support narrowing at this time.
             functions.Add(
                 Functions.Substring,
@@ -71,6 +73,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.ToReal, toDoubleFunctionInfo);
             functions.Add(Functions.ToDouble, toDoubleFunctionInfo);
             functions.Add(Functions.ToBool, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToBoolStringFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
+
+            functions.Add(Functions.UrlEncode_Component, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
+            functions.Add(Functions.UrlDecode, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlDecodeFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
         }
 
         public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)

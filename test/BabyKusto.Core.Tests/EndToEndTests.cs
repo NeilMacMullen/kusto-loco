@@ -778,6 +778,45 @@ b-456
         }
 
         [Fact]
+        public void BuiltIns_replace_string_Scalar1()
+        {
+            // Arrange
+            string query = @"
+print v=replace_string('abcb', 'b', '1')
+";
+
+            string expected = @"
+v:string
+------------------
+a1c1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_replace_string_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string) [ 'abc', 'abcb', 'def' ]
+| project v = replace_string(a, 'b', '1')
+";
+
+            string expected = @"
+v:string
+------------------
+a1c
+a1c1
+def
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_strlen_Scalar()
         {
             // Arrange
@@ -865,6 +904,82 @@ v:string
 1
 12
 12
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_url_encode_component_Scalar1()
+        {
+            // Arrange
+            string query = @"
+print v=url_encode_component('hello world')
+";
+
+            string expected = @"
+v:string
+------------------
+hello%20world
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_url_encode_component_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string) [ 'hello world', 'https://example.com?a=b' ]
+| project v = url_encode_component(a)
+";
+
+            string expected = @"
+v:string
+------------------
+hello%20world
+https%3A%2F%2Fexample.com%3Fa%3Db
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_url_decode_Scalar1()
+        {
+            // Arrange
+            string query = @"
+print v=url_decode('hello%20world')
+";
+
+            string expected = @"
+v:string
+------------------
+hello world
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_url_decode_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string) [ 'hello%20world', 'https%3A%2F%2Fexample.com%3Fa%3Db' ]
+| project v = url_decode(a)
+";
+
+            string expected = @"
+v:string
+------------------
+hello world
+https://example.com?a=b
 ";
 
             // Act & Assert
