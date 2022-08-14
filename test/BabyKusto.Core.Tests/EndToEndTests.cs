@@ -2020,6 +2020,68 @@ cs:int; normalized:real
             Test(query, expected);
         }
 
+        [Fact]
+        public void Join_InnerJoin1()
+        {
+            // Arrange
+            string query = @"
+let me = 'baby';
+let A = datatable(a:string, b:string) [
+    'abc', 'aLeft',
+    'def', 'dLeft',
+    'ghi', 'gLeft',
+];
+let B = datatable(a:string, c:long) [
+    'abc', 1,
+    'def', 2,
+    'jkl', 3,
+];
+A | join kind=inner B on a
+| order by a asc
+";
+
+            string expected = @"
+a:string; b:string; a1:string; c:long
+------------------
+abc; aLeft; abc; 1
+def; dLeft; def; 2
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact(Skip = "$left, $right scopes not properly supported yet")]
+        public void Join_InnerJoin_LeftRightScopesOnClause()
+        {
+            // Arrange
+            string query = @"
+let me = 'baby';
+let A = datatable(a:string, b:string) [
+    'abc', 'aLeft',
+    'def', 'dLeft',
+    'ghi', 'gLeft',
+];
+let B = datatable(a:string, c:string) [
+    'abc', 'aRight',
+    'def', 'dRight',
+    'jkl', 'jRight',
+];
+A | join kind=inner B on $left.a == $right.a
+| order by a asc
+";
+
+            string expected = @"
+a:string; b:string; a1:string; c:string
+------------------
+abc; aLeft; abc; aRight
+def; dLeft; def; dRight
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         private static void Test(string query, string expectedOutput)
         {
             var engine = new BabyKustoEngine();
