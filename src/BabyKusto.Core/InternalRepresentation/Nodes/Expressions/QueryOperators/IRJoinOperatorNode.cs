@@ -8,10 +8,13 @@ namespace BabyKusto.Core.InternalRepresentation
 {
     internal enum IRJoinKind
     {
+        InnerUnique,
         Inner,
         LeftOuter,
         RightOuter,
         FullOuter,
+        LeftSemi,
+        RightSemi,
         LeftAnti,
         RightAnti,
     }

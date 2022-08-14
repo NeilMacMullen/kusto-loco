@@ -64,13 +64,19 @@ namespace BabyKusto.Core.Evaluation
                 var leftBuckets = Bucketize(_left);
                 var rightBuckets = Bucketize(right);
 
-                switch (_joinKind)
+                return _joinKind switch
                 {
-                    case IRJoinKind.Inner:
-                        return InnerJoin(leftBuckets, rightBuckets);
-                    default:
-                        throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.");
-                }
+                    IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, dedupeLeft: true),
+                    IRJoinKind.Inner => InnerJoin(leftBuckets, rightBuckets, dedupeLeft: false),
+                    IRJoinKind.LeftOuter => LeftOuterJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.RightOuter => RightOuterJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.FullOuter => FullOuterJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.LeftSemi => LeftSemiJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.RightSemi => RightSemiJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.LeftAnti => LeftAntiJoin(leftBuckets, rightBuckets),
+                    IRJoinKind.RightAnti => RightAntiJoin(leftBuckets, rightBuckets),
+                    _ => throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.")
+                };
             }
 
             public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
@@ -80,9 +86,9 @@ namespace BabyKusto.Core.Evaluation
 
             private BucketedRows Bucketize(ITableSource table)
             {
-                var numColumns = table.Type.Columns.Count;
-                var result = new BucketedRows(numColumns);
+                var result = new BucketedRows(table);
 
+                var numColumns = table.Type.Columns.Count;
                 foreach (var chunk in table.GetData())
                 {
                     var onValuesColumns = new List<Column>(_onExpressions.Count);
@@ -127,40 +133,383 @@ namespace BabyKusto.Core.Evaluation
                 return result;
             }
 
-            private IEnumerable<ITableChunk> InnerJoin(BucketedRows leftBuckets, BucketedRows rightBuckets)
+            /// <param name="dedupeLeft">
+            /// When true, takes the first left match of each bucket instead of all.
+            /// In other words, setting <paramref name="dedupeLeft"/> to true produces the default join behavior (i.e. `innerunique`).
+            /// Setting it to false produces the `inner`-join behavior.
+            /// </param>
+            private IEnumerable<ITableChunk> InnerJoin(BucketedRows left, BucketedRows right, bool dedupeLeft)
             {
-                var resultColumns = new ColumnBuilder[leftBuckets.NumColumns + rightBuckets.NumColumns];
-
-                foreach (var kvp in leftBuckets.Buckets)
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+                for (int i = 0; i < numLeftColumns; i++)
                 {
-                    if (rightBuckets.Buckets.TryGetValue(kvp.Key, out var rightValue))
-                    {
-                        Debug.Assert(leftBuckets.NumColumns == kvp.Value.Data.Length);
-                        Debug.Assert(rightBuckets.NumColumns == rightValue.Data.Length);
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
 
-                        for (int i = 0; i < kvp.Value.Data.Length; i++)
+                foreach (var kvp in left.Buckets)
+                {
+                    int numLeftRows = dedupeLeft ? 1 : kvp.Value.Data[0].RowCount;
+                    if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
+                    {
+                        Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
+                        Debug.Assert(numRightColumns == rightValue.Data.Length);
+                        int numRightRows = rightValue.Data[0].RowCount;
+
+                        for (int i = 0; i < numLeftRows; i++)
                         {
-                            var col = kvp.Value.Data[i];
-                            if (resultColumns[i] == null)
+                            for (int j = 0; j < numRightRows; j++)
                             {
-                                resultColumns[i] = col.Clone();
-                            }
-                            else
-                            {
-                                resultColumns[i].AddRange(col);
+                                for (int c = 0; c < numLeftColumns; c++)
+                                {
+                                    var leftCol = kvp.Value.Data[c];
+                                    resultColumns[c].Add(leftCol[i]);
+                                }
+
+                                for (int c = 0; c < numRightColumns; c++)
+                                {
+                                    var rightCol = rightValue.Data[c];
+                                    resultColumns[numLeftColumns + c].Add(rightCol[j]);
+                                }
                             }
                         }
+                    }
+                }
 
-                        for (int i = 0; i < rightValue.Data.Length; i++)
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
+            {
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns];
+                for (int i = 0; i < numLeftColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in right.Buckets)
+                {
+                    if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
+                    {
+                        Debug.Assert(numLeftColumns == leftValue.Data.Length);
+                        for (int i = 0; i < numLeftColumns; i++)
                         {
-                            var col = rightValue.Data[i];
-                            if (resultColumns[i + leftBuckets.NumColumns] == null)
+                            resultColumns[i].AddRange(leftValue.Data[i]);
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
+            {
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numRightColumns];
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in left.Buckets)
+                {
+                    if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
+                    {
+                        Debug.Assert(numRightColumns == rightValue.Data.Length);
+                        for (int i = 0; i < numRightColumns; i++)
+                        {
+                            resultColumns[i].AddRange(rightValue.Data[i]);
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
+            {
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns];
+                for (int i = 0; i < numLeftColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in left.Buckets)
+                {
+                    if (!right.Buckets.ContainsKey(kvp.Key))
+                    {
+                        Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
+                        for (int i = 0; i < numLeftColumns; i++)
+                        {
+                            resultColumns[i].AddRange(kvp.Value.Data[i]);
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
+            {
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numRightColumns];
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in right.Buckets)
+                {
+                    if (!left.Buckets.ContainsKey(kvp.Key))
+                    {
+                        Debug.Assert(numRightColumns == kvp.Value.Data.Length);
+                        for (int i = 0; i < numRightColumns; i++)
+                        {
+                            resultColumns[i].AddRange(kvp.Value.Data[i]);
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
+            {
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+                for (int i = 0; i < numLeftColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in left.Buckets)
+                {
+                    int numLeftRows = kvp.Value.Data[0].RowCount;
+
+                    if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
+                    {
+                        Debug.Assert(numLeftColumns == rightValue.Data.Length);
+                        int numRightRows = rightValue.Data[0].RowCount;
+
+                        for (int i = 0; i < numLeftRows; i++)
+                        {
+                            for (int j = 0; j < numRightRows; j++)
                             {
-                                resultColumns[i + leftBuckets.NumColumns] = col.Clone();
+                                for (int c = 0; c < numLeftColumns; c++)
+                                {
+                                    var leftCol = kvp.Value.Data[c];
+                                    resultColumns[c].Add(leftCol[i]);
+                                }
+
+                                for (int c = 0; c < numRightColumns; c++)
+                                {
+                                    var rightCol = rightValue.Data[c];
+                                    resultColumns[numLeftColumns + c].Add(rightCol[j]);
+                                }
                             }
-                            else
+                        }
+                    }
+                    else
+                    {
+
+                        for (int i = 0; i < numLeftRows; i++)
+                        {
+                            for (int c = 0; c < numLeftColumns; c++)
                             {
-                                resultColumns[i + leftBuckets.NumColumns].AddRange(col);
+                                var leftCol = kvp.Value.Data[c];
+                                resultColumns[c].Add(leftCol[i]);
+                            }
+
+                            for (int c = 0; c < numRightColumns; c++)
+                            {
+                                resultColumns[numLeftColumns + c].Add(null);
+                            }
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> RightOuterJoin(BucketedRows left, BucketedRows right)
+            {
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+                for (int i = 0; i < numLeftColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in right.Buckets)
+                {
+                    int numRightRows = kvp.Value.Data[0].RowCount;
+
+                    if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
+                    {
+                        Debug.Assert(numLeftColumns == leftValue.Data.Length);
+                        int numLeftRows = leftValue.Data[0].RowCount;
+
+                        for (int i = 0; i < numLeftRows; i++)
+                        {
+                            for (int j = 0; j < numRightRows; j++)
+                            {
+                                for (int c = 0; c < numLeftColumns; c++)
+                                {
+                                    var leftCol = leftValue.Data[c];
+                                    resultColumns[c].Add(leftCol[i]);
+                                }
+
+                                for (int c = 0; c < numRightColumns; c++)
+                                {
+                                    var rightCol = kvp.Value.Data[c];
+                                    resultColumns[numLeftColumns + c].Add(rightCol[j]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < numRightRows; i++)
+                        {
+                            for (int c = 0; c < numLeftColumns; c++)
+                            {
+                                resultColumns[c].Add(null);
+                            }
+
+                            for (int c = 0; c < numRightColumns; c++)
+                            {
+                                var rightCol = kvp.Value.Data[c];
+                                resultColumns[numLeftColumns + c].Add(rightCol[i]);
+                            }
+                        }
+                    }
+                }
+
+                var columns = resultColumns
+                    .Select(c => c.ToColumn())
+                    .ToArray();
+                var chunk = new TableChunk(this, columns);
+                return new[] { chunk };
+            }
+
+            private IEnumerable<ITableChunk> FullOuterJoin(BucketedRows left, BucketedRows right)
+            {
+                int numLeftColumns = left.Table.Type.Columns.Count;
+                int numRightColumns = right.Table.Type.Columns.Count;
+                var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+                for (int i = 0; i < numLeftColumns; i++)
+                {
+                    resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
+                }
+                for (int i = 0; i < numRightColumns; i++)
+                {
+                    resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+                }
+
+                foreach (var kvp in left.Buckets)
+                {
+                    int numLeftRows = kvp.Value.Data[0].RowCount;
+
+                    if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
+                    {
+                        Debug.Assert(numLeftColumns == rightValue.Data.Length);
+                        int numRightRows = rightValue.Data[0].RowCount;
+
+                        for (int i = 0; i < numLeftRows; i++)
+                        {
+                            for (int j = 0; j < numRightRows; j++)
+                            {
+                                for (int c = 0; c < numLeftColumns; c++)
+                                {
+                                    var leftCol = kvp.Value.Data[c];
+                                    resultColumns[c].Add(leftCol[i]);
+                                }
+
+                                for (int c = 0; c < numRightColumns; c++)
+                                {
+                                    var rightCol = rightValue.Data[c];
+                                    resultColumns[numLeftColumns + c].Add(rightCol[j]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        for (int i = 0; i < numLeftRows; i++)
+                        {
+                            for (int c = 0; c < numLeftColumns; c++)
+                            {
+                                var leftCol = kvp.Value.Data[c];
+                                resultColumns[c].Add(leftCol[i]);
+                            }
+
+                            for (int c = 0; c < numRightColumns; c++)
+                            {
+                                resultColumns[numLeftColumns + c].Add(null);
+                            }
+                        }
+                    }
+                }
+
+                foreach (var kvp in right.Buckets)
+                {
+                    int numRightRows = kvp.Value.Data[0].RowCount;
+
+                    if (!left.Buckets.TryGetValue(kvp.Key, out var leftValue))
+                    {
+                        for (int i = 0; i < numRightRows; i++)
+                        {
+                            for (int c = 0; c < numLeftColumns; c++)
+                            {
+                                resultColumns[c].Add(null);
+                            }
+
+                            for (int c = 0; c < numRightColumns; c++)
+                            {
+                                var rightCol = kvp.Value.Data[c];
+                                resultColumns[numLeftColumns + c].Add(rightCol[i]);
                             }
                         }
                     }
@@ -175,12 +524,12 @@ namespace BabyKusto.Core.Evaluation
 
             private class BucketedRows
             {
-                public BucketedRows(int numColumns)
+                public BucketedRows(ITableSource table)
                 {
-                    NumColumns = numColumns;
+                    Table = table;
                 }
 
-                public int NumColumns { get; }
+                public ITableSource Table { get; }
                 public Dictionary<string, (List<object?> OnValues, ColumnBuilder[] Data)> Buckets { get; } = new();
             }
         }

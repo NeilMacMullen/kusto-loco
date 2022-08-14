@@ -11,6 +11,7 @@ namespace BabyKusto.Core
         public TableChunk(ITableSource table, Column[] columns)
         {
             ValidateTypes(table.Type, columns);
+            ValidateRowCounts(columns);
 
             Table = table;
             Columns = columns;
@@ -34,6 +35,23 @@ namespace BabyKusto.Core
                 if (columns[i].Type != tableSymbol.Columns[i].Type)
                 {
                     throw new ArgumentException($"Mismatched column[{i}] type in chunk, got {columns[i].Type.Display}, expected {tableSymbol.Columns[i].Type.Display}.");
+                }
+            }
+        }
+
+        private static void ValidateRowCounts(Column[] columns)
+        {
+            if (columns.Length == 0)
+            {
+                return;
+            }
+
+            int expected = columns[0].RowCount;
+            for (int i = 1; i < columns.Length; i++)
+            {
+                if (columns[i].RowCount != expected)
+                {
+                    throw new ArgumentException($"Mismatched column lengths, column[0] has {expected} rows, but column[{i} has {columns[i].RowCount} rows.");
                 }
             }
         }

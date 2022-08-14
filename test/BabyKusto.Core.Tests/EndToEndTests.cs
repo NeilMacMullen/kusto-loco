@@ -2136,30 +2136,100 @@ cs:int; normalized:real
         }
 
         [Fact]
-        public void Join_InnerJoin1()
+        public void Join_DefaultJoin()
         {
             // Arrange
             string query = @"
-let me = 'baby';
-let A = datatable(a:string, b:string) [
-    'abc', 'aLeft',
-    'def', 'dLeft',
-    'ghi', 'gLeft',
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
 ];
-let B = datatable(a:string, c:long) [
-    'abc', 1,
-    'def', 2,
-    'jkl', 3,
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
 ];
-A | join kind=inner B on a
-| order by a asc
+X | join Y on Key
+| order by Key asc, Value2 asc
 ";
 
             string expected = @"
-a:string; b:string; a1:string; c:long
+Key:string; Value1:long; Key1:string; Value2:long
 ------------------
-abc; aLeft; abc; 1
-def; dLeft; def; 2
+b; 2; b; 10
+c; 4; c; 20
+c; 4; c; 30
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_InnerUniquetJoin()
+        {
+            // Arrange
+            string query = @"
+let t1 = datatable(key:long, value:string)
+[
+    1, 'val1.1',
+    1, 'val1.2'
+];
+let t2 = datatable(key:long, value:string)
+[
+    1, 'val1.3',
+    1, 'val1.4'
+];
+t1 | join kind=innerunique t2 on key
+| order by value1 asc
+";
+
+            string expected = @"
+key:long; value:string; key1:long; value1:string
+------------------
+1; val1.1; 1; val1.3
+1; val1.1; 1; val1.4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_InnerJoin()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=inner Y on Key
+| order by Key asc, Value1 asc, Value2 asc
+";
+
+            string expected = @"
+Key:string; Value1:long; Key1:string; Value2:long
+------------------
+b; 2; b; 10
+b; 3; b; 10
+c; 4; c; 20
+c; 4; c; 30
 ";
 
             // Act & Assert
@@ -2191,6 +2261,257 @@ a:string; b:string; a1:string; c:string
 ------------------
 abc; aLeft; abc; aRight
 def; dLeft; def; dRight
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_LeftOuterJoin1()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=leftouter Y on Key
+| order by Key asc, Key1 asc
+";
+
+            string expected = @"
+Key:string; Value1:long; Key1:string; Value2:long
+------------------
+a; 1; (null); (null)
+b; 2; b; 10
+b; 3; b; 10
+c; 4; c; 20
+c; 4; c; 30
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_RightOuterJoin1()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=rightouter Y on Key
+| order by Key asc nulls last, Key1 asc
+";
+
+            string expected = @"
+Key:string; Value1:long; Key1:string; Value2:long
+------------------
+b; 2; b; 10
+b; 3; b; 10
+c; 4; c; 20
+c; 4; c; 30
+(null); (null); d; 40
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_FullOuterJoin1()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=fullouter Y on Key
+| order by Key asc nulls last, Key1 asc nulls first
+";
+
+            string expected = @"
+Key:string; Value1:long; Key1:string; Value2:long
+------------------
+a; 1; (null); (null)
+b; 2; b; 10
+b; 3; b; 10
+c; 4; c; 20
+c; 4; c; 30
+(null); (null); d; 40
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_LeftSemiJoin1()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=leftsemi Y on Key
+| order by Key asc
+";
+
+            string expected = @"
+Key:string; Value1:long
+------------------
+b; 2
+b; 3
+c; 4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_RightSemiJoin1()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind=rightsemi Y on Key
+| order by Key asc
+";
+
+            string expected = @"
+Key:string; Value2:long
+------------------
+b; 10
+c; 20
+c; 30
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Theory]
+        [InlineData("leftanti")]
+        [InlineData("anti")]
+        [InlineData("leftantisemi")]
+        public void Join_LeftAntiJoin1(string kind)
+        {
+            // Arrange
+            string query = $@"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind={kind} Y on Key
+";
+
+            string expected = @"
+Key:string; Value1:long
+------------------
+a; 1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Theory]
+        [InlineData("rightanti")]
+        [InlineData("rightantisemi")]
+        public void Join_RightAntiJoin1(string kind)
+        {
+            // Arrange
+            string query = $@"
+let X = datatable(Key:string, Value1:long)
+[
+    'a',1,
+    'b',2,
+    'b',3,
+    'c',4
+];
+let Y = datatable(Key:string, Value2:long)
+[
+    'b',10,
+    'c',20,
+    'c',30,
+    'd',40
+];
+X | join kind={kind} Y on Key
+";
+
+            string expected = @"
+Key:string; Value2:long
+------------------
+d; 40
 ";
 
             // Act & Assert

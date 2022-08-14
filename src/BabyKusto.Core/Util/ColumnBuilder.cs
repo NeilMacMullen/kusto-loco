@@ -15,6 +15,8 @@ namespace BabyKusto.Core.Util
         public abstract Column ToColumn();
         public abstract ColumnBuilder Clone();
         public abstract ColumnBuilder NewEmpty();
+        public abstract int RowCount { get; }
+        public abstract object? this[int index] { get; }
     }
 
     public class ColumnBuilder<T> : ColumnBuilder
@@ -27,6 +29,9 @@ namespace BabyKusto.Core.Util
         }
 
         public TypeSymbol Type { get; }
+
+        public override int RowCount => _data.Count;
+        public override object? this[int index] => _data[index];
 
         public void Add(T value)
         {

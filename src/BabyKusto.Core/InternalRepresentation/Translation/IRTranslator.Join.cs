@@ -11,7 +11,7 @@ namespace BabyKusto.Core.InternalRepresentation
     {
         public override IRNode VisitJoinOperator(JoinOperator node)
         {
-            var kind = IRJoinKind.Inner;
+            var kind = IRJoinKind.InnerUnique;
             foreach (var parameter in node.Parameters)
             {
                 if (parameter.Name.SimpleName == "kind")
@@ -20,12 +20,15 @@ namespace BabyKusto.Core.InternalRepresentation
                     {
                         kind = literalExpression.LiteralValue switch
                         {
+                            "innerunique" => IRJoinKind.InnerUnique,
                             "inner" => IRJoinKind.Inner,
                             "leftouter" => IRJoinKind.LeftOuter,
                             "rightouter" => IRJoinKind.RightOuter,
                             "fullouter" => IRJoinKind.FullOuter,
-                            "leftanti" => IRJoinKind.LeftAnti,
-                            "rightanti" => IRJoinKind.RightAnti,
+                            "leftsemi" => IRJoinKind.LeftSemi,
+                            "rightsemi" => IRJoinKind.RightSemi,
+                            "leftanti" or "anti" or "leftantisemi" => IRJoinKind.LeftAnti,
+                            "rightanti" or "rightantisemi"  => IRJoinKind.RightAnti,
                             _ => throw new NotSupportedException($"Unsupported join kind '{literalExpression.LiteralValue}'."),
                         };
                     }
