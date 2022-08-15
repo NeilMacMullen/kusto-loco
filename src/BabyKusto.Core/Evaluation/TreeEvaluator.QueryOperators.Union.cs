@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -37,7 +38,7 @@ namespace BabyKusto.Core.Evaluation
         private class UnionResultTable : ITableSource
         {
             private readonly List<ITableSource> _tables;
-            private readonly Dictionary<ColumnSymbol, int> _columnMappings;
+            private readonly Dictionary<(string Name, TypeSymbol Type), int> _columnMappings;
 
             public UnionResultTable(List<ITableSource> tables, TableSymbol resultType)
             {
@@ -47,7 +48,7 @@ namespace BabyKusto.Core.Evaluation
                 _columnMappings = new();
                 foreach (ColumnSymbol columnSymbol in resultType.Members)
                 {
-                    _columnMappings.TryAdd(columnSymbol, _columnMappings.Count);
+                    _columnMappings.TryAdd((Name: columnSymbol.Name, Type: columnSymbol.Type), _columnMappings.Count);
                 }
             }
 
@@ -81,7 +82,12 @@ namespace BabyKusto.Core.Evaluation
                 for (int i = 0; i < chunk.Columns.Length; i++)
                 {
                     var symbol = (ColumnSymbol)table.Type.Members[i];
-                    int destinationColumnIndex = _columnMappings[symbol];
+                    int destinationColumnIndex;
+                    if (!_columnMappings.TryGetValue((Name: symbol.Name, Type: symbol.Type), out destinationColumnIndex))
+                    {
+                        throw new InvalidOperationException($"Couldn't find source column to match to output column {symbol.Display}");
+                    }
+
                     columns[destinationColumnIndex] = chunk.Columns[i];
                 }
 

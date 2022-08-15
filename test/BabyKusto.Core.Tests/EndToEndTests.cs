@@ -625,6 +625,75 @@ v:real
         }
 
         [Fact]
+        public void Union_DifferentAndNonMatchingSchemas1()
+        {
+            // Arrange
+            string query = @"
+union
+    (datatable(v1:real) [ 1, 2 ]),
+    (datatable(v2:real) [ 3, 4 ])
+";
+
+            string expected = @"
+v1:real; v2:real
+------------------
+1; (null)
+2; (null)
+(null); 3
+(null); 4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact(Skip = "Not supported yet, waiting for https://github.com/microsoft/Kusto-Query-Language/issues/65")]
+        public void Union_DifferentAndNonMatchingSchemas2()
+        {
+            // Arrange
+            string query = @"
+union
+    (datatable(v:real) [ 1, 2 ]),
+    (datatable(v:long) [ 3, 4 ])
+";
+
+            string expected = @"
+v_real:real; v_long:real
+------------------
+1; (null)
+2; (null)
+(null); 3
+(null); 4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Union_DifferentButMatchingSchemas()
+        {
+            // Arrange
+            string query = @"
+union
+    (datatable(v:real) [ 1, 2 ]),
+    (datatable(v:real) [ 3, 4 ])
+";
+
+            string expected = @"
+v:real
+------------------
+1
+2
+3
+4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_minof_Scalar()
         {
             // Arrange
