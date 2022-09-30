@@ -647,23 +647,28 @@ v1:real; v2:real
             Test(query, expected);
         }
 
-        [Fact(Skip = "Not supported yet, waiting for https://github.com/microsoft/Kusto-Query-Language/issues/65")]
+        [Fact]
         public void Union_DifferentAndNonMatchingSchemas2()
         {
             // Arrange
             string query = @"
 union
-    (datatable(v:real) [ 1, 2 ]),
-    (datatable(v:long) [ 3, 4 ])
+    (datatable(v_real:real) [ 1, 2 ]),
+    (datatable(v:real) [ 3, 4 ]),
+    (datatable(v:long) [ 5, 6 ]),
+    (datatable(v_real:real) [ 7 ])
 ";
 
             string expected = @"
-v_real:real; v_long:real
+v_real:real; v_real1:real; v_long:long
 ------------------
-1; (null)
-2; (null)
-(null); 3
-(null); 4
+1; (null); (null)
+2; (null); (null)
+(null); 3; (null)
+(null); 4; (null)
+(null); (null); 5
+(null); (null); 6
+7; (null); (null)
 ";
 
             // Act & Assert

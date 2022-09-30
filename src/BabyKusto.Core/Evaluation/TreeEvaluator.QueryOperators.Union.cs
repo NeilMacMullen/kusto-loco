@@ -38,7 +38,7 @@ namespace BabyKusto.Core.Evaluation
         private class UnionResultTable : ITableSource
         {
             private readonly List<ITableSource> _tables;
-            private readonly Dictionary<(string Name, TypeSymbol Type), int> _columnMappings;
+            private readonly Dictionary<ColumnSymbol, int> _columnMappings;
 
             public UnionResultTable(List<ITableSource> tables, TableSymbol resultType)
             {
@@ -46,9 +46,16 @@ namespace BabyKusto.Core.Evaluation
                 Type = resultType;
 
                 _columnMappings = new();
+                int i = 0;
                 foreach (ColumnSymbol columnSymbol in resultType.Members)
                 {
-                    _columnMappings.TryAdd((Name: columnSymbol.Name, Type: columnSymbol.Type), _columnMappings.Count);
+                    _columnMappings.TryAdd(columnSymbol, i);
+                    foreach (var originalColumn in columnSymbol.OriginalColumns)
+                    {
+                        _columnMappings.TryAdd(originalColumn, i);
+                    }
+
+                    i++;
                 }
             }
 
@@ -83,7 +90,7 @@ namespace BabyKusto.Core.Evaluation
                 {
                     var symbol = (ColumnSymbol)table.Type.Members[i];
                     int destinationColumnIndex;
-                    if (!_columnMappings.TryGetValue((Name: symbol.Name, Type: symbol.Type), out destinationColumnIndex))
+                    if (!_columnMappings.TryGetValue(symbol, out destinationColumnIndex))
                     {
                         throw new InvalidOperationException($"Couldn't find source column to match to output column {symbol.Display}");
                     }
