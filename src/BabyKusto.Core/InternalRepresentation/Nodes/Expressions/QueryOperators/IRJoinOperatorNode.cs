@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.InternalRepresentation
@@ -21,24 +22,23 @@ namespace BabyKusto.Core.InternalRepresentation
 
     internal class IRJoinOperatorNode : IRQueryOperatorNode
     {
-        public IRJoinOperatorNode(IRJoinKind kind, IRExpressionNode expression, IRListNode<IRExpressionNode> onExpressions, TypeSymbol resultType)
+        public IRJoinOperatorNode(IRJoinKind kind, IRExpressionNode expression, List<IRJoinOnClause> onClauses, TypeSymbol resultType)
             : base(resultType)
         {
             Kind = kind;
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            OnExpressions = onExpressions ?? throw new ArgumentNullException(nameof(onExpressions));
+            OnClauses = onClauses ?? throw new ArgumentNullException(nameof(onClauses));
         }
 
         public IRJoinKind Kind { get; }
         public IRExpressionNode Expression { get; }
-        public IRListNode<IRExpressionNode> OnExpressions { get; }
+        public List<IRJoinOnClause> OnClauses { get; }
 
-        public override int ChildCount => 2;
+        public override int ChildCount => 1;
         public override IRNode GetChild(int index) =>
             index switch
             {
                 0 => Expression,
-                1 => OnExpressions,
                 _ => throw new ArgumentOutOfRangeException(nameof(index)),
             };
 
@@ -50,7 +50,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"JoinOperator(kind={Kind}): {ResultType.Display}";
+            return $"JoinOperator(kind={Kind}, {string.Join(", ", OnClauses)}): {ResultType.Display}";
         }
     }
 }

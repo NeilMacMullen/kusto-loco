@@ -17,13 +17,7 @@ namespace BabyKusto.Core.Evaluation
         public override EvaluationResult? VisitJoinOperator(IRJoinOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
-            var onExpressions = new List<IRExpressionNode>();
-            for (int i = 0; i < node.OnExpressions.ChildCount; i++)
-            {
-                onExpressions.Add(node.OnExpressions.GetTypedChild(i));
-            }
-
-            var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context, onExpressions, (TableSymbol)node.ResultType);
+            var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context, node.OnClauses, (TableSymbol)node.ResultType);
             return new TabularResult(result);
         }
 
@@ -34,16 +28,16 @@ namespace BabyKusto.Core.Evaluation
             private readonly IRExpressionNode _rightExpression;
             private readonly IRJoinKind _joinKind;
             private readonly EvaluationContext _context;
-            private readonly List<IRExpressionNode> _onExpressions;
+            private readonly List<IRJoinOnClause> _onClauses;
 
-            public JoinResultTable(TreeEvaluator owner, ITableSource left, IRExpressionNode rightExpression, IRJoinKind joinKind, EvaluationContext context, List<IRExpressionNode> onExpressions, TableSymbol resultType)
+            public JoinResultTable(TreeEvaluator owner, ITableSource left, IRExpressionNode rightExpression, IRJoinKind joinKind, EvaluationContext context, List<IRJoinOnClause> onClauses, TableSymbol resultType)
             {
                 _owner = owner;
                 _left = left;
                 _rightExpression = rightExpression;
                 _joinKind = joinKind;
                 _context = context;
-                _onExpressions = onExpressions;
+                _onClauses = onClauses;
                 Type = resultType;
             }
 
@@ -61,8 +55,8 @@ namespace BabyKusto.Core.Evaluation
                 var rightTabularResult = (TabularResult)rightResult;
                 var right = rightTabularResult.Value;
 
-                var leftBuckets = Bucketize(_left);
-                var rightBuckets = Bucketize(right);
+                var leftBuckets = Bucketize(_left, isLeft: true);
+                var rightBuckets = Bucketize(right, isLeft: false);
 
                 return _joinKind switch
                 {
@@ -84,19 +78,20 @@ namespace BabyKusto.Core.Evaluation
                 throw new NotSupportedException();
             }
 
-            private BucketedRows Bucketize(ITableSource table)
+            private BucketedRows Bucketize(ITableSource table, bool isLeft)
             {
                 var result = new BucketedRows(table);
 
                 var numColumns = table.Type.Columns.Count;
+                var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
                 foreach (var chunk in table.GetData())
                 {
-                    var onValuesColumns = new List<Column>(_onExpressions.Count);
+                    var onValuesColumns = new List<Column>(_onClauses.Count);
                     {
                         var chunkContext = new EvaluationContext(_context.Scope, Chunk: chunk);
-                        for (int i = 0; i < _onExpressions.Count; i++)
+                        for (int i = 0; i < onExpressions.Length; i++)
                         {
-                            var onExpression = _onExpressions[i];
+                            var onExpression = onExpressions[i];
                             var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
                             Debug.Assert(onExpressionResult != null);
                             Debug.Assert(onExpressionResult.Type == onExpression.ResultType, $"On expression[{i}] produced wrong type {onExpressionResult.Type}, expected {onExpression.ResultType}.");

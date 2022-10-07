@@ -2310,7 +2310,7 @@ c; 4; c; 30
             Test(query, expected);
         }
 
-        [Fact(Skip = "$left, $right scopes not properly supported yet")]
+        [Fact]
         public void Join_InnerJoin_LeftRightScopesOnClause()
         {
             // Arrange
@@ -2586,6 +2586,87 @@ X | join kind={kind} Y on Key
 Key:string; Value2:long
 ------------------
 d; 40
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_DollarLeftDollarRight()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(a:string, b:string)
+[
+    'a1','b1',
+    'a2','b2',
+];
+let Y = datatable(b:string)
+[
+    'b2',
+];
+X | join kind=inner Y on $left.b == $right.b
+";
+
+            string expected = @"
+a:string; b:string; b1:string
+------------------
+a2; b2; b2
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_DollarLeftDollarRight2()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(a:string, leftKey:string)
+[
+    'a1','key1',
+    'a2','key2',
+];
+let Y = datatable(rightKey:string)
+[
+    'key2',
+];
+X | join kind=inner Y on $left.leftKey == $right.rightKey
+";
+
+            string expected = @"
+a:string; leftKey:string; rightKey:string
+------------------
+a2; key2; key2
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_DifferentNumColumnsLeftAndRight()
+        {
+            // Arrange
+            string query = @"
+let X = datatable(a:string, b:string)
+[
+    'a1','b1',
+    'a2','b2',
+];
+let Y = datatable(b:string)
+[
+    'b2',
+];
+X | join kind=inner Y on b
+";
+
+            string expected = @"
+a:string; b:string; b1:string
+------------------
+a2; b2; b2
 ";
 
             // Act & Assert
