@@ -1,0 +1,3 @@
+Taken from:
+  Repo:      https://github.com/Cyral/t-digest-csharp
+  Commit ID: 5442c5b71461f4ee737045b924664c6aa3eef6c7
