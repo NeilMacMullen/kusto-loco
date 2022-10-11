@@ -71,6 +71,13 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime),
                     new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
                     new AggregateOverloadInfo(new AnyFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
+
+            aggregates.Add(
+                Aggregates.Percentile,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new PercentileAggregateIntImpl(), ScalarTypes.Real, ScalarTypes.Int, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new PercentileAggregateLongImpl(), ScalarTypes.Real, ScalarTypes.Long, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new PercentileAggregateDoubleImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
         }
 
         public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)

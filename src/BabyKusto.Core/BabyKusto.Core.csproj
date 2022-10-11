@@ -28,4 +28,8 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" />
+  </ItemGroup>
+
 </Project>

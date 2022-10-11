@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation
@@ -77,14 +78,34 @@ namespace BabyKusto.Core.Evaluation
                     return node.OverloadInfo.AggregateImpl;
                 });
 
-            var arguments = new ColumnarResult[node.Arguments.ChildCount];
+            var rawArguments = new EvaluationResult[node.Arguments.ChildCount];
+            bool hasScalar = false;
             for (int i = 0; i < node.Arguments.ChildCount; i++)
             {
                 var argResult = node.Arguments.GetChild(i).Accept(this, context);
                 Debug.Assert(argResult != null);
-                arguments[i] = (ColumnarResult)argResult;
+                rawArguments[i] = argResult;
+                hasScalar = hasScalar || argResult.IsScalar;
             }
 
+            if (hasScalar)
+            {
+                // Expand any scalar inputs into columnar
+                //
+                // TODO: Some aggregate functions really want just a scalar input, e.g. `percentile(durationMs, 99)`.
+                // It is rather silly that we expand the second argument into a column, only for the aggregate implementation
+                // to then grab any value from it. In any case, this gets the job done for now...
+                int numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
+                for (int i = 0; i < rawArguments.Length; i++)
+                {
+                    if (rawArguments[i] is ScalarResult scalarResult)
+                    {
+                        rawArguments[i] = new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarResult.Value, scalarResult.Type, numRows));
+                    }
+                }
+            }
+
+            var arguments = rawArguments.Select(a => (ColumnarResult)a).ToArray();
             return impl.Invoke(context.Chunk, arguments);
         }
 

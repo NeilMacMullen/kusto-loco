@@ -391,6 +391,25 @@ v:long
         }
 
         [Fact]
+        public void BuiltInAggregates_sumif_ScalarInput()
+        {
+            // Arrange
+            string query = @"
+datatable(v:long) [ 1, 2, 4, 8 ]
+| summarize v=sumif(v, true)
+";
+
+            string expected = @"
+v:long
+------------------
+15
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltInAggregates_any_String()
         {
             // Arrange
@@ -410,6 +429,25 @@ x:long; any_val:string
 ------------------
 0; first
 2; third
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_percentile()
+        {
+            // Arrange
+            string query = @"
+datatable(a: real) [ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ]
+| summarize p0 = percentile(a, 0), p100=percentile(a, 100)
+";
+
+            string expected = @"
+p0:real; p100:real
+------------------
+0; 9
 ";
 
             // Act & Assert
