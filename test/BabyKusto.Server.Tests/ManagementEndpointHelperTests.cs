@@ -35,7 +35,7 @@ namespace BabyKusto.Server.Tests
             table.TableName.Should().Be("Table_0");
 
             var columns = string.Join(",", table.Columns.Select(c => $"{c.ColumnName}:{c.DataType}:{c.ColumnType}"));
-            columns.Should().Be("BuildVersion:String:,BuildTime:DateTime:,ServiceType:String:,ProductVersion:String:,ServiceOffering:String:");
+            columns.Should().Be("BuildVersion:String:string,BuildTime:DateTime:datetime,ServiceType:String:string,ProductVersion:String:string,ServiceOffering:String:string");
 
             table.Rows.Count().Should().Be(1);
             var row = table.Rows[0];
