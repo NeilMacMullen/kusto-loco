@@ -29,7 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" />
+    <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
   </ItemGroup>
+
+  <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />
 
 </Project>

@@ -5,6 +5,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageVersion>0.0.9-preview</PackageVersion>
+    <PackageTags>kusto;kql;aspnetcore</PackageTags>
+    <Description>
+      Host your own self-contained local Kusto server, powered by BabyKusto and ASP .NET Core.
+    </Description>
+    <RepositoryUrl>https://github.com/davidnx/baby-kusto-csharp</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
