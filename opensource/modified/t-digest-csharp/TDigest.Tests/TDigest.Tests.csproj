@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-
-        <IsPackable>false</IsPackable>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,5 +19,4 @@
     <ItemGroup>
       <ProjectReference Include="..\TDigest\TDigest.csproj" />
     </ItemGroup>
-
 </Project>

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace TDigest {
     public abstract class AbstractTDigest : Digest {
-        private readonly Random gen = new();
+        private readonly Random gen = new Random();
         protected bool IsRecordingAllData;
 
         /**

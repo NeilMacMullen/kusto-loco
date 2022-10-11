@@ -2,7 +2,7 @@ using System;
 
 namespace TDigest {
     public class Sorts {
-        private static readonly Random Prng = new(); // for choosing pivots during quicksort
+        private static readonly Random Prng = new Random(); // for choosing pivots during quicksort
 
         /**
          * Quick sort using an index array.  On return,

@@ -1,23 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <PackageId>T-Digest</PackageId>
-        <Title>T-Digest .NET</Title>
-        <Authors />
-        <PackageProjectUrl>https://github.com/Cyral/t-digest-csharp</PackageProjectUrl>
+        <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Compile Remove="TDigest.Tests\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="TDigest.Tests\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="TDigest.Tests\**" />
-    </ItemGroup>
-
 </Project>
