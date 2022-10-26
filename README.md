@@ -7,46 +7,44 @@ BabyKusto is a self-contained execution engine for the [Kusto Query Language](ht
 
 ## How to use
 
-Queries that don't rely on any external data can be evaluated with as little as two lines of code:
+1. Evaluate a simple query:
 
-```cs
-var query = "print hello='world'";
+   ```cs
+   var query = "print hello='world'";
+   
+   var engine = new BabyKustoEngine();
+   var result = engine.Evaluate(query);
+   ```
 
-var engine = new BabyKustoEngine();
-var result = engine.Evaluate(query);
-result.Dump(Console.Out);
-```
+2. Inject custom tabular sources:
 
-Most real world scenarios will want to operate on real data sourced from elsewhere.
-For that, BabyKusto allows you to register an `ITableSource` with any name in the global scope.
-The [**ProcessQuerier**](./samples/BabyKusto.ProcessQuerier) sample
-shows how to feed live data to BabyKusto with this mechanism.
+   Implement an `ITableSource`, then register it with the engine using `BabyKustoEngine.AddGlobalTable(ITableSource table)`. You can think of `ITableSource` as similar to an `IEnumerable<T>`, which allows the engine to get metadata about the table (e.g. its name and type) as well as to iterate over its data.
 
-```cs
-var query = @"MyTable | summarize c = count() by AppMachine";
+   Just like `IEnumerable<T>`, the data doesn't have to be materialized ahead of time, and your implementation of `ITableSource` can produce data on the fly. The type, however, has to be static and known ahead of time.
 
-ITableSource myTable = /*...*/; // Get your data from anywhere
-var engine = new BabyKustoEngine();
-engine.AddGlobalTable("MyTable", myTable);
+   ```cs
+   ITableSource myTable = /*...*/; // Get your data from anywhere
+   var engine = new BabyKustoEngine();
+   engine.AddGlobalTable(myTable);
+   
+   var result = engine.Evaluate("MyTable | count");
+   ```
 
-var result = engine.Evaluate(query);
-result.Dump(Console.Out);
-```
+3. Play with the samples
 
-This repo ships with three ready-to-run samples that showcase BabyKusto in action.
+   This repo ships with three ready-to-run samples that showcase BabyKusto in action.
+   
+   * [**Sample.HelloWorld**](./samples/Sample.HelloWorld): as simple as it gets, shows how to run a simple query.
+   
+   * [**Sample.ProcessesCli**](./samples/Sample.ProcessesCli): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
+     ```
+     Processes
+     | project name, memMB=workingSet/1024/1024
+     | order by memMB desc
+     | take 1
+     ```
 
-* [**HelloWorld**](./samples/BabyKusto.HelloWorld): as simple as it gets, shows how to run a simple query.
-
-* [**ProcessQuerier**](./samples/BabyKusto.ProcessQuerier): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
-  ```
-  Processes
-  | project name, memMB=workingSet/1024/1024
-  | order by memMB desc
-  | take 1
-  ```
-
-* [**BlazorApp**](./samples/BabyKusto.BlazorApp): a web-facing demo that lets you query an arbitrary CSV file using KQL queries. [Live demo](https://babykusto.azurewebsites.net/).
-
+   * [**Sample.ProcessesServer**](./samples/Sample.ProcessesServer): an ASP .NET Core-based web server that implements that Kusto REST API and exposes the same table `Processes` as the `Sample.ProcessesCli` sample. You can connect to the local Kusto cluster using the official Kusto client (Azure Data Explorer).
 
 ## How it works
 

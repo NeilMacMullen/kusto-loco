@@ -11,15 +11,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{932C804C-F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{17CA2597-13D2-4A89-AFCC-B5E7170DB32F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.ProcessQuerier", "samples\BabyKusto.ProcessQuerier\BabyKusto.ProcessQuerier.csproj", "{A73B096E-8F66-41C3-AE45-A6588D1382FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.ProcessesCli", "samples\Sample.ProcessesCli\Sample.ProcessesCli.csproj", "{A73B096E-8F66-41C3-AE45-A6588D1382FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{48CD2752-9462-473A-8699-7AD8B146742F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.HelloWorld", "samples\BabyKusto.HelloWorld\BabyKusto.HelloWorld.csproj", "{A13576D6-6910-4298-9BDB-176E2341EC6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.HelloWorld", "samples\Sample.HelloWorld\Sample.HelloWorld.csproj", "{A13576D6-6910-4298-9BDB-176E2341EC6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.Server", "src\BabyKusto.Server\BabyKusto.Server.csproj", "{ED91F3CD-DC36-45D0-BC52-DAEB07AF5A52}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.SampleServer", "samples\BabyKusto.SampleServer\BabyKusto.SampleServer.csproj", "{A00A97E4-655A-4199-8FC0-0329A48E6679}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.ProcessesServer", "samples\Sample.ProcessesServer\Sample.ProcessesServer.csproj", "{A00A97E4-655A-4199-8FC0-0329A48E6679}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BabyKusto.Server.Tests", "test\BabyKusto.Server.Tests\BabyKusto.Server.Tests.csproj", "{011BBFD7-4C4F-46FC-99C0-6922BF267E61}"
 EndProject
