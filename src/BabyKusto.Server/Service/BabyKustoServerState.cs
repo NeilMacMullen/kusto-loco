@@ -21,11 +21,11 @@ namespace BabyKusto.Server.Service
             Tables = tablesProvider.GetTables();
             Globals = GlobalState.Default.WithDatabase(
                 new DatabaseSymbol(Options.DatabaseName, Tables.Select(t => t.Type).ToArray()));
-            
+
             var engine = new BabyKustoEngine();
             foreach (var table in Tables)
             {
-                engine.AddGlobalTable(table.Type.Name, table);
+                engine.AddGlobalTable(table);
             }
             Engine = engine;
         }

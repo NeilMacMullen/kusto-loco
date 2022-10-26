@@ -2,12 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
 using BabyKusto.Core;
-using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Extensions;
-using BabyKusto.Core.Util;
-using Kusto.Language.Symbols;
+using BabyKusto.ProcessQuerier;
 
 Console.WriteLine(@"/----------------------------------------------------------------\");
 Console.WriteLine(@"| Welcome to BabyKusto.ProcessQuerier. You can write KQL queries |");
@@ -69,9 +66,9 @@ static void ShowDemo(string title, string query)
 
 static void ExecuteReplQuery(string query)
 {
-    var processesTable = GetProcessesTable();
+    var processesTable = new ProcessesTable("Processes");
     var engine = new BabyKustoEngine();
-    engine.AddGlobalTable("Processes", processesTable);
+    engine.AddGlobalTable(processesTable);
     var result = engine.Evaluate(query, dumpIRTree: false); // Set dumpIRTree = true to see the internal tree representation
 
     Console.WriteLine();
@@ -79,35 +76,6 @@ static void ExecuteReplQuery(string query)
     Console.WriteLine();
 }
 
-static InMemoryTableSource GetProcessesTable()
-{
-    var names = new ColumnBuilder<string?>(ScalarTypes.String);
-    var numThreads = new ColumnBuilder<int?>(ScalarTypes.Int);
-    var workingSets = new ColumnBuilder<long?>(ScalarTypes.Long);
-
-    foreach (var p in Process.GetProcesses())
-    {
-        string processName;
-        int processThreads;
-        long workingSet;
-        try
-        {
-            processName = p.ProcessName;
-            processThreads = p.Threads.Count;
-            workingSet = p.WorkingSet64;
-        }
-        catch { continue; }
-
-        names.Add(processName);
-        numThreads.Add(processThreads);
-        workingSets.Add(workingSet);
-    }
-
-    var myTable = new InMemoryTableSource(
-        TableSymbol.From("(name:string, numThreads:int, workingSet:long)"),
-        new Column[] { names.ToColumn(), numThreads.ToColumn(), workingSets.ToColumn() });
-    return myTable;
-}
 
 static void PrintCaret()
 {

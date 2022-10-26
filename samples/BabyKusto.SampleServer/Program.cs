@@ -1,8 +1,7 @@
 using BabyKusto.Core;
-using BabyKusto.Core.Util;
+using BabyKusto.ProcessQuerier;
 using BabyKusto.Server;
 using BabyKusto.Server.Service;
-using Kusto.Language.Symbols;
 
 namespace BabyKusto.SampleServer
 {
@@ -37,15 +36,9 @@ namespace BabyKusto.SampleServer
 
             public SimpleTableProvider()
             {
-                var colBuilder = ColumnHelpers.CreateBuilder(ScalarTypes.String);
-                colBuilder.Add("val1");
-                colBuilder.Add("val2");
-
                 _tables = new List<ITableSource>
                 {
-                    new InMemoryTableSource(
-                        new TableSymbol("MyTable", new ColumnSymbol("Col1", ScalarTypes.String)),
-                        new[] { colBuilder.ToColumn() }),
+                    new ProcessesTable("Processes"),
                 };
             }
 

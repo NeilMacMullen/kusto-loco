@@ -14,11 +14,16 @@ namespace BabyKusto.Core
 {
     public class BabyKustoEngine
     {
-        private readonly List<(string TableName, ITableSource Source)> _globalTables = new();
+        private readonly List<ITableSource> _globalTables = new();
 
-        public void AddGlobalTable(string tableName, ITableSource source)
+        public void AddGlobalTable(ITableSource table)
         {
-            _globalTables.Add((tableName, source));
+            if (string.IsNullOrEmpty(table.Type.Name))
+            {
+                throw new ArgumentNullException($"{nameof(table)}.{nameof(table.Type)}.{nameof(table.Type.Name)}");
+            }
+
+            _globalTables.Add(table);
         }
 
         public EvaluationResult? Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
@@ -26,7 +31,7 @@ namespace BabyKusto.Core
             // TODO: davidni: Set up global state somehwere proper where it would be done just once
             var db = new DatabaseSymbol(
                 "MyDb",
-                _globalTables.Select(table => table.Source.Type.WithName(table.TableName)).ToArray());
+                _globalTables.Select(table => table.Type).ToArray());
             GlobalState globals = GlobalState.Default.WithDatabase(db);
 
             var code = KustoCode.ParseAndAnalyze(query, globals);
@@ -59,9 +64,9 @@ namespace BabyKusto.Core
             }
 
             var scope = new LocalScope();
-            for (int i = 0; i < _globalTables.Count; i++)
+            foreach (var table in _globalTables)
             {
-                scope.AddSymbol(db.Tables[i], new TabularResult(_globalTables[i].Source));
+                scope.AddSymbol(table.Type, new TabularResult(table));
             }
 
             var result = BabyKustoEvaluator.Evaluate(ir, scope);
