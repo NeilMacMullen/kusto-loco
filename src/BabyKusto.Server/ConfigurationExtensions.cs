@@ -13,6 +13,7 @@ namespace BabyKusto.Server
             services.AddSingleton<IBabyKustoServerState, BabyKustoServerState>();
             services.AddSingleton<ManagementEndpointHelper>();
             services.AddSingleton<QueryEndpointHelper>();
+            services.AddSingleton<QueryV2EndpointHelper>();
 
             return services;
         }

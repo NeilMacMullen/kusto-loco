@@ -62,5 +62,10 @@ namespace BabyKusto.Server.Contract
                 ColumnType = type.Display,
             };
         }
+
+        public override string ToString()
+        {
+            return $"{ColumnName}: {ColumnType}";
+        }
     }
 }
