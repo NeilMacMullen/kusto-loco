@@ -1,5 +1,3 @@
-[![NuGet Gallery | BabyKusto.Core](https://img.shields.io/nuget/v/BabyKusto.Core?style=plastic)](https://www.nuget.org/packages/BabyKusto.Core)
-
 # BabyKusto
 
 BabyKusto is a self-contained execution engine for the [Kusto Query Language](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/) (KQL).
@@ -34,9 +32,9 @@ BabyKusto is a self-contained execution engine for the [Kusto Query Language](ht
 
    This repo ships with three ready-to-run samples that showcase BabyKusto in action.
    
-   * [**Sample.HelloWorld**](./samples/Sample.HelloWorld): as simple as it gets, shows how to run a simple query.
+   * [**Sample.HelloWorld**](https://github.com/davidnx/baby-kusto-csharp/tree/main/samples/Sample.HelloWorld): as simple as it gets, shows how to run a simple query.
    
-   * [**Sample.ProcessesCli**](./samples/Sample.ProcessesCli): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
+   * [**Sample.ProcessesCli**](https://github.com/davidnx/baby-kusto-csharp/tree/main/samples/Sample.ProcessesCli): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
      ```
      Processes
      | project name, memMB=workingSet/1024/1024
@@ -44,25 +42,15 @@ BabyKusto is a self-contained execution engine for the [Kusto Query Language](ht
      | take 1
      ```
 
-   * [**Sample.ProcessesServer**](./samples/Sample.ProcessesServer): an ASP .NET Core-based web server that implements the Kusto REST API and exposes the same table `Processes` as the `Sample.ProcessesCli` sample. You can connect to the local Kusto cluster using the official Kusto client (Azure Data Explorer).
+   * [**Sample.ProcessesServer**](https://github.com/davidnx/baby-kusto-csharp/tree/main/samples/Sample.ProcessesServer): an ASP .NET Core-based web server that implements the Kusto REST API and exposes the same table `Processes` as the `Sample.ProcessesCli` sample. You can connect to the local Kusto cluster using the official Kusto client (Azure Data Explorer).
 
 ## How it works
 
 BabyKusto leverages the official [`Microsoft.Azure.Kusto.Language`](https://www.nuget.org/packages/Microsoft.Azure.Kusto.Language/) package for parsing and semantic analysis of KQL queries.
 
-The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](./src/BabyKusto.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](./src/BabyKusto.Core/Evaluation/BabyKustoEvaluator.cs).
+The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](https://github.com/davidnx/baby-kusto-csharp/tree/main/src/BabyKusto.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](https://github.com/davidnx/baby-kusto-csharp/blob/main/src/BabyKusto.Core/Evaluation/BabyKustoEvaluator.cs).
 
 You can explore the internal representation of a query by setting `dumpIRTree: true` when calling `BabyKustoEngine.Evaluate`.
-Below is an example of the internal representation for the query:
-
-```
-Processes
-| project name, memMB=workingSet/1024/1024
-| order by memMB desc
-| take 1
-```
-
-![Internal representation outputs](./docs/internal-representation.png)
 
 ## Contributing
 
