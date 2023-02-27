@@ -736,6 +736,105 @@ v:real
             Test(query, expected);
         }
 
+        [Theory]
+        [InlineData("isnull(bool(null))", true)]
+        [InlineData("isnull(false)", false)]
+        [InlineData("isnull(true)", false)]
+        [InlineData("isnull(int(null))", true)]
+        [InlineData("isnull(int(0))", false)]
+        [InlineData("isnull(long(null))", true)]
+        [InlineData("isnull(long(0))", false)]
+        [InlineData("isnull(real(null))", true)]
+        [InlineData("isnull(0.0)", false)]
+        [InlineData("isnull(datetime(null))", true)]
+        [InlineData("isnull(datetime(2023-02-26))", false)]
+        [InlineData("isnull(timespan(null))", true)]
+        [InlineData("isnull(0s)", false)]
+        [InlineData("isnull('')", false)]
+        [InlineData("isnull(' ')", false)]
+        [InlineData("isnull('hello')", false)]
+        public void BuiltIns_isnull_Scalar(string expression, bool expectedValue)
+        {
+            // Arrange
+            string query = $"print v={expression}";
+
+            string expected = $@"
+v:bool
+------------------
+{expectedValue}
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_isnull_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(b:bool, i:int, l:long, r:real, d:datetime, t:timespan, s:string) [
+  bool(null), int(null), long(null), real(null), datetime(null), timespan(null), '',
+  false, 0, 0, 0, datetime(null), 0s, ' ',
+  true, 1, 2, 3.5, datetime(2023-02-26), 5m, 'hello'
+]
+| project b=isnull(b), i=isnull(i), l=isnull(l), r=isnull(r), d=isnull(d), t=isnull(t), s=isnull(s)
+";
+
+            string expected = @"
+b:bool; i:bool; l:bool; r:bool; d:bool; t:bool; s:bool
+------------------
+True; True; True; True; True; True; False
+False; False; False; False; True; False; False
+False; False; False; False; False; False; False
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Theory]
+        [InlineData("isempty('')", true)]
+        [InlineData("isempty(' ')", false)]
+        [InlineData("isempty('hello')", false)]
+        public void BuiltIns_isempty_Scalar(string expression, bool expectedValue)
+        {
+            // Arrange
+            string query = $"print v={expression}";
+
+            string expected = $@"
+v:bool
+------------------
+{expectedValue}
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_isempty_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(s:string) [
+  '', ' ', 'hello'
+]
+| project s=isempty(s)
+";
+
+            string expected = @"
+s:bool
+------------------
+True
+False
+False
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
         [Fact]
         public void BuiltIns_minof_Scalar()
         {

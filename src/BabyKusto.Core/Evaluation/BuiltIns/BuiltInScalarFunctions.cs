@@ -19,6 +19,18 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         static BuiltInScalarFunctions()
         {
             functions.Add(
+                Functions.IsNull,
+                new ScalarFunctionInfo(
+                    new ScalarOverloadInfo(new IsNullBoolFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool),
+                    new ScalarOverloadInfo(new IsNullIntFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Int),
+                    new ScalarOverloadInfo(new IsNullLongFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Long),
+                    new ScalarOverloadInfo(new IsNullDoubleFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Real),
+                    new ScalarOverloadInfo(new IsNullDateTimeFunctionImpl(), ScalarTypes.Bool, ScalarTypes.DateTime),
+                    new ScalarOverloadInfo(new IsNullTimeSpanFunctionImpl(), ScalarTypes.Bool, ScalarTypes.TimeSpan),
+                    new ScalarOverloadInfo(new IsNullStringFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
+            functions.Add(Functions.IsEmpty, new ScalarFunctionInfo(new ScalarOverloadInfo(new IsEmptyFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
+
+            functions.Add(
                 Functions.MinOf,
                 new ScalarFunctionInfo(
                     new ScalarOverloadInfo(new MinOfIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
