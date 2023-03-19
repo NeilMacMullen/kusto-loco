@@ -410,7 +410,7 @@ v:long
         }
 
         [Fact]
-        public void BuiltInAggregates_any_String()
+        public void BuiltInAggregates_take_any_String()
         {
             // Arrange
             string query = @"
@@ -421,14 +421,14 @@ datatable(x:long, val:string)
     2, 'third',
     3, 'fourth',
 ]
-| summarize any(val) by bin(x, 2)
+| summarize take_any(val), any(val) by bin(x, 2)
 ";
 
             string expected = @"
-x:long; any_val:string
+x:long; val:string; any_val:string
 ------------------
-0; first
-2; third
+0; first; first
+2; third; third
 ";
 
             // Act & Assert

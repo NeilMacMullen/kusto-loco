@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 {
-    internal class AnyFunctionImpl : IAggregateImpl
+    internal class TakeAnyFunctionImpl : IAggregateImpl
     {
         public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
         {
