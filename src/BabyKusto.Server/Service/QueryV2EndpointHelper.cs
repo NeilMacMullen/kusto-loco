@@ -66,7 +66,34 @@ namespace BabyKusto.Server.Service
                     tableWriter.StartRow();
                     for (int c = 0; c < chunk.Columns.Length; c++)
                     {
-                        tableWriter.WriteRowValue(JsonValue.Create(chunk.Columns[c].RawData.GetValue(i)));
+                        var v = chunk.Columns[c].RawData.GetValue(i);
+
+                        JsonValue? valueToWrite;
+                        if (v is double doubleV)
+                        {
+                            if (double.IsPositiveInfinity(doubleV))
+                            {
+                                valueToWrite = JsonValue.Create("Infinity");
+                            }
+                            else if (double.IsNegativeInfinity(doubleV))
+                            {
+                                valueToWrite = JsonValue.Create("-Infinity");
+                            }
+                            else if (double.IsNaN(doubleV))
+                            {
+                                valueToWrite = JsonValue.Create("NaN");
+                            }
+                            else
+                            {
+                                valueToWrite = JsonValue.Create(v);
+                            }
+                        }
+                        else
+                        {
+                            valueToWrite = JsonValue.Create(v);
+                        }
+
+                        tableWriter.WriteRowValue(valueToWrite);
                     }
                     tableWriter.EndRow();
                     await tableWriter.FlushAsync();
