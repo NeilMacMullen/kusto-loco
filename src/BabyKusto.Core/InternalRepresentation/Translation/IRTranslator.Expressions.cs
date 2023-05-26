@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
@@ -47,6 +49,62 @@ namespace BabyKusto.Core.InternalRepresentation
         public override IRNode VisitLiteralExpression(LiteralExpression node)
         {
             return new IRLiteralExpressionNode(node.LiteralValue, node.ResultType);
+        }
+
+        public override IRNode VisitDynamicExpression(DynamicExpression node)
+        {
+            var literalValue = (string)node.LiteralValue;
+            try
+            {
+                var parsedValue = JsonNode.Parse(literalValue);
+                return new IRLiteralExpressionNode(parsedValue, node.ResultType);
+            }
+            catch (JsonException)
+            {
+                throw new InvalidOperationException($"A literal dynamic expression was provided that is valid in Kusto but doesn't conform to the stricter JSON parser used by BabyKusto. Please rewrite the literal expression to be properly formatted JSON (invalid input: \"{literalValue}\")");
+            }
+        }
+
+        public override IRNode VisitPathExpression(PathExpression node)
+        {
+            var irExpression = (IRExpressionNode)node.Expression.Accept(this);
+
+            var selectorName = node.Selector as NameReference;
+            if (selectorName == null)
+            {
+                throw new InvalidOperationException($"Expected path selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
+            }
+
+            return new IRMemberAccessNode(irExpression, selectorName.SimpleName, node.ResultType);
+        }
+
+        public override IRNode VisitElementExpression(ElementExpression node)
+        {
+            var irExpression = (IRExpressionNode)node.Expression.Accept(this);
+
+            var selector = node.Selector as BracketedExpression;
+            if (selector == null)
+            {
+                throw new InvalidOperationException($"Expected element selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
+            }
+
+            if (selector.Expression is not LiteralExpression literalExpressionSelector)
+            {
+                throw new InvalidOperationException($"Expected element selector expression to be {TypeNameHelper.GetTypeDisplayName(typeof(LiteralExpression))}, but found {TypeNameHelper.GetTypeDisplayName(selector.Expression)}");
+            }
+
+            var value = selector.Expression.Accept(this) as IRLiteralExpressionNode;
+            if (value == null)
+            {
+                throw new InvalidOperationException($"Expected element selector expression to evaluate to {TypeNameHelper.GetTypeDisplayName(typeof(IRLiteralExpressionNode))}, but found {TypeNameHelper.GetTypeDisplayName(value)}");
+            }
+
+            if (value.Value is not string stringValue || stringValue == null)
+            {
+                throw new InvalidOperationException($"Element selector expression evaluated to null or to an unexpected data type ({TypeNameHelper.GetTypeDisplayName(value.Value)})");
+            }
+
+            return new IRMemberAccessNode(irExpression, stringValue, node.ResultType);
         }
 
         public override IRNode VisitCompoundStringLiteralExpression(CompoundStringLiteralExpression node)
@@ -226,13 +284,13 @@ namespace BabyKusto.Core.InternalRepresentation
             var data = new object?[node.Values.Count];
             for (int i = 0; i < node.Values.Count; i++)
             {
-                var expression = node.Values[i].Element;
-                if (expression is not LiteralExpression literalExpression)
+                var irLiteralExpression = node.Values[i].Element.Accept(this);
+                if (irLiteralExpression is not IRLiteralExpressionNode literalExpression)
                 {
-                    throw new InvalidOperationException($"Expected literal expression in datatable values, found {TypeNameHelper.GetTypeDisplayName(expression)}.");
+                    throw new InvalidOperationException($"Expected literal expression in datatable values, found {TypeNameHelper.GetTypeDisplayName(irLiteralExpression)}.");
                 }
 
-                data[i] = literalExpression.LiteralValue;
+                data[i] = literalExpression.Value;
             }
 
             return new IRDataTableExpression(data, node.ResultType);

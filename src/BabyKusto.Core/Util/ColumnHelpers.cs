@@ -40,6 +40,10 @@ namespace BabyKusto.Core.Util
             {
                 return CreateFromObjectArray<TimeSpan?>(data, typeSymbol);
             }
+            else if (typeSymbol == ScalarTypes.Dynamic)
+            {
+                return CreateFromObjectArray<JsonNode?>(data, typeSymbol);
+            }
             else
             {
                 // TODO: Support all data types
@@ -117,6 +121,10 @@ namespace BabyKusto.Core.Util
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
                 return new ColumnBuilder<TimeSpan?>(typeSymbol);
+            }
+            else if (typeSymbol == ScalarTypes.Dynamic)
+            {
+                return new ColumnBuilder<JsonNode?>(typeSymbol);
             }
             else
             {

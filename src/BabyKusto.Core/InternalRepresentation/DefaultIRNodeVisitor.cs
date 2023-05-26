@@ -83,6 +83,11 @@ namespace BabyKusto.Core.InternalRepresentation
             return this.DefaultVisit(node, context);
         }
 
+        public override TResult? VisitMemberAccess(IRMemberAccessNode node, TContext context)
+        {
+            return this.DefaultVisit(node, context);
+        }
+
         public override TResult? VisitNameReference(IRNameReferenceNode node, TContext context)
         {
             return this.DefaultVisit(node, context);

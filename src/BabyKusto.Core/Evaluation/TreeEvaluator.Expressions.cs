@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -33,6 +34,53 @@ namespace BabyKusto.Core.Evaluation
             Debug.Assert(context.Chunk != null);
             var column = context.Chunk.Columns[node.ReferencedColumnIndex];
             return new ColumnarResult(column);
+        }
+
+        public override EvaluationResult? VisitMemberAccess(IRMemberAccessNode node, EvaluationContext context)
+        {
+            if (node.ResultKind == EvaluatedExpressionKind.Columnar)
+            {
+                var items = (ColumnarResult?)node.Expression.Accept(this, context);
+                if (items == null)
+                {
+                    throw new InvalidOperationException("Expression yielded null result");
+                }
+
+                var itemsCol = (Column<JsonNode?>)items.Column;
+
+                var data = new JsonNode?[itemsCol.RowCount];
+                for (int i = 0; i < items.Column.RowCount; i++)
+                {
+                    if (itemsCol[i] is JsonObject obj)
+                    {
+                        if (obj.TryGetPropertyValue(node.MemberName, out var value))
+                        {
+                            data[i] = value;
+                        }
+                    }
+                }
+
+                var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
+                return new ColumnarResult(column);
+            }
+            else
+            {
+                var item = (ScalarResult?)node.Expression.Accept(this, context);
+                if (item == null)
+                {
+                    throw new InvalidOperationException("Expression yielded null result");
+                }
+
+                if (item.Value is JsonObject obj)
+                {
+                    if (obj.TryGetPropertyValue(node.MemberName, out var value))
+                    {
+                        return new ScalarResult(ScalarTypes.Dynamic, value);
+                    }
+                }
+
+                return new ScalarResult(ScalarTypes.Dynamic, null);
+            }
         }
 
         public override EvaluationResult? VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
