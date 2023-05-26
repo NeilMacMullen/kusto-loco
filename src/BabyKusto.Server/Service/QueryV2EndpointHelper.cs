@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -40,17 +39,15 @@ namespace BabyKusto.Server.Service
             try
             {
                 var jsonWriter = new Utf8JsonWriter(context.Response.Body);
-                {
-                    using var writer = new KustoQueryV2ResponseWriter(jsonWriter);
-                    {
-                        await writer.StartAsync();
-                        await WritePrimaryResultTable(tabularResult, writer);
-                        await writer.FinishAsync();
-                    }
-                    await jsonWriter.DisposeAsync();
-                }
+
+                var writer = new KustoQueryV2ResponseWriter(jsonWriter);
+                await writer.StartAsync();
+                await WritePrimaryResultTable(tabularResult, writer);
+                await writer.FinishAsync();
+
+                await jsonWriter.DisposeAsync();
             }
-            catch (Exception)
+            catch
             {
                 context.Abort();
                 throw;
@@ -60,25 +57,23 @@ namespace BabyKusto.Server.Service
         private static async Task WritePrimaryResultTable(TabularResult tabularResult, KustoQueryV2ResponseWriter writer)
         {
             var resultType = (TableSymbol)tabularResult.Type;
-            using (var tableWriter = writer.CreateTableWriter())
+            var tableWriter = writer.CreateTableWriter();
+            await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", resultType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = c.Type.Display }).ToList());
+            foreach (var chunk in tabularResult.Value.GetData())
             {
-                await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", resultType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = c.Type.Display }).ToList());
-                foreach (var chunk in tabularResult.Value.GetData())
+                for (int i = 0; i < chunk.RowCount; i++)
                 {
-                    for (int i = 0; i < chunk.RowCount; i++)
+                    tableWriter.StartRow();
+                    for (int c = 0; c < chunk.Columns.Length; c++)
                     {
-                        tableWriter.StartRow();
-                        for (int c = 0; c < chunk.Columns.Length; c++)
-                        {
-                            tableWriter.WriteRowValue(JsonValue.Create(chunk.Columns[c].RawData.GetValue(i)));
-                        }
-                        tableWriter.EndRow();
-                        await tableWriter.FlushAsync();
+                        tableWriter.WriteRowValue(JsonValue.Create(chunk.Columns[c].RawData.GetValue(i)));
                     }
+                    tableWriter.EndRow();
+                    await tableWriter.FlushAsync();
                 }
-
-                await tableWriter.FinishAsync();
             }
+
+            await tableWriter.FinishAsync();
         }
     }
 }

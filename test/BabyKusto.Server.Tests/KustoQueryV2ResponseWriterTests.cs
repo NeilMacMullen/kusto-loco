@@ -1,17 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using BabyKusto.Core;
 using BabyKusto.Server.Contract;
 using BabyKusto.Server.Service;
 using FluentAssertions;
-using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace BabyKusto.Server.Tests
@@ -29,8 +25,8 @@ namespace BabyKusto.Server.Tests
 
             // Act
             using (var jsonWriter = new Utf8JsonWriter(stream))
-            using (var sut = new KustoQueryV2ResponseWriter(jsonWriter))
             {
+                var sut = new KustoQueryV2ResponseWriter(jsonWriter);
                 await sut.StartAsync();
                 await sut.FinishAsync();
             }
@@ -57,18 +53,16 @@ namespace BabyKusto.Server.Tests
 
             // Act
             using (var jsonWriter = new Utf8JsonWriter(stream))
-            using (var sut = new KustoQueryV2ResponseWriter(jsonWriter))
             {
+                var sut = new KustoQueryV2ResponseWriter(jsonWriter);
                 await sut.StartAsync();
 
-                using (var tableWriter = sut.CreateTableWriter())
-                {
-                    await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", columns);
-                    tableWriter.StartRow();
-                    tableWriter.WriteRowValue(JsonValue.Create("a"));
-                    tableWriter.EndRow();
-                    await tableWriter.FinishAsync();
-                }
+                var tableWriter = sut.CreateTableWriter();
+                await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", columns);
+                tableWriter.StartRow();
+                tableWriter.WriteRowValue(JsonValue.Create("a"));
+                tableWriter.EndRow();
+                await tableWriter.FinishAsync();
 
                 await sut.FinishAsync();
             }

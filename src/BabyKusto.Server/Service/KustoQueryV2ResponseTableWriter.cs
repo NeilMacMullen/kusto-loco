@@ -7,7 +7,7 @@ using BabyKusto.Server.Contract;
 
 namespace BabyKusto.Server.Service
 {
-    internal class KustoQueryV2ResponseTableWriter : IDisposable
+    internal class KustoQueryV2ResponseTableWriter
     {
         private readonly KustoQueryV2ResponseWriter _owner;
         private readonly Utf8JsonWriter _jsonWriter;
@@ -19,7 +19,6 @@ namespace BabyKusto.Server.Service
             ReadyToWriteRow,
             WritingRowValues,
             Done,
-            Disposed,
         }
 
         public KustoQueryV2ResponseTableWriter(KustoQueryV2ResponseWriter owner)
@@ -113,19 +112,5 @@ namespace BabyKusto.Server.Service
         }
 
         public Task FlushAsync() => _jsonWriter.FlushAsync();
-
-        public void Dispose()
-        {
-            if (_state == State.Disposed)
-            {
-                return;
-            }
-            else if (_state != State.Done)
-            {
-                throw new InvalidOperationException($"Invalid state for {nameof(Dispose)}: {_state}.");
-            }
-
-            _state = State.Disposed;
-        }
     }
 }

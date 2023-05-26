@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BabyKusto.Server.Service
 {
-    internal class KustoQueryV2ResponseWriter : IDisposable
+    internal class KustoQueryV2ResponseWriter
     {
         private readonly Utf8JsonWriter _writer;
         private State _state;
@@ -15,7 +15,6 @@ namespace BabyKusto.Server.Service
             ReadyToWriteTable,
             WritingTable,
             Done,
-            Disposed,
         }
 
         public KustoQueryV2ResponseWriter(Utf8JsonWriter writer)
@@ -62,20 +61,6 @@ namespace BabyKusto.Server.Service
             await _writer.FlushAsync();
 
             _state = State.Done;
-        }
-
-        public void Dispose()
-        {
-            if (_state == State.Disposed)
-            {
-                return;
-            }
-            else if (_state != State.Done)
-            {
-                throw new InvalidOperationException($"Invalid state for {nameof(Dispose)}: {_state}.");
-            }
-
-            _state = State.Disposed;
         }
 
         internal void OnTableWritten()

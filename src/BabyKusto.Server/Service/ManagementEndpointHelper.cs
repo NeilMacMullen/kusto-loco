@@ -94,6 +94,10 @@ namespace BabyKusto.Server.Service
             {
                 return ProcessShowSchemaCommand();
             }
+            else if (command == EngineCommands.CancelQuery)
+            {
+                throw new NotImplementedException($"Command {command.Name} is not yet implemented.");
+            }
 
             throw new NotImplementedException($"Command {command.Name} is not yet implemented.");
         }
