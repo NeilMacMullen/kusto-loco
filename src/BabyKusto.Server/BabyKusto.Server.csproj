@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="README-NUGET.md" Pack="true" PackagePath="\"/>
+    <None Include="README-NUGET.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.2.2" />
+    <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.3.1" />
   </ItemGroup>
 
 </Project>
