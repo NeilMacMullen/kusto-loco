@@ -31,6 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.3.1" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="System.Text.Json" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>

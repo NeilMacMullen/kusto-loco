@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
@@ -70,6 +72,10 @@ namespace BabyKusto.Core
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
                 valid = type == typeof(TimeSpan?);
+            }
+            else if (typeSymbol == ScalarTypes.Dynamic)
+            {
+                valid = type == typeof(JsonNode);
             }
 
             if (!valid)

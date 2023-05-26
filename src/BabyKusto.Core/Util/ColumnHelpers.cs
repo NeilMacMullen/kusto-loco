@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Util
@@ -74,6 +76,10 @@ namespace BabyKusto.Core.Util
             else if (typeSymbol == ScalarTypes.TimeSpan)
             {
                 return CreateFromScalar<TimeSpan?>((TimeSpan?)value, typeSymbol, numRows);
+            }
+            else if (typeSymbol == ScalarTypes.Dynamic)
+            {
+                return CreateFromScalar<JsonNode?>((JsonNode?)value, typeSymbol, numRows);
             }
             else
             {

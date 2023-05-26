@@ -4,11 +4,19 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace BabyKusto.Core.Extensions
 {
     public static class TableSourceExtensions
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        };
+
         public static void Dump(this ITableSource table, TextWriter writer, int indent = 0)
         {
             WriteIndent(writer, indent);
@@ -46,6 +54,7 @@ namespace BabyKusto.Core.Extensions
                             v switch
                             {
                                 DateTime dateTime => dateTime.ToString("O"),
+                                JsonNode jsonNode => jsonNode.ToJsonString(JsonOptions),
                                 null => "(null)",
                                 _ => v,
                             });
