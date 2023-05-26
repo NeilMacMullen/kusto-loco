@@ -130,7 +130,7 @@ namespace BabyKusto.Core.Evaluation
                         var aggregationExpression = _aggregationExpressions[i];
                         var aggregationResult = (ScalarResult?)aggregationExpression.Accept(_owner, chunkContext);
                         Debug.Assert(aggregationResult != null);
-                        Debug.Assert(aggregationResult.Type == aggregationExpression.ResultType, $"Aggregation expression produced wrong type {aggregationResult.Type}, expected {aggregationExpression.ResultType}.");
+                        Debug.Assert(aggregationResult.Type == aggregationExpression.ResultType, $"Aggregation expression produced wrong type {aggregationResult.Type.Display}, expected {aggregationExpression.ResultType.Display}.");
                         resultsData[tableData.ByValues.Count + i].Add(aggregationResult.Value);
                     }
 

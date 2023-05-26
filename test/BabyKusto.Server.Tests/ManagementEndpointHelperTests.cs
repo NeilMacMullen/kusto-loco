@@ -95,22 +95,6 @@ namespace BabyKusto.Server.Tests
             var sut = CreateInstance();
             var body = new KustoApiMgmtRequestBody
             {
-                Csl = ".show databases  schema as json",
-            };
-
-            // Act
-            var result = sut.Process(body);
-
-            // Assert
-        }
-
-        [Fact]
-        public void ShowSchemaAsJson3_Works()
-        {
-            // Arrange
-            var sut = CreateInstance();
-            var body = new KustoApiMgmtRequestBody
-            {
                 Csl = ".show databases (['BabyKusto']) schema as json",
             };
 

@@ -32,7 +32,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 }
             }
 
-            return new ScalarResult(ScalarTypes.Real, digest.Quantile(percentile.Value / 100.0));
+            return new ScalarResult(ScalarTypes.Long, (long)Math.Round(digest.Quantile(percentile.Value / 100.0)));
         }
     }
 
@@ -60,7 +60,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 }
             }
 
-            return new ScalarResult(ScalarTypes.Real, digest.Quantile(percentile.Value / 100.0));
+            return new ScalarResult(ScalarTypes.Long, (long)Math.Round(digest.Quantile(percentile.Value / 100.0)));
         }
     }
 

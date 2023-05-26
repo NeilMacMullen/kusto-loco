@@ -436,7 +436,45 @@ x:long; val:string; any_val:string
         }
 
         [Fact]
-        public void BuiltInAggregates_percentile()
+        public void BuiltInAggregates_percentile_int()
+        {
+            // Arrange
+            string query = @"
+datatable(a: int) [ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ]
+| summarize p0 = percentile(a, 0), p100=percentile(a, 100)
+";
+
+            string expected = @"
+p0:long; p100:long
+------------------
+0; 9
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_percentile_long()
+        {
+            // Arrange
+            string query = @"
+datatable(a: long) [ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ]
+| summarize p0 = percentile(a, 0), p100=percentile(a, 100)
+";
+
+            string expected = @"
+p0:long; p100:long
+------------------
+0; 9
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_percentile_double()
         {
             // Arrange
             string query = @"

@@ -75,8 +75,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             aggregates.Add(
                 Aggregates.Percentile,
                 new AggregateInfo(
-                    new AggregateOverloadInfo(new PercentileAggregateIntImpl(), ScalarTypes.Real, ScalarTypes.Int, ScalarTypes.Real),
-                    new AggregateOverloadInfo(new PercentileAggregateLongImpl(), ScalarTypes.Real, ScalarTypes.Long, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new PercentileAggregateIntImpl(), ScalarTypes.Long, ScalarTypes.Int, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new PercentileAggregateLongImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Real),
                     new AggregateOverloadInfo(new PercentileAggregateDoubleImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
         }
 
