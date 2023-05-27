@@ -29,6 +29,17 @@ namespace BabyKusto.Server.Tests
             result.Should().Be("[{\"FrameType\":\"DataSetHeader\",\"IsProgressive\":false,\"Version\":\"v2.0\"},{\"FrameType\":\"DataTable\",\"TableId\":0,\"TableKind\":\"PrimaryResult\",\"TableName\":\"PrimaryResult\",\"Columns\":[{\"ColumnName\":\"posInf\",\"ColumnType\":\"real\"},{\"ColumnName\":\"negInf\",\"ColumnType\":\"real\"},{\"ColumnName\":\"nan\",\"ColumnType\":\"real\"},{\"ColumnName\":\"longDivZero\",\"ColumnType\":\"long\"}],\"Rows\":[[\"Infinity\",\"-Infinity\",\"NaN\",null]]},{\"FrameType\":\"DataSetCompletion\",\"HasErrors\":false,\"Cancelled\":false}]");
         }
 
+        [Fact]
+        public async Task Dynamic_Works()
+        {
+            // Act
+            var result = await ExecuteQueryAsync(
+                csl: "print obj=dynamic({\"a\":{\"b\":2}}), arr=dynamic([1,2,3])");
+
+            // Assert
+            result.Should().Be("[{\"FrameType\":\"DataSetHeader\",\"IsProgressive\":false,\"Version\":\"v2.0\"},{\"FrameType\":\"DataTable\",\"TableId\":0,\"TableKind\":\"PrimaryResult\",\"TableName\":\"PrimaryResult\",\"Columns\":[{\"ColumnName\":\"obj\",\"ColumnType\":\"dynamic\"},{\"ColumnName\":\"arr\",\"ColumnType\":\"dynamic\"}],\"Rows\":[[\"{\\u0022a\\u0022:{\\u0022b\\u0022:2}}\",\"[1,2,3]\"]]},{\"FrameType\":\"DataSetCompletion\",\"HasErrors\":false,\"Cancelled\":false}]");
+        }
+
         private static async Task<string> ExecuteQueryAsync(string csl, params ITableSource[] tables)
         {
             // Arrange

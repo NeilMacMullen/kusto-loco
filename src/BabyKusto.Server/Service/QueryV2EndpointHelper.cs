@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -15,6 +16,11 @@ namespace BabyKusto.Server.Service
 {
     public class QueryV2EndpointHelper
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        };
+
         private readonly IBabyKustoServerState _state;
 
         public QueryV2EndpointHelper(IBabyKustoServerState state)
@@ -87,6 +93,10 @@ namespace BabyKusto.Server.Service
                             {
                                 valueToWrite = JsonValue.Create(v);
                             }
+                        }
+                        else if (v is JsonNode json)
+                        {
+                            valueToWrite = JsonValue.Create(json.ToJsonString(JsonOptions));
                         }
                         else
                         {
