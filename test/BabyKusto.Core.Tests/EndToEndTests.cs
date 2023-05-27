@@ -493,6 +493,45 @@ p0:real; p100:real
         }
 
         [Fact]
+        public void BuiltInAggregates_makeset_int()
+        {
+            // Arrange
+            string query = @"
+datatable(x: int) [1, 2, 3, 1]
+| summarize a = make_set(x), b = make_set(x,2)
+| project a = array_sort_asc(a), b = array_sort_asc(b)
+";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[1,2,3]; [1,2]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_makelist_int()
+        {
+            // Arrange
+            string query = @"
+datatable(x: int) [1, 3, 2, 1]
+| summarize a = make_list(x), b = make_list(x,2)
+";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[1,3,2,1]; [1,3]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Take_Works()
         {
             // Arrange
@@ -1307,6 +1346,42 @@ v1:real; v2:real
 -0.5; -0.5
 -0.5; -0.5
 -1; -1
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_arraysort_Scalar()
+        {
+            // Arrange
+            string query = @"
+let x=dynamic([ 1, 3, 2, ""a"", ""c"", ""b"" ]);
+print a=array_sort_asc(x), b=array_sort_desc(x)";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[1,2,3,""a"",""b"",""c""]; [3,2,1,""c"",""b"",""a""]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_arraysort_Columnar()
+        {
+            // Arrange
+            string query = @"
+print x=dynamic([ 1, 3, 2, ""a"", ""c"", ""b"" ])
+| project a=array_sort_asc(x), b=array_sort_desc(x)";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[1,2,3,""a"",""b"",""c""]; [3,2,1,""c"",""b"",""a""]
 ";
 
             // Act & Assert

@@ -19,7 +19,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         static BuiltInAggregates()
         {
             aggregates.Add(Aggregates.Count, new AggregateInfo(new AggregateOverloadInfo(new CountFunctionImpl(), ScalarTypes.Long)));
-            
+
             aggregates.Add(Aggregates.CountIf, new AggregateInfo(new AggregateOverloadInfo(new CountIfFunctionImpl(), ScalarTypes.Long, ScalarTypes.Bool)));
 
             aggregates.Add(
@@ -78,6 +78,38 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new PercentileAggregateIntImpl(), ScalarTypes.Long, ScalarTypes.Int, ScalarTypes.Real),
                     new AggregateOverloadInfo(new PercentileAggregateLongImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Real),
                     new AggregateOverloadInfo(new PercentileAggregateDoubleImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
+
+            aggregates.Add(
+                Aggregates.MakeSet,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new MakeSetIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int),
+                    new AggregateOverloadInfo(new MakeSetIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new MakeSetDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String),
+                    new AggregateOverloadInfo(new MakeSetStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Long)));
+
+            aggregates.Add(
+                Aggregates.MakeList,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new MakeListIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int),
+                    new AggregateOverloadInfo(new MakeListIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new MakeListDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String),
+                    new AggregateOverloadInfo(new MakeListStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Long)));
+
+            aggregates.Add(
+                Aggregates.MakeListWithNulls,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new MakeListWithNullsIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int),
+                    new AggregateOverloadInfo(new MakeListWithNullsLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListWithNullsDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new MakeListWithNullsStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String)));
         }
 
         public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)
