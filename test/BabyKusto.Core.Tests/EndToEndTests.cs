@@ -1353,7 +1353,48 @@ v1:real; v2:real
         }
 
         [Fact]
-        public void BuiltIns_arraysort_Scalar()
+        public void BuiltIns_array_length_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=array_length(dynamic([])), b=array_length(dynamic([1,2])), c=array_length(dynamic({}))";
+
+            string expected = @"
+a:long; b:long; c:long
+------------------
+0; 2; (null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_array_length_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(x:dynamic) [
+    dynamic([]),
+    dynamic([1,2]),
+    dynamic({})
+]
+| project a=array_length(x)";
+
+            string expected = @"
+a:long
+------------------
+0
+2
+(null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_array_sort_Scalar()
         {
             // Arrange
             string query = @"
@@ -1371,7 +1412,7 @@ a:dynamic; b:dynamic
         }
 
         [Fact]
-        public void BuiltIns_arraysort_Columnar()
+        public void BuiltIns_array_sort_Columnar()
         {
             // Arrange
             string query = @"

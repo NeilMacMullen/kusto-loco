@@ -97,6 +97,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 new ScalarOverloadInfo(new ArraySortFunctionImpl(ascending: true), ScalarTypes.Dynamic, ScalarTypes.Dynamic)));
             functions.Add(Functions.ArraySortDesc, new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new ArraySortFunctionImpl(ascending: false), ScalarTypes.Dynamic, ScalarTypes.Dynamic)));
+
+            functions.Add(Functions.ArrayLength, new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new ArrayLengthFunctionImpl(), ScalarTypes.Long, ScalarTypes.Dynamic)));
         }
 
         public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)
