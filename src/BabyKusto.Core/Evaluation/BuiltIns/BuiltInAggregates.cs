@@ -88,8 +88,28 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new MakeSetLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Long),
                     new AggregateOverloadInfo(new MakeSetDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
                     new AggregateOverloadInfo(new MakeSetDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan),
+                    new AggregateOverloadInfo(new MakeSetTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime),
+                    new AggregateOverloadInfo(new MakeSetDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Long),
                     new AggregateOverloadInfo(new MakeSetStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String),
                     new AggregateOverloadInfo(new MakeSetStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Long)));
+
+            aggregates.Add(
+                Aggregates.MakeSetIf,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new MakeSetIfIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetIfLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetIfDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetIfTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetIfDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeSetIfStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeSetIfStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Bool, ScalarTypes.Long)));
 
             aggregates.Add(
                 Aggregates.MakeList,
@@ -100,8 +120,28 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new MakeListLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Long),
                     new AggregateOverloadInfo(new MakeListDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
                     new AggregateOverloadInfo(new MakeListDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan),
+                    new AggregateOverloadInfo(new MakeListTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime),
+                    new AggregateOverloadInfo(new MakeListDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Long),
                     new AggregateOverloadInfo(new MakeListStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String),
                     new AggregateOverloadInfo(new MakeListStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Long)));
+
+            aggregates.Add(
+                Aggregates.MakeListIf,
+                new AggregateInfo(
+                    new AggregateOverloadInfo(new MakeListIfIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListIfLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListIfDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListIfTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListIfDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime, ScalarTypes.Bool, ScalarTypes.Long),
+                    new AggregateOverloadInfo(new MakeListIfStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Bool),
+                    new AggregateOverloadInfo(new MakeListIfStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String, ScalarTypes.Bool, ScalarTypes.Long)));
 
             aggregates.Add(
                 Aggregates.MakeListWithNulls,
@@ -109,6 +149,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new AggregateOverloadInfo(new MakeListWithNullsIntFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Int),
                     new AggregateOverloadInfo(new MakeListWithNullsLongFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Long),
                     new AggregateOverloadInfo(new MakeListWithNullsDoubleFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Real),
+                    new AggregateOverloadInfo(new MakeListWithNullsTimeSpanFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.TimeSpan),
+                    new AggregateOverloadInfo(new MakeListWithNullsDateTimeFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.DateTime),
                     new AggregateOverloadInfo(new MakeListWithNullsStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String)));
         }
 

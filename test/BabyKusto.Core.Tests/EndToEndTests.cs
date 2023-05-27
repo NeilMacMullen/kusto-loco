@@ -493,7 +493,7 @@ p0:real; p100:real
         }
 
         [Fact]
-        public void BuiltInAggregates_makeset_int()
+        public void BuiltInAggregates_make_set_int()
         {
             // Arrange
             string query = @"
@@ -513,7 +513,27 @@ a:dynamic; b:dynamic
         }
 
         [Fact]
-        public void BuiltInAggregates_makelist_int()
+        public void BuiltInAggregates_make_set_if_int()
+        {
+            // Arrange
+            string query = @"
+datatable(x: int) [1, 2, 3, 1]
+| summarize a = make_set_if(x,x>1), b = make_set_if(x,true,2)
+| project a = array_sort_asc(a), b = array_sort_asc(b)
+";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[2,3]; [1,2]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_make_list_int()
         {
             // Arrange
             string query = @"
@@ -525,6 +545,25 @@ datatable(x: int) [1, 3, 2, 1]
 a:dynamic; b:dynamic
 ------------------
 [1,3,2,1]; [1,3]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_make_list_if_int()
+        {
+            // Arrange
+            string query = @"
+datatable(x: int) [1, 3, 2, 1]
+| summarize a = make_list_if(x,x>1), b = make_list_if(x,true,3)
+";
+
+            string expected = @"
+a:dynamic; b:dynamic
+------------------
+[3,2]; [1,3,2]
 ";
 
             // Act & Assert
