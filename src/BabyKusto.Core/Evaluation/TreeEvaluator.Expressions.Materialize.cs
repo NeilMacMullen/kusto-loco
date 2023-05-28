@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation
             Debug.Assert(innerResult != null);
 
             var result = new MaterializedTableResult(innerResult.Value);
-            return new TabularResult(result);
+            return new TabularResult(result, innerResult.VisualizationState);
         }
 
         private class MaterializedTableResult : ITableSource

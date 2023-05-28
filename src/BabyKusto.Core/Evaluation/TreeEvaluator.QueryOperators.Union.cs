@@ -17,9 +17,11 @@ namespace BabyKusto.Core.Evaluation
         public override EvaluationResult? VisitUnionOperator(IRUnionOperatorNode node, EvaluationContext context)
         {
             var tables = new List<ITableSource>((context.Left != null ? 1 : 0) + node.Expressions.ChildCount);
+            VisualizationState? visualizationState = null;
             if (context.Left != null)
             {
                 tables.Add(context.Left.Value);
+                visualizationState = context.Left.VisualizationState;
             }
 
             for (int i = 0; i < node.Expressions.ChildCount; i++)
@@ -29,10 +31,15 @@ namespace BabyKusto.Core.Evaluation
                 Debug.Assert(expressionResult != null);
                 var tableResult = (TabularResult)expressionResult;
                 tables.Add(tableResult.Value);
+
+                if (tableResult.VisualizationState != null)
+                {
+                    visualizationState = tableResult.VisualizationState;
+                }
             }
 
             var result = new UnionResultTable(tables, (TableSymbol)node.ResultType);
-            return new TabularResult(result);
+            return new TabularResult(result, visualizationState);
         }
 
         private class UnionResultTable : ITableSource

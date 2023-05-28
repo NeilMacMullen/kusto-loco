@@ -54,12 +54,19 @@ namespace BabyKusto.Core.Evaluation
 
     public sealed class TabularResult : EvaluationResult
     {
-        public TabularResult(ITableSource value)
+        public TabularResult(ITableSource value, VisualizationState? visualizationState)
             : base(value.Type)
         {
             Value = value;
+            VisualizationState = visualizationState;
         }
 
         public ITableSource Value { get; }
+
+        public VisualizationState? VisualizationState { get; }
+    }
+
+    public record VisualizationState(string ChartType, string? ChartKind)
+    {
     }
 }

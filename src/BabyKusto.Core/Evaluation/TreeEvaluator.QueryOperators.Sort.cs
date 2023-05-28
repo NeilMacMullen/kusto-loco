@@ -27,7 +27,7 @@ namespace BabyKusto.Core.Evaluation
             }
 
             var result = new SortResultTable(this, context, context.Left.Value, sortColumns);
-            return new TabularResult(result);
+            return new TabularResult(result, context.Left.VisualizationState);
         }
 
         private class SortResultTable : ITableSource

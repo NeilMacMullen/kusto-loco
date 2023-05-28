@@ -49,6 +49,7 @@ namespace BabyKusto.Server.Service
                 var writer = new KustoQueryV2ResponseWriter(jsonWriter);
                 await writer.StartAsync();
                 await WritePrimaryResultTable(tabularResult, writer);
+                await WriteQueryPropertiesTable(tabularResult, writer);
                 await writer.FinishAsync();
 
                 await jsonWriter.DisposeAsync();
@@ -111,6 +112,75 @@ namespace BabyKusto.Server.Service
             }
 
             await tableWriter.FinishAsync();
+        }
+
+        private static async Task WriteQueryPropertiesTable(TabularResult tabularResult, KustoQueryV2ResponseWriter writer)
+        {
+            if (tabularResult.VisualizationState != null)
+            {
+                var tableType = new TableSymbol(
+                    "QueryProperties",
+                    new ColumnSymbol("TableIndex", ScalarTypes.Long),
+                    new ColumnSymbol("Type", ScalarTypes.String),
+                    new ColumnSymbol("Value", ScalarTypes.String)
+                );
+                var resultType = tableType;
+                var tableWriter = writer.CreateTableWriter();
+                await tableWriter.StartAsync(1, KustoQueryV2ResponseTableKind.QueryProperties, "QueryProperties", tableType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = c.Type.Display }).ToList());
+
+                tableWriter.StartRow();
+                tableWriter.WriteRowValue(JsonValue.Create(0));
+                tableWriter.WriteRowValue(JsonValue.Create("Visualization"));
+                tableWriter.WriteRowValue(JsonValue.Create(JsonSerializer.Serialize(
+                    new ChartVisualizationDto
+                    {
+                        Visualization = tabularResult.VisualizationState.ChartType,
+                        Kind = tabularResult.VisualizationState.ChartKind,
+                        // TODO: We should set a lot more things here, but this seems to work well enough for now and Kusto Explorer fills in the gaps...
+                    })));
+                tableWriter.EndRow();
+
+                await tableWriter.FlushAsync();
+                await tableWriter.FinishAsync();
+            }
+        }
+
+        private class ChartVisualizationDto
+        {
+            public string? Visualization { get; set; }
+
+            public string? Kind { get; set; }
+
+            public string? YSplit { get; set; }
+
+            public string? Legend { get; set; }
+
+            public string? XAxis { get; set; }
+
+            public string? YAxis { get; set; }
+
+            public string? Title { get; set; }
+
+            public string? XColumn { get; set; }
+
+            public string[]? Series { get; set; }
+
+            public string[]? YColumns { get; set; }
+
+            public string[]? AnomalyColumns { get; set; }
+
+            public string? XTitle { get; set; }
+
+            public string? YTitle { get; set; }
+
+            public bool Accumulate { get; set; }
+
+            public bool IsQuerySorted { get; set; }
+
+            public object? Ymin { get; set; } = "NaN";
+            public object? Ymax { get; set; } = "NaN";
+            public object? Xmin { get; set; }
+            public object? Xmax { get; set; }
         }
     }
 }

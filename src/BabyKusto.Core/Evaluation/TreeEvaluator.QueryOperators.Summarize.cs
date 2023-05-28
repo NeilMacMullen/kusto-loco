@@ -29,7 +29,7 @@ namespace BabyKusto.Core.Evaluation
             }
 
             var result = new SummarizeResultTable(this, context.Left.Value, context, byExpressions, aggregationExpressions, (TableSymbol)node.ResultType);
-            return new TabularResult(result);
+            return new TabularResult(result, context.Left.VisualizationState);
         }
 
         private class SummarizeResultTable : DerivedTableSourceBase<SummarizeResultTableContext>

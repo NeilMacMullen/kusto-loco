@@ -27,6 +27,7 @@ namespace BabyKusto.Core.InternalRepresentation
         public abstract TResult? VisitPrintOperator(IRPrintOperatorNode node, TContext context);
         public abstract TResult? VisitProjectOperator(IRProjectOperatorNode node, TContext context);
         public abstract TResult? VisitQueryBlock(IRQueryBlockNode node, TContext context);
+        public abstract TResult? VisitRenderOperator(IRRenderOperatorNode node, TContext context);
         public abstract TResult? VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, TContext context);
         public abstract TResult? VisitSortOperator(IRSortOperatorNode node, TContext context);
         public abstract TResult? VisitSummarizeOperator(IRSummarizeOperatorNode node, TContext context);

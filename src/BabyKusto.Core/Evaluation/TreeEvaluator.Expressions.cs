@@ -119,7 +119,7 @@ namespace BabyKusto.Core.Evaluation
             }
 
             var result = new InMemoryTableSource(tableSymbol, columns);
-            return new TabularResult(result);
+            return new TabularResult(result, visualizationState: null);
         }
     }
 }

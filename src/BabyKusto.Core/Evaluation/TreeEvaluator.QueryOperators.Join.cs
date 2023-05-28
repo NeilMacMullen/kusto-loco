@@ -18,7 +18,7 @@ namespace BabyKusto.Core.Evaluation
         {
             Debug.Assert(context.Left != null);
             var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context, node.OnClauses, (TableSymbol)node.ResultType);
-            return new TabularResult(result);
+            return new TabularResult(result, context.Left.VisualizationState);
         }
 
         private class JoinResultTable : ITableSource

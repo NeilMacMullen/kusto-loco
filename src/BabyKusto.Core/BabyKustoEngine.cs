@@ -66,7 +66,7 @@ namespace BabyKusto.Core
             var scope = new LocalScope();
             foreach (var table in _globalTables)
             {
-                scope.AddSymbol(table.Type, new TabularResult(table));
+                scope.AddSymbol(table.Type, new TabularResult(table, visualizationState: null));
             }
 
             var result = BabyKustoEvaluator.Evaluate(ir, scope);

@@ -17,7 +17,7 @@ namespace BabyKusto.Core.Evaluation
         {
             Debug.Assert(context.Left != null);
             var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
-            return new TabularResult(result);
+            return new TabularResult(result, context.Left.VisualizationState);
         }
 
         private class FilterResultsTable : DerivedTableSourceBase<NoContext>

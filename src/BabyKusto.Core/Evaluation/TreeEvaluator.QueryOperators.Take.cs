@@ -19,7 +19,7 @@ namespace BabyKusto.Core.Evaluation
             Debug.Assert(countExpressionResult != null);
             var count = (ScalarResult)countExpressionResult;
             var result = new TakeResultTable(context.Left.Value, count.Value == null ? 0 : Convert.ToInt32(count.Value));
-            return new TabularResult(result);
+            return new TabularResult(result, context.Left.VisualizationState);
         }
 
         private class TakeResultTable : DerivedTableSourceBase<TakeResultTableContext>

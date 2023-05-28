@@ -123,6 +123,11 @@ namespace BabyKusto.Core.InternalRepresentation
             return this.DefaultVisit(node, context);
         }
 
+        public override TResult? VisitRenderOperator(IRRenderOperatorNode node, TContext context)
+        {
+            return this.DefaultVisit(node, context);
+        }
+
         public override TResult? VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, TContext context)
         {
             return this.DefaultVisit(node, context);

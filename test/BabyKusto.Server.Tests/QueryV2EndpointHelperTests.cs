@@ -40,6 +40,22 @@ namespace BabyKusto.Server.Tests
             result.Should().Be("[{\"FrameType\":\"DataSetHeader\",\"IsProgressive\":false,\"Version\":\"v2.0\"},{\"FrameType\":\"DataTable\",\"TableId\":0,\"TableKind\":\"PrimaryResult\",\"TableName\":\"PrimaryResult\",\"Columns\":[{\"ColumnName\":\"obj\",\"ColumnType\":\"dynamic\"},{\"ColumnName\":\"arr\",\"ColumnType\":\"dynamic\"}],\"Rows\":[[\"{\\u0022a\\u0022:{\\u0022b\\u0022:2}}\",\"[1,2,3]\"]]},{\"FrameType\":\"DataSetCompletion\",\"HasErrors\":false,\"Cancelled\":false}]");
         }
 
+        [Fact]
+        public async Task Visualization_Works()
+        {
+            // Act
+            var result = await ExecuteQueryAsync(csl: @"
+datatable(lon:real,lat:real, name:string)[
+    -122.3493, 47.6205, 'Space Needle',
+    -122.3402, 47.6089, 'Pike Place Market',
+]
+| render scatterchart with (kind=map)
+");
+
+            // Assert
+            result.Should().Be("[{\"FrameType\":\"DataSetHeader\",\"IsProgressive\":false,\"Version\":\"v2.0\"},{\"FrameType\":\"DataTable\",\"TableId\":0,\"TableKind\":\"PrimaryResult\",\"TableName\":\"PrimaryResult\",\"Columns\":[{\"ColumnName\":\"lon\",\"ColumnType\":\"real\"},{\"ColumnName\":\"lat\",\"ColumnType\":\"real\"},{\"ColumnName\":\"name\",\"ColumnType\":\"string\"}],\"Rows\":[[-122.3493,47.6205,\"Space Needle\"],[-122.3402,47.6089,\"Pike Place Market\"]]},{\"FrameType\":\"DataTable\",\"TableId\":1,\"TableKind\":\"QueryProperties\",\"TableName\":\"QueryProperties\",\"Columns\":[{\"ColumnName\":\"TableIndex\",\"ColumnType\":\"long\"},{\"ColumnName\":\"Type\",\"ColumnType\":\"string\"},{\"ColumnName\":\"Value\",\"ColumnType\":\"string\"}],\"Rows\":[[0,\"Visualization\",\"{\\u0022Visualization\\u0022:\\u0022scatterchart\\u0022,\\u0022Kind\\u0022:\\u0022map\\u0022,\\u0022YSplit\\u0022:null,\\u0022Legend\\u0022:null,\\u0022XAxis\\u0022:null,\\u0022YAxis\\u0022:null,\\u0022Title\\u0022:null,\\u0022XColumn\\u0022:null,\\u0022Series\\u0022:null,\\u0022YColumns\\u0022:null,\\u0022AnomalyColumns\\u0022:null,\\u0022XTitle\\u0022:null,\\u0022YTitle\\u0022:null,\\u0022Accumulate\\u0022:false,\\u0022IsQuerySorted\\u0022:false,\\u0022Ymin\\u0022:\\u0022NaN\\u0022,\\u0022Ymax\\u0022:\\u0022NaN\\u0022,\\u0022Xmin\\u0022:null,\\u0022Xmax\\u0022:null}\"]]},{\"FrameType\":\"DataSetCompletion\",\"HasErrors\":false,\"Cancelled\":false}]");
+        }
+
         private static async Task<string> ExecuteQueryAsync(string csl, params ITableSource[] tables)
         {
             // Arrange
