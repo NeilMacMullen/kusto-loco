@@ -366,6 +366,25 @@ v:long
         }
 
         [Fact]
+        public void BuiltInAggregates_sum_Int()
+        {
+            // Arrange
+            string query = @"
+datatable(v:int) [ 1, 2, 4 ]
+| summarize v=sum(v)
+";
+
+            string expected = @"
+v:long
+------------------
+7
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltInAggregates_sumif_Long()
         {
             // Arrange
@@ -564,6 +583,76 @@ datatable(x: int) [1, 3, 2, 1]
 a:dynamic; b:dynamic
 ------------------
 [3,2]; [1,3,2]
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_dcount_Int()
+        {
+            // Arrange
+            string query = @"
+datatable(a: int)
+[
+    int(null), 1, 2, 3 // nulls are ignored
+]
+| summarize v=dcount(a)
+";
+
+            string expected = @"
+v:long
+------------------
+3
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_dcount_String()
+        {
+            // Arrange
+            string query = @"
+datatable(a: string)
+[
+    '', 'a', 'b', 'c' // empty string are NOT ignored
+]
+| summarize v=dcount(a)
+";
+
+            string expected = @"
+v:long
+------------------
+4
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltInAggregates_dcountif_String()
+        {
+            // Arrange
+            string query = @"
+datatable(a:string, b: bool)
+[
+    '', true,
+    'a', true,
+    'b', false,
+    'a', false,
+    'a', true,
+]
+| summarize v=dcountif(a, b)
+";
+
+            string expected = @"
+v:long
+------------------
+2
 ";
 
             // Act & Assert
@@ -1499,6 +1588,60 @@ v:long
 0
 10
 10
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_geo_distance_2points_Scalar()
+        {
+            // Arrange
+            string query = @"
+print d1=tolong(geo_distance_2points(-122.3518577,47.6205099,-122.3519241,47.6097268)), // Space Needle to Pike Place Market
+      d2=geo_distance_2points(300,0,0,0), // Invalid lon1
+      d3=geo_distance_2points(0,-300,0,0), // Invalid lat1
+      d4=geo_distance_2points(0,0,-300,0), // Invalid lon2
+      d5=geo_distance_2points(0,0,0,300), // Invalid lat2
+      d6=geo_distance_2points(0,real(null),0,0) // Something is null
+";
+
+            string expected = @"
+d1:long; d2:real; d3:real; d4:real; d5:real; d6:real
+------------------
+1199; (null); (null); (null); (null); (null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_geo_distance_2points_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(lon1:real,lat1:real,lon2:real,lat2:real) [
+    -122.3518577,47.6205099,-122.3519241,47.6097268, // Space Needle to Pike Place Market
+    300,0,0,0,
+    0,-300,0,0,
+    0,0,-300,0,
+    0,0,0,300,
+    0,real(null),0,0,
+]
+| project d=tolong(geo_distance_2points(lon1, lat1, lon2, lat2))
+";
+
+            string expected = @"
+d:long
+------------------
+1199
+(null)
+(null)
+(null)
+(null)
+(null)
 ";
 
             // Act & Assert
