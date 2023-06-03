@@ -100,6 +100,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
             functions.Add(Functions.ArrayLength, new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new ArrayLengthFunctionImpl(), ScalarTypes.Long, ScalarTypes.Dynamic)));
+
+            functions.Add(Functions.GeoDistance2Points, new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new GeoDistance2PointsFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
         }
 
         public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)
