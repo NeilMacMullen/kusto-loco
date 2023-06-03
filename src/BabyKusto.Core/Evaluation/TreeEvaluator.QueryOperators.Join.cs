@@ -94,7 +94,7 @@ namespace BabyKusto.Core.Evaluation
                             var onExpression = onExpressions[i];
                             var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
                             Debug.Assert(onExpressionResult != null);
-                            Debug.Assert(onExpressionResult.Type == onExpression.ResultType, $"On expression[{i}] produced wrong type {onExpressionResult.Type}, expected {onExpression.ResultType}.");
+                            Debug.Assert(onExpressionResult.Type == onExpression.ResultType, $"On expression[{i}] produced wrong type {onExpressionResult.Type.Display}, expected {onExpression.ResultType.Display}.");
                             onValuesColumns.Add(onExpressionResult.Column);
                         }
                     }

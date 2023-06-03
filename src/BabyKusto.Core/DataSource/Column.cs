@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;

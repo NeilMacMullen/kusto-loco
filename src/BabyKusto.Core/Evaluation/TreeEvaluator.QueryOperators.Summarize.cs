@@ -87,8 +87,6 @@ namespace BabyKusto.Core.Evaluation
                     // TODO: Use a less expensive composite key computation
                     var key = string.Join("|", byValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
 
-                    var newData = new object[1];
-
                     if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                     {
                         context.BucketizedTables[key] = bucket = (byValues, new ColumnBuilder[numInputColumns]);
