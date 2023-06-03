@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length == 1);
             var column = (Column<int?>)arguments[0].Column;
-            int sum = 0;
+            long sum = 0;
             for (int i = 0; i < column.RowCount; i++)
             {
                 var item = column[i];
@@ -21,7 +21,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     sum += item.Value;
                 }
             }
-            return new ScalarResult(ScalarTypes.Int, sum);
+            return new ScalarResult(ScalarTypes.Long, sum);
         }
     }
 
