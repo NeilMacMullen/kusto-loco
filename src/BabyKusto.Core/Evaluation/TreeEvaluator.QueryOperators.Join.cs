@@ -311,11 +311,12 @@ namespace BabyKusto.Core.Evaluation
 
                 foreach (var kvp in left.Buckets)
                 {
+                    Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
                     int numLeftRows = kvp.Value.Data[0].RowCount;
 
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
-                        Debug.Assert(numLeftColumns == rightValue.Data.Length);
+                        Debug.Assert(numRightColumns == rightValue.Data.Length);
                         int numRightRows = rightValue.Data[0].RowCount;
 
                         for (int i = 0; i < numLeftRows; i++)
@@ -378,6 +379,7 @@ namespace BabyKusto.Core.Evaluation
 
                 foreach (var kvp in right.Buckets)
                 {
+                    Debug.Assert(numRightColumns == kvp.Value.Data.Length);
                     int numRightRows = kvp.Value.Data[0].RowCount;
 
                     if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
@@ -444,11 +446,12 @@ namespace BabyKusto.Core.Evaluation
 
                 foreach (var kvp in left.Buckets)
                 {
+                    Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
                     int numLeftRows = kvp.Value.Data[0].RowCount;
 
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
-                        Debug.Assert(numLeftColumns == rightValue.Data.Length);
+                        Debug.Assert(numRightColumns == rightValue.Data.Length);
                         int numRightRows = rightValue.Data[0].RowCount;
 
                         for (int i = 0; i < numLeftRows; i++)

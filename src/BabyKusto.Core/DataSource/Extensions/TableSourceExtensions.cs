@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Extensions
 {
@@ -50,14 +51,21 @@ namespace BabyKusto.Core.Extensions
                         }
 
                         var v = chunk.Columns[j].RawData.GetValue(i);
-                        writer.Write(
-                            v switch
-                            {
-                                DateTime dateTime => dateTime.ToString("O"),
-                                JsonNode jsonNode => jsonNode.ToJsonString(JsonOptions),
-                                null => "(null)",
-                                _ => v,
-                            });
+                        if (chunk.Columns[j].Type == ScalarTypes.String)
+                        {
+                            writer.Write((string?)v ?? string.Empty);
+                        }
+                        else
+                        {
+                            writer.Write(
+                                v switch
+                                {
+                                    DateTime dateTime => dateTime.ToString("O"),
+                                    JsonNode jsonNode => jsonNode.ToJsonString(JsonOptions),
+                                    null => "(null)",
+                                    _ => v,
+                                });
+                        }
                     }
                     writer.WriteLine();
                 }

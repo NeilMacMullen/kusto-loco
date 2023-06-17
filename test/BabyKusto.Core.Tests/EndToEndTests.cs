@@ -2824,27 +2824,27 @@ let X = datatable(Key:string, Value1:long)
     'a',1,
     'b',2,
     'b',3,
-    'c',4
+    'c',4,
 ];
-let Y = datatable(Key:string, Value2:long)
+let Y = datatable(Key:string, Value2:long, Value3:string)
 [
-    'b',10,
-    'c',20,
-    'c',30,
-    'd',40
+    'b',10,'aa',
+    'c',20,'bb',
+    'c',30,'cc',
+    'd',40,'dd',
 ];
 X | join kind=leftouter Y on Key
 | order by Key asc, Key1 asc
 ";
 
             string expected = @"
-Key:string; Value1:long; Key1:string; Value2:long
+Key:string; Value1:long; Key1:string; Value2:long; Value3:string
 ------------------
-a; 1; (null); (null)
-b; 2; b; 10
-b; 3; b; 10
-c; 4; c; 20
-c; 4; c; 30
+a; 1; ; (null); 
+b; 2; b; 10; aa
+b; 3; b; 10; aa
+c; 4; c; 20; bb
+c; 4; c; 30; cc
 ";
 
             // Act & Assert
@@ -2861,27 +2861,27 @@ let X = datatable(Key:string, Value1:long)
     'a',1,
     'b',2,
     'b',3,
-    'c',4
+    'c',4,
 ];
-let Y = datatable(Key:string, Value2:long)
+let Y = datatable(Key:string, Value2:long, Value3:string)
 [
-    'b',10,
-    'c',20,
-    'c',30,
-    'd',40
+    'b',10,'aa',
+    'c',20,'bb',
+    'c',30,'cc',
+    'd',40,'dd',
 ];
 X | join kind=rightouter Y on Key
 | order by Key asc nulls last, Key1 asc
 ";
 
             string expected = @"
-Key:string; Value1:long; Key1:string; Value2:long
+Key:string; Value1:long; Key1:string; Value2:long; Value3:string
 ------------------
-b; 2; b; 10
-b; 3; b; 10
-c; 4; c; 20
-c; 4; c; 30
-(null); (null); d; 40
+b; 2; b; 10; aa
+b; 3; b; 10; aa
+c; 4; c; 20; bb
+c; 4; c; 30; cc
+; (null); d; 40; dd
 ";
 
             // Act & Assert
@@ -2914,12 +2914,12 @@ X | join kind=fullouter Y on Key
             string expected = @"
 Key:string; Value1:long; Key1:string; Value2:long
 ------------------
-a; 1; (null); (null)
+a; 1; ; (null)
 b; 2; b; 10
 b; 3; b; 10
 c; 4; c; 20
 c; 4; c; 30
-(null); (null); d; 40
+; (null); d; 40
 ";
 
             // Act & Assert
@@ -3140,6 +3140,37 @@ X | join kind=inner Y on b
 a:string; b:string; b1:string
 ------------------
 a2; b2; b2
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Join_StringColumnsAreEmpty()
+        {
+            // Arrange
+            string query = @"
+datatable(Key:int)
+[
+    1,
+    2,
+]
+| join kind=leftouter (
+    datatable(Key:int, a:string)
+    [
+        1, 'b',
+        3, 'c'
+    ]
+) on Key | project-away Key1
+| extend aIsNull = isnull(a), aIsEmpty=isempty(a), aLen=strlen(a)
+";
+
+            string expected = @"
+Key:int; a:string; aIsNull:bool; aIsEmpty:bool; aLen:long
+------------------
+1; b; False; False; 1
+2; ; False; True; 0
 ";
 
             // Act & Assert

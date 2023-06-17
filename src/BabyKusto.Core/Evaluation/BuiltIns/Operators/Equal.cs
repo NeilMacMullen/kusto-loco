@@ -97,7 +97,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var data = new bool?[left.RowCount];
             for (int i = 0; i < left.RowCount; i++)
             {
-                data[i] = (left[i] ?? string.Empty) == (right[i] ?? string.Empty);
+                data[i] = string.Equals(left[i] ?? string.Empty, right[i] ?? string.Empty, StringComparison.Ordinal);
             }
             return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
         }
