@@ -1158,6 +1158,65 @@ v:real
         }
 
         [Fact]
+        public void BuiltIns_coalesce_Scalar()
+        {
+            // Arrange
+            string query = @"
+print b=coalesce(bool(null),true),
+      i=coalesce(int(null),int(1)),
+      l2=coalesce(long(null),long(1)),
+      l3=coalesce(long(null),long(null),long(123)),
+      l4=coalesce(long(null),long(null),long(5),long(6)),
+      r=coalesce(real(null),real(1)),
+      dt=coalesce(datetime(null),datetime(2023-01-01)),
+      ts=coalesce(timespan(null),10s),
+      s=coalesce('','a')
+";
+
+            string expected = @"
+b:bool; i:int; l2:long; l3:long; l4:long; r:real; dt:datetime; ts:timespan; s:string
+------------------
+True; 1; 1; 123; 5; 1; 2023-01-01T00:00:00.0000000; 00:00:10; a
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_coalesce_Columnar()
+        {
+            // Arrange
+            string query = @"
+let d =
+    datatable(b:bool, i:int, l:long, r:real, dt:datetime, ts:timespan, s:string)
+    [
+       true, 1, 1, 1, datetime(2023-01-01), 10s, 'a'
+    ];
+d
+| where i==2 // get zero rows
+| extend jc=1
+| join kind=fullouter (d|extend jc=1) on jc
+| project b=coalesce(b,b1),
+          i=coalesce(i,i1),
+          l=coalesce(l,l1),
+          r=coalesce(r,r1),
+          dt=coalesce(dt,dt1),
+          ts=coalesce(ts,ts1),
+          s=coalesce(s,s1)
+";
+
+            string expected = @"
+b:bool; i:int; l:long; r:real; dt:datetime; ts:timespan; s:string
+------------------
+True; 1; 1; 1; 2023-01-01T00:00:00.0000000; 00:00:10; a
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_strcat_Scalar1()
         {
             // Arrange

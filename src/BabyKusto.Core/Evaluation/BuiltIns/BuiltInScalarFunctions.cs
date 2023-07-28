@@ -39,6 +39,36 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     new ScalarOverloadInfo(new MinOfLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
                     new ScalarOverloadInfo(new MinOfDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
 
+            {
+                var overloads = new List<ScalarOverloadInfo>();
+
+                AddCoalesce(overloads, () => new CoalesceBoolFunctionImpl(), ScalarTypes.Bool);
+                AddCoalesce(overloads, () => new CoalesceIntFunctionImpl(), ScalarTypes.Int);
+                AddCoalesce(overloads, () => new CoalesceLongFunctionImpl(), ScalarTypes.Long);
+                AddCoalesce(overloads, () => new CoalesceDoubleFunctionImpl(), ScalarTypes.Real);
+                AddCoalesce(overloads, () => new CoalesceDateTimeFunctionImpl(), ScalarTypes.DateTime);
+                AddCoalesce(overloads, () => new CoalesceTimeSpanFunctionImpl(), ScalarTypes.TimeSpan);
+                AddCoalesce(overloads, () => new CoalesceStringFunctionImpl(), ScalarTypes.String);
+
+                functions.Add(Functions.Coalesce, new ScalarFunctionInfo(overloads.ToArray()));
+
+                static void AddCoalesce(List<ScalarOverloadInfo> overloads, Func<IScalarFunctionImpl> factory, ScalarSymbol type)
+                {
+                    var impl = factory();
+
+                    for (int numArgs = 2; numArgs <= 4; numArgs++)
+                    {
+                        var argTypes = new ScalarSymbol[numArgs];
+                        for (int i = 0; i < numArgs; i++)
+                        {
+                            argTypes[i] = type;
+                        }
+
+                        overloads.Add(new ScalarOverloadInfo(impl, type, argTypes));
+                    }
+                }
+            }
+
             functions.Add(Functions.Now, new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
             functions.Add(Functions.Ago, new ScalarFunctionInfo(new ScalarOverloadInfo(new AgoFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.TimeSpan)));
 
