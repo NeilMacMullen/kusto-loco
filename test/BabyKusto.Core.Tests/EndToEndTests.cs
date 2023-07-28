@@ -999,6 +999,48 @@ False; False; False; False; False; False; False
         }
 
         [Theory]
+        [InlineData("not(true)", false)]
+        [InlineData("not(false)", true)]
+        [InlineData("not(bool(null))", null)]
+        public void BuiltIns_not_Scalar(string expression, bool? expectedValue)
+        {
+            // Arrange
+            string query = $"print v={expression}";
+
+            string expected = $@"
+v:bool
+------------------
+{(expectedValue.HasValue ? expectedValue.Value.ToString() : "(null)")}
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_not_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(v:bool) [
+  true, false, bool(null)
+]
+| project v=not(v)
+";
+
+            string expected = @"
+v:bool
+------------------
+False
+True
+(null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Theory]
         [InlineData("isempty('')", true)]
         [InlineData("isempty(' ')", false)]
         [InlineData("isempty('hello')", false)]

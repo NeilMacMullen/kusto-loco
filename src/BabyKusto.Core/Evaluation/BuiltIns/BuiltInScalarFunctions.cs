@@ -18,6 +18,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
         static BuiltInScalarFunctions()
         {
+            functions.Add(Functions.Not, new ScalarFunctionInfo(new ScalarOverloadInfo(new NotFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool)));
+
             functions.Add(
                 Functions.IsNull,
                 new ScalarFunctionInfo(
