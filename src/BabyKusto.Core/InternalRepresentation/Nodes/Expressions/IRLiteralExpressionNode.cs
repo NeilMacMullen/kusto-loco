@@ -23,7 +23,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"LiteralExpression: {ResultType.Display} = {Value}";
+            return $"LiteralExpression: {SchemaDisplay.GetText(ResultType)} = {Value}";
         }
     }
 }

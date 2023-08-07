@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.3.1" />
+    <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.3.24011" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BabyKusto.Core;
+using Kusto.Language.Symbols;
 
 namespace BabyKusto.Server.Service
 {
@@ -36,7 +37,7 @@ namespace BabyKusto.Server.Service
                         new ColumnSchema
                         {
                             Name = column.Name,
-                            CslType = column.Type.Display,
+                            CslType = SchemaDisplay.GetText(column.Type),
                             Type = column.Type switch
                             {
                                 _ => "",

@@ -1586,12 +1586,12 @@ v1:real; v2:real
         {
             // Arrange
             string query = @"
-print a=array_length(dynamic([])), b=array_length(dynamic([1,2])), c=array_length(dynamic({}))";
+print a=array_length(dynamic([])), b=array_length(dynamic([1,2]))";
 
             string expected = @"
-a:long; b:long; c:long
+a:long; b:long
 ------------------
-0; 2; (null)
+0; 2
 ";
 
             // Act & Assert

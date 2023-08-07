@@ -175,7 +175,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         {
             if (!TryGetOverload(symbol, arguments, parameters, out var overload))
             {
-                throw new NotImplementedException($"Aggregate function {symbol.Display} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => arg.ResultType.Display))}).");
+                throw new NotImplementedException($"Aggregate function {SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
             }
 
             Debug.Assert(overload != null);

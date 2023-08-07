@@ -31,7 +31,7 @@ namespace BabyKusto.Core.Extensions
 
                 writer.Write(table.Type.Columns[i].Name);
                 writer.Write(":");
-                writer.Write(table.Type.Columns[i].Type.Display);
+                writer.Write(SchemaDisplay.GetText(table.Type.Columns[i].Type));
             }
             writer.WriteLine();
 

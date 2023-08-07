@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -28,10 +29,13 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     var argument = arguments[i];
                     var parameterType = overload.ParameterTypes[i];
 
+                    var simplifiedArgType = argument.ResultType.Simplify();
+                    var simplifiedParamType = parameterType.Simplify();
+
                     bool thisCompatible =
-                        argument.ResultType == parameterType ||
-                        (argument.ResultType is ScalarSymbol scalarArg && parameterType is ScalarSymbol scalarParam && scalarParam.IsWiderThan(scalarArg)) ||
-                        parameterType == ScalarTypes.String; // TODO: Is it true that anything is coercible to string?
+                        simplifiedArgType == simplifiedParamType ||
+                        (simplifiedArgType is ScalarSymbol scalarArg && simplifiedParamType is ScalarSymbol scalarParam && scalarParam.IsWiderThan(scalarArg)) ||
+                        simplifiedParamType == ScalarTypes.String; // TODO: Is it true that anything is coercible to string?
 
                     if (!thisCompatible)
                     {
@@ -66,7 +70,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                         scalarArgs[i] = (ScalarResult)arguments[i];
                     }
                     var result = impl.InvokeScalar(scalarArgs);
-                    Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
+                    Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(), $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
                     return result;
                 };
             }
@@ -115,7 +119,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     }
 
                     var result = impl.InvokeColumnar(columnarArgs);
-                    Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
+                    Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(), $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
                     return result;
                 };
             }
@@ -177,7 +181,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 }
 
                 var result = impl.InvokeWindow(columnarArgs, lastWindowArgs, previousResult);
-                Debug.Assert(result.Type == expectedResultType, $"Evaluation produced wrong type {result.Type.Display}, expected {expectedResultType.Display}");
+                Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(), $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
                 lastWindowArgs = columnarArgs;
                 previousResult = result;
                 return result;

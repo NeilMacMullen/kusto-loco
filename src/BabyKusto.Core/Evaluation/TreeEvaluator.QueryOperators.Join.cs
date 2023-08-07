@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -49,7 +50,7 @@ namespace BabyKusto.Core.Evaluation
                 var rightResult = _rightExpression.Accept(_owner, rightContext);
                 if (rightResult == null || !rightResult.IsTabular)
                 {
-                    throw new InvalidOperationException($"Expected right expression to produce tabular result, got {rightResult?.Type.Display}");
+                    throw new InvalidOperationException($"Expected right expression to produce tabular result, got {SchemaDisplay.GetText(rightResult?.Type)}");
                 }
 
                 var rightTabularResult = (TabularResult)rightResult;
@@ -94,7 +95,7 @@ namespace BabyKusto.Core.Evaluation
                             var onExpression = onExpressions[i];
                             var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
                             Debug.Assert(onExpressionResult != null);
-                            Debug.Assert(onExpressionResult.Type == onExpression.ResultType, $"On expression[{i}] produced wrong type {onExpressionResult.Type.Display}, expected {onExpression.ResultType.Display}.");
+                            Debug.Assert(onExpressionResult.Type.Simplify() == onExpression.ResultType.Simplify(), $"On expression[{i}] produced wrong type {SchemaDisplay.GetText(onExpressionResult.Type)}, expected {SchemaDisplay.GetText(onExpression.ResultType)}.");
                             onValuesColumns.Add(onExpressionResult.Column);
                         }
                     }

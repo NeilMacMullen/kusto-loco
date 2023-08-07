@@ -99,7 +99,7 @@ namespace BabyKusto.Core.Evaluation
                     int destinationColumnIndex;
                     if (!_columnMappings.TryGetValue(symbol, out destinationColumnIndex))
                     {
-                        throw new InvalidOperationException($"Couldn't find source column to match to output column {symbol.Display}");
+                        throw new InvalidOperationException($"Couldn't find source column to match to output column {SchemaDisplay.GetText(symbol)}");
                     }
 
                     columns[destinationColumnIndex] = chunk.Columns[i];

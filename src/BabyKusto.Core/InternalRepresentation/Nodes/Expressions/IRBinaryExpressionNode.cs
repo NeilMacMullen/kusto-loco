@@ -40,7 +40,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"BinaryExpression({Signature.Display}): {ResultType.Display}";
+            return $"BinaryExpression({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

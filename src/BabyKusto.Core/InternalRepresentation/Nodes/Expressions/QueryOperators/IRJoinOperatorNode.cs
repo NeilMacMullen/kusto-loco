@@ -50,7 +50,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"JoinOperator(kind={Kind}, {string.Join(", ", OnClauses)}): {ResultType.Display}";
+            return $"JoinOperator(kind={Kind}, {string.Join(", ", OnClauses)}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

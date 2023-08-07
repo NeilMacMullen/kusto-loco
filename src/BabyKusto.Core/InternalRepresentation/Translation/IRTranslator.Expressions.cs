@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Evaluation.BuiltIns;
+using BabyKusto.Core.Extensions;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
@@ -211,7 +212,7 @@ namespace BabyKusto.Core.InternalRepresentation
                     for (int i = 0; i < arguments.Length; i++)
                     {
                         // NOTE: For now we only support type coercions for scalars. Bad things may happen for tabular inputs, oh well...
-                        if (irArguments[i].ResultType is ScalarSymbol && paramSymbols[i].Type != irArguments[i].ResultType)
+                        if (irArguments[i].ResultType is ScalarSymbol && paramSymbols[i].Type.Simplify() != irArguments[i].ResultType.Simplify())
                         {
                             irArguments[i] = new IRCastExpressionNode(irArguments[i], paramSymbols[i].Type);
                         }
@@ -246,7 +247,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
             else
             {
-                throw new InvalidOperationException($"Function {functionSymbol.Display} is not implemented.");
+                throw new InvalidOperationException($"Function {SchemaDisplay.GetText(functionSymbol)} is not implemented.");
             }
         }
 
@@ -254,7 +255,7 @@ namespace BabyKusto.Core.InternalRepresentation
         {
             for (int i = 0; i < irArguments.Length; i++)
             {
-                if (overloadInfo.ParameterTypes[i] != irArguments[i].ResultType)
+                if (overloadInfo.ParameterTypes[i].Simplify() != irArguments[i].ResultType.Simplify())
                 {
                     irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[i]);
                 }

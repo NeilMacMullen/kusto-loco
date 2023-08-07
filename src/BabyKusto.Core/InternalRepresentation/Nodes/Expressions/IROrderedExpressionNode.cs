@@ -50,7 +50,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"OrderedExpression {FormatDirection(SortDirection)} nulls {FormatNullsDirection(NullsDirection)}: {ResultType.Display}";
+            return $"OrderedExpression {FormatDirection(SortDirection)} nulls {FormatNullsDirection(NullsDirection)}: {SchemaDisplay.GetText(ResultType)}";
 
             static string FormatDirection(SortDirections sortDirection) =>
                 sortDirection switch

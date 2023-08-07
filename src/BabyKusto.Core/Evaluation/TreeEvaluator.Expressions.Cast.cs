@@ -56,7 +56,7 @@ namespace BabyKusto.Core.Evaluation
                         }
                         else
                         {
-                            throw new InvalidOperationException($"Unexpected target cast type for scalar value: {node.ResultType.Display}");
+                            throw new InvalidOperationException($"Unexpected target cast type for scalar value: {SchemaDisplay.GetText(node.ResultType)}");
                         }
                     }
                     else if (node.ResultKind == EvaluatedExpressionKind.Columnar)
@@ -107,7 +107,7 @@ namespace BabyKusto.Core.Evaluation
                         }
                         else
                         {
-                            throw new InvalidOperationException($"Unexpected target cast type for columnar value: {node.ResultType.Display}");
+                            throw new InvalidOperationException($"Unexpected target cast type for columnar value: {SchemaDisplay.GetText(node.ResultType)}");
                         }
                     }
                     else

@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 
 namespace BabyKusto.Core.Evaluation
@@ -23,7 +24,7 @@ namespace BabyKusto.Core.Evaluation
                 {
                     if (chunk.Columns[0].RowCount > 0)
                     {
-                        Debug.Assert(chunk.Columns[0].Type == node.ResultType);
+                        Debug.Assert(chunk.Columns[0].Type.Simplify() == node.ResultType.Simplify());
                         return new ScalarResult(chunk.Columns[0].Type, chunk.Columns[0].RawData.GetValue(0));
                     }
                 }

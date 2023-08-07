@@ -34,7 +34,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"PrintOperator: {ResultType.Display}";
+            return $"PrintOperator: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

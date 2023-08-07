@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.InternalRepresentation
 {
@@ -18,7 +19,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"JoinOnClause({Left.ReferencedSymbol.Display}, {Right.ReferencedSymbol.Display})";
+            return $"JoinOnClause({SchemaDisplay.GetText(Left.ReferencedSymbol)}, {SchemaDisplay.GetText(Right.ReferencedSymbol)})";
         }
     }
 }

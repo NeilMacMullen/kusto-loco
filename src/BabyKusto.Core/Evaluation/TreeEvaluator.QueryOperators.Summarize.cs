@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
@@ -74,7 +75,7 @@ namespace BabyKusto.Core.Evaluation
                         var byExpression = _byExpressions[i];
                         var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
                         Debug.Assert(byExpressionResult != null);
-                        Debug.Assert(byExpressionResult.Type == byExpression.ResultType, $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
+                        Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(), $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
                         byValuesColumns.Add(byExpressionResult.Column);
                     }
                 }
@@ -128,7 +129,7 @@ namespace BabyKusto.Core.Evaluation
                         var aggregationExpression = _aggregationExpressions[i];
                         var aggregationResult = (ScalarResult?)aggregationExpression.Accept(_owner, chunkContext);
                         Debug.Assert(aggregationResult != null);
-                        Debug.Assert(aggregationResult.Type == aggregationExpression.ResultType, $"Aggregation expression produced wrong type {aggregationResult.Type.Display}, expected {aggregationExpression.ResultType.Display}.");
+                        Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(), $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
                         resultsData[tableData.ByValues.Count + i].Add(aggregationResult.Value);
                     }
 

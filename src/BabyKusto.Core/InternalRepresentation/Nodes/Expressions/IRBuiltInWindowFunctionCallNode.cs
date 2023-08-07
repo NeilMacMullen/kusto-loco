@@ -40,7 +40,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"BuiltInWindowFunctionCall({Signature.Display}): {ResultType.Display}";
+            return $"BuiltInWindowFunctionCall({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

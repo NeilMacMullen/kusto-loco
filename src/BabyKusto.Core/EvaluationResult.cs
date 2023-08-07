@@ -21,7 +21,7 @@ namespace BabyKusto.Core.Evaluation
 
         public override string ToString()
         {
-            return $"{this.GetType().Name}: {Type.Display}";
+            return $"{this.GetType().Name}: {SchemaDisplay.GetText(Type)}";
         }
     }
 
@@ -32,7 +32,7 @@ namespace BabyKusto.Core.Evaluation
         {
             if (!type.IsScalar)
             {
-                throw new InvalidOperationException($"Expected scalar type for {nameof(ScalarResult)} value, got '{type.Display}'.");
+                throw new InvalidOperationException($"Expected scalar type for {nameof(ScalarResult)} value, got '{SchemaDisplay.GetText(type)}'.");
             }
 
             Value = value;

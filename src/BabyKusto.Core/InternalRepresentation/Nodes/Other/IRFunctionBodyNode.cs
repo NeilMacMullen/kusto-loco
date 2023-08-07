@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.InternalRepresentation
 {
@@ -33,7 +34,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"FunctionBody: {Expression.ResultType.Display}";
+            return $"FunctionBody: {SchemaDisplay.GetText(Expression.ResultType)}";
         }
     }
 }

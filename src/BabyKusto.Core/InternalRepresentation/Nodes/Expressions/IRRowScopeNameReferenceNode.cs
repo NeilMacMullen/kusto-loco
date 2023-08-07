@@ -31,7 +31,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"RowScopeNameReferenceNode({ReferencedSymbol.Name}=[{ReferencedColumnIndex}]): {ResultType.Display}";
+            return $"RowScopeNameReferenceNode({ReferencedSymbol.Name}=[{ReferencedColumnIndex}]): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

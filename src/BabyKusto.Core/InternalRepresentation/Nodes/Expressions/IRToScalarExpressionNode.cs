@@ -32,7 +32,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"ToScalarExpression: {ResultType.Display}";
+            return $"ToScalarExpression: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

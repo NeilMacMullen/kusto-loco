@@ -28,7 +28,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"DataTableExpression: {ResultType.Display}";
+            return $"DataTableExpression: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

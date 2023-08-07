@@ -29,7 +29,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"NameReference({ReferencedSymbol.Name}): {ResultType.Display}";
+            return $"NameReference({ReferencedSymbol.Name}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

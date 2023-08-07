@@ -55,7 +55,7 @@ namespace BabyKusto.Core.InternalRepresentation
                 return EvaluatedExpressionKind.Table;
             }
 
-            throw new InvalidOperationException($"Type cannot be mapped toa {nameof(EvaluatedExpressionKind)}: {type.Display}");
+            throw new InvalidOperationException($"Type cannot be mapped to {nameof(EvaluatedExpressionKind)}: {SchemaDisplay.GetText(type)}");
         }
 
         protected static EvaluatedExpressionKind GetResultKind(EvaluatedExpressionKind a, EvaluatedExpressionKind b)

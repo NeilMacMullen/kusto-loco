@@ -32,7 +32,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"FilterOperator: {ResultType.Display}";
+            return $"FilterOperator: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

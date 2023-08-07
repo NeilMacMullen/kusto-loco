@@ -52,14 +52,14 @@ namespace BabyKusto.Server.Contract
             }
             else
             {
-                throw new ArgumentException($"Type {type.Display} is not supported.", nameof(type));
+                throw new ArgumentException($"Type {SchemaDisplay.GetText(type)} is not supported.", nameof(type));
             }
 
             return new KustoApiColumnDescription
             {
                 ColumnName = name,
                 DataType = dataType,
-                ColumnType = type.Display,
+                ColumnType = SchemaDisplay.GetText(type),
             };
         }
 

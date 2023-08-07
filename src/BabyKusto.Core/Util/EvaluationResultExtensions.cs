@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using BabyKusto.Core.Evaluation;
+using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core.Extensions
@@ -24,7 +25,7 @@ namespace BabyKusto.Core.Extensions
                     }
                     writer.Write(scalarResult.Value);
                     writer.Write(" (");
-                    writer.Write(scalarResult.Type.Display);
+                    writer.Write(SchemaDisplay.GetText(scalarResult.Type));
                     writer.WriteLine(")");
                     break;
                 default:

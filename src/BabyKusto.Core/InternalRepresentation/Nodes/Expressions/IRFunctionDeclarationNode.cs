@@ -20,7 +20,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"FunctionDeclaration: {ResultType.Display}";
+            return $"FunctionDeclaration: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

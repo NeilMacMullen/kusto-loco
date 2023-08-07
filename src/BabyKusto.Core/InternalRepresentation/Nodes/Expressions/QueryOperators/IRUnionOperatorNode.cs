@@ -32,7 +32,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"UnionOperator: {ResultType.Display}";
+            return $"UnionOperator: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

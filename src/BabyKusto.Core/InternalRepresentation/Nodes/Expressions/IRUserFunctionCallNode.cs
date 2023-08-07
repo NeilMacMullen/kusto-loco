@@ -44,7 +44,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"UserFunctionCall({Signature.Display}): {ResultType.Display}";
+            return $"UserFunctionCall({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

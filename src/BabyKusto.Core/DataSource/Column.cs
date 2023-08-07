@@ -79,7 +79,7 @@ namespace BabyKusto.Core
 
             if (!valid)
             {
-                throw new InvalidOperationException($"Invalid column type {TypeNameHelper.GetTypeDisplayName(type)} for type symbol {typeSymbol.Display}. Types must be nullable.");
+                throw new InvalidOperationException($"Invalid column type {TypeNameHelper.GetTypeDisplayName(type)} for type symbol {SchemaDisplay.GetText(typeSymbol)}. Types must be nullable.");
             }
         }
 

@@ -48,7 +48,7 @@ namespace BabyKusto.Core.InternalRepresentation
             var rightType = irExpression.ResultType as TableSymbol;
             if (rightType == null)
             {
-                throw new InvalidOperationException($"Expected join operator's Right type to be tabular, found {irExpression.ResultType.Display}");
+                throw new InvalidOperationException($"Expected join operator's Right type to be tabular, found {SchemaDisplay.GetText(irExpression.ResultType)}");
             }
 
             List<IRJoinOnClause> onExpressions = new();

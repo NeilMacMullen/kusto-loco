@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using BabyKusto.Core.Extensions;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core
@@ -32,9 +33,9 @@ namespace BabyKusto.Core
 
             for (int i = 0; i < columns.Length; i++)
             {
-                if (columns[i].Type != tableSymbol.Columns[i].Type)
+                if (columns[i].Type.Simplify() != tableSymbol.Columns[i].Type.Simplify())
                 {
-                    throw new ArgumentException($"Mismatched column[{i}] type in chunk, got {columns[i].Type.Display}, expected {tableSymbol.Columns[i].Type.Display}.");
+                    throw new ArgumentException($"Mismatched column[{i}] type in chunk, got {SchemaDisplay.GetText(columns[i].Type)}, expected {SchemaDisplay.GetText(tableSymbol.Columns[i].Type)}.");
                 }
             }
         }

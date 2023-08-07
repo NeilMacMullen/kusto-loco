@@ -4,6 +4,7 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using BabyKusto.Core.Extensions;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Util
@@ -12,6 +13,7 @@ namespace BabyKusto.Core.Util
     {
         public static Column CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
+            typeSymbol = typeSymbol.Simplify();
             if (typeSymbol == ScalarTypes.Int)
             {
                 return CreateFromIntsObjectArray(data, typeSymbol);
@@ -47,12 +49,13 @@ namespace BabyKusto.Core.Util
             else
             {
                 // TODO: Support all data types
-                throw new NotImplementedException($"Unsupported scalar type to create column from: {typeSymbol.Display}");
+                throw new NotImplementedException($"Unsupported scalar type to create column from: {SchemaDisplay.GetText(typeSymbol)}");
             }
         }
 
         public static Column CreateFromScalar(object? value, TypeSymbol typeSymbol, int numRows)
         {
+            typeSymbol = typeSymbol.Simplify();
             if (typeSymbol == ScalarTypes.Int)
             {
                 return CreateFromInt(value, typeSymbol, numRows);
@@ -88,12 +91,13 @@ namespace BabyKusto.Core.Util
             else
             {
                 // TODO: Support all data types
-                throw new NotImplementedException($"Unsupported scalar type to create column from: {typeSymbol.Display}");
+                throw new NotImplementedException($"Unsupported scalar type to create column from: {SchemaDisplay.GetText(typeSymbol)}");
             }
         }
 
         public static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
         {
+            typeSymbol = typeSymbol.Simplify();
             if (typeSymbol == ScalarTypes.Int)
             {
                 return new ColumnBuilder<int?>(typeSymbol);
@@ -129,7 +133,7 @@ namespace BabyKusto.Core.Util
             else
             {
                 // TODO: Support all data types
-                throw new NotImplementedException($"Unsupported scalar type to create column builder from: {typeSymbol.Display}");
+                throw new NotImplementedException($"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
             }
         }
 

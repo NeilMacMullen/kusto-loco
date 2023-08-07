@@ -65,7 +65,7 @@ namespace BabyKusto.Server.Service
         {
             var resultType = (TableSymbol)tabularResult.Type;
             var tableWriter = writer.CreateTableWriter();
-            await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", resultType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = c.Type.Display }).ToList());
+            await tableWriter.StartAsync(0, KustoQueryV2ResponseTableKind.PrimaryResult, "PrimaryResult", resultType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = SchemaDisplay.GetText(c.Type) }).ToList());
             foreach (var chunk in tabularResult.Value.GetData())
             {
                 for (int i = 0; i < chunk.RowCount; i++)
@@ -126,7 +126,7 @@ namespace BabyKusto.Server.Service
                 );
                 var resultType = tableType;
                 var tableWriter = writer.CreateTableWriter();
-                await tableWriter.StartAsync(1, KustoQueryV2ResponseTableKind.QueryProperties, "QueryProperties", tableType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = c.Type.Display }).ToList());
+                await tableWriter.StartAsync(1, KustoQueryV2ResponseTableKind.QueryProperties, "QueryProperties", tableType.Columns.Select(c => new KustoApiV2ColumnDescription { ColumnName = c.Name, ColumnType = SchemaDisplay.GetText(c.Type) }).ToList());
 
                 tableWriter.StartRow();
                 tableWriter.WriteRowValue(JsonValue.Create(0));

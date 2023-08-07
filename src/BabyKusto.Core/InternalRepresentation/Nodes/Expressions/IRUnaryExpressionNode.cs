@@ -37,7 +37,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"UnaryExpression({Signature.Display}): {ResultType.Display}";
+            return $"UnaryExpression({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

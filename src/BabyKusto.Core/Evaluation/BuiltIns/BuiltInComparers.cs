@@ -56,7 +56,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         {
             if (!comparers.TryGetValue((direction, nullsDirections, type), out var comparer))
             {
-                throw new InvalidOperationException($"Comparer not implemented for {type.Display} {direction} nulls {nullsDirections}");
+                throw new InvalidOperationException($"Comparer not implemented for {SchemaDisplay.GetText(type)} {direction} nulls {nullsDirections}");
             }
 
             return comparer;

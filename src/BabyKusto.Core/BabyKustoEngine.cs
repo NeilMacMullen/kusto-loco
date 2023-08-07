@@ -80,7 +80,7 @@ namespace BabyKusto.Core
                     fnBefore: node =>
                     {
                         Console.Write(new string(' ', indent));
-                        Console.WriteLine($"{node.Kind}: {node.ToString(IncludeTrivia.SingleLine)}: {(node as Expression)?.ResultType?.Display}");
+                        Console.WriteLine($"{node.Kind}: {node.ToString(IncludeTrivia.SingleLine)}: {SchemaDisplay.GetText((node as Expression)?.ResultType)}");
                         indent++;
                     },
                     fnAfter: node =>

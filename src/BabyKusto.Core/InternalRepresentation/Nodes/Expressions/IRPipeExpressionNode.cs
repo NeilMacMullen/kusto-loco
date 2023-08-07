@@ -35,7 +35,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"PipeExpression: {ResultType.Display}";
+            return $"PipeExpression: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

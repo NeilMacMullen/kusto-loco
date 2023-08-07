@@ -32,7 +32,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"IRMemberAccess({MemberName}): {ResultType.Display}";
+            return $"IRMemberAccess({MemberName}): {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }

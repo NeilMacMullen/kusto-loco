@@ -36,7 +36,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override string ToString()
         {
-            return $"SummarizeOperator: {ResultType.Display}";
+            return $"SummarizeOperator: {SchemaDisplay.GetText(ResultType)}";
         }
     }
 }
