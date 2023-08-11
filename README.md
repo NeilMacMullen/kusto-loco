@@ -1,4 +1,5 @@
-[![NuGet Gallery | BabyKusto.Core](https://img.shields.io/nuget/v/BabyKusto.Core?style=plastic)](https://www.nuget.org/packages/BabyKusto.Core)
+[![NuGet Gallery | BabyKusto.Server](https://img.shields.io/nuget/vpre/BabyKusto.Core?label=BabyKusto.Core&style=plastic)](https://www.nuget.org/packages/BabyKusto.Core)
+[![NuGet Gallery | BabyKusto.Server](https://img.shields.io/nuget/vpre/BabyKusto.Server?label=BabyKusto.Server&style=plastic)](https://www.nuget.org/packages/BabyKusto.Server)
 
 # BabyKusto
 
