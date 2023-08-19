@@ -121,6 +121,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.UrlEncode_Component, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
             functions.Add(Functions.UrlDecode, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlDecodeFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
 
+            functions.Add(Functions.Extract, new ScalarFunctionInfo(new ScalarOverloadInfo(new ExtractRegexFunctionImpl(), ScalarTypes.String, ScalarTypes.String, ScalarTypes.Long, ScalarTypes.String)));
+
             functions.Add(Functions.ParseJson, new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new ParseJsonDynamicFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Dynamic),
                 new ScalarOverloadInfo(new ParseJsonStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String)));

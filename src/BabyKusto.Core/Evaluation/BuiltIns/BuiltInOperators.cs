@@ -146,6 +146,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             operators.Add(Operators.EndsWithCs, new ScalarFunctionInfo(new ScalarOverloadInfo(new EndsWithCsOperatorImpl(), ScalarTypes.Bool, ScalarTypes.String, ScalarTypes.String)));
             operators.Add(Operators.NotEndsWith, new ScalarFunctionInfo(new ScalarOverloadInfo(new NotEndsWithOperatorImpl(), ScalarTypes.Bool, ScalarTypes.String, ScalarTypes.String)));
             operators.Add(Operators.NotEndsWithCs, new ScalarFunctionInfo(new ScalarOverloadInfo(new NotEndsWithCsOperatorImpl(), ScalarTypes.Bool, ScalarTypes.String, ScalarTypes.String)));
+
+            operators.Add(Operators.MatchRegex, new ScalarFunctionInfo(new ScalarOverloadInfo(new MatchRegexOperatorImpl(), ScalarTypes.Bool, ScalarTypes.String, ScalarTypes.String)));
         }
 
         public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters)

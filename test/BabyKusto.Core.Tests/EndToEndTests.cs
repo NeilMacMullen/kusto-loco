@@ -1504,6 +1504,58 @@ https://example.com?a=b
         }
 
         [Fact]
+        public void BuiltIns_extract_Scalar()
+        {
+            // Arrange
+            string query = @"
+let pattern = '([0-9.]+) (s|ms)$';
+let input   = 'Operation took 127.5 ms';
+print duration    = extract(pattern, 1, input),
+      unit        = extract(pattern, 2, input),
+      all         = extract(pattern, 0, input),
+      outOfBounds = extract(pattern, 3, input)
+";
+
+            string expected = @"
+duration:string; unit:string; all:string; outOfBounds:string
+------------------
+127.5; ms; 127.5 ms; 
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_extract_Columnar()
+        {
+            // Arrange
+            string query = @"
+let pattern = '([0-9.]+) (s|ms)$';
+datatable(input:string) [
+    'Operation took 127.5 ms',
+    'Another operation took 234.75 s',
+    '',
+]
+| project duration    = extract(pattern, 1, input),
+          unit        = extract(pattern, 2, input),
+          all         = extract(pattern, 0, input),
+          outOfBounds = extract(pattern, 3, input)
+";
+
+            string expected = @"
+duration:string; unit:string; all:string; outOfBounds:string
+------------------
+127.5; ms; 127.5 ms; 
+234.75; s; 234.75 s; 
+; ; ; 
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_bin_Long()
         {
             // Arrange
@@ -2365,6 +2417,53 @@ True; False
 True; False
 False; True
 False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_MatchRegex_Scalar()
+        {
+            // Arrange
+            string query = @"
+print v1 = '' matches regex '[0-9]',
+      v2 = 'abc' matches regex '[0-9]',
+      v3 = 'a1c' matches regex '[0-9]'
+";
+
+            string expected = @"
+v1:bool; v2:bool; v3:bool
+------------------
+False; False; True
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BinOp_MatchRegex_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(s:string, p:string)
+[
+    '',    '[0-9]',
+    'abc', '[a-z]',
+    'a1c', '',
+]
+| project v1 = s matches regex '[0-9]',
+          v2 = '123abc' matches regex p
+";
+
+            string expected = @"
+v1:bool; v2:bool
+------------------
+False; True
+False; True
+True; True
 ";
 
             // Act & Assert
