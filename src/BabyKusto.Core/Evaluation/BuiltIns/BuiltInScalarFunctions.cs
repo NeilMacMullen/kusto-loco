@@ -100,6 +100,18 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.Bin, binFunctionInfo);
             functions.Add(Functions.Floor, binFunctionInfo);
 
+            functions.Add(Functions.DayOfWeek, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfWeekFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.DateTime)));
+            functions.Add(Functions.DayOfMonth, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfMonthFunctionImpl(), ScalarTypes.Int, ScalarTypes.DateTime)));
+            functions.Add(Functions.DayOfYear, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfYearFunctionImpl(), ScalarTypes.Int, ScalarTypes.DateTime)));
+            functions.Add(Functions.StartOfDay, new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfDayFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.EndOfDay, new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfDayFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.StartOfWeek, new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfWeekFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.EndOfWeek, new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfWeekFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.StartOfMonth, new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfMonthFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.EndOfMonth, new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfMonthFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.StartOfYear, new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfYearFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+            functions.Add(Functions.EndOfYear, new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfYearFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime)));
+
             var iffFunctionInfo = new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool, ScalarTypes.Bool, ScalarTypes.Bool),
                 new ScalarOverloadInfo(new IffIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Bool, ScalarTypes.Int, ScalarTypes.Int),

@@ -1634,6 +1634,183 @@ v1:real; v2:real
         }
 
         [Fact]
+        public void BuiltIns_DayOfWeek()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(1947-11-30 10:00:05),
+    datetime(1970-05-11),
+]
+| project v = dayofweek(d)";
+
+            string expected = @"
+v:timespan
+------------------
+00:00:00
+1.00:00:00
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_DayOfMonth()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2015-12-14),
+    datetime(2015-12-14 11:15),
+]
+| project v = dayofmonth(d)";
+
+            string expected = @"
+v:int
+------------------
+14
+14
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_DayOfYear()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2015-12-14),
+    datetime(2015-12-14 23:59:59.999),
+]
+| project v = dayofyear(d)";
+
+            string expected = @"
+v:int
+------------------
+348
+348
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_StartOfDay_EndOfDay()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2017-01-01),
+    datetime(2017-01-01 10:10:17),
+]
+| project v1 = startofday(d), v2 = endofday(d)";
+
+            string expected = @"
+v1:datetime; v2:datetime
+------------------
+2017-01-01T00:00:00.0000000; 2017-01-01T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-01-01T23:59:59.9999999
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_StartOfWeek_EndOfWeek()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2017-01-01),
+    datetime(2017-01-01 10:10:17),
+    datetime(2017-01-07),
+    datetime(2017-01-07 23:59:59.999),
+    datetime(2017-01-08),
+]
+| project v1 = startofweek(d), v2 = endofweek(d)";
+
+            string expected = @"
+v1:datetime; v2:datetime
+------------------
+2017-01-01T00:00:00.0000000; 2017-01-07T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-01-07T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-01-07T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-01-07T23:59:59.9999999
+2017-01-08T00:00:00.0000000; 2017-01-14T23:59:59.9999999
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_StartOfMonth_EndOfMonth()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2017-01-01),
+    datetime(2017-01-31 23:59:59.999),
+    datetime(2017-02-01),
+    datetime(2020-02-29 23:59:59.999),
+    datetime(2020-03-01),
+]
+| project v1 = startofmonth(d), v2 = endofmonth(d)";
+
+            string expected = @"
+v1:datetime; v2:datetime
+------------------
+2017-01-01T00:00:00.0000000; 2017-01-31T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-01-31T23:59:59.9999999
+2017-02-01T00:00:00.0000000; 2017-02-28T23:59:59.9999999
+2020-02-01T00:00:00.0000000; 2020-02-29T23:59:59.9999999
+2020-03-01T00:00:00.0000000; 2020-03-31T23:59:59.9999999
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_StartOfYear_EndOfYear()
+        {
+            // Arrange
+            string query = @"
+datatable(d:datetime)
+[
+    datetime(2017-01-01),
+    datetime(2017-02-01),
+    datetime(2020-02-29 23:59:59.999),
+    datetime(2020-03-01),
+]
+| project v1 = startofyear(d), v2 = endofyear(d)";
+
+            string expected = @"
+v1:datetime; v2:datetime
+------------------
+2017-01-01T00:00:00.0000000; 2017-12-31T23:59:59.9999999
+2017-01-01T00:00:00.0000000; 2017-12-31T23:59:59.9999999
+2020-01-01T00:00:00.0000000; 2020-12-31T23:59:59.9999999
+2020-01-01T00:00:00.0000000; 2020-12-31T23:59:59.9999999
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_array_length_Scalar()
         {
             // Arrange
