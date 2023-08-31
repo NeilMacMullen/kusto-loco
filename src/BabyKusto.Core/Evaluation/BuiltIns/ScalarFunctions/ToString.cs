@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Kusto.Language.Symbols;
 
@@ -179,7 +180,36 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(JsonNode? input)
         {
-            return input?.ToJsonString() ?? string.Empty;
+            if (input != null)
+            {
+                if (input is JsonValue valueNode)
+                {
+                    var value = valueNode.GetValue<object>();
+                    if (value is JsonElement element)
+                    {
+                        if (element.ValueKind == JsonValueKind.String)
+                        {
+                            return element.GetString();
+                        }
+                        else if (element.ValueKind == JsonValueKind.Null)
+                        {
+                            return string.Empty;
+                        }
+
+                        // For any other value kind, continue below and use input.ToJsonString...
+                    }
+                    else if (value is string stringValue)
+                    {
+                        return stringValue ?? string.Empty;
+                    }
+
+                    // For any other type, continue below and use input.ToJsonString...
+                }
+
+                return input.ToJsonString();
+            }
+
+            return string.Empty;
         }
     }
 

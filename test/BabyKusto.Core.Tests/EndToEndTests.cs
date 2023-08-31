@@ -2920,6 +2920,31 @@ a:string; b:string; c:string; d:string; e:string; f:string
         }
 
         [Fact]
+        public void Cast_ToStringFromDynamicString_Works()
+        {
+            // Arrange
+            string query = @"
+let a = parse_json('{""stringField"":""abc def"", ""intField"":123, ""realField"":1.5, ""nullField"":null, ""arrayField"":[1,2], ""objField"":{""a"":1}}');
+print stringField = tostring(a.stringField),
+      intField    = tostring(a.intField),
+      realField   = tostring(a.realField),
+      nullField   = tostring(a.nullField),
+      arrayField  = tostring(a.arrayField),
+      objField    = tostring(a.objField),
+      nonExistent = tostring(a.nonExistent)
+";
+
+            string expected = @"
+stringField:string; intField:string; realField:string; nullField:string; arrayField:string; objField:string; nonExistent:string
+------------------
+abc def; 123; 1.5; ; [1,2]; {""a"":1};
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Iff_Scalar()
         {
             // Arrange
