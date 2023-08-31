@@ -2877,6 +2877,49 @@ NaN
         }
 
         [Fact]
+        public void Cast_ToString_Scalar()
+        {
+            // Arrange
+            string query = @"
+print a=tostring(int(123)), b=tostring(long(234)), c=tostring(1.5), d=tostring(10s), e=tostring(datetime(2023-08-30 23:00)), f=tostring('abc'),
+      n1=tostring(int(null)), n2=tostring(long(null)), n3=tostring(real(null)), n4=tostring(timespan(null)), n5=tostring(datetime(null)), n6=tostring('')
+";
+
+            string expected = @"
+a:string; b:string; c:string; d:string; e:string; f:string; n1:string; n2:string; n3:string; n4:string; n5:string; n6:string
+------------------
+123; 234; 1.5; 00:00:10; 8/30/2023 11:00:00 PM; abc; ; ; ; ; ;
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void Cast_ToString_Columnar()
+        {
+            // Arrange
+            string query = @"
+datatable(a:int, b:long, c:real, d:timespan, e:datetime, f:string)
+[
+    123, 234, 1.5, 10s, datetime(2023-08-30 23:00), 'abc',
+    int(null), long(null), real(null), timespan(null), datetime(null), '',
+]
+| project a=tostring(a), b=tostring(b), c=tostring(c), d=tostring(d), e=tostring(e), f=tostring(f)
+";
+
+            string expected = @"
+a:string; b:string; c:string; d:string; e:string; f:string
+------------------
+123; 234; 1.5; 00:00:10; 8/30/2023 11:00:00 PM; abc
+; ; ; ; ;
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void Iff_Scalar()
         {
             // Arrange

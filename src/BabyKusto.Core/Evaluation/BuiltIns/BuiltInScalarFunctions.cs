@@ -130,6 +130,15 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.ToDouble, toDoubleFunctionInfo);
             functions.Add(Functions.ToBool, new ScalarFunctionInfo(new ScalarOverloadInfo(new ToBoolStringFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
 
+            functions.Add(Functions.ToString, new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new ToStringFromIntFunctionImpl(), ScalarTypes.String, ScalarTypes.Int),
+                new ScalarOverloadInfo(new ToStringFromLongFunctionImpl(), ScalarTypes.String, ScalarTypes.Long),
+                new ScalarOverloadInfo(new ToStringFromRealFunctionImpl(), ScalarTypes.String, ScalarTypes.Real),
+                new ScalarOverloadInfo(new ToStringFromTimeSpanFunctionImpl(), ScalarTypes.String, ScalarTypes.TimeSpan),
+                new ScalarOverloadInfo(new ToStringFromDateTimeFunctionImpl(), ScalarTypes.String, ScalarTypes.DateTime),
+                new ScalarOverloadInfo(new ToStringFromDynamicFunctionImpl(), ScalarTypes.String, ScalarTypes.Dynamic),
+                new ScalarOverloadInfo(new ToStringFromStringFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
+
             functions.Add(Functions.UrlEncode_Component, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
             functions.Add(Functions.UrlDecode, new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlDecodeFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
 
