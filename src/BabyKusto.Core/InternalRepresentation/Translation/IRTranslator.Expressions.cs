@@ -247,7 +247,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
             else
             {
-                throw new InvalidOperationException($"Function {SchemaDisplay.GetText(functionSymbol)} is not implemented.");
+                throw new InvalidOperationException($"Function {functionSymbol.Name}{SchemaDisplay.GetText(functionSymbol)} is not implemented.");
             }
         }
 
