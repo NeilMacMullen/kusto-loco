@@ -100,6 +100,13 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             functions.Add(Functions.Bin, binFunctionInfo);
             functions.Add(Functions.Floor, binFunctionInfo);
 
+            functions.Add(Functions.Exp, new ScalarFunctionInfo(new ScalarOverloadInfo(new ExpFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            functions.Add(Functions.Log, new ScalarFunctionInfo(new ScalarOverloadInfo(new LogFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            functions.Add(Functions.Log10, new ScalarFunctionInfo(new ScalarOverloadInfo(new Log10FunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            functions.Add(Functions.Log2, new ScalarFunctionInfo(new ScalarOverloadInfo(new Log2FunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            functions.Add(Functions.Pow, new ScalarFunctionInfo(new ScalarOverloadInfo(new PowFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
+            functions.Add(Functions.Sqrt, new ScalarFunctionInfo(new ScalarOverloadInfo(new SqrtFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+
             functions.Add(Functions.DayOfWeek, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfWeekFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.DateTime)));
             functions.Add(Functions.DayOfMonth, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfMonthFunctionImpl(), ScalarTypes.Int, ScalarTypes.DateTime)));
             functions.Add(Functions.DayOfYear, new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfYearFunctionImpl(), ScalarTypes.Int, ScalarTypes.DateTime)));

@@ -1634,6 +1634,127 @@ v1:real; v2:real
         }
 
         [Fact]
+        public void BuiltIns_LogExp()
+        {
+            // Arrange
+            string query = @"
+datatable(a:real) [ 1, 0.1, 10, 100 ]
+| project v1 = tolong(log(exp(a))*100+0.5)/100.0,
+          v2 = tolong(exp(log(a))*100+0.5)/100.0";
+
+            string expected = @"
+v1:real; v2:real
+------------------
+1; 1
+0.1; 0.1
+10; 10
+100; 100
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_Log10()
+        {
+            // Arrange
+            string query = @"
+datatable(a:real) [ 1, 0.1, 10, 100, -1 ]
+| project v = log10(a)";
+
+            string expected = @"
+v:real
+------------------
+0
+-1
+1
+2
+NaN
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_Log2()
+        {
+            // Arrange
+            string query = @"
+datatable(a:real) [ 1, 0.5, 2, 8, -1 ]
+| project v = log2(a)";
+
+            string expected = @"
+v:real
+------------------
+0
+-1
+1
+3
+NaN
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_Pow()
+        {
+            // Arrange
+            string query = @"
+datatable(x:real, y:real)
+[
+    10, 0,
+    10, 1,
+    10, 2,
+    10, 3,
+    10, -1,
+    real(null), 3,
+    3, real(null),
+]
+| project v = pow(x,y)";
+
+            string expected = @"
+v:real
+------------------
+1
+10
+100
+1000
+0.1
+(null)
+(null)
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
+        public void BuiltIns_Sqrt()
+        {
+            // Arrange
+            string query = @"
+datatable(a:real) [ 0, 1, 4, 9, -1 ]
+| project v = sqrt(a)";
+
+            string expected = @"
+v:real
+------------------
+0
+1
+2
+3
+NaN
+";
+
+            // Act & Assert
+            Test(query, expected);
+        }
+
+        [Fact]
         public void BuiltIns_DayOfWeek()
         {
             // Arrange
