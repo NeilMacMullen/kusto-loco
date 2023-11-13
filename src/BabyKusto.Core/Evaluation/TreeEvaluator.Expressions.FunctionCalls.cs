@@ -13,7 +13,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node, EvaluationContext context)
+        public override EvaluationResult VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache(
                 () =>
@@ -38,7 +38,7 @@ namespace BabyKusto.Core.Evaluation
             return impl(arguments);
         }
 
-        public override EvaluationResult? VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, EvaluationContext context)
+        public override EvaluationResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache(
                 () =>
@@ -63,7 +63,7 @@ namespace BabyKusto.Core.Evaluation
             return impl(arguments);
         }
 
-        public override EvaluationResult? VisitAggregateCallNode(IRAggregateCallNode node, EvaluationContext context)
+        public override EvaluationResult VisitAggregateCallNode(IRAggregateCallNode node, EvaluationContext context)
         {
             Debug.Assert(context.Chunk != null);
             var impl = node.GetOrSetCache(
@@ -109,7 +109,7 @@ namespace BabyKusto.Core.Evaluation
             return impl.Invoke(context.Chunk, arguments);
         }
 
-        public override EvaluationResult? VisitUserFunctionCall(IRUserFunctionCallNode node, EvaluationContext context)
+        public override EvaluationResult VisitUserFunctionCall(IRUserFunctionCallNode node, EvaluationContext context)
         {
             var lookup = context.Scope.Lookup(node.Signature.Symbol.Name);
             var functionSymbol = lookup?.Symbol as FunctionSymbol;
@@ -141,7 +141,7 @@ namespace BabyKusto.Core.Evaluation
             return node.ExpandedBody.Accept(this, new EvaluationContext(functionCallScope));
         }
 
-        public override EvaluationResult? VisitFunctionBody(IRFunctionBodyNode node, EvaluationContext context)
+        public override EvaluationResult VisitFunctionBody(IRFunctionBodyNode node, EvaluationContext context)
         {
             var statements = node.Statements;
             for (int i = 0; i < statements.ChildCount; i++)

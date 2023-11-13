@@ -14,7 +14,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitMaterializeExpression(IRMaterializeExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitMaterializeExpression(IRMaterializeExpressionNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left == null);
 

@@ -26,7 +26,7 @@ namespace BabyKusto.Core
             _globalTables.Add(table);
         }
 
-        public EvaluationResult? Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
+        public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
         {
             // TODO: davidni: Set up global state somehwere proper where it would be done just once
             var db = new DatabaseSymbol(

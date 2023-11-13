@@ -8,7 +8,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitRenderOperator(IRRenderOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitRenderOperator(IRRenderOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
 

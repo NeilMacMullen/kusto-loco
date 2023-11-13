@@ -11,7 +11,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitCastExpression(IRCastExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitCastExpression(IRCastExpressionNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache<Func<EvaluationResult[], EvaluationResult>>(
                 () =>

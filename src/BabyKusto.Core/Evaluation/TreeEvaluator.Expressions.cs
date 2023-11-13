@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
+        public override EvaluationResult VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
         {
             var lookup = context.Scope.Lookup(node.ReferencedSymbol.Name);
             if (lookup == null)
@@ -29,14 +29,14 @@ namespace BabyKusto.Core.Evaluation
             return value;
         }
 
-        public override EvaluationResult? VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, EvaluationContext context)
+        public override EvaluationResult VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, EvaluationContext context)
         {
             Debug.Assert(context.Chunk != null);
             var column = context.Chunk.Columns[node.ReferencedColumnIndex];
             return new ColumnarResult(column);
         }
 
-        public override EvaluationResult? VisitMemberAccess(IRMemberAccessNode node, EvaluationContext context)
+        public override EvaluationResult VisitMemberAccess(IRMemberAccessNode node, EvaluationContext context)
         {
             if (node.ResultKind == EvaluatedExpressionKind.Columnar)
             {
@@ -83,12 +83,12 @@ namespace BabyKusto.Core.Evaluation
             }
         }
 
-        public override EvaluationResult? VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
         {
             return new ScalarResult(node.ResultType, node.Value);
         }
 
-        public override EvaluationResult? VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
         {
             var left = (TabularResult?)node.Expression.Accept(this, context);
             if (left == null)
@@ -99,7 +99,7 @@ namespace BabyKusto.Core.Evaluation
             return node.Operator.Accept(this, context with { Left = left });
         }
 
-        public override EvaluationResult? VisitDataTableExpression(IRDataTableExpression node, EvaluationContext context)
+        public override EvaluationResult VisitDataTableExpression(IRDataTableExpression node, EvaluationContext context)
         {
             var tableSymbol = (TableSymbol)node.ResultType;
 

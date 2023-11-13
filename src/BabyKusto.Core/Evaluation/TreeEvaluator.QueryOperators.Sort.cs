@@ -16,7 +16,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
             var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];

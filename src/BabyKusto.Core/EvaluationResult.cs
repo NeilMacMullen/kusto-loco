@@ -6,8 +6,20 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation
 {
-    public abstract class EvaluationResult
+    public class NullTypeSymbol : TypeSymbol
     {
+        public static readonly TypeSymbol Instance = new NullTypeSymbol();
+
+        private NullTypeSymbol() : base(string.Empty)
+        {
+
+        }
+    }
+
+    public class EvaluationResult
+    {
+
+
         protected EvaluationResult(TypeSymbol type)
         {
             Type = type;
@@ -23,7 +35,11 @@ namespace BabyKusto.Core.Evaluation
         {
             return $"{this.GetType().Name}: {SchemaDisplay.GetText(Type)}";
         }
+
+        public static readonly EvaluationResult Null = new EvaluationResult(NullTypeSymbol.Instance);
     }
+
+   
 
     public sealed class ScalarResult : EvaluationResult
     {

@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
             var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);

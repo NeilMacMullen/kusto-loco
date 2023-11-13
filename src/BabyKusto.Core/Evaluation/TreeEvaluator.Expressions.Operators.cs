@@ -9,7 +9,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitUnaryExpression(IRUnaryExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitUnaryExpression(IRUnaryExpressionNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache(
                 () =>
@@ -24,7 +24,7 @@ namespace BabyKusto.Core.Evaluation
             return impl(arguments);
         }
 
-        public override EvaluationResult? VisitBinaryExpression(IRBinaryExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitBinaryExpression(IRBinaryExpressionNode node, EvaluationContext context)
         {
             var impl = node.GetOrSetCache(
                 () =>

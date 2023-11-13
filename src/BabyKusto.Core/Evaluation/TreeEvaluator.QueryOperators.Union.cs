@@ -14,7 +14,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitUnionOperator(IRUnionOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitUnionOperator(IRUnionOperatorNode node, EvaluationContext context)
         {
             var tables = new List<ITableSource>((context.Left != null ? 1 : 0) + node.Expressions.ChildCount);
             VisualizationState? visualizationState = null;

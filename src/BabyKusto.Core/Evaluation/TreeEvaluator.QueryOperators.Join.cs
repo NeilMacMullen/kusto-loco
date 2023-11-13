@@ -15,7 +15,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitJoinOperator(IRJoinOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitJoinOperator(IRJoinOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
             var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context, node.OnClauses, (TableSymbol)node.ResultType);
@@ -48,9 +48,9 @@ namespace BabyKusto.Core.Evaluation
             {
                 var rightContext = new EvaluationContext(_context.Scope);
                 var rightResult = _rightExpression.Accept(_owner, rightContext);
-                if (rightResult == null || !rightResult.IsTabular)
+                if (rightResult == EvaluationResult.Null || !rightResult.IsTabular)
                 {
-                    throw new InvalidOperationException($"Expected right expression to produce tabular result, got {SchemaDisplay.GetText(rightResult?.Type)}");
+                    throw new InvalidOperationException($"Expected right expression to produce tabular result, got {SchemaDisplay.GetText(rightResult.Type)}");
                 }
 
                 var rightTabularResult = (TabularResult)rightResult;

@@ -11,7 +11,7 @@ namespace BabyKusto.Core.Extensions
 {
     public static class EvaluationResultExtensions
     {
-        public static void Dump(this EvaluationResult? result, TextWriter writer, int indent = 0)
+        public static void Dump(this EvaluationResult result, TextWriter writer, int indent = 0)
         {
             switch (result)
             {

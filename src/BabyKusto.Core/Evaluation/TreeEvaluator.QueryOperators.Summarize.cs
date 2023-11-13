@@ -14,7 +14,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
             var byExpressions = new List<IRExpressionNode>();

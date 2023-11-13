@@ -11,7 +11,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
+        public override EvaluationResult VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
         {
             Debug.Assert(context.Left != null);
 

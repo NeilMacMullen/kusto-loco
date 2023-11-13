@@ -10,7 +10,7 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
-        public override EvaluationResult? VisitToScalarExpressionNode(IRToScalarExpressionNode node, EvaluationContext context)
+        public override EvaluationResult VisitToScalarExpressionNode(IRToScalarExpressionNode node, EvaluationContext context)
         {
             var result = node.Expression.Accept(this, context);
             Debug.Assert(result != null);
