@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <!-- Lots of spurious warnings when enabling nullable support and targeting old frameworks, so we only enable it for new-ish targets -->
     <Nullable Condition=" '$(TargetFramework)' == 'netstandard2.0' ">annotations</Nullable>
     <Nullable Condition=" '$(TargetFramework)' != 'netstandard2.0' ">enable</Nullable>
-    <LangVersion>10</LangVersion>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>

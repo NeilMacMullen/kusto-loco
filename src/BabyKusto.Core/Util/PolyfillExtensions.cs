@@ -7,6 +7,7 @@ namespace System.Collections.Generic
     internal static class PolyfillDictionaryExtensions
     {
         internal static bool TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        where TKey :notnull
         {
             try
             {

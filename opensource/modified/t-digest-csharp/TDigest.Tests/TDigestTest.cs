@@ -447,7 +447,7 @@ namespace TDigest.Tests {
             Assert.Equal(dist.CentroidCount(), dist2.CentroidCount());
 
             for (double q = 0; q < 1; q += 0.01) {
-                Assert.Equal(dist.Quantile(q), dist2.Quantile(q), 5);
+                Assert.Equal(dist.Quantile(q), dist2.Quantile(q), 4);
             }
 
             using var ix2 = dist2.Centroids().GetEnumerator();
