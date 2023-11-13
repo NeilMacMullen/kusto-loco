@@ -21,7 +21,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<int?>)(arguments[0].Column);
 
             var data = new int?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
             }
@@ -43,7 +43,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<long?>)(arguments[0].Column);
 
             var data = new long?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
             }
@@ -65,7 +65,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<double?>)(arguments[0].Column);
 
             var data = new double?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
             }
@@ -87,7 +87,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<TimeSpan?>)(arguments[0].Column);
 
             var data = new TimeSpan?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = -column[i];
             }

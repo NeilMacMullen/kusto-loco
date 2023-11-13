@@ -16,7 +16,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<int?>)arguments[0].Column;
 
             var list = new List<int?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }
@@ -33,7 +33,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<long?>)arguments[0].Column;
 
             var list = new List<long?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }
@@ -50,7 +50,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<double?>)arguments[0].Column;
 
             var list = new List<double?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }
@@ -67,7 +67,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
 
             var list = new List<TimeSpan?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }
@@ -84,7 +84,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<DateTime?>)arguments[0].Column;
 
             var list = new List<DateTime?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }
@@ -101,7 +101,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valuesColumn = (Column<string?>)arguments[0].Column;
 
             var list = new List<string?>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 list.Add(valuesColumn[i]);
             }

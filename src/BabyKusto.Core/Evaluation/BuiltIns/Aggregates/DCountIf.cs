@@ -81,7 +81,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             // TODO: Use HLL like real Kusto
             var seen = new HashSet<T>();
-            for (int i = 0; i < values.RowCount; i++)
+            for (var i = 0; i < values.RowCount; i++)
             {
                 if (predicates[i] == true)
                 {
@@ -100,7 +100,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             // TODO: Use HLL like real Kusto
             var seen = new HashSet<string>();
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 if (predicates[i] == true)
                 {

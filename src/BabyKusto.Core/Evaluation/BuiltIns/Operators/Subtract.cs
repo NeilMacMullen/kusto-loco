@@ -25,7 +25,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<int?>)(arguments[1].Column);
 
             var data = new int?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
@@ -53,7 +53,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<long?>)(arguments[1].Column);
 
             var data = new long?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
@@ -81,7 +81,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<double?>)(arguments[1].Column);
 
             var data = new double?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
@@ -109,7 +109,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
 
             var data = new TimeSpan?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value.Ticks - right.Value.Ticks) : null;
@@ -137,7 +137,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
 
             var data = new DateTime?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
@@ -165,7 +165,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<DateTime?>)(arguments[1].Column);
 
             var data = new TimeSpan?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;

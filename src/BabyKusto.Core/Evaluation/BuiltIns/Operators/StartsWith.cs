@@ -24,7 +24,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<string?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = (left[i] ?? string.Empty).ToUpperInvariant().StartsWith((right[i] ?? string.Empty).ToUpperInvariant());
             }

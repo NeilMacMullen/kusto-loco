@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var dates = (Column<DateTime?>)arguments[0].Column;
 
             var data = new TimeSpan?[dates.RowCount];
-            for (int i = 0; i < dates.RowCount; i++)
+            for (var i = 0; i < dates.RowCount; i++)
             {
                 data[i] = Impl(dates[i]);
             }

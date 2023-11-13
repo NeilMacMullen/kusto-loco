@@ -25,7 +25,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var yCol = (Column<double?>)(arguments[1].Column);
 
             var data = new double?[xCol.RowCount];
-            for (int i = 0; i < xCol.RowCount; i++)
+            for (var i = 0; i < xCol.RowCount; i++)
             {
                 data[i] = Impl(xCol[i], yCol[i]);
             }

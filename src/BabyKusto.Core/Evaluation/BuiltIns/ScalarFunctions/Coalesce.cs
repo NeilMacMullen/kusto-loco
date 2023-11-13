@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             bool? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (bool?)arguments[i].Value;
                 if (item.HasValue)
@@ -29,11 +29,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new bool?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<bool?>)arguments[i].Column;
                     var item = column[j];
@@ -54,7 +54,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             int? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (int?)arguments[i].Value;
                 if (item.HasValue)
@@ -71,11 +71,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new int?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<int?>)arguments[i].Column;
                     var item = column[j];
@@ -96,7 +96,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             long? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (long?)arguments[i].Value;
                 if (item.HasValue)
@@ -113,11 +113,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new long?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<long?>)arguments[i].Column;
                     var item = column[j];
@@ -138,7 +138,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             double? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (double?)arguments[i].Value;
                 if (item.HasValue)
@@ -155,11 +155,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new double?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<double?>)arguments[i].Column;
                     var item = column[j];
@@ -180,7 +180,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             DateTime? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (DateTime?)arguments[i].Value;
                 if (item.HasValue)
@@ -197,11 +197,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new DateTime?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<DateTime?>)arguments[i].Column;
                     var item = column[j];
@@ -222,7 +222,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
             TimeSpan? result = null;
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (TimeSpan?)arguments[i].Value;
                 if (item.HasValue)
@@ -239,11 +239,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new TimeSpan?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<TimeSpan?>)arguments[i].Column;
                     var item = column[j];
@@ -263,8 +263,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
     {
         public ScalarResult InvokeScalar(ScalarResult[] arguments)
         {
-            string? result = string.Empty;
-            for (int i = 0; i < arguments.Length; i++)
+            var result = string.Empty;
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var item = (string?)arguments[i].Value;
                 if (!string.IsNullOrEmpty(item))
@@ -281,11 +281,11 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
 
-            int numRows = arguments[0].Column.RowCount;
+            var numRows = arguments[0].Column.RowCount;
             var data = new string?[numRows];
-            for (int j = 0; j < numRows; j++)
+            for (var j = 0; j < numRows; j++)
             {
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var column = (Column<string?>)arguments[i].Column;
                     var item = column[j];

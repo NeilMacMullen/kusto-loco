@@ -23,8 +23,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     continue;
                 }
 
-                bool compatible = true;
-                for (int i = 0; i < arguments.Length; i++)
+                var compatible = true;
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     var argument = arguments[i];
                     var parameterType = overload.ParameterTypes[i];
@@ -32,7 +32,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                     var simplifiedArgType = argument.ResultType.Simplify();
                     var simplifiedParamType = parameterType.Simplify();
 
-                    bool thisCompatible =
+                    var thisCompatible =
                         simplifiedArgType == simplifiedParamType ||
                         (simplifiedArgType is ScalarSymbol scalarArg && simplifiedParamType is ScalarSymbol scalarParam && scalarParam.IsWiderThan(scalarArg)) ||
                         simplifiedParamType == ScalarTypes.String; // TODO: Is it true that anything is coercible to string?
@@ -60,12 +60,12 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
         {
             if (resultKind == EvaluatedExpressionKind.Scalar)
             {
-                int expectedNumArgs = argumentExpressions.Length;
+                var expectedNumArgs = argumentExpressions.Length;
                 return (EvaluationResult[] arguments) =>
                 {
                     Debug.Assert(arguments.Length == expectedNumArgs);
                     var scalarArgs = new ScalarResult[arguments.Length];
-                    for (int i = 0; i < arguments.Length; i++)
+                    for (var i = 0; i < arguments.Length; i++)
                     {
                         scalarArgs[i] = (ScalarResult)arguments[i];
                     }
@@ -76,9 +76,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
             }
             else if (resultKind == EvaluatedExpressionKind.Columnar)
             {
-                int firstColumnarArgIndex = -1;
+                var firstColumnarArgIndex = -1;
                 var argNeedsExpansion = new bool[argumentExpressions.Length];
-                for (int i = 0; i < argumentExpressions.Length; i++)
+                for (var i = 0; i < argumentExpressions.Length; i++)
                 {
                     if (argumentExpressions[i].ResultKind == EvaluatedExpressionKind.Columnar)
                     {
@@ -105,7 +105,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
                     var numRows = ((ColumnarResult)arguments[firstColumnarArgIndex]).Column.RowCount;
                     var columnarArgs = new ColumnarResult[arguments.Length];
-                    for (int i = 0; i < arguments.Length; i++)
+                    for (var i = 0; i < arguments.Length; i++)
                     {
                         if (!argNeedsExpansion[i])
                         {
@@ -136,9 +136,9 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 throw new InvalidOperationException($"Unexpected result kind {resultKind}");
             }
 
-            int firstColumnarArgIndex = -1;
+            var firstColumnarArgIndex = -1;
             var argNeedsExpansion = new bool[argumentExpressions.Length];
-            for (int i = 0; i < argumentExpressions.Length; i++)
+            for (var i = 0; i < argumentExpressions.Length; i++)
             {
                 if (argumentExpressions[i].ResultKind == EvaluatedExpressionKind.Columnar)
                 {
@@ -167,7 +167,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
 
                 var numRows = ((ColumnarResult)arguments[firstColumnarArgIndex]).Column.RowCount;
                 var columnarArgs = new ColumnarResult[arguments.Length];
-                for (int i = 0; i < arguments.Length; i++)
+                for (var i = 0; i < arguments.Length; i++)
                 {
                     if (!argNeedsExpansion[i])
                     {

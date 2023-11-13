@@ -140,7 +140,7 @@ namespace BabyKusto.Core.Util
         private static Column<T> CreateFromObjectArray<T>(object?[] data, TypeSymbol typeSymbol)
         {
             var columnData = new T?[data.Length];
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 columnData[i] = (T?)data[i];
             }
@@ -151,7 +151,7 @@ namespace BabyKusto.Core.Util
         private static Column<int?> CreateFromIntsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
             var columnData = new int?[data.Length];
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var item = data[i];
                 columnData[i] = item == null ? null : Convert.ToInt32(item);
@@ -163,7 +163,7 @@ namespace BabyKusto.Core.Util
         private static Column<long?> CreateFromLongsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
             var columnData = new long?[data.Length];
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var item = data[i];
                 columnData[i] = item == null ? null : Convert.ToInt64(item);
@@ -175,7 +175,7 @@ namespace BabyKusto.Core.Util
         private static Column<double?> CreateFromDoublesObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
             var columnData = new double?[data.Length];
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var item = data[i];
                 columnData[i] = item == null ? null : Convert.ToDouble(item);
@@ -187,7 +187,7 @@ namespace BabyKusto.Core.Util
         private static Column<bool?> CreateFromBoolsObjectArray(object?[] data, TypeSymbol typeSymbol)
         {
             var columnData = new bool?[data.Length];
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 var item = data[i];
                 columnData[i] = item == null ? null : Convert.ToBoolean(item);
@@ -199,7 +199,7 @@ namespace BabyKusto.Core.Util
         private static Column<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount)
         {
             var columnData = new T[rowCount];
-            for (int i = 0; i < rowCount; i++)
+            for (var i = 0; i < rowCount; i++)
             {
                 columnData[i] = value;
             }

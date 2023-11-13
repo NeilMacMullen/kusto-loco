@@ -36,7 +36,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 
             var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
             var data = new string?[values.RowCount];
-            for (int i = 0; i < values.RowCount; i++)
+            for (var i = 0; i < values.RowCount; i++)
             {
                 var pattern = patterns[i];
                 if (i == 0 || !string.Equals(pattern, cacheEntry.Pattern))

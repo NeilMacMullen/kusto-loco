@@ -49,7 +49,7 @@ namespace BabyKusto.Core.Evaluation
                 var itemsCol = (Column<JsonNode?>)items.Column;
 
                 var data = new JsonNode?[itemsCol.RowCount];
-                for (int i = 0; i < items.Column.RowCount; i++)
+                for (var i = 0; i < items.Column.RowCount; i++)
                 {
                     if (itemsCol[i] is JsonObject obj)
                     {
@@ -103,14 +103,14 @@ namespace BabyKusto.Core.Evaluation
         {
             var tableSymbol = (TableSymbol)node.ResultType;
 
-            int numColumns = tableSymbol.Columns.Count;
-            int numRows = node.Data.Length / numColumns;
+            var numColumns = tableSymbol.Columns.Count;
+            var numRows = node.Data.Length / numColumns;
 
             var columns = new Column[numColumns];
-            for (int j = 0; j < numColumns; j++)
+            for (var j = 0; j < numColumns; j++)
             {
                 var columnData = new object?[numRows];
-                for (int i = 0; i < numRows; i++)
+                for (var i = 0; i < numRows; i++)
                 {
                     columnData[i] = node.Data[i * numColumns + j];
                 }

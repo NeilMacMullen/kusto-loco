@@ -15,7 +15,7 @@ namespace BabyKusto.Core.Evaluation
             var tableSymbol = (TableSymbol)node.ResultType;
 
             var columns = new Column[node.Expressions.ChildCount];
-            for (int i = 0; i < node.Expressions.ChildCount; i++)
+            for (var i = 0; i < node.Expressions.ChildCount; i++)
             {
                 var expression = node.Expressions.GetChild(i);
                 var expressionResult = expression.Accept(this, context);

@@ -69,7 +69,7 @@ namespace Microsoft.Extensions.Internal
             {
                 ProcessArrayType(builder, type, options);
             }
-            else if (_builtInTypeNames.TryGetValue(type, out string? builtInName))
+            else if (_builtInTypeNames.TryGetValue(type, out var builtInName))
             {
                 builder.Append(builtInName);
             }
@@ -82,7 +82,7 @@ namespace Microsoft.Extensions.Internal
             }
             else
             {
-                string name = options.FullName ? type.FullName! : type.Name;
+                var name = options.FullName ? type.FullName! : type.Name;
                 builder.Append(name);
 
                 if (options.NestedTypeDelimiter != DefaultNestedTypeDelimiter)
@@ -94,7 +94,7 @@ namespace Microsoft.Extensions.Internal
 
         private static void ProcessArrayType(StringBuilder builder, Type type, in DisplayNameOptions options)
         {
-            Type innerType = type;
+            var innerType = type;
             while (innerType.IsArray)
             {
                 innerType = innerType.GetElementType()!;
@@ -113,7 +113,7 @@ namespace Microsoft.Extensions.Internal
 
         private static void ProcessGenericType(StringBuilder builder, Type type, Type[] genericArguments, int length, in DisplayNameOptions options)
         {
-            int offset = 0;
+            var offset = 0;
             if (type.IsNested)
             {
                 offset = type.DeclaringType!.GetGenericArguments().Length;
@@ -133,7 +133,7 @@ namespace Microsoft.Extensions.Internal
                 }
             }
 
-            int genericPartIndex = type.Name.IndexOf('`');
+            var genericPartIndex = type.Name.IndexOf('`');
             if (genericPartIndex <= 0)
             {
                 builder.Append(type.Name);
@@ -145,7 +145,7 @@ namespace Microsoft.Extensions.Internal
             if (options.IncludeGenericParameters)
             {
                 builder.Append('<');
-                for (int i = offset; i < length; i++)
+                for (var i = offset; i < length; i++)
                 {
                     ProcessType(builder, genericArguments[i], options);
                     if (i + 1 == length)

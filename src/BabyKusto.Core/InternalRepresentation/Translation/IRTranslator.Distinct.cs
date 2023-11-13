@@ -22,7 +22,7 @@ namespace BabyKusto.Core.InternalRepresentation
                 }
 
                 var table = (TableSymbol)node.ResultType;
-                for (int i = 0; i < table.Columns.Count; i++)
+                for (var i = 0; i < table.Columns.Count; i++)
                 {
                     var column = table.Columns[i];
                     irExpressions.Add(new IRRowScopeNameReferenceNode(column, column.Type, i));

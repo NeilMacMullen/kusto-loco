@@ -16,7 +16,7 @@ namespace BabyKusto.Core.Evaluation
         {
             Debug.Assert(context.Left != null);
             var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
-            for (int i = 0; i < node.Columns.ChildCount; i++)
+            for (var i = 0; i < node.Columns.ChildCount; i++)
             {
                 columns.Add(node.Columns.GetTypedChild(i));
             }

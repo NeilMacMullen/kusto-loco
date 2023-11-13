@@ -15,7 +15,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<int?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -28,7 +28,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<int>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (v.HasValue)
@@ -52,7 +52,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<long?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -65,7 +65,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<long>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (v.HasValue)
@@ -89,7 +89,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<double?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -102,7 +102,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<double>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (v.HasValue)
@@ -126,7 +126,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -139,7 +139,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<TimeSpan>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (v.HasValue)
@@ -163,7 +163,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<DateTime?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -176,7 +176,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<DateTime>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (v.HasValue)
@@ -200,7 +200,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
             var valuesColumn = (Column<string?>)arguments[0].Column;
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 2)
             {
                 var maxSizeColumn = (Column<long?>)arguments[1].Column;
@@ -213,7 +213,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var list = new List<string>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 var v = valuesColumn[i];
                 if (!string.IsNullOrEmpty(v))

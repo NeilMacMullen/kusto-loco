@@ -27,7 +27,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var lengthCol = (Column<long?>)arguments[2].Column;
 
             var data = new string?[inputCol.RowCount];
-            for (int i = 0; i < inputCol.RowCount; i++)
+            for (var i = 0; i < inputCol.RowCount; i++)
             {
                 data[i] = Impl(inputCol[i], startCol[i], lengthCol[i]);
             }

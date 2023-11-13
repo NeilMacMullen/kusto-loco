@@ -90,7 +90,7 @@ namespace BabyKusto.Core.Evaluation
                     var onValuesColumns = new List<Column>(_onClauses.Count);
                     {
                         var chunkContext = new EvaluationContext(_context.Scope, Chunk: chunk);
-                        for (int i = 0; i < onExpressions.Length; i++)
+                        for (var i = 0; i < onExpressions.Length; i++)
                         {
                             var onExpression = onExpressions[i];
                             var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
@@ -101,7 +101,7 @@ namespace BabyKusto.Core.Evaluation
                     }
 
                     var numRows = chunk.RowCount;
-                    for (int i = 0; i < numRows; i++)
+                    for (var i = 0; i < numRows; i++)
                     {
                         var onValues = onValuesColumns.Select(c => (object?)c.RawData.GetValue(i)).ToList();
 
@@ -111,7 +111,7 @@ namespace BabyKusto.Core.Evaluation
                         if (!result.Buckets.TryGetValue(key, out var bucket))
                         {
                             bucket = (OnValues: onValues, Data: new ColumnBuilder[numColumns]);
-                            for (int j = 0; j < numColumns; j++)
+                            for (var j = 0; j < numColumns; j++)
                             {
                                 bucket.Data[j] = ColumnHelpers.CreateBuilder(chunk.Columns[j].Type);
                             }
@@ -119,7 +119,7 @@ namespace BabyKusto.Core.Evaluation
                             result.Buckets.Add(key, bucket);
                         }
 
-                        for (int j = 0; j < numColumns; j++)
+                        for (var j = 0; j < numColumns; j++)
                         {
                             bucket.Data[j].Add(chunk.Columns[j].RawData.GetValue(i));
                         }
@@ -136,38 +136,38 @@ namespace BabyKusto.Core.Evaluation
             /// </param>
             private IEnumerable<ITableChunk> InnerJoin(BucketedRows left, BucketedRows right, bool dedupeLeft)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
 
                 foreach (var kvp in left.Buckets)
                 {
-                    int numLeftRows = dedupeLeft ? 1 : kvp.Value.Data[0].RowCount;
+                    var numLeftRows = dedupeLeft ? 1 : kvp.Value.Data[0].RowCount;
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
                         Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
                         Debug.Assert(numRightColumns == rightValue.Data.Length);
-                        int numRightRows = rightValue.Data[0].RowCount;
+                        var numRightRows = rightValue.Data[0].RowCount;
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int j = 0; j < numRightRows; j++)
+                            for (var j = 0; j < numRightRows; j++)
                             {
-                                for (int c = 0; c < numLeftColumns; c++)
+                                for (var c = 0; c < numLeftColumns; c++)
                                 {
                                     var leftCol = kvp.Value.Data[c];
                                     resultColumns[c].Add(leftCol[i]);
                                 }
 
-                                for (int c = 0; c < numRightColumns; c++)
+                                for (var c = 0; c < numRightColumns; c++)
                                 {
                                     var rightCol = rightValue.Data[c];
                                     resultColumns[numLeftColumns + c].Add(rightCol[j]);
@@ -186,9 +186,9 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
@@ -198,7 +198,7 @@ namespace BabyKusto.Core.Evaluation
                     if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
                     {
                         Debug.Assert(numLeftColumns == leftValue.Data.Length);
-                        for (int i = 0; i < numLeftColumns; i++)
+                        for (var i = 0; i < numLeftColumns; i++)
                         {
                             resultColumns[i].AddRange(leftValue.Data[i]);
                         }
@@ -214,9 +214,9 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
             {
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numRightColumns];
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
@@ -226,7 +226,7 @@ namespace BabyKusto.Core.Evaluation
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
                         Debug.Assert(numRightColumns == rightValue.Data.Length);
-                        for (int i = 0; i < numRightColumns; i++)
+                        for (var i = 0; i < numRightColumns; i++)
                         {
                             resultColumns[i].AddRange(rightValue.Data[i]);
                         }
@@ -242,9 +242,9 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
@@ -254,7 +254,7 @@ namespace BabyKusto.Core.Evaluation
                     if (!right.Buckets.ContainsKey(kvp.Key))
                     {
                         Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
-                        for (int i = 0; i < numLeftColumns; i++)
+                        for (var i = 0; i < numLeftColumns; i++)
                         {
                             resultColumns[i].AddRange(kvp.Value.Data[i]);
                         }
@@ -270,9 +270,9 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
             {
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numRightColumns];
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
@@ -282,7 +282,7 @@ namespace BabyKusto.Core.Evaluation
                     if (!left.Buckets.ContainsKey(kvp.Key))
                     {
                         Debug.Assert(numRightColumns == kvp.Value.Data.Length);
-                        for (int i = 0; i < numRightColumns; i++)
+                        for (var i = 0; i < numRightColumns; i++)
                         {
                             resultColumns[i].AddRange(kvp.Value.Data[i]);
                         }
@@ -298,14 +298,14 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
@@ -313,24 +313,24 @@ namespace BabyKusto.Core.Evaluation
                 foreach (var kvp in left.Buckets)
                 {
                     Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
-                    int numLeftRows = kvp.Value.Data[0].RowCount;
+                    var numLeftRows = kvp.Value.Data[0].RowCount;
 
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
                         Debug.Assert(numRightColumns == rightValue.Data.Length);
-                        int numRightRows = rightValue.Data[0].RowCount;
+                        var numRightRows = rightValue.Data[0].RowCount;
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int j = 0; j < numRightRows; j++)
+                            for (var j = 0; j < numRightRows; j++)
                             {
-                                for (int c = 0; c < numLeftColumns; c++)
+                                for (var c = 0; c < numLeftColumns; c++)
                                 {
                                     var leftCol = kvp.Value.Data[c];
                                     resultColumns[c].Add(leftCol[i]);
                                 }
 
-                                for (int c = 0; c < numRightColumns; c++)
+                                for (var c = 0; c < numRightColumns; c++)
                                 {
                                     var rightCol = rightValue.Data[c];
                                     resultColumns[numLeftColumns + c].Add(rightCol[j]);
@@ -341,15 +341,15 @@ namespace BabyKusto.Core.Evaluation
                     else
                     {
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int c = 0; c < numLeftColumns; c++)
+                            for (var c = 0; c < numLeftColumns; c++)
                             {
                                 var leftCol = kvp.Value.Data[c];
                                 resultColumns[c].Add(leftCol[i]);
                             }
 
-                            for (int c = 0; c < numRightColumns; c++)
+                            for (var c = 0; c < numRightColumns; c++)
                             {
                                 resultColumns[numLeftColumns + c].Add(null);
                             }
@@ -366,14 +366,14 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> RightOuterJoin(BucketedRows left, BucketedRows right)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
@@ -381,24 +381,24 @@ namespace BabyKusto.Core.Evaluation
                 foreach (var kvp in right.Buckets)
                 {
                     Debug.Assert(numRightColumns == kvp.Value.Data.Length);
-                    int numRightRows = kvp.Value.Data[0].RowCount;
+                    var numRightRows = kvp.Value.Data[0].RowCount;
 
                     if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
                     {
                         Debug.Assert(numLeftColumns == leftValue.Data.Length);
-                        int numLeftRows = leftValue.Data[0].RowCount;
+                        var numLeftRows = leftValue.Data[0].RowCount;
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int j = 0; j < numRightRows; j++)
+                            for (var j = 0; j < numRightRows; j++)
                             {
-                                for (int c = 0; c < numLeftColumns; c++)
+                                for (var c = 0; c < numLeftColumns; c++)
                                 {
                                     var leftCol = leftValue.Data[c];
                                     resultColumns[c].Add(leftCol[i]);
                                 }
 
-                                for (int c = 0; c < numRightColumns; c++)
+                                for (var c = 0; c < numRightColumns; c++)
                                 {
                                     var rightCol = kvp.Value.Data[c];
                                     resultColumns[numLeftColumns + c].Add(rightCol[j]);
@@ -408,14 +408,14 @@ namespace BabyKusto.Core.Evaluation
                     }
                     else
                     {
-                        for (int i = 0; i < numRightRows; i++)
+                        for (var i = 0; i < numRightRows; i++)
                         {
-                            for (int c = 0; c < numLeftColumns; c++)
+                            for (var c = 0; c < numLeftColumns; c++)
                             {
                                 resultColumns[c].Add(null);
                             }
 
-                            for (int c = 0; c < numRightColumns; c++)
+                            for (var c = 0; c < numRightColumns; c++)
                             {
                                 var rightCol = kvp.Value.Data[c];
                                 resultColumns[numLeftColumns + c].Add(rightCol[i]);
@@ -433,14 +433,14 @@ namespace BabyKusto.Core.Evaluation
 
             private IEnumerable<ITableChunk> FullOuterJoin(BucketedRows left, BucketedRows right)
             {
-                int numLeftColumns = left.Table.Type.Columns.Count;
-                int numRightColumns = right.Table.Type.Columns.Count;
+                var numLeftColumns = left.Table.Type.Columns.Count;
+                var numRightColumns = right.Table.Type.Columns.Count;
                 var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
-                for (int i = 0; i < numLeftColumns; i++)
+                for (var i = 0; i < numLeftColumns; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
                 }
-                for (int i = 0; i < numRightColumns; i++)
+                for (var i = 0; i < numRightColumns; i++)
                 {
                     resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
                 }
@@ -448,24 +448,24 @@ namespace BabyKusto.Core.Evaluation
                 foreach (var kvp in left.Buckets)
                 {
                     Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
-                    int numLeftRows = kvp.Value.Data[0].RowCount;
+                    var numLeftRows = kvp.Value.Data[0].RowCount;
 
                     if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                     {
                         Debug.Assert(numRightColumns == rightValue.Data.Length);
-                        int numRightRows = rightValue.Data[0].RowCount;
+                        var numRightRows = rightValue.Data[0].RowCount;
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int j = 0; j < numRightRows; j++)
+                            for (var j = 0; j < numRightRows; j++)
                             {
-                                for (int c = 0; c < numLeftColumns; c++)
+                                for (var c = 0; c < numLeftColumns; c++)
                                 {
                                     var leftCol = kvp.Value.Data[c];
                                     resultColumns[c].Add(leftCol[i]);
                                 }
 
-                                for (int c = 0; c < numRightColumns; c++)
+                                for (var c = 0; c < numRightColumns; c++)
                                 {
                                     var rightCol = rightValue.Data[c];
                                     resultColumns[numLeftColumns + c].Add(rightCol[j]);
@@ -476,15 +476,15 @@ namespace BabyKusto.Core.Evaluation
                     else
                     {
 
-                        for (int i = 0; i < numLeftRows; i++)
+                        for (var i = 0; i < numLeftRows; i++)
                         {
-                            for (int c = 0; c < numLeftColumns; c++)
+                            for (var c = 0; c < numLeftColumns; c++)
                             {
                                 var leftCol = kvp.Value.Data[c];
                                 resultColumns[c].Add(leftCol[i]);
                             }
 
-                            for (int c = 0; c < numRightColumns; c++)
+                            for (var c = 0; c < numRightColumns; c++)
                             {
                                 resultColumns[numLeftColumns + c].Add(null);
                             }
@@ -494,18 +494,18 @@ namespace BabyKusto.Core.Evaluation
 
                 foreach (var kvp in right.Buckets)
                 {
-                    int numRightRows = kvp.Value.Data[0].RowCount;
+                    var numRightRows = kvp.Value.Data[0].RowCount;
 
                     if (!left.Buckets.TryGetValue(kvp.Key, out var leftValue))
                     {
-                        for (int i = 0; i < numRightRows; i++)
+                        for (var i = 0; i < numRightRows; i++)
                         {
-                            for (int c = 0; c < numLeftColumns; c++)
+                            for (var c = 0; c < numLeftColumns; c++)
                             {
                                 resultColumns[c].Add(null);
                             }
 
-                            for (int c = 0; c < numRightColumns; c++)
+                            for (var c = 0; c < numRightColumns; c++)
                             {
                                 var rightCol = kvp.Value.Data[c];
                                 resultColumns[numLeftColumns + c].Add(rightCol[i]);

@@ -19,7 +19,7 @@ namespace BabyKusto.Core.Evaluation
                 () =>
                 {
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                    for (int i = 0; i < node.Arguments.ChildCount; i++)
+                    for (var i = 0; i < node.Arguments.ChildCount; i++)
                     {
                         argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
@@ -28,7 +28,7 @@ namespace BabyKusto.Core.Evaluation
                 });
 
             var arguments = new EvaluationResult[node.Arguments.ChildCount];
-            for (int i = 0; i < node.Arguments.ChildCount; i++)
+            for (var i = 0; i < node.Arguments.ChildCount; i++)
             {
                 var argVal = node.Arguments.GetChild(i).Accept(this, context);
                 Debug.Assert(argVal != null);
@@ -44,7 +44,7 @@ namespace BabyKusto.Core.Evaluation
                 () =>
                 {
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                    for (int i = 0; i < node.Arguments.ChildCount; i++)
+                    for (var i = 0; i < node.Arguments.ChildCount; i++)
                     {
                         argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
@@ -53,7 +53,7 @@ namespace BabyKusto.Core.Evaluation
                 });
 
             var arguments = new EvaluationResult[node.Arguments.ChildCount];
-            for (int i = 0; i < node.Arguments.ChildCount; i++)
+            for (var i = 0; i < node.Arguments.ChildCount; i++)
             {
                 var argVal = node.Arguments.GetChild(i).Accept(this, context);
                 Debug.Assert(argVal != null);
@@ -70,7 +70,7 @@ namespace BabyKusto.Core.Evaluation
                 () =>
                 {
                     var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                    for (int i = 0; i < node.Arguments.ChildCount; i++)
+                    for (var i = 0; i < node.Arguments.ChildCount; i++)
                     {
                         argumentExpressions[i] = node.Arguments.GetTypedChild(i);
                     }
@@ -79,8 +79,8 @@ namespace BabyKusto.Core.Evaluation
                 });
 
             var rawArguments = new EvaluationResult[node.Arguments.ChildCount];
-            bool hasScalar = false;
-            for (int i = 0; i < node.Arguments.ChildCount; i++)
+            var hasScalar = false;
+            for (var i = 0; i < node.Arguments.ChildCount; i++)
             {
                 var argResult = node.Arguments.GetChild(i).Accept(this, context);
                 Debug.Assert(argResult != null);
@@ -95,8 +95,8 @@ namespace BabyKusto.Core.Evaluation
                 // TODO: Some aggregate functions really want just a scalar input, e.g. `percentile(durationMs, 99)`.
                 // It is rather silly that we expand the second argument into a column, only for the aggregate implementation
                 // to then grab any value from it. In any case, this gets the job done for now...
-                int numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
-                for (int i = 0; i < rawArguments.Length; i++)
+                var numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
+                for (var i = 0; i < rawArguments.Length; i++)
                 {
                     if (rawArguments[i] is ScalarResult scalarResult)
                     {
@@ -126,7 +126,7 @@ namespace BabyKusto.Core.Evaluation
             }
 
             var functionCallScope = new LocalScope(context.Scope);
-            for (int i = 0; i < node.Arguments.ChildCount; i++)
+            for (var i = 0; i < node.Arguments.ChildCount; i++)
             {
                 if (signature.Parameters[i].DeclaredTypes.Count != 1)
                 {
@@ -144,7 +144,7 @@ namespace BabyKusto.Core.Evaluation
         public override EvaluationResult VisitFunctionBody(IRFunctionBodyNode node, EvaluationContext context)
         {
             var statements = node.Statements;
-            for (int i = 0; i < statements.ChildCount; i++)
+            for (var i = 0; i < statements.ChildCount; i++)
             {
                 var statement = statements.GetChild(i);
                 statement.Accept(this, context);

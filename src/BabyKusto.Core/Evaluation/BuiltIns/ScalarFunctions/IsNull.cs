@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<bool?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -48,7 +48,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<int?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -73,7 +73,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<long?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -98,7 +98,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<double?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -123,7 +123,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<DateTime?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -148,7 +148,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<TimeSpan?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value == null;
@@ -174,7 +174,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<string?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 // Strings can never be null. Nulls are always interpreted as empty strings.
                 data[i] = false;

@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var digest = new MergingDigest(compression: 100);
-            for (int i = 0; i < valuesCol.RowCount; i++)
+            for (var i = 0; i < valuesCol.RowCount; i++)
             {
                 var item = valuesCol[i];
                 if (item.HasValue)
@@ -51,7 +51,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var digest = new MergingDigest(compression: 100);
-            for (int i = 0; i < valuesCol.RowCount; i++)
+            for (var i = 0; i < valuesCol.RowCount; i++)
             {
                 var item = valuesCol[i];
                 if (item.HasValue)
@@ -79,7 +79,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var digest = new MergingDigest(compression: 100);
-            for (int i = 0; i < valuesCol.RowCount; i++)
+            for (var i = 0; i < valuesCol.RowCount; i++)
             {
                 var item = valuesCol[i];
                 if (item.HasValue)

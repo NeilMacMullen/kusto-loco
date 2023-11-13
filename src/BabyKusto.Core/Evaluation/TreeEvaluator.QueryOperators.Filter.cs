@@ -55,17 +55,17 @@ namespace BabyKusto.Core.Evaluation
                 else if (evaluated is ColumnarResult columnar)
                 {
                     var resultColumns = new ColumnBuilder[chunk.Columns.Length];
-                    for (int j = 0; j < chunk.Columns.Length; j++)
+                    for (var j = 0; j < chunk.Columns.Length; j++)
                     {
                         resultColumns[j] = chunk.Columns[j].CreateBuilder();
                     }
 
                     var predicateColumn = (Column<bool?>)columnar.Column;
-                    for (int i = 0; i < predicateColumn.RowCount; i++)
+                    for (var i = 0; i < predicateColumn.RowCount; i++)
                     {
                         if (predicateColumn[i] == true)
                         {
-                            for (int j = 0; j < chunk.Columns.Length; j++)
+                            for (var j = 0; j < chunk.Columns.Length; j++)
                             {
                                 resultColumns[j].Add(chunk.Columns[j].RawData.GetValue(i));
                             }

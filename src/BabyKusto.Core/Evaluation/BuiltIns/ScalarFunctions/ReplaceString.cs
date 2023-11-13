@@ -26,7 +26,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rewriteCol = (Column<string?>)arguments[2].Column;
 
             var data = new string?[textCol.RowCount];
-            for (int i = 0; i < textCol.RowCount; i++)
+            for (var i = 0; i < textCol.RowCount; i++)
             {
                 data[i] = Impl(textCol[i], lookupCol[i], rewriteCol[i]);
             }

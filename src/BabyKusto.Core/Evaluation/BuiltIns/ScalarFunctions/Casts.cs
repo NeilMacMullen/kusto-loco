@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new int?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -55,7 +55,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new long?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -88,7 +88,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new double?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -117,7 +117,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new bool?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }

@@ -21,7 +21,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new long?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = (long)(column[i] ?? string.Empty).Length;
             }

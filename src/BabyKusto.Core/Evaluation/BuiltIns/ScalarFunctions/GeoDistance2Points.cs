@@ -29,7 +29,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(p1LonColumn.RowCount == p1LatColumn.RowCount && p1LonColumn.RowCount == p2LonColumn.RowCount && p1LonColumn.RowCount == p2LatColumn.RowCount);
 
             var data = new double?[p1LonColumn.RowCount];
-            for (int i = 0; i < p1LonColumn.RowCount; i++)
+            for (var i = 0; i < p1LonColumn.RowCount; i++)
             {
                 data[i] = Compute(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
             }

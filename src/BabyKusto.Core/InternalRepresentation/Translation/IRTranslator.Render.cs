@@ -12,7 +12,7 @@ namespace BabyKusto.Core.InternalRepresentation
     {
         public override IRNode VisitRenderOperator(RenderOperator node)
         {
-            string chartType = node.ChartType.Text;
+            var chartType = node.ChartType.Text;
             string? kind = null;
 
             if (node.WithClause != null)

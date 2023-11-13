@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var urlCol = (Column<string?>)arguments[0].Column;
 
             var data = new string?[urlCol.RowCount];
-            for (int i = 0; i < urlCol.RowCount; i++)
+            for (var i = 0; i < urlCol.RowCount; i++)
             {
                 data[i] = Impl(urlCol[i]);
             }

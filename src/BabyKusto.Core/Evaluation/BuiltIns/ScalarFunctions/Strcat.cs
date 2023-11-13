@@ -13,7 +13,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
             var builder = new StringBuilder();
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 builder.Append((string?)arguments[i].Value);
             }
@@ -25,16 +25,16 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length > 0);
             var columns = new Column<string?>[arguments.Length];
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 columns[i] = (Column<string?>)arguments[i].Column;
             }
 
             var data = new string?[columns[0].RowCount];
             var builder = new StringBuilder();
-            for (int i = 0; i < columns[0].RowCount; i++)
+            for (var i = 0; i < columns[0].RowCount; i++)
             {
-                for (int j = 0; j < columns.Length; j++)
+                for (var j = 0; j < columns.Length; j++)
                 {
                     builder.Append(columns[j][i]);
                 }

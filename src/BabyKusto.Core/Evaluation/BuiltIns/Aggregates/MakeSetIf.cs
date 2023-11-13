@@ -17,7 +17,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -30,7 +30,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<int>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {
@@ -59,7 +59,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -72,7 +72,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<long>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {
@@ -101,7 +101,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -114,7 +114,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<double>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {
@@ -143,7 +143,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -156,7 +156,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<TimeSpan>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {
@@ -185,7 +185,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -198,7 +198,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<DateTime>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {
@@ -227,7 +227,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var predicatesColumn = (Column<bool?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
-            long maxSize = long.MaxValue;
+            var maxSize = long.MaxValue;
             if (arguments.Length == 3)
             {
                 var maxSizeColumn = (Column<long?>)arguments[2].Column;
@@ -240,7 +240,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var set = new HashSet<string>();
-            for (int i = 0; i < valuesColumn.RowCount; i++)
+            for (var i = 0; i < valuesColumn.RowCount; i++)
             {
                 if (predicatesColumn[i] == true)
                 {

@@ -15,7 +15,7 @@ namespace BabyKusto.Core.InternalRepresentation
         public override IRNode VisitProjectOperator(ProjectOperator node)
         {
             var columns = new List<IROutputColumnNode>();
-            for (int i = 0; i < node.Expressions.Count; i++)
+            for (var i = 0; i < node.Expressions.Count; i++)
             {
                 var symbol = (ColumnSymbol)node.ResultType.Members[i];
                 var expression = node.Expressions[i].Element;
@@ -47,7 +47,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
 
             var columns = new List<IROutputColumnNode>();
-            for (int i = 0; i < resultTypeMember.Count; i++)
+            for (var i = 0; i < resultTypeMember.Count; i++)
             {
                 var symbol = (ColumnSymbol)resultTypeMember[i];
                 renamedColumns.TryGetValue(symbol, out var originalSymbol);
@@ -84,7 +84,7 @@ namespace BabyKusto.Core.InternalRepresentation
             var resultTypeMember = resultType.Members;
 
             var columns = new List<IROutputColumnNode>();
-            for (int i = 0; i < resultTypeMember.Count; i++)
+            for (var i = 0; i < resultTypeMember.Count; i++)
             {
                 var symbol = (ColumnSymbol)resultTypeMember[i];
                 var referencedColumnIndex = _rowScope.Members.IndexOf(symbol);
@@ -129,7 +129,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
             var resultTypeMember = resultType.Members;
             var columns = new List<IROutputColumnNode>();
-            for (int i = 0; i < resultTypeMember.Count; i++)
+            for (var i = 0; i < resultTypeMember.Count; i++)
             {
                 var column = (ColumnSymbol)resultTypeMember[i];
 

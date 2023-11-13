@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Extensions
         {
             WriteIndent(writer, indent);
 
-            for (int i = 0; i < table.Type.Columns.Count; i++)
+            for (var i = 0; i < table.Type.Columns.Count; i++)
             {
                 if (i > 0)
                 {
@@ -40,10 +40,10 @@ namespace BabyKusto.Core.Extensions
 
             foreach (var chunk in table.GetData())
             {
-                for (int i = 0; i < chunk.RowCount; i++)
+                for (var i = 0; i < chunk.RowCount; i++)
                 {
                     WriteIndent(writer, indent);
-                    for (int j = 0; j < chunk.Columns.Length; j++)
+                    for (var j = 0; j < chunk.Columns.Length; j++)
                     {
                         if (j > 0)
                         {

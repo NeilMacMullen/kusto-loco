@@ -65,7 +65,7 @@ namespace BabyKusto.Core.InternalRepresentation
                     {
                         var name = nameReferenceExpression.Name.SimpleName;
 
-                        int leftIndex = _rowScope.Columns.FirstIndex(c => c.Name == name);
+                        var leftIndex = _rowScope.Columns.FirstIndex(c => c.Name == name);
                         if (leftIndex < 0)
                         {
                             throw new InvalidOperationException($"Could not find column {name} on left side of join.");
@@ -107,7 +107,7 @@ namespace BabyKusto.Core.InternalRepresentation
                         }
 
                         var leftName = leftNameReferenceExpression.Name.SimpleName;
-                        int leftIndex = _rowScope.Columns.FirstIndex(c => c.Name == leftName);
+                        var leftIndex = _rowScope.Columns.FirstIndex(c => c.Name == leftName);
                         if (leftIndex < 0)
                         {
                             throw new InvalidOperationException($"Could not find column {leftName} on left side of join.");

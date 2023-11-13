@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var valueCol = (Column<bool?>)(arguments[0].Column);
 
             var data = new bool?[valueCol.RowCount];
-            for (int i = 0; i < valueCol.RowCount; i++)
+            for (var i = 0; i < valueCol.RowCount; i++)
             {
                 var value = valueCol[i];
                 data[i] = value.HasValue ? !value.Value : null;

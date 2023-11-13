@@ -15,8 +15,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 
             var expression = (Column<int?>)arguments[0].Column;
             var predicate = (Column<bool?>)arguments[1].Column;
-            int sum = 0;
-            for (int i = 0; i < predicate.RowCount; i++)
+            var sum = 0;
+            for (var i = 0; i < predicate.RowCount; i++)
             {
                 if (predicate[i] == true)
                 {
@@ -42,7 +42,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var expression = (Column<long?>)arguments[0].Column;
             var predicate = (Column<bool?>)arguments[1].Column;
             long sum = 0;
-            for (int i = 0; i < predicate.RowCount; i++)
+            for (var i = 0; i < predicate.RowCount; i++)
             {
                 if (predicate[i] == true)
                 {
@@ -68,7 +68,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var expression = (Column<double?>)arguments[0].Column;
             var predicate = (Column<bool?>)arguments[1].Column;
             double sum = 0;
-            for (int i = 0; i < predicate.RowCount; i++)
+            for (var i = 0; i < predicate.RowCount; i++)
             {
                 if (predicate[i] == true)
                 {

@@ -28,7 +28,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<bool?>)(arguments[2].Column);
 
             var data = new bool?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -58,7 +58,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<int?>)(arguments[2].Column);
 
             var data = new int?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -88,7 +88,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<long?>)(arguments[2].Column);
 
             var data = new long?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -118,7 +118,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<double?>)(arguments[2].Column);
 
             var data = new double?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -148,7 +148,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<string?>)(arguments[2].Column);
 
             var data = new string?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -178,7 +178,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<DateTime?>)(arguments[2].Column);
 
             var data = new DateTime?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
@@ -208,7 +208,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var ifFalseCol = (Column<TimeSpan?>)(arguments[2].Column);
 
             var data = new TimeSpan?[predicateCol.RowCount];
-            for (int i = 0; i < predicateCol.RowCount; i++)
+            for (var i = 0; i < predicateCol.RowCount; i++)
             {
                 var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
                 data[i] = predicateCol[i] == true ? ifTrue : ifFalse;

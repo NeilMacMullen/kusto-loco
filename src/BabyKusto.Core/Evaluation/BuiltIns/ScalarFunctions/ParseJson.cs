@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new JsonNode?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = ParseInternal(column[i]);
             }

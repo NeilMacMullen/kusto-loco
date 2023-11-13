@@ -52,7 +52,7 @@ namespace BabyKusto.Core.Evaluation
                 else
                 {
                     var columns = new Column[chunk.Columns.Length];
-                    for (int i = 0; i < columns.Length; i++)
+                    for (var i = 0; i < columns.Length; i++)
                     {
                         columns[i] = chunk.Columns[i].Slice(0, context.Remaining);
                     }

@@ -35,7 +35,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<JsonNode?>)arguments[0].Column;
 
             var data = new JsonNode?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var array = column[i] as JsonArray;
                 data[i] = array == null ? null : Do(array);
@@ -46,12 +46,12 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 
         private JsonArray Do(JsonArray array)
         {
-            int count = array.Count;
+            var count = array.Count;
             var ordering = Enumerable.Range(0, count).ToList();
             ordering.Sort(new JsonArrayComparer(array, ascending: _ascending));
 
             var result = new JsonNode?[count];
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var node = array[ordering[i]];
                 // TODO: Find a better way to clone than serialize+deserialize. This is silly.
@@ -99,8 +99,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 var vA = ExtractValue(a);
                 var vB = ExtractValue(b);
 
-                bool isDoubleA = TryToDouble(vA, out var dA);
-                bool isDoubleB = TryToDouble(vB, out var dB);
+                var isDoubleA = TryToDouble(vA, out var dA);
+                var isDoubleB = TryToDouble(vB, out var dB);
 
                 if (isDoubleA && isDoubleB)
                 {
@@ -132,8 +132,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 }
                 else
                 {
-                    bool isStringA = vA is string;
-                    bool isStringB = vB is string;
+                    var isStringA = vA is string;
+                    var isStringB = vB is string;
                     if (isStringA && isStringB)
                     {
                         var v = StringComparer.Ordinal.Compare((string?)vA, (string?)vB);

@@ -27,7 +27,7 @@ namespace BabyKusto.Core.InternalRepresentation
         {
             if (_rowScope != null)
             {
-                int index = _rowScope.Members.IndexOf(node.ReferencedSymbol);
+                var index = _rowScope.Members.IndexOf(node.ReferencedSymbol);
                 if (index >= 0)
                 {
                     return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, index);
@@ -177,7 +177,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
             var arguments = new Expression[node.ArgumentList.Expressions.Count];
             var irArguments = new IRExpressionNode[arguments.Length];
-            for (int i = 0; i < arguments.Length; i++)
+            for (var i = 0; i < arguments.Length; i++)
             {
                 var argument = node.ArgumentList.Expressions[i].Element;
                 arguments[i] = argument;
@@ -186,7 +186,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
             var parameters = signature.GetArgumentParameters(arguments);
 
-            bool isUserFunction = signature.Declaration != null; // user functions have declarations
+            var isUserFunction = signature.Declaration != null; // user functions have declarations
             if (isUserFunction)
             {
                 var expansion = node.GetCalledFunctionBody();
@@ -196,7 +196,7 @@ namespace BabyKusto.Core.InternalRepresentation
                 }
 
                 var paramSymbols = new VariableSymbol[arguments.Length];
-                for (int i = 0; i < parameters.Count; i++)
+                for (var i = 0; i < parameters.Count; i++)
                 {
                     if (parameters[i].DeclaredTypes.Count != 1)
                     {
@@ -209,7 +209,7 @@ namespace BabyKusto.Core.InternalRepresentation
                 IRFunctionBodyNode irFunctionBody;
                 {
                     var nestedTranslator = new IRTranslator();
-                    for (int i = 0; i < arguments.Length; i++)
+                    for (var i = 0; i < arguments.Length; i++)
                     {
                         // NOTE: For now we only support type coercions for scalars. Bad things may happen for tabular inputs, oh well...
                         if (irArguments[i].ResultType is ScalarSymbol && paramSymbols[i].Type.Simplify() != irArguments[i].ResultType.Simplify())
@@ -253,7 +253,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         private static void ApplyTypeCoercions(IRExpressionNode[] irArguments, OverloadInfoBase overloadInfo)
         {
-            for (int i = 0; i < irArguments.Length; i++)
+            for (var i = 0; i < irArguments.Length; i++)
             {
                 if (overloadInfo.ParameterTypes[i].Simplify() != irArguments[i].ResultType.Simplify())
                 {
@@ -275,7 +275,7 @@ namespace BabyKusto.Core.InternalRepresentation
 
         public override IRNode VisitDataTableExpression(DataTableExpression node)
         {
-            int numColumns = node.Schema.Columns.Count;
+            var numColumns = node.Schema.Columns.Count;
 
             if (node.Values.Count % numColumns != 0)
             {
@@ -283,7 +283,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
 
             var data = new object?[node.Values.Count];
-            for (int i = 0; i < node.Values.Count; i++)
+            for (var i = 0; i < node.Values.Count; i++)
             {
                 var irLiteralExpression = node.Values[i].Element.Accept(this);
                 if (irLiteralExpression is not IRLiteralExpressionNode literalExpression)

@@ -24,7 +24,7 @@ namespace BabyKusto.Core.Evaluation
                 visualizationState = context.Left.VisualizationState;
             }
 
-            for (int i = 0; i < node.Expressions.ChildCount; i++)
+            for (var i = 0; i < node.Expressions.ChildCount; i++)
             {
                 var expression = node.Expressions.GetChild(i);
                 var expressionResult = expression.Accept(this, context);
@@ -53,7 +53,7 @@ namespace BabyKusto.Core.Evaluation
                 Type = resultType;
 
                 _columnMappings = new();
-                int i = 0;
+                var i = 0;
                 foreach (ColumnSymbol columnSymbol in resultType.Members)
                 {
                     _columnMappings.TryAdd(columnSymbol, i);
@@ -93,7 +93,7 @@ namespace BabyKusto.Core.Evaluation
             private TableChunk ProcessChunk(ITableSource table, ITableChunk chunk)
             {
                 var columns = new Column[Type.Columns.Count];
-                for (int i = 0; i < chunk.Columns.Length; i++)
+                for (var i = 0; i < chunk.Columns.Length; i++)
                 {
                     var symbol = (ColumnSymbol)table.Type.Members[i];
                     int destinationColumnIndex;
@@ -105,8 +105,8 @@ namespace BabyKusto.Core.Evaluation
                     columns[destinationColumnIndex] = chunk.Columns[i];
                 }
 
-                int rowCount = chunk.RowCount;
-                for (int i = 0; i < columns.Length; i++)
+                var rowCount = chunk.RowCount;
+                for (var i = 0; i < columns.Length; i++)
                 {
                     if (columns[i] == null)
                     {

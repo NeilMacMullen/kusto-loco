@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<int?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = left[i] == right[i];
             }
@@ -47,7 +47,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<long?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = left[i] == right[i];
             }
@@ -71,7 +71,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<double?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = left[i] == right[i];
             }
@@ -95,7 +95,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<string?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = string.Equals(left[i] ?? string.Empty, right[i] ?? string.Empty, StringComparison.Ordinal);
             }
@@ -119,7 +119,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<TimeSpan?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = left[i] == right[i];
             }
@@ -143,7 +143,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var right = (Column<DateTime?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
-            for (int i = 0; i < left.RowCount; i++)
+            for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = left[i] == right[i];
             }

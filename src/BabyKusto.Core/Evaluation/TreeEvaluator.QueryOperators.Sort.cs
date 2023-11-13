@@ -20,7 +20,7 @@ namespace BabyKusto.Core.Evaluation
         {
             Debug.Assert(context.Left != null);
             var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];
-            for (int i = 0; i < node.Expressions.ChildCount; i++)
+            for (var i = 0; i < node.Expressions.ChildCount; i++)
             {
                 var orderedExpression = node.Expressions.GetTypedChild(i);
                 sortColumns[i] = (orderedExpression.Expression, BuiltInComparers.GetComparer(orderedExpression.SortDirection, orderedExpression.NullsDirection, orderedExpression.Expression.ResultType));
@@ -50,36 +50,36 @@ namespace BabyKusto.Core.Evaluation
             public IEnumerable<ITableChunk> GetData()
             {
                 var allData = new List<object?>[_input.Type.Columns.Count];
-                for (int i = 0; i < allData.Length; i++)
+                for (var i = 0; i < allData.Length; i++)
                 {
                     allData[i] = new List<object?>();
                 }
 
                 var sortColumnsData = new List<object?>[_sortColumns.Length];
-                for (int i = 0; i < _sortColumns.Length; i++)
+                for (var i = 0; i < _sortColumns.Length; i++)
                 {
                     sortColumnsData[i] = new List<object?>();
                 }
 
                 foreach (var chunk in _input.GetData())
                 {
-                    for (int i = 0; i < allData.Length; i++)
+                    for (var i = 0; i < allData.Length; i++)
                     {
                         var sourceColumn = chunk.Columns[i].RawData;
-                        for (int j = 0; j < chunk.RowCount; j++)
+                        for (var j = 0; j < chunk.RowCount; j++)
                         {
                             allData[i].Add(sourceColumn.GetValue(j));
                         }
                     }
 
                     var chunkContext = _context with { Chunk = chunk };
-                    for (int i = 0; i < _sortColumns.Length; i++)
+                    for (var i = 0; i < _sortColumns.Length; i++)
                     {
                         var sortExpression = _sortColumns[i].Expression;
                         var sortExpressionResult = sortExpression.Accept(_evaluator, chunkContext);
                         Debug.Assert(sortExpressionResult != null);
                         var sortedChunkColumn = ((ColumnarResult)sortExpressionResult).Column;
-                        for (int j = 0; j < sortedChunkColumn.RowCount; j++)
+                        for (var j = 0; j < sortedChunkColumn.RowCount; j++)
                         {
                             sortColumnsData[i].Add(sortedChunkColumn.RawData.GetValue(j));
                         }
@@ -87,7 +87,7 @@ namespace BabyKusto.Core.Evaluation
                 }
 
                 var sortedIndexes = new int[sortColumnsData[0].Count];
-                for (int i = 0; i < sortedIndexes.Length; i++)
+                for (var i = 0; i < sortedIndexes.Length; i++)
                 {
                     sortedIndexes[i] = i;
                 }
@@ -96,10 +96,10 @@ namespace BabyKusto.Core.Evaluation
                     sortedIndexes,
                     (a, b) =>
                     {
-                        for (int i = 0; i < _sortColumns.Length; i++)
+                        for (var i = 0; i < _sortColumns.Length; i++)
                         {
                             var column = sortColumnsData[i];
-                            int result = _sortColumns[i].Comparer.Compare(column[a], column[b]);
+                            var result = _sortColumns[i].Comparer.Compare(column[a], column[b]);
 
                             if (result != 0)
                             {
@@ -111,10 +111,10 @@ namespace BabyKusto.Core.Evaluation
                     });
 
                 var resultColumns = new ColumnBuilder[allData.Length];
-                for (int i = 0; i < resultColumns.Length; i++)
+                for (var i = 0; i < resultColumns.Length; i++)
                 {
                     resultColumns[i] = ColumnHelpers.CreateBuilder(_input.Type.Columns[i].Type);
-                    for (int j = 0; j < sortedIndexes.Length; j++)
+                    for (var j = 0; j < sortedIndexes.Length; j++)
                     {
                         resultColumns[i].Add(allData[i][sortedIndexes[j]]);
                     }

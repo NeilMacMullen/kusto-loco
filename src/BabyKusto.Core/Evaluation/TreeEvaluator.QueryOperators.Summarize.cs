@@ -18,13 +18,13 @@ namespace BabyKusto.Core.Evaluation
         {
             Debug.Assert(context.Left != null);
             var byExpressions = new List<IRExpressionNode>();
-            for (int i = 0; i < node.ByColumns.ChildCount; i++)
+            for (var i = 0; i < node.ByColumns.ChildCount; i++)
             {
                 byExpressions.Add(node.ByColumns.GetTypedChild(i));
             }
 
             var aggregationExpressions = new List<IRExpressionNode>();
-            for (int i = 0; i < node.Aggregations.ChildCount; i++)
+            for (var i = 0; i < node.Aggregations.ChildCount; i++)
             {
                 aggregationExpressions.Add(node.Aggregations.GetTypedChild(i));
             }
@@ -66,11 +66,11 @@ namespace BabyKusto.Core.Evaluation
                 //  * Copies all data, even columns that aren't used
                 //  * Composite key calculation involves lots of string allocations and escapings
 
-                int numInputColumns = Source.Type.Columns.Count;
+                var numInputColumns = Source.Type.Columns.Count;
                 var byValuesColumns = new List<Column>(_byExpressions.Count);
                 {
                     var chunkContext = _context with { Chunk = chunk };
-                    for (int i = 0; i < _byExpressions.Count; i++)
+                    for (var i = 0; i < _byExpressions.Count; i++)
                     {
                         var byExpression = _byExpressions[i];
                         var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
@@ -80,7 +80,7 @@ namespace BabyKusto.Core.Evaluation
                     }
                 }
 
-                for (int i = 0; i < chunk.RowCount; i++)
+                for (var i = 0; i < chunk.RowCount; i++)
                 {
                     var byValues = byValuesColumns.Select(c => (object?)c.RawData.GetValue(i)).ToList();
 
@@ -91,13 +91,13 @@ namespace BabyKusto.Core.Evaluation
                     if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                     {
                         context.BucketizedTables[key] = bucket = (byValues, new ColumnBuilder[numInputColumns]);
-                        for (int j = 0; j < numInputColumns; j++)
+                        for (var j = 0; j < numInputColumns; j++)
                         {
                             bucket.OriginalData[j] = chunk.Columns[j].CreateBuilder();
                         }
                     }
 
-                    for (int j = 0; j < numInputColumns; j++)
+                    for (var j = 0; j < numInputColumns; j++)
                     {
                         bucket.OriginalData[j].Add(chunk.Columns[j].RawData.GetValue(i));
                     }
@@ -109,22 +109,22 @@ namespace BabyKusto.Core.Evaluation
             protected override ITableChunk? ProcessLastChunk(SummarizeResultTableContext context)
             {
                 var resultsData = new ColumnBuilder[_byExpressions.Count + _aggregationExpressions.Count];
-                for (int i = 0; i < resultsData.Length; i++)
+                for (var i = 0; i < resultsData.Length; i++)
                 {
                     resultsData[i] = ColumnHelpers.CreateBuilder(Type.Columns[i].Type);
                 }
 
-                int resultRow = 0;
+                var resultRow = 0;
                 foreach (var tableData in context.BucketizedTables.Values)
                 {
-                    for (int i = 0; i < tableData.ByValues.Count; i++)
+                    for (var i = 0; i < tableData.ByValues.Count; i++)
                     {
                         resultsData[i].Add(tableData.ByValues[i]);
                     }
 
                     var bucketChunk = new TableChunk(Source, tableData.OriginalData.Select(c => c.ToColumn()).ToArray());
                     var chunkContext = _context with { Chunk = bucketChunk };
-                    for (int i = 0; i < _aggregationExpressions.Count; i++)
+                    for (var i = 0; i < _aggregationExpressions.Count; i++)
                     {
                         var aggregationExpression = _aggregationExpressions[i];
                         var aggregationResult = (ScalarResult?)aggregationExpression.Accept(_owner, chunkContext);

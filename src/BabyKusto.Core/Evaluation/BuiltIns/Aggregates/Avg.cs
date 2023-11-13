@@ -13,8 +13,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1);
             var column = (Column<int?>)arguments[0].Column;
             double sum = 0;
-            int count = 0;
-            for (int i = 0; i < column.RowCount; i++)
+            var count = 0;
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var item = column[i];
                 if (item.HasValue)
@@ -34,8 +34,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1);
             var column = (Column<long?>)arguments[0].Column;
             double sum = 0;
-            int count = 0;
-            for (int i = 0; i < column.RowCount; i++)
+            var count = 0;
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var item = column[i];
                 if (item.HasValue)
@@ -55,8 +55,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             Debug.Assert(arguments.Length == 1);
             var column = (Column<double?>)arguments[0].Column;
             double sum = 0;
-            int count = 0;
-            for (int i = 0; i < column.RowCount; i++)
+            var count = 0;
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var item = column[i];
                 if (item.HasValue)

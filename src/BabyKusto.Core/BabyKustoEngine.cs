@@ -32,7 +32,7 @@ namespace BabyKusto.Core
             var db = new DatabaseSymbol(
                 "MyDb",
                 _globalTables.Select(table => table.Type).ToArray());
-            GlobalState globals = GlobalState.Default.WithDatabase(db);
+            var globals = GlobalState.Default.WithDatabase(db);
 
             var code = KustoCode.ParseAndAnalyze(query, globals);
             if (dumpKustoTree)
@@ -74,7 +74,7 @@ namespace BabyKusto.Core
 
             static void DumpKustoTree(KustoCode code)
             {
-                int indent = 0;
+                var indent = 0;
                 SyntaxElement.WalkNodes(
                     code.Syntax,
                     fnBefore: node =>
@@ -129,7 +129,7 @@ namespace BabyKusto.Core
 
                     indent += isLast ? "   " : " | ";
 
-                    for (int i = 0; i < node.ChildCount; i++)
+                    for (var i = 0; i < node.ChildCount; i++)
                     {
                         var child = node.GetChild(i);
                         DumpTreeInternal(child, indent, i == node.ChildCount - 1);

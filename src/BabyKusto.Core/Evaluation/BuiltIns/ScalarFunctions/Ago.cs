@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 
             var data = new DateTime?[column.RowCount];
             var now = DateTime.UtcNow;
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var item = column[i];
                 if (item.HasValue)

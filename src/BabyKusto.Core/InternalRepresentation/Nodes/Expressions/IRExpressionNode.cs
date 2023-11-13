@@ -82,7 +82,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
 
             EvaluatedExpressionKind? resultKind = null;
-            for (int i = 0; i < arguments.ChildCount; i++)
+            for (var i = 0; i < arguments.ChildCount; i++)
             {
                 var argument = arguments.GetTypedChild(i);
                 if (argument.ResultKind == EvaluatedExpressionKind.Table)

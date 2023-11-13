@@ -13,8 +13,8 @@ namespace BabyKusto.Core.InternalRepresentation
             List<IRExpressionNode> byColumns = new();
             if (node.ByClause != null)
             {
-                int byExpressionsCount = node.ByClause.Expressions.Count;
-                for (int i = 0; i < byExpressionsCount; i++)
+                var byExpressionsCount = node.ByClause.Expressions.Count;
+                for (var i = 0; i < byExpressionsCount; i++)
                 {
                     var expression = node.ByClause.Expressions[i].Element;
                     var irExpression = (IRExpressionNode)expression.Accept(this);
@@ -23,7 +23,7 @@ namespace BabyKusto.Core.InternalRepresentation
             }
 
             List<IRExpressionNode> aggregations = new();
-            for (int i = 0; i < node.Aggregates.Count; i++)
+            for (var i = 0; i < node.Aggregates.Count; i++)
             {
                 var expression = node.Aggregates[i].Element;
                 var irExpression = (IRExpressionNode)expression.Accept(this);

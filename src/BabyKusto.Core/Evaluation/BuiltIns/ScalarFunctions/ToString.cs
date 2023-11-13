@@ -25,7 +25,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<int?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -54,7 +54,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<long?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -83,7 +83,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<double?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -112,7 +112,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<TimeSpan?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -141,7 +141,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<DateTime?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -170,7 +170,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<JsonNode?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = Impl(column[i]);
             }
@@ -228,7 +228,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<string?>)arguments[0].Column;
 
             var data = new string?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 data[i] = column[i];
             }

@@ -15,7 +15,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var termCol = (Column<int?>)thisWindowArguments[0].Column;
             var restartCol = (Column<bool?>)thisWindowArguments[1].Column;
 
-            int accumulator = 0;
+            var accumulator = 0;
             if (previousWindowResult != null)
             {
                 var previousColumn = (Column<int?>)previousWindowResult.Column;
@@ -28,7 +28,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var data = new int?[termCol.RowCount];
-            for (int i = 0; i < termCol.RowCount; i++)
+            for (var i = 0; i < termCol.RowCount; i++)
             {
                 var restart = restartCol[i];
                 if (restart == true)
@@ -70,7 +70,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var data = new long?[termCol.RowCount];
-            for (int i = 0; i < termCol.RowCount; i++)
+            for (var i = 0; i < termCol.RowCount; i++)
             {
                 var restart = restartCol[i];
                 if (restart == true)
@@ -112,7 +112,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var data = new double?[termCol.RowCount];
-            for (int i = 0; i < termCol.RowCount; i++)
+            for (var i = 0; i < termCol.RowCount; i++)
             {
                 var restart = restartCol[i];
                 if (restart == true)
@@ -141,7 +141,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var termCol = (Column<TimeSpan?>)thisWindowArguments[0].Column;
             var restartCol = (Column<bool?>)thisWindowArguments[1].Column;
 
-            TimeSpan accumulator = TimeSpan.Zero;
+            var accumulator = TimeSpan.Zero;
             if (previousWindowResult != null)
             {
                 var previousColumn = (Column<TimeSpan?>)previousWindowResult.Column;
@@ -154,7 +154,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             }
 
             var data = new TimeSpan?[termCol.RowCount];
-            for (int i = 0; i < termCol.RowCount; i++)
+            for (var i = 0; i < termCol.RowCount; i++)
             {
                 var restart = restartCol[i];
                 if (restart == true)

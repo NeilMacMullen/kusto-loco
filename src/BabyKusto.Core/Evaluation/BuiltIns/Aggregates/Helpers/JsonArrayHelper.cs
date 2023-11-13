@@ -11,7 +11,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         internal static JsonArray From<T>(ICollection<T> source)
         {
             var array = new JsonNode?[source.Count];
-            int i = 0;
+            var i = 0;
             foreach (var item in source)
             {
                 array[i++] = item == null ? null : JsonValue.Create(item);

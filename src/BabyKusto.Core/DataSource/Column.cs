@@ -43,7 +43,7 @@ namespace BabyKusto.Core
 
         private static void ValidateTypes(TypeSymbol typeSymbol, Type type)
         {
-            bool valid = false;
+            var valid = false;
             if (typeSymbol == ScalarTypes.Int)
             {
                 valid = type == typeof(int?);

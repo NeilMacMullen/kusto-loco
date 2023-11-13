@@ -25,7 +25,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<int?>)(arguments[1].Column);
 
             var data = new bool?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left > right : null;
@@ -52,7 +52,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<long?>)(arguments[1].Column);
 
             var data = new bool?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left > right : null;
@@ -79,7 +79,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<double?>)(arguments[1].Column);
 
             var data = new bool?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left > right : null;
@@ -106,7 +106,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
 
             var data = new bool?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left > right : null;
@@ -133,7 +133,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var rightCol = (Column<DateTime?>)(arguments[1].Column);
 
             var data = new bool?[leftCol.RowCount];
-            for (int i = 0; i < leftCol.RowCount; i++)
+            for (var i = 0; i < leftCol.RowCount; i++)
             {
                 var (left, right) = (leftCol[i], rightCol[i]);
                 data[i] = left.HasValue && right.HasValue ? left > right : null;

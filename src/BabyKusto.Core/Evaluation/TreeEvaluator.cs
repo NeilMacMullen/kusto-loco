@@ -10,8 +10,8 @@ namespace BabyKusto.Core.Evaluation
     {
         public override EvaluationResult VisitQueryBlock(IRQueryBlockNode node, EvaluationContext context)
         {
-            EvaluationResult lastResult = EvaluationResult.Null;
-            for (int i = 0; i < node.Statements.ChildCount; i++)
+            var lastResult = EvaluationResult.Null;
+            for (var i = 0; i < node.Statements.ChildCount; i++)
             {
                 var statement = node.Statements.GetChild(i);
                 lastResult = statement.Accept(this, context);

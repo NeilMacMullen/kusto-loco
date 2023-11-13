@@ -56,10 +56,10 @@ namespace BabyKusto.Core.Evaluation.BuiltIns
                 {
                     var impl = factory();
 
-                    for (int numArgs = 2; numArgs <= 4; numArgs++)
+                    for (var numArgs = 2; numArgs <= 4; numArgs++)
                     {
                         var argTypes = new ScalarSymbol[numArgs];
-                        for (int i = 0; i < numArgs; i++)
+                        for (var i = 0; i < numArgs; i++)
                         {
                             argTypes[i] = type;
                         }

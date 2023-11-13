@@ -23,7 +23,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var column = (Column<JsonNode?>)arguments[0].Column;
 
             var data = new long?[column.RowCount];
-            for (int i = 0; i < column.RowCount; i++)
+            for (var i = 0; i < column.RowCount; i++)
             {
                 var array = column[i] as JsonArray;
                 data[i] = array == null ? null : array.Count;

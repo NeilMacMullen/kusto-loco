@@ -31,7 +31,7 @@ namespace BabyKusto.Core
                 throw new ArgumentException($"Invalid number of columns in chunk, got {columns.Length}, expected {tableSymbol.Columns.Count} per table schema.");
             }
 
-            for (int i = 0; i < columns.Length; i++)
+            for (var i = 0; i < columns.Length; i++)
             {
                 if (columns[i].Type.Simplify() != tableSymbol.Columns[i].Type.Simplify())
                 {
@@ -47,8 +47,8 @@ namespace BabyKusto.Core
                 return;
             }
 
-            int expected = columns[0].RowCount;
-            for (int i = 1; i < columns.Length; i++)
+            var expected = columns[0].RowCount;
+            for (var i = 1; i < columns.Length; i++)
             {
                 if (columns[i].RowCount != expected)
                 {
