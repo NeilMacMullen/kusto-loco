@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <!-- Lots of spurious warnings when enabling nullable support and targeting old frameworks, so we only enable it for new-ish targets -->
     <Nullable Condition=" '$(TargetFramework)' == 'netstandard2.0' ">annotations</Nullable>
     <Nullable Condition=" '$(TargetFramework)' != 'netstandard2.0' ">enable</Nullable>
@@ -30,7 +30,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Kusto.Language" Version="11.3.24011" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="System.Text.Json" Version="6.0.7" />
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
