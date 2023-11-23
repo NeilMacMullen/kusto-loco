@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Extensions
@@ -16,6 +17,7 @@ namespace BabyKusto.Core.Extensions
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
 
         public static void Dump(this ITableSource table, TextWriter writer, int indent = 0)
@@ -33,6 +35,7 @@ namespace BabyKusto.Core.Extensions
                 writer.Write(":");
                 writer.Write(SchemaDisplay.GetText(table.Type.Columns[i].Type));
             }
+
             writer.WriteLine();
 
             WriteIndent(writer, indent);
@@ -61,14 +64,27 @@ namespace BabyKusto.Core.Extensions
                                 v switch
                                 {
                                     DateTime dateTime => dateTime.ToString("O"),
-                                    JsonNode jsonNode => jsonNode.ToJsonString(JsonOptions),
+                                    JsonNode jsonNode => DumpNode(jsonNode),
                                     null => "(null)",
                                     _ => v,
                                 });
                         }
                     }
+
                     writer.WriteLine();
                 }
+            }
+        }
+
+        private static string DumpNode(JsonNode jsonNode)
+        {
+            try
+            {
+                return jsonNode.ToJsonString(JsonOptions);
+            }
+            catch (Exception ex)
+            {
+                return $"Unable to dump node {ex.Message}";
             }
         }
 
