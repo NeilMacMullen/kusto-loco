@@ -31,7 +31,7 @@ internal class IRSummarizeOperatorNode : IRQueryOperatorNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitSummarizeOperator(this, context);
 
     public override string ToString() => $"SummarizeOperator: {SchemaDisplay.GetText(ResultType)}";

@@ -35,7 +35,7 @@ internal class IRBuiltInWindowFunctionCallNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitBuiltInWindowFunctionCall(this, context);
 
     public override string ToString() =>

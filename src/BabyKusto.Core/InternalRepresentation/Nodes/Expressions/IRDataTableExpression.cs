@@ -22,7 +22,7 @@ internal class IRDataTableExpression : IRExpressionNode
     public object?[] Data { get; }
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitDataTableExpression(this, context);
 
     public override string ToString() => $"DataTableExpression: {SchemaDisplay.GetText(ResultType)}";

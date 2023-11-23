@@ -8,6 +8,10 @@ namespace BabyKusto.Core.InternalRepresentation;
 
 internal class IRRowScopeNameReferenceNode : IRExpressionNode
 {
+    public readonly int ReferencedColumnIndex;
+
+    public readonly Symbol ReferencedSymbol;
+
     public IRRowScopeNameReferenceNode(Symbol referencedSymbol, TypeSymbol resultType, int referencedColumnIndex)
         : base(resultType, EvaluatedExpressionKind.Columnar)
     {
@@ -20,12 +24,9 @@ internal class IRRowScopeNameReferenceNode : IRExpressionNode
         ReferencedColumnIndex = referencedColumnIndex;
     }
 
-    public Symbol ReferencedSymbol { get; }
-    public int ReferencedColumnIndex { get; }
-
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
-        visitor.VisitRowScopeNameReferenceNode(this, context);
+        =>
+            visitor.VisitRowScopeNameReferenceNode(this, context);
 
     public override string ToString() =>
         $"RowScopeNameReferenceNode({ReferencedSymbol.Name}=[{ReferencedColumnIndex}]): {SchemaDisplay.GetText(ResultType)}";

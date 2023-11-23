@@ -24,7 +24,7 @@ internal class IRTakeOperatorNode : IRQueryOperatorNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitTakeOperator(this, context);
 
     public override string ToString() => "TakeOperator";

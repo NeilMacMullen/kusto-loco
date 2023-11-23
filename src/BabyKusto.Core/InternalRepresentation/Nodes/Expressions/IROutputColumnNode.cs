@@ -28,7 +28,7 @@ internal class IROutputColumnNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitOutputColumn(this, context);
 
     public override string ToString() => $"OutputColumn({Symbol.Name}: {SchemaDisplay.GetText(ResultType)})";

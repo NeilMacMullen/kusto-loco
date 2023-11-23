@@ -32,7 +32,7 @@ internal class IRUnaryExpressionNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitUnaryExpression(this, context);
 
     public override string ToString() =>

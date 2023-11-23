@@ -13,7 +13,7 @@ internal class IRFunctionDeclarationNode : IRExpressionNode
     }
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitFunctionDeclaration(this, context);
 
     public override string ToString() => $"FunctionDeclaration: {SchemaDisplay.GetText(ResultType)}";

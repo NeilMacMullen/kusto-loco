@@ -22,7 +22,7 @@ internal class IRQueryBlockNode : IRNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitQueryBlock(this, context);
 
     public override string ToString() => "QueryBlock";

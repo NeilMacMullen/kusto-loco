@@ -24,7 +24,7 @@ internal class IRUnionOperatorNode : IRQueryOperatorNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitUnionOperator(this, context);
 
     public override string ToString() => $"UnionOperator: {SchemaDisplay.GetText(ResultType)}";

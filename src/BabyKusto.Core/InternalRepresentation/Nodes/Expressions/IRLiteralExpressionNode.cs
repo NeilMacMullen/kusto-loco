@@ -14,8 +14,8 @@ internal class IRLiteralExpressionNode : IRExpressionNode
     public object? Value { get; }
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
-        visitor.VisitLiteralExpression(this, context);
+        =>
+            visitor.VisitLiteralExpression(this, context);
 
     public override string ToString() => $"LiteralExpression: {SchemaDisplay.GetText(ResultType)} = {Value}";
 }

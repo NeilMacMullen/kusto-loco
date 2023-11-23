@@ -35,7 +35,7 @@ internal class IRAggregateCallNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitAggregateCallNode(this, context);
 
     public override string ToString() =>

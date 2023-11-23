@@ -25,7 +25,7 @@ internal class IRProjectOperatorNode : IRQueryOperatorNode
 
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitProjectOperator(this, context);
 
     public override string ToString() => $"ProjectOperator: {SchemaDisplay.GetText(ResultType)}";

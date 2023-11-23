@@ -35,7 +35,7 @@ internal class IRBinaryExpressionNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitBinaryExpression(this, context);
 
     public override string ToString() =>

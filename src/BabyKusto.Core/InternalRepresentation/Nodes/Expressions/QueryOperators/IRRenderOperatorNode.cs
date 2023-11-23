@@ -22,7 +22,7 @@ internal class IRRenderOperatorNode : IRQueryOperatorNode
     public override IRNode GetChild(int index) => throw new ArgumentOutOfRangeException(nameof(index));
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitRenderOperator(this, context);
 
     public override string ToString() => "RenderOperator";

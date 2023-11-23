@@ -24,7 +24,7 @@ internal class IRCastExpressionNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitCastExpression(this, context);
 
     public override string ToString() => $"CastExpression: {SchemaDisplay.GetText(ResultType)}";

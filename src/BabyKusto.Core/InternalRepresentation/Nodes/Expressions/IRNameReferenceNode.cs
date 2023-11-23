@@ -20,8 +20,8 @@ internal class IRNameReferenceNode : IRExpressionNode
     public Symbol ReferencedSymbol { get; }
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
-        visitor.VisitNameReference(this, context);
+        =>
+            visitor.VisitNameReference(this, context);
 
     public override string ToString() =>
         $"NameReference({ReferencedSymbol.Name}): {SchemaDisplay.GetText(ResultType)}";

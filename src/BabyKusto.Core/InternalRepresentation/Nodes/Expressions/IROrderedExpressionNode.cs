@@ -45,7 +45,7 @@ internal class IROrderedExpressionNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitOrderedExpression(this, context);
 
     public override string ToString()

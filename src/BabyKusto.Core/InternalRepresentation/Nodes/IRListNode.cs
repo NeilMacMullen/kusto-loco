@@ -9,7 +9,7 @@ namespace BabyKusto.Core.InternalRepresentation;
 internal abstract class IRListNode : IRNode
 {
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitList(this, context);
 
     public static IRListNode<T> From<T>(IReadOnlyList<T> items) where T : IRNode => new(items);

@@ -25,7 +25,7 @@ internal class IRPrintOperatorNode : IRQueryOperatorNode
 
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitPrintOperator(this, context);
 
     public override string ToString() => $"PrintOperator: {SchemaDisplay.GetText(ResultType)}";

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using BabyKusto.Core.Evaluation;
 
 namespace BabyKusto.Core.InternalRepresentation;
 
@@ -11,5 +12,5 @@ internal abstract class IRNode
     public virtual IRNode GetChild(int index) => throw new ArgumentOutOfRangeException();
 
     public abstract TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class;
+        where TResult : EvaluationResult;
 }

@@ -22,7 +22,7 @@ internal class IRExpressionStatementNode : IRStatementNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitExpressionStatement(this, context);
 
     public override string ToString() => "ExpressionStatement";

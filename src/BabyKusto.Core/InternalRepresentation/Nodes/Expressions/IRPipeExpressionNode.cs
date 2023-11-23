@@ -29,7 +29,7 @@ internal class IRPipeExpressionNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
+         =>
         visitor.VisitPipeExpression(this, context);
 
     public override string ToString() => $"PipeExpression: {SchemaDisplay.GetText(ResultType)}";

@@ -27,8 +27,8 @@ internal class IRLetStatementNode : IRStatementNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
-        visitor.VisitLetStatement(this, context);
+        =>
+            visitor.VisitLetStatement(this, context);
 
     public override string ToString() => $"LetStatement {{{Symbol.Name} = ...}}";
 }

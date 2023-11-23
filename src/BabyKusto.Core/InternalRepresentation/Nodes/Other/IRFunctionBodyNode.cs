@@ -28,8 +28,8 @@ internal class IRFunctionBodyNode : IRNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-        where TResult : class =>
-        visitor.VisitFunctionBody(this, context);
+        =>
+            visitor.VisitFunctionBody(this, context);
 
     public override string ToString() => $"FunctionBody: {SchemaDisplay.GetText(Expression.ResultType)}";
 }
