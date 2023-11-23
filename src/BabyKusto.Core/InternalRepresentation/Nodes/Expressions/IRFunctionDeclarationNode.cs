@@ -3,24 +3,18 @@
 
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRFunctionDeclarationNode : IRExpressionNode
 {
-    internal class IRFunctionDeclarationNode : IRExpressionNode
+    public IRFunctionDeclarationNode(TypeSymbol resultType)
+        : base(resultType, EvaluatedExpressionKind.Scalar)
     {
-        public IRFunctionDeclarationNode(TypeSymbol resultType)
-            : base(resultType, EvaluatedExpressionKind.Scalar)
-        {
-        }
-
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-            where TResult : class
-        {
-            return visitor.VisitFunctionDeclaration(this, context);
-        }
-
-        public override string ToString()
-        {
-            return $"FunctionDeclaration: {SchemaDisplay.GetText(ResultType)}";
-        }
     }
+
+    public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        where TResult : class =>
+        visitor.VisitFunctionDeclaration(this, context);
+
+    public override string ToString() => $"FunctionDeclaration: {SchemaDisplay.GetText(ResultType)}";
 }

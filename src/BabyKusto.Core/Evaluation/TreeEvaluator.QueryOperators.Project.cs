@@ -8,74 +8,78 @@ using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation
-{
-    internal partial class TreeEvaluator
-    {
-        public override EvaluationResult VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
-        {
-            Debug.Assert(context.Left != null);
-            var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
-            for (var i = 0; i < node.Columns.ChildCount; i++)
-            {
-                columns.Add(node.Columns.GetTypedChild(i));
-            }
+namespace BabyKusto.Core.Evaluation;
 
-            var result = new ProjectTableResult(this, context.Left.Value, context, columns, (TableSymbol)node.ResultType);
-            return new TabularResult(result, context.Left.VisualizationState);
+internal partial class TreeEvaluator
+{
+    public override EvaluationResult VisitProjectOperator(IRProjectOperatorNode node, EvaluationContext context)
+    {
+        Debug.Assert(context.Left != null);
+        var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
+        for (var i = 0; i < node.Columns.ChildCount; i++)
+        {
+            columns.Add(node.Columns.GetTypedChild(i));
         }
 
-        private class ProjectTableResult : DerivedTableSourceBase<NoContext>
+        var result = new ProjectTableResult(this, context.Left.Value, context, columns, (TableSymbol)node.ResultType);
+        return new TabularResult(result, context.Left.VisualizationState);
+    }
+
+    private class ProjectTableResult : DerivedTableSourceBase<NoContext>
+    {
+        private readonly List<IROutputColumnNode> _columns;
+        private readonly EvaluationContext _context;
+        private readonly TreeEvaluator _owner;
+
+        public ProjectTableResult(TreeEvaluator owner, ITableSource source, EvaluationContext context,
+            List<IROutputColumnNode> columns, TableSymbol resultType)
+            : base(source)
         {
-            private readonly TreeEvaluator _owner;
-            private readonly EvaluationContext _context;
-            private readonly List<IROutputColumnNode> _columns;
+            _owner = owner;
+            _context = context;
+            _columns = columns;
+            Type = resultType;
+        }
 
-            public ProjectTableResult(TreeEvaluator owner, ITableSource source, EvaluationContext context, List<IROutputColumnNode> columns, TableSymbol resultType)
-                : base(source)
+        public override TableSymbol Type { get; }
+
+        protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
+            ITableChunk chunk)
+        {
+            var outputColumns = new Column[_columns.Count];
+            var chunkContext = _context with { Chunk = chunk };
+            for (var i = 0; i < _columns.Count; i++)
             {
-                _owner = owner;
-                _context = context;
-                _columns = columns;
-                Type = resultType;
+                var expression = _columns[i].Expression;
+                var evaluatedExpression = expression.Accept(_owner, chunkContext);
+                Debug.Assert(evaluatedExpression != null);
+                outputColumns[i] = ColumnizeResult(evaluatedExpression, chunk.RowCount);
             }
 
-            public override TableSymbol Type { get; }
+            return (default, new TableChunk(this, outputColumns), false);
+        }
 
-            protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
+        private static Column ColumnizeResult(EvaluationResult result, int expectedRowCount)
+        {
+            if (result is ColumnarResult columnarResult)
             {
-                var outputColumns = new Column[_columns.Count];
-                var chunkContext = _context with { Chunk = chunk };
-                for (var i = 0; i < _columns.Count; i++)
+                if (columnarResult.Column.RowCount != expectedRowCount)
                 {
-                    var expression = _columns[i].Expression;
-                    var evaluatedExpression = expression.Accept(_owner, chunkContext);
-                    Debug.Assert(evaluatedExpression != null);
-                    outputColumns[i] = ColumnizeResult(evaluatedExpression, chunk.RowCount);
+                    throw new InvalidOperationException(
+                        $"Expression produced column with {columnarResult.Column.RowCount} rows but expected {expectedRowCount}.");
                 }
 
-                return (default, new TableChunk(this, outputColumns), false);
+                return columnarResult.Column;
             }
 
-            private static Column ColumnizeResult(EvaluationResult result, int expectedRowCount)
+            if (result is ScalarResult scalarResult)
             {
-                if (result is ColumnarResult columnarResult)
-                {
-                    if (columnarResult.Column.RowCount != expectedRowCount)
-                    {
-                        throw new InvalidOperationException($"Expression produced column with {columnarResult.Column.RowCount} rows but expected {expectedRowCount}.");
-                    }
-
-                    return columnarResult.Column;
-                }
-                else if (result is ScalarResult scalarResult)
-                {
-                    // Make it into a column of the right size
-                    return ColumnHelpers.CreateFromScalar(scalarResult.Value, scalarResult.Type, expectedRowCount);
-                }
-
-                throw new InvalidOperationException($"Unexpected expression result is neither a scalar nor a column: {result}.");
+                // Make it into a column of the right size
+                return ColumnHelpers.CreateFromScalar(scalarResult.Value, scalarResult.Type, expectedRowCount);
             }
+
+            throw new InvalidOperationException(
+                $"Unexpected expression result is neither a scalar nor a column: {result}.");
         }
     }
 }

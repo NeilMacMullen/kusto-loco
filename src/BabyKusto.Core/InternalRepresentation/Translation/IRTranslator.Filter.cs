@@ -3,14 +3,13 @@
 
 using Kusto.Language.Syntax;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal partial class IRTranslator
 {
-    internal partial class IRTranslator
+    public override IRNode VisitFilterOperator(FilterOperator node)
     {
-        public override IRNode VisitFilterOperator(FilterOperator node)
-        {
-            var irCondition = (IRExpressionNode)node.Condition.Accept(this);
-            return new IRFilterOperatorNode(irCondition, node.ResultType);
-        }
+        var irCondition = (IRExpressionNode)node.Condition.Accept(this);
+        return new IRFilterOperatorNode(irCondition, node.ResultType);
     }
 }

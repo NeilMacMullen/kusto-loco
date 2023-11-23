@@ -3,34 +3,27 @@
 
 using System;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRExpressionStatementNode : IRStatementNode
 {
-    internal class IRExpressionStatementNode : IRStatementNode
-    {
-        public IRExpressionStatementNode(IRNode expression)
-        {
-            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-        }
+    public IRExpressionStatementNode(IRNode expression) =>
+        Expression = expression ?? throw new ArgumentNullException(nameof(expression));
 
-        public IRNode Expression { get; }
-        
-        public override int ChildCount => 1;
-        public override IRNode GetChild(int index) =>
-            index switch
-            {
-                0 => Expression,
-                _ => throw new ArgumentOutOfRangeException(nameof(index)),
-            };
+    public IRNode Expression { get; }
 
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-            where TResult : class
-        {
-            return visitor.VisitExpressionStatement(this, context);
-        }
+    public override int ChildCount => 1;
 
-        public override string ToString()
+    public override IRNode GetChild(int index) =>
+        index switch
         {
-            return "ExpressionStatement";
-        }
-    }
+            0 => Expression,
+            _ => throw new ArgumentOutOfRangeException(nameof(index)),
+        };
+
+    public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        where TResult : class =>
+        visitor.VisitExpressionStatement(this, context);
+
+    public override string ToString() => "ExpressionStatement";
 }

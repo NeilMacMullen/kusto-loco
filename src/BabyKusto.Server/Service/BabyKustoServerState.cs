@@ -9,30 +9,30 @@ using Kusto.Language;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Options;
 
-namespace BabyKusto.Server.Service
+namespace BabyKusto.Server.Service;
+
+internal class BabyKustoServerState : IBabyKustoServerState
 {
-    internal class BabyKustoServerState : IBabyKustoServerState
+    public BabyKustoServerState(IOptions<BabyKustoServerOptions> options, ITablesProvider tablesProvider)
     {
-        public BabyKustoServerState(IOptions<BabyKustoServerOptions> options, ITablesProvider tablesProvider)
+        _ = tablesProvider ?? throw new ArgumentNullException(nameof(tablesProvider));
+
+        Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        Tables = tablesProvider.GetTables();
+        Globals = GlobalState.Default.WithDatabase(
+            new DatabaseSymbol(Options.DatabaseName, Tables.Select(t => t.Type).ToArray()));
+
+        var engine = new BabyKustoEngine();
+        foreach (var table in Tables)
         {
-            _ = tablesProvider ?? throw new ArgumentNullException(nameof(tablesProvider));
-
-            Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            Tables = tablesProvider.GetTables();
-            Globals = GlobalState.Default.WithDatabase(
-                new DatabaseSymbol(Options.DatabaseName, Tables.Select(t => t.Type).ToArray()));
-
-            var engine = new BabyKustoEngine();
-            foreach (var table in Tables)
-            {
-                engine.AddGlobalTable(table);
-            }
-            Engine = engine;
+            engine.AddGlobalTable(table);
         }
 
-        public BabyKustoServerOptions Options { get; }
-        public List<ITableSource> Tables { get; }
-        public GlobalState Globals { get; }
-        public BabyKustoEngine Engine { get; }
+        Engine = engine;
     }
+
+    public BabyKustoServerOptions Options { get; }
+    public List<ITableSource> Tables { get; }
+    public GlobalState Globals { get; }
+    public BabyKustoEngine Engine { get; }
 }

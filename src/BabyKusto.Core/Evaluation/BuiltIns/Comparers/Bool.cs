@@ -3,65 +3,52 @@
 
 using System.Collections;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class BoolAscNullsFirstComparer : IComparer
 {
-    internal class BoolAscNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
-                    ? -1
-                    : b == null
-                        ? 1
-                        : ((bool)a).CompareTo((bool)b);
-        }
-    }
-
-    internal class BoolAscNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : ((bool)a).CompareTo((bool)b);
-        }
-    }
+                    : ((bool)a).CompareTo((bool)b);
+}
 
-    internal class BoolDescNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class BoolAscNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
                     ? -1
-                    : b == null
-                        ? 1
-                        : ((bool)b).CompareTo((bool)a);
-        }
-    }
+                    : ((bool)a).CompareTo((bool)b);
+}
 
-    internal class BoolDescNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class BoolDescNullsFirstComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : ((bool)b).CompareTo((bool)a);
-        }
-    }
+                    : ((bool)b).CompareTo((bool)a);
+}
+
+internal class BoolDescNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
+                    ? -1
+                    : ((bool)b).CompareTo((bool)a);
 }

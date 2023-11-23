@@ -2,93 +2,90 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace BabyKusto.Server.Service
+namespace BabyKusto.Server.Service;
+
+internal class KustoQueryV2ResponseWriter
 {
-    internal class KustoQueryV2ResponseWriter
+    private State _state;
+
+    public KustoQueryV2ResponseWriter(Utf8JsonWriter writer) =>
+        JsonWriter = writer ?? throw new ArgumentNullException(nameof(writer));
+
+    internal Utf8JsonWriter JsonWriter { get; }
+
+    public async Task StartAsync()
     {
-        private readonly Utf8JsonWriter _writer;
-        private State _state;
-
-        enum State
+        if (_state != State.Initial)
         {
-            Initial,
-            ReadyToWriteTable,
-            WritingTable,
-            Done,
+            throw new InvalidOperationException($"Invalid state to initiate {nameof(StartAsync)}: {_state}.");
         }
 
-        public KustoQueryV2ResponseWriter(Utf8JsonWriter writer)
+        JsonWriter.WriteStartArray();
+        WriteDatasetHeader();
+        await JsonWriter.FlushAsync();
+
+        _state = State.ReadyToWriteTable;
+    }
+
+    public KustoQueryV2ResponseTableWriter CreateTableWriter()
+    {
+        if (_state != State.ReadyToWriteTable)
         {
-            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            throw new InvalidOperationException(
+                $"Invalid state to initiate {nameof(CreateTableWriter)}: {_state}.");
         }
 
-        internal Utf8JsonWriter JsonWriter => _writer;
+        _state = State.WritingTable;
+        return new KustoQueryV2ResponseTableWriter(this);
+    }
 
-        public async Task StartAsync()
+    public async Task FinishAsync()
+    {
+        if (_state != State.ReadyToWriteTable)
         {
-            if (_state != State.Initial)
-            {
-                throw new InvalidOperationException($"Invalid state to initiate {nameof(StartAsync)}: {_state}.");
-            }
-
-            _writer.WriteStartArray();
-            WriteDatasetHeader();
-            await _writer.FlushAsync();
-
-            _state = State.ReadyToWriteTable;
+            throw new InvalidOperationException($"Invalid state to initiate {nameof(FinishAsync)}: {_state}.");
         }
 
-        public KustoQueryV2ResponseTableWriter CreateTableWriter()
-        {
-            if (_state != State.ReadyToWriteTable)
-            {
-                throw new InvalidOperationException($"Invalid state to initiate {nameof(CreateTableWriter)}: {_state}.");
-            }
+        WriteDatasetCompletion();
+        JsonWriter.WriteEndArray();
+        await JsonWriter.FlushAsync();
 
-            _state = State.WritingTable;
-            return new KustoQueryV2ResponseTableWriter(this);
+        _state = State.Done;
+    }
+
+    internal void OnTableWritten()
+    {
+        if (_state != State.WritingTable)
+        {
+            throw new InvalidOperationException();
         }
 
-        public async Task FinishAsync()
-        {
-            if (_state != State.ReadyToWriteTable)
-            {
-                throw new InvalidOperationException($"Invalid state to initiate {nameof(FinishAsync)}: {_state}.");
-            }
+        _state = State.ReadyToWriteTable;
+    }
 
-            WriteDatasetCompletion();
-            _writer.WriteEndArray();
-            await _writer.FlushAsync();
+    private void WriteDatasetHeader()
+    {
+        JsonWriter.WriteStartObject();
+        JsonWriter.WriteString("FrameType", "DataSetHeader");
+        JsonWriter.WriteBoolean("IsProgressive", false);
+        JsonWriter.WriteString("Version", "v2.0");
+        JsonWriter.WriteEndObject();
+    }
 
-            _state = State.Done;
-        }
+    private void WriteDatasetCompletion()
+    {
+        JsonWriter.WriteStartObject();
+        JsonWriter.WriteString("FrameType", "DataSetCompletion");
+        JsonWriter.WriteBoolean("HasErrors", false);
+        JsonWriter.WriteBoolean("Cancelled", false);
+        JsonWriter.WriteEndObject();
+    }
 
-        internal void OnTableWritten()
-        {
-            if (_state != State.WritingTable)
-            {
-                throw new InvalidOperationException();
-            }
-
-            _state = State.ReadyToWriteTable;
-        }
-
-        private void WriteDatasetHeader()
-        {
-            _writer.WriteStartObject();
-            _writer.WriteString("FrameType", "DataSetHeader");
-            _writer.WriteBoolean("IsProgressive", false);
-            _writer.WriteString("Version", "v2.0");
-            _writer.WriteEndObject();
-        }
-
-        private void WriteDatasetCompletion()
-        {
-            _writer.WriteStartObject();
-            _writer.WriteString("FrameType", "DataSetCompletion");
-            _writer.WriteBoolean("HasErrors", false);
-            _writer.WriteBoolean("Cancelled", false);
-            _writer.WriteEndObject();
-        }
+    private enum State
+    {
+        Initial,
+        ReadyToWriteTable,
+        WritingTable,
+        Done,
     }
 }

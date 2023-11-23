@@ -4,10 +4,9 @@
 using System.Collections.Generic;
 using BabyKusto.Core;
 
-namespace BabyKusto.Server.Service
+namespace BabyKusto.Server.Service;
+
+public interface ITablesProvider
 {
-    public interface ITablesProvider
-    {
-        List<ITableSource> GetTables();
-    }
+    List<ITableSource> GetTables();
 }

@@ -3,13 +3,12 @@
 
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal abstract class IRQueryOperatorNode : IRExpressionNode
 {
-    internal abstract class IRQueryOperatorNode : IRExpressionNode
+    protected IRQueryOperatorNode(TypeSymbol resultType)
+        : base(resultType, EvaluatedExpressionKind.Table)
     {
-        protected IRQueryOperatorNode(TypeSymbol resultType)
-            : base(resultType, EvaluatedExpressionKind.Table)
-        {
-        }
     }
 }

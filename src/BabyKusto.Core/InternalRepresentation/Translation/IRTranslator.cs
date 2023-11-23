@@ -7,39 +7,32 @@ using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Microsoft.Extensions.Internal;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 {
-    internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
+    private readonly Dictionary<string, EvaluatedExpressionKind> _inScopeSymbolInfos = new();
+    private TableSymbol? _rowScope;
+
+    private void SetInScopeSymbolInfo(string name, EvaluatedExpressionKind resultKind)
     {
-        private readonly Dictionary<string, EvaluatedExpressionKind> _inScopeSymbolInfos = new();
-        private TableSymbol? _rowScope;
+        _inScopeSymbolInfos.Add(name, resultKind);
+    }
 
-        internal IRTranslator()
+    protected override IRNode DefaultVisit(SyntaxNode node) =>
+        throw new NotImplementedException(TypeNameHelper.GetTypeDisplayName(node));
+
+    public override IRNode VisitQueryBlock(QueryBlock node)
+    {
+        var irStatements = new List<IRStatementNode>();
+        foreach (var se in node.Statements)
         {
+            var statement = se.Element;
+            var irStatement = (IRStatementNode)statement.Accept(this);
+            irStatements.Add(irStatement);
         }
 
-        private void SetInScopeSymbolInfo(string name, EvaluatedExpressionKind resultKind)
-        {
-            _inScopeSymbolInfos.Add(name, resultKind);
-        }
-
-        protected override IRNode DefaultVisit(SyntaxNode node)
-        {
-            throw new NotImplementedException(TypeNameHelper.GetTypeDisplayName(node));
-        }
-
-        public override IRNode VisitQueryBlock(QueryBlock node)
-        {
-            var irStatements = new List<IRStatementNode>();
-            foreach (var se in node.Statements)
-            {
-                var statement = se.Element;
-                var irStatement = (IRStatementNode)statement.Accept(this);
-                irStatements.Add(irStatement);
-            }
-
-            var listNode = IRListNode.From(irStatements);
-            return new IRQueryBlockNode(listNode);
-        }
+        var listNode = IRListNode.From(irStatements);
+        return new IRQueryBlockNode(listNode);
     }
 }

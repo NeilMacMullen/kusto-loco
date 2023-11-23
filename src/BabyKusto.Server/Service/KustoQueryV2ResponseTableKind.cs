@@ -1,9 +1,8 @@
-﻿namespace BabyKusto.Server.Service
+﻿namespace BabyKusto.Server.Service;
+
+public enum KustoQueryV2ResponseTableKind
 {
-    public enum KustoQueryV2ResponseTableKind
-    {
-        QueryCompletionInformation,
-        QueryProperties,
-        PrimaryResult,
-    }
+    QueryCompletionInformation,
+    QueryProperties,
+    PrimaryResult,
 }

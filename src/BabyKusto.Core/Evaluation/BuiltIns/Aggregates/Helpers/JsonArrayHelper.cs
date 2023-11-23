@@ -4,20 +4,19 @@
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
-{
-    internal static class JsonArrayHelper
-    {
-        internal static JsonArray From<T>(ICollection<T> source)
-        {
-            var array = new JsonNode?[source.Count];
-            var i = 0;
-            foreach (var item in source)
-            {
-                array[i++] = item == null ? null : JsonValue.Create(item);
-            }
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-            return new JsonArray(array);
+internal static class JsonArrayHelper
+{
+    internal static JsonArray From<T>(ICollection<T> source)
+    {
+        var array = new JsonNode?[source.Count];
+        var i = 0;
+        foreach (var item in source)
+        {
+            array[i++] = item == null ? null : JsonValue.Create(item);
         }
+
+        return new JsonArray(array);
     }
 }

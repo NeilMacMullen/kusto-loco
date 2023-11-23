@@ -4,65 +4,52 @@
 using System;
 using System.Collections;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class StringAscNullsFirstComparer : IComparer
 {
-    internal class StringAscNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
-                    ? -1
-                    : b == null
-                        ? 1
-                        : StringComparer.Ordinal.Compare((string)a, (string)b);
-        }
-    }
-
-    internal class StringAscNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : StringComparer.Ordinal.Compare((string)a, (string)b);
-        }
-    }
+                    : StringComparer.Ordinal.Compare((string)a, (string)b);
+}
 
-    internal class StringDescNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class StringAscNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
                     ? -1
-                    : b == null
-                        ? 1
-                        : StringComparer.Ordinal.Compare((string)b, (string)a);
-        }
-    }
+                    : StringComparer.Ordinal.Compare((string)a, (string)b);
+}
 
-    internal class StringDescNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class StringDescNullsFirstComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : StringComparer.Ordinal.Compare((string)b, (string)a);
-        }
-    }
+                    : StringComparer.Ordinal.Compare((string)b, (string)a);
+}
+
+internal class StringDescNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
+                    ? -1
+                    : StringComparer.Ordinal.Compare((string)b, (string)a);
 }

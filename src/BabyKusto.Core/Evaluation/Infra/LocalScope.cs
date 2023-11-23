@@ -5,36 +5,32 @@ using System;
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation
+namespace BabyKusto.Core.Evaluation;
+
+internal class LocalScope
 {
-    internal class LocalScope
+    private readonly Dictionary<string, (Symbol Symbol, EvaluationResult Value)> _locals = new();
+    private readonly LocalScope? _outer;
+
+    public LocalScope(LocalScope? outer = null) => _outer = outer;
+
+    public void AddSymbol(Symbol symbol, EvaluationResult value)
     {
-        private readonly LocalScope? _outer;
-        private readonly Dictionary<string, (Symbol Symbol, EvaluationResult Value)> _locals = new();
-
-        public LocalScope(LocalScope? outer = null)
+        if (Lookup(symbol.Name) != null)
         {
-            _outer = outer;
+            throw new InvalidOperationException($"A symbol with name {symbol.Name} is already defined.");
         }
 
-        public void AddSymbol(Symbol symbol, EvaluationResult value)
-        {
-            if (Lookup(symbol.Name) != null)
-            {
-                throw new InvalidOperationException($"A symbol with name {symbol.Name} is already defined.");
-            }
+        _locals.Add(symbol.Name, (symbol, value));
+    }
 
-            _locals.Add(symbol.Name, (symbol, value));
+    public (Symbol Symbol, EvaluationResult Value)? Lookup(string name)
+    {
+        if (_locals.TryGetValue(name, out var symbol))
+        {
+            return symbol;
         }
 
-        public (Symbol Symbol, EvaluationResult Value)? Lookup(string name)
-        {
-            if (_locals.TryGetValue(name, out var symbol))
-            {
-                return symbol;
-            }
-
-            return _outer?.Lookup(name);
-        }
+        return _outer?.Lookup(name);
     }
 }

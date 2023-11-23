@@ -6,257 +6,256 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class MakeListIfIntFunctionImpl : IAggregateImpl
 {
-    internal class MakeListIfIntFunctionImpl : IAggregateImpl
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<int?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<int?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<int>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<int>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (v.HasValue)
                 {
-                    var v = valuesColumn[i];
-                    if (v.HasValue)
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v.Value);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
+}
 
-    internal class MakeListIfLongFunctionImpl : IAggregateImpl
+internal class MakeListIfLongFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<long?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<long?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<long>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<long>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (v.HasValue)
                 {
-                    var v = valuesColumn[i];
-                    if (v.HasValue)
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v.Value);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
+}
 
-    internal class MakeListIfDoubleFunctionImpl : IAggregateImpl
+internal class MakeListIfDoubleFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<double?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<double?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<double>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<double>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (v.HasValue)
                 {
-                    var v = valuesColumn[i];
-                    if (v.HasValue)
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v.Value);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
+}
 
-    internal class MakeListIfTimeSpanFunctionImpl : IAggregateImpl
+internal class MakeListIfTimeSpanFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<TimeSpan>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<TimeSpan>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (v.HasValue)
                 {
-                    var v = valuesColumn[i];
-                    if (v.HasValue)
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v.Value);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
+}
 
-    internal class MakeListIfDateTimeFunctionImpl : IAggregateImpl
+internal class MakeListIfDateTimeFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<DateTime?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<DateTime?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<DateTime>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<DateTime>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (v.HasValue)
                 {
-                    var v = valuesColumn[i];
-                    if (v.HasValue)
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v.Value);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
+}
 
-    internal class MakeListIfStringFunctionImpl : IAggregateImpl
+internal class MakeListIfStringFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (Column<string?>)arguments[0].Column;
+        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
         {
-            Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-            var valuesColumn = (Column<string?>)arguments[0].Column;
-            var predicatesColumn = (Column<bool?>)arguments[1].Column;
-            Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
-            var maxSize = long.MaxValue;
-            if (arguments.Length == 3)
+            if (maxSizeColumn.RowCount > 0)
             {
-                var maxSizeColumn = (Column<long?>)arguments[2].Column;
-                Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
-
-                if (maxSizeColumn.RowCount > 0)
-                {
-                    maxSize = maxSizeColumn[0] ?? long.MaxValue;
-                }
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
             }
+        }
 
-            var list = new List<string>();
-            for (var i = 0; i < valuesColumn.RowCount; i++)
+        var list = new List<string>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
             {
-                if (predicatesColumn[i] == true)
+                var v = valuesColumn[i];
+                if (!string.IsNullOrEmpty(v))
                 {
-                    var v = valuesColumn[i];
-                    if (!string.IsNullOrEmpty(v))
+                    list.Add(v);
+                    if (list.Count >= maxSize)
                     {
-                        list.Add(v);
-                        if (list.Count >= maxSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
         }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
     }
 }

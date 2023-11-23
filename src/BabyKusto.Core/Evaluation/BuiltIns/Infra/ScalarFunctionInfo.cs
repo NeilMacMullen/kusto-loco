@@ -3,15 +3,11 @@
 
 using System.Collections.Generic;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns
-{
-    internal class ScalarFunctionInfo
-    {
-        public ScalarFunctionInfo(params ScalarOverloadInfo[] overloads)
-        {
-            Overloads = overloads;
-        }
+namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-        public IReadOnlyList<ScalarOverloadInfo> Overloads { get; }
-    }
+internal class ScalarFunctionInfo
+{
+    public ScalarFunctionInfo(params ScalarOverloadInfo[] overloads) => Overloads = overloads;
+
+    public IReadOnlyList<ScalarOverloadInfo> Overloads { get; }
 }

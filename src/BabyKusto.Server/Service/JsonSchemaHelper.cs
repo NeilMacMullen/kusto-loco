@@ -8,114 +8,99 @@ using System.Text.Json.Serialization;
 using BabyKusto.Core;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Server.Service
+namespace BabyKusto.Server.Service;
+
+internal static class JsonSchemaHelper
 {
-    internal static class JsonSchemaHelper
+    public static string GetJsonSchema(BabyKustoServerOptions options, IEnumerable<ITableSource> tables)
     {
-        public static string GetJsonSchema(BabyKustoServerOptions options, IEnumerable<ITableSource> tables)
+        _ = options ?? throw new ArgumentNullException(nameof(options));
+        _ = tables ?? throw new ArgumentNullException(nameof(tables));
+
+        var database = new DatabaseSchema
         {
-            _ = options ?? throw new ArgumentNullException(nameof(options));
-            _ = tables ?? throw new ArgumentNullException(nameof(tables));
+            Name = options.DatabaseName,
+            MajorVersion = 1,
+            MinorVersion = 0,
+            DatabaseAccessMode = "ReadWrite",
+        };
 
-            var database = new DatabaseSchema
+        foreach (var table in tables)
+        {
+            var tableSchema = new TableSchema
             {
-                Name = options.DatabaseName,
-                MajorVersion = 1,
-                MinorVersion = 0,
-                DatabaseAccessMode = "ReadWrite",
+                Name = table.Type.Name,
             };
-
-            foreach (var table in tables)
+            foreach (var column in table.Type.Columns)
             {
-                var tableSchema = new TableSchema
-                {
-                    Name = table.Type.Name,
-                };
-                foreach (var column in table.Type.Columns)
-                {
-                    tableSchema.OrderedColumns.Add(
-                        new ColumnSchema
+                tableSchema.OrderedColumns.Add(
+                    new ColumnSchema
+                    {
+                        Name = column.Name,
+                        CslType = SchemaDisplay.GetText(column.Type),
+                        Type = column.Type switch
                         {
-                            Name = column.Name,
-                            CslType = SchemaDisplay.GetText(column.Type),
-                            Type = column.Type switch
-                            {
-                                _ => "",
-                            },
-                        });
-                }
-                database.Tables.Add(tableSchema.Name, tableSchema);
+                            _ => "",
+                        },
+                    });
             }
 
-            var root = new JsonSchemaResult
-            {
-                Databases = { { options.DatabaseName, database } },
-            };
-
-            return JsonSerializer.Serialize(root);
+            database.Tables.Add(tableSchema.Name, tableSchema);
         }
 
-        private class JsonSchemaResult
+        var root = new JsonSchemaResult
         {
-            [JsonPropertyName("Databases")]
-            public Dictionary<string, DatabaseSchema> Databases { get; } = new();
-        }
+            Databases = { { options.DatabaseName, database } },
+        };
 
-        private class DatabaseSchema
-        {
-            [JsonPropertyName("Name")]
-            public string? Name { get; set; }
+        return JsonSerializer.Serialize(root);
+    }
 
-            [JsonPropertyName("MajorVersion")]
-            public int? MajorVersion { get; set; }
+    private class JsonSchemaResult
+    {
+        [JsonPropertyName("Databases")] public Dictionary<string, DatabaseSchema> Databases { get; } = new();
+    }
 
-            [JsonPropertyName("MinorVersion")]
-            public int? MinorVersion { get; set; }
+    private class DatabaseSchema
+    {
+        [JsonPropertyName("Name")] public string? Name { get; set; }
 
-            [JsonPropertyName("DatabaseAccessMode")]
-            public string? DatabaseAccessMode { get; set; }
+        [JsonPropertyName("MajorVersion")] public int? MajorVersion { get; set; }
 
-            [JsonPropertyName("Tables")]
-            public Dictionary<string, TableSchema> Tables { get; } = new();
+        [JsonPropertyName("MinorVersion")] public int? MinorVersion { get; set; }
 
-            [JsonPropertyName("ExternalTables")]
-            public Dictionary<string, object> ExternalTables { get; } = new();
+        [JsonPropertyName("DatabaseAccessMode")]
+        public string? DatabaseAccessMode { get; set; }
 
-            [JsonPropertyName("MaterializedViews")]
-            public Dictionary<string, object> MaterializedViews { get; } = new();
+        [JsonPropertyName("Tables")] public Dictionary<string, TableSchema> Tables { get; } = new();
 
-            [JsonPropertyName("EntityGroups")]
-            public Dictionary<string, object> EntityGroups { get; } = new();
+        [JsonPropertyName("ExternalTables")] public Dictionary<string, object> ExternalTables { get; } = new();
 
-            [JsonPropertyName("Functions")]
-            public Dictionary<string, object> Functions { get; } = new();
-        }
+        [JsonPropertyName("MaterializedViews")]
+        public Dictionary<string, object> MaterializedViews { get; } = new();
 
-        private class TableSchema
-        {
-            [JsonPropertyName("Name")]
-            public string? Name { get; set; }
+        [JsonPropertyName("EntityGroups")] public Dictionary<string, object> EntityGroups { get; } = new();
 
-            [JsonPropertyName("Folder")]
-            public string? Folder { get; set; }
+        [JsonPropertyName("Functions")] public Dictionary<string, object> Functions { get; } = new();
+    }
 
-            [JsonPropertyName("DocString")]
-            public string? DocString { get; set; }
+    private class TableSchema
+    {
+        [JsonPropertyName("Name")] public string? Name { get; set; }
 
-            [JsonPropertyName("OrderedColumns")]
-            public List<ColumnSchema> OrderedColumns { get; } = new();
-        }
+        [JsonPropertyName("Folder")] public string? Folder { get; set; }
 
-        private class ColumnSchema
-        {
-            [JsonPropertyName("Name")]
-            public string? Name { get; set; }
+        [JsonPropertyName("DocString")] public string? DocString { get; set; }
 
-            [JsonPropertyName("Type")]
-            public string? Type { get; set; }
+        [JsonPropertyName("OrderedColumns")] public List<ColumnSchema> OrderedColumns { get; } = new();
+    }
 
-            [JsonPropertyName("CslType")]
-            public string? CslType { get; set; }
-        }
+    private class ColumnSchema
+    {
+        [JsonPropertyName("Name")] public string? Name { get; set; }
+
+        [JsonPropertyName("Type")] public string? Type { get; set; }
+
+        [JsonPropertyName("CslType")] public string? CslType { get; set; }
     }
 }

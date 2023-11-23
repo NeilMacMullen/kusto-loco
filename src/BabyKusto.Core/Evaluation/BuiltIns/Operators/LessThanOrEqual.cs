@@ -5,140 +5,144 @@ using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class LessThanOrEqualIntOperatorImpl : IScalarFunctionImpl
 {
-    internal class LessThanOrEqualIntOperatorImpl : IScalarFunctionImpl
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            var left = (int?)arguments[0].Value;
-            var right = (int?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
-        }
-
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var leftCol = (Column<int?>)(arguments[0].Column);
-            var rightCol = (Column<int?>)(arguments[1].Column);
-
-            var data = new bool?[leftCol.RowCount];
-            for (var i = 0; i < leftCol.RowCount; i++)
-            {
-                var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue ? left <= right : null;
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
-        }
+        Debug.Assert(arguments.Length == 2);
+        var left = (int?)arguments[0].Value;
+        var right = (int?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
     }
 
-    internal class LessThanOrEqualLongOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var leftCol = (Column<int?>)(arguments[0].Column);
+        var rightCol = (Column<int?>)(arguments[1].Column);
+
+        var data = new bool?[leftCol.RowCount];
+        for (var i = 0; i < leftCol.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 2);
-            var left = (long?)arguments[0].Value;
-            var right = (long?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
+            var (left, right) = (leftCol[i], rightCol[i]);
+            data[i] = left.HasValue && right.HasValue ? left <= right : null;
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var leftCol = (Column<long?>)(arguments[0].Column);
-            var rightCol = (Column<long?>)(arguments[1].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+    }
+}
 
-            var data = new bool?[leftCol.RowCount];
-            for (var i = 0; i < leftCol.RowCount; i++)
-            {
-                var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue ? left <= right : null;
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
-        }
+internal class LessThanOrEqualLongOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var left = (long?)arguments[0].Value;
+        var right = (long?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
     }
 
-    internal class LessThanOrEqualDoubleOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var leftCol = (Column<long?>)(arguments[0].Column);
+        var rightCol = (Column<long?>)(arguments[1].Column);
+
+        var data = new bool?[leftCol.RowCount];
+        for (var i = 0; i < leftCol.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 2);
-            var left = (double?)arguments[0].Value;
-            var right = (double?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
+            var (left, right) = (leftCol[i], rightCol[i]);
+            data[i] = left.HasValue && right.HasValue ? left <= right : null;
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var leftCol = (Column<double?>)(arguments[0].Column);
-            var rightCol = (Column<double?>)(arguments[1].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+    }
+}
 
-            var data = new bool?[leftCol.RowCount];
-            for (var i = 0; i < leftCol.RowCount; i++)
-            {
-                var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue ? left <= right : null;
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
-        }
+internal class LessThanOrEqualDoubleOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var left = (double?)arguments[0].Value;
+        var right = (double?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
     }
 
-    internal class LessThanOrEqualTimeSpanOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var leftCol = (Column<double?>)(arguments[0].Column);
+        var rightCol = (Column<double?>)(arguments[1].Column);
+
+        var data = new bool?[leftCol.RowCount];
+        for (var i = 0; i < leftCol.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 2);
-            var left = (TimeSpan?)arguments[0].Value;
-            var right = (TimeSpan?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
+            var (left, right) = (leftCol[i], rightCol[i]);
+            data[i] = left.HasValue && right.HasValue ? left <= right : null;
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
-            var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+    }
+}
 
-            var data = new bool?[leftCol.RowCount];
-            for (var i = 0; i < leftCol.RowCount; i++)
-            {
-                var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue ? left <= right : null;
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
-        }
+internal class LessThanOrEqualTimeSpanOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var left = (TimeSpan?)arguments[0].Value;
+        var right = (TimeSpan?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
     }
 
-    internal class LessThanOrEqualDateTimeOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
+        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+
+        var data = new bool?[leftCol.RowCount];
+        for (var i = 0; i < leftCol.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 2);
-            var left = (DateTime?)arguments[0].Value;
-            var right = (DateTime?)arguments[1].Value;
-            return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
+            var (left, right) = (leftCol[i], rightCol[i]);
+            data[i] = left.HasValue && right.HasValue ? left <= right : null;
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var leftCol = (Column<DateTime?>)(arguments[0].Column);
-            var rightCol = (Column<DateTime?>)(arguments[1].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+    }
+}
 
-            var data = new bool?[leftCol.RowCount];
-            for (var i = 0; i < leftCol.RowCount; i++)
-            {
-                var (left, right) = (leftCol[i], rightCol[i]);
-                data[i] = left.HasValue && right.HasValue ? left <= right : null;
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+internal class LessThanOrEqualDateTimeOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var left = (DateTime?)arguments[0].Value;
+        var right = (DateTime?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left <= right : null);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var leftCol = (Column<DateTime?>)(arguments[0].Column);
+        var rightCol = (Column<DateTime?>)(arguments[1].Column);
+
+        var data = new bool?[leftCol.RowCount];
+        for (var i = 0; i < leftCol.RowCount; i++)
+        {
+            var (left, right) = (leftCol[i], rightCol[i]);
+            data[i] = left.HasValue && right.HasValue ? left <= right : null;
         }
+
+        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
     }
 }

@@ -4,35 +4,28 @@
 using System;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRTakeOperatorNode : IRQueryOperatorNode
 {
-    internal class IRTakeOperatorNode : IRQueryOperatorNode
-    {
-        public IRTakeOperatorNode(IRExpressionNode expression, TypeSymbol resultType)
-            : base(resultType)
+    public IRTakeOperatorNode(IRExpressionNode expression, TypeSymbol resultType)
+        : base(resultType) =>
+        Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+
+    public IRExpressionNode Expression { get; }
+
+    public override int ChildCount => 1;
+
+    public override IRNode GetChild(int index) =>
+        index switch
         {
-            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-        }
+            0 => Expression,
+            _ => throw new ArgumentOutOfRangeException(nameof(index)),
+        };
 
-        public IRExpressionNode Expression { get; }
+    public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        where TResult : class =>
+        visitor.VisitTakeOperator(this, context);
 
-        public override int ChildCount => 1;
-        public override IRNode GetChild(int index) =>
-            index switch
-            {
-                0 => Expression,
-                _ => throw new ArgumentOutOfRangeException(nameof(index)),
-            };
-
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-            where TResult : class
-        {
-            return visitor.VisitTakeOperator(this, context);
-        }
-
-        public override string ToString()
-        {
-            return $"TakeOperator";
-        }
-    }
+    public override string ToString() => "TakeOperator";
 }

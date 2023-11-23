@@ -4,35 +4,28 @@
 using System;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRFilterOperatorNode : IRQueryOperatorNode
 {
-    internal class IRFilterOperatorNode : IRQueryOperatorNode
-    {
-        public IRFilterOperatorNode(IRExpressionNode condition, TypeSymbol resultType)
-            : base(resultType)
+    public IRExpressionNode Condition;
+
+    public IRFilterOperatorNode(IRExpressionNode condition, TypeSymbol resultType)
+        : base(resultType) =>
+        Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+
+    public override int ChildCount => 1;
+
+    public override IRNode GetChild(int index) =>
+        index switch
         {
-            Condition = condition ?? throw new ArgumentNullException(nameof(condition));
-        }
+            0 => Condition,
+            _ => throw new ArgumentOutOfRangeException(nameof(index)),
+        };
 
-        public IRExpressionNode Condition;
+    public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        where TResult : class =>
+        visitor.VisitFilterOperator(this, context);
 
-        public override int ChildCount => 1;
-        public override IRNode GetChild(int index) =>
-            index switch
-            {
-                0 => Condition,
-                _ => throw new ArgumentOutOfRangeException(nameof(index)),
-            };
-
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-            where TResult : class
-        {
-            return visitor.VisitFilterOperator(this, context);
-        }
-
-        public override string ToString()
-        {
-            return $"FilterOperator: {SchemaDisplay.GetText(ResultType)}";
-        }
-    }
+    public override string ToString() => $"FilterOperator: {SchemaDisplay.GetText(ResultType)}";
 }

@@ -3,65 +3,52 @@
 
 using System.Collections;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class LongAscNullsFirstComparer : IComparer
 {
-    internal class LongAscNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
-                    ? -1
-                    : b == null
-                        ? 1
-                        : ((long)a).CompareTo((long)b);
-        }
-    }
-
-    internal class LongAscNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : ((long)a).CompareTo((long)b);
-        }
-    }
+                    : ((long)a).CompareTo((long)b);
+}
 
-    internal class LongDescNullsFirstComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class LongAscNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
                     ? -1
-                    : b == null
-                        ? 1
-                        : ((long)b).CompareTo((long)a);
-        }
-    }
+                    : ((long)a).CompareTo((long)b);
+}
 
-    internal class LongDescNullsLastComparer : IComparer
-    {
-        public int Compare(object? a, object? b)
-        {
-            return
-                (a == null && b == null)
-                ? 0
-                : a == null
+internal class LongDescNullsFirstComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? -1
+                : b == null
                     ? 1
-                    : b == null
-                        ? -1
-                        : ((long)b).CompareTo((long)a);
-        }
-    }
+                    : ((long)b).CompareTo((long)a);
+}
+
+internal class LongDescNullsLastComparer : IComparer
+{
+    public int Compare(object? a, object? b) =>
+        (a == null && b == null)
+            ? 0
+            : a == null
+                ? 1
+                : b == null
+                    ? -1
+                    : ((long)b).CompareTo((long)a);
 }

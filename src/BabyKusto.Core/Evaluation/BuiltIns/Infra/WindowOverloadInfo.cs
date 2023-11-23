@@ -3,16 +3,13 @@
 
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns
-{
-    internal sealed class WindowOverloadInfo : OverloadInfoBase
-    {
-        public WindowOverloadInfo(IWindowFunctionImpl impl, TypeSymbol returnType, params TypeSymbol[] parameterTypes)
-           : base(returnType, parameterTypes)
-        {
-            Impl = impl;
-        }
+namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-        public IWindowFunctionImpl Impl { get; }
-    }
+internal sealed class WindowOverloadInfo : OverloadInfoBase
+{
+    public WindowOverloadInfo(IWindowFunctionImpl impl, TypeSymbol returnType, params TypeSymbol[] parameterTypes)
+        : base(returnType, parameterTypes) =>
+        Impl = impl;
+
+    public IWindowFunctionImpl Impl { get; }
 }

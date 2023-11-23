@@ -9,76 +9,76 @@ using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation
+namespace BabyKusto.Core.Evaluation;
+
+internal partial class TreeEvaluator
 {
-    internal partial class TreeEvaluator
+    public override EvaluationResult VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
     {
-        public override EvaluationResult VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
+        Debug.Assert(context.Left != null);
+        var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
+        return new TabularResult(result, context.Left.VisualizationState);
+    }
+
+    private class FilterResultsTable : DerivedTableSourceBase<NoContext>
+    {
+        private readonly IRExpressionNode _condition;
+        private readonly EvaluationContext _context;
+        private readonly TreeEvaluator _owner;
+
+        public FilterResultsTable(TreeEvaluator owner, ITableSource input, EvaluationContext context,
+            IRExpressionNode condition)
+            : base(input)
         {
-            Debug.Assert(context.Left != null);
-            var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
-            return new TabularResult(result, context.Left.VisualizationState);
+            _owner = owner;
+            _context = context;
+            _condition = condition;
+            Type = input.Type;
         }
 
-        private class FilterResultsTable : DerivedTableSourceBase<NoContext>
-        {
-            private readonly TreeEvaluator _owner;
-            private readonly EvaluationContext _context;
-            private readonly IRExpressionNode _condition;
+        public override TableSymbol Type { get; }
 
-            public FilterResultsTable(TreeEvaluator owner, ITableSource input, EvaluationContext context, IRExpressionNode condition)
-                : base(input)
+        protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
+            ITableChunk chunk)
+        {
+            var chunkContext = _context with { Chunk = chunk };
+            var evaluated = _condition.Accept(_owner, chunkContext);
+
+            if (evaluated is ScalarResult scalar)
             {
-                _owner = owner;
-                _context = context;
-                _condition = condition;
-                Type = input.Type;
+                // Scalar will evaluate to the same value for any chunk, so wecan process the entire chunk at once
+                if ((bool?)scalar.Value == true)
+                {
+                    return (default, chunk.ReParent(this), false);
+                }
+
+                return (default, null, false);
             }
 
-            public override TableSymbol Type { get; }
-
-            protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _, ITableChunk chunk)
+            if (evaluated is ColumnarResult columnar)
             {
-                var chunkContext = _context with { Chunk = chunk };
-                var evaluated = _condition.Accept(_owner, chunkContext);
-
-                if (evaluated is ScalarResult scalar)
+                var resultColumns = new ColumnBuilder[chunk.Columns.Length];
+                for (var j = 0; j < chunk.Columns.Length; j++)
                 {
-                    // Scalar will evaluate to the same value for any chunk, so wecan process the entire chunk at once
-                    if ((bool?)scalar.Value == true)
-                    {
-                        return (default, chunk.ReParent(this), false);
-                    }
-
-                    return (default, null, false);
+                    resultColumns[j] = chunk.Columns[j].CreateBuilder();
                 }
-                else if (evaluated is ColumnarResult columnar)
-                {
-                    var resultColumns = new ColumnBuilder[chunk.Columns.Length];
-                    for (var j = 0; j < chunk.Columns.Length; j++)
-                    {
-                        resultColumns[j] = chunk.Columns[j].CreateBuilder();
-                    }
 
-                    var predicateColumn = (Column<bool?>)columnar.Column;
-                    for (var i = 0; i < predicateColumn.RowCount; i++)
+                var predicateColumn = (Column<bool?>)columnar.Column;
+                for (var i = 0; i < predicateColumn.RowCount; i++)
+                {
+                    if (predicateColumn[i] == true)
                     {
-                        if (predicateColumn[i] == true)
+                        for (var j = 0; j < chunk.Columns.Length; j++)
                         {
-                            for (var j = 0; j < chunk.Columns.Length; j++)
-                            {
-                                resultColumns[j].Add(chunk.Columns[j].RawData.GetValue(i));
-                            }
+                            resultColumns[j].Add(chunk.Columns[j].RawData.GetValue(i));
                         }
                     }
+                }
 
-                    return (default, new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray()), false);
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
+                return (default, new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray()), false);
             }
+
+            throw new InvalidOperationException();
         }
     }
 }

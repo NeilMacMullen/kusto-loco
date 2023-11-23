@@ -5,40 +5,39 @@ using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class UrlDecodeFunctionImpl : IScalarFunctionImpl
 {
-    internal class UrlDecodeFunctionImpl : IScalarFunctionImpl
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            var url = (string?)arguments[0].Value;
+        Debug.Assert(arguments.Length == 1);
+        var url = (string?)arguments[0].Value;
 
-            return new ScalarResult(ScalarTypes.String, Impl(url));
+        return new ScalarResult(ScalarTypes.String, Impl(url));
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var urlCol = (Column<string?>)arguments[0].Column;
+
+        var data = new string?[urlCol.RowCount];
+        for (var i = 0; i < urlCol.RowCount; i++)
+        {
+            data[i] = Impl(urlCol[i]);
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+    }
+
+    private static string? Impl(string? url)
+    {
+        if (string.IsNullOrEmpty(url))
         {
-            Debug.Assert(arguments.Length == 1);
-            var urlCol = (Column<string?>)arguments[0].Column;
-
-            var data = new string?[urlCol.RowCount];
-            for (var i = 0; i < urlCol.RowCount; i++)
-            {
-                data[i] = Impl(urlCol[i]);
-            }
-
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return string.Empty;
         }
 
-        static string? Impl(string? url)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                return string.Empty;
-            }
-
-            return Uri.UnescapeDataString(url);
-        }
+        return Uri.UnescapeDataString(url);
     }
 }

@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace BabyKusto.Core
+namespace BabyKusto.Core;
+
+public interface ITableChunk
 {
-    public interface ITableChunk
-    {
-        ITableSource Table { get; }
+    ITableSource Table { get; }
 
-        Column[] Columns { get; }
+    Column[] Columns { get; }
 
-        int RowCount { get; }
-    }
+    int RowCount { get; }
 }

@@ -10,97 +10,99 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Extensions
+namespace BabyKusto.Core.Extensions;
+
+/// <summary>
+///     used only for dumping results
+/// </summary>
+public static class TableSourceExtensions
 {
-    public static class TableSourceExtensions
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-        };
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+    };
 
-        public static void Dump(this ITableSource table, TextWriter writer, int indent = 0)
-        {
-            WriteIndent(writer, indent);
+    public static void Dump(this ITableSource table, TextWriter writer, int indent = 0)
+    {
+        WriteIndent(writer, indent);
 
-            for (var i = 0; i < table.Type.Columns.Count; i++)
+        for (var i = 0; i < table.Type.Columns.Count; i++)
+        {
+            if (i > 0)
             {
-                if (i > 0)
-                {
-                    writer.Write("; ");
-                }
-
-                writer.Write(table.Type.Columns[i].Name);
-                writer.Write(":");
-                writer.Write(SchemaDisplay.GetText(table.Type.Columns[i].Type));
+                writer.Write("; ");
             }
 
-            writer.WriteLine();
+            writer.Write(table.Type.Columns[i].Name);
+            writer.Write(":");
+            writer.Write(SchemaDisplay.GetText(table.Type.Columns[i].Type));
+        }
 
-            WriteIndent(writer, indent);
-            writer.WriteLine("------------------");
+        writer.WriteLine();
 
-            foreach (var chunk in table.GetData())
+        WriteIndent(writer, indent);
+        writer.WriteLine("------------------");
+
+        foreach (var chunk in table.GetData())
+        {
+            for (var i = 0; i < chunk.RowCount; i++)
             {
-                for (var i = 0; i < chunk.RowCount; i++)
+                WriteIndent(writer, indent);
+                for (var j = 0; j < chunk.Columns.Length; j++)
                 {
-                    WriteIndent(writer, indent);
-                    for (var j = 0; j < chunk.Columns.Length; j++)
+                    if (j > 0)
                     {
-                        if (j > 0)
-                        {
-                            writer.Write("; ");
-                        }
-
-                        var v = chunk.Columns[j].RawData.GetValue(i);
-                        if (chunk.Columns[j].Type == ScalarTypes.String)
-                        {
-                            writer.Write((string?)v ?? string.Empty);
-                        }
-                        else
-                        {
-                            writer.Write(
-                                v switch
-                                {
-                                    DateTime dateTime => dateTime.ToString("O"),
-                                    JsonNode jsonNode => DumpNode(jsonNode),
-                                    null => "(null)",
-                                    _ => v,
-                                });
-                        }
+                        writer.Write("; ");
                     }
 
-                    writer.WriteLine();
+                    var v = chunk.Columns[j].RawData.GetValue(i);
+                    if (chunk.Columns[j].Type == ScalarTypes.String)
+                    {
+                        writer.Write((string?)v ?? string.Empty);
+                    }
+                    else
+                    {
+                        writer.Write(
+                            v switch
+                            {
+                                DateTime dateTime => dateTime.ToString("O"),
+                                JsonNode jsonNode => DumpNode(jsonNode),
+                                null => "(null)",
+                                _ => v,
+                            });
+                    }
                 }
+
+                writer.WriteLine();
             }
         }
+    }
 
-        private static string DumpNode(JsonNode jsonNode)
+    private static string DumpNode(JsonNode jsonNode)
+    {
+        try
         {
-            try
-            {
-                return jsonNode.ToJsonString(JsonOptions);
-            }
-            catch (Exception ex)
-            {
-                return $"Unable to dump node {ex.Message}";
-            }
+            return jsonNode.ToJsonString(JsonOptions);
         }
-
-        public static string DumpToString(this ITableSource table, int indent = 0)
+        catch (Exception ex)
         {
-            using var writer = new StringWriter(CultureInfo.InvariantCulture);
-            table.Dump(writer, indent);
-            return writer.ToString();
+            return $"Unable to dump node {ex.Message}";
         }
+    }
 
-        private static void WriteIndent(TextWriter writer, int indent)
+    public static string DumpToString(this ITableSource table, int indent = 0)
+    {
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
+        table.Dump(writer, indent);
+        return writer.ToString();
+    }
+
+    private static void WriteIndent(TextWriter writer, int indent)
+    {
+        if (indent > 0)
         {
-            if (indent > 0)
-            {
-                writer.Write(new string(' ', indent));
-            }
+            writer.Write(new string(' ', indent));
         }
     }
 }

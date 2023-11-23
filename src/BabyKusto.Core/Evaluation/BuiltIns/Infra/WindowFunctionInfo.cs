@@ -3,15 +3,11 @@
 
 using System.Collections.Generic;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns
-{
-    internal class WindowFunctionInfo
-    {
-        public WindowFunctionInfo(params WindowOverloadInfo[] overloads)
-        {
-            Overloads = overloads;
-        }
+namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-        public IReadOnlyList<WindowOverloadInfo> Overloads { get; }
-    }
+internal class WindowFunctionInfo
+{
+    public WindowFunctionInfo(params WindowOverloadInfo[] overloads) => Overloads = overloads;
+
+    public IReadOnlyList<WindowOverloadInfo> Overloads { get; }
 }

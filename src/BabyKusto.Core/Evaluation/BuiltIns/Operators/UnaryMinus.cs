@@ -5,93 +5,96 @@ using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class UnaryMinusIntOperatorImpl : IScalarFunctionImpl
 {
-    internal class UnaryMinusIntOperatorImpl : IScalarFunctionImpl
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Int, -(int?)arguments[0].Value);
-        }
-
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            var column = (Column<int?>)(arguments[0].Column);
-
-            var data = new int?[column.RowCount];
-            for (var i = 0; i < column.RowCount; i++)
-            {
-                data[i] = -column[i];
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
-        }
+        Debug.Assert(arguments.Length == 1);
+        return new ScalarResult(ScalarTypes.Int, -(int?)arguments[0].Value);
     }
 
-    internal class UnaryMinusLongOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 1);
+        var column = (Column<int?>)(arguments[0].Column);
+
+        var data = new int?[column.RowCount];
+        for (var i = 0; i < column.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Long, -(long?)arguments[0].Value);
+            data[i] = -column[i];
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            var column = (Column<long?>)(arguments[0].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+    }
+}
 
-            var data = new long?[column.RowCount];
-            for (var i = 0; i < column.RowCount; i++)
-            {
-                data[i] = -column[i];
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
-        }
+internal class UnaryMinusLongOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        return new ScalarResult(ScalarTypes.Long, -(long?)arguments[0].Value);
     }
 
-    internal class UnaryMinusDoubleOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 1);
+        var column = (Column<long?>)(arguments[0].Column);
+
+        var data = new long?[column.RowCount];
+        for (var i = 0; i < column.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.Real, -(double?)arguments[0].Value);
+            data[i] = -column[i];
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            var column = (Column<double?>)(arguments[0].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+    }
+}
 
-            var data = new double?[column.RowCount];
-            for (var i = 0; i < column.RowCount; i++)
-            {
-                data[i] = -column[i];
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
-        }
+internal class UnaryMinusDoubleOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        return new ScalarResult(ScalarTypes.Real, -(double?)arguments[0].Value);
     }
 
-    internal class UnaryMinusTimeSpanOperatorImpl : IScalarFunctionImpl
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        public ScalarResult InvokeScalar(ScalarResult[] arguments)
+        Debug.Assert(arguments.Length == 1);
+        var column = (Column<double?>)(arguments[0].Column);
+
+        var data = new double?[column.RowCount];
+        for (var i = 0; i < column.RowCount; i++)
         {
-            Debug.Assert(arguments.Length == 1);
-            return new ScalarResult(ScalarTypes.TimeSpan, -(TimeSpan?)arguments[0].Value);
+            data[i] = -column[i];
         }
 
-        public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 1);
-            var column = (Column<TimeSpan?>)(arguments[0].Column);
+        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+    }
+}
 
-            var data = new TimeSpan?[column.RowCount];
-            for (var i = 0; i < column.RowCount; i++)
-            {
-                data[i] = -column[i];
-            }
-            return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+internal class UnaryMinusTimeSpanOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        return new ScalarResult(ScalarTypes.TimeSpan, -(TimeSpan?)arguments[0].Value);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var column = (Column<TimeSpan?>)(arguments[0].Column);
+
+        var data = new TimeSpan?[column.RowCount];
+        for (var i = 0; i < column.RowCount; i++)
+        {
+            data[i] = -column[i];
         }
+
+        return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
     }
 }

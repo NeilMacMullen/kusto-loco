@@ -7,30 +7,31 @@ using BabyKusto.Core.Evaluation;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 
-namespace BabyKusto.Core.Extensions
+namespace BabyKusto.Core.Extensions;
+
+public static class EvaluationResultExtensions
 {
-    public static class EvaluationResultExtensions
+    public static void Dump(this EvaluationResult result, TextWriter writer, int indent = 0)
     {
-        public static void Dump(this EvaluationResult result, TextWriter writer, int indent = 0)
+        switch (result)
         {
-            switch (result)
-            {
-                case TabularResult tabularResult:
-                    tabularResult.Value.Dump(writer, indent);
-                    break;
-                case ScalarResult scalarResult:
-                    if (indent > 0)
-                    {
-                        writer.Write(new string(' ', indent));
-                    }
-                    writer.Write(scalarResult.Value);
-                    writer.Write(" (");
-                    writer.Write(SchemaDisplay.GetText(scalarResult.Type));
-                    writer.WriteLine(")");
-                    break;
-                default:
-                    throw new NotSupportedException($"Unsupported evaluation result type cannot be dumped: {TypeNameHelper.GetTypeDisplayName(result)}");
-            }
+            case TabularResult tabularResult:
+                tabularResult.Value.Dump(writer, indent);
+                break;
+            case ScalarResult scalarResult:
+                if (indent > 0)
+                {
+                    writer.Write(new string(' ', indent));
+                }
+
+                writer.Write(scalarResult.Value);
+                writer.Write(" (");
+                writer.Write(SchemaDisplay.GetText(scalarResult.Type));
+                writer.WriteLine(")");
+                break;
+            default:
+                throw new NotSupportedException(
+                    $"Unsupported evaluation result type cannot be dumped: {TypeNameHelper.GetTypeDisplayName(result)}");
         }
     }
 }

@@ -4,83 +4,82 @@
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
+namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+
+internal class SumIfIntFunctionImpl : IAggregateImpl
 {
-    internal class SumIfIntFunctionImpl : IAggregateImpl
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-            var expression = (Column<int?>)arguments[0].Column;
-            var predicate = (Column<bool?>)arguments[1].Column;
-            var sum = 0;
-            for (var i = 0; i < predicate.RowCount; i++)
+        var expression = (Column<int?>)arguments[0].Column;
+        var predicate = (Column<bool?>)arguments[1].Column;
+        var sum = 0;
+        for (var i = 0; i < predicate.RowCount; i++)
+        {
+            if (predicate[i] == true)
             {
-                if (predicate[i] == true)
+                var item = expression[i];
+                if (item.HasValue)
                 {
-                    var item = expression[i];
-                    if (item.HasValue)
-                    {
-                        sum += item.Value;
-                    }
+                    sum += item.Value;
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Int, sum);
         }
+
+        return new ScalarResult(ScalarTypes.Int, sum);
     }
+}
 
-    internal class SumIfLongFunctionImpl : IAggregateImpl
+internal class SumIfLongFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-            var expression = (Column<long?>)arguments[0].Column;
-            var predicate = (Column<bool?>)arguments[1].Column;
-            long sum = 0;
-            for (var i = 0; i < predicate.RowCount; i++)
+        var expression = (Column<long?>)arguments[0].Column;
+        var predicate = (Column<bool?>)arguments[1].Column;
+        long sum = 0;
+        for (var i = 0; i < predicate.RowCount; i++)
+        {
+            if (predicate[i] == true)
             {
-                if (predicate[i] == true)
+                var item = expression[i];
+                if (item.HasValue)
                 {
-                    var item = expression[i];
-                    if (item.HasValue)
-                    {
-                        sum += item.Value;
-                    }
+                    sum += item.Value;
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Long, sum);
         }
+
+        return new ScalarResult(ScalarTypes.Long, sum);
     }
+}
 
-    internal class SumIfDoubleFunctionImpl : IAggregateImpl
+internal class SumIfDoubleFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
-        {
-            Debug.Assert(arguments.Length == 2);
-            Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-            var expression = (Column<double?>)arguments[0].Column;
-            var predicate = (Column<bool?>)arguments[1].Column;
-            double sum = 0;
-            for (var i = 0; i < predicate.RowCount; i++)
+        var expression = (Column<double?>)arguments[0].Column;
+        var predicate = (Column<bool?>)arguments[1].Column;
+        double sum = 0;
+        for (var i = 0; i < predicate.RowCount; i++)
+        {
+            if (predicate[i] == true)
             {
-                if (predicate[i] == true)
+                var item = expression[i];
+                if (item.HasValue)
                 {
-                    var item = expression[i];
-                    if (item.HasValue)
-                    {
-                        sum += item.Value;
-                    }
+                    sum += item.Value;
                 }
             }
-
-            return new ScalarResult(ScalarTypes.Real, sum);
         }
+
+        return new ScalarResult(ScalarTypes.Real, sum);
     }
 }

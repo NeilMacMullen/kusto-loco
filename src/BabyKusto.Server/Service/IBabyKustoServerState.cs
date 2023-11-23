@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using BabyKusto.Core;
 using Kusto.Language;
 
-namespace BabyKusto.Server.Service
-{
-    public interface IBabyKustoServerState
-    {
-        GlobalState Globals { get; }
-        BabyKustoServerOptions Options { get; }
-        List<ITableSource> Tables { get; }
+namespace BabyKusto.Server.Service;
 
-        BabyKustoEngine Engine { get; }
-    }
+public interface IBabyKustoServerState
+{
+    GlobalState Globals { get; }
+    BabyKustoServerOptions Options { get; }
+    List<ITableSource> Tables { get; }
+
+    BabyKustoEngine Engine { get; }
 }

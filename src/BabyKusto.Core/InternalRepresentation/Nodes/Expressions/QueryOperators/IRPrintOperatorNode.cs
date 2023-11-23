@@ -4,37 +4,29 @@
 using System;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRPrintOperatorNode : IRQueryOperatorNode
 {
-    internal class IRPrintOperatorNode : IRQueryOperatorNode
-    {
+    public IRPrintOperatorNode(IRListNode<IRExpressionNode> expressions, TypeSymbol resultType)
+        : base(resultType) =>
+        Expressions = expressions ?? throw new ArgumentNullException(nameof(expressions));
 
-        public IRPrintOperatorNode(IRListNode<IRExpressionNode> expressions, TypeSymbol resultType)
-            : base(resultType)
+    public IRListNode<IRExpressionNode> Expressions { get; }
+
+    public override int ChildCount => 1;
+
+    public override IRNode GetChild(int index) =>
+        index switch
         {
-            Expressions = expressions ?? throw new ArgumentNullException(nameof(expressions));
-        }
-
-        public IRListNode<IRExpressionNode> Expressions { get; }
-
-        public override int ChildCount => 1;
-        public override IRNode GetChild(int index) =>
-            index switch
-            {
-                0 => Expressions,
-                _ => throw new ArgumentOutOfRangeException(nameof(index)),
-            };
+            0 => Expressions,
+            _ => throw new ArgumentOutOfRangeException(nameof(index)),
+        };
 
 
-        public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-            where TResult : class
-        {
-            return visitor.VisitPrintOperator(this, context);
-        }
+    public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
+        where TResult : class =>
+        visitor.VisitPrintOperator(this, context);
 
-        public override string ToString()
-        {
-            return $"PrintOperator: {SchemaDisplay.GetText(ResultType)}";
-        }
-    }
+    public override string ToString() => $"PrintOperator: {SchemaDisplay.GetText(ResultType)}";
 }

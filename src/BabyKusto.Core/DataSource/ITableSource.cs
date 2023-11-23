@@ -5,13 +5,12 @@ using System.Collections.Generic;
 using System.Threading;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core
-{
-    public interface ITableSource
-    {
-        TableSymbol Type { get; }
+namespace BabyKusto.Core;
 
-        IEnumerable<ITableChunk> GetData();
-        IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default);
-    }
+public interface ITableSource
+{
+    TableSymbol Type { get; }
+
+    IEnumerable<ITableChunk> GetData();
+    IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default);
 }

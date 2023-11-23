@@ -4,22 +4,19 @@
 using System;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal class IRJoinOnClause
 {
-    internal class IRJoinOnClause
+    public IRJoinOnClause(IRRowScopeNameReferenceNode left, IRRowScopeNameReferenceNode right)
     {
-        public IRJoinOnClause(IRRowScopeNameReferenceNode left, IRRowScopeNameReferenceNode right)
-        {
-            Left = left ?? throw new ArgumentNullException(nameof(left));
-            Right = right ?? throw new ArgumentNullException(nameof(right));
-        }
-
-        public IRRowScopeNameReferenceNode Left { get; }
-        public IRRowScopeNameReferenceNode Right { get; }
-
-        public override string ToString()
-        {
-            return $"JoinOnClause({SchemaDisplay.GetText(Left.ReferencedSymbol)}, {SchemaDisplay.GetText(Right.ReferencedSymbol)})";
-        }
+        Left = left ?? throw new ArgumentNullException(nameof(left));
+        Right = right ?? throw new ArgumentNullException(nameof(right));
     }
+
+    public IRRowScopeNameReferenceNode Left { get; }
+    public IRRowScopeNameReferenceNode Right { get; }
+
+    public override string ToString() =>
+        $"JoinOnClause({SchemaDisplay.GetText(Left.ReferencedSymbol)}, {SchemaDisplay.GetText(Right.ReferencedSymbol)})";
 }

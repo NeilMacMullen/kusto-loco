@@ -1,12 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
-using BabyKusto.Core;
-using Xunit;
-
-namespace KustoExecutionEngine.Core.Tests
-{
+namespace KustoExecutionEngine.Core.Tests;
 #if false
     public class TranslationTests
     {
@@ -60,4 +55,3 @@ namespace KustoExecutionEngine.Core.Tests
         }
     }
 #endif
-}

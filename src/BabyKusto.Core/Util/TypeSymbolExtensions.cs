@@ -1,19 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Diagnostics.CodeAnalysis;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.Extensions
+namespace BabyKusto.Core.Extensions;
+
+internal static class TypeSymbolExtensions
 {
-    internal static class TypeSymbolExtensions
-    {
-        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("type")]
-        internal static TypeSymbol? Simplify(this TypeSymbol? type)
-        {
-            return
-                type == null ? null :
-                type.Name == ScalarTypes.Dynamic.Name ? ScalarTypes.Dynamic :
-                type;
-        }
-    }
+    [return: NotNullIfNotNull("type")]
+    internal static TypeSymbol? Simplify(this TypeSymbol? type) =>
+        type == null ? null :
+        type.Name == ScalarTypes.Dynamic.Name ? ScalarTypes.Dynamic :
+        type;
 }

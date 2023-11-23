@@ -8,100 +8,101 @@ using System.Threading;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 
-namespace BabyKusto.Core.Evaluation
+namespace BabyKusto.Core.Evaluation;
+
+internal abstract class DerivedTableSourceBase<TContext> : ITableSource
 {
-    internal abstract class DerivedTableSourceBase<TContext> : ITableSource
+    public DerivedTableSourceBase(ITableSource source) => Source = source;
+    protected ITableSource Source { get; }
+
+    public abstract TableSymbol Type { get; }
+
+    public virtual IEnumerable<ITableChunk> GetData()
     {
-        private readonly ITableSource _source;
-
-        public DerivedTableSourceBase(ITableSource source)
+        var context = Init();
+        foreach (var chunk in Source.GetData())
         {
-            _source = source;
-        }
+            var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
+            context = newContext;
 
-        public abstract TableSymbol Type { get; }
-        protected ITableSource Source => _source;
-
-        public virtual IEnumerable<ITableChunk> GetData()
-        {
-            var context = Init();
-            foreach (var chunk in _source.GetData())
+            if (newChunk != null)
             {
-                var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
-                context = newContext;
-
-                if (newChunk != null)
-                {
-                    yield return newChunk;
-                }
-
-                if (shouldBreak)
-                {
-                    break;
-                }
+                yield return newChunk;
             }
 
-            var lastChunk = ProcessLastChunkInternal(context);
-            if (lastChunk != null)
+            if (shouldBreak)
             {
-                yield return lastChunk;
+                break;
             }
         }
 
-        public virtual async IAsyncEnumerable<ITableChunk> GetDataAsync([EnumeratorCancellation] CancellationToken cancellation = default)
+        var lastChunk = ProcessLastChunkInternal(context);
+        if (lastChunk != null)
         {
-            var context = Init();
-            await foreach (var chunk in _source.GetDataAsync(cancellation))
-            {
-                var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
-                context = newContext;
-
-                if (newChunk != null)
-                {
-                    yield return newChunk;
-                }
-
-                if (shouldBreak)
-                {
-                    break;
-                }
-            }
-
-            var lastChunk = ProcessLastChunkInternal(context);
-            if (lastChunk != null)
-            {
-                yield return lastChunk;
-            }
-        }
-
-        protected virtual TContext Init() => default!;
-        protected abstract (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TContext context, ITableChunk chunk);
-        protected virtual ITableChunk? ProcessLastChunk(TContext context) => null;
-
-        private (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context, ITableChunk chunk)
-        {
-            var (newContext, newChunk, shouldBreak) = ProcessChunk(context, chunk);
-            if (newChunk != null && newChunk.Table != this)
-            {
-                throw new InvalidOperationException($"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");
-            }
-
-            return (newContext, newChunk, shouldBreak);
-        }
-
-        private ITableChunk? ProcessLastChunkInternal(TContext context)
-        {
-            var newChunk = ProcessLastChunk(context);
-            if (newChunk != null && newChunk.Table != this)
-            {
-                throw new InvalidOperationException($"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");
-            }
-
-            return newChunk;
+            yield return lastChunk;
         }
     }
 
-    internal struct NoContext
+    public virtual async IAsyncEnumerable<ITableChunk> GetDataAsync(
+        [EnumeratorCancellation] CancellationToken cancellation = default)
     {
+        var context = Init();
+        await foreach (var chunk in Source.GetDataAsync(cancellation))
+        {
+            var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
+            context = newContext;
+
+            if (newChunk != null)
+            {
+                yield return newChunk;
+            }
+
+            if (shouldBreak)
+            {
+                break;
+            }
+        }
+
+        var lastChunk = ProcessLastChunkInternal(context);
+        if (lastChunk != null)
+        {
+            yield return lastChunk;
+        }
     }
+
+    protected virtual TContext Init() => default!;
+
+    protected abstract (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TContext context,
+        ITableChunk chunk);
+
+    protected virtual ITableChunk? ProcessLastChunk(TContext context) => null;
+
+    private (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context,
+        ITableChunk chunk)
+    {
+        var (newContext, newChunk, shouldBreak) = ProcessChunk(context, chunk);
+        if (newChunk != null && newChunk.Table != this)
+        {
+            throw new InvalidOperationException(
+                $"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");
+        }
+
+        return (newContext, newChunk, shouldBreak);
+    }
+
+    private ITableChunk? ProcessLastChunkInternal(TContext context)
+    {
+        var newChunk = ProcessLastChunk(context);
+        if (newChunk != null && newChunk.Table != this)
+        {
+            throw new InvalidOperationException(
+                $"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");
+        }
+
+        return newChunk;
+    }
+}
+
+internal struct NoContext
+{
 }

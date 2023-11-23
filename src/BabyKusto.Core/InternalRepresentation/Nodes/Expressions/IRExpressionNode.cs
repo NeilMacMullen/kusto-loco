@@ -5,106 +5,107 @@ using System;
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.Core.InternalRepresentation
+namespace BabyKusto.Core.InternalRepresentation;
+
+internal enum EvaluatedExpressionKind
 {
-    internal enum EvaluatedExpressionKind
+    Scalar,
+    Columnar,
+    Table,
+}
+
+internal abstract class IRExpressionNode : IRNode
+{
+    private Dictionary<Type, object>? _cache;
+
+    public IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
     {
-        Scalar,
-        Columnar,
-        Table,
+        ResultType = resultType ?? throw new ArgumentNullException(nameof(resultType));
+        ResultKind = resultKind;
     }
 
-    internal abstract class IRExpressionNode : IRNode
+    public TypeSymbol ResultType { get; }
+    public EvaluatedExpressionKind ResultKind { get; }
+
+    public T GetOrSetCache<T>(Func<T> factoryFunc)
     {
-        private Dictionary<Type, object>? _cache;
-
-        public IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
+        if (_cache == null)
         {
-            ResultType = resultType ?? throw new ArgumentNullException(nameof(resultType));
-            ResultKind = resultKind;
+            _cache = new Dictionary<Type, object>();
         }
 
-        public TypeSymbol ResultType { get; }
-        public EvaluatedExpressionKind ResultKind { get; }
-
-        public T GetOrSetCache<T>(Func<T> factoryFunc)
+        var typeKey = typeof(T);
+        if (!_cache.TryGetValue(typeKey, out var item))
         {
-            if (_cache == null)
-            {
-                _cache = new Dictionary<Type, object>();
-            }
-
-            var typeKey = typeof(T);
-            if (!_cache.TryGetValue(typeKey, out var item))
-            {
-                item = factoryFunc()!;
-                _cache.Add(typeKey, item);
-            }
-
-            return (T)item;
+            item = factoryFunc()!;
+            _cache.Add(typeKey, item);
         }
 
-        protected static EvaluatedExpressionKind GetResultKind(TypeSymbol type)
-        {
-            if (type.IsScalar)
-            {
-                return EvaluatedExpressionKind.Scalar;
-            }
-            else if (type.IsTabular)
-            {
-                return EvaluatedExpressionKind.Table;
-            }
+        return (T)item;
+    }
 
-            throw new InvalidOperationException($"Type cannot be mapped to {nameof(EvaluatedExpressionKind)}: {SchemaDisplay.GetText(type)}");
+    protected static EvaluatedExpressionKind GetResultKind(TypeSymbol type)
+    {
+        if (type.IsScalar)
+        {
+            return EvaluatedExpressionKind.Scalar;
         }
 
-        protected static EvaluatedExpressionKind GetResultKind(EvaluatedExpressionKind a, EvaluatedExpressionKind b)
+        if (type.IsTabular)
         {
-            if (a == b)
-            {
-                return a;
-            }
-
-            if ((a == EvaluatedExpressionKind.Scalar || b == EvaluatedExpressionKind.Scalar) &&
-                (a == EvaluatedExpressionKind.Columnar || b == EvaluatedExpressionKind.Columnar))
-            {
-                return EvaluatedExpressionKind.Columnar;
-            }
-
-            throw new InvalidOperationException($"Incompatible expression kinds: {a}, {b}");
+            return EvaluatedExpressionKind.Table;
         }
 
-        protected static EvaluatedExpressionKind GetResultKind(IRListNode<IRExpressionNode> arguments)
+        throw new InvalidOperationException(
+            $"Type cannot be mapped to {nameof(EvaluatedExpressionKind)}: {SchemaDisplay.GetText(type)}");
+    }
+
+    protected static EvaluatedExpressionKind GetResultKind(EvaluatedExpressionKind a, EvaluatedExpressionKind b)
+    {
+        if (a == b)
         {
-            if (arguments.ChildCount == 0)
+            return a;
+        }
+
+        if ((a == EvaluatedExpressionKind.Scalar || b == EvaluatedExpressionKind.Scalar) &&
+            (a == EvaluatedExpressionKind.Columnar || b == EvaluatedExpressionKind.Columnar))
+        {
+            return EvaluatedExpressionKind.Columnar;
+        }
+
+        throw new InvalidOperationException($"Incompatible expression kinds: {a}, {b}");
+    }
+
+    protected static EvaluatedExpressionKind GetResultKind(IRListNode<IRExpressionNode> arguments)
+    {
+        if (arguments.ChildCount == 0)
+        {
+            return EvaluatedExpressionKind.Scalar;
+        }
+
+        EvaluatedExpressionKind? resultKind = null;
+        for (var i = 0; i < arguments.ChildCount; i++)
+        {
+            var argument = arguments.GetTypedChild(i);
+            if (argument.ResultKind == EvaluatedExpressionKind.Table)
             {
-                return EvaluatedExpressionKind.Scalar;
+                // Tabular inputs are special and don't participate in row-scope result kind decisions
+                continue;
             }
 
-            EvaluatedExpressionKind? resultKind = null;
-            for (var i = 0; i < arguments.ChildCount; i++)
-            {
-                var argument = arguments.GetTypedChild(i);
-                if (argument.ResultKind == EvaluatedExpressionKind.Table)
-                {
-                    // Tabular inputs are special and don't participate in row-scope result kind decisions
-                    continue;
-                }
-
-                resultKind =
-                    resultKind.HasValue
+            resultKind =
+                resultKind.HasValue
                     ? GetResultKind(resultKind.Value, argument.ResultKind)
                     : argument.ResultKind;
-            }
-
-            if (!resultKind.HasValue)
-            {
-                // TODO: this is absurd
-                return EvaluatedExpressionKind.Table;
-                //throw new InvalidOperationException("Could not determine result kind from argument types.");
-            }
-
-            return resultKind.Value;
         }
+
+        if (!resultKind.HasValue)
+        {
+            // TODO: this is absurd
+            return EvaluatedExpressionKind.Table;
+            //throw new InvalidOperationException("Could not determine result kind from argument types.");
+        }
+
+        return resultKind.Value;
     }
 }

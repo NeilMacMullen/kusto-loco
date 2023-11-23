@@ -1,27 +1,23 @@
 using System.IO;
 using Xunit.Abstractions;
 
-namespace TDigest.Tests {
-    public class MergingDigestTest : DigestTest {
-        protected override IDigestFactory Factory(double compression) {
-            return new MergeDigestFactory(compression);
-        }
+namespace TDigest.Tests;
 
-        protected override AbstractTDigest fromBytes(BinaryReader reader) {
-            return MergingDigest.FromBytes(reader);
-        }
+public class MergingDigestTest : DigestTest
+{
+    public MergingDigestTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
+    }
 
-        class MergeDigestFactory : IDigestFactory {
-            private double compression;
-            public MergeDigestFactory(double compression) {
-                this.compression = compression;
-            }
+    protected override IDigestFactory Factory(double compression) => new MergeDigestFactory(compression);
 
-            public Digest Create() {
-                return new MergingDigest(compression);
-            }
-        }
+    protected override AbstractTDigest fromBytes(BinaryReader reader) => MergingDigest.FromBytes(reader);
 
-        public MergingDigestTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+    private class MergeDigestFactory : IDigestFactory
+    {
+        private readonly double compression;
+        public MergeDigestFactory(double compression) => this.compression = compression;
+
+        public Digest Create() => new MergingDigest(compression);
     }
 }
