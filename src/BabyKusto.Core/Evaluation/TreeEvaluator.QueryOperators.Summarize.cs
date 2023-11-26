@@ -58,18 +58,12 @@ internal partial class TreeEvaluator
         protected override SummarizeResultTableContext Init() =>
             new()
             {
-                BucketizedTables = new Dictionary<string, NpmSummarySet>()
+                BucketizedTables = new Dictionary<SummaryKey, NpmSummarySet>()
             };
 
         protected override (SummarizeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
-            // TODO: This is horribly inefficient
-            //  * Copies all data, even columns that aren't used
-            //  * Composite key calculation involves lots of string allocations and escapings
-            // NPM - introduce record key type.  Also summaries could just be lists of rows referenced from
-            // original table/columns
-            var numInputColumns = Source.Type.Columns.Count;
             var byValuesColumns = new List<Column>(_byExpressions.Count);
             {
                 var chunkContext = _context with { Chunk = chunk };
@@ -86,12 +80,9 @@ internal partial class TreeEvaluator
 
             for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
             {
-                var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToList();
+                var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
 
-                // TODO: Should nulls be treated differently than empty string?
-                // TODO: Use a less expensive composite key computation
-                var key = string.Join("|", byValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
-
+                var key = new SummaryKey(byValues);
                 if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 {
                     var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder()).ToArray();
@@ -120,7 +111,7 @@ internal partial class TreeEvaluator
             var resultRow = 0;
             foreach (var summarySet in context.BucketizedTables.Values)
             {
-                for (var i = 0; i < summarySet.ByValues.Count; i++)
+                for (var i = 0; i < summarySet.ByValues.Length; i++)
                 {
                     resultsData[i].Add(summarySet.ByValues[i]);
                 }
@@ -138,7 +129,7 @@ internal partial class TreeEvaluator
                     Debug.Assert(aggregationResult != null);
                     Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
                         $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
-                    resultsData[summarySet.ByValues.Count + i].Add(aggregationResult.Value);
+                    resultsData[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
                 }
 
                 resultRow++;
@@ -151,10 +142,35 @@ internal partial class TreeEvaluator
 
     private struct SummarizeResultTableContext
     {
-        public Dictionary<string, NpmSummarySet> BucketizedTables;
+        public Dictionary<SummaryKey, NpmSummarySet> BucketizedTables;
     }
 
-    private readonly record struct NpmSummarySet(List<object> ByValues,
+    private readonly record struct NpmSummarySet(object?[] ByValues,
         IndirectColumnBuilder[] IndirectionBuilders,
         List<int> SelectedRows);
+
+    private readonly record struct SummaryKey
+    {
+        private readonly object? O0;
+        private readonly object? O1;
+        private readonly object? O2;
+        private readonly object? O3;
+        private readonly object? O4;
+
+        public SummaryKey(object?[] Values)
+        {
+            if (Values.Length > 0)
+                O0 = Values[0];
+            if (Values.Length > 1)
+                O1 = Values[1];
+            if (Values.Length > 2)
+                O2 = Values[2];
+            if (Values.Length > 3)
+                O3 = Values[3];
+            if (Values.Length > 4)
+                O4 = Values[4];
+            if (Values.Length > 5)
+                throw new NotImplementedException("summarize limited to 5 vals");
+        }
+    }
 }
