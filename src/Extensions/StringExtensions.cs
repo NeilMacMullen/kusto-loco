@@ -44,4 +44,7 @@ public static class StringExtensions
     ///     Splits string into array of non-empty tokens separated by space
     /// </summary>
     public static string[] Tokenise(this string input) => input.Tokenise(" \t");
+
+    public static bool IsBlank(this string s) => string.IsNullOrWhiteSpace(s);
+    public static bool IsNotBlank(this string s) => !s.IsBlank();
 }

@@ -25,5 +25,19 @@ def,30
             countResult.Error.Should().BeEmpty();
             countResult.Results.Count.Should().Be(1);
         }
+
+
+        [TestMethod]
+        public async Task Count()
+        {
+            var context = new KustoQueryContext();
+            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToArray();
+
+            context.AddTableFromRecords("data", rows);
+            var result = (await context.RunQuery("data | count"));
+            KustoFormatter.Tabulate(result.Results).Should().Contain("50000");
+        }
+
+        public readonly record struct Row(string Name, int value);
     }
 }

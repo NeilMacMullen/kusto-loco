@@ -47,6 +47,14 @@ public class KustoQueryContext
         AddTable(table);
     }
 
+    public int BenchmarkQuery(string query)
+    {
+        var res = _engine.Evaluate(query,
+            dumpIRTree: false
+        );
+        return Materialise(res as TabularResult);
+    }
+
     public IReadOnlyCollection<OrderedDictionary> RunTabularQueryToDictionarySet(string query)
     {
         //handling for "special" commands
@@ -122,6 +130,29 @@ public class KustoQueryContext
 
         return items;
     }
+
+    public static int Materialise(TabularResult result)
+    {
+        var count = 0;
+        if (result is TabularResult tabularResult)
+        {
+            var table = tabularResult.Value;
+            foreach (var chunk in table.GetData())
+            {
+                for (var i = 0; i < chunk.RowCount; i++)
+                {
+                    for (var c = 0; c < chunk.Columns.Length; c++)
+                    {
+                        var v = chunk.Columns[c].RawData.GetValue(i);
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
 
     /// <summary>
     ///     Deserialises a Dictionary-based result to objects
