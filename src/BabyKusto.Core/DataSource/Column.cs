@@ -11,18 +11,57 @@ namespace BabyKusto.Core;
 
 public abstract class Column
 {
-    public Column(TypeSymbol type) => Type = type ?? throw new ArgumentNullException(nameof(type));
+    protected Column(TypeSymbol type) => Type = type ?? throw new ArgumentNullException(nameof(type));
 
     public TypeSymbol Type { get; }
     public abstract int RowCount { get; }
-    protected abstract Array RawData { get; }
 
-    public object? GetRawDataValue(int index) => RawData.GetValue(index);
+    public abstract object? GetRawDataValue(int index);
+
     public abstract Column Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
     internal abstract ColumnBuilder CreateBuilder();
 
     public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
+}
+
+public class IndirectColumn<T> : Column<T>
+{
+    private readonly int[] _lookups;
+    public readonly Column<T> BackingColumn;
+
+    public IndirectColumn(TypeSymbol type, int[] lookups, Column<T> backing)
+        : base(type, Array.Empty<T>())
+    {
+        _lookups = lookups;
+        ValidateTypes(type, typeof(T));
+
+        BackingColumn = backing;
+    }
+
+    public override T? this[int index] => BackingColumn[IndirectIndex(index)];
+    public override int RowCount => _lookups.Length;
+
+    public int IndirectIndex(int index) => _lookups[index];
+
+    public override void ForEach(Action<object?> action)
+    {
+        foreach (var i in _lookups)
+        {
+            action(this[i]);
+        }
+    }
+
+    public override Column Slice(int start, int length)
+    {
+        var slicedData = new int[length];
+        Array.Copy(_lookups, start, slicedData, 0, length);
+        return new IndirectColumn<T>(Type, slicedData, BackingColumn);
+    }
+
+    internal override ColumnBuilder CreateBuilder() => base.CreateBuilder();
+
+    public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
 }
 
 public class Column<T> : Column
@@ -36,16 +75,15 @@ public class Column<T> : Column
         _data = data ?? throw new ArgumentNullException(nameof(data));
     }
 
+
     public override int RowCount => _data.Length;
-    protected override Array RawData => _data;
 
-    public T? this[int index]
-    {
-        get => _data[index];
-        set => _data[index] = value;
-    }
+    public virtual T? this[int index] => _data[index];
 
-    private static void ValidateTypes(TypeSymbol typeSymbol, Type type)
+
+    public override object? GetRawDataValue(int index) => _data.GetValue(index);
+
+    public static void ValidateTypes(TypeSymbol typeSymbol, Type type)
     {
         var valid = false;
         if (typeSymbol == ScalarTypes.Int)
