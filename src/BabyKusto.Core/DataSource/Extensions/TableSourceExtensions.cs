@@ -56,7 +56,7 @@ public static class TableSourceExtensions
                         writer.Write("; ");
                     }
 
-                    var v = chunk.Columns[j].RawData.GetValue(i);
+                    var v = chunk.Columns[j].GetRawDataValue(i);
                     if (chunk.Columns[j].Type == ScalarTypes.String)
                     {
                         writer.Write((string?)v ?? string.Empty);

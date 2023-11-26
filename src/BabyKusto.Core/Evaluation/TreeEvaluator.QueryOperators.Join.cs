@@ -105,7 +105,7 @@ internal partial class TreeEvaluator
                 var numRows = chunk.RowCount;
                 for (var i = 0; i < numRows; i++)
                 {
-                    var onValues = onValuesColumns.Select(c => c.RawData.GetValue(i)).ToList();
+                    var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToList();
 
                     // TODO: Should nulls be treated differently than empty string?
                     // TODO: Use a less expensive composite key computation
@@ -124,7 +124,7 @@ internal partial class TreeEvaluator
 
                     for (var j = 0; j < numColumns; j++)
                     {
-                        bucket.Data[j].Add(chunk.Columns[j].RawData.GetValue(i));
+                        bucket.Data[j].Add(chunk.Columns[j].GetRawDataValue(i));
                     }
                 }
             }

@@ -11,6 +11,6 @@ internal class TakeAnyFunctionImpl : IAggregateImpl
     {
         Debug.Assert(arguments.Length == 1);
         var column = arguments[0].Column;
-        return new ScalarResult(column.Type, column.RowCount > 0 ? column.RawData.GetValue(0) : null);
+        return new ScalarResult(column.Type, column.RowCount > 0 ? column.GetRawDataValue(0) : null);
     }
 }

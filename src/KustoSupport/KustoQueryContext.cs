@@ -119,7 +119,7 @@ public class KustoQueryContext
                     var d = new OrderedDictionary();
                     for (var c = 0; c < chunk.Columns.Length; c++)
                     {
-                        var v = chunk.Columns[c].RawData.GetValue(i);
+                        var v = chunk.Columns[c].GetRawDataValue(i);
                         d[table.Type.Columns[c].Name] = v;
                     }
 
@@ -143,7 +143,7 @@ public class KustoQueryContext
                 {
                     for (var c = 0; c < chunk.Columns.Length; c++)
                     {
-                        var v = chunk.Columns[c].RawData.GetValue(i);
+                        var v = chunk.Columns[c].GetRawDataValue(i);
                         count++;
                     }
                 }

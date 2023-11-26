@@ -68,10 +68,9 @@ internal partial class TreeEvaluator
             {
                 for (var i = 0; i < allData.Length; i++)
                 {
-                    var sourceColumn = chunk.Columns[i].RawData;
                     for (var j = 0; j < chunk.RowCount; j++)
                     {
-                        allData[i].Add(sourceColumn.GetValue(j));
+                        allData[i].Add(chunk.Columns[i].GetRawDataValue(j));
                     }
                 }
 
@@ -84,7 +83,7 @@ internal partial class TreeEvaluator
                     var sortedChunkColumn = ((ColumnarResult)sortExpressionResult).Column;
                     for (var j = 0; j < sortedChunkColumn.RowCount; j++)
                     {
-                        sortColumnsData[i].Add(sortedChunkColumn.RawData.GetValue(j));
+                        sortColumnsData[i].Add(sortedChunkColumn.GetRawDataValue(j));
                     }
                 }
             }

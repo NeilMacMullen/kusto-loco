@@ -70,7 +70,7 @@ internal partial class TreeEvaluator
                     {
                         for (var j = 0; j < chunk.Columns.Length; j++)
                         {
-                            resultColumns[j].Add(chunk.Columns[j].RawData.GetValue(i));
+                            resultColumns[j].Add(chunk.Columns[j].GetRawDataValue(i));
                         }
                     }
                 }

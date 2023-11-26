@@ -26,7 +26,7 @@ internal partial class TreeEvaluator
                 if (chunk.Columns[0].RowCount > 0)
                 {
                     Debug.Assert(chunk.Columns[0].Type.Simplify() == node.ResultType.Simplify());
-                    return new ScalarResult(chunk.Columns[0].Type, chunk.Columns[0].RawData.GetValue(0));
+                    return new ScalarResult(chunk.Columns[0].Type, chunk.Columns[0].GetRawDataValue(0));
                 }
             }
 

@@ -15,8 +15,9 @@ public abstract class Column
 
     public TypeSymbol Type { get; }
     public abstract int RowCount { get; }
-    public abstract Array RawData { get; }
+    protected abstract Array RawData { get; }
 
+    public object? GetRawDataValue(int index) => RawData.GetValue(index);
     public abstract Column Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
     internal abstract ColumnBuilder CreateBuilder();
@@ -36,7 +37,7 @@ public class Column<T> : Column
     }
 
     public override int RowCount => _data.Length;
-    public override Array RawData => _data;
+    protected override Array RawData => _data;
 
     public T? this[int index]
     {
