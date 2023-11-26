@@ -19,6 +19,20 @@ public abstract class ColumnBuilder
     public abstract ColumnBuilder NewEmpty();
 }
 
+public abstract class IndirectColumnBuilder
+{
+    public abstract Column CreateIndirectColumn(int[] rows);
+}
+
+public class IndirectColumnBuilder<T> : IndirectColumnBuilder
+{
+    private readonly Column<T> _baseColumn;
+
+    public IndirectColumnBuilder(Column<T> baseColumn) => _baseColumn = baseColumn;
+
+    public override Column CreateIndirectColumn(int[] rows) => new IndirectColumn<T>(rows, _baseColumn);
+}
+
 public class ColumnBuilder<T> : ColumnBuilder
 {
     private readonly List<T?> _data = new();

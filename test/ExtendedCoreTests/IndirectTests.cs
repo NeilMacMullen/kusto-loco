@@ -12,14 +12,14 @@ public class IndirectTests
         var originalData = Enumerable.Range(0, sourceCount)
             .Select(i => i.ToString()).ToArray();
         var cs = new Column<string>(ScalarTypes.String, originalData);
-        var backing = new IndirectColumn<string>(ScalarTypes.String,
+        var backing = new IndirectColumn<string>(
             Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0).ToArray()
             , cs);
         return backing;
     }
 
     [TestMethod]
-    public void IndiretionWorks()
+    public void IndirectionWorks()
     {
         var backing = MakeDecimatedColumn(100);
         backing.RowCount.Should().Be(10);

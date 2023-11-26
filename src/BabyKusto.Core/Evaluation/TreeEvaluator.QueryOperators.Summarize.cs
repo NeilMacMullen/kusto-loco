@@ -58,7 +58,7 @@ internal partial class TreeEvaluator
         protected override SummarizeResultTableContext Init() =>
             new()
             {
-                BucketizedTables = new Dictionary<string, (List<object?> ByValues, ColumnBuilder[] OriginalData)>()
+                BucketizedTables = new Dictionary<string, NpmSummarySet>()
             };
 
         protected override (SummarizeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak)
@@ -84,9 +84,9 @@ internal partial class TreeEvaluator
                 }
             }
 
-            for (var i = 0; i < chunk.RowCount; i++)
+            for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
             {
-                var byValues = byValuesColumns.Select(c => c.GetRawDataValue(i)).ToList();
+                var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToList();
 
                 // TODO: Should nulls be treated differently than empty string?
                 // TODO: Use a less expensive composite key computation
@@ -94,17 +94,16 @@ internal partial class TreeEvaluator
 
                 if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 {
-                    context.BucketizedTables[key] = bucket = (byValues, new ColumnBuilder[numInputColumns]);
-                    for (var j = 0; j < numInputColumns; j++)
-                    {
-                        bucket.OriginalData[j] = chunk.Columns[j].CreateBuilder();
-                    }
+                    var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder()).ToArray();
+
+                    context.BucketizedTables[key] = bucket =
+                        new NpmSummarySet(byValues!,
+                            builders,
+                            new List<int>());
                 }
 
-                for (var j = 0; j < numInputColumns; j++)
-                {
-                    bucket.OriginalData[j].Add(chunk.Columns[j].GetRawDataValue(i));
-                }
+
+                bucket.SelectedRows.Add(rowIndex);
             }
 
             return (context, null, false);
@@ -119,15 +118,18 @@ internal partial class TreeEvaluator
             }
 
             var resultRow = 0;
-            foreach (var tableData in context.BucketizedTables.Values)
+            foreach (var summarySet in context.BucketizedTables.Values)
             {
-                for (var i = 0; i < tableData.ByValues.Count; i++)
+                for (var i = 0; i < summarySet.ByValues.Count; i++)
                 {
-                    resultsData[i].Add(tableData.ByValues[i]);
+                    resultsData[i].Add(summarySet.ByValues[i]);
                 }
 
+                var rows = summarySet.SelectedRows.ToArray();
+
                 var bucketChunk =
-                    new TableChunk(Source, tableData.OriginalData.Select(c => c.ToColumn()).ToArray());
+                    new TableChunk(Source,
+                        summarySet.IndirectionBuilders.Select(c => c.CreateIndirectColumn(rows)).ToArray());
                 var chunkContext = _context with { Chunk = bucketChunk };
                 for (var i = 0; i < _aggregationExpressions.Count; i++)
                 {
@@ -136,7 +138,7 @@ internal partial class TreeEvaluator
                     Debug.Assert(aggregationResult != null);
                     Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
                         $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
-                    resultsData[tableData.ByValues.Count + i].Add(aggregationResult.Value);
+                    resultsData[summarySet.ByValues.Count + i].Add(aggregationResult.Value);
                 }
 
                 resultRow++;
@@ -149,6 +151,10 @@ internal partial class TreeEvaluator
 
     private struct SummarizeResultTableContext
     {
-        public Dictionary<string, (List<object?> ByValues, ColumnBuilder[] OriginalData)> BucketizedTables;
+        public Dictionary<string, NpmSummarySet> BucketizedTables;
     }
+
+    private readonly record struct NpmSummarySet(List<object> ByValues,
+        IndirectColumnBuilder[] IndirectionBuilders,
+        List<int> SelectedRows);
 }

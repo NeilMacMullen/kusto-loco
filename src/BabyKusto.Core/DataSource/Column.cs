@@ -21,6 +21,7 @@ public abstract class Column
     public abstract Column Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
     internal abstract ColumnBuilder CreateBuilder();
+    internal abstract IndirectColumnBuilder CreateIndirectBuilder();
 
     public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
 }
@@ -30,12 +31,10 @@ public class IndirectColumn<T> : Column<T>
     private readonly int[] _lookups;
     public readonly Column<T> BackingColumn;
 
-    public IndirectColumn(TypeSymbol type, int[] lookups, Column<T> backing)
-        : base(type, Array.Empty<T>())
+    public IndirectColumn(int[] lookups, Column<T> backing)
+        : base(backing.Type, Array.Empty<T>())
     {
         _lookups = lookups;
-        ValidateTypes(type, typeof(T));
-
         BackingColumn = backing;
     }
 
@@ -56,12 +55,21 @@ public class IndirectColumn<T> : Column<T>
     {
         var slicedData = new int[length];
         Array.Copy(_lookups, start, slicedData, 0, length);
-        return new IndirectColumn<T>(Type, slicedData, BackingColumn);
+        return new IndirectColumn<T>(slicedData, BackingColumn);
     }
 
     internal override ColumnBuilder CreateBuilder() => base.CreateBuilder();
 
+    public static Func<int[], Column> CreateBuilder(Column<T> baseColumn)
+    {
+        return rows => new IndirectColumn<T>(rows, baseColumn);
+    }
+
     public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
+
+    internal override IndirectColumnBuilder CreateIndirectBuilder() =>
+        //TODO - this could be optimised to flatten the redirection chain
+        new IndirectColumnBuilder<T>(this);
 }
 
 public class Column<T> : Column
@@ -142,4 +150,7 @@ public class Column<T> : Column
     }
 
     internal override ColumnBuilder CreateBuilder() => new ColumnBuilder<T>(Type);
+
+    internal override IndirectColumnBuilder CreateIndirectBuilder() =>
+        new IndirectColumnBuilder<T>(this);
 }
