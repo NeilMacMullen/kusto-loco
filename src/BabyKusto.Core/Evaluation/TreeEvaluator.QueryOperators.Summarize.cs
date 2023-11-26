@@ -65,37 +65,48 @@ internal partial class TreeEvaluator
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
             var byValuesColumns = new List<Column>(_byExpressions.Count);
+
+            var chunkContext = _context with { Chunk = chunk };
+            for (var i = 0; i < _byExpressions.Count; i++)
             {
-                var chunkContext = _context with { Chunk = chunk };
-                for (var i = 0; i < _byExpressions.Count; i++)
-                {
-                    var byExpression = _byExpressions[i];
-                    var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
-                    Debug.Assert(byExpressionResult != null);
-                    Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
-                        $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
-                    byValuesColumns.Add(byExpressionResult.Column);
-                }
+                var byExpression = _byExpressions[i];
+                var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
+                Debug.Assert(byExpressionResult != null);
+                Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
+                    $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
+                byValuesColumns.Add(byExpressionResult.Column);
             }
 
-            for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
+            if (byValuesColumns.Any())
             {
-                var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
-
-                var key = new SummaryKey(byValues);
-                if (!context.BucketizedTables.TryGetValue(key, out var bucket))
+                for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
-                    var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder()).ToArray();
+                    var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
 
-                    context.BucketizedTables[key] = bucket =
-                        new NpmSummarySet(byValues!,
-                            builders,
-                            new List<int>());
+                    var key = new SummaryKey(byValues);
+                    if (!context.BucketizedTables.TryGetValue(key, out var bucket))
+                    {
+                        var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder(IndirectPolicy.Map))
+                            .ToArray();
+
+                        context.BucketizedTables[key] = bucket =
+                            new NpmSummarySet(byValues!,
+                                builders,
+                                new List<int>());
+                    }
+
+                    bucket.SelectedRows.Add(rowIndex);
                 }
-
-
-                bucket.SelectedRows.Add(rowIndex);
             }
+            else
+                context.BucketizedTables[new SummaryKey(Array.Empty<object?>())] =
+                    new NpmSummarySet(
+                        Array.Empty<object?>(),
+                        chunk.Columns.Select(col => col.CreateIndirectBuilder(
+                            IndirectPolicy.Passthru
+                        )).ToArray(),
+                        new List<int>());
+
 
             return (context, null, false);
         }
@@ -117,6 +128,7 @@ internal partial class TreeEvaluator
                 }
 
                 var rows = summarySet.SelectedRows.ToArray();
+
 
                 var bucketChunk =
                     new TableChunk(Source,

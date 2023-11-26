@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
-using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation;
@@ -46,7 +46,7 @@ internal partial class TreeEvaluator
 
             if (evaluated is ScalarResult scalar)
             {
-                // Scalar will evaluate to the same value for any chunk, so wecan process the entire chunk at once
+                // Scalar will evaluate to the same value for any chunk, so we can process the entire chunk at once
                 if ((bool?)scalar.Value == true)
                 {
                     return (default, chunk.ReParent(this), false);
@@ -57,25 +57,23 @@ internal partial class TreeEvaluator
 
             if (evaluated is ColumnarResult columnar)
             {
-                var resultColumns = new ColumnBuilder[chunk.Columns.Length];
-                for (var j = 0; j < chunk.Columns.Length; j++)
-                {
-                    resultColumns[j] = chunk.Columns[j].CreateBuilder();
-                }
-
                 var predicateColumn = (Column<bool?>)columnar.Column;
+
+                var wantedRows = new List<int>();
                 for (var i = 0; i < predicateColumn.RowCount; i++)
                 {
                     if (predicateColumn[i] == true)
                     {
-                        for (var j = 0; j < chunk.Columns.Length; j++)
-                        {
-                            resultColumns[j].Add(chunk.Columns[j].GetRawDataValue(i));
-                        }
+                        wantedRows.Add(i);
                     }
                 }
 
-                return (default, new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray()), false);
+                var wanted = wantedRows.ToArray();
+                var indirectedColumns = chunk.Columns
+                    .Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map))
+                    .Select(b => b.CreateIndirectColumn(wanted))
+                    .ToArray();
+                return (default, new TableChunk(this, indirectedColumns), false);
             }
 
             throw new InvalidOperationException();

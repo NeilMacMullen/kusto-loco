@@ -38,6 +38,17 @@ def,30
             KustoFormatter.Tabulate(result.Results).Should().Contain("50000");
         }
 
-        public readonly record struct Row(string Name, int value);
+
+        [TestMethod]
+        public async Task Where()
+        {
+            var context = new KustoQueryContext();
+            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToArray();
+
+            context.AddTableFromRecords("data", rows);
+            var result = (await context.RunQuery("data | where Value < 10 | count"));
+            KustoFormatter.Tabulate(result.Results).Should().Contain("10");
+        }
+        public readonly record struct Row(string Name, int Value);
     }
 }

@@ -9,6 +9,13 @@ using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core;
 
+public enum IndirectPolicy
+{
+    Passthru,
+    Map,
+    SingleValue
+}
+
 public abstract class Column
 {
     protected Column(TypeSymbol type) => Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -21,7 +28,7 @@ public abstract class Column
     public abstract Column Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
     internal abstract ColumnBuilder CreateBuilder();
-    internal abstract IndirectColumnBuilder CreateIndirectBuilder();
+    internal abstract IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy);
 
     public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
 }
@@ -67,9 +74,9 @@ public class IndirectColumn<T> : Column<T>
 
     public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
 
-    internal override IndirectColumnBuilder CreateIndirectBuilder() =>
-        //TODO - this could be optimised to flatten the redirection chain
-        new IndirectColumnBuilder<T>(this);
+    //TODO - this could be optimised to flatten the redirection chain
+    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+        base.CreateIndirectBuilder(policy);
 }
 
 public class Column<T> : Column
@@ -151,6 +158,6 @@ public class Column<T> : Column
 
     internal override ColumnBuilder CreateBuilder() => new ColumnBuilder<T>(Type);
 
-    internal override IndirectColumnBuilder CreateIndirectBuilder() =>
-        new IndirectColumnBuilder<T>(this);
+    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+        new IndirectColumnBuilder<T>(this, policy);
 }

@@ -27,10 +27,25 @@ public abstract class IndirectColumnBuilder
 public class IndirectColumnBuilder<T> : IndirectColumnBuilder
 {
     private readonly Column<T> _baseColumn;
+    private readonly IndirectPolicy _policy;
 
-    public IndirectColumnBuilder(Column<T> baseColumn) => _baseColumn = baseColumn;
+    public IndirectColumnBuilder(Column<T> baseColumn, IndirectPolicy policy)
+    {
+        _baseColumn = baseColumn;
+        _policy = policy;
+    }
 
-    public override Column CreateIndirectColumn(int[] rows) => new IndirectColumn<T>(rows, _baseColumn);
+    public override Column CreateIndirectColumn(int[] rows)
+    {
+        return _policy switch
+        {
+            IndirectPolicy.Map =>
+                new IndirectColumn<T>(rows, _baseColumn),
+            IndirectPolicy.Passthru => _baseColumn,
+            IndirectPolicy.SingleValue => throw new NotImplementedException(),
+            _ => throw new NotImplementedException()
+        };
+    }
 }
 
 public class ColumnBuilder<T> : ColumnBuilder

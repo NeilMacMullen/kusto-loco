@@ -32,6 +32,13 @@ namespace Benchmarks
             var query = "data | summarize count() by Radius";
             return _context.BenchmarkQuery(query);
         }
+
+        [Benchmark]
+        public int Where()
+        {
+            var query = "data | where  Radius >200 and Name contains 'CENTRAL'";
+            return _context.BenchmarkQuery(query);
+        }
     }
 
     public class Program
