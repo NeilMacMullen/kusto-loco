@@ -49,3 +49,18 @@ public class IndirectTests
         sliced.GetRawDataValue(0).Should().Be("50");
     }
 }
+
+[TestClass]
+public class SingleValueTests
+{
+    [TestMethod]
+    public void SingleWorks()
+    {
+        var backing = new SingleValueColumn<string>(ScalarTypes.String, "hello", 10);
+        backing.RowCount.Should().Be(10);
+
+        backing[0].Should().Be("hello");
+        backing[9].Should().Be("hello");
+        backing.GetRawDataValue(0).Should().Be("hello");
+    }
+}

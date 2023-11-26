@@ -101,6 +101,7 @@ internal partial class TreeEvaluator
             // to then grab any value from it. In any case, this gets the job done for now...
             // NPM - introduce a "single value" column type we could also add "indirect column" to avoid copying
             var numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
+
             for (var i = 0; i < rawArguments.Length; i++)
             {
                 if (rawArguments[i] is ScalarResult scalarResult)

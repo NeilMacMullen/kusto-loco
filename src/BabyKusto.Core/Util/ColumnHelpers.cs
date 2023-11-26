@@ -213,16 +213,8 @@ public static class ColumnHelpers
         return Column.Create(typeSymbol, columnData);
     }
 
-    private static Column<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount)
-    {
-        var columnData = new T[rowCount];
-        for (var i = 0; i < rowCount; i++)
-        {
-            columnData[i] = value;
-        }
-
-        return new Column<T>(typeSymbol, columnData);
-    }
+    private static Column<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount) =>
+        new SingleValueColumn<T>(typeSymbol, value, rowCount);
 
     private static Column<int?> CreateFromInt(object? value, TypeSymbol typeSymbol, int rowCount) =>
         CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), typeSymbol, rowCount);

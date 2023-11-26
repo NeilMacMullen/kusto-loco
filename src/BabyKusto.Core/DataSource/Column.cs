@@ -33,6 +33,36 @@ public abstract class Column
     public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
 }
 
+public class SingleValueColumn<T> : Column<T>
+{
+    private readonly int _rowCount;
+
+    public SingleValueColumn(TypeSymbol type, T? value, int nominalRowCount)
+        : base(type, new[] { value }) =>
+        _rowCount = nominalRowCount;
+
+    public override T? this[int index] => base[0];
+    public override int RowCount => _rowCount;
+
+    public int IndirectIndex(int index) => 0;
+
+    public override void ForEach(Action<object?> action)
+    {
+        for (var i = 0; i < _rowCount; i++)
+        {
+            action(this[i]);
+        }
+    }
+
+    public override Column Slice(int start, int length) => new SingleValueColumn<T>(Type, this[0], length);
+
+    public override object? GetRawDataValue(int index) => this[IndirectIndex(index)];
+
+    //TODO - this could be optimised to flatten the redirection chain
+    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+        base.CreateIndirectBuilder(policy);
+}
+
 public class IndirectColumn<T> : Column<T>
 {
     private readonly int[] _lookups;
@@ -65,12 +95,6 @@ public class IndirectColumn<T> : Column<T>
         return new IndirectColumn<T>(slicedData, BackingColumn);
     }
 
-    internal override ColumnBuilder CreateBuilder() => base.CreateBuilder();
-
-    public static Func<int[], Column> CreateBuilder(Column<T> baseColumn)
-    {
-        return rows => new IndirectColumn<T>(rows, baseColumn);
-    }
 
     public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
 

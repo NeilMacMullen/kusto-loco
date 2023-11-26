@@ -49,6 +49,7 @@ def,30
             var result = (await context.RunQuery("data | where Value < 10 | count"));
             KustoFormatter.Tabulate(result.Results).Should().Contain("10");
         }
+
         public readonly record struct Row(string Name, int Value);
     }
 }
