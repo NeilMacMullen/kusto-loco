@@ -109,6 +109,7 @@ internal partial class TreeEvaluator
 
                     // TODO: Should nulls be treated differently than empty string?
                     // TODO: Use a less expensive composite key computation
+                    //NPM - we can drop column values into a record and get free equality check
                     var key = string.Join("|", onValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {

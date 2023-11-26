@@ -67,7 +67,8 @@ internal partial class TreeEvaluator
             // TODO: This is horribly inefficient
             //  * Copies all data, even columns that aren't used
             //  * Composite key calculation involves lots of string allocations and escapings
-
+            // NPM - introduce record key type.  Also summaries could just be lists of rows referenced from
+            // original table/columns
             var numInputColumns = Source.Type.Columns.Count;
             var byValuesColumns = new List<Column>(_byExpressions.Count);
             {

@@ -29,7 +29,11 @@ internal class MatchRegexOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
         var values = (Column<string?>)(arguments[0].Column);
         var patterns = (Column<string?>)(arguments[1].Column);
-
+        // TODO NPM - this pattern would be worth generalising...
+        //it's likely there are lots of times that tables have "runs" 
+        //of data and caching the value of the last fetch makes sense
+        //in fact we might even consider caching the entire last row and 
+        //result for really expensive things like regexes
         var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
         var data = new bool?[values.RowCount];
         for (var i = 0; i < values.RowCount; i++)

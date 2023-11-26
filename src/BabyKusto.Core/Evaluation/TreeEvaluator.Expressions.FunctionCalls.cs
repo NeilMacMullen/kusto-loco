@@ -99,6 +99,7 @@ internal partial class TreeEvaluator
             // TODO: Some aggregate functions really want just a scalar input, e.g. `percentile(durationMs, 99)`.
             // It is rather silly that we expand the second argument into a column, only for the aggregate implementation
             // to then grab any value from it. In any case, this gets the job done for now...
+            // NPM - introduce a "single value" column type we could also add "indirect column" to avoid copying
             var numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
             for (var i = 0; i < rawArguments.Length; i++)
             {
