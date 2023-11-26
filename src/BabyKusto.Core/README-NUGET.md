@@ -1,3 +1,10 @@
+
+# Under Construction....
+
+This fork of BabyKusto is currently unstable
+
+Please refer back to original repo for a more stable version
+
 # BabyKusto
 
 BabyKusto is a self-contained execution engine for the [Kusto Query Language](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/) (KQL).
