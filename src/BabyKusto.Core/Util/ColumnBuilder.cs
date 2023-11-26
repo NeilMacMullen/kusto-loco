@@ -28,21 +28,37 @@ public class IndirectColumnBuilder<T> : IndirectColumnBuilder
 {
     private readonly Column<T> _baseColumn;
     private readonly IndirectPolicy _policy;
+    private readonly int[] _previousLookups;
 
     public IndirectColumnBuilder(Column<T> baseColumn, IndirectPolicy policy)
+        : this(baseColumn, policy, Array.Empty<int>())
+    {
+    }
+
+
+    public IndirectColumnBuilder(Column<T> baseColumn, IndirectPolicy policy, int[] previousLookups)
     {
         _baseColumn = baseColumn;
         _policy = policy;
+        _previousLookups = previousLookups;
     }
+
+    private IndirectColumn<T> Create(int[] rows) =>
+        //TODO - this probably isn't worth doing because it prevents us sharing the 
+        //lookup tables across multiple columns
+        //if (_previousLookups.Any())
+        //    rows = rows.Select(r => _previousLookups[r]).ToArray();
+        new(rows, _baseColumn);
 
     public override Column CreateIndirectColumn(int[] rows)
     {
         return _policy switch
         {
             IndirectPolicy.Map =>
-                new IndirectColumn<T>(rows, _baseColumn),
+                Create(rows),
             IndirectPolicy.Passthru => _baseColumn,
-            IndirectPolicy.SingleValue => throw new NotImplementedException(),
+            //when single value columns are sliced the mapping is unimportant
+            IndirectPolicy.SingleValue => _baseColumn.Slice(0, rows.Length),
             _ => throw new NotImplementedException()
         };
     }

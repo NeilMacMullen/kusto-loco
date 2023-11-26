@@ -27,8 +27,8 @@ public abstract class Column
 
     public abstract Column Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
-    internal abstract ColumnBuilder CreateBuilder();
-    internal abstract IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy);
+    public abstract ColumnBuilder CreateBuilder();
+    public abstract IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy);
 
     public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
 }
@@ -58,9 +58,9 @@ public class SingleValueColumn<T> : Column<T>
 
     public override object? GetRawDataValue(int index) => this[IndirectIndex(index)];
 
-    //TODO - this could be optimised to flatten the redirection chain
-    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
-        base.CreateIndirectBuilder(policy);
+
+    public override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+        new IndirectColumnBuilder<T>(this, IndirectPolicy.SingleValue);
 }
 
 public class IndirectColumn<T> : Column<T>
@@ -99,8 +99,8 @@ public class IndirectColumn<T> : Column<T>
     public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
 
     //TODO - this could be optimised to flatten the redirection chain
-    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
-        base.CreateIndirectBuilder(policy);
+    public override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+        new IndirectColumnBuilder<T>(this, policy, _lookups);
 }
 
 public class Column<T> : Column
@@ -180,8 +180,8 @@ public class Column<T> : Column
         }
     }
 
-    internal override ColumnBuilder CreateBuilder() => new ColumnBuilder<T>(Type);
+    public override ColumnBuilder CreateBuilder() => new ColumnBuilder<T>(Type);
 
-    internal override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
+    public override IndirectColumnBuilder CreateIndirectBuilder(IndirectPolicy policy) =>
         new IndirectColumnBuilder<T>(this, policy);
 }

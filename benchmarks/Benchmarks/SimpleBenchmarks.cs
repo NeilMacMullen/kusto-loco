@@ -21,8 +21,6 @@ namespace Benchmarks
         {
             var query = "data | count";
             var res = _context.BenchmarkQuery(query);
-
-            Console.WriteLine($"{res} cells");
         }
 
 

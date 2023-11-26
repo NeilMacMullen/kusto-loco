@@ -48,19 +48,35 @@ public class IndirectTests
         sliced.RowCount.Should().Be(2);
         sliced.GetRawDataValue(0).Should().Be("50");
     }
-}
 
-[TestClass]
-public class SingleValueTests
-{
     [TestMethod]
-    public void SingleWorks()
+    public void PassThruIndirectionReturnsOriginalColumn()
     {
-        var backing = new SingleValueColumn<string>(ScalarTypes.String, "hello", 10);
-        backing.RowCount.Should().Be(10);
+        var backing = MakeDecimatedColumn(100);
+        var builder = backing.CreateIndirectBuilder(IndirectPolicy.Passthru);
+        var same = builder.CreateIndirectColumn(Array.Empty<int>());
+        same.Should().BeSameAs(backing);
+    }
 
-        backing[0].Should().Be("hello");
-        backing[9].Should().Be("hello");
-        backing.GetRawDataValue(0).Should().Be("hello");
+    [TestMethod]
+    public void MappedIndirectionFlattens()
+    {
+        var backing = MakeDecimatedColumn(100);
+        var builder = backing.CreateIndirectBuilder(IndirectPolicy.Map);
+        var flattened = builder.CreateIndirectColumn(new[] { 0, 1 }) as IndirectColumn<string>;
+        flattened!.RowCount.Should().Be(2);
+        flattened!.IndirectIndex(0).Should().Be(backing.IndirectIndex(0));
+        flattened!.IndirectIndex(1).Should().Be(backing.IndirectIndex(1));
+    }
+
+    [TestMethod]
+    public void IndirectingSingleValueColumnReturnsSingleValue()
+    {
+        var sv = new SingleValueColumn<string>(ScalarTypes.String, "HELLO", 100);
+        var builder = sv.CreateIndirectBuilder(IndirectPolicy.Map);
+        var second = builder.CreateIndirectColumn(new[] { 0, 1 });
+        second.GetType().Should().Be(typeof(SingleValueColumn<string>));
+        second.RowCount.Should().Be(2);
+        second.GetRawDataValue(0).Should().Be("HELLO");
     }
 }
