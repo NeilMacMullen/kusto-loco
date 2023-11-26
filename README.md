@@ -1,5 +1,7 @@
-[![NuGet Gallery | BabyKusto.Server](https://img.shields.io/nuget/vpre/BabyKusto.Core?label=BabyKusto.Core&style=plastic)](https://www.nuget.org/packages/BabyKusto.Core)
-[![NuGet Gallery | BabyKusto.Server](https://img.shields.io/nuget/vpre/BabyKusto.Server?label=BabyKusto.Server&style=plastic)](https://www.nuget.org/packages/BabyKusto.Server)
+# DO NOT USE
+
+This fork is currently undergoing changes and is unstable.
+Please refer back to the original repo for a more stable version
 
 # BabyKusto
 
