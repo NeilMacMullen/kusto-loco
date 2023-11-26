@@ -105,15 +105,17 @@ internal partial class TreeEvaluator
                 var numRows = chunk.RowCount;
                 for (var i = 0; i < numRows; i++)
                 {
-                    var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToList();
+                    var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
 
                     // TODO: Should nulls be treated differently than empty string?
                     // TODO: Use a less expensive composite key computation
                     //NPM - we can drop column values into a record and get free equality check
-                    var key = string.Join("|", onValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
+                    //var key = string.Join("|", onValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
+                    var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
-                        bucket = (OnValues: onValues, Data: new ColumnBuilder[numColumns]);
+                        bucket = new NpmJoinSet(OnValues: onValues,
+                            Data: new ColumnBuilder[numColumns]);
                         for (var j = 0; j < numColumns; j++)
                         {
                             bucket.Data[j] = ColumnHelpers.CreateBuilder(chunk.Columns[j].Type);
@@ -532,7 +534,10 @@ internal partial class TreeEvaluator
             public BucketedRows(ITableSource table) => Table = table;
 
             public ITableSource Table { get; }
-            public Dictionary<string, (List<object?> OnValues, ColumnBuilder[] Data)> Buckets { get; } = new();
+            public Dictionary<SummaryKey, NpmJoinSet> Buckets { get; } = new();
         }
     }
+
+    private readonly record struct NpmJoinSet(object?[] OnValues,
+        ColumnBuilder[] Data);
 }
