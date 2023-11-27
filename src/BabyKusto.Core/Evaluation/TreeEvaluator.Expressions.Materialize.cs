@@ -17,10 +17,10 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitMaterializeExpression(IRMaterializeExpressionNode node,
         EvaluationContext context)
     {
-        Debug.Assert(context.Left == null);
+        Debug.Assert(context.Left == TabularResult.Empty);
 
-        var innerResult = (TabularResult?)node.Expression.Accept(this, context);
-        Debug.Assert(innerResult != null);
+        var innerResult = (TabularResult)node.Expression.Accept(this, context);
+        Debug.Assert(innerResult != TabularResult.Empty);
 
         var result = new MaterializedTableResult(innerResult.Value);
         return new TabularResult(result, innerResult.VisualizationState);

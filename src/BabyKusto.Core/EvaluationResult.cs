@@ -59,6 +59,9 @@ public sealed class ColumnarResult : EvaluationResult
 
 public sealed class TabularResult : EvaluationResult
 {
+    public static readonly TabularResult Empty = new(NullTableSource.Instance
+        , null);
+
     public TabularResult(ITableSource value, VisualizationState? visualizationState)
         : base(value.Type)
     {
