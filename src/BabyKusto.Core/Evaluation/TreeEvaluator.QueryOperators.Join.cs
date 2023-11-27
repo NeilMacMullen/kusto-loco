@@ -90,7 +90,7 @@ internal partial class TreeEvaluator
             {
                 var onValuesColumns = new List<Column>(_onClauses.Count);
                 {
-                    var chunkContext = new EvaluationContext(_context.Scope, Chunk: chunk);
+                    var chunkContext = new EvaluationContext(_context.Scope, chunk);
                     for (var i = 0; i < onExpressions.Length; i++)
                     {
                         var onExpression = onExpressions[i];
@@ -108,9 +108,6 @@ internal partial class TreeEvaluator
                     var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
 
                     // TODO: Should nulls be treated differently than empty string?
-                    // TODO: Use a less expensive composite key computation
-                    //NPM - we can drop column values into a record and get free equality check
-                    //var key = string.Join("|", onValues.Select(v => Uri.EscapeDataString(v?.ToString() ?? "")));
                     var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {

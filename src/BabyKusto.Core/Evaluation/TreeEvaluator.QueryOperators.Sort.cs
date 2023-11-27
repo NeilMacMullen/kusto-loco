@@ -45,7 +45,7 @@ internal partial class TreeEvaluator
             _input = input;
             _sortColumns = sortColumns;
             _evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
 
         public TableSymbol Type => _input.Type;

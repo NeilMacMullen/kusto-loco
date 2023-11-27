@@ -43,7 +43,7 @@ internal partial class TreeEvaluator
 
         public override TableSymbol Type { get; }
 
-        protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
+        protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
             ITableChunk chunk)
         {
             var outputColumns = new Column[_columns.Count];

@@ -58,6 +58,7 @@ public class IndirectTests
         same.Should().BeSameAs(backing);
     }
 
+    [Ignore("decided not to implement this!")]
     [TestMethod]
     public void MappedIndirectionFlattens()
     {

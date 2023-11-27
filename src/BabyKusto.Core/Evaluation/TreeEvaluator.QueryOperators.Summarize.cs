@@ -61,7 +61,7 @@ internal partial class TreeEvaluator
                 BucketizedTables = new Dictionary<SummaryKey, NpmSummarySet>()
             };
 
-        protected override (SummarizeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak)
+        protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
             var byValuesColumns = new List<Column>(_byExpressions.Count);
@@ -108,10 +108,10 @@ internal partial class TreeEvaluator
                         new List<int>());
 
 
-            return (context, null, false);
+            return (context, TableChunk.Empty, false);
         }
 
-        protected override ITableChunk? ProcessLastChunk(SummarizeResultTableContext context)
+        protected override ITableChunk ProcessLastChunk(SummarizeResultTableContext context)
         {
             var resultsData = new ColumnBuilder[_byExpressions.Count + _aggregationExpressions.Count];
             for (var i = 0; i < resultsData.Length; i++)

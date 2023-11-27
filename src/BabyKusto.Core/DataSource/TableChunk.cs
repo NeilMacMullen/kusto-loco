@@ -9,6 +9,8 @@ namespace BabyKusto.Core;
 
 public class TableChunk : ITableChunk
 {
+    public static readonly TableChunk Empty = new(NullTableSource.Instance, Array.Empty<Column>());
+
     public TableChunk(ITableSource table, Column[] columns)
     {
         ValidateTypes(table.Type, columns);

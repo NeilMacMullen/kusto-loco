@@ -38,7 +38,7 @@ internal partial class TreeEvaluator
 
         public override TableSymbol Type { get; }
 
-        protected override (NoContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
+        protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
             ITableChunk chunk)
         {
             var chunkContext = _context with { Chunk = chunk };
@@ -52,7 +52,7 @@ internal partial class TreeEvaluator
                     return (default, chunk.ReParent(this), false);
                 }
 
-                return (default, null, false);
+                return (default, TableChunk.Empty, false);
             }
 
             if (evaluated is ColumnarResult columnar)

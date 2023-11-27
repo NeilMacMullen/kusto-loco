@@ -25,7 +25,7 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
             var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
             context = newContext;
 
-            if (newChunk != null)
+            if (newChunk != TableChunk.Empty)
             {
                 yield return newChunk;
             }
@@ -37,7 +37,7 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
         }
 
         var lastChunk = ProcessLastChunkInternal(context);
-        if (lastChunk != null)
+        if (lastChunk != TableChunk.Empty)
         {
             yield return lastChunk;
         }
@@ -72,16 +72,16 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
 
     protected virtual TContext Init() => default!;
 
-    protected abstract (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunk(TContext context,
+    protected abstract (TContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(TContext context,
         ITableChunk chunk);
 
-    protected virtual ITableChunk? ProcessLastChunk(TContext context) => null;
+    protected virtual ITableChunk ProcessLastChunk(TContext context) => TableChunk.Empty;
 
-    private (TContext NewContext, ITableChunk? NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context,
+    private (TContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunkInternal(TContext context,
         ITableChunk chunk)
     {
         var (newContext, newChunk, shouldBreak) = ProcessChunk(context, chunk);
-        if (newChunk != null && newChunk.Table != this)
+        if (newChunk != TableChunk.Empty && newChunk.Table != this)
         {
             throw new InvalidOperationException(
                 $"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");
@@ -90,10 +90,10 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
         return (newContext, newChunk, shouldBreak);
     }
 
-    private ITableChunk? ProcessLastChunkInternal(TContext context)
+    private ITableChunk ProcessLastChunkInternal(TContext context)
     {
         var newChunk = ProcessLastChunk(context);
-        if (newChunk != null && newChunk.Table != this)
+        if (newChunk != TableChunk.Empty && newChunk.Table != this)
         {
             throw new InvalidOperationException(
                 $"Coding defect, new chunk should set the right table it belongs to ({TypeNameHelper.GetTypeDisplayName(this)})");

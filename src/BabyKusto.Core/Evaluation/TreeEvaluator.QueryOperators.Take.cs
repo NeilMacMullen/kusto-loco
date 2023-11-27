@@ -39,7 +39,7 @@ internal partial class TreeEvaluator
                 Remaining = _count,
             };
 
-        protected override (TakeResultTableContext NewContext, ITableChunk? NewChunk, bool ShouldBreak)
+        protected override (TakeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(TakeResultTableContext context, ITableChunk chunk)
         {
             if (context.Remaining >= chunk.RowCount)
