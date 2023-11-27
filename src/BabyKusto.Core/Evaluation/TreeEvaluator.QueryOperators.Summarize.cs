@@ -16,7 +16,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
+        Debug.Assert(context.Left != TabularResult.Empty);
         var byExpressions = new List<IRExpressionNode>();
         for (var i = 0; i < node.ByColumns.ChildCount; i++)
         {
@@ -70,8 +70,7 @@ internal partial class TreeEvaluator
             for (var i = 0; i < _byExpressions.Count; i++)
             {
                 var byExpression = _byExpressions[i];
-                var byExpressionResult = (ColumnarResult?)byExpression.Accept(_owner, chunkContext);
-                Debug.Assert(byExpressionResult != null);
+                var byExpressionResult = (ColumnarResult)byExpression.Accept(_owner, chunkContext);
                 Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
                     $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
                 byValuesColumns.Add(byExpressionResult.Column);
@@ -137,8 +136,7 @@ internal partial class TreeEvaluator
                 for (var i = 0; i < _aggregationExpressions.Count; i++)
                 {
                     var aggregationExpression = _aggregationExpressions[i];
-                    var aggregationResult = (ScalarResult?)aggregationExpression.Accept(_owner, chunkContext);
-                    Debug.Assert(aggregationResult != null);
+                    var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
                     Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
                         $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
                     resultsData[summarySet.ByValues.Length + i].Add(aggregationResult.Value);

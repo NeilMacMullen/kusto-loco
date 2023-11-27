@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using BabyKusto.Core.InternalRepresentation;
@@ -16,9 +17,10 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitUnionOperator(IRUnionOperatorNode node, EvaluationContext context)
     {
-        var tables = new List<ITableSource>((context.Left != null ? 1 : 0) + node.Expressions.ChildCount);
+        var tables =
+            new List<ITableSource>((context.Left != TabularResult.Empty ? 1 : 0) + node.Expressions.ChildCount);
         VisualizationState? visualizationState = null;
-        if (context.Left != null)
+        if (context.Left != TabularResult.Empty)
         {
             tables.Add(context.Left.Value);
             visualizationState = context.Left.VisualizationState;
@@ -28,7 +30,7 @@ internal partial class TreeEvaluator
         {
             var expression = node.Expressions.GetChild(i);
             var expressionResult = expression.Accept(this, context);
-            Debug.Assert(expressionResult != null);
+            Debug.Assert(expressionResult != EvaluationResult.Null);
             var tableResult = (TabularResult)expressionResult;
             tables.Add(tableResult.Value);
 
@@ -92,7 +94,10 @@ internal partial class TreeEvaluator
 
         private TableChunk ProcessChunk(ITableSource table, ITableChunk chunk)
         {
-            var columns = new Column[Type.Columns.Count];
+            var columns = Enumerable.Range(0, Type.Columns.Count).Select(
+                    _ => NullColumn.Instance)
+                .Cast<Column>()
+                .ToArray();
             for (var i = 0; i < chunk.Columns.Length; i++)
             {
                 var symbol = (ColumnSymbol)table.Type.Members[i];
@@ -109,7 +114,7 @@ internal partial class TreeEvaluator
             var rowCount = chunk.RowCount;
             for (var i = 0; i < columns.Length; i++)
             {
-                if (columns[i] == null)
+                if (columns[i] == NullColumn.Instance)
                 {
                     columns[i] = ColumnHelpers.CreateFromScalar(null, Type.Columns[i].Type, rowCount);
                 }

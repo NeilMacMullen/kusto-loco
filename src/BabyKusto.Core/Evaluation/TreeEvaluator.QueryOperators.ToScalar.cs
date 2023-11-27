@@ -14,7 +14,7 @@ internal partial class TreeEvaluator
         EvaluationContext context)
     {
         var result = node.Expression.Accept(this, context);
-        Debug.Assert(result != null);
+        Debug.Assert(result != EvaluationResult.Null);
 
         if (node.Expression.ResultKind == EvaluatedExpressionKind.Table)
         {

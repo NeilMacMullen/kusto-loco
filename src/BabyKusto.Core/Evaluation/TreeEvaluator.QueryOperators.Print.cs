@@ -19,7 +19,7 @@ internal partial class TreeEvaluator
         {
             var expression = node.Expressions.GetChild(i);
             var expressionResult = expression.Accept(this, context);
-            Debug.Assert(expressionResult != null);
+            Debug.Assert(expressionResult != EvaluationResult.Null);
             var scalarResult = (ScalarResult)expressionResult;
             columns[i] = ColumnHelpers.CreateFromScalar(scalarResult.Value, tableSymbol.Columns[i].Type, 1);
         }

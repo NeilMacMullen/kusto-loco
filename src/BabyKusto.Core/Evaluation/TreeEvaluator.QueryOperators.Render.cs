@@ -10,7 +10,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitRenderOperator(IRRenderOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
+        Debug.Assert(context.Left != EvaluationResult.Null);
 
         return new TabularResult(
             value: context.Left.Value,

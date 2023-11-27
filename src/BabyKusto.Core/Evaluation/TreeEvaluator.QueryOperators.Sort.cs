@@ -18,7 +18,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
+        Debug.Assert(context.Left != EvaluationResult.Null);
         var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];
         for (var i = 0; i < node.Expressions.ChildCount; i++)
         {
@@ -79,7 +79,7 @@ internal partial class TreeEvaluator
                 {
                     var sortExpression = _sortColumns[i].Expression;
                     var sortExpressionResult = sortExpression.Accept(_evaluator, chunkContext);
-                    Debug.Assert(sortExpressionResult != null);
+                    Debug.Assert(sortExpressionResult != EvaluationResult.Null);
                     var sortedChunkColumn = ((ColumnarResult)sortExpressionResult).Column;
                     for (var j = 0; j < sortedChunkColumn.RowCount; j++)
                     {

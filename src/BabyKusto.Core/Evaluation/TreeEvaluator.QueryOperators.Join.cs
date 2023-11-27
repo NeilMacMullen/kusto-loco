@@ -17,7 +17,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitJoinOperator(IRJoinOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
+        Debug.Assert(context.Left != TabularResult.Empty);
         var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context,
             node.OnClauses, (TableSymbol)node.ResultType);
         return new TabularResult(result, context.Left.VisualizationState);
