@@ -52,7 +52,7 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
             var (newContext, newChunk, shouldBreak) = ProcessChunkInternal(context, chunk);
             context = newContext;
 
-            if (newChunk != null)
+            if (newChunk != TableChunk.Empty)
             {
                 yield return newChunk;
             }
@@ -64,7 +64,7 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
         }
 
         var lastChunk = ProcessLastChunkInternal(context);
-        if (lastChunk != null)
+        if (lastChunk != TableChunk.Empty)
         {
             yield return lastChunk;
         }

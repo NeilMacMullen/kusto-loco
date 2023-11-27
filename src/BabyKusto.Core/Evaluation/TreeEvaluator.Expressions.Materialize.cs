@@ -33,7 +33,7 @@ internal partial class TreeEvaluator
         private int _hydrated;
 
         public MaterializedTableResult(ITableSource input) =>
-            _input = input ?? throw new ArgumentNullException(nameof(input));
+            _input = input;
 
         public TableSymbol Type => _input.Type;
 
