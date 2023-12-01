@@ -9,15 +9,18 @@ using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using NLog;
 
 namespace BabyKusto.Core;
 
 public class BabyKustoEngine
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly List<ITableSource> _globalTables = new();
 
     public void AddGlobalTable(ITableSource table)
     {
+        Logger.Trace($"Adding table  {table.Type.Name} ");
         if (string.IsNullOrEmpty(table.Type.Name))
         {
             throw new ArgumentNullException($"{nameof(table)}.{nameof(table.Type)}.{nameof(table.Type.Name)}");

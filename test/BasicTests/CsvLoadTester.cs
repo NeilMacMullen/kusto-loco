@@ -1,12 +1,19 @@
 using CsvSupport;
 using FluentAssertions;
 using KustoSupport;
+using LogSetup;
+using NLog;
 
 namespace BasicTests
 {
     [TestClass]
     public class CsvLoadTester
     {
+        public CsvLoadTester()
+        {
+            LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
+        }
+
         [TestMethod]
         public async Task TestMethod1()
         {
@@ -24,6 +31,7 @@ def,30
             var countResult = await context.RunQuery("data | where Count > 50");
             countResult.Error.Should().BeEmpty();
             countResult.Results.Count.Should().Be(1);
+            1.Should().Be(2);
         }
 
 

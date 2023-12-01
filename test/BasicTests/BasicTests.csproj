@@ -11,15 +11,17 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="NLog" Version="5.2.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CsvSupport\CsvSupport.csproj" />
     <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\..\src\LogSetup\LogSetup.csproj" />
   </ItemGroup>
 
 </Project>

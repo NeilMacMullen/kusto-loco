@@ -2,19 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="5.2.7" />
-  </ItemGroup>
-
- 
-  <ItemGroup>
-    <ProjectReference Include="..\BabyKusto.Core\BabyKusto.Core.csproj" />
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
 
 </Project>
