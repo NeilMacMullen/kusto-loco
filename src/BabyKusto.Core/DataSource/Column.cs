@@ -45,6 +45,7 @@ public class Column<T> : Column
 
     public static void ValidateTypes(TypeSymbol typeSymbol, Type type)
     {
+#if DEBUG
         var valid = false;
         if (typeSymbol == ScalarTypes.Int)
         {
@@ -84,6 +85,7 @@ public class Column<T> : Column
             throw new InvalidOperationException(
                 $"Invalid column type {TypeNameHelper.GetTypeDisplayName(type)} for type symbol {SchemaDisplay.GetText(typeSymbol)}. Types must be nullable.");
         }
+#endif
     }
 
     public override Column Slice(int start, int length)

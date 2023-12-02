@@ -27,16 +27,38 @@ namespace Benchmarks
         [Benchmark]
         public int Summarize()
         {
-            var query = "data | summarize count() by Radius";
+            var query = "data | summarize count() by LocationSetTagString";
             return _context.BenchmarkQuery(query);
         }
 
         [Benchmark]
         public int Where()
         {
-            var query = "data | where  Radius >200 and Name contains 'CENTRAL'";
+            var query = "data | where Name contains 'CENTRAL' | count";
             return _context.BenchmarkQuery(query);
         }
+
+        [Benchmark]
+        public int Distance()
+        {
+            var query = "data | where geo_distance_2points(Longitude,Latitude, 0.19686015028158654,52.26279460357216) < 10000 | count";
+            return _context.BenchmarkQuery(query);
+        }
+		
+		[Benchmark]
+        public int Extend()
+        {
+            var query = "data | extend d=Latitude+Longitude | count";
+            return _context.BenchmarkQuery(query);
+        }
+
+        [Benchmark]
+        public int ExtendDistance()
+        {
+            var query = "data | extend d=geo_distance_2points(Longitude,Latitude, 0.19686015028158654,52.26279460357216) | where d < 10000 | count";
+            return _context.BenchmarkQuery(query);
+        }
+
     }
 
     public class Program
