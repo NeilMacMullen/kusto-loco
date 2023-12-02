@@ -48,38 +48,35 @@ internal partial class TreeEvaluator
             var chunkContext = _context with { Chunk = chunk };
             var evaluated = _condition.Accept(_owner, chunkContext);
 
-            if (evaluated is ScalarResult scalar)
+            switch (evaluated)
             {
                 // Scalar will evaluate to the same value for any chunk, so we can process the entire chunk at once
-                if ((bool?)scalar.Value == true)
-                {
+                case ScalarResult scalar when (bool?)scalar.Value == true:
                     return (default, chunk.ReParent(this), false);
-                }
-
-                return (default, TableChunk.Empty, false);
-            }
-
-            if (evaluated is ColumnarResult columnar)
-            {
-                var predicateColumn = (Column<bool?>)columnar.Column;
-
-                var wantedRows = new List<int>();
-                for (var i = 0; i < predicateColumn.RowCount; i++)
+                case ScalarResult scalar:
+                    return (default, TableChunk.Empty, false);
+                case ColumnarResult columnar:
                 {
-                    if (predicateColumn[i] == true)
+                    var predicateColumn = (Column<bool?>)columnar.Column;
+
+                    var wantedRows = new List<int>();
+                    for (var i = 0; i < predicateColumn.RowCount; i++)
                     {
-                        wantedRows.Add(i);
+                        if (predicateColumn[i] == true)
+                        {
+                            wantedRows.Add(i);
+                        }
                     }
+
+                    var wanted = wantedRows.ToArray();
+                    var indirectedColumns = chunk.Columns
+                        .Select(c => ColumnHelpers.MapColumn(c,wanted))
+                        .ToArray();
+                    return (default, new TableChunk(this, indirectedColumns), false);
                 }
-
-                var wanted = wantedRows.ToArray();
-                var indirectedColumns = chunk.Columns
-                    .Select(c => ColumnHelpers.MapColumn(c,wanted))
-                    .ToArray();
-                return (default, new TableChunk(this, indirectedColumns), false);
+                default:
+                    throw new InvalidOperationException();
             }
-
-            throw new InvalidOperationException();
         }
     }
 }
