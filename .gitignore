@@ -31,3 +31,4 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 /_NCrunch_BabyKusto/StoredText
+/.NCrunch_BabyKusto/StoredText
