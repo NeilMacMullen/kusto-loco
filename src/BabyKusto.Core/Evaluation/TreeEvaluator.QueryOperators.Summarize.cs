@@ -79,8 +79,8 @@ internal partial class TreeEvaluator
                 byValuesColumns.Add(byExpressionResult.Column);
             }
 
-          
-            var hasAddedChunk = new Dictionary<SummaryKey,NpmSummarisedChunk>();
+
+            var hasAddedChunk = new Dictionary<SummaryKey, NpmSummarisedChunk>();
             if (byValuesColumns.Any())
             {
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
@@ -88,15 +88,11 @@ internal partial class TreeEvaluator
                     var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
 
                     var key = new SummaryKey(byValues);
-                   
+
                     if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                     {
-                        var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder(IndirectPolicy.Map))
-                            .ToArray();
-
                         context.BucketizedTables[key] = bucket =
                             new NpmSummarySet(byValues!,
-                                builders,
                                 new List<NpmSummarisedChunk>());
                     }
 
@@ -117,12 +113,8 @@ internal partial class TreeEvaluator
                 var key = new SummaryKey(Array.Empty<object?>());
                 if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 {
-                    var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder(IndirectPolicy.Map))
-                        .ToArray();
-
                     context.BucketizedTables[key] = bucket =
                         new NpmSummarySet(Array.Empty<object?>(),
-                            builders,
                             new List<NpmSummarisedChunk>());
                 }
 
