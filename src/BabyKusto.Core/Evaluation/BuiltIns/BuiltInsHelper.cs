@@ -121,8 +121,7 @@ internal static class BuiltInsHelper
                     {
                         var scalarValue = (ScalarResult)arguments[i];
                         columnarArgs[i] =
-                            new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type,
-                                numRows));
+                            new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type, numRows));
                     }
                 }
 
