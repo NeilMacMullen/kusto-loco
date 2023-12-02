@@ -21,14 +21,16 @@ public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly BabyKustoEngine _engine = new();
-    private readonly List<InMemoryKustoTable> _tables = new();
+    private readonly List<MyKustoTable> _tables = new();
+
+    private bool _fullDebug;
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
 
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
-    public void AddTable(InMemoryKustoTable table)
+    public void AddTable(MyKustoTable table)
     {
         if (_tables.Any(t => t.Name == table.Name))
             throw new ArgumentException($"Context already contains a table named '{table.Name}'");
@@ -36,7 +38,7 @@ public class KustoQueryContext
         _engine.AddGlobalTable(table);
     }
 
-    public InMemoryKustoTable GetTable(string name)
+    public MyKustoTable GetTable(string name)
     {
         return _tables.Single(t => UnescapeTableName(t.Name) == name);
     }
@@ -47,11 +49,17 @@ public class KustoQueryContext
         AddTable(table);
     }
 
+
+    public void AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
+    {
+        var table = InMemoryKustoTable.CreateFromRows(tableName, records);
+        var chunked = ChunkedKustoTable.FromTable(table, chunkSize);
+        AddTable(chunked);
+    }
+
     public int BenchmarkQuery(string query)
     {
-        var res = _engine.Evaluate(query,
-            dumpIRTree: false
-        );
+        var res = _engine.Evaluate(query, _fullDebug, _fullDebug);
         return Materialise(res as TabularResult);
     }
 
@@ -71,7 +79,7 @@ public class KustoQueryContext
 
         var result =
             _engine.Evaluate(query,
-                dumpIRTree: false
+                _fullDebug, _fullDebug
             );
         return GetDictionarySet(result as TabularResult);
     }
@@ -200,7 +208,7 @@ public class KustoQueryContext
         return tables.Select(UnescapeTableName).Distinct().ToArray();
     }
 
-    public IEnumerable<InMemoryKustoTable> Tables() => _tables;
+    public IEnumerable<MyKustoTable> Tables() => _tables;
 
     public static string UnescapeTableName(string tableName)
     {
@@ -212,4 +220,11 @@ public class KustoQueryContext
     }
 
     public static string EnsureEscapedTableName(string tableName) => $"['{UnescapeTableName(tableName)}']";
+
+    public static KustoQueryContext WithFullDebug()
+    {
+        var context = new KustoQueryContext();
+        context._fullDebug = true;
+        return context;
+    }
 }

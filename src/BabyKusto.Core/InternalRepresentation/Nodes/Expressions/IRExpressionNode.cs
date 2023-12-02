@@ -2,8 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Kusto.Language.Symbols;
+using NLog;
 
 namespace BabyKusto.Core.InternalRepresentation;
 
@@ -16,7 +17,8 @@ internal enum EvaluatedExpressionKind
 
 internal abstract class IRExpressionNode : IRNode
 {
-    private Dictionary<Type, object>? _cache;
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private ImmutableDictionary<Type, object> _cache = ImmutableDictionary<Type, object>.Empty;
 
     public IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
     {
@@ -29,18 +31,18 @@ internal abstract class IRExpressionNode : IRNode
 
     public T GetOrSetCache<T>(Func<T> factoryFunc)
     {
-        if (_cache == null)
-        {
-            _cache = new Dictionary<Type, object>();
-        }
-
         var typeKey = typeof(T);
+
         if (!_cache.TryGetValue(typeKey, out var item))
         {
             item = factoryFunc()!;
-            _cache.Add(typeKey, item);
+            _cache = _cache.SetItem(typeKey, item);
         }
 
+        //It's not very clear if this can every occur in practice.  If it _can_ it would be good 
+        //to understand the circumstances so treat it as a fatal error for now
+        if (_cache.Count > 1)
+            throw new InvalidOperationException("Unexpected implementation results - cache has two different entries");
         return (T)item;
     }
 

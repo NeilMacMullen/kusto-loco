@@ -6,12 +6,20 @@ using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Extensions;
 using FluentAssertions;
+using LogSetup;
+using NLog;
 using Xunit;
 
 namespace KustoExecutionEngine.Core.Tests;
 
 public class EndToEndTests
+
 {
+    public EndToEndTests()
+    {
+        LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
+    }
+
     [Fact]
     public void Print1()
     {
@@ -3747,7 +3755,7 @@ Key:int; a:string; aIsNull:bool; aIsEmpty:bool; aLen:long
     private static void Test(string query, string expectedOutput)
     {
         var engine = new BabyKustoEngine();
-        var result = (TabularResult?)engine.Evaluate(query);
+        var result = (TabularResult?)engine.Evaluate(query, true, true);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 

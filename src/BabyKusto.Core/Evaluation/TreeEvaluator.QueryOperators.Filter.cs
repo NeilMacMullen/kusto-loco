@@ -8,6 +8,7 @@ using System.Linq;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
+using NLog;
 
 namespace BabyKusto.Core.Evaluation;
 
@@ -22,6 +23,7 @@ internal partial class TreeEvaluator
 
     private class FilterResultsTable : DerivedTableSourceBase<NoContext>
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly IRExpressionNode _condition;
         private readonly EvaluationContext _context;
         private readonly TreeEvaluator _owner;
@@ -41,6 +43,7 @@ internal partial class TreeEvaluator
         protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
             ITableChunk chunk)
         {
+            Logger.Info("Filter processing chunk...");
             var chunkContext = _context with { Chunk = chunk };
             var evaluated = _condition.Accept(_owner, chunkContext);
 

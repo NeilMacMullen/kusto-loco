@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
+using NLog;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
@@ -37,6 +38,8 @@ internal class LessThanIntOperatorImpl : IScalarFunctionImpl
 
 internal class LessThanLongOperatorImpl : IScalarFunctionImpl
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
@@ -52,10 +55,13 @@ internal class LessThanLongOperatorImpl : IScalarFunctionImpl
         var leftCol = (Column<long?>)(arguments[0].Column);
         var rightCol = (Column<long?>)(arguments[1].Column);
 
+        Logger.Debug($"less than called on {leftCol.RowCount} rows");
+
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
+            Logger.Debug($"{left} comp {right}");
             data[i] = left.HasValue && right.HasValue ? left < right : null;
         }
 

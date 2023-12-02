@@ -1,23 +1,18 @@
 using CsvSupport;
 using FluentAssertions;
 using KustoSupport;
-using LogSetup;
-using NLog;
 
 namespace BasicTests
 {
     [TestClass]
     public class CsvLoadTester
     {
-        public CsvLoadTester()
-        {
-            LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
-        }
+        private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
 
         [TestMethod]
         public async Task TestMethod1()
         {
-            var context = new KustoQueryContext();
+            var context = CreateContext();
             var csv = @"
 Name,Count
 acd,100
@@ -31,7 +26,6 @@ def,30
             var countResult = await context.RunQuery("data | where Count > 50");
             countResult.Error.Should().BeEmpty();
             countResult.Results.Count.Should().Be(1);
-            1.Should().Be(2);
         }
 
 
@@ -57,7 +51,7 @@ def,30
             var result = (await context.RunQuery("data | where Value < 10 | count"));
             KustoFormatter.Tabulate(result.Results).Should().Contain("10");
         }
-
-        public readonly record struct Row(string Name, int Value);
     }
+
+    public readonly record struct Row(string Name, int Value);
 }

@@ -27,13 +27,25 @@ internal static class TypeLookup
     public static TypeSymbol ToKusto(Type native) => Mapping.First(m => m.NativeType == native).KustoType;
 }
 
+public abstract class MyKustoTable : ITableSource
+{
+    public string Name = string.Empty;
+
+    public int Length { get; protected set; }
+
+    public abstract TableSymbol Type { get; }
+    public abstract IEnumerable<ITableChunk> GetData();
+
+    public abstract IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default);
+}
+
 /// <summary>
 ///     Provides a simple way to create a Kusto ITableSource
 /// </summary>
 /// <remarks>
 ///     TODO This is currently a bit incomplete - more type support is needed
 /// </remarks>
-public class InMemoryKustoTable : ITableSource
+public class InMemoryKustoTable : MyKustoTable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -44,20 +56,19 @@ public class InMemoryKustoTable : ITableSource
         Length = length;
     }
 
-    public string Name => Type.Name;
-    public int Length { get; }
+    public override TableSymbol Type { get; }
+
 
     public ColumnBuilder[] Builders { get; }
 
-    public TableSymbol Type { get; }
 
-    public IEnumerable<ITableChunk> GetData()
+    public override IEnumerable<ITableChunk> GetData()
     {
         yield return new TableChunk(this, Builders.Select(b => b.ToColumn()).ToArray());
     }
 
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
+    public override IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
         => throw new NotSupportedException();
 
     /// <summary>
@@ -170,4 +181,34 @@ public class InMemoryKustoTable : ITableSource
             columnDefinitions);
         return FromDefinition(definition);
     }
+}
+
+public class ChunkedKustoTable : MyKustoTable
+{
+    private readonly int _chunkSize;
+    private readonly ITableSource _source;
+
+    private ChunkedKustoTable(ITableSource source, int chunkSize)
+    {
+        _source = source;
+        _chunkSize = chunkSize;
+    }
+
+    public override TableSymbol Type => _source.Type;
+
+    public override IEnumerable<ITableChunk> GetData()
+    {
+        foreach (var c in _source.GetData())
+        {
+            foreach (var splitTable in ChunkSplitter.Split(c, _chunkSize))
+            {
+                yield return splitTable;
+            }
+        }
+    }
+
+    public override IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
+        throw new NotImplementedException();
+
+    public static ChunkedKustoTable FromTable(ITableSource source, int chunkSize) => new(source, chunkSize);
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language;
@@ -32,6 +33,8 @@ public class BabyKustoEngine
     public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
     {
         // TODO: davidni: Set up global state somehwere proper where it would be done just once
+
+        Logger.Trace("Evaluate called");
         var db = new DatabaseSymbol(
             "MyDb",
             _globalTables.Select(table => table.Type).ToArray());
@@ -40,9 +43,9 @@ public class BabyKustoEngine
         var code = KustoCode.ParseAndAnalyze(query, globals);
         if (dumpKustoTree)
         {
-            Console.WriteLine("Kusto tree:");
-            DumpKustoTree(code);
-            Console.WriteLine();
+            Logger.Debug("Kusto tree:");
+            var tree = DumpKustoTree(code);
+            Logger.Debug(tree);
         }
 
         var diagnostics = code.GetDiagnostics();
@@ -50,14 +53,16 @@ public class BabyKustoEngine
         {
             foreach (var diag in diagnostics)
             {
-                Console.WriteLine($"Kusto diagnostics: {diag.Severity} {diag.Code} {diag.Message} {diag.Description}");
+                Logger.Warn($"Kusto diagnostics: {diag.Severity} {diag.Code} {diag.Message} {diag.Description}");
             }
 
             throw new InvalidOperationException(
                 $"Query is malformed.\r\n{string.Join("\r\n", diagnostics.Select(diag => $"[{diag.Start}] {diag.Severity} {diag.Code} {diag.Message} {diag.Description}"))}");
         }
 
+        Logger.Trace("visiting with IRTranslator...");
         var irVisitor = new IRTranslator();
+
         var ir = code.Syntax.Accept(irVisitor);
 
         if (dumpIRTree)
@@ -67,31 +72,35 @@ public class BabyKustoEngine
             Console.WriteLine();
         }
 
+        Logger.Trace("Adding tables to scope...");
         var scope = new LocalScope();
         foreach (var table in _globalTables)
         {
             scope.AddSymbol(table.Type, new TabularResult(table, visualizationState: null));
         }
 
+        Logger.Trace("Evaluating in scope...");
         var result = BabyKustoEvaluator.Evaluate(ir, scope);
         return result;
 
-        static void DumpKustoTree(KustoCode code)
+        static string DumpKustoTree(KustoCode code)
         {
+            var sb = new StringBuilder();
             var indent = 0;
             SyntaxElement.WalkNodes(
                 code.Syntax,
                 fnBefore: node =>
                 {
-                    Console.Write(new string(' ', indent));
-                    Console.WriteLine(
+                    sb.Append(new string(' ', indent));
+                    sb.AppendLine(
                         $"{node.Kind}: {node.ToString(IncludeTrivia.SingleLine)}: {SchemaDisplay.GetText((node as Expression)?.ResultType)}");
                     indent++;
                 },
                 fnAfter: node => { indent--; });
 
-            Console.WriteLine();
-            Console.WriteLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            return sb.ToString();
         }
 
         static void DumpIRTree(IRNode node)

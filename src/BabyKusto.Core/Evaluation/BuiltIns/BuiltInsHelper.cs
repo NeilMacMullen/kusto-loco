@@ -126,6 +126,10 @@ internal static class BuiltInsHelper
                     }
                 }
 
+                //TODO NPM here -this should be parallisable for at least some operations
+                //i.e. 1->1 mappings
+                //other things such as max/min would need a map/reduce type approach
+                //but possibly they are handled elsewhere
                 var result = impl.InvokeColumnar(columnarArgs);
                 Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
                     $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
