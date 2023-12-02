@@ -148,15 +148,8 @@ internal partial class TreeEvaluator
                     Logger.Info(
                         $"adding sum chunk of size {sumChunk.Chunk.RowCount} reduced to {sumChunk.RowIds.Count}");
 
-                    var rows = sumChunk.RowIds.ToArray();
-                    var remappedColumns =
-                        sumChunk.Chunk.Columns.Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map)
-                            .CreateIndirectColumn(rows)).ToArray();
 
-                    var bucketChunk =
-                        new TableChunk(sumChunk.Chunk.Table,
-                            remappedColumns
-                        );
+                    var bucketChunk = CreateTableChunkFromSummaryChunk(sumChunk);
                     //todo - this is where we need to remerge or add another layer of indirection
 
                     var chunkContext = _context with { Chunk = bucketChunk };
@@ -176,7 +169,22 @@ internal partial class TreeEvaluator
             var resultChunk = new TableChunk(this, resultsData.Select(c => c.ToColumn()).ToArray());
             return resultChunk;
         }
+
+        private ITableChunk CreateTableChunkFromSummaryChunk(NpmSummarisedChunk sumChunk)
+        {
+            var rows = sumChunk.RowIds.ToArray();
+            var remappedColumns =
+                sumChunk.Chunk.Columns.Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map)
+                    .CreateIndirectColumn(rows)).ToArray();
+
+            var bucketChunk =
+                new TableChunk(sumChunk.Chunk.Table,
+                    remappedColumns
+                );
+            return bucketChunk;
+        }
     }
+
 
     private struct SummarizeResultTableContext
     {
