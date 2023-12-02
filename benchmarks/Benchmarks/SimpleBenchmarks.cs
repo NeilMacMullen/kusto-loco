@@ -7,11 +7,12 @@ namespace Benchmarks
 {
     public class SimpleBenchmarks
     {
-        private readonly KustoQueryContext _context = new();
+        private KustoQueryContext _context ;
 
         [GlobalSetup]
         public void Setup()
         {
+            _context = new KustoQueryContext();
             CsvLoader.Load(@"C:\temp\locations.csv", _context, "data");
         }
 
