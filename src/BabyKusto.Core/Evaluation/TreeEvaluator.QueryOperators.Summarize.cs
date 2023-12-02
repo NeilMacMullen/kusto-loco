@@ -9,6 +9,7 @@ using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
+using NLog;
 
 namespace BabyKusto.Core.Evaluation;
 
@@ -36,6 +37,7 @@ internal partial class TreeEvaluator
 
     private class SummarizeResultTable : DerivedTableSourceBase<SummarizeResultTableContext>
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly List<IRExpressionNode> _aggregationExpressions;
         private readonly List<IRExpressionNode> _byExpressions;
         private readonly EvaluationContext _context;
@@ -64,6 +66,7 @@ internal partial class TreeEvaluator
         protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
+            Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
             var byValuesColumns = new List<Column>(_byExpressions.Count);
 
             var chunkContext = _context with { Chunk = chunk };
@@ -76,6 +79,8 @@ internal partial class TreeEvaluator
                 byValuesColumns.Add(byExpressionResult.Column);
             }
 
+          
+            var hasAddedChunk = new Dictionary<SummaryKey,NpmSummarisedChunk>();
             if (byValuesColumns.Any())
             {
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
@@ -83,6 +88,7 @@ internal partial class TreeEvaluator
                     var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
 
                     var key = new SummaryKey(byValues);
+                   
                     if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                     {
                         var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder(IndirectPolicy.Map))
@@ -91,22 +97,37 @@ internal partial class TreeEvaluator
                         context.BucketizedTables[key] = bucket =
                             new NpmSummarySet(byValues!,
                                 builders,
-                                new List<int>());
+                                new List<NpmSummarisedChunk>());
                     }
 
-                    bucket.SelectedRows.Add(rowIndex);
+                    if (!hasAddedChunk.TryGetValue(key, out var summarizedChunk))
+                    {
+                        summarizedChunk = new NpmSummarisedChunk(chunk, new List<int>());
+                        hasAddedChunk[key] = summarizedChunk;
+                        bucket.SummarisedChunks.Add(summarizedChunk);
+                    }
+
+                    summarizedChunk.RowIds.Add(rowIndex);
                 }
             }
             else
             {
                 //If we are not actually summarizing then we can just return the original chunk
-                context.BucketizedTables[new SummaryKey(Array.Empty<object?>())] =
-                    new NpmSummarySet(
-                        Array.Empty<object?>(),
-                        chunk.Columns.Select(col => col.CreateIndirectBuilder(
-                            IndirectPolicy.Passthru
-                        )).ToArray(),
-                        new List<int>());
+                var summarizedChunk = new NpmSummarisedChunk(chunk, new List<int>());
+                var key = new SummaryKey(Array.Empty<object?>());
+                if (!context.BucketizedTables.TryGetValue(key, out var bucket))
+                {
+                    var builders = chunk.Columns.Select(col => col.CreateIndirectBuilder(IndirectPolicy.Map))
+                        .ToArray();
+
+                    context.BucketizedTables[key] = bucket =
+                        new NpmSummarySet(Array.Empty<object?>(),
+                            builders,
+                            new List<NpmSummarisedChunk>());
+                }
+
+                summarizedChunk.RowIds.AddRange(Enumerable.Range(0, chunk.RowCount));
+                bucket.SummarisedChunks.Add(summarizedChunk);
             }
 
 
@@ -124,28 +145,40 @@ internal partial class TreeEvaluator
             var resultRow = 0;
             foreach (var summarySet in context.BucketizedTables.Values)
             {
+                Logger.Info("Processing summary set");
                 for (var i = 0; i < summarySet.ByValues.Length; i++)
                 {
                     resultsData[i].Add(summarySet.ByValues[i]);
                 }
 
-                var rows = summarySet.SelectedRows.ToArray();
-
-
-                var bucketChunk =
-                    new TableChunk(Source,
-                        summarySet.IndirectionBuilders.Select(c => c.CreateIndirectColumn(rows)).ToArray());
-                var chunkContext = _context with { Chunk = bucketChunk };
-                for (var i = 0; i < _aggregationExpressions.Count; i++)
+                foreach (var sumChunk in summarySet.SummarisedChunks)
                 {
-                    var aggregationExpression = _aggregationExpressions[i];
-                    var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
-                    Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
-                        $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
-                    resultsData[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
-                }
+                    Logger.Info(
+                        $"adding sum chunk of size {sumChunk.Chunk.RowCount} reduced to {sumChunk.RowIds.Count}");
 
-                resultRow++;
+                    var rows = sumChunk.RowIds.ToArray();
+                    var remappedColumns =
+                        sumChunk.Chunk.Columns.Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map)
+                            .CreateIndirectColumn(rows)).ToArray();
+
+                    var bucketChunk =
+                        new TableChunk(sumChunk.Chunk.Table,
+                            remappedColumns
+                        );
+                    //todo - this is where we need to remerge or add another layer of indirection
+
+                    var chunkContext = _context with { Chunk = bucketChunk };
+                    for (var i = 0; i < _aggregationExpressions.Count; i++)
+                    {
+                        var aggregationExpression = _aggregationExpressions[i];
+                        var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
+                        Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
+                            $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
+                        resultsData[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
+                    }
+
+                    resultRow++;
+                }
             }
 
             var resultChunk = new TableChunk(this, resultsData.Select(c => c.ToColumn()).ToArray());
