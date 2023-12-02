@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using NLog;
 
@@ -73,8 +74,7 @@ internal partial class TreeEvaluator
 
                 var wanted = wantedRows.ToArray();
                 var indirectedColumns = chunk.Columns
-                    .Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map))
-                    .Select(b => b.CreateIndirectColumn(wanted))
+                    .Select(c => ColumnHelpers.MapColumn(c,wanted))
                     .ToArray();
                 return (default, new TableChunk(this, indirectedColumns), false);
             }

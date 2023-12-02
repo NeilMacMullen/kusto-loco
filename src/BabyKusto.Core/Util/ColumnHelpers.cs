@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Extensions;
 using Kusto.Language.Symbols;
@@ -10,6 +11,9 @@ namespace BabyKusto.Core.Util;
 
 public static class ColumnHelpers
 {
+
+    
+
     public static Column CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
@@ -152,6 +156,61 @@ public static class ColumnHelpers
         // TODO: Support all data types
         throw new NotImplementedException(
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+    }
+
+    public static Column MapColumn(Column other, int[] mapping)
+    {
+    
+        var typeSymbol = other.Type;
+        if (typeSymbol == ScalarTypes.Int)
+        {
+            return  MappedColumn<int?>.Create(mapping!,(Column<int?>) other);
+        }
+        
+        if (typeSymbol == ScalarTypes.Long)
+        {
+            return  MappedColumn<long?>.Create(mapping!, (Column<long?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.Real)
+        {
+            return  MappedColumn<double?>.Create(mapping!, (Column<double?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.Bool)
+        {
+            return  MappedColumn<bool?>.Create(mapping!, (Column<bool?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.String)
+        {
+            return  MappedColumn<string?>.Create(mapping!, (Column<string?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.DateTime)
+        {
+            return  MappedColumn<DateTime?>.Create(mapping!, (Column<DateTime?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.TimeSpan)
+        {
+            return  MappedColumn<TimeSpan?>.Create(mapping!, (Column<TimeSpan?>)other);
+        }
+
+        if (typeSymbol == ScalarTypes.Dynamic)
+        {
+            return  MappedColumn<JsonNode?>.Create(mapping!, (Column<JsonNode?>)other);
+        }
+       
+        // TODO: Support all data types
+        throw new NotImplementedException(
+            $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+    }
+
+
+    public static Column<T> MapColumn<T>(Column<T> other, int[] mapping)
+    {
+        return MappedColumn<T>.Create(mapping, other);
     }
 
     private static Column<T> CreateFromObjectArray<T>(object?[] data, TypeSymbol typeSymbol)

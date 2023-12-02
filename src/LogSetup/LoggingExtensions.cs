@@ -16,10 +16,10 @@ public static class LoggingExtensions
 
         // Create filter log. No need pass the Microsoft.* and System.* pattern into any target.
 #if !DEBUG
-        var ignoreSystemLoggingRule = CreateIgnoreLoggingRule("System.*");
-        var ignoreMicrosoftLoggingRule = CreateIgnoreLoggingRule("Microsoft.*");
-        config.AddRule(ignoreSystemLoggingRule);
-        config.AddRule(ignoreMicrosoftLoggingRule);
+        //var ignoreSystemLoggingRule = CreateIgnoreLoggingRule("System.*");
+        //var ignoreMicrosoftLoggingRule = CreateIgnoreLoggingRule("Microsoft.*");
+        //config.AddRule(ignoreSystemLoggingRule);
+        //config.AddRule(ignoreMicrosoftLoggingRule);
 #endif
 
         // Log to console.

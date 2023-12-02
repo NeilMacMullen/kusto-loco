@@ -174,8 +174,7 @@ internal partial class TreeEvaluator
         {
             var rows = sumChunk.RowIds.ToArray();
             var remappedColumns =
-                sumChunk.Chunk.Columns.Select(c => c.CreateIndirectBuilder(IndirectPolicy.Map)
-                    .CreateIndirectColumn(rows)).ToArray();
+                sumChunk.Chunk.Columns.Select(c => ColumnHelpers.MapColumn(c,rows)).ToArray();
 
             var bucketChunk =
                 new TableChunk(sumChunk.Chunk.Table,

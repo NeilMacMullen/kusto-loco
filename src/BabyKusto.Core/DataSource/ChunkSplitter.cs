@@ -25,7 +25,7 @@ public static class ChunkSplitter
             var chunkCols = new List<ColumnBuilder>();
             foreach (var col in source.Columns)
             {
-                var builder = col.CreateBuilder();
+                var builder = ColumnHelpers.CreateBuilder(col.Type);
                 for (var i = 0; i < takeSize; i++)
                     builder.Add(col.GetRawDataValue(offset + i));
                 chunkCols.Add(builder);
