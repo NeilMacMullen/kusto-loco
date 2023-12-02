@@ -5,9 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
-using System.Security.Cryptography;
-using System.Threading;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
@@ -22,16 +19,11 @@ internal partial class TreeEvaluator
     {
         Debug.Assert(context.Left != TabularResult.Empty);
         var byExpressions = new List<IRExpressionNode>();
-        for (var i = 0; i < node.ByColumns.ChildCount; i++)
-        {
-            byExpressions.Add(node.ByColumns.GetTypedChild(i));
-        }
+        for (var i = 0; i < node.ByColumns.ChildCount; i++) byExpressions.Add(node.ByColumns.GetTypedChild(i));
 
         var aggregationExpressions = new List<IRExpressionNode>();
         for (var i = 0; i < node.Aggregations.ChildCount; i++)
-        {
             aggregationExpressions.Add(node.Aggregations.GetTypedChild(i));
-        }
 
         var result = new SummarizeResultTable(this, context.Left.Value, context, byExpressions,
             aggregationExpressions, (TableSymbol)node.ResultType);
@@ -60,11 +52,26 @@ internal partial class TreeEvaluator
 
         public override TableSymbol Type { get; }
 
-        protected override SummarizeResultTableContext Init() =>
-            new()
+        protected override SummarizeResultTableContext Init()
+        {
+            return new SummarizeResultTableContext
             {
                 BucketizedTables = new Dictionary<SummaryKey, NpmSummarySet>()
             };
+        }
+
+        private static (SummaryKey key,NpmSummarySet set) GetOrAddBucket(object?[] byValues, SummarizeResultTableContext context)
+        {
+            var key = new SummaryKey(byValues);
+            if (!context.BucketizedTables.TryGetValue(key, out var bucket))
+            {
+                context.BucketizedTables[key] = bucket =
+                    new NpmSummarySet(byValues!,
+                        new List<ITableChunk>());
+            }
+
+            return (key,bucket);
+        }
 
         protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
@@ -83,120 +90,71 @@ internal partial class TreeEvaluator
             }
 
 
-          
             if (byValuesColumns.Any())
             {
-                var hasAddedChunk = new Dictionary<SummaryKey, List<int> >();
+                var rowListsForPartitions = new Dictionary<SummaryKey, List<int>>();
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
                     var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
 
-                    var key = new SummaryKey(byValues);
-
-                    if (!context.BucketizedTables.TryGetValue(key, out var bucket))
-                    {
-                        context.BucketizedTables[key] = bucket =
-                            new NpmSummarySet(byValues!,
-                                new List<ITableChunk>());
-                    }
-
-                    if (!hasAddedChunk.TryGetValue(key, out var rowList))
-                    {
-                       
-                        hasAddedChunk[key] = rowList =new List<int>();
-                      
-                    }
+                    var (key,bucket) = GetOrAddBucket(byValues,context);
+                   
+                    if (!rowListsForPartitions.TryGetValue(key, out var rowList))
+                        rowListsForPartitions[key] = rowList = new List<int>();
 
                     rowList.Add(rowIndex);
                 }
 
-                foreach (var (summaryKey,rowIds) in hasAddedChunk)
+                foreach (var (summaryKey, rowIds) in rowListsForPartitions)
                 {
                     var wantedRowChunk = ChunkHelpers.Slice(chunk, rowIds.ToArray());
                     var set = context.BucketizedTables[summaryKey];
                     set.SummarisedChunks.Add(wantedRowChunk);
-
                 }
             }
             else
             {
                 //If we are not actually summarizing then we can just return the original chunk
-                var summaryValues = Array.Empty<object?>();
-                var key = new SummaryKey(summaryValues);
-                if (!context.BucketizedTables.TryGetValue(key, out var bucket))
-                {
-                    context.BucketizedTables[key] = bucket =
-                        new NpmSummarySet(summaryValues, new List<ITableChunk>());
-                }
-              
+                var emptyByValues = Array.Empty<object?>();
+                var (key,bucket) = GetOrAddBucket(emptyByValues,context);
                 bucket.SummarisedChunks.Add(chunk);
             }
-
 
             return (context, TableChunk.Empty, false);
         }
 
         protected override ITableChunk ProcessLastChunk(SummarizeResultTableContext context)
         {
-            var resultsData = new ColumnBuilder[_byExpressions.Count + _aggregationExpressions.Count];
-            for (var i = 0; i < resultsData.Length; i++)
-            {
-                resultsData[i] = ColumnHelpers.CreateBuilder(Type.Columns[i].Type);
-            }
+            var resultColumns = ColumnHelpers.CreateBuildersForTable(Type);
 
-            var resultRow = 0;
             foreach (var summarySet in context.BucketizedTables.Values)
             {
                 Logger.Info("Processing summary set");
-                for (var i = 0; i < summarySet.ByValues.Length; i++)
-                {
-                    resultsData[i].Add(summarySet.ByValues[i]);
-                }
+                // populate the initial summary indices 
+                for (var i = 0; i < summarySet.ByValues.Length; i++) resultColumns[i].Add(summarySet.ByValues[i]);
+
+                //now merge the chunks for this bucket before running any aggregation function...
 
                 var chunksInThisBucket = summarySet.SummarisedChunks.ToArray();
+                var bucketChunk = ChunkHelpers.Reassemble(chunksInThisBucket);
+                Logger.Info(
+                    $"adding sum chunk of size {bucketChunk.RowCount} ");
 
-                //now merge the chunks...
-
-                var columnCount = chunksInThisBucket.First().Columns.Length;
-                Logger.Info($"column count is {columnCount} chunksInBucket = {chunksInThisBucket.Length}");
-                var mergedColumns = new List<Column>();
-                for (var i = 0; i < columnCount; i++)
+                var chunkContext = _context with { Chunk = bucketChunk };
+                for (var i = 0; i < _aggregationExpressions.Count; i++)
                 {
-                    var columnIs = chunksInThisBucket.Select(chk => chk.Columns[i]).ToArray();
-                    Logger.Info($"column {i} num {columnIs.Length}");
-                    var merged = ColumnHelpers.MapColumn(columnIs);
-                    mergedColumns.Add(merged);
+                    var aggregationExpression = _aggregationExpressions[i];
+                    var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
+                    Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
+                        $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
+                    resultColumns[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
                 }
-
-                var bucketChunk = new TableChunk(chunksInThisBucket.First().Table, mergedColumns.ToArray());
-             
-
-                    Logger.Info(
-                        $"adding sum chunk of size {bucketChunk.RowCount} ");
-
-
-                    
-
-
-                    var chunkContext = _context with { Chunk = bucketChunk };
-                    for (var i = 0; i < _aggregationExpressions.Count; i++)
-                    {
-                        var aggregationExpression = _aggregationExpressions[i];
-                        var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
-                        Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
-                            $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
-                        resultsData[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
-                    }
-
-                    resultRow++;
-                
             }
 
-            var resultChunk = new TableChunk(this, resultsData.Select(c => c.ToColumn()).ToArray());
+            var resultChunk = new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray());
             return resultChunk;
         }
     }
-
 
     private struct SummarizeResultTableContext
     {

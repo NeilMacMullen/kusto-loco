@@ -112,6 +112,19 @@ public static class ColumnHelpers
             $"Unsupported scalar type to create column from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
+    /// <summary>
+    /// Creates column builds for a Table symbol
+    /// </summary>
+    /// <remarks>
+    /// This is useful when we want to populate a set of columns based on an expected tabular
+    /// return type
+    /// </remarks>
+    public static ColumnBuilder[] CreateBuildersForTable(TableSymbol table)
+    {
+
+        return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
+    }
+
     public static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
@@ -170,7 +183,7 @@ public static class ColumnHelpers
         return MapColumn(new []{other},mapping, MappingType.Arbitrary);
     }
 
-    public static Column MapColumn(Column [] others)
+    public static Column ReassembleInOrder(Column [] others)
     {
         return MapColumn(others, Array.Empty<int>(), MappingType.Reassembly);
     }
@@ -321,13 +334,4 @@ public static class ColumnHelpers
 
     private static Column<bool?> CreateFromBool(object? value, TypeSymbol typeSymbol, int rowCount) =>
         CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), typeSymbol, rowCount);
-}
-
-public static class ChunkHelpers
-{
-    public static ITableChunk Slice(ITableChunk chunk, int[] rowIds)
-    {
-        var mappedColumns = chunk.Columns.Select(c => ColumnHelpers.MapColumn(c, rowIds)).ToArray();
-        return new TableChunk(chunk.Table, mappedColumns);
-    }
 }
