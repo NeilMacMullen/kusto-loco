@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Threading;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
@@ -81,9 +83,10 @@ internal partial class TreeEvaluator
             }
 
 
-            var hasAddedChunk = new Dictionary<SummaryKey, NpmSummarisedChunk>();
+          
             if (byValuesColumns.Any())
             {
+                var hasAddedChunk = new Dictionary<SummaryKey, List<int> >();
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
                     var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
@@ -94,33 +97,39 @@ internal partial class TreeEvaluator
                     {
                         context.BucketizedTables[key] = bucket =
                             new NpmSummarySet(byValues!,
-                                new List<NpmSummarisedChunk>());
+                                new List<ITableChunk>());
                     }
 
-                    if (!hasAddedChunk.TryGetValue(key, out var summarizedChunk))
+                    if (!hasAddedChunk.TryGetValue(key, out var rowList))
                     {
-                        summarizedChunk = new NpmSummarisedChunk(chunk, new List<int>());
-                        hasAddedChunk[key] = summarizedChunk;
-                        bucket.SummarisedChunks.Add(summarizedChunk);
+                       
+                        hasAddedChunk[key] = rowList =new List<int>();
+                      
                     }
 
-                    summarizedChunk.RowIds.Add(rowIndex);
+                    rowList.Add(rowIndex);
+                }
+
+                foreach (var (summaryKey,rowIds) in hasAddedChunk)
+                {
+                    var wantedRowChunk = ChunkHelpers.Slice(chunk, rowIds.ToArray());
+                    var set = context.BucketizedTables[summaryKey];
+                    set.SummarisedChunks.Add(wantedRowChunk);
+
                 }
             }
             else
             {
                 //If we are not actually summarizing then we can just return the original chunk
-                var summarizedChunk = new NpmSummarisedChunk(chunk, new List<int>());
-                var key = new SummaryKey(Array.Empty<object?>());
+                var summaryValues = Array.Empty<object?>();
+                var key = new SummaryKey(summaryValues);
                 if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 {
                     context.BucketizedTables[key] = bucket =
-                        new NpmSummarySet(Array.Empty<object?>(),
-                            new List<NpmSummarisedChunk>());
+                        new NpmSummarySet(summaryValues, new List<ITableChunk>());
                 }
-
-                summarizedChunk.RowIds.AddRange(Enumerable.Range(0, chunk.RowCount));
-                bucket.SummarisedChunks.Add(summarizedChunk);
+              
+                bucket.SummarisedChunks.Add(chunk);
             }
 
 
@@ -144,9 +153,7 @@ internal partial class TreeEvaluator
                     resultsData[i].Add(summarySet.ByValues[i]);
                 }
 
-
-
-                var chunksInThisBucket = summarySet.SummarisedChunks.Select(CreateTableChunkFromSummaryChunk).ToArray();
+                var chunksInThisBucket = summarySet.SummarisedChunks.ToArray();
 
                 //now merge the chunks...
 
@@ -168,8 +175,7 @@ internal partial class TreeEvaluator
                         $"adding sum chunk of size {bucketChunk.RowCount} ");
 
 
-                    // bucketChunk = CreateTableChunkFromSummaryChunk(sumChunk);
-                    //todo - this is where we need to remerge or add another layer of indirection
+                    
 
 
                     var chunkContext = _context with { Chunk = bucketChunk };
@@ -188,19 +194,6 @@ internal partial class TreeEvaluator
 
             var resultChunk = new TableChunk(this, resultsData.Select(c => c.ToColumn()).ToArray());
             return resultChunk;
-        }
-
-        private ITableChunk CreateTableChunkFromSummaryChunk(NpmSummarisedChunk sumChunk)
-        {
-            var rows = sumChunk.RowIds.ToArray();
-            var remappedColumns =
-                sumChunk.Chunk.Columns.Select(c => ColumnHelpers.MapColumn(c,rows)).ToArray();
-
-            var bucketChunk =
-                new TableChunk(sumChunk.Chunk.Table,
-                    remappedColumns
-                );
-            return bucketChunk;
         }
     }
 
