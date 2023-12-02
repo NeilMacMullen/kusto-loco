@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
@@ -143,14 +144,33 @@ internal partial class TreeEvaluator
                     resultsData[i].Add(summarySet.ByValues[i]);
                 }
 
-                foreach (var sumChunk in summarySet.SummarisedChunks)
+
+
+                var chunksInThisBucket = summarySet.SummarisedChunks.Select(CreateTableChunkFromSummaryChunk).ToArray();
+
+                //now merge the chunks...
+
+                var columnCount = chunksInThisBucket.First().Columns.Length;
+                Logger.Info($"column count is {columnCount} chunksInBucket = {chunksInThisBucket.Length}");
+                var mergedColumns = new List<Column>();
+                for (var i = 0; i < columnCount; i++)
                 {
+                    var columnIs = chunksInThisBucket.Select(chk => chk.Columns[i]).ToArray();
+                    Logger.Info($"column {i} num {columnIs.Length}");
+                    var merged = ColumnHelpers.MapColumn(columnIs);
+                    mergedColumns.Add(merged);
+                }
+
+                var bucketChunk = new TableChunk(chunksInThisBucket.First().Table, mergedColumns.ToArray());
+             
+
                     Logger.Info(
-                        $"adding sum chunk of size {sumChunk.Chunk.RowCount} reduced to {sumChunk.RowIds.Count}");
+                        $"adding sum chunk of size {bucketChunk.RowCount} ");
 
 
-                    var bucketChunk = CreateTableChunkFromSummaryChunk(sumChunk);
+                    // bucketChunk = CreateTableChunkFromSummaryChunk(sumChunk);
                     //todo - this is where we need to remerge or add another layer of indirection
+
 
                     var chunkContext = _context with { Chunk = bucketChunk };
                     for (var i = 0; i < _aggregationExpressions.Count; i++)
@@ -163,7 +183,7 @@ internal partial class TreeEvaluator
                     }
 
                     resultRow++;
-                }
+                
             }
 
             var resultChunk = new TableChunk(this, resultsData.Select(c => c.ToColumn()).ToArray());

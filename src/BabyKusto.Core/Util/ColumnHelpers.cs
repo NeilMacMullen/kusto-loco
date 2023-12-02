@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Extensions;
@@ -158,48 +160,81 @@ public static class ColumnHelpers
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
+    public static Column MapColumn(Column other, int offset, int length)
+    {
+        return MapColumn(new [] {other}, new[] { offset, length }, MappingType.Chunk);
+    }
+
     public static Column MapColumn(Column other, int[] mapping)
     {
+        return MapColumn(new []{other},mapping, MappingType.Arbitrary);
+    }
+
+    public static Column MapColumn(Column [] others)
+    {
+        return MapColumn(others, Array.Empty<int>(), MappingType.Reassembly);
+    }
+
+    private enum MappingType
+    {
+        Arbitrary,
+        Chunk,
+        Reassembly
+    }
+
+    private static Column<T> Create<T>(int[] mapping, Column<T> [] other, MappingType mapType)
+    {
+        return mapType switch
+        {
+            MappingType.Arbitrary => MapColumn(other[0], mapping),
+            MappingType.Chunk => ChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
+            MappingType.Reassembly => new ReassembledChunkColumn<T>(other),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private static Column MapColumn(IEnumerable<Column> others, int[] mapping,MappingType mapType)
+    {
     
-        var typeSymbol = other.Type;
+        var typeSymbol = others.First().Type;
         if (typeSymbol == ScalarTypes.Int)
         {
-            return  MappedColumn<int?>.Create(mapping!,(Column<int?>) other);
+            return Create(mapping!, others.Cast<Column<int?>>().ToArray(), mapType);
         }
         
         if (typeSymbol == ScalarTypes.Long)
         {
-            return  MappedColumn<long?>.Create(mapping!, (Column<long?>)other);
+            return Create(mapping!, others.Cast<Column<long?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return  MappedColumn<double?>.Create(mapping!, (Column<double?>)other);
+            return Create(mapping!, others.Cast<Column<double?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return  MappedColumn<bool?>.Create(mapping!, (Column<bool?>)other);
+            return Create(mapping!, others.Cast<Column<bool?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return  MappedColumn<string?>.Create(mapping!, (Column<string?>)other);
+            return Create(mapping!, others.Cast<Column<string?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return  MappedColumn<DateTime?>.Create(mapping!, (Column<DateTime?>)other);
+            return Create(mapping!, others.Cast<Column<DateTime?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return  MappedColumn<TimeSpan?>.Create(mapping!, (Column<TimeSpan?>)other);
+            return Create(mapping!, others.Cast<Column<TimeSpan?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return  MappedColumn<JsonNode?>.Create(mapping!, (Column<JsonNode?>)other);
+            return Create(mapping!, others.Cast<Column<JsonNode?>>().ToArray(), mapType);
         }
        
         // TODO: Support all data types

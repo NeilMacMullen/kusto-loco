@@ -54,9 +54,6 @@ internal class LessThanLongOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
         var leftCol = (Column<long?>)(arguments[0].Column);
         var rightCol = (Column<long?>)(arguments[1].Column);
-
-        Logger.Debug($"less than called on {leftCol.RowCount} rows");
-
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
         {

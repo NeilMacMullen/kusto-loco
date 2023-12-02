@@ -2,6 +2,9 @@
 
 namespace BabyKusto.Core;
 
+/// <summary>
+/// Allows a column to arbitrarily remap rows to those in another column
+/// </summary>
 public class MappedColumn<T> : Column<T>
 {
     private readonly int[] _lookups;
@@ -41,6 +44,4 @@ public class MappedColumn<T> : Column<T>
 
 
     public override object? GetRawDataValue(int index) => BackingColumn.GetRawDataValue(IndirectIndex(index));
-
-
 }

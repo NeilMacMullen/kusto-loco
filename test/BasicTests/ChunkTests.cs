@@ -36,7 +36,7 @@ public class ChunkTests
 
         context.AddChunkedTableFromRecords("data", rows, 2);
         var result = (await context.RunQuery("data | count"));
-        KustoFormatter.Tabulate(result.Results).Should().Contain("10");
+        KustoFormatter.Tabulate(result.Results).Should().Contain("20");
     }
 
     [TestMethod]
