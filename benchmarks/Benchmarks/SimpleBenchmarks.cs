@@ -5,6 +5,7 @@ using KustoSupport;
 
 namespace Benchmarks
 {
+    [MemoryDiagnoser]
     public class SimpleBenchmarks
     {
         private KustoQueryContext _context ;
@@ -22,6 +23,27 @@ namespace Benchmarks
         {
             var query = "data | count";
             var res = _context.BenchmarkQuery(query);
+        }
+
+         [Benchmark]
+        public int SummarizeCount()
+        {
+            var query = "data | summarize count() by LocationSetTagString | count ";
+            return _context.BenchmarkQuery(query);
+        }
+
+        [Benchmark]
+        public int SummarizeSimpleCount()
+        {
+            var query = "data | summarize by LocationSetTagString | count";
+            return _context.BenchmarkQuery(query);
+        }
+
+        [Benchmark]
+        public int SummarizeSimpleCountInt()
+        {
+            var query = "data | summarize by Radius | count";
+            return _context.BenchmarkQuery(query);
         }
 
 
@@ -66,14 +88,6 @@ namespace Benchmarks
     {
         public static void Main(string[] args)
         {
-            /*
-            var c = new Class1();
-            c.Setup();
-            var res = c.Summarize();
-            var s = KustoFormatter
-                .Tabulate(KustoQueryContext.GetDictionarySet(res as TabularResult));
-            Console.WriteLine($"{s}");
-            */
             BenchmarkRunner.Run<SimpleBenchmarks>();
         }
     }

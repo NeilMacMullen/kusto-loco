@@ -41,7 +41,7 @@ public class Column<T> : Column
     public virtual T? this[int index] => _data[index];
 
 
-    public override object? GetRawDataValue(int index) => _data.GetValue(index);
+    public override object? GetRawDataValue(int index) => _data[index];
 
     public static void ValidateTypes(TypeSymbol typeSymbol, Type type)
     {

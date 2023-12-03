@@ -60,23 +60,23 @@ internal partial class TreeEvaluator
             };
         }
 
-        private static (SummaryKey key,NpmSummarySet set) GetOrAddBucket(object?[] byValues, SummarizeResultTableContext context)
+        private static NpmSummarySet GetOrAddBucket(SummaryKey key,
+            SummarizeResultTableContext context)
         {
-            var key = new SummaryKey(byValues);
             if (!context.BucketizedTables.TryGetValue(key, out var bucket))
-            {
                 context.BucketizedTables[key] = bucket =
-                    new NpmSummarySet(byValues!,
-                        new List<ITableChunk>());
-            }
+                    new NpmSummarySet(key.GetArray(),
+                        new List<ITableChunk>(),new List<int>());
 
-            return (key,bucket);
+            return bucket;
         }
 
         protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
-            Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
+           
+
+            //Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
             var byValuesColumns = new List<Column>(_byExpressions.Count);
 
             var chunkContext = _context with { Chunk = chunk };
@@ -89,25 +89,29 @@ internal partial class TreeEvaluator
                 byValuesColumns.Add(byExpressionResult.Column);
             }
 
+            //Console.WriteLine($"created by col {watch.ElapsedMilliseconds}ms");
 
             if (byValuesColumns.Any())
             {
-                var rowListsForPartitions = new Dictionary<SummaryKey, List<int>>();
+             
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
-                    var byValues = byValuesColumns.Select(c => c.GetRawDataValue(rowIndex)).ToArray();
-
-                    var (key,bucket) = GetOrAddBucket(byValues,context);
+                    //although it's tempting to use a linq select here, 
+                    //this loop has to be very performant and it's significantly
+                    //faster to set properties in a for loop
+                    var key = new SummaryKey();
+                    for (var c = 0; c < byValuesColumns.Count; c++)
+                        key.Set(c, byValuesColumns[c].GetRawDataValue(rowIndex));
                    
-                    if (!rowListsForPartitions.TryGetValue(key, out var rowList))
-                        rowListsForPartitions[key] = rowList = new List<int>();
-
+                  
+                    var bucket =GetOrAddBucket(key, context);
+                    var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
                 }
 
-                foreach (var (summaryKey, rowIds) in rowListsForPartitions)
+                foreach (var (summaryKey, summary) in context.BucketizedTables)
                 {
-                    var wantedRowChunk = ChunkHelpers.Slice(chunk, rowIds.ToArray());
+                    var wantedRowChunk = ChunkHelpers.Slice(chunk, summary.RowIds.ToArray());
                     var set = context.BucketizedTables[summaryKey];
                     set.SummarisedChunks.Add(wantedRowChunk);
                 }
@@ -115,11 +119,11 @@ internal partial class TreeEvaluator
             else
             {
                 //If we are not actually summarizing then we can just return the original chunk
-                var emptyByValues = Array.Empty<object?>();
-                var (key,bucket) = GetOrAddBucket(emptyByValues,context);
+                var bucket = GetOrAddBucket(new SummaryKey(), context);
                 bucket.SummarisedChunks.Add(chunk);
             }
 
+            //Console.WriteLine($"Summarize chunk took {watch.ElapsedMilliseconds}ms");
             return (context, TableChunk.Empty, false);
         }
 
