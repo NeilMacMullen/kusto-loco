@@ -6,11 +6,14 @@ using System.Diagnostics;
 using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
-
+using NLog;
 namespace BabyKusto.Core.Evaluation;
 
 internal partial class TreeEvaluator
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+
     public override EvaluationResult VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
     {
         Debug.Assert(context.Left != TabularResult.Empty);
@@ -28,16 +31,20 @@ internal partial class TreeEvaluator
         private readonly int _count;
 
         public TakeResultTable(ITableSource input, int count)
-            : base(input) =>
+            : base(input)
+        {
             _count = count;
+        }
 
         public override TableSymbol Type => Source.Type;
 
-        protected override TakeResultTableContext Init() =>
-            new()
+        protected override TakeResultTableContext Init()
+        {
+            return new TakeResultTableContext
             {
-                Remaining = _count,
+                Remaining = _count
             };
+        }
 
         protected override (TakeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(TakeResultTableContext context, ITableChunk chunk)
@@ -49,10 +56,7 @@ internal partial class TreeEvaluator
             }
 
             var columns = new Column[chunk.Columns.Length];
-            for (var i = 0; i < columns.Length; i++)
-            {
-                columns[i] = chunk.Columns[i].Slice(0, context.Remaining);
-            }
+            for (var i = 0; i < columns.Length; i++) columns[i] = chunk.Columns[i].Slice(0, context.Remaining);
 
             var trimmedChunk = new TableChunk(this, columns);
             context.Remaining = 0;

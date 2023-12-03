@@ -32,6 +32,7 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitSortOperator(IRSortOperatorNode node, TContext context);
     public abstract TResult VisitSummarizeOperator(IRSummarizeOperatorNode node, TContext context);
     public abstract TResult VisitTakeOperator(IRTakeOperatorNode node, TContext context);
+    public abstract TResult VisitGetSchemaOperator(IRGetSchemaOperatorNode node, TContext context);
     public abstract TResult VisitToScalarExpressionNode(IRToScalarExpressionNode node, TContext context);
     public abstract TResult VisitUnaryExpression(IRUnaryExpressionNode node, TContext context);
     public abstract TResult VisitUnionOperator(IRUnionOperatorNode node, TContext context);

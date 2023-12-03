@@ -2,11 +2,13 @@
 // Licensed under the MIT License.
 
 using Kusto.Language.Syntax;
+using NLog;
 
 namespace BabyKusto.Core.InternalRepresentation;
 
 internal partial class IRTranslator
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     public override IRNode VisitTakeOperator(TakeOperator node)
     {
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);

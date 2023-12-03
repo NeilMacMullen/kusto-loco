@@ -91,6 +91,9 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
     public override TResult VisitTakeOperator(IRTakeOperatorNode node, TContext context) =>
         DefaultVisit(node, context);
 
+    public override TResult VisitGetSchemaOperator(IRGetSchemaOperatorNode node, TContext context) =>
+        DefaultVisit(node, context);
+
     public override TResult VisitToScalarExpressionNode(IRToScalarExpressionNode node, TContext context) =>
         DefaultVisit(node, context);
 
