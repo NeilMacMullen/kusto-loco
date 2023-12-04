@@ -20,6 +20,7 @@ public class SimpleFunctionTests
         var context = CreateContext();
         var result = await context.RunQuery(query);
         //return the last line 
+        Console.WriteLine($"{result.Error}");
         return KustoFormatter.Tabulate(result.Results)
             .Trim()
             .Split(Environment.NewLine)
@@ -75,10 +76,26 @@ datatable(Size:int) [50]
     }
 
     [TestMethod]
-    public async Task GeoDistance2Points()
+    public async Task GeoDistance2PointsScalar()
     {
         var query = @" print distance_in_meters = geo_distance_2points(-122.407628, 47.578557, -118.275287, 34.019056)";
         var result = await LastLineOfResult(query);
         result.Should().Contain("15467");
+    }
+
+    [TestMethod]
+    public async Task GeoPointToGeoHashScalar()
+    {
+        var query = @"print geohash = geo_point_to_geohash(139.806115, 35.554128, 12)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("xn76m27ty9g4");
+    }
+
+    [TestMethod]
+    public async Task GeoPointToGeoHashScalarWithDefault()
+    {
+        var query = @"print geohash = geo_point_to_geohash(139.806115, 35.554128)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("xn76m");
     }
 }

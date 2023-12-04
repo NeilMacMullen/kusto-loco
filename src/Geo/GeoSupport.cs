@@ -1,4 +1,6 @@
-﻿namespace Geo;
+﻿using Geohash;
+
+namespace Geo;
 
 public static class GeoSupport
 {
@@ -30,5 +32,18 @@ public static class GeoSupport
         const double R = 6371e3;
         var d = R * c;
         return d;
+    }
+
+    public static string GeoHash(double? lon, double? lat, long? resolution)
+    {
+        if (!CheckValid(lon, lat))
+            return string.Empty;
+        if (resolution == null)
+            return string.Empty;
+
+        var geohasher = new Geohasher();
+
+        // Encode latitude and longitude into a geohash string
+        return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution!.Value);
     }
 }

@@ -237,59 +237,68 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.GeoDistance2Points, new ScalarFunctionInfo(
             new ScalarOverloadInfo(new GeoDistance2PointsFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real,
                 ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real)));
-        functions.Add(
-                         Functions.Trim,
-                         new ScalarFunctionInfo(
-                                                new ScalarOverloadInfo(new TrimFunctionImpl(),
-                                                                       ScalarTypes.String,
-                                                                       ScalarTypes.String,
-                                                                       ScalarTypes.String)));
-        functions.Add(
-                      Functions.TrimStart,
-                      new ScalarFunctionInfo(
-                                             new ScalarOverloadInfo(new TrimStartFunctionImpl(),
-                                                                    ScalarTypes.String,
-                                                                    ScalarTypes.String,
-                                                                    ScalarTypes.String)));
+
+        functions.Add(Functions.GeoPointToGeohash, new ScalarFunctionInfo(
+            new ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(), ScalarTypes.String, ScalarTypes.Real,
+                ScalarTypes.Real,
+                ScalarTypes.Long),
+            new ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(), ScalarTypes.String, ScalarTypes.Real,
+                ScalarTypes.Real)
+        ));
+
 
         functions.Add(
-                      Functions.TrimEnd,
-                      new ScalarFunctionInfo(
-                                             new ScalarOverloadInfo(new TrimEndFunctionImpl(),
-                                                                    ScalarTypes.String,
-                                                                    ScalarTypes.String,
-                                                                    ScalarTypes.String)));
+            Functions.Trim,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new TrimFunctionImpl(),
+                    ScalarTypes.String,
+                    ScalarTypes.String,
+                    ScalarTypes.String)));
+        functions.Add(
+            Functions.TrimStart,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new TrimStartFunctionImpl(),
+                    ScalarTypes.String,
+                    ScalarTypes.String,
+                    ScalarTypes.String)));
+
+        functions.Add(
+            Functions.TrimEnd,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new TrimEndFunctionImpl(),
+                    ScalarTypes.String,
+                    ScalarTypes.String,
+                    ScalarTypes.String)));
 
         ScalarOverloadInfo[] BuildOverloads(IScalarFunctionImpl func, TypeSymbol t)
             => Enumerable.Range(1, 10)
-                         .Select(i =>
-                         {
-                             var pairs = Enumerable.Range(0, i)
-                                                       .SelectMany(_ => new[] { ScalarTypes.Bool, t })
-                                                       .ToArray();
-                             var paramArray = pairs.Append(t).ToArray();
-                             var overload = new ScalarOverloadInfo(func,
-                                                                       t,
-                                                                       paramArray);
-                             return overload;
-                         })
-                         .ToArray();
+                .Select(i =>
+                {
+                    var pairs = Enumerable.Range(0, i)
+                        .SelectMany(_ => new[] { ScalarTypes.Bool, t })
+                        .ToArray();
+                    var paramArray = pairs.Append(t).ToArray();
+                    var overload = new ScalarOverloadInfo(func,
+                        t,
+                        paramArray);
+                    return overload;
+                })
+                .ToArray();
 
         functions.Add(
-                      Functions.Case,
-                      new ScalarFunctionInfo
-                          (
-                           //note most restrictive types have to be checked first!
-                           Array.Empty<ScalarOverloadInfo>()
-                                .Concat(BuildOverloads(new CaseFunctionImpl<bool?>(), ScalarTypes.Bool))
-                                .Concat(BuildOverloads(new CaseFunctionImpl<int?>(), ScalarTypes.Int))
-                                .Concat(BuildOverloads(new CaseFunctionImpl<long?>(), ScalarTypes.Long))
-                                .Concat(BuildOverloads(new CaseFunctionImpl<double?>(), ScalarTypes.Real))
-                                .Concat(BuildOverloads(new CaseFunctionImpl<DateTime?>(), ScalarTypes.DateTime))
-                                .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
-                                .ToArray()
-                          ));
-
+            Functions.Case,
+            new ScalarFunctionInfo
+            (
+                //note most restrictive types have to be checked first!
+                Array.Empty<ScalarOverloadInfo>()
+                    .Concat(BuildOverloads(new CaseFunctionImpl<bool?>(), ScalarTypes.Bool))
+                    .Concat(BuildOverloads(new CaseFunctionImpl<int?>(), ScalarTypes.Int))
+                    .Concat(BuildOverloads(new CaseFunctionImpl<long?>(), ScalarTypes.Long))
+                    .Concat(BuildOverloads(new CaseFunctionImpl<double?>(), ScalarTypes.Real))
+                    .Concat(BuildOverloads(new CaseFunctionImpl<DateTime?>(), ScalarTypes.DateTime))
+                    .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
+                    .ToArray()
+            ));
     }
 
     public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
