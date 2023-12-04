@@ -3752,6 +3752,49 @@ Key:int; a:string; aIsNull:bool; aIsEmpty:bool; aLen:long
         Test(query, expected);
     }
 
+    [Fact]
+    public void TrimWorksAsExpected()
+    {
+        // Arrange
+        var query = @"print trim('a*','aaathis is a testaaaa')";
+
+        var expected = @"print_0:string
+------------------
+this is a test";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+
+    [Fact]
+    public void TrimStartWorksAsExpected()
+    {
+        // Arrange
+        var query = @"print trim_start('a*','aaathis is a testaaaa')";
+
+        var expected = @"print_0:string
+------------------
+this is a testaaaa";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+
+    [Fact]
+    public void TrimEndWorksAsExpected()
+    {
+        // Arrange
+        var query = @"print trim_end('a*','aaathis is a testaaaa')";
+
+        var expected = @"print_0:string
+------------------
+aaathis is a test";
+
+        // Act & Assert
+        Test(query, expected);
+    }
     private static void Test(string query, string expectedOutput)
     {
         var engine = new BabyKustoEngine();

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using KustoSupport;
 using LogSetup;
