@@ -13,10 +13,7 @@ public class SimpleFunctionTests
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    private static KustoQueryContext CreateContext()
-    {
-        return KustoQueryContext.WithFullDebug();
-    }
+    private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
 
     private async Task<string> LastLineOfResult(string query)
     {
@@ -75,5 +72,13 @@ datatable(Size:int) [50]
                           'Large')";
         var result = await LastLineOfResult(query);
         result.Should().Contain("Large");
+    }
+
+    [TestMethod]
+    public async Task GeoDistance2Points()
+    {
+        var query = @" print distance_in_meters = geo_distance_2points(-122.407628, 47.578557, -118.275287, 34.019056)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("15467");
     }
 }

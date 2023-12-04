@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Geo\Geo.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />

@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "benchmarks\Be
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtendedCoreTests", "test\ExtendedCoreTests\ExtendedCoreTests.csproj", "{CB8ABFEF-4F5C-440C-8DEE-65BB77873BB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogSetup", "src\LogSetup\LogSetup.csproj", "{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogSetup", "src\LogSetup\LogSetup.csproj", "{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geo", "src\Geo\Geo.csproj", "{CEFB8842-4862-4FC4-8407-40116972895C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEFB8842-4862-4FC4-8407-40116972895C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEFB8842-4862-4FC4-8407-40116972895C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEFB8842-4862-4FC4-8407-40116972895C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEFB8842-4862-4FC4-8407-40116972895C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,7 @@ Global
 		{11A53A25-A3A5-4484-A909-C55471636222} = {240DE661-CB71-4D27-B320-62E553CFBCAE}
 		{CB8ABFEF-4F5C-440C-8DEE-65BB77873BB7} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{CEFB8842-4862-4FC4-8407-40116972895C} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
