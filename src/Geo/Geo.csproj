@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="geohash-dotnet" Version="2.1.0" />
+    <PackageReference Include="geohash-dotnet"  />
   </ItemGroup>
 
 </Project>
