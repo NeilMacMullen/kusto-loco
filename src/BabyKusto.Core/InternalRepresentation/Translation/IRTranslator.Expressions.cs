@@ -99,6 +99,14 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 $"Expected element selector expression to evaluate to {TypeNameHelper.GetTypeDisplayName(typeof(IRLiteralExpressionNode))}, but found {TypeNameHelper.GetTypeDisplayName(value)}");
         }
 
+
+        //support array access for dynamic objects
+        if (value.Value is long index)
+        {
+            return new IRArrayAccessNode(irExpression, (int) index, node.ResultType);
+        }
+
+
         if (value.Value is not string stringValue || stringValue == null)
         {
             throw new InvalidOperationException(

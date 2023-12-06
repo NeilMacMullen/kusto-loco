@@ -46,4 +46,12 @@ public static class GeoSupport
         // Encode latitude and longitude into a geohash string
         return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution!.Value);
     }
+
+    public static (double Latitude,double Longitude) GeoHashCentralPoint(string point)
+    {
+
+        var geohasher = new Geohasher();
+        var d = geohasher.Decode(point);
+        return (d.latitude, d.longitude);
+    }
 }

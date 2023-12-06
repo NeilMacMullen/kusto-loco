@@ -15,17 +15,12 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
     {
         var lookup = context.Scope.Lookup(node.ReferencedSymbol.Name);
-        if (lookup == null)
-        {
-            throw new InvalidOperationException($"Name {node.ReferencedSymbol.Name} is not in scope.");
-        }
+        if (lookup == null) throw new InvalidOperationException($"Name {node.ReferencedSymbol.Name} is not in scope.");
 
         var (symbol, value) = lookup.Value;
         if (symbol != node.ReferencedSymbol)
-        {
             Console.WriteLine(
                 $"Name '{node.ReferencedSymbol.Name}' mismatched, but that's expected for now in function calls.");
-        }
 
         return value;
     }
@@ -38,29 +33,20 @@ internal partial class TreeEvaluator
         return new ColumnarResult(column);
     }
 
-    public override EvaluationResult VisitMemberAccess(IRMemberAccessNode node, EvaluationContext context)
+    public override EvaluationResult VisitMemberAccess(IRArrayAccessNode node, EvaluationContext context)
     {
         if (node.ResultKind == EvaluatedExpressionKind.Columnar)
         {
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
-            if (items == null)
-            {
-                throw new InvalidOperationException("Expression yielded null result");
-            }
+            if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
             var itemsCol = (Column<JsonNode?>)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
-            {
-                if (itemsCol[i] is JsonObject obj)
-                {
-                    if (obj.TryGetPropertyValue(node.MemberName, out var value))
-                    {
-                        data[i] = value;
-                    }
-                }
-            }
+                //TODO _ ADD SOME LENGTH CHECKING HERE!!!!
+                if (itemsCol[i] is JsonArray obj && obj.Count > node.Index)
+                    data[i] = obj[node.Index];
 
             var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
             return new ColumnarResult(column);
@@ -68,34 +54,60 @@ internal partial class TreeEvaluator
 
         {
             var item = (ScalarResult?)node.Expression.Accept(this, context);
-            if (item == null)
-            {
-                throw new InvalidOperationException("Expression yielded null result");
-            }
+            if (item == null) throw new InvalidOperationException("Expression yielded null result");
 
-            if (item.Value is JsonObject obj)
+            if (item.Value is JsonArray obj && obj.Count > node.Index)
             {
-                if (obj.TryGetPropertyValue(node.MemberName, out var value))
-                {
-                    return new ScalarResult(ScalarTypes.Dynamic, value);
-                }
+                var value = obj[node.Index];
+
+                return new ScalarResult(ScalarTypes.Dynamic, value);
             }
 
             return new ScalarResult(ScalarTypes.Dynamic, null);
         }
     }
 
+    public override EvaluationResult VisitMemberAccess(IRMemberAccessNode node, EvaluationContext context)
+    {
+        if (node.ResultKind == EvaluatedExpressionKind.Columnar)
+        {
+            var items = (ColumnarResult?)node.Expression.Accept(this, context);
+            if (items == null) throw new InvalidOperationException("Expression yielded null result");
+
+            var itemsCol = (Column<JsonNode?>)items.Column;
+
+            var data = new JsonNode?[itemsCol.RowCount];
+            for (var i = 0; i < items.Column.RowCount; i++)
+                if (itemsCol[i] is JsonObject obj)
+                    if (obj.TryGetPropertyValue(node.MemberName, out var value))
+                        data[i] = value;
+
+            var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
+            return new ColumnarResult(column);
+        }
+
+        {
+            var item = (ScalarResult?)node.Expression.Accept(this, context);
+            if (item == null) throw new InvalidOperationException("Expression yielded null result");
+
+            if (item.Value is JsonObject obj)
+                if (obj.TryGetPropertyValue(node.MemberName, out var value))
+                    return new ScalarResult(ScalarTypes.Dynamic, value);
+
+            return new ScalarResult(ScalarTypes.Dynamic, null);
+        }
+    }
+
     public override EvaluationResult
-        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context) =>
-        new ScalarResult(node.ResultType, node.Value);
+        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
+    {
+        return new ScalarResult(node.ResultType, node.Value);
+    }
 
     public override EvaluationResult VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
     {
         var left = (TabularResult?)node.Expression.Accept(this, context);
-        if (left == null)
-        {
-            throw new InvalidOperationException("Left expression produced null result");
-        }
+        if (left == null) throw new InvalidOperationException("Left expression produced null result");
 
         return node.Operator.Accept(this, context with { Left = left });
     }
@@ -111,15 +123,12 @@ internal partial class TreeEvaluator
         for (var j = 0; j < numColumns; j++)
         {
             var columnData = new object?[numRows];
-            for (var i = 0; i < numRows; i++)
-            {
-                columnData[i] = node.Data[i * numColumns + j];
-            }
+            for (var i = 0; i < numRows; i++) columnData[i] = node.Data[i * numColumns + j];
 
             columns[j] = ColumnHelpers.CreateFromObjectArray(columnData, tableSymbol.Columns[j].Type);
         }
 
         var result = new InMemoryTableSource(tableSymbol, columns);
-        return new TabularResult(result, visualizationState: null);
+        return new TabularResult(result, null);
     }
 }

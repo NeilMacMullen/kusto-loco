@@ -1,32 +1,13 @@
 using FluentAssertions;
-using KustoSupport;
-using LogSetup;
-using NLog;
 
 namespace BasicTests;
 
 [TestClass]
-public class SimpleFunctionTests
+public class SimpleFunctionTests :TestMethods
 {
-    public SimpleFunctionTests()
-    {
-        LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
-    }
+  
 
-    private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
-
-    private async Task<string> LastLineOfResult(string query)
-    {
-        var context = CreateContext();
-        var result = await context.RunQuery(query);
-        //return the last line 
-        Console.WriteLine($"{result.Error}");
-        return KustoFormatter.Tabulate(result.Results)
-            .Trim()
-            .Split(Environment.NewLine)
-            .Last().Trim();
-    }
-
+  
     [TestMethod]
     public async Task TrimStart()
     {
@@ -97,5 +78,16 @@ datatable(Size:int) [50]
         var query = @"print geohash = geo_point_to_geohash(139.806115, 35.554128)";
         var result = await LastLineOfResult(query);
         result.Should().Be("xn76m");
+    }
+
+
+    [TestMethod]
+    public async Task GeoHashToCentralPointScalar()
+    {
+        var query = @"print point = geo_geohash_to_central_point('sunny')
+                      | extend coordinates = point.coordinates
+                      | project longitude = coordinates[0]";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("42.4731445");
     }
 }

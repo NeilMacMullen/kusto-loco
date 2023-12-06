@@ -246,6 +246,11 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.Real)
         ));
 
+        functions.Add(Functions.GeohashToCentralPoint, new ScalarFunctionInfo(
+            new ScalarOverloadInfo(new GeoHashToCentralPointFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String)
+        ));
+
+
 
         functions.Add(
             Functions.Trim,

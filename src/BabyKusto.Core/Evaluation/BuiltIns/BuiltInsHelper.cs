@@ -8,11 +8,13 @@ using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
+using NLog;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns;
 
 internal static class BuiltInsHelper
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     internal static T? PickOverload<T>(IReadOnlyList<T> overloads, IRExpressionNode[] arguments)
         where T : OverloadInfoBase
     {
