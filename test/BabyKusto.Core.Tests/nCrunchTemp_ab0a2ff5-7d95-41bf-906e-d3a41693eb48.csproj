@@ -1,0 +1,91 @@
+﻿<Project DefaultTargets="Build;NCrunchOutputDataQuery" Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BabyKusto.Core\BabyKusto.Core.csproj" />
+    <ProjectReference Include="..\..\src\LogSetup\LogSetup.csproj" />
+  </ItemGroup>
+
+<Target Name="AssignProjectConfiguration" DependsOnTargets=""></Target>
+<Target Name="ResolveTestReferences" DependsOnTargets=""></Target>
+<Target Name="NCrunchDetectExplicitlyAddedFrameworkReferences" BeforeTargets="AddTransitiveFrameworkReferences">     <ItemGroup>
+      <NCrunchFrameworkReferencesBeforeTransitiveReferences Include="@(FrameworkReference)"/>
+    </ItemGroup></Target>
+<Target Name="NCrunchOutputDataQuery" DependsOnTargets="_SplitProjectReferencesByFileExistence;ResolveKeySource;$(ResolveReferencesDependsOn)"><Message Text="#54521ab66d3943f9957bbe6132eaa2fd=$(Configuration)"/>
+<Message Text="#af53fe04320340929a2909462dadf9a1=$(TargetFrameworkVersion)"/>
+<Message Text="#d68dad10aeb44f439bc29d48e8bf4911=$(TargetFramework)"/>
+<Message Text="#755b99c8bc4b43a8b61a0bdf6b0a7861=$(AssemblyName)"/>
+<Message Text="#1d496c753be24133bb5f6edc9c358be1=$(DefaultItemExcludes)"/>
+<Message Text="#275cad6861b6493e8c86d5c45bb64900=$(DefaultItemExcludesInProjectFolder)"/>
+<Message Text="#a01d158c23eb43f9a8ef697d9d58733d=$(EnableDefaultItems)"/>
+<Message Text="#6939e25cf0c64971b9dc29d16234db11=$(OutputPath)"/>
+<Message Text="#d8cd1552894f407e8601ce72bf3dc4fc=$(OutDir)"/>
+<Message Text="#0b88805c931d4ff9b5a75f7a20a173d9=$(KeyOriginatorFile)"/>
+<Message Text="#10de11f3d931483a994913530370c33e=$(SignAssembly)"/>
+<Message Text="#c738b7f64c2549e48d3fee3574de9ff3=$(PlatformTarget)"/>
+<Message Text="#6c0457a38caa41d0a0c85e112389ee57=$(NuGetToolsPath)"/>
+<Message Text="#02b358dcac6145de92d19567230ddd32=$(Language)"/>
+<Message Text="#069ce162efff423fb8f9c6918c5652a1=$(DebugType)"/>
+<Message Text="#28edcd54c5e04a598b1b5b2d2556cc90=$(OtherFlags)"/>
+<Message Text="#96b305c465964f81a1542fdeb76ec016=$(PreBuildEvent)"/>
+<Message Text="#e28071256d0b47448db24116ce99defe=$(PostBuildEvent)"/>
+<Message Text="#9eac54041b84463b915157987e51ff8d=$(LinkedServerProject)"/>
+<Message Text="#84eac05ed62c408f8c750bb03dd39407=$(ResolveAssemblyReferencesStateFile)"/>
+<Message Text="#1becb37d3aba4762ad4310718a71d55b=$(SDKReferenceDirectoryRoot)"/>
+<Message Text="#8ab22b69efc04d8a8c3c079eced24568=$(__IntermediateAppConfig)"/>
+<Message Text="#6f6a61939d584834874dcb9a027248c0=$(PrepareForBuildDependsOn)"/>
+<Message Text="#2b8ae1e4b01b474d923528463ba1da58=$(AfterMicrosoftNETSdkTargets)"/>
+<Message Text="#ab70a23cc7e84edb92b197795abd69de=$(CustomAfterMicrosoftCommonTargets)"/>
+<Message Text="#d68b443d8f574e8f8e0f01c82848bb81=$(ProjectAssetsFile)"/>
+<Message Text="#ef423b08829f4c0a913e7ab660697799=$(DefineConstants)"/>
+<Message Text="#32f2ad2d14b244528324edadf5a1628f=$(NuGetPackageFolders)"/>
+<Message Text="#_ResolveComReferenceCache=;@(_ResolveComReferenceCache)"/>
+<Message Text="#AppxManifest=;@(AppxManifest)"/>
+<Message Text="#TransitiveFrameworkReference=;@(TransitiveFrameworkReference)"/>
+<Message Text="#ReferencePath=;@(ReferencePath)"/>
+<Message Text="#ReferenceDependencyPaths=;@(ReferenceDependencyPaths)"/>
+<Message Text="#ComReferenceWrappers=;@(ComReferenceWrappers)"/>
+<Message Text="#ProjectReference=;@(ProjectReference)"/>
+<Message Text="#ResolvedFrameworkReference=;@(ResolvedFrameworkReference)"/>
+<Message Text="#NCrunchFrameworkReferencesBeforeTransitiveReferences=;@(NCrunchFrameworkReferencesBeforeTransitiveReferences)"/>
+<Message Text="#None=;@(None)" Condition="'%(None.Generator)'!=''" />
+<Message Text="#Compile.ClCompile.SpecFlowFeatureFiles=;@(Compile);@(ClCompile);@(SpecFlowFeatureFiles)"/>
+<Message Text="#Content=;@(Content)"/>
+<Message Text="#None.EmbeddedResource.VSCTCompile.Page.ApplicationDefinition.Resource.ClInclude.ResourceCompile.Library.$ApplicationIcon.$Win32Resource.$ApplicationManifest.$KeyOriginatorFile.EntityDeploy.XamlAppdef.$ManifestKeyFile.SplashScreen.BaseApplicationManifest.Midl.ServiceDefinition.ServiceConfiguration.BlendEmbeddedFont.TypeScriptCompile.AndroidResource.InterfaceDefinition.BundleResource.ITunesArtwork.PRIResource.Image.FsYacc.FsLex.Analyzer.AdditionalFiles.Map.XLang.Pipeline.Schema.Antlr4=;@(None);@(EmbeddedResource);@(VSCTCompile);@(Page);@(ApplicationDefinition);@(Resource);@(ClInclude);@(ResourceCompile);@(Library);$(ApplicationIcon);$(Win32Resource);$(ApplicationManifest);$(KeyOriginatorFile);@(EntityDeploy);@(XamlAppdef);$(ManifestKeyFile);@(SplashScreen);@(BaseApplicationManifest);@(Midl);@(ServiceDefinition);@(ServiceConfiguration);@(BlendEmbeddedFont);@(TypeScriptCompile);@(AndroidResource);@(InterfaceDefinition);@(BundleResource);@(ITunesArtwork);@(PRIResource);@(Image);@(FsYacc);@(FsLex);@(Analyzer);@(AdditionalFiles);@(Map);@(XLang);@(Pipeline);@(Schema);@(Antlr4)"/>
+<Message Text="#LinkedFiles=;@(Compile->'%(Link)')"/>
+<Message Text="#DotNetCliToolReference=@(DotNetCliToolReference)|@(DotNetCliToolReference->'%(Version)')" Condition="'@(DotNetCliToolReference->'%(Version)')'!=''"/><Message Text="#ReferencePathAliases=@(ReferencePath)|%(ReferencePath.Aliases)" Condition="'%(ReferencePath.Aliases)'!=''"/><Message Text="#ReferencePathEmbedInteropTypes=@(ReferencePath)|%(ReferencePath.EmbedInteropTypes)" Condition="'%(ReferencePath.EmbedInteropTypes)'!=''"/><Message Text="#ReferencePathPrivate=@(ReferencePath)|%(ReferencePath.Private)" Condition="'%(ReferencePath.Private)'!=''"/><Message Text="#ReferencePathIsIgnoredNCrunchTestFrameworkReference=@(ReferencePath)|%(ReferencePath.IsIgnoredNCrunchTestFrameworkReference)" Condition="'%(ReferencePath.IsIgnoredNCrunchTestFrameworkReference)'!=''"/><Message Text="#ProjectReferenceAliases=@(ProjectReference)|%(ProjectReference.Aliases)" Condition="'%(ProjectReference.Aliases)'!=''"/><Message Text="#ProjectReferenceEmbedInteropTypes=@(ProjectReference)|%(ProjectReference.EmbedInteropTypes)" Condition="'%(ProjectReference.EmbedInteropTypes)'!=''"/><Message Text="#ProjectReferencePrivate=@(ProjectReference)|%(ProjectReference.Private)" Condition="'%(ProjectReference.Private)'!=''"/><Message Text="#ProjectReferenceIsIgnoredNCrunchTestFrameworkReference=@(ProjectReference)|%(ProjectReference.IsIgnoredNCrunchTestFrameworkReference)" Condition="'%(ProjectReference.IsIgnoredNCrunchTestFrameworkReference)'!=''"/><Message Text="#ProjectReferenceAdditionalProperties=@(ProjectReference)|%(ProjectReference.AdditionalProperties)" Condition="'%(ProjectReference.AdditionalProperties)'!=''"/><Message Text="#ProjectReferenceSetTargetFramework=@(ProjectReference)|%(ProjectReference.SetTargetFramework)" Condition="'%(ProjectReference.SetTargetFramework)'!=''"/><Message Text="#ProjectReferenceOutputItemType=@(ProjectReference)|%(ProjectReference.OutputItemType)" Condition="'%(ProjectReference.OutputItemType)'!=''"/><Message Text="#ResolvedFrameworkReferenceTargetingPackVersion=@(ResolvedFrameworkReference)|%(ResolvedFrameworkReference.TargetingPackVersion)" Condition="'%(ResolvedFrameworkReference.TargetingPackVersion)'!=''"/><Message Text="#_ConflictPackageFiles=;@(_ConflictPackageFiles)"/>
+<Message Text="#d4b56ab2f9ae485cb3639ef38b414a78=$(TargetFramework)"/>
+<Message Text="#b3950513d3f8454e92b62e181a74f104=$(TargetFramework)"/>
+<Message Text="#2431997fbebf478c8ba29f55c2e2f6fc=$(TargetFramework)"/>
+<Message Text="#23c569725e534eebaa65418fd717656f=$(ImplicitFrameworkDefine)"/>
+<Message Text="#b2500b1d96644017ad73380acd69bbe5=$(_IsFunctionsSdkBuild)"/>
+<Message Text="#b441d30f884044ec880ba7c472dc78dd=$(CodeAnalysisRuleSet)"/>
+<Message Text="#CodeAnalysisDictionary=;@(CodeAnalysisDictionary)"/>
+<Message Text="#9ffbedd525d046a7bc8874e06c2b3c20=$(CodeContractsReferenceAssembly)"/>
+<Message Text="#Fakes=;@(Fakes)"/>
+<Message Text="#FakesConfigurations=;@(FakesConfigurations)"/>
+<Message Text="#c5d59a1180c04a5b923329ac06b26fc8=$(MvcBuildViews)"/>
+<Message Text="#a3b5c45eb42241c9b0eaa9b82812e9fe=$(StyleCopEnabled)"/>
+<Message Text="#Shadow=;@(Shadow)"/>
+</Target>
+</Project>
