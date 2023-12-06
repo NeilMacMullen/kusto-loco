@@ -3,11 +3,8 @@ using FluentAssertions;
 namespace BasicTests;
 
 [TestClass]
-public class SimpleFunctionTests :TestMethods
+public class SimpleFunctionTests : TestMethods
 {
-  
-
-  
     [TestMethod]
     public async Task TrimStart()
     {
@@ -89,5 +86,14 @@ datatable(Size:int) [50]
                       | project longitude = coordinates[0]";
         var result = await LastLineOfResult(query);
         result.Should().Contain("42.4731445");
+    }
+
+
+    [TestMethod]
+    public async Task SplitScalar()
+    {
+        var query = @"print c=split('this.is.a.string.and.I.need.the.last.part', '.')[-1]";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("part");
     }
 }

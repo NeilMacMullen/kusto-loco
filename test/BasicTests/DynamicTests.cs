@@ -3,9 +3,8 @@ using FluentAssertions;
 namespace BasicTests;
 
 [TestClass]
-public class DynamicTests :TestMethods
+public class DynamicTests : TestMethods
 {
-
     [TestMethod]
     public async Task MemberAccess()
     {
@@ -30,4 +29,28 @@ public class DynamicTests :TestMethods
         result.Should().Be("1");
     }
 
+    [TestMethod]
+    public async Task NegativeNumber()
+    {
+        var query = @"print -1 *5";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("-5");
+    }
+
+
+    [TestMethod]
+    public async Task NegativeExpression()
+    {
+        var query = @"print -(1+5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("-6");
+    }
+
+    [TestMethod]
+    public async Task ArrayAccessWithNegativeIndex()
+    {
+        var query = @"print o=dynamic({""a"":[1,2]}) | project z=o.a[-1]";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
 }

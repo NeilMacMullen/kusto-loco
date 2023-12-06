@@ -251,7 +251,6 @@ internal static class BuiltInScalarFunctions
         ));
 
 
-
         functions.Add(
             Functions.Trim,
             new ScalarFunctionInfo(
@@ -272,6 +271,15 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(
                 new ScalarOverloadInfo(new TrimEndFunctionImpl(),
                     ScalarTypes.String,
+                    ScalarTypes.String,
+                    ScalarTypes.String)));
+
+
+        functions.Add(
+            Functions.Split,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new SplitFunctionImpl(),
+                    ScalarTypes.DynamicArrayOfString,
                     ScalarTypes.String,
                     ScalarTypes.String)));
 

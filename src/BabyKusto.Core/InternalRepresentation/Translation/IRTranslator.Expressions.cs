@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.Extensions;
+using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
@@ -86,13 +87,29 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 $"Expected element selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
         }
 
-        if (selector.Expression is not LiteralExpression literalExpressionSelector)
+        var selectorExpression = selector.Expression;
+
+        if (selectorExpression is PrefixUnaryExpression pfxExpression)
+        {
+            //TODO HERE - this is a horrible hack to allow for negative array indices
+            //surely there as to be a better way....
+            var pvalue = pfxExpression.Accept(this) as IRUnaryExpressionNode;
+            if (pvalue!.Expression is IRLiteralExpressionNode lit)
+            {
+                var v = (long)lit.Value!;
+                var op = pvalue.Signature.Symbol.Name;
+                if (op == Operators.UnaryMinus.Name) v = -v;
+                return new IRArrayAccessNode(irExpression, (int)v, node.ResultType);
+            }
+        }
+
+        if (selectorExpression is not LiteralExpression literalExpressionSelector)
         {
             throw new InvalidOperationException(
                 $"Expected element selector expression to be {TypeNameHelper.GetTypeDisplayName(typeof(LiteralExpression))}, but found {TypeNameHelper.GetTypeDisplayName(selector.Expression)}");
         }
 
-        var value = selector.Expression.Accept(this) as IRLiteralExpressionNode;
+        var value = selectorExpression.Accept(this) as IRLiteralExpressionNode;
         if (value == null)
         {
             throw new InvalidOperationException(
@@ -103,7 +120,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         //support array access for dynamic objects
         if (value.Value is long index)
         {
-            return new IRArrayAccessNode(irExpression, (int) index, node.ResultType);
+            return new IRArrayAccessNode(irExpression, (int)index, node.ResultType);
         }
 
 
@@ -166,6 +183,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
+
 
         var irArguments = new[] { irExpression };
         var parameters = signature.GetArgumentParameters(new[] { node.Expression });

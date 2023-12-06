@@ -33,6 +33,17 @@ internal partial class TreeEvaluator
         return new ColumnarResult(column);
     }
 
+    private static JsonNode? IndexIntoPossibleJsonArray(object? array, int index)
+    {
+        if (array is not JsonArray obj)
+            return null;
+
+        if (index < 0) index = obj.Count + index;
+        if (index < 0) return null;
+        if (index >= obj.Count) return null;
+        return obj[index];
+    }
+
     public override EvaluationResult VisitMemberAccess(IRArrayAccessNode node, EvaluationContext context)
     {
         if (node.ResultKind == EvaluatedExpressionKind.Columnar)
@@ -44,9 +55,9 @@ internal partial class TreeEvaluator
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
-                //TODO _ ADD SOME LENGTH CHECKING HERE!!!!
-                if (itemsCol[i] is JsonArray obj && obj.Count > node.Index)
-                    data[i] = obj[node.Index];
+            {
+                data[i] = IndexIntoPossibleJsonArray(itemsCol[i], node.Index);
+            }
 
             var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
             return new ColumnarResult(column);
@@ -56,14 +67,8 @@ internal partial class TreeEvaluator
             var item = (ScalarResult?)node.Expression.Accept(this, context);
             if (item == null) throw new InvalidOperationException("Expression yielded null result");
 
-            if (item.Value is JsonArray obj && obj.Count > node.Index)
-            {
-                var value = obj[node.Index];
-
-                return new ScalarResult(ScalarTypes.Dynamic, value);
-            }
-
-            return new ScalarResult(ScalarTypes.Dynamic, null);
+            var value = IndexIntoPossibleJsonArray(item.Value, node.Index);
+            return new ScalarResult(ScalarTypes.Dynamic, value);
         }
     }
 
@@ -99,10 +104,8 @@ internal partial class TreeEvaluator
     }
 
     public override EvaluationResult
-        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
-    {
-        return new ScalarResult(node.ResultType, node.Value);
-    }
+        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context) =>
+        new ScalarResult(node.ResultType, node.Value);
 
     public override EvaluationResult VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
     {
