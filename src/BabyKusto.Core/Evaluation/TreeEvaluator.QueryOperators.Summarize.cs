@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Extensions;
@@ -52,13 +52,11 @@ internal partial class TreeEvaluator
 
         public override TableSymbol Type { get; }
 
-        protected override SummarizeResultTableContext Init()
-        {
-            return new SummarizeResultTableContext
+        protected override SummarizeResultTableContext Init() =>
+            new()
             {
                 BucketizedTables = new Dictionary<SummaryKey, NpmSummarySet>()
             };
-        }
 
         private static NpmSummarySet GetOrAddBucket(SummaryKey key,
             SummarizeResultTableContext context)
@@ -66,7 +64,7 @@ internal partial class TreeEvaluator
             if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 context.BucketizedTables[key] = bucket =
                     new NpmSummarySet(key.GetArray(),
-                        new List<ITableChunk>(),new List<int>());
+                        new List<ITableChunk>(), new List<int>());
 
             return bucket;
         }
@@ -74,8 +72,6 @@ internal partial class TreeEvaluator
         protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
-           
-
             //Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
             var byValuesColumns = new List<Column>(_byExpressions.Count);
 
@@ -93,7 +89,6 @@ internal partial class TreeEvaluator
 
             if (byValuesColumns.Any())
             {
-             
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
                     //although it's tempting to use a linq select here, 
@@ -102,16 +97,16 @@ internal partial class TreeEvaluator
                     var key = new SummaryKey();
                     for (var c = 0; c < byValuesColumns.Count; c++)
                         key.Set(c, byValuesColumns[c].GetRawDataValue(rowIndex));
-                   
-                  
-                    var bucket =GetOrAddBucket(key, context);
+
+
+                    var bucket = GetOrAddBucket(key, context);
                     var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
                 }
 
                 foreach (var (summaryKey, summary) in context.BucketizedTables)
                 {
-                    var wantedRowChunk = ChunkHelpers.Slice(chunk, summary.RowIds.ToArray());
+                    var wantedRowChunk = ChunkHelpers.Slice(chunk, summary.RowIds.ToImmutableArray());
                     var set = context.BucketizedTables[summaryKey];
                     set.SummarisedChunks.Add(wantedRowChunk);
                 }

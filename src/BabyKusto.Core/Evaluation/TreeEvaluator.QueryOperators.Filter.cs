@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Extensions;
@@ -68,9 +69,9 @@ internal partial class TreeEvaluator
                         }
                     }
 
-                    var wanted = wantedRows.ToArray();
+                    var wanted = wantedRows.ToImmutableArray();
                     var indirectedColumns = chunk.Columns
-                        .Select(c => ColumnHelpers.MapColumn(c,wanted))
+                        .Select(c => ColumnHelpers.MapColumn(c, wanted))
                         .ToArray();
                     return (default, new TableChunk(this, indirectedColumns), false);
                 }

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using BabyKusto.Core;
 using BabyKusto.Core.Util;
 using FluentAssertions;
@@ -14,9 +15,9 @@ public class IndirectTests
             .Select(i => i.ToString()).ToArray();
         var cs = new Column<string>(ScalarTypes.String, originalData);
         var backing = MappedColumn<string>.Create(
-            Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0).ToArray()
+            Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0).ToImmutableArray()
             , cs);
-        return (MappedColumn<string>) backing;
+        return (MappedColumn<string>)backing;
     }
 
     [TestMethod]
@@ -50,14 +51,13 @@ public class IndirectTests
         sliced.GetRawDataValue(0).Should().Be("50");
     }
 
-   
 
     [Ignore("decided not to implement this!")]
     [TestMethod]
     public void MappedIndirectionFlattens()
     {
         var backing = MakeDecimatedColumn(100);
-        var flattened = ColumnHelpers.MapColumn(backing,new[] { 0, 1 }) as MappedColumn<string>;
+        var flattened = ColumnHelpers.MapColumn(backing, new[] { 0, 1 }.ToImmutableArray()) as MappedColumn<string>;
         flattened!.RowCount.Should().Be(2);
         flattened!.IndirectIndex(0).Should().Be(backing.IndirectIndex(0));
         flattened!.IndirectIndex(1).Should().Be(backing.IndirectIndex(1));
@@ -67,7 +67,7 @@ public class IndirectTests
     public void IndirectingSingleValueColumnReturnsSingleValue()
     {
         var sv = new SingleValueColumn<string>(ScalarTypes.String, "HELLO", 100);
-        var second =  ColumnHelpers.MapColumn(sv,new[] { 0, 1 });
+        var second = ColumnHelpers.MapColumn(sv, new[] { 0, 1 }.ToImmutableArray());
         second.GetType().Should().Be(typeof(SingleValueColumn<string>));
         second.RowCount.Should().Be(2);
         second.GetRawDataValue(0).Should().Be("HELLO");

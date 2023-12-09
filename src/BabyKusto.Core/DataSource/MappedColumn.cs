@@ -1,29 +1,32 @@
 ﻿using System;
+using System.Collections.Immutable;
 
 namespace BabyKusto.Core;
 
 /// <summary>
-/// Allows a column to arbitrarily remap rows to those in another column
+///     Allows a column to arbitrarily remap rows to those in another column
 /// </summary>
 public class MappedColumn<T> : Column<T>
 {
-    private readonly int[] _lookups;
+    private readonly ImmutableArray<int> _lookups;
     public readonly Column<T> BackingColumn;
 
-    private MappedColumn(int[] lookups, Column<T> backing)
+    private MappedColumn(ImmutableArray<int> lookups, Column<T> backing)
         : base(backing.Type, Array.Empty<T>())
     {
         _lookups = lookups;
         BackingColumn = backing;
     }
-    public static Column<T> Create(int[] lookups, Column<T> backing)
+
+    public override T? this[int index] => BackingColumn[IndirectIndex(index)];
+    public override int RowCount => _lookups.Length;
+
+    public static Column<T> Create(ImmutableArray<int> lookups, Column<T> backing)
     {
         if (backing is SingleValueColumn<T> single)
             return single.ResizeTo(lookups.Length);
-        return new MappedColumn<T>(lookups,backing);
+        return new MappedColumn<T>(lookups, backing);
     }
-    public override T? this[int index] => BackingColumn[IndirectIndex(index)];
-    public override int RowCount => _lookups.Length;
 
     public int IndirectIndex(int index) => _lookups[index];
 
@@ -37,8 +40,7 @@ public class MappedColumn<T> : Column<T>
 
     public override Column Slice(int start, int length)
     {
-        var slicedData = new int[length];
-        Array.Copy(_lookups, start, slicedData, 0, length);
+        var slicedData = _lookups.Slice(start, length);
         return new MappedColumn<T>(slicedData, BackingColumn);
     }
 

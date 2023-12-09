@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Extensions;
 using Kusto.Language.Symbols;
@@ -13,9 +13,6 @@ namespace BabyKusto.Core.Util;
 
 public static class ColumnHelpers
 {
-
-    
-
     public static Column CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
@@ -113,15 +110,14 @@ public static class ColumnHelpers
     }
 
     /// <summary>
-    /// Creates column builds for a Table symbol
+    ///     Creates column builds for a Table symbol
     /// </summary>
     /// <remarks>
-    /// This is useful when we want to populate a set of columns based on an expected tabular
-    /// return type
+    ///     This is useful when we want to populate a set of columns based on an expected tabular
+    ///     return type
     /// </remarks>
     public static ColumnBuilder[] CreateBuildersForTable(TableSymbol table)
     {
-
         return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
     }
 
@@ -175,27 +171,21 @@ public static class ColumnHelpers
 
     public static Column MapColumn(Column other, int offset, int length)
     {
-        return MapColumn(new [] {other}, new[] { offset, length }, MappingType.Chunk);
+        //TODO - packing the offset and length into a mapping array is just a bit of 
+        //a hack to make the internal API easier
+        return MapColumn(new[] { other }, new[] { offset, length }.ToImmutableArray(),
+            MappingType.Chunk);
     }
 
-    public static Column MapColumn(Column other, int[] mapping)
+    public static Column MapColumn(Column other, ImmutableArray<int> mapping)
     {
-        return MapColumn(new []{other},mapping, MappingType.Arbitrary);
+        return MapColumn(new[] { other }, mapping, MappingType.Arbitrary);
     }
 
-    public static Column ReassembleInOrder(Column [] others)
-    {
-        return MapColumn(others, Array.Empty<int>(), MappingType.Reassembly);
-    }
+    public static Column ReassembleInOrder(Column[] others) =>
+        MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
-    private enum MappingType
-    {
-        Arbitrary,
-        Chunk,
-        Reassembly
-    }
-
-    private static Column<T> Create<T>(int[] mapping, Column<T> [] other, MappingType mapType)
+    private static Column<T> Create<T>(ImmutableArray<int> mapping, Column<T>[] other, MappingType mapType)
     {
         return mapType switch
         {
@@ -206,60 +196,57 @@ public static class ColumnHelpers
         };
     }
 
-    private static Column MapColumn(IEnumerable<Column> others, int[] mapping,MappingType mapType)
+    private static Column MapColumn(IEnumerable<Column> others, ImmutableArray<int> mapping, MappingType mapType)
     {
-    
         var typeSymbol = others.First().Type;
         if (typeSymbol == ScalarTypes.Int)
         {
-            return Create(mapping!, others.Cast<Column<int?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<int?>>().ToArray(), mapType);
         }
-        
+
         if (typeSymbol == ScalarTypes.Long)
         {
-            return Create(mapping!, others.Cast<Column<long?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<long?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return Create(mapping!, others.Cast<Column<double?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<double?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return Create(mapping!, others.Cast<Column<bool?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<bool?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return Create(mapping!, others.Cast<Column<string?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<string?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return Create(mapping!, others.Cast<Column<DateTime?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<DateTime?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return Create(mapping!, others.Cast<Column<TimeSpan?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<TimeSpan?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return Create(mapping!, others.Cast<Column<JsonNode?>>().ToArray(), mapType);
+            return Create(mapping, others.Cast<Column<JsonNode?>>().ToArray(), mapType);
         }
-       
+
         // TODO: Support all data types
         throw new NotImplementedException(
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
 
-    public static Column<T> MapColumn<T>(Column<T> other, int[] mapping)
-    {
-        return MappedColumn<T>.Create(mapping, other);
-    }
+    public static Column<T> MapColumn<T>(Column<T> other, ImmutableArray<int> mapping) =>
+        MappedColumn<T>.Create(mapping, other);
 
     private static Column<T> CreateFromObjectArray<T>(object?[] data, TypeSymbol typeSymbol)
     {
@@ -334,4 +321,11 @@ public static class ColumnHelpers
 
     private static Column<bool?> CreateFromBool(object? value, TypeSymbol typeSymbol, int rowCount) =>
         CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), typeSymbol, rowCount);
+
+    private enum MappingType
+    {
+        Arbitrary,
+        Chunk,
+        Reassembly
+    }
 }

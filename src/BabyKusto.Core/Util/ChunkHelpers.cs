@@ -1,12 +1,12 @@
-﻿using NLog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace BabyKusto.Core.Util;
 
 public static class ChunkHelpers
 {
-    public static ITableChunk Slice(ITableChunk chunk, int[] rowIds)
+    public static ITableChunk Slice(ITableChunk chunk, ImmutableArray<int> rowIds)
     {
         var mappedColumns = chunk.Columns.Select(c => ColumnHelpers.MapColumn(c, rowIds)).ToArray();
         return new TableChunk(chunk.Table, mappedColumns);
