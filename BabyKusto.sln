@@ -41,7 +41,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtendedCoreTests", "test\E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogSetup", "src\LogSetup\LogSetup.csproj", "{35BE1709-9DB2-4AF0-A1E1-C3C95B112D8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geo", "src\Geo\Geo.csproj", "{CEFB8842-4862-4FC4-8407-40116972895C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geo", "src\Geo\Geo.csproj", "{CEFB8842-4862-4FC4-8407-40116972895C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A5579A8E-4198-4EC3-9F20-46BBAC53B97F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal-representation.png = docs\internal-representation.png
+		OldReadMe.md = OldReadMe.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{44F51B35-D6EE-402F-93C7-3C43B1FD62B2}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

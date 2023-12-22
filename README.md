@@ -1,73 +1,51 @@
-# DO NOT USE
+# WARNING
 
 This fork is currently undergoing changes and is unstable.
 Please refer back to the original repo for a more stable version
 
-# BabyKusto
+# Kusto-Loco
 
-BabyKusto is a self-contained execution engine for the [Kusto Query Language](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/) (KQL).
+KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) which has been extended to improve query performance to provide a richer feature-set.
+
+It provides a simple way to perform complex queries against in-memory tabular data.
+
+TODO:Example here
+
+## Project Goals
+
+| Goal | Anti-Goal|
+|------|----------|
+|Provide a *useful* implementation of a significant subset of the standard Kusto Query Language and built-in functions. | Provide "bit-exact" results vs ADX |
+|Easy import/export of local file-based and in-memory data | Distributed/cluster-based processing |
+|"Good enough" performance for single-user interaction | Low-latency, "web-scale" query serving |
+| Allow engine extensibility for custom functionality |Fork Kusto Language |
+
+## Changes relative to original BabyKusto
+- Much more efficient filtering
+- CSV/POCO adaptation layer
+- Tabulation of results
+- Additional functions and operations
+
+## Known differences to ADX/Kusto
+- Regex operations use C# regex format
+- GeoHash limited to precision of 12 
+- No clustering
+- Rendering ?
+
+TODO 
 
 
-## How to use
+## Credits
+Credit for original implementation and all heavy-lifting belongs to [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
 
-1. Evaluate a simple query:
+Since then the engine has been extended and optimised by the [Sensize](https://sensize.net) team including NeilMacMullen, Vartika Gupta and Kosta Demoore.
 
-   ```cs
-   var query = "print hello='world'";
-   
-   var engine = new BabyKustoEngine();
-   var result = engine.Evaluate(query);
-   ```
+## Help Wanted
 
-2. Inject custom tabular sources:
-
-   Implement an `ITableSource`, then register it with the engine using `BabyKustoEngine.AddGlobalTable(ITableSource table)`. You can think of `ITableSource` as similar to an `IEnumerable<T>`, which allows the engine to get metadata about the table (e.g. its name and type) as well as to iterate over its data.
-
-   Just like `IEnumerable<T>`, the data doesn't have to be materialized ahead of time, and your implementation of `ITableSource` can produce data on the fly. The type, however, has to be static and known ahead of time.
-
-   ```cs
-   ITableSource myTable = /*...*/; // Get your data from anywhere
-   var engine = new BabyKustoEngine();
-   engine.AddGlobalTable(myTable);
-   
-   var result = engine.Evaluate("MyTable | count");
-   ```
-
-3. Play with the samples
-
-   This repo ships with three ready-to-run samples that showcase BabyKusto in action.
-   
-   * [**Sample.HelloWorld**](./samples/Sample.HelloWorld): as simple as it gets, shows how to run a simple query.
-   
-   * [**Sample.ProcessesCli**](./samples/Sample.ProcessesCli): a command-line tool that lets you explore processes running on your machine using KQL. For example, find the process using the most memory with a query like this:
-     ```
-     Processes
-     | project name, memMB=workingSet/1024/1024
-     | order by memMB desc
-     | take 1
-     ```
-
-   * [**Sample.ProcessesServer**](./samples/Sample.ProcessesServer): an ASP .NET Core-based web server that implements the Kusto REST API and exposes the same table `Processes` as the `Sample.ProcessesCli` sample. You can connect to the local Kusto cluster using the official Kusto client (Azure Data Explorer).
-
-## How it works
-
-BabyKusto leverages the official [`Microsoft.Azure.Kusto.Language`](https://www.nuget.org/packages/Microsoft.Azure.Kusto.Language/) package for parsing and semantic analysis of KQL queries.
-
-The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](./src/BabyKusto.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](./src/BabyKusto.Core/Evaluation/BabyKustoEvaluator.cs).
-
-You can explore the internal representation of a query by setting `dumpIRTree: true` when calling `BabyKustoEngine.Evaluate`.
-Below is an example of the internal representation for the query:
-
-```
-Processes
-| project name, memMB=workingSet/1024/1024
-| order by memMB desc
-| take 1
-```
-
-![Internal representation outputs](./docs/internal-representation.png)
+To come... primarily filling out the function/operation set
 
 ## Contributing
+
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
