@@ -216,34 +216,6 @@ internal partial class TreeEvaluator
             return new[] { chunk };
         }
 
-        private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
-        {
-            var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numRightColumns];
-            for (var i = 0; i < numRightColumns; i++)
-            {
-                resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
-
-            foreach (var kvp in left.Buckets)
-            {
-                if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
-                {
-                    Debug.Assert(numRightColumns == rightValue.Data.Length);
-                    for (var i = 0; i < numRightColumns; i++)
-                    {
-                        resultColumns[i].AddRange(rightValue.Data[i]);
-                    }
-                }
-            }
-
-            var columns = resultColumns
-                .Select(c => c.ToColumn())
-                .ToArray();
-            var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
-        }
-
         private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
@@ -259,34 +231,6 @@ internal partial class TreeEvaluator
                 {
                     Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
                     for (var i = 0; i < numLeftColumns; i++)
-                    {
-                        resultColumns[i].AddRange(kvp.Value.Data[i]);
-                    }
-                }
-            }
-
-            var columns = resultColumns
-                .Select(c => c.ToColumn())
-                .ToArray();
-            var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
-        }
-
-        private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
-        {
-            var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numRightColumns];
-            for (var i = 0; i < numRightColumns; i++)
-            {
-                resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
-
-            foreach (var kvp in right.Buckets)
-            {
-                if (!left.Buckets.ContainsKey(kvp.Key))
-                {
-                    Debug.Assert(numRightColumns == kvp.Value.Data.Length);
-                    for (var i = 0; i < numRightColumns; i++)
                     {
                         resultColumns[i].AddRange(kvp.Value.Data[i]);
                     }
@@ -357,6 +301,62 @@ internal partial class TreeEvaluator
                         {
                             resultColumns[numLeftColumns + c].Add(null);
                         }
+                    }
+                }
+            }
+
+            var columns = resultColumns
+                .Select(c => c.ToColumn())
+                .ToArray();
+            var chunk = new TableChunk(this, columns);
+            return new[] { chunk };
+        }
+
+        private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
+        {
+            var numRightColumns = right.Table.Type.Columns.Count;
+            var resultColumns = new ColumnBuilder[numRightColumns];
+            for (var i = 0; i < numRightColumns; i++)
+            {
+                resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+            }
+
+            foreach (var kvp in left.Buckets)
+            {
+                if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
+                {
+                    Debug.Assert(numRightColumns == rightValue.Data.Length);
+                    for (var i = 0; i < numRightColumns; i++)
+                    {
+                        resultColumns[i].AddRange(rightValue.Data[i]);
+                    }
+                }
+            }
+
+            var columns = resultColumns
+                .Select(c => c.ToColumn())
+                .ToArray();
+            var chunk = new TableChunk(this, columns);
+            return new[] { chunk };
+        }
+
+        private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
+        {
+            var numRightColumns = right.Table.Type.Columns.Count;
+            var resultColumns = new ColumnBuilder[numRightColumns];
+            for (var i = 0; i < numRightColumns; i++)
+            {
+                resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
+            }
+
+            foreach (var kvp in right.Buckets)
+            {
+                if (!left.Buckets.ContainsKey(kvp.Key))
+                {
+                    Debug.Assert(numRightColumns == kvp.Value.Data.Length);
+                    for (var i = 0; i < numRightColumns; i++)
+                    {
+                        resultColumns[i].AddRange(kvp.Value.Data[i]);
                     }
                 }
             }
@@ -535,6 +535,7 @@ internal partial class TreeEvaluator
         }
     }
 
-    private readonly record struct NpmJoinSet(object?[] OnValues,
+    private readonly record struct NpmJoinSet(
+        object?[] OnValues,
         ColumnBuilder[] Data);
 }
