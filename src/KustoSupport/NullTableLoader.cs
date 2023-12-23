@@ -5,5 +5,6 @@
 /// </summary>
 internal class NullTableLoader : IKustoQueryContextTableLoader
 {
-    public Task LoadTables(KustoQueryContext context, IReadOnlyCollection<string> tableNames) => Task.CompletedTask;
+    public Task LoadTablesAsync(KustoQueryContext context, IReadOnlyCollection<string> tableNames)
+        => Task.CompletedTask;
 }

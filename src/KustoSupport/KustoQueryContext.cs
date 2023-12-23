@@ -21,7 +21,7 @@ public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly BabyKustoEngine _engine = new();
-    private readonly List<MyKustoTable> _tables = new();
+    private readonly List<BaseKustoTable> _tables = new();
 
     private bool _fullDebug;
 
@@ -30,7 +30,7 @@ public class KustoQueryContext
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
-    public void AddTable(MyKustoTable table)
+    public void AddTable(BaseKustoTable table)
     {
         if (_tables.Any(t => t.Name == table.Name))
             throw new ArgumentException($"Context already contains a table named '{table.Name}'");
@@ -38,7 +38,7 @@ public class KustoQueryContext
         _engine.AddGlobalTable(table);
     }
 
-    public MyKustoTable GetTable(string name)
+    public BaseKustoTable GetTable(string name)
     {
         return _tables.Single(t => UnescapeTableName(t.Name) == name);
     }
@@ -91,15 +91,18 @@ public class KustoQueryContext
         var watch = Stopwatch.StartNew();
         try
         {
+            // Get tables referenced in query
             var requiredTables = GetTableList(query);
-            var unloadedTables = requiredTables.Except(_tables.Select(t => t.Name)).ToArray();
-            if (unloadedTables.Any())
-                await _lazyTableLoader.LoadTables(this, unloadedTables);
 
+            // Ensure that tables are loaded into the query context
+            await _lazyTableLoader.LoadTablesAsync(this, requiredTables);
+
+            // Note: Hold the lock until the query is complete to ensure that tables don't change
+            // in the middle of execution.
             var results = RunTabularQueryToDictionarySet(query);
             return new KustoQueryResult<OrderedDictionary>(query, results,
-                (int)watch.ElapsedMilliseconds,
-                string.Empty);
+                                                           (int)watch.ElapsedMilliseconds,
+                                                           string.Empty);
         }
         catch (Exception ex)
         {
@@ -208,7 +211,7 @@ public class KustoQueryContext
         return tables.Select(UnescapeTableName).Distinct().ToArray();
     }
 
-    public IEnumerable<MyKustoTable> Tables() => _tables;
+    public IEnumerable<BaseKustoTable> Tables() => _tables;
 
     public static string UnescapeTableName(string tableName)
     {
