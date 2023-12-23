@@ -322,6 +322,11 @@ internal static class BuiltInScalarFunctions
             ScalarTypes.String,
             ScalarTypes.String)));
 
+        functions.Add(DateTimeToIso, new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeToIsoImpl(),
+            ScalarTypes.String,
+            ScalarTypes.DateTime)));
+
+
 
     }
     /// <summary>
@@ -375,7 +380,13 @@ internal static class BuiltInScalarFunctions
                 new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
             .WithResultNameKind(ResultNameKind.None);
 
-    public static readonly FunctionSymbol[] AdditionalFunctionSymbols = { Levenshtein, StringSimilarity };
+    public static readonly FunctionSymbol DateTimeToIso =
+        new FunctionSymbol("datetime_to_iso", ScalarTypes.String, new Parameter("value1", ScalarTypes.DateTime))
+            .ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
+    public static readonly FunctionSymbol[] AdditionalFunctionSymbols =
+        { Levenshtein, StringSimilarity, DateTimeToIso };
 
     #endregion
 }

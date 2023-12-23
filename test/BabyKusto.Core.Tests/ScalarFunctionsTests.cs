@@ -69,7 +69,21 @@ s:real
         Test(query, expected);
     }
 
-
+    [Fact]
+    public void TestDateTimeToIsoFunctionWithBlankInput()
+    {
+        var query = """
+                    let Table1 = datatable(value1:string,value2:datetime)['test123', datetime(2023-02-03T14:30:00.00)];
+                    Table1 | project iso = datetime_to_iso(value2)
+                    """;
+        var expected = @"
+iso:string
+------------------
+2023-02-03T14:30:00.0000000 
+";
+        // Act and Assert
+        Test(query, expected);
+    }
 
     private static void Test(string query, string expectedOutput)
     {
