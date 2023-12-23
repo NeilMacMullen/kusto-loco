@@ -376,7 +376,7 @@ internal static class BuiltInScalarFunctions
             .WithResultNameKind(ResultNameKind.None);
 
     public static readonly FunctionSymbol StringSimilarity =
-        new FunctionSymbol("stringSimilarity", ScalarTypes.Real, new Parameter("value1", ScalarTypes.String),
+        new FunctionSymbol("string_similarity", ScalarTypes.Real, new Parameter("value1", ScalarTypes.String),
                 new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
             .WithResultNameKind(ResultNameKind.None);
 

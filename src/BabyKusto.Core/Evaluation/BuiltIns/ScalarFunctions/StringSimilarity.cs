@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using AdvancedStringFunctionality;
 using Kusto.Language.Symbols;
 
@@ -34,7 +35,7 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
     public double CalculateSimilarity(string left, string right)
     {
         if (left.Length == 0 && right.Length == 0)
-            return 100;
+            return 1.0;
 
         if (left.Length == 0 || right.Length == 0)
         {
@@ -42,11 +43,9 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
         }
 
         var distance = LevenshteinFunctions.Distance(left, right);
-        var smallestString = left.Length < right.Length
-                                 ? left
-                                 : right;
+        var smallestString = Math.Min(left.Length, right.Length);
 
-        var similarity = 100 - (distance * 100 / smallestString.Length);
+        var similarity = 1.0 - ((double)distance / smallestString);
         return similarity;
     }
 }

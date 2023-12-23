@@ -29,13 +29,12 @@ test123; test124
     public void TestSimilarityFunction()
     {
         var query = """
-                let Table1 = datatable(value1:string,value2:string)['test123','test124'];
-                Table1 | where stringSimilarity(value1, value2) < 90
+                print s= toint((string_similarity('test123', 'test124') *100))
                 """;
         var expected = @"
-value1:string; value2:string
+s:int
 ------------------
-test123; test124
+85
 ";
         Test(query, expected);
     }
@@ -45,7 +44,7 @@ test123; test124
     {
         var query = """
                 let Table1 = datatable(value1:string,value2:string)['test123',''];
-                Table1 | where stringSimilarity(value1, value2) < 90
+                Table1 | where string_similarity(value1, value2) < 0.9
                 """;
         var expected = @"
 value1:string; value2:string
@@ -59,12 +58,12 @@ test123;
     public void EnsureTwoBlankStringsAre100PercentSimilar()
     {
         var query = """
-                    print s=stringSimilarity('', '')
+                    print s=string_similarity('', '')
                     """;
         var expected = @"
 s:real
 ------------------
-100 
+1 
 ";
         Test(query, expected);
     }
