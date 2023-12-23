@@ -55,6 +55,21 @@ test123;
         Test(query, expected);
     }
 
+    [Fact]
+    public void EnsureTwoBlankStringsAre100PercentSimilar()
+    {
+        var query = """
+                    print s=stringSimilarity('', '')
+                    """;
+        var expected = @"
+s:real
+------------------
+100 
+";
+        Test(query, expected);
+    }
+
+
 
     private static void Test(string query, string expectedOutput)
     {

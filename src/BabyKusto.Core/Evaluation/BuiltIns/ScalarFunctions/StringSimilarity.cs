@@ -33,6 +33,9 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
 
     public double CalculateSimilarity(string left, string right)
     {
+        if (left.Length == 0 && right.Length == 0)
+            return 100;
+
         if (left.Length == 0 || right.Length == 0)
         {
             return 0;
