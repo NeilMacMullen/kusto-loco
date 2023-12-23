@@ -128,7 +128,6 @@ internal partial class TreeEvaluator
 
             foreach (var summarySet in context.BucketizedTables.Values)
             {
-                Logger.Info("Processing summary set");
                 // populate the initial summary indices 
                 for (var i = 0; i < summarySet.ByValues.Length; i++) resultColumns[i].Add(summarySet.ByValues[i]);
 
@@ -136,8 +135,7 @@ internal partial class TreeEvaluator
 
                 var chunksInThisBucket = summarySet.SummarisedChunks.ToArray();
                 var bucketChunk = ChunkHelpers.Reassemble(chunksInThisBucket);
-                Logger.Info(
-                    $"adding sum chunk of size {bucketChunk.RowCount} ");
+
 
                 var chunkContext = _context with { Chunk = bucketChunk };
                 for (var i = 0; i < _aggregationExpressions.Count; i++)

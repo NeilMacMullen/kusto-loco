@@ -1,17 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommandLine;
+using CsvHelper;
 using Extensions;
 using KustoSupport;
 using NLog;
-using System.CommandLine.Parsing;
-using CommandLine;
-using CsvHelper;
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -21,18 +22,15 @@ using CsvHelper;
 internal class ReportExplorer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(FormatTypes.Ascii, 10);
-    private KustoQueryContext _context = new KustoQueryContext();
     private KustoQueryResult<OrderedDictionary> _prevResult;
 
-    public ReportExplorer(FolderContext folders)
-    {
-        _folders = folders;
-    }
+    public ReportExplorer(FolderContext folders) => _folders = folders;
 
     private KustoQueryContext GetCurrentContext() => _context;
 
@@ -43,31 +41,40 @@ internal class ReportExplorer
         else
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            var display = result with
+            if (!result.Results.Any())
             {
-                Results = result.Results.Take(_currentDisplayOptions.MaxToDisplay)
-                    .ToArray()
-            };
-            switch (_currentDisplayOptions.Format)
-            {
-                case FormatTypes.Ascii:
-                    Console.WriteLine(Tabulate(display));
-                    break;
-                case FormatTypes.Json:
-                    Console.WriteLine(ToJson(display));
-                    break;
-                case FormatTypes.Csv:
-                    Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, false));
-                    break;
-                case FormatTypes.Txt:
-                    Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, true));
-                    break;
+                Console.WriteLine("No results");
             }
-
-            if (display.Results.Count != result.Results.Count)
+            else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Display was truncated to first {display.Results.Count} of {result.Results.Count}.  Use '.display --max' to change this behaviour");
+                var display = result with
+                {
+                    Results = result.Results.Take(_currentDisplayOptions.MaxToDisplay)
+                        .ToArray()
+                };
+
+                switch (_currentDisplayOptions.Format)
+                {
+                    case FormatTypes.Ascii:
+                        Console.WriteLine(Tabulate(display));
+                        break;
+                    case FormatTypes.Json:
+                        Console.WriteLine(ToJson(display));
+                        break;
+                    case FormatTypes.Csv:
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, false));
+                        break;
+                    case FormatTypes.Txt:
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, true));
+                        break;
+                }
+
+                if (display.Results.Count != result.Results.Count)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(
+                        $"Display was truncated to first {display.Results.Count} of {result.Results.Count}.  Use '.display --max' to change this behaviour");
+                }
             }
 
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -77,7 +84,7 @@ internal class ReportExplorer
 
     public async Task RunInteractive(string initialScript)
     {
-        Logger.Info("Use '.help' to list commands");
+        Console.WriteLine("Use '.help' to list commands");
 
         if (initialScript.IsNotBlank())
         {
@@ -107,7 +114,7 @@ internal class ReportExplorer
     {
         query = query.Trim();
         //support comments
-        if (query.StartsWith("#")) return;
+        if (query.StartsWith("#") | query.IsBlank()) return;
         if (query.EndsWith("\\"))
         {
             commandBuffer.Append(query.Substring(0, query.Length - 1) + " ");
@@ -342,18 +349,16 @@ internal class ReportExplorer
         }
     }
 
-  
 
     public static class RenderCommand
     {
-      
         internal static void Run(ReportExplorer exp, Options o)
         {
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
-           // var text = KustoResultRenderer.RenderToTable(result);
-           var text = KustoResultRenderer.RenderToLineChart(result.Query,result); 
-           File.WriteAllText(fileName, text);
+            // var text = KustoResultRenderer.RenderToTable(result);
+            var text = KustoResultRenderer.RenderToLineChart(result.Query, result);
+            File.WriteAllText(fileName, text);
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
 
@@ -512,7 +517,6 @@ internal class ReportExplorer
         {
             await Task.CompletedTask;
             var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".csv");
-            Logger.Info($"Loading from stream '{filename}'..");
 
             var records = new List<OrderedDictionary>();
             using (TextReader fileReader = new StreamReader(filename))
@@ -531,7 +535,6 @@ internal class ReportExplorer
             }
 
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
-            Logger.Info("File loaded.... adding to context");
 
             InferTypes(records.ToArray());
             exp.GetCurrentContext()
@@ -593,7 +596,6 @@ internal class ReportExplorer
             [Value(2, HelpText = "Property Name")] public string Property { get; set; } = "Id";
         }
     }
-
 
 
     public static class SynTableCommand
