@@ -243,7 +243,7 @@ internal class ReportExplorer
             }
         }
 
-        [Verb("run", aliases: new[] { "script", "r" },
+        [Verb("run", aliases: ["script", "r"],
             HelpText = "run a script")]
         internal class Options
         {
@@ -262,7 +262,7 @@ internal class ReportExplorer
             await exp.ExecuteAsync($"{o.Prefix}{query}");
         }
 
-        [Verb("query", aliases: new[] { "q" },
+        [Verb("query", aliases: ["q"],
             HelpText = "run a multi-line query from a file")]
         internal class Options
         {
@@ -295,7 +295,7 @@ internal class ReportExplorer
             await File.WriteAllTextAsync(filename, text);
         }
 
-        [Verb("savequery", aliases: new[] { "sq" },
+        [Verb("savequery", aliases: ["sq"],
             HelpText = "save a query to a file so you can use it again")]
         internal class Options
         {
@@ -328,7 +328,7 @@ internal class ReportExplorer
             File.WriteAllText(filename, text);
         }
 
-        [Verb("save", aliases: new[] { "sv" }, HelpText = "save last results to file")]
+        [Verb("save", aliases: ["sv"], HelpText = "save last results to file")]
         internal class Options
         {
             [Value(0, HelpText = "Name of file", Required = true)]
@@ -381,7 +381,7 @@ internal class ReportExplorer
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
 
-        [Verb("render", aliases: new[] { "ren" }, HelpText = "render last results as html")]
+        [Verb("render", aliases: ["ren"], HelpText = "render last results as html")]
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
@@ -402,7 +402,7 @@ internal class ReportExplorer
             Logger.Info($"Table '{o.As}' now available");
         }
 
-        [Verb("materialize", aliases: new[] { "materialise", "mat" },
+        [Verb("materialize", aliases: ["materialise", "mat"],
             HelpText = "save last results back into context as a table")]
         internal class Options
         {
@@ -423,7 +423,7 @@ internal class ReportExplorer
             Console.WriteLine(tableNames);
         }
 
-        [Verb("listtables", aliases: new[] { "ls", "alltables", "at" },
+        [Verb("listtables", aliases: ["ls", "alltables", "at"],
             HelpText = "Lists all available tables in the global context")]
         internal class Options
         {
@@ -471,7 +471,7 @@ internal class ReportExplorer
             }
         }
 
-        [Verb("loadjson", aliases: new[] { "lj" },
+        [Verb("loadjson", aliases: ["lj"],
             HelpText = "loads a previous-saved json query result as a new table")]
         internal class Options
         {
@@ -565,7 +565,7 @@ internal class ReportExplorer
             Logger.Info($"Table '{tableName}' now available");
         }
 
-        [Verb("loadcsv", aliases: new[] { "lj" },
+        [Verb("loadcsv", aliases: ["lj"],
             HelpText = "loads a previous-saved json query result as a new table")]
         internal class Options
         {
@@ -604,7 +604,7 @@ internal class ReportExplorer
             Logger.Info($"Table '{tableName}' now available");
         }
 
-        [Verb("loaditems", aliases: new[] { "ids" },
+        [Verb("loaditems", aliases: ["ids"],
             HelpText = "loads a previous-saved json query result as a new table")]
         internal class Options
         {
@@ -629,7 +629,7 @@ internal class ReportExplorer
             exp.GetCurrentContext().AddTable(table.ShareAs(KustoQueryContext.UnescapeTableName(o.As)));
         }
 
-        [Verb("synomym", aliases: new[] { "syn", "alias" }, HelpText = "provides a synonym for a table")]
+        [Verb("synomym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]
         internal class Options
         {
             [Value(0, HelpText = "table name", Required = true)]
@@ -651,7 +651,7 @@ internal class ReportExplorer
             Logger.Info($"Set: {exp._currentDisplayOptions}");
         }
 
-        [Verb("display", aliases: new[] { "d" }, HelpText = "change the output format")]
+        [Verb("display", aliases: ["d"], HelpText = "change the output format")]
         [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local")]
         internal class Options
         {
@@ -673,10 +673,8 @@ internal class ReportExplorer
             Environment.Exit(0);
         }
 
-        [Verb("exit", aliases: new[] { "quit" }, HelpText = "Exit application")]
-        internal class Options
-        {
-        }
+        [Verb("exit", aliases: ["quit"], HelpText = "Exit application")]
+        internal class Options;
     }
 
     #endregion
