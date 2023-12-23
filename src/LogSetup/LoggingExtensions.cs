@@ -9,6 +9,10 @@ public static class LoggingExtensions
     public static void SetupLoggingForTest(LogLevel level)
         => NLogFactoryBuilder(level, LoggingTarget.Console, LoggingTarget.Debugger);
 
+
+    public static void SetupLoggingForConsole(LogLevel level)
+        => NLogFactoryBuilder(level, LoggingTarget.Console);
+
     internal static LogFactory NLogFactoryBuilder(LogLevel level, params LoggingTarget[] loggingTargets)
     {
         var factory = new LogFactory();

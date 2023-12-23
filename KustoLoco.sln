@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPokeTests", "test\JPokeTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VegaGenerator", "src\VegaGenerator\VegaGenerator.csproj", "{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokql", "src\lokql\lokql.csproj", "{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +136,10 @@ Global
 		{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,6 +163,7 @@ Global
 		{55EFCE63-7109-495B-9B87-36600002C1E4} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{276FBA77-6674-452B-B5F2-A8A8455CA30D} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}

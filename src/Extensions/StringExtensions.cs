@@ -47,4 +47,12 @@ public static class StringExtensions
 
     public static bool IsBlank(this string s) => string.IsNullOrWhiteSpace(s);
     public static bool IsNotBlank(this string s) => !s.IsBlank();
+
+    /// <summary>
+    ///     Replaces the string with an alternative value if the original is blank
+    /// </summary>
+    public static string OrWhenBlank(this string s, string fallback)
+        => s.IsBlank()
+            ? fallback
+            : s;
 }

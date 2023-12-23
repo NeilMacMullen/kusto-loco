@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
+using System.Formats.Asn1;
+using System.Globalization;
 using System.Text;
+using CsvHelper;
 using Extensions;
+#pragma warning disable CS8604 // Possible null reference argument.
 
 #pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
 
@@ -46,7 +50,43 @@ public static class KustoFormatter
 
         int MaxColumnSize(int key)
             => dictionaries.Select(d => SafeGet(d, key).Length)
-                .Append(headerLengths[key])
-                .Max();
+                           .Append(headerLengths[key])
+                           .Max();
+    }
+
+    public static string WriteToCsvString(IReadOnlyCollection<OrderedDictionary> dictionaries, bool skipHeader)
+    {
+        var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
+        var writer = new StringWriter();
+        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        {
+            if (!skipHeader)
+            {
+                foreach (var heading in headers)
+                {
+                    csv.WriteField(heading);
+                }
+            }
+
+            csv.NextRecord();
+
+            foreach (var item in dictionaries)
+            {
+                foreach (var heading in headers)
+                {
+                    csv.WriteField(item[heading]);
+                }
+
+                csv.NextRecord();
+            }
+        }
+
+        return writer.ToString();
+    }
+
+    public static void WriteToCsv(string path, IReadOnlyCollection<OrderedDictionary> dictionaries)
+    {
+        var str = WriteToCsvString(dictionaries, false);
+        File.WriteAllText(path, str);
     }
 }
