@@ -18,6 +18,7 @@ internal static class BuiltInScalarFunctions
 
     static BuiltInScalarFunctions()
     {
+        RegisterAdditionalFunctionSymbols();
         functions.Add(Functions.Not,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NotFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool)));
 
@@ -312,8 +313,31 @@ internal static class BuiltInScalarFunctions
                     .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
                     .ToArray()
             ));
+        functions.Add(Levenshtein, new ScalarFunctionInfo(new ScalarOverloadInfo(new LevenshteinDistanceImpl(),
+            ScalarTypes.Int,
+            ScalarTypes.String,
+            ScalarTypes.String)));
+        functions.Add(StringSimilarity, new ScalarFunctionInfo(new ScalarOverloadInfo(new StringSimilarityImpl(),
+            ScalarTypes.Real,
+            ScalarTypes.String,
+            ScalarTypes.String)));
+
+
+    }
+    /// <summary>
+    ///     We don't do anything inside this function, however we need this so that the Kusto engine can ensure that the static
+    ///     constructor is called and functions are registered
+    /// </summary>
+    public static void Initialize()
+    {
     }
 
+    private static void RegisterAdditionalFunctionSymbols()
+    {
+        var functions = BabyKustoEngine.GlobalStateInstance.Functions;
+        var newFunctions = functions.Concat(AdditionalFunctionSymbols).ToArray();
+        BabyKustoEngine.GlobalStateInstance = BabyKustoEngine.GlobalStateInstance.WithFunctions(newFunctions);
+    }
     public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
         List<Parameter> parameters)
     {
@@ -339,4 +363,19 @@ internal static class BuiltInScalarFunctions
         overload = BuiltInsHelper.PickOverload(functionInfo.Overloads, arguments);
         return overload != null;
     }
+    #region AdditionalFunctionSymbols
+
+    public static readonly FunctionSymbol Levenshtein =
+        new FunctionSymbol("levenshtein", ScalarTypes.Int, new Parameter("value1", ScalarTypes.String),
+                new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
+    public static readonly FunctionSymbol StringSimilarity =
+        new FunctionSymbol("stringSimilarity", ScalarTypes.Real, new Parameter("value1", ScalarTypes.String),
+                new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
+    public static readonly FunctionSymbol[] AdditionalFunctionSymbols = { Levenshtein, StringSimilarity };
+
+    #endregion
 }

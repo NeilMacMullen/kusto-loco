@@ -55,4 +55,7 @@ public static class StringExtensions
         => s.IsBlank()
             ? fallback
             : s;
+    
+    public static string NullToEmpty(this string s)
+    => s ?? string.Empty;
 }

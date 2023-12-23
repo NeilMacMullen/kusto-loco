@@ -29,13 +29,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
-    <PackageReference Include="NLog"  />
-    <PackageReference Include="System.Linq.Async"  />
-    <PackageReference Include="System.Text.Json"/>
+    <PackageReference Include="NLog" />
+    <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
     <ProjectReference Include="..\Geo\Geo.csproj" />
   </ItemGroup>
 

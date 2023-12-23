@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BabyKusto.Core.Evaluation;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
@@ -18,7 +19,13 @@ public class BabyKustoEngine
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly List<ITableSource> _globalTables = new();
+    static BabyKustoEngine()
+    {
+        //ensure added functions are registered before engine is set up
+        BuiltInScalarFunctions.Initialize();
+    }
 
+    public static GlobalState GlobalStateInstance { get; set; } = GlobalState.Default;
     public void AddGlobalTable(ITableSource table)
     {
         Logger.Trace($"Adding table  {table.Type.Name} ");
@@ -38,7 +45,7 @@ public class BabyKustoEngine
         var db = new DatabaseSymbol(
             "MyDb",
             _globalTables.Select(table => table.Type).ToArray());
-        var globals = GlobalState.Default.WithDatabase(db);
+        var globals = GlobalStateInstance.WithDatabase(db);
 
         var code = KustoCode.ParseAndAnalyze(query, globals);
         if (dumpKustoTree)
