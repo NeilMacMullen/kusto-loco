@@ -39,4 +39,6 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitUnionOperator(IRUnionOperatorNode node, TContext context);
     public abstract TResult VisitUserFunctionCall(IRUserFunctionCallNode node, TContext context);
     public abstract TResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context);
+    public abstract TResult VisitRangeOperator(IRRangeOperatorNode node, TContext context);
+
 }
