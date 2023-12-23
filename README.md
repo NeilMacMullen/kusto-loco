@@ -1,4 +1,4 @@
-# WARNING
+# !!! UNDER CONSTRUCTION !!!
 
 This fork is currently undergoing changes and is unstable.
 Please refer back to the original repo for a more stable version
@@ -9,11 +9,15 @@ KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csh
 
 It provides a simple way to perform complex queries against in-memory tabular data.
 
+
+## Lokql
+Lokql is a a simple command-line based data explorer that allows you to load data from files, issue KQL queries, and render the results to charts or tables.
+
 TODO:Example here
 
 ## Project Goals
 
-| Goal | Anti-Goal|
+| Goal | Non-Goal|
 |------|----------|
 |Provide a *useful* implementation of a significant subset of the standard Kusto Query Language and built-in functions. | Provide "bit-exact" results vs ADX |
 |Easy import/export of local file-based and in-memory data | Distributed/cluster-based processing |
