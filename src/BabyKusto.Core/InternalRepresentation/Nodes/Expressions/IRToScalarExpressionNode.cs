@@ -8,9 +8,13 @@ namespace BabyKusto.Core.InternalRepresentation;
 
 internal class IRToScalarExpressionNode : IRExpressionNode
 {
+    // Irrespective of the result kind of the expression, the result is always a Scalar
     public IRToScalarExpressionNode(IRExpressionNode expression, TypeSymbol resultType)
-        : base(resultType, expression.ResultKind) =>
+        : base(resultType, EvaluatedExpressionKind.Scalar)
+    {
         Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+    }
+
 
     public IRExpressionNode Expression { get; }
 

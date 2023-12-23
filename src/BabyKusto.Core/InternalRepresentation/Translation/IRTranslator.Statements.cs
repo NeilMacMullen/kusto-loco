@@ -10,6 +10,12 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitLetStatement(LetStatement node)
     {
         var expression = (IRExpressionNode)node.Expression.Accept(this);
+
+        // Let statement introduces a new name into the current scope. We must add
+        // the name here so that subsequent expressions know the result kind associated
+        // with the symbol.
+        // Test, UserDefinedFunction_With_Local_Variables, fails without the following line:
+        SetInScopeSymbolInfo(node.Name.ReferencedSymbol.Name, expression.ResultKind);
         return new IRLetStatementNode(node.Name.ReferencedSymbol, expression);
     }
 

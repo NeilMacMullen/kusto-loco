@@ -3808,6 +3808,38 @@ aaathis is a test";
         canonicalOutput.Should().Be(canonicalExpectedOutput);
     }
 
+    /// <summary>
+    ///     This function tests the case where a function accepting
+    ///     a scalar is called with a columnar value. Let bindings
+    ///     in the function need to be associated with the
+    ///     "result kind" of the expression so that columnar values
+    ///     propagate to subsequent expressions.
+    /// </summary>
+    [Fact]
+    public void UserDefinedFunction_With_Local_Variables()
+    {
+        // Arrange
+        var query = """
+                    let f=(a:long) { let b = a + 1; let c = b * b; c };
+
+                    datatable(v: long) [1, 2, 3, 4]
+                    | project v = f(v)
+                    """;
+
+        var expected = """
+                       v:long
+                       ------------------
+                       4
+                       9
+                       16
+                       25
+                       """;
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+
 #if false
         [Fact]
         public void Union_Works()
