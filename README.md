@@ -5,7 +5,7 @@ Please refer back to the original repo for a more stable version
 
 # Kusto-Loco
 
-KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) which has been [extended](docs/additionalFunctions) to improve query performance to provide a richer feature-set.
+KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) which has been [extended](docs/additionalFunctions.md) to improve query performance to provide a richer feature-set.
 
 It provides a simple way to perform complex queries against in-memory tabular data.
 
