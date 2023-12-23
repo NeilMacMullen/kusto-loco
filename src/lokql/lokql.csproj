@@ -15,8 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JPoke\JPoke.csproj" />
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\LogSetup\LogSetup.csproj" />
+    <ProjectReference Include="..\VegaGenerator\VegaGenerator.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8603 // Possible null reference return.
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -28,16 +29,33 @@ public class JObjectBuilder
         var element = path.Elements.First();
         if (!path.IsTerminal)
         {
+            JsonNode child = new JsonObject();
             if (element.IsIndex)
-                container.Add(element.Name, new JsonArray());
-
-            var child = new JsonObject();
-            if (container.TryGetPropertyValue(element.Name, out var existingNode))
             {
-                child = existingNode as JsonObject;
+                JsonArray arr = new JsonArray();
+                if (container.TryGetPropertyValue(element.Name, out var existingArray))
+                {
+                    arr = existingArray as JsonArray;
+                }
+                else
+                    container.Add(element.Name, arr);
+
+                var i = element.Index;
+                while(arr.Count <= i) arr.Add(new JsonObject());
+                var cnt = arr[element.Index] as JsonObject;
+
+                Set(cnt, path.Descend(), value);
+
             }
             else
-                container.Add(element.Name, child);
+            {
+                if (container.TryGetPropertyValue(element.Name, out var existingNode))
+                {
+                    child = existingNode as JsonObject;
+                }
+                else
+                    container.Add(element.Name, child);
+            }
 
             Set(child, path.Descend(), value);
             return this;

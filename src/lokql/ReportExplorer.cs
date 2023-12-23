@@ -346,38 +346,14 @@ internal class ReportExplorer
 
     public static class RenderCommand
     {
-        private static string RenderToTable(KustoQueryResult<OrderedDictionary> result)
-        {
-            var dictionaries = result.Results;
-            var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
-
-            var keyCount = Enumerable.Range(0, dictionaries.First().Count).ToArray();
-            string SafeGet(IOrderedDictionary dict, int key) => dict[key]?.ToString() ?? string.Empty;
-
-            var sb = new StringBuilder();
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            foreach (var h in headers)
-                sb.AppendLine($"<th>{h}</th>");
-            sb.AppendLine("</tr>");
-            foreach (var d in dictionaries)
-            {
-                sb.AppendLine("<tr>");
-                var line = keyCount.Select(c => $"<td>{SafeGet(d, c)}</td>").JoinAsLines();
-                sb.AppendLine(line);
-                sb.AppendLine("</tr>");
-            }
-
-            sb.AppendLine("</table>");
-            return sb.ToString();
-        }
-
+      
         internal static void Run(ReportExplorer exp, Options o)
         {
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
-            var text = RenderToTable(result);
-            File.WriteAllText(fileName, text);
+           // var text = KustoResultRenderer.RenderToTable(result);
+           var text = KustoResultRenderer.RenderToLineChart(result.Query,result); 
+           File.WriteAllText(fileName, text);
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
 

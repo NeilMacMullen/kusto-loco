@@ -98,6 +98,26 @@ public class BuilderTests
         Check(b, expected);
     }
 
+
+    [TestMethod]
+    public void ArrayElementCanBeSetInPassing()
+    {
+        var b = JObjectBuilder.CreateEmpty();
+        b.Set("abc.def[0].a", 123);
+        var expected = new
+        {
+            abc = new
+            {
+                def = new[] { new
+                {
+                    a=123
+                    
+                } }
+            }
+        };
+        Check(b, expected);
+    }
+
     [TestMethod]
     public void ArrayElementCanBeSetInMiddle()
     {
