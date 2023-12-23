@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
+
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8603 // Possible null reference return.
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -22,6 +23,23 @@ public class JObjectBuilder
 
     public JObjectBuilder Set(string path, object value) => Set(_root, PathParser.Parse(path), value);
 
+    private static T EnsureContainerHasArrayWithSufficientItems<T>(JsonObject container,
+        string arrayName, int index,
+        Func<T> fill)
+        where T : JsonNode
+    {
+        var arr = new JsonArray();
+        if (container.TryGetPropertyValue(arrayName, out var existingArray))
+        {
+            arr = existingArray as JsonArray;
+        }
+        else
+            container.Add(arrayName, arr);
+
+
+        while (arr.Count <= index) arr.Add(fill());
+        return arr[index] as T;
+    }
 
     public JObjectBuilder Set(JsonNode current, PathParser.JPath path, object value)
     {
@@ -32,20 +50,10 @@ public class JObjectBuilder
             JsonNode child = new JsonObject();
             if (element.IsIndex)
             {
-                JsonArray arr = new JsonArray();
-                if (container.TryGetPropertyValue(element.Name, out var existingArray))
-                {
-                    arr = existingArray as JsonArray;
-                }
-                else
-                    container.Add(element.Name, arr);
-
-                var i = element.Index;
-                while(arr.Count <= i) arr.Add(new JsonObject());
-                var cnt = arr[element.Index] as JsonObject;
+                var cnt = EnsureContainerHasArrayWithSufficientItems(
+                    container, element.Name, element.Index, () => new JsonObject());
 
                 Set(cnt, path.Descend(), value);
-
             }
             else
             {
@@ -61,17 +69,24 @@ public class JObjectBuilder
             return this;
         }
 
+        var newValue = ObjectToJsonNode(value);
+
+        //if is terminal
         if (element.IsIndex)
         {
+            var isObject = newValue is JsonObject;
+            EnsureContainerHasArrayWithSufficientItems<JsonNode>(container, element.Name, element.Index, () =>
+                isObject ? new JsonObject() : null
+            );
             var arra = new JsonArray();
             if (element.Index == -1)
                 arra.Add(ObjectToJsonNode(value));
             else
                 arra.Add(ObjectToJsonNode(value));
-            container.Add(element.Name, arra);
+            (container[element.Name] as JsonArray)[element.Index] = newValue;
         }
         else
-            container.Add(element.Name, ObjectToJsonNode(value));
+            container.Add(element.Name, newValue);
 
         return this;
     }

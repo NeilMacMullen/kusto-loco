@@ -1,7 +1,6 @@
 using System.Text.Json;
 using FluentAssertions;
 
-
 namespace TestProject1;
 
 [TestClass]
@@ -14,7 +13,11 @@ public class BuilderTests
             {
                 WriteIndented = true
             });
-        b.Serialize().Should().Be(e);
+        Console.WriteLine($"expected:{e}");
+        var actual = b.Serialize();
+        Console.WriteLine($"  actual:{actual}");
+        actual
+            .Should().Be(e);
     }
 
     [TestMethod]
@@ -69,13 +72,13 @@ public class BuilderTests
     public void ObjectCanBeSet()
     {
         var b = JObjectBuilder.CreateEmpty();
-        b.Set("abc.def", new {xyz=5});
+        b.Set("abc.def", new { xyz = 5 });
 
         var expected = new
         {
             abc = new
             {
-                def = new { xyz=5 }
+                def = new { xyz = 5 }
             }
         };
         Check(b, expected);
@@ -85,7 +88,7 @@ public class BuilderTests
     public void ArrayCanBeAdded()
     {
         var b = JObjectBuilder.CreateEmpty();
-        var arr = new string[] { "first", "second" };
+        var arr = new[] { "first", "second" };
         b.Set("abc.def", arr);
 
         var expected = new
@@ -108,11 +111,13 @@ public class BuilderTests
         {
             abc = new
             {
-                def = new[] { new
+                def = new[]
                 {
-                    a=123
-                    
-                } }
+                    new
+                    {
+                        a = 123
+                    }
+                }
             }
         };
         Check(b, expected);
@@ -128,7 +133,7 @@ public class BuilderTests
         {
             abc = new
             {
-                def = new[] { 0,123 }
+                def = new int?[] { null, 123 }
             }
         };
         Check(b, expected);
