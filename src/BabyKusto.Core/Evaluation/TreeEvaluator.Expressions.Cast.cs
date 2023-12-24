@@ -16,111 +16,70 @@ internal partial class TreeEvaluator
         var impl = node.GetOrSetCache<Func<EvaluationResult[], EvaluationResult>>(
             () =>
             {
-                if (node.ResultKind == EvaluatedExpressionKind.Scalar)
+                return node.ResultKind switch
                 {
-                    if (node.ResultType == ScalarTypes.Int)
+                    EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Int => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var value = ((ScalarResult)arguments[0]).Value;
-                            return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt32(value));
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.Long)
+                        Debug.Assert(arguments.Length == 1);
+                        var value = ((ScalarResult)arguments[0]).Value;
+                        return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt32(value));
+                    },
+                    EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Long => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var value = ((ScalarResult)arguments[0]).Value;
-                            return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt64(value));
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.Real)
+                        Debug.Assert(arguments.Length == 1);
+                        var value = ((ScalarResult)arguments[0]).Value;
+                        return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt64(value));
+                    },
+                    EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Real => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var value = ((ScalarResult)arguments[0]).Value;
-                            return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDouble(value));
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.String)
+                        Debug.Assert(arguments.Length == 1);
+                        var value = ((ScalarResult)arguments[0]).Value;
+                        return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDouble(value));
+                    },
+                    EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.String => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var value = ((ScalarResult)arguments[0]).Value;
-                            return new ScalarResult(node.ResultType, value == null ? null : Convert.ToString(value));
-                        };
-                    }
-
-                    throw new InvalidOperationException(
-                        $"Unexpected target cast type for scalar value: {SchemaDisplay.GetText(node.ResultType)}");
-                }
-
-                if (node.ResultKind == EvaluatedExpressionKind.Columnar)
-                {
-                    if (node.ResultType == ScalarTypes.Int)
+                        Debug.Assert(arguments.Length == 1);
+                        var value = ((ScalarResult)arguments[0]).Value;
+                        return new ScalarResult(node.ResultType, value == null ? null : Convert.ToString(value));
+                    },
+                    EvaluatedExpressionKind.Scalar => throw new InvalidOperationException(
+                        $"Unexpected target cast type for scalar value: {SchemaDisplay.GetText(node.ResultType)}"),
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Int => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<int?>();
-                            columnResult.Column.ForEach(
-                                item => builder.Add(item == null ? null : Convert.ToInt32(item)));
-                            return new ColumnarResult(builder.ToColumn());
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.Long)
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<int?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToInt32(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Long => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<long?>();
-                            columnResult.Column.ForEach(
-                                item => builder.Add(item == null ? null : Convert.ToInt64(item)));
-                            return new ColumnarResult(builder.ToColumn());
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.Real)
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<long?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToInt64(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Real => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<double?>();
-                            columnResult.Column.ForEach(item =>
-                                builder.Add(item == null ? null : Convert.ToDouble(item)));
-                            return new ColumnarResult(builder.ToColumn());
-                        };
-                    }
-
-                    if (node.ResultType == ScalarTypes.String)
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<double?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToDouble(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.String => arguments =>
                     {
-                        return arguments =>
-                        {
-                            Debug.Assert(arguments.Length == 1);
-                            var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<string?>();
-                            columnResult.Column.ForEach(item =>
-                                builder.Add(item == null ? null : Convert.ToString(item)));
-                            return new ColumnarResult(builder.ToColumn());
-                        };
-                    }
-
-                    throw new InvalidOperationException(
-                        $"Unexpected target cast type for columnar value: {SchemaDisplay.GetText(node.ResultType)}");
-                }
-
-                throw new InvalidOperationException($"Unexpected expression result kind {node.ResultKind}");
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<string?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToString(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
+                    EvaluatedExpressionKind.Columnar => throw new InvalidOperationException(
+                        $"Unexpected target cast type for columnar value: {SchemaDisplay.GetText(node.ResultType)}"),
+                    _ => throw new InvalidOperationException($"Unexpected expression result kind {node.ResultKind}")
+                };
             });
 
         var expressionResult = node.Expression.Accept(this, context);

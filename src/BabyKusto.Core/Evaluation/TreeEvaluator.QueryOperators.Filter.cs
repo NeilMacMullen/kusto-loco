@@ -54,7 +54,7 @@ internal partial class TreeEvaluator
                 // Scalar will evaluate to the same value for any chunk, so we can process the entire chunk at once
                 case ScalarResult scalar when (bool?)scalar.Value == true:
                     return (default, chunk.ReParent(this), false);
-                case ScalarResult scalar:
+                case ScalarResult:
                     return (default, TableChunk.Empty, false);
                 case ColumnarResult columnar:
                 {

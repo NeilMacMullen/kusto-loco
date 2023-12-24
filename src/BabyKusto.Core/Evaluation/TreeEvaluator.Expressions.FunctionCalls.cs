@@ -16,11 +16,8 @@ internal partial class TreeEvaluator
         EvaluationContext context)
     {
         var impl = node.GetOrSetCache(
-            () =>
-            {
-                return BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
-                    node.ResultKind, node.ResultType);
-            });
+            () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
+                node.ResultKind, node.ResultType));
 
         var arguments = new EvaluationResult[node.Arguments.ChildCount];
         for (var i = 0; i < node.Arguments.ChildCount; i++)
@@ -76,8 +73,7 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitUserFunctionCall(IRUserFunctionCallNode node, EvaluationContext context)
     {
         var lookup = context.Scope.Lookup(node.Signature.Symbol.Name);
-        var functionSymbol = lookup?.Symbol as FunctionSymbol;
-        if (functionSymbol == null)
+        if (lookup?.Symbol is not FunctionSymbol functionSymbol)
         {
             throw new InvalidOperationException($"Function {node.Signature.Symbol.Name} not found.");
         }

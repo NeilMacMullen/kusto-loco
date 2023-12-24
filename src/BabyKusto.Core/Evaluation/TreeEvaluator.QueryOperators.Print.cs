@@ -19,7 +19,6 @@ internal partial class TreeEvaluator
         {
             var expression = node.Expressions.GetChild(i);
             results[i] = expression.Accept(this, context);
-            ;
         }
 
         var columns = BuiltInsHelper.CreateResultArray(results)

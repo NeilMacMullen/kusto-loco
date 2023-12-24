@@ -55,15 +55,15 @@ internal partial class TreeEvaluator
         protected override SummarizeResultTableContext Init() =>
             new()
             {
-                BucketizedTables = new Dictionary<SummaryKey, NpmSummarySet>()
+                BucketizedTables = new Dictionary<SummaryKey, SummarySet>()
             };
 
-        private static NpmSummarySet GetOrAddBucket(SummaryKey key,
+        private static SummarySet GetOrAddBucket(SummaryKey key,
             SummarizeResultTableContext context)
         {
             if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 context.BucketizedTables[key] = bucket =
-                    new NpmSummarySet(key.GetArray(),
+                    new SummarySet(key.GetArray(),
                         new List<ITableChunk>(), new List<int>());
 
             return bucket;
@@ -76,9 +76,8 @@ internal partial class TreeEvaluator
             var byValuesColumns = new List<BaseColumn>(_byExpressions.Count);
 
             var chunkContext = _context with { Chunk = chunk };
-            for (var i = 0; i < _byExpressions.Count; i++)
+            foreach (var byExpression in _byExpressions)
             {
-                var byExpression = _byExpressions[i];
                 var byExpressionResult = (ColumnarResult)byExpression.Accept(_owner, chunkContext);
                 Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
                     $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
@@ -155,6 +154,6 @@ internal partial class TreeEvaluator
 
     private struct SummarizeResultTableContext
     {
-        public Dictionary<SummaryKey, NpmSummarySet> BucketizedTables;
+        public Dictionary<SummaryKey, SummarySet> BucketizedTables;
     }
 }

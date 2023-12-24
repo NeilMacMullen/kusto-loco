@@ -15,9 +15,9 @@ namespace BabyKusto.Core.Evaluation
     {
         public override EvaluationResult VisitRangeOperator(IRRangeOperatorNode node, EvaluationContext context)
         {
-            var fromExpressionResult = (ScalarResult)node.FromExpression.Accept(this, context)!;
-            var toExpressionResult = (ScalarResult)node.ToExpression.Accept(this, context)!;
-            var stepExpressionResult = (ScalarResult)node.StepExpression.Accept(this, context)!;
+            var fromExpressionResult = (ScalarResult)node.FromExpression.Accept(this, context);
+            var toExpressionResult = (ScalarResult)node.ToExpression.Accept(this, context);
+            var stepExpressionResult = (ScalarResult)node.StepExpression.Accept(this, context);
 
             var resultType = (TableSymbol)node.ResultType;
 

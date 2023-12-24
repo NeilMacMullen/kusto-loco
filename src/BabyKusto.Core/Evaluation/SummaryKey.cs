@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
 
 namespace BabyKusto.Core.Evaluation;
 
-
-public record struct SummaryKey 
+public record struct SummaryKey
 {
     private int num;
     private object? O0;
@@ -15,7 +13,6 @@ public record struct SummaryKey
 
     public SummaryKey()
     {
-
     }
 
     public SummaryKey(object?[] objects)
@@ -25,6 +22,7 @@ public record struct SummaryKey
             Set(i, objects[i]);
         }
     }
+
     public void Set(int i, object? o)
     {
         if (i >= num)
@@ -38,16 +36,6 @@ public record struct SummaryKey
             throw new NotImplementedException("summarize limited to 5 vals");
     }
 
-    public void Clear()
-    {
-        num = 0;
-        O0 = null;
-        O1 = null;
-        O2 = null;
-        O3 = null;
-        O4 = null;
-    }
-
     public object?[] GetArray()
     {
         var ret = new object?[num];
@@ -58,7 +46,4 @@ public record struct SummaryKey
         if (num > 4) ret[4] = O4;
         return ret;
     }
-
-
 }
-
