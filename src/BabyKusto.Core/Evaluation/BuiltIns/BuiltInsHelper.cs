@@ -63,12 +63,7 @@ internal static class BuiltInsHelper
     private static EvaluationResult CreateResultForScalarInvocation(IScalarFunctionImpl impl,
         EvaluationResult[] arguments, TypeSymbol expectedResultType)
     {
-        var scalarArgs = new ScalarResult[arguments.Length];
-        for (var i = 0; i < arguments.Length; i++)
-        {
-            scalarArgs[i] = (ScalarResult)arguments[i];
-        }
-
+        var scalarArgs = arguments.Cast<ScalarResult>().ToArray();
         var result = impl.InvokeScalar(scalarArgs);
         Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
@@ -92,28 +87,24 @@ internal static class BuiltInsHelper
         var numRows =
             arguments.OfType<ColumnarResult>()
                 .FirstOrDefault()?.Column.RowCount ?? 1;
-        var columnarArgs = new ColumnarResult[arguments.Length];
 
-        for (var i = 0; i < arguments.Length; i++)
-        {
-            if (arguments[i] is ColumnarResult column)
-            {
-                columnarArgs[i] = column;
-            }
-            else
-            {
-                //create a "single value" columnar result to hold the
-                //scalar
-                var scalarValue = (ScalarResult)arguments[i];
-                columnarArgs[i] =
-                    new ColumnarResult(
-                        ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type,
-                            numRows));
-            }
-        }
 
+        var columnarArgs = arguments
+            .Select(a => ToColumnar(a, numRows))
+            .ToArray();
         return columnarArgs;
     }
+
+
+    public static ColumnarResult ToColumnar(EvaluationResult r, int numRows)
+        => r switch
+        {
+            ColumnarResult c => c,
+            ScalarResult s => new ColumnarResult(
+                ColumnHelpers.CreateFromScalar(s.Value, s.Type, numRows)),
+            _ => throw new InvalidOperationException()
+        };
+
 
     private static EvaluationResult CreateResultForColumnarInvocation(IScalarFunctionImpl impl,
         EvaluationResult[] arguments, TypeSymbol expectedResultType)
