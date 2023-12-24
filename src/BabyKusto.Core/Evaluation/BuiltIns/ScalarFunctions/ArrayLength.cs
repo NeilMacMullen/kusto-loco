@@ -29,6 +29,6 @@ internal class ArrayLengthFunctionImpl : IScalarFunctionImpl
             data[i] = array == null ? null : array.Count;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 }

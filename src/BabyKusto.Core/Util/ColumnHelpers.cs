@@ -13,7 +13,7 @@ namespace BabyKusto.Core.Util;
 
 public static class ColumnHelpers
 {
-    public static Column CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
+    public static BaseColumn CreateFromObjectArray(object?[] data, TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
@@ -61,7 +61,7 @@ public static class ColumnHelpers
             $"Unsupported scalar type to create column from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
-    public static Column CreateFromScalar(object? value, TypeSymbol typeSymbol, int numRows)
+    public static BaseColumn CreateFromScalar(object? value, TypeSymbol typeSymbol, int numRows)
     {
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
@@ -173,7 +173,7 @@ public static class ColumnHelpers
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
-    public static Column MapColumn(Column other, int offset, int length)
+    public static BaseColumn MapColumn(BaseColumn other, int offset, int length)
     {
         //TODO - packing the offset and length into a mapping array is just a bit of 
         //a hack to make the internal API easier
@@ -181,12 +181,12 @@ public static class ColumnHelpers
             MappingType.Chunk);
     }
 
-    public static Column MapColumn(Column other, ImmutableArray<int> mapping)
+    public static BaseColumn MapColumn(BaseColumn other, ImmutableArray<int> mapping)
     {
         return MapColumn(new[] { other }, mapping, MappingType.Arbitrary);
     }
 
-    public static Column ReassembleInOrder(Column[] others) =>
+    public static BaseColumn ReassembleInOrder(BaseColumn[] others) =>
         MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
     private static Column<T> Create<T>(ImmutableArray<int> mapping, Column<T>[] other, MappingType mapType)
@@ -200,7 +200,8 @@ public static class ColumnHelpers
         };
     }
 
-    private static Column MapColumn(IEnumerable<Column> others, ImmutableArray<int> mapping, MappingType mapType)
+    private static BaseColumn MapColumn(IEnumerable<BaseColumn> others, ImmutableArray<int> mapping,
+        MappingType mapType)
     {
         var typeSymbol = others.First().Type;
         if (typeSymbol == ScalarTypes.Int)
@@ -272,7 +273,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToInt32(item);
         }
 
-        return Column.Create(typeSymbol, columnData);
+        return BaseColumn.Create(typeSymbol, columnData);
     }
 
     private static Column<long?> CreateFromLongsObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -284,7 +285,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToInt64(item);
         }
 
-        return Column.Create(typeSymbol, columnData);
+        return BaseColumn.Create(typeSymbol, columnData);
     }
 
     private static Column<double?> CreateFromDoublesObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -296,7 +297,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToDouble(item);
         }
 
-        return Column.Create(typeSymbol, columnData);
+        return BaseColumn.Create(typeSymbol, columnData);
     }
 
     private static Column<bool?> CreateFromBoolsObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -308,7 +309,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToBoolean(item);
         }
 
-        return Column.Create(typeSymbol, columnData);
+        return BaseColumn.Create(typeSymbol, columnData);
     }
 
     private static Column<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount) =>

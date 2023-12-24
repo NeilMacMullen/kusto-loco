@@ -52,7 +52,7 @@ internal partial class TreeEvaluator
                 return (context, chunk.ReParent(this), false);
             }
 
-            var columns = new Column[chunk.Columns.Length];
+            var columns = new BaseColumn[chunk.Columns.Length];
             for (var i = 0; i < columns.Length; i++) columns[i] = chunk.Columns[i].Slice(0, context.Remaining);
 
             var trimmedChunk = new TableChunk(this, columns);

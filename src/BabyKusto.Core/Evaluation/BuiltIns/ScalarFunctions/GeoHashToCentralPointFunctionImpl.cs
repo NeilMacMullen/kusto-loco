@@ -8,19 +8,6 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
 internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 {
-
-    private static JsonObject PtToJson(double latitude, double longitude)
-    {
-        return new JsonObject
-        {
-            ["type"] = "Point",
-            ["coordinates"] = new JsonArray
-            {
-                longitude,
-                latitude
-            }
-        };
-    }
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
         var p1Lon = (string?)arguments[0].Value;
@@ -30,13 +17,13 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
         var j = PtToJson(pt.Latitude, pt.Longitude);
 
-        return new ScalarResult(ScalarTypes.Dynamic,j);
+        return new ScalarResult(ScalarTypes.Dynamic, j);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         var hash = (Column<string?>)arguments[0].Column;
-     
+
         var rowCount = hash.RowCount;
 
         var data = new JsonNode[rowCount];
@@ -51,6 +38,17 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
                 data[i] = PtToJson(pt.Latitude, pt.Longitude);
             }
         });
-        return new ColumnarResult(Column.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
     }
+
+    private static JsonObject PtToJson(double latitude, double longitude) =>
+        new()
+        {
+            ["type"] = "Point",
+            ["coordinates"] = new JsonArray
+            {
+                longitude,
+                latitude
+            }
+        };
 }

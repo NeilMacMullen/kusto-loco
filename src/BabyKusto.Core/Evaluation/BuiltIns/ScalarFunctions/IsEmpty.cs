@@ -28,6 +28,6 @@ internal class IsEmptyFunctionImpl : IScalarFunctionImpl
             data[i] = string.IsNullOrEmpty(value);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

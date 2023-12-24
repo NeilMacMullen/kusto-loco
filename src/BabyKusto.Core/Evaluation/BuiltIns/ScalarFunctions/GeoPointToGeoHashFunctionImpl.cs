@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Geo;
 using Kusto.Language.Symbols;
@@ -41,6 +40,6 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.GeoHash(p1LonColumn[i], p1LatColumn[i], resColumn[i]);
             }
         });
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 }

@@ -32,6 +32,6 @@ internal class AgoFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
     }
 }

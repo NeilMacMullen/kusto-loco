@@ -26,7 +26,7 @@ internal class UnaryMinusIntOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -49,7 +49,7 @@ internal class UnaryMinusLongOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -72,7 +72,7 @@ internal class UnaryMinusDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -95,6 +95,6 @@ internal class UnaryMinusTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
     }
 }

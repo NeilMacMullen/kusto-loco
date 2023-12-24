@@ -47,7 +47,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
             data[i] = GetResult(cacheEntry.Regex!, captureGroups[i], values[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 
     private static Regex GetRegex(string? pattern) => new(pattern ?? string.Empty);

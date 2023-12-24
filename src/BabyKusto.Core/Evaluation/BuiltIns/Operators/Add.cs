@@ -31,7 +31,7 @@ internal class AddIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -60,7 +60,7 @@ internal class AddLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -89,7 +89,7 @@ internal class AddDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -119,7 +119,7 @@ internal class AddTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value.Ticks + right.Value.Ticks) : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
     }
 }
 
@@ -149,6 +149,6 @@ internal class AddDateTimeTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
     }
 }

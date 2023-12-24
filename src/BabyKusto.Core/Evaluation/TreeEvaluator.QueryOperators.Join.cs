@@ -88,7 +88,7 @@ internal partial class TreeEvaluator
             var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
             foreach (var chunk in table.GetData())
             {
-                var onValuesColumns = new List<Column>(_onClauses.Count);
+                var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
                 {
                     var chunkContext = new EvaluationContext(_context.Scope, chunk);
                     for (var i = 0; i < onExpressions.Length; i++)

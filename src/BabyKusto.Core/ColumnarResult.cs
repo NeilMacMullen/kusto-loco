@@ -2,9 +2,9 @@
 
 public sealed class ColumnarResult : EvaluationResult
 {
-    public ColumnarResult(Column column)
+    public ColumnarResult(BaseColumn column)
         : base(column.Type) =>
         Column = column;
 
-    public Column Column { get; }
+    public BaseColumn Column { get; }
 }

@@ -13,7 +13,7 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
         var left = (string?)arguments[0].Value;
         var right = (string?)arguments[1].Value;
         return new ScalarResult(ScalarTypes.Real,
-                                CalculateSimilarity(left ?? string.Empty, right ?? string.Empty));
+            CalculateSimilarity(left ?? string.Empty, right ?? string.Empty));
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -29,7 +29,7 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
             data[i] = CalculateSimilarity(left[i] ?? string.Empty, right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 
     public double CalculateSimilarity(string left, string right)

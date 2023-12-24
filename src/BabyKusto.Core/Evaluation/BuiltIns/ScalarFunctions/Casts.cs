@@ -27,7 +27,7 @@ internal class ToIntStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -60,7 +60,7 @@ internal class ToLongStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,7 +93,7 @@ internal class ToDoubleStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,7 +121,7 @@ internal class ToBoolStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

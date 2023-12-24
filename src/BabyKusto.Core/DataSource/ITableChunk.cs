@@ -7,7 +7,7 @@ public interface ITableChunk
 {
     ITableSource Table { get; }
 
-    Column[] Columns { get; }
+    BaseColumn[] Columns { get; }
 
     int RowCount { get; }
 }

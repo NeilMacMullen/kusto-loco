@@ -29,7 +29,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(inputCol[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         private static string? Impl(DateTime? input)

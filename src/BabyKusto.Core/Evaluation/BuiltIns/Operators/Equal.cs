@@ -28,7 +28,7 @@ internal class EqualIntOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -53,7 +53,7 @@ internal class EqualLongOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -78,7 +78,7 @@ internal class EqualDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -104,7 +104,7 @@ internal class EqualStringOperatorImpl : IScalarFunctionImpl
             data[i] = string.Equals(left[i] ?? string.Empty, right[i] ?? string.Empty, StringComparison.Ordinal);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -129,7 +129,7 @@ internal class EqualTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -154,6 +154,6 @@ internal class EqualDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

@@ -31,7 +31,7 @@ internal class GreaterThanIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -59,7 +59,7 @@ internal class GreaterThanLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -87,7 +87,7 @@ internal class GreaterThanDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -115,7 +115,7 @@ internal class GreaterThanTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -143,6 +143,6 @@ internal class GreaterThanDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

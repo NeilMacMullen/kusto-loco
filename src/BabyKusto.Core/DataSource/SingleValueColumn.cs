@@ -24,12 +24,9 @@ public class SingleValueColumn<T> : Column<T>
         }
     }
 
-    public override Column Slice(int start, int length) => new SingleValueColumn<T>(Type, this[0], length);
+    public override BaseColumn Slice(int start, int length) => new SingleValueColumn<T>(Type, this[0], length);
 
     public override object? GetRawDataValue(int index) => this[IndirectIndex(index)];
 
-    public Column<T> ResizeTo(int lookupsLength)
-    {
-        return (Column<T>)Slice(0, lookupsLength);
-    }
+    public Column<T> ResizeTo(int lookupsLength) => (Column<T>)Slice(0, lookupsLength);
 }

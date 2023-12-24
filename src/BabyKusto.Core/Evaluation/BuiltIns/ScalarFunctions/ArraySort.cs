@@ -38,7 +38,7 @@ internal class ArraySortFunctionImpl : IScalarFunctionImpl
             data[i] = array == null ? null : Do(array);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
     }
 
     private JsonArray Do(JsonArray array)

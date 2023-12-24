@@ -27,7 +27,7 @@ internal class DayOfWeekFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(dates[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
     }
 
     private static TimeSpan? Impl(DateTime? input)

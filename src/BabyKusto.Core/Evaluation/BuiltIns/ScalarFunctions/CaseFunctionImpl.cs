@@ -10,8 +10,8 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
         var val = arguments.Last().Value is T?
-                      ? (T?)arguments.Last().Value
-                      : default;
+            ? (T?)arguments.Last().Value
+            : default;
         for (var p = 0; p < arguments.Length / 2; p++)
         {
             var pred = arguments[p * 2].Value as bool?;
@@ -30,12 +30,12 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
         var caseLength = arguments.Length / 2;
         var fallback = (Column<T?>)arguments.Last().Column;
         var condValues = Enumerable.Range(0, caseLength)
-                                   .Select(i => new
-                                                {
-                                                    Pred = (Column<bool?>)arguments[i * 2].Column,
-                                                    Val = (Column<T?>)arguments[i * 2 + 1].Column
-                                                })
-                                   .ToArray();
+            .Select(i => new
+            {
+                Pred = (Column<bool?>)arguments[i * 2].Column,
+                Val = (Column<T?>)arguments[i * 2 + 1].Column
+            })
+            .ToArray();
 
 
         var rowCount = fallback.RowCount;
@@ -45,7 +45,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             var val = fallback[i];
             foreach (var c in condValues)
             {
-                if (c.Pred[i]!.Value==true)
+                if (c.Pred[i]!.Value)
                 {
                     val = c.Val[i];
                     break;
@@ -55,7 +55,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             data[i] = val;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypeFromNetType(typeof(T)), data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypeFromNetType(typeof(T)), data));
     }
 
     private static TypeSymbol ScalarTypeFromNetType(Type t)

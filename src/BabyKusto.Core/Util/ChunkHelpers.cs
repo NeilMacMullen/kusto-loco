@@ -15,7 +15,7 @@ public static class ChunkHelpers
     public static ITableChunk Reassemble(ITableChunk[] chunksInThisBucket)
     {
         var columnCount = chunksInThisBucket.First().Columns.Length;
-        var mergedColumns = new List<Column>();
+        var mergedColumns = new List<BaseColumn>();
         for (var i = 0; i < columnCount; i++)
         {
             var columnIs = chunksInThisBucket.Select(chk => chk.Columns[i]).ToArray();

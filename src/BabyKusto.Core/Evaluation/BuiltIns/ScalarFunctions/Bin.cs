@@ -33,7 +33,7 @@ internal class BinIntFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,7 +85,7 @@ internal class BinLongFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,7 +137,7 @@ internal class BinDoubleFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -184,6 +184,6 @@ internal class BinDateTimeTimeSpanFunctionImpl : IScalarFunctionImpl
             data[i] = floor.HasValue ? new DateTime(floor.Value) : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
     }
 }

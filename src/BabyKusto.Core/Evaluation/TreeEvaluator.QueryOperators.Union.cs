@@ -96,7 +96,7 @@ internal partial class TreeEvaluator
         {
             var columns = Enumerable.Range(0, Type.Columns.Count).Select(
                     _ => NullColumn.Instance)
-                .Cast<Column>()
+                .Cast<BaseColumn>()
                 .ToArray();
             for (var i = 0; i < chunk.Columns.Length; i++)
             {

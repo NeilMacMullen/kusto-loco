@@ -29,7 +29,7 @@ internal class LogFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(value);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 
     private static double? Impl(double? input)

@@ -9,9 +9,9 @@ namespace BabyKusto.Core;
 
 public class TableChunk : ITableChunk
 {
-    public static readonly TableChunk Empty = new(NullTableSource.Instance, Array.Empty<Column>());
+    public static readonly TableChunk Empty = new(NullTableSource.Instance, Array.Empty<BaseColumn>());
 
-    public TableChunk(ITableSource table, Column[] columns)
+    public TableChunk(ITableSource table, BaseColumn[] columns)
     {
         ValidateTypes(table.Type, columns);
         ValidateRowCounts(columns);
@@ -22,11 +22,11 @@ public class TableChunk : ITableChunk
 
     public ITableSource Table { get; }
 
-    public Column[] Columns { get; }
+    public BaseColumn[] Columns { get; }
 
     public int RowCount => Columns.Length == 0 ? 0 : Columns[0].RowCount;
 
-    private static void ValidateTypes(TableSymbol tableSymbol, Column[] columns)
+    private static void ValidateTypes(TableSymbol tableSymbol, BaseColumn[] columns)
     {
         if (columns.Length != tableSymbol.Columns.Count)
         {
@@ -44,7 +44,7 @@ public class TableChunk : ITableChunk
         }
     }
 
-    private static void ValidateRowCounts(Column[] columns)
+    private static void ValidateRowCounts(BaseColumn[] columns)
     {
         if (columns.Length == 0)
         {

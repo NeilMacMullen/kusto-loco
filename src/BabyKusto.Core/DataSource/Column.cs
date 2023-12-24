@@ -3,28 +3,12 @@
 
 using System;
 using System.Text.Json.Nodes;
-using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core;
 
-public abstract class Column
-{
-    protected Column(TypeSymbol type) => Type = type ?? throw new ArgumentNullException(nameof(type));
-
-    public TypeSymbol Type { get; }
-    public abstract int RowCount { get; }
-
-    public abstract object? GetRawDataValue(int index);
-
-    public abstract Column Slice(int start, int end);
-    public abstract void ForEach(Action<object?> action);
-
-    public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
-}
-
-public class Column<T> : Column
+public class Column<T> : BaseColumn
 {
     private readonly T?[] _data;
 
@@ -88,7 +72,7 @@ public class Column<T> : Column
 #endif
     }
 
-    public override Column Slice(int start, int length)
+    public override BaseColumn Slice(int start, int length)
     {
         var slicedData = new T[length];
         Array.Copy(_data, start, slicedData, 0, length);
@@ -102,5 +86,4 @@ public class Column<T> : Column
             action(item);
         }
     }
-
 }

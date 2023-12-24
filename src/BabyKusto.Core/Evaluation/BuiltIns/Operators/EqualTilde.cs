@@ -14,8 +14,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             var left = (string?)arguments[0].Value;
             var right = (string?)arguments[1].Value;
             return new ScalarResult(ScalarTypes.Bool,
-                                    (left ?? string.Empty).ToLowerInvariant()
-                                                          .Equals((right ?? string.Empty).ToLowerInvariant()));
+                (left ?? string.Empty).ToLowerInvariant()
+                .Equals((right ?? string.Empty).ToLowerInvariant()));
         }
 
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -30,10 +30,10 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
             for (var i = 0; i < left.RowCount; i++)
             {
                 data[i] = (left[i] ?? string.Empty).ToLowerInvariant()
-                                                   .Equals((right[i] ?? string.Empty).ToLowerInvariant());
+                    .Equals((right[i] ?? string.Empty).ToLowerInvariant());
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
         }
     }
 }

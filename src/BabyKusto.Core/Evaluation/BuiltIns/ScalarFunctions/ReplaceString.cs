@@ -31,7 +31,7 @@ internal class ReplaceStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(textCol[i], lookupCol[i], rewriteCol[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? text, string? lookup, string? rewrite)

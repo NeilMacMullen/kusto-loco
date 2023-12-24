@@ -34,7 +34,7 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -65,7 +65,7 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -96,7 +96,7 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -127,7 +127,7 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -158,7 +158,7 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 }
 
@@ -189,7 +189,7 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
     }
 }
 
@@ -220,6 +220,6 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
     }
 }

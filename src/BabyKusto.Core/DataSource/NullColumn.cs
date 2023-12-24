@@ -3,7 +3,7 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core;
 
-public class NullColumn : Column
+public class NullColumn : BaseColumn
 {
     public static readonly NullColumn Instance = new();
 
@@ -14,14 +14,11 @@ public class NullColumn : Column
     public override int RowCount { get; } = 0;
     public override object? GetRawDataValue(int index) => throw new InvalidOperationException();
 
-    public override Column Slice(int start, int end) => throw new InvalidOperationException();
+    public override BaseColumn Slice(int start, int end) => throw new InvalidOperationException();
 
 
     public override void ForEach(Action<object?> action)
     {
         throw new InvalidOperationException();
     }
-
-
- 
 }

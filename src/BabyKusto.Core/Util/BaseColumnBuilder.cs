@@ -6,5 +6,5 @@ public abstract class BaseColumnBuilder
     public abstract object? this[int index] { get; }
     public abstract void Add(object? value);
     public abstract void AddRange(BaseColumnBuilder other);
-    public abstract Column ToColumn();
+    public abstract BaseColumn ToColumn();
 }

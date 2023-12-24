@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Kusto.Language.Parsing;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
@@ -29,23 +28,21 @@ internal class ContainsOperatorImpl : IScalarFunctionImpl
         var right = (Column<string?>)(arguments[1].Column);
         var data = new bool?[left.RowCount];
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount,1000);
+        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
-            for (int i = range.Item1; i < range.Item2; i++)
+            for (var i = range.Item1; i < range.Item2; i++)
             {
                 var lefts = left[i];
                 var rights = right[i];
                 data[i] = string.IsNullOrEmpty(rights) ? true
-                    : string.IsNullOrEmpty(lefts) ? 
-                        false
-                    :
-                data[i] = lefts!.Contains(rights!,StringComparison.InvariantCultureIgnoreCase);
+                    : string.IsNullOrEmpty(lefts) ? false
+                    : data[i] = lefts!.Contains(rights!, StringComparison.InvariantCultureIgnoreCase);
             }
         });
-      
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

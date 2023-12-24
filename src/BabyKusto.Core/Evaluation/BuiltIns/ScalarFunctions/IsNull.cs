@@ -29,7 +29,7 @@ internal class IsNullBoolFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -55,7 +55,7 @@ internal class IsNullIntFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -81,7 +81,7 @@ internal class IsNullLongFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -107,7 +107,7 @@ internal class IsNullDoubleFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -133,7 +133,7 @@ internal class IsNullDateTimeFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -159,7 +159,7 @@ internal class IsNullTimeSpanFunctionImpl : IScalarFunctionImpl
             data[i] = value == null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -186,6 +186,6 @@ internal class IsNullStringFunctionImpl : IScalarFunctionImpl
             data[i] = false;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

@@ -28,7 +28,7 @@ internal class UrlDecodeFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(urlCol[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? url)

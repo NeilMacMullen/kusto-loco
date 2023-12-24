@@ -31,6 +31,6 @@ internal class NotContainsOperatorImpl : IScalarFunctionImpl
                 .Contains((right[i] ?? string.Empty).ToUpperInvariant());
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

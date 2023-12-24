@@ -122,7 +122,7 @@ internal partial class TreeEvaluator
         var numColumns = tableSymbol.Columns.Count;
         var numRows = node.Data.Length / numColumns;
 
-        var columns = new Column[numColumns];
+        var columns = new BaseColumn[numColumns];
         for (var j = 0; j < numColumns; j++)
         {
             var columnData = new object?[numRows];

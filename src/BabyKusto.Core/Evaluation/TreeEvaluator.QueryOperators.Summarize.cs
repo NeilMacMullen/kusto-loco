@@ -73,7 +73,7 @@ internal partial class TreeEvaluator
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
             //Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
-            var byValuesColumns = new List<Column>(_byExpressions.Count);
+            var byValuesColumns = new List<BaseColumn>(_byExpressions.Count);
 
             var chunkContext = _context with { Chunk = chunk };
             for (var i = 0; i < _byExpressions.Count; i++)

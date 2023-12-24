@@ -38,7 +38,7 @@ public class MappedColumn<T> : Column<T>
         }
     }
 
-    public override Column Slice(int start, int length)
+    public override BaseColumn Slice(int start, int length)
     {
         var slicedData = _lookups.Slice(start, length);
         return new MappedColumn<T>(slicedData, BackingColumn);

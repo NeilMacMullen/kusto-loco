@@ -44,6 +44,6 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
             builder.Clear();
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 }

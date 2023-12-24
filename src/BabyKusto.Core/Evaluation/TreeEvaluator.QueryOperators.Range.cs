@@ -82,7 +82,8 @@ namespace BabyKusto.Core.Evaluation
 
                 if (_step == T.Zero || direction != stepDirection)
                 {
-                    yield return new TableChunk(this, new Column[] { Column.Create(columnType, Array.Empty<T?>()) });
+                    yield return new TableChunk(this,
+                        new BaseColumn[] { BaseColumn.Create(columnType, Array.Empty<T?>()) });
                     yield break;
                 }
 
@@ -99,7 +100,7 @@ namespace BabyKusto.Core.Evaluation
                     if (i != MaxRowsPerChunk)
                         continue;
 
-                    yield return new TableChunk(this, new Column[] { Column.Create(columnType, chunk) });
+                    yield return new TableChunk(this, new BaseColumn[] { BaseColumn.Create(columnType, chunk) });
                     i = 0;
                 }
 
@@ -109,7 +110,7 @@ namespace BabyKusto.Core.Evaluation
                 // Smaller end chunk
                 Array.Resize(ref chunk, i);
 
-                yield return new TableChunk(this, new Column[] { Column.Create(columnType, chunk) });
+                yield return new TableChunk(this, new BaseColumn[] { BaseColumn.Create(columnType, chunk) });
             }
 
             public IAsyncEnumerable<ITableChunk> GetDataAsync(

@@ -31,14 +31,14 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(int? input)
             => input.HasValue
-                   ? input.Value.ToString()
-                   : string.Empty;
+                ? input.Value.ToString()
+                : string.Empty;
     }
 
     internal class ToStringFromLongFunctionImpl : IScalarFunctionImpl
@@ -61,14 +61,14 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(long? input)
             => input.HasValue
-                   ? input.Value.ToString()
-                   : string.Empty;
+                ? input.Value.ToString()
+                : string.Empty;
     }
 
     internal class ToStringFromRealFunctionImpl : IScalarFunctionImpl
@@ -91,14 +91,14 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(double? input)
             => input.HasValue
-                   ? input.Value.ToString()
-                   : string.Empty;
+                ? input.Value.ToString()
+                : string.Empty;
     }
 
     internal class ToStringFromTimeSpanFunctionImpl : IScalarFunctionImpl
@@ -121,14 +121,14 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(TimeSpan? input)
             => input.HasValue
-                   ? input.Value.ToString()
-                   : string.Empty;
+                ? input.Value.ToString()
+                : string.Empty;
     }
 
     internal class ToStringFromDateTimeFunctionImpl : IScalarFunctionImpl
@@ -151,14 +151,14 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string? Impl(DateTime? input)
             => input == null
-                   ? string.Empty
-                   : input.Value.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                ? string.Empty
+                : input.Value.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
     }
 
     internal class ToStringFromDynamicFunctionImpl : IScalarFunctionImpl
@@ -181,7 +181,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -241,7 +241,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = column[i];
             }
 
-            return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
         }
     }
 }

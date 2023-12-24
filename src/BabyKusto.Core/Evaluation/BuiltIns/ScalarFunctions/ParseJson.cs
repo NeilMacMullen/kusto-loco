@@ -28,7 +28,7 @@ internal class ParseJsonStringFunctionImpl : IScalarFunctionImpl
             data[i] = ParseInternal(column[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
     }
 
     private static JsonNode? ParseInternal(string? input)

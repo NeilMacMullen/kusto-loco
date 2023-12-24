@@ -5,20 +5,18 @@ using System.Linq;
 namespace BabyKusto.Core;
 
 /// <summary>
-/// Represents a column formed of one or more sections which are processed in order
+///     Represents a column formed of one or more sections which are processed in order
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class ReassembledChunkColumn<T> : Column<T>
 {
-    private readonly record struct Section(int Offset, int Length,Column<T> BackingColumn);
-
-    private readonly Section[] BackingColumns ;
     private readonly int _Length;
+
+    private readonly Section[] BackingColumns;
 
     public ReassembledChunkColumn(IEnumerable<Column<T>> backing)
         : base(backing.First().Type, Array.Empty<T>())
     {
-
         var sections = new List<Section>();
         var offset = 0;
         foreach (var b in backing)
@@ -32,17 +30,6 @@ public class ReassembledChunkColumn<T> : Column<T>
         _Length = offset;
     }
 
-    private (int,Column<T>) IndirectIndex(int index)
-    {
-        foreach (var s in BackingColumns)
-        {
-            if (index >= s.Offset && index < (s.Offset + s.Length))
-                return (index - s.Offset, s.BackingColumn);
-        }
-
-        throw new InvalidOperationException($"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
-    }
-
     public override T? this[int index]
     {
         get
@@ -54,8 +41,18 @@ public class ReassembledChunkColumn<T> : Column<T>
 
     public override int RowCount => _Length;
 
+    private (int, Column<T>) IndirectIndex(int index)
+    {
+        foreach (var s in BackingColumns)
+        {
+            if (index >= s.Offset && index < (s.Offset + s.Length))
+                return (index - s.Offset, s.BackingColumn);
+        }
 
-   
+        throw new InvalidOperationException(
+            $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
+    }
+
 
     public override void ForEach(Action<object?> action)
     {
@@ -65,10 +62,8 @@ public class ReassembledChunkColumn<T> : Column<T>
         }
     }
 
-    public override Column Slice(int start, int length)
-    {
+    public override BaseColumn Slice(int start, int length) =>
         throw new NotImplementedException("Can't yet slice reassembled chunks");
-    }
 
 
     public override object? GetRawDataValue(int index)
@@ -76,4 +71,6 @@ public class ReassembledChunkColumn<T> : Column<T>
         var (i, chunk) = IndirectIndex(index);
         return chunk[i];
     }
+
+    private readonly record struct Section(int Offset, int Length, Column<T> BackingColumn);
 }

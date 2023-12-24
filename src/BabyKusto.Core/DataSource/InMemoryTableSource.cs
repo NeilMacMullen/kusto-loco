@@ -23,7 +23,7 @@ public class InMemoryTableSource : ITableSource
 {
     private readonly ITableChunk[] _data;
 
-    public InMemoryTableSource(TableSymbol type, Column[] columns)
+    public InMemoryTableSource(TableSymbol type, BaseColumn[] columns)
     {
         Type = type;
         _data = new ITableChunk[] { new TableChunk(this, columns) };

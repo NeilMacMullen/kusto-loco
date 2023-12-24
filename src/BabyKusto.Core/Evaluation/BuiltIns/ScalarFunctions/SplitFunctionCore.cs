@@ -33,7 +33,7 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
             data[i] = Evaluate(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 
     protected JsonArray? Evaluate(string? source, string? delimiter)

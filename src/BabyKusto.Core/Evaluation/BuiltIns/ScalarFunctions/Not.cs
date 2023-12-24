@@ -28,6 +28,6 @@ internal class NotFunctionImpl : IScalarFunctionImpl
             data[i] = value.HasValue ? !value.Value : null;
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
     }
 }

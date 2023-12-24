@@ -32,7 +32,7 @@ internal class SubstringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(inputCol[i], startCol[i], lengthCol[i]);
         }
 
-        return new ColumnarResult(Column.Create(ScalarTypes.String, data));
+        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? input, long? start, long? length)
