@@ -135,49 +135,47 @@ public class KustoQueryContext
         return new KustoQueryResult<T>(d.Query, rows, d.QueryDuration, d.Error);
     }
 
-    public static IReadOnlyCollection<OrderedDictionary> GetDictionarySet(TabularResult result)
+    public static IReadOnlyCollection<OrderedDictionary> GetDictionarySet(TabularResult tabularResult)
     {
         var items = new List<OrderedDictionary>();
-        if (result is TabularResult tabularResult)
-        {
-            var table = tabularResult.Value;
-            foreach (var chunk in table.GetData())
-            {
-                for (var i = 0; i < chunk.RowCount; i++)
-                {
-                    var d = new OrderedDictionary();
-                    for (var c = 0; c < chunk.Columns.Length; c++)
-                    {
-                        var v = chunk.Columns[c].GetRawDataValue(i);
-                        d[table.Type.Columns[c].Name] = v;
-                    }
 
-                    items.Add(d);
+        var table = tabularResult.Value;
+        foreach (var chunk in table.GetData())
+        {
+            for (var i = 0; i < chunk.RowCount; i++)
+            {
+                var d = new OrderedDictionary();
+                for (var c = 0; c < chunk.Columns.Length; c++)
+                {
+                    var v = chunk.Columns[c].GetRawDataValue(i);
+                    d[table.Type.Columns[c].Name] = v;
                 }
+
+                items.Add(d);
             }
         }
+
 
         return items;
     }
 
-    public static int Materialise(TabularResult result)
+    public static int Materialise(TabularResult tabularResult)
     {
         var count = 0;
-        if (result is TabularResult tabularResult)
+
+        var table = tabularResult.Value;
+        foreach (var chunk in table.GetData())
         {
-            var table = tabularResult.Value;
-            foreach (var chunk in table.GetData())
+            for (var i = 0; i < chunk.RowCount; i++)
             {
-                for (var i = 0; i < chunk.RowCount; i++)
+                for (var c = 0; c < chunk.Columns.Length; c++)
                 {
-                    for (var c = 0; c < chunk.Columns.Length; c++)
-                    {
-                        var v = chunk.Columns[c].GetRawDataValue(i);
-                        count++;
-                    }
+                    var v = chunk.Columns[c].GetRawDataValue(i);
+                    count++;
                 }
             }
         }
+
 
         return count;
     }
@@ -244,8 +242,10 @@ public class KustoQueryContext
 
     public static KustoQueryContext WithFullDebug()
     {
-        var context = new KustoQueryContext();
-        context._fullDebug = true;
+        var context = new KustoQueryContext
+        {
+            _fullDebug = true
+        };
         return context;
     }
 }

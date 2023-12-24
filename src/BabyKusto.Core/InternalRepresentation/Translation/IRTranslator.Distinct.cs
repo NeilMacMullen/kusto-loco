@@ -22,18 +22,13 @@ internal partial class IRTranslator
             }
 
             var table = (TableSymbol)node.ResultType;
-            for (var i = 0; i < table.Columns.Count; i++)
-            {
-                var column = table.Columns[i];
-                irExpressions.Add(new IRRowScopeNameReferenceNode(column, column.Type, i));
-            }
+            irExpressions.AddRange(table.Columns
+                .Select((column, i) => new IRRowScopeNameReferenceNode(column, column.Type, i)));
         }
         else
         {
-            foreach (var expression in node.Expressions)
-            {
-                irExpressions.Add((IRExpressionNode)expression.Element.Accept(this));
-            }
+            irExpressions.AddRange(node.Expressions.Select(expression =>
+                (IRExpressionNode)expression.Element.Accept(this)));
         }
 
         return new IRSummarizeOperatorNode(aggregations: IRListNode<IRExpressionNode>.Empty,

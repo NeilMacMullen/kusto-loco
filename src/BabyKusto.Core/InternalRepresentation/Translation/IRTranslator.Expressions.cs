@@ -36,12 +36,10 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         // in which case we need this additional information to ascertain if the data is e.g. scalar or columnar.
         // TODO: Do this right. Look-up by string from global scope is likely to produce wrong results in many cases.
         // Ideally we'd want to track argument to parameter variable symbols.
-        if (_inScopeSymbolInfos.TryGetValue(node.Name.SimpleName, out var resultKind))
-        {
-            return new IRNameReferenceNode(node.ReferencedSymbol, node.ResultType, resultKind);
-        }
-
-        return new IRNameReferenceNode(node.ReferencedSymbol, node.ResultType);
+        return
+            _inScopeSymbolInfos.TryGetValue(node.Name.SimpleName, out var resultKind)
+                ? new IRNameReferenceNode(node.ReferencedSymbol, node.ResultType, resultKind)
+                : new IRNameReferenceNode(node.ReferencedSymbol, node.ResultType);
     }
 
     public override IRNode VisitLiteralExpression(LiteralExpression node) =>

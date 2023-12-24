@@ -4,8 +4,5 @@ namespace BabyKusto.Core.InternalRepresentation;
 
 internal partial class IRTranslator
 {
-    public override IRNode VisitGetSchemaOperator(GetSchemaOperator node)
-    {
-              return new IRGetSchemaOperatorNode();
-    }
+    public override IRNode VisitGetSchemaOperator(GetSchemaOperator node) => new IRGetSchemaOperatorNode();
 }

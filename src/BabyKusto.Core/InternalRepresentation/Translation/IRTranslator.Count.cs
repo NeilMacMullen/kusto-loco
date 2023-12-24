@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using Kusto.Language;
@@ -18,7 +19,7 @@ internal partial class IRTranslator
         {
             new IRAggregateCallNode(
                 Aggregates.Count.Signatures[0],
-                BuiltInAggregates.GetOverload(Aggregates.Count, new IRExpressionNode[0], new List<Parameter>()),
+                BuiltInAggregates.GetOverload(Aggregates.Count, Array.Empty<IRExpressionNode>(), new List<Parameter>()),
                 new List<Parameter>(),
                 IRListNode<IRExpressionNode>.Empty,
                 ScalarTypes.Long),
