@@ -7,17 +7,7 @@ using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core.Util;
 
-public abstract class ColumnBuilder
-{
-    public abstract int RowCount { get; }
-    public abstract object? this[int index] { get; }
-    public abstract void Add(object? value);
-    public abstract void AddRange(ColumnBuilder other);
-    public abstract Column ToColumn();
- 
-}
-
-public class ColumnBuilder<T> : ColumnBuilder
+public class ColumnBuilder<T> : BaseColumnBuilder
 {
     private readonly List<T?> _data = new();
 
@@ -30,7 +20,7 @@ public class ColumnBuilder<T> : ColumnBuilder
         _data.Add(value);
     }
 
-    public override void AddRange(ColumnBuilder other)
+    public override void AddRange(BaseColumnBuilder other)
     {
         if (other is not ColumnBuilder<T> typedOther)
         {
@@ -49,5 +39,4 @@ public class ColumnBuilder<T> : ColumnBuilder
     public override Column ToColumn() => Column.Create(
         TypeMapping.SymbolForType(typeof(T)),
         _data.ToArray());
-
 }

@@ -116,16 +116,16 @@ public static class ColumnHelpers
     ///     This is useful when we want to populate a set of columns based on an expected tabular
     ///     return type
     /// </remarks>
-    public static ColumnBuilder[] CreateBuildersForTable(TableSymbol table)
+    public static BaseColumnBuilder[] CreateBuildersForTable(TableSymbol table)
     {
         return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
     }
 
-    public static ColumnBuilder CreateBuilder(Type type)
+    public static BaseColumnBuilder CreateBuilder(Type type)
         => CreateBuilder(TypeMapping.SymbolForType(type));
 
 
-    public static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
+    public static BaseColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)

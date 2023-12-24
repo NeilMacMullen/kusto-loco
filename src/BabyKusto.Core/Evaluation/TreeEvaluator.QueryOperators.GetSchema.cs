@@ -21,7 +21,7 @@ internal partial class TreeEvaluator
             new ColumnSymbol("ColumnType", ScalarTypes.String),
         };
         var ts = new TableSymbol("schema", cs);
-        var builders = new ColumnBuilder[]
+        var builders = new BaseColumnBuilder[]
         {
             new ColumnBuilder<string?>(),
             new ColumnBuilder<int?>(),

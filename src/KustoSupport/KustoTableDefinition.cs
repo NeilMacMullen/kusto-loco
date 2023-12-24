@@ -9,5 +9,7 @@ namespace KustoSupport;
 /// <remarks>
 ///     Useful when building tables
 /// </remarks>
-public readonly record struct KustoTableDefinition(TableSymbol Symbol, IReadOnlyCollection<ColumnBuilder> Columns,
+public readonly record struct KustoTableDefinition(
+    TableSymbol Symbol,
+    IReadOnlyCollection<BaseColumnBuilder> Columns,
     int RowCount);

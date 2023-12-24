@@ -112,7 +112,7 @@ internal partial class TreeEvaluator
                     return 0;
                 });
 
-            var resultColumns = new ColumnBuilder[allData.Length];
+            var resultColumns = new BaseColumnBuilder[allData.Length];
             for (var i = 0; i < resultColumns.Length; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(_input.Type.Columns[i].Type);

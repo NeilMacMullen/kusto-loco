@@ -23,14 +23,15 @@ public class InMemoryKustoTable : BaseKustoTable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    private InMemoryKustoTable(TableSymbol tableSym, IEnumerable<ColumnBuilder> builders, int length) : base(tableSym,
+    private InMemoryKustoTable(TableSymbol tableSym, IEnumerable<BaseColumnBuilder> builders, int length) : base(
+        tableSym,
         length)
     {
         Builders = builders.ToArray();
         Length = length;
     }
 
-    public ColumnBuilder[] Builders { get; }
+    public BaseColumnBuilder[] Builders { get; }
 
 
     public override IEnumerable<ITableChunk> GetData()
@@ -98,7 +99,7 @@ public class InMemoryKustoTable : BaseKustoTable
 
         return new KustoTableDefinition(tableSymbol, allBuilders, rows.Count);
 
-        ColumnBuilder Create(KustoColumnDefinition<T> c)
+        BaseColumnBuilder Create(KustoColumnDefinition<T> c)
         {
             var builder = ColumnHelpers.CreateBuilder(c.Type);
             foreach (var r in rows)

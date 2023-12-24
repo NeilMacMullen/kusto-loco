@@ -112,7 +112,7 @@ internal partial class TreeEvaluator
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
                         bucket = new NpmJoinSet(OnValues: onValues,
-                            Data: new ColumnBuilder[numColumns]);
+                            Data: new BaseColumnBuilder[numColumns]);
                         for (var j = 0; j < numColumns; j++)
                         {
                             bucket.Data[j] = ColumnHelpers.CreateBuilder(chunk.Columns[j].Type);
@@ -141,7 +141,7 @@ internal partial class TreeEvaluator
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -191,7 +191,7 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -219,7 +219,7 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -248,7 +248,7 @@ internal partial class TreeEvaluator
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -315,7 +315,7 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
         {
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numRightColumns];
             for (var i = 0; i < numRightColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
@@ -343,7 +343,7 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
         {
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numRightColumns];
             for (var i = 0; i < numRightColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
@@ -372,7 +372,7 @@ internal partial class TreeEvaluator
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -440,7 +440,7 @@ internal partial class TreeEvaluator
         {
             var numLeftColumns = left.Table.Type.Columns.Count;
             var numRightColumns = right.Table.Type.Columns.Count;
-            var resultColumns = new ColumnBuilder[numLeftColumns + numRightColumns];
+            var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
@@ -537,5 +537,5 @@ internal partial class TreeEvaluator
 
     private readonly record struct NpmJoinSet(
         object?[] OnValues,
-        ColumnBuilder[] Data);
+        BaseColumnBuilder[] Data);
 }

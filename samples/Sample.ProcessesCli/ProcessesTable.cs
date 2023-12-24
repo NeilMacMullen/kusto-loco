@@ -37,7 +37,7 @@ public class ProcessesTable : ITableSource
             workingSets.Add(p.WorkingSet64);
         }
 
-        var builders = new ColumnBuilder[] { pids, names, numThreads, workingSets };
+        var builders = new BaseColumnBuilder[] { pids, names, numThreads, workingSets };
         yield return new TableChunk(this, builders.Select(b => b.ToColumn()).ToArray());
     }
 
