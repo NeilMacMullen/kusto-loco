@@ -15,6 +15,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns;
 internal static class BuiltInsHelper
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     internal static T? PickOverload<T>(IReadOnlyList<T> overloads, IRExpressionNode[] arguments)
         where T : OverloadInfoBase
     {
@@ -102,10 +103,7 @@ internal static class BuiltInsHelper
             }
 
             Debug.Assert(firstColumnarArgIndex >= 0);
-            if (firstColumnarArgIndex < 0)
-            {
-                throw new InvalidOperationException();
-            }
+
 
             return arguments =>
             {
@@ -123,9 +121,12 @@ internal static class BuiltInsHelper
                     {
                         var scalarValue = (ScalarResult)arguments[i];
                         columnarArgs[i] =
-                            new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type, numRows));
+                            new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarValue.Value, scalarValue.Type,
+                                numRows));
                     }
                 }
+                //TODO - NPM here - if all columns are single-value we can avoid the row-wise 
+                //evaluation and therefore not pull data into memory for deferred columns
 
                 //TODO NPM here -this should be parallisable for at least some operations
                 //i.e. 1->1 mappings
@@ -168,10 +169,7 @@ internal static class BuiltInsHelper
         }
 
         Debug.Assert(firstColumnarArgIndex >= 0);
-        if (firstColumnarArgIndex < 0)
-        {
-            throw new InvalidOperationException();
-        }
+
 
         ColumnarResult[]? lastWindowArgs = null;
         ColumnarResult? previousResult = null;

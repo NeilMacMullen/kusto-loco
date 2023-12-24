@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Text;
 using Extensions;
 using KustoSupport;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #pragma warning disable CS8618, CS8600, CS8602, CS8604
 public class KustoResultRenderer
@@ -34,18 +33,45 @@ public class KustoResultRenderer
         return sb.ToString();
     }
 
-    public static string RenderToLineChart(string title,KustoQueryResult<OrderedDictionary> result)
+    public static string RenderToLineChart(string title, KustoQueryResult<OrderedDictionary> result)
     {
         var dictionaries = result.Results;
         var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
+        var types = dictionaries.First().Cast<DictionaryEntry>()
+            .Select(de => de.Value.GetType()).ToArray();
+
+        string AxisType(Type t)
+        {
+            var numericTypes = new[] { typeof(int), typeof(long), typeof(double), typeof(float) };
+            if (numericTypes.Contains(t))
+                return VegaGenerator.AxisTypeQuantity;
+            if (t == typeof(DateTime))
+                return VegaGenerator.AxisTypeTime;
+            return VegaGenerator.AxisTypeOrdinal;
+        }
+
+        string ChartType(string[] axisTypes)
+        {
+            var x = axisTypes[0];
+            var y = axisTypes.Skip(1).ToArray();
+            if (x == VegaGenerator.AxisTypeOrdinal)
+                return VegaGenerator.BarChart;
+            return VegaGenerator.LineChart;
+        }
+
+        var chartType = ChartType(types.Select(AxisType).ToArray());
+
+        var color = new ColumnAndName(string.Empty, string.Empty);
+        if (headers.Length > 2) color = new ColumnAndName(headers[2], headers[2]);
 
         var spec = VegaGenerator.Spec(
-            VegaGenerator.LineChart,
-            VegaGenerator.AxisTypeTime,
-            VegaGenerator.AxisTypeQuantity,
+            chartType,
+            AxisType(types[0]),
+            AxisType(types[1]),
             new ColumnAndName(headers.First(), headers.First()),
             new ColumnAndName(headers[1], headers[1]),
-            new ColumnAndName(string.Empty, string.Empty));
+            color
+        );
 
         var b = JObjectBuilder.FromObject(spec);
         var row = 0;
@@ -57,15 +83,12 @@ public class KustoResultRenderer
             }
 
             row++;
-
-
         }
 
         b.Set("width", "container");
         b.Set("height", "container");
 
 
-        return VegaMaker.MakeHtml(title,b.Serialize());
+        return VegaMaker.MakeHtml(title, b.Serialize());
     }
-
 }

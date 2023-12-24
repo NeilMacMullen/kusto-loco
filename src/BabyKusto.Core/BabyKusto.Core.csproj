@@ -15,7 +15,6 @@
       A self-contained execution engine for the Kusto Query Language (KQL) written in C#.
     </Description>
     <RepositoryUrl>https://github.com/davidnx/baby-kusto-csharp</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README-NUGET.md</PackageReadmeFile>
   </PropertyGroup>
 
