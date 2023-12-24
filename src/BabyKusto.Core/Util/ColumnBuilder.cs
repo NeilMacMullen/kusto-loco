@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core.Util;
@@ -15,18 +14,13 @@ public abstract class ColumnBuilder
     public abstract void Add(object? value);
     public abstract void AddRange(ColumnBuilder other);
     public abstract Column ToColumn();
-    public abstract ColumnBuilder Clone();
-    public abstract ColumnBuilder NewEmpty();
+ 
 }
-
 
 public class ColumnBuilder<T> : ColumnBuilder
 {
     private readonly List<T?> _data = new();
 
-    public ColumnBuilder(TypeSymbol type) => Type = type;
-
-    public TypeSymbol Type { get; }
 
     public override int RowCount => _data.Count;
     public override object? this[int index] => _data[index];
@@ -52,18 +46,8 @@ public class ColumnBuilder<T> : ColumnBuilder
         _data.Add((T?)value);
     }
 
-    public override Column ToColumn() => Column.Create(Type, _data.ToArray());
+    public override Column ToColumn() => Column.Create(
+        TypeMapping.SymbolForType(typeof(T)),
+        _data.ToArray());
 
-    public override ColumnBuilder Clone()
-    {
-        var result = new ColumnBuilder<T>(Type);
-        result.AddRange(this);
-        return result;
-    }
-
-    public override ColumnBuilder NewEmpty()
-    {
-        var result = new ColumnBuilder<T>(Type);
-        return result;
-    }
 }

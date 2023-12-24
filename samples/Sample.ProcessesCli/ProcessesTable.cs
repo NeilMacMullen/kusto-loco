@@ -24,10 +24,10 @@ public class ProcessesTable : ITableSource
 
     public IEnumerable<ITableChunk> GetData()
     {
-        var pids = new ColumnBuilder<int?>(ScalarTypes.Int);
-        var names = new ColumnBuilder<string?>(ScalarTypes.String);
-        var numThreads = new ColumnBuilder<int?>(ScalarTypes.Int);
-        var workingSets = new ColumnBuilder<long?>(ScalarTypes.Long);
+        var pids = new ColumnBuilder<int?>();
+        var names = new ColumnBuilder<string?>();
+        var numThreads = new ColumnBuilder<int?>();
+        var workingSets = new ColumnBuilder<long?>();
 
         foreach (var p in Process.GetProcesses())
         {

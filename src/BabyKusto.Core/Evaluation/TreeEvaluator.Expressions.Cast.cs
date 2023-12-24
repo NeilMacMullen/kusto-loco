@@ -70,7 +70,7 @@ internal partial class TreeEvaluator
                         {
                             Debug.Assert(arguments.Length == 1);
                             var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<int?>(node.ResultType);
+                            var builder = new ColumnBuilder<int?>();
                             columnResult.Column.ForEach(
                                 item => builder.Add(item == null ? null : Convert.ToInt32(item)));
                             return new ColumnarResult(builder.ToColumn());
@@ -83,7 +83,7 @@ internal partial class TreeEvaluator
                         {
                             Debug.Assert(arguments.Length == 1);
                             var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<long?>(node.ResultType);
+                            var builder = new ColumnBuilder<long?>();
                             columnResult.Column.ForEach(
                                 item => builder.Add(item == null ? null : Convert.ToInt64(item)));
                             return new ColumnarResult(builder.ToColumn());
@@ -96,7 +96,7 @@ internal partial class TreeEvaluator
                         {
                             Debug.Assert(arguments.Length == 1);
                             var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<double?>(node.ResultType);
+                            var builder = new ColumnBuilder<double?>();
                             columnResult.Column.ForEach(item =>
                                 builder.Add(item == null ? null : Convert.ToDouble(item)));
                             return new ColumnarResult(builder.ToColumn());
@@ -109,7 +109,7 @@ internal partial class TreeEvaluator
                         {
                             Debug.Assert(arguments.Length == 1);
                             var columnResult = (ColumnarResult)arguments[0];
-                            var builder = new ColumnBuilder<string?>(node.ResultType);
+                            var builder = new ColumnBuilder<string?>();
                             columnResult.Column.ForEach(item =>
                                 builder.Add(item == null ? null : Convert.ToString(item)));
                             return new ColumnarResult(builder.ToColumn());

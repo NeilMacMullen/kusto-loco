@@ -121,47 +121,51 @@ public static class ColumnHelpers
         return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
     }
 
+    public static ColumnBuilder CreateBuilder(Type type)
+        => CreateBuilder(TypeMapping.SymbolForType(type));
+
+
     public static ColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
     {
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
         {
-            return new ColumnBuilder<int?>(typeSymbol);
+            return new ColumnBuilder<int?>();
         }
 
         if (typeSymbol == ScalarTypes.Long)
         {
-            return new ColumnBuilder<long?>(typeSymbol);
+            return new ColumnBuilder<long?>();
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return new ColumnBuilder<double?>(typeSymbol);
+            return new ColumnBuilder<double?>();
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return new ColumnBuilder<bool?>(typeSymbol);
+            return new ColumnBuilder<bool?>();
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return new ColumnBuilder<string?>(typeSymbol);
+            return new ColumnBuilder<string?>();
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return new ColumnBuilder<DateTime?>(typeSymbol);
+            return new ColumnBuilder<DateTime?>();
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return new ColumnBuilder<TimeSpan?>(typeSymbol);
+            return new ColumnBuilder<TimeSpan?>();
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return new ColumnBuilder<JsonNode?>(typeSymbol);
+            return new ColumnBuilder<JsonNode?>();
         }
 
         // TODO: Support all data types

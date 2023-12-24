@@ -110,13 +110,19 @@ internal static class BuiltInsHelper
         EvaluationResult[] arguments, TypeSymbol expectedResultType)
     {
         var columnarArgs = CreateResultArray(arguments);
-        //TODO - NPM here - if all columns are single-value we can avoid the row-wise 
-        //evaluation and therefore not pull data into memory for deferred columns
+
 
         //TODO NPM here -this should be parallisable for at least some operations
         //i.e. 1->1 mappings
         //other things such as max/min would need a map/reduce type approach
         //but possibly they are handled elsewhere
+
+        //TODO - NPM here - if all columns are single-value we can avoid the row-wise 
+        //evaluation and therefore not pull data into memory for deferred columns
+
+        //if columnar args are all SingleValue
+        //cast back to Scalars and call InvokeScalar
+        //the expand back again
         var result = impl.InvokeColumnar(columnarArgs);
         Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
