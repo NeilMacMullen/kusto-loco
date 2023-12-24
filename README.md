@@ -1,6 +1,6 @@
 # !!! UNDER CONSTRUCTION !!!
 
-This fork is currently undergoing changes and is unstable. See [todo-list](docs/planned_work.md)
+This fork is currently undergoing changes and is unstable. See [todo-list](docs/plannedWork.md)
 Please refer back to the original repo for a more stable version
 
 # Kusto-Loco
