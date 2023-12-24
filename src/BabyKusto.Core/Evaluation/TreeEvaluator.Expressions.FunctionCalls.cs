@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
-using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation;
@@ -19,13 +18,7 @@ internal partial class TreeEvaluator
         var impl = node.GetOrSetCache(
             () =>
             {
-                var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                for (var i = 0; i < node.Arguments.ChildCount; i++)
-                {
-                    argumentExpressions[i] = node.Arguments.GetTypedChild(i);
-                }
-
-                return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl,
+                return BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
                     node.ResultKind, node.ResultType);
             });
 
@@ -44,17 +37,9 @@ internal partial class TreeEvaluator
         EvaluationContext context)
     {
         var impl = node.GetOrSetCache(
-            () =>
-            {
-                var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                for (var i = 0; i < node.Arguments.ChildCount; i++)
-                {
-                    argumentExpressions[i] = node.Arguments.GetTypedChild(i);
-                }
-
-                return BuiltInsHelper.GetWindowImplementation(argumentExpressions, node.OverloadInfo.Impl,
-                    node.ResultKind, node.ResultType);
-            });
+            () => BuiltInsHelper.GetWindowImplementation(
+                node.OverloadInfo.Impl,
+                node.ResultKind, node.ResultType));
 
         var arguments = new EvaluationResult[node.Arguments.ChildCount];
         for (var i = 0; i < node.Arguments.ChildCount; i++)
@@ -69,18 +54,9 @@ internal partial class TreeEvaluator
 
     public override EvaluationResult VisitAggregateCallNode(IRAggregateCallNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Chunk != null);
+        Debug.Assert(context.Chunk != TableChunk.Empty);
         var impl = node.GetOrSetCache(
-            () =>
-            {
-                var argumentExpressions = new IRExpressionNode[node.Arguments.ChildCount];
-                for (var i = 0; i < node.Arguments.ChildCount; i++)
-                {
-                    argumentExpressions[i] = node.Arguments.GetTypedChild(i);
-                }
-
-                return node.OverloadInfo.AggregateImpl;
-            });
+            () => node.OverloadInfo.AggregateImpl);
 
         var rawArguments = new EvaluationResult[node.Arguments.ChildCount];
         var hasScalar = false;
@@ -92,28 +68,8 @@ internal partial class TreeEvaluator
             hasScalar = hasScalar || argResult.IsScalar;
         }
 
-        if (hasScalar)
-        {
-            // Expand any scalar inputs into columnar
-            //
-            // TODO: Some aggregate functions really want just a scalar input, e.g. `percentile(durationMs, 99)`.
-            // It is rather silly that we expand the second argument into a column, only for the aggregate implementation
-            // to then grab any value from it. In any case, this gets the job done for now...
-            // NPM - introduce a "single value" column type we could also add "indirect column" to avoid copying
-            var numRows = ((ColumnarResult)rawArguments.First(a => a.IsColumnar)).Column.RowCount;
+        var arguments = BuiltInsHelper.CreateResultArray(rawArguments);
 
-            for (var i = 0; i < rawArguments.Length; i++)
-            {
-                if (rawArguments[i] is ScalarResult scalarResult)
-                {
-                    rawArguments[i] =
-                        new ColumnarResult(ColumnHelpers.CreateFromScalar(scalarResult.Value, scalarResult.Type,
-                            numRows));
-                }
-            }
-        }
-
-        var arguments = rawArguments.Select(a => (ColumnarResult)a).ToArray();
         return impl.Invoke(context.Chunk, arguments);
     }
 

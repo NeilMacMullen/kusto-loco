@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
-using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation;
@@ -46,40 +46,13 @@ internal partial class TreeEvaluator
         protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
             ITableChunk chunk)
         {
-            var outputColumns = new Column[_columns.Count];
             var chunkContext = _context with { Chunk = chunk };
-            for (var i = 0; i < _columns.Count; i++)
-            {
-                var expression = _columns[i].Expression;
-                var evaluatedExpression = expression.Accept(_owner, chunkContext);
-                Debug.Assert(evaluatedExpression != EvaluationResult.Null);
-                outputColumns[i] = ColumnizeResult(evaluatedExpression, chunk.RowCount);
-            }
-
+            var results =
+                _columns.Select(c => c.Expression.Accept(_owner, chunkContext)).ToArray();
+            var outputColumns =
+                BuiltInsHelper.CreateResultArray(results)
+                    .Select(cr => cr.Column).ToArray();
             return (default, new TableChunk(this, outputColumns), false);
-        }
-
-        private static Column ColumnizeResult(EvaluationResult result, int expectedRowCount)
-        {
-            if (result is ColumnarResult columnarResult)
-            {
-                if (columnarResult.Column.RowCount != expectedRowCount)
-                {
-                    throw new InvalidOperationException(
-                        $"Expression produced column with {columnarResult.Column.RowCount} rows but expected {expectedRowCount}.");
-                }
-
-                return columnarResult.Column;
-            }
-
-            if (result is ScalarResult scalarResult)
-            {
-                // Make it into a column of the right size
-                return ColumnHelpers.CreateFromScalar(scalarResult.Value, scalarResult.Type, expectedRowCount);
-            }
-
-            throw new InvalidOperationException(
-                $"Unexpected expression result is neither a scalar nor a column: {result}.");
         }
     }
 }

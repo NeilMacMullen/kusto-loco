@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
+using System.Linq;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
-using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation;
@@ -14,16 +14,16 @@ internal partial class TreeEvaluator
     {
         var tableSymbol = (TableSymbol)node.ResultType;
 
-        var columns = new Column[node.Expressions.ChildCount];
+        var results = new EvaluationResult[node.Expressions.ChildCount];
         for (var i = 0; i < node.Expressions.ChildCount; i++)
         {
             var expression = node.Expressions.GetChild(i);
-            var expressionResult = expression.Accept(this, context);
-            Debug.Assert(expressionResult != EvaluationResult.Null);
-            var scalarResult = (ScalarResult)expressionResult;
-            columns[i] = ColumnHelpers.CreateFromScalar(scalarResult.Value, tableSymbol.Columns[i].Type, 1);
+            results[i] = expression.Accept(this, context);
+            ;
         }
 
+        var columns = BuiltInsHelper.CreateResultArray(results)
+            .Select(c => c.Column).ToArray();
         var result = new InMemoryTableSource(tableSymbol, columns);
         return TabularResult.CreateUnvisualized(result);
     }

@@ -12,12 +12,8 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitUnaryExpression(IRUnaryExpressionNode node, EvaluationContext context)
     {
         var impl = node.GetOrSetCache(
-            () =>
-            {
-                var argumentExpressions = new[] { node.Expression };
-                return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl,
-                    node.ResultKind, node.ResultType);
-            });
+            () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
+                node.ResultKind, node.ResultType));
 
         var val = node.Expression.Accept(this, context);
         Debug.Assert(val != null);
@@ -28,12 +24,8 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitBinaryExpression(IRBinaryExpressionNode node, EvaluationContext context)
     {
         var impl = node.GetOrSetCache(
-            () =>
-            {
-                var argumentExpressions = new[] { node.Left, node.Right };
-                return BuiltInsHelper.GetScalarImplementation(argumentExpressions, node.OverloadInfo.ScalarImpl,
-                    node.ResultKind, node.ResultType);
-            });
+            () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
+                node.ResultKind, node.ResultType));
 
         var leftVal = node.Left.Accept(this, context);
         var rightVal = node.Right.Accept(this, context);
