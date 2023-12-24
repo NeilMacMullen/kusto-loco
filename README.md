@@ -1,6 +1,6 @@
 # !!! UNDER CONSTRUCTION !!!
 
-This fork is currently undergoing changes and is unstable.
+This fork is currently undergoing changes and is unstable. See [todo-list](docs/planned_work.md)
 Please refer back to the original repo for a more stable version
 
 # Kusto-Loco
@@ -23,6 +23,7 @@ TODO:Example here
 |Easy import/export of local file-based and in-memory data | Distributed/cluster-based processing |
 |"Good enough" performance for single-user interaction | Low-latency, "web-scale" query serving |
 | Allow engine extensibility for custom functionality |Fork Kusto Language |
+| Basic query optimisation | Complex query planner |
 
 ## Changes relative to original BabyKusto
 - Much more efficient filtering
