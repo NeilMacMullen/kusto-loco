@@ -22,7 +22,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
     public override IRNode VisitNameReference(NameReference node)
     {
-        if (_rowScope != null)
+        if (_rowScope != TableSymbol.Empty)
         {
             var index = _rowScope.Members.IndexOf(node.ReferencedSymbol);
             if (index >= 0)
@@ -64,22 +64,17 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     {
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
 
-        var selectorName = node.Selector as NameReference;
-        if (selectorName == null)
-        {
-            throw new InvalidOperationException(
+        return node.Selector is NameReference selectorName
+            ? (IRNode)new IRMemberAccessNode(irExpression, selectorName.SimpleName, node.ResultType)
+            : throw new InvalidOperationException(
                 $"Expected path selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
-        }
-
-        return new IRMemberAccessNode(irExpression, selectorName.SimpleName, node.ResultType);
     }
 
     public override IRNode VisitElementExpression(ElementExpression node)
     {
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
 
-        var selector = node.Selector as BracketedExpression;
-        if (selector == null)
+        if (node.Selector is not BracketedExpression selector)
         {
             throw new InvalidOperationException(
                 $"Expected element selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
@@ -90,7 +85,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         if (selectorExpression is PrefixUnaryExpression pfxExpression)
         {
             //TODO HERE - this is a horrible hack to allow for negative array indices
-            //surely there as to be a better way....
+            //surely there has to be a better way....
             var pvalue = pfxExpression.Accept(this) as IRUnaryExpressionNode;
             if (pvalue!.Expression is IRLiteralExpressionNode lit)
             {
@@ -122,13 +117,10 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
 
-        if (value.Value is not string stringValue || stringValue == null)
-        {
-            throw new InvalidOperationException(
-                $"Element selector expression evaluated to null or to an unexpected data type ({TypeNameHelper.GetTypeDisplayName(value.Value)})");
-        }
-
-        return new IRMemberAccessNode(irExpression, stringValue, node.ResultType);
+        return value.Value is not string stringValue
+            ? throw new InvalidOperationException(
+                $"Element selector expression evaluated to null or to an unexpected data type ({TypeNameHelper.GetTypeDisplayName(value.Value)})")
+            : new IRMemberAccessNode(irExpression, stringValue, node.ResultType);
     }
 
     public override IRNode VisitCompoundStringLiteralExpression(CompoundStringLiteralExpression node) =>
@@ -154,11 +146,6 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitBinaryExpression(BinaryExpression node)
     {
         var signature = node.ReferencedSignature;
-        if (signature == null)
-        {
-            throw new InvalidOperationException(
-                $"Unexpected binary expression operator missing referenced signature ({node}).");
-        }
 
         var irLeft = (IRExpressionNode)node.Left.Accept(this);
         var irRight = (IRExpressionNode)node.Right.Accept(this);
@@ -174,11 +161,6 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitPrefixUnaryExpression(PrefixUnaryExpression node)
     {
         var signature = node.ReferencedSignature;
-        if (signature == null)
-        {
-            throw new InvalidOperationException(
-                $"Unexpected unar expression operator missing referenced signature ({node}).");
-        }
 
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
 
@@ -194,10 +176,6 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitFunctionCallExpression(FunctionCallExpression node)
     {
         var signature = node.ReferencedSignature;
-        if (signature == null)
-        {
-            throw new InvalidOperationException($"signature was null ({node}).");
-        }
 
         var arguments = new Expression[node.ArgumentList.Expressions.Count];
         var irArguments = new IRExpressionNode[arguments.Length];

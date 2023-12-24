@@ -47,8 +47,7 @@ internal partial class IRTranslator
 
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
 
-        var rightType = irExpression.ResultType as TableSymbol;
-        if (rightType == null)
+        if (irExpression.ResultType is not TableSymbol rightType)
         {
             throw new InvalidOperationException(
                 $"Expected join operator's Right type to be tabular, found {SchemaDisplay.GetText(irExpression.ResultType)}");
@@ -57,7 +56,7 @@ internal partial class IRTranslator
         List<IRJoinOnClause> onExpressions = new();
         if (node.ConditionClause is JoinOnClause onClause)
         {
-            Debug.Assert(_rowScope != null);
+            Debug.Assert(_rowScope != TableSymbol.Empty);
             foreach (var element in onClause.Expressions)
             {
                 var expression = element.Element;

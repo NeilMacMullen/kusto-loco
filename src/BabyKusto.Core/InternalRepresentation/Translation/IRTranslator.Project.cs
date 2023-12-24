@@ -28,7 +28,7 @@ internal partial class IRTranslator
 
     public override IRNode VisitProjectRenameOperator(ProjectRenameOperator node)
     {
-        Debug.Assert(_rowScope != null);
+        Debug.Assert(_rowScope != TableSymbol.Empty);
         var resultTypeMember = node.ResultType.Members;
 
         var renamedColumns = new Dictionary<ColumnSymbol, ColumnSymbol>();
@@ -47,9 +47,9 @@ internal partial class IRTranslator
         }
 
         var columns = new List<IROutputColumnNode>();
-        for (var i = 0; i < resultTypeMember.Count; i++)
+        foreach (var t in resultTypeMember)
         {
-            var symbol = (ColumnSymbol)resultTypeMember[i];
+            var symbol = (ColumnSymbol)t;
             renamedColumns.TryGetValue(symbol, out var originalSymbol);
             var referencedSymbol = originalSymbol ?? symbol;
             var referencedColumnIndex = _rowScope.Members.IndexOf(referencedSymbol);
@@ -74,13 +74,13 @@ internal partial class IRTranslator
     /// </summary>
     private IRNode EasyProjectImpl(TypeSymbol resultType)
     {
-        Debug.Assert(_rowScope != null);
+        Debug.Assert(_rowScope != TableSymbol.Empty);
         var resultTypeMember = resultType.Members;
 
         var columns = new List<IROutputColumnNode>();
-        for (var i = 0; i < resultTypeMember.Count; i++)
+        foreach (var t in resultTypeMember)
         {
-            var symbol = (ColumnSymbol)resultTypeMember[i];
+            var symbol = (ColumnSymbol)t;
             var referencedColumnIndex = _rowScope.Members.IndexOf(symbol);
             columns.Add(new IROutputColumnNode(symbol,
                 new IRRowScopeNameReferenceNode(symbol, symbol.Type, referencedColumnIndex)));
@@ -98,7 +98,7 @@ internal partial class IRTranslator
     private IRNode HandleExtendOperatorInternal(SyntaxList<SeparatedElement<Expression>> expressions,
         TypeSymbol resultType)
     {
-        Debug.Assert(_rowScope != null);
+        Debug.Assert(_rowScope != TableSymbol.Empty);
         var pendingExpressions = new LinkedList<IRExpressionNode>();
         var namedExtendedColumns = new Dictionary<ColumnSymbol, LinkedListNode<IRExpressionNode>>();
         foreach (var element in expressions)
