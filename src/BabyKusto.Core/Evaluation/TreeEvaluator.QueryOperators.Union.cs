@@ -19,7 +19,7 @@ internal partial class TreeEvaluator
     {
         var tables =
             new List<ITableSource>((context.Left != TabularResult.Empty ? 1 : 0) + node.Expressions.ChildCount);
-        VisualizationState? visualizationState = null;
+        var visualizationState = VisualizationState.Empty;
         if (context.Left != TabularResult.Empty)
         {
             tables.Add(context.Left.Value);
@@ -34,14 +34,14 @@ internal partial class TreeEvaluator
             var tableResult = (TabularResult)expressionResult;
             tables.Add(tableResult.Value);
 
-            if (tableResult.VisualizationState != null)
+            if (tableResult.VisualizationState != VisualizationState.Empty)
             {
                 visualizationState = tableResult.VisualizationState;
             }
         }
 
         var result = new UnionResultTable(tables, (TableSymbol)node.ResultType);
-        return new TabularResult(result, visualizationState);
+        return TabularResult.CreateWithVisualisation(result, visualizationState);
     }
 
     private class UnionResultTable : ITableSource

@@ -7,6 +7,7 @@ using BabyKusto.Core.Extensions;
 using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
 using NLog;
+
 namespace BabyKusto.Core.Evaluation;
 
 internal partial class TreeEvaluator
@@ -23,7 +24,7 @@ internal partial class TreeEvaluator
         var count = (ScalarResult)countExpressionResult;
         var result =
             new TakeResultTable(context.Left.Value, count.Value == null ? 0 : Convert.ToInt32(count.Value));
-        return new TabularResult(result, context.Left.VisualizationState);
+        return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
     private class TakeResultTable : DerivedTableSourceBase<TakeResultTableContext>
@@ -31,20 +32,16 @@ internal partial class TreeEvaluator
         private readonly int _count;
 
         public TakeResultTable(ITableSource input, int count)
-            : base(input)
-        {
+            : base(input) =>
             _count = count;
-        }
 
         public override TableSymbol Type => Source.Type;
 
-        protected override TakeResultTableContext Init()
-        {
-            return new TakeResultTableContext
+        protected override TakeResultTableContext Init() =>
+            new()
             {
                 Remaining = _count
             };
-        }
 
         protected override (TakeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(TakeResultTableContext context, ITableChunk chunk)

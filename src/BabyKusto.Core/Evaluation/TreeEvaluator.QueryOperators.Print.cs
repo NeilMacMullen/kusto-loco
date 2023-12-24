@@ -25,6 +25,6 @@ internal partial class TreeEvaluator
         }
 
         var result = new InMemoryTableSource(tableSymbol, columns);
-        return new TabularResult(result, visualizationState: null);
+        return TabularResult.CreateUnvisualized(result);
     }
 }

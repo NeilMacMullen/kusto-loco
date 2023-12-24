@@ -23,7 +23,7 @@ internal partial class TreeEvaluator
         Debug.Assert(innerResult != TabularResult.Empty);
 
         var result = new MaterializedTableResult(innerResult.Value);
-        return new TabularResult(result, innerResult.VisualizationState);
+        return TabularResult.CreateWithVisualisation(result, innerResult.VisualizationState);
     }
 
     private class MaterializedTableResult : ITableSource

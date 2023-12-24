@@ -12,8 +12,8 @@ internal partial class TreeEvaluator
     {
         Debug.Assert(context.Left != EvaluationResult.Null);
 
-        return new TabularResult(
-            value: context.Left.Value,
-            visualizationState: new VisualizationState(ChartType: node.ChartType, ChartKind: node.Kind));
+        return TabularResult.CreateWithVisualisation(
+            context.Left.Value,
+            new VisualizationState(ChartType: node.ChartType, node.Items));
     }
 }

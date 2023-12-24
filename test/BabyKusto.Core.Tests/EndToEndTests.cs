@@ -3795,10 +3795,11 @@ aaathis is a test";
         // Act & Assert
         Test(query, expected);
     }
+
     private static void Test(string query, string expectedOutput)
     {
         var engine = new BabyKustoEngine();
-        var result = (TabularResult?)engine.Evaluate(query, true, true);
+        var result = (TabularResult)engine.Evaluate(query, true, true);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
@@ -3846,12 +3847,12 @@ aaathis is a test";
         var query = "range x from 1 to 6 step 2";
 
         var expected = """
-                x:long
-                ------------------
-                1
-                3
-                5
-                """;
+                       x:long
+                       ------------------
+                       1
+                       3
+                       5
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3864,12 +3865,12 @@ aaathis is a test";
         var query = "range x from 6 to 1 step -2";
 
         var expected = """
-                x:long
-                ------------------
-                6
-                4
-                2
-                """;
+                       x:long
+                       ------------------
+                       6
+                       4
+                       2
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3882,15 +3883,15 @@ aaathis is a test";
         var query = "range x from int(0) to int(5) step int(1)";
 
         var expected = """
-                x:int
-                ------------------
-                0
-                1
-                2
-                3
-                4
-                5
-                """;
+                       x:int
+                       ------------------
+                       0
+                       1
+                       2
+                       3
+                       4
+                       5
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3903,12 +3904,12 @@ aaathis is a test";
         var query = "range x from 0 to 2.5 step 1";
 
         var expected = """
-                x:real
-                ------------------
-                0
-                1
-                2
-                """;
+                       x:real
+                       ------------------
+                       0
+                       1
+                       2
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3921,20 +3922,20 @@ aaathis is a test";
         var query = "range x from 0 to 5 step 0.5";
 
         var expected = """
-                x:real
-                ------------------
-                0
-                0.5
-                1
-                1.5
-                2
-                2.5
-                3
-                3.5
-                4
-                4.5
-                5
-                """;
+                       x:real
+                       ------------------
+                       0
+                       0.5
+                       1
+                       1.5
+                       2
+                       2.5
+                       3
+                       3.5
+                       4
+                       4.5
+                       5
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3947,13 +3948,13 @@ aaathis is a test";
         var query = "range x from 5 to 2 step -1.0";
 
         var expected = """
-                x:real
-                ------------------
-                5
-                4
-                3
-                2
-                """;
+                       x:real
+                       ------------------
+                       5
+                       4
+                       3
+                       2
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3966,14 +3967,14 @@ aaathis is a test";
         var query = "range x from 1 to 9999999999999999 step 2 | take 5";
 
         var expected = """
-                x:long
-                ------------------
-                1
-                3
-                5
-                7
-                9
-                """;
+                       x:long
+                       ------------------
+                       1
+                       3
+                       5
+                       7
+                       9
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -3986,9 +3987,9 @@ aaathis is a test";
         var query = "range x from 1 to 10 step 0";
 
         var expected = """
-                x:long
-                ------------------
-                """;
+                       x:long
+                       ------------------
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -4001,10 +4002,10 @@ aaathis is a test";
         var query = "range x from 0 to 0 step 1";
 
         var expected = """
-                x:long
-                ------------------
-                0
-                """;
+                       x:long
+                       ------------------
+                       0
+                       """;
 
         // Act & Assert
         Test(query, expected);
@@ -4018,15 +4019,25 @@ aaathis is a test";
         var query = "range x from 1 to 10 step -1";
 
         var expected = """
-                x:long
-                ------------------
-                """;
+                       x:long
+                       ------------------
+                       """;
 
         // Act & Assert
         Test(query, expected);
     }
 
-
+    [Fact]
+    public void RenderTest()
+    {
+        var engine = new BabyKustoEngine();
+        var query = "print X=1 | render barchart with (legend=visible,ymax=100)";
+        var result = (TabularResult)engine.Evaluate(query, true, true);
+        var vis = result.VisualizationState;
+        vis.ChartType.Should().Be("barchart");
+        vis.Items["legend"].Should().Be("visible");
+        vis.Items["ymax"].Should().Be(100);
+    }
 #if false
         [Fact]
         public void Union_Works()

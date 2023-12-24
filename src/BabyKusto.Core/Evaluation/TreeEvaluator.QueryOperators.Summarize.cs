@@ -27,7 +27,7 @@ internal partial class TreeEvaluator
 
         var result = new SummarizeResultTable(this, context.Left.Value, context, byExpressions,
             aggregationExpressions, (TableSymbol)node.ResultType);
-        return new TabularResult(result, context.Left.VisualizationState);
+        return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
     private class SummarizeResultTable : DerivedTableSourceBase<SummarizeResultTableContext>

@@ -22,7 +22,7 @@ namespace BabyKusto.Core.Evaluation
             var resultType = (TableSymbol)node.ResultType;
 
             var result = CreateTable(fromExpressionResult, toExpressionResult, stepExpressionResult, resultType);
-            return new TabularResult(result, visualizationState: null);
+            return TabularResult.CreateUnvisualized(result);
 
             // Local function
             static ITableSource CreateTable(ScalarResult from, ScalarResult to, ScalarResult step,
@@ -87,8 +87,8 @@ namespace BabyKusto.Core.Evaluation
                 }
 
                 Func<T, bool> isDone = direction == T.One
-                    ? (T val) => val <= _to
-                    : (T val) => val >= _to;
+                    ? val => val <= _to
+                    : val => val >= _to;
 
                 var chunk = new T?[MaxRowsPerChunk];
                 var i = 0;

@@ -41,6 +41,6 @@ internal partial class TreeEvaluator
 
         var schema = new InMemoryTableSource(ts, builders.Select(b => b.ToColumn()).ToArray())
             ;
-        return new TabularResult(schema, context.Left.VisualizationState);
+        return TabularResult.CreateWithVisualisation(schema, context.Left.VisualizationState);
     }
 }

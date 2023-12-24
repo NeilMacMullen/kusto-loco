@@ -1,5 +1,9 @@
-﻿namespace BabyKusto.Core.Evaluation;
+﻿using System.Collections.Immutable;
 
-public record VisualizationState(string ChartType, string? ChartKind)
+namespace BabyKusto.Core.Evaluation;
+
+public record VisualizationState(string ChartType, ImmutableDictionary<string, object> Items)
 {
+    public static readonly VisualizationState Empty =
+        new(string.Empty, ImmutableDictionary<string, object>.Empty);
 }

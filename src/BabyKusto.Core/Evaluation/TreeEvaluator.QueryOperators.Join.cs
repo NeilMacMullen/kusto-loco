@@ -20,7 +20,7 @@ internal partial class TreeEvaluator
         Debug.Assert(context.Left != TabularResult.Empty);
         var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context,
             node.OnClauses, (TableSymbol)node.ResultType);
-        return new TabularResult(result, context.Left.VisualizationState);
+        return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
     private class JoinResultTable : ITableSource

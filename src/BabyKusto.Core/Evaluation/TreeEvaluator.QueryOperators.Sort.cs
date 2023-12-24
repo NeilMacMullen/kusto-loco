@@ -29,7 +29,7 @@ internal partial class TreeEvaluator
         }
 
         var result = new SortResultTable(this, context, context.Left.Value, sortColumns);
-        return new TabularResult(result, context.Left.VisualizationState);
+        return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
     private class SortResultTable : ITableSource
