@@ -79,6 +79,7 @@ internal class ReportExplorer
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Query took {result.QueryDuration}ms");
+            Console.WriteLine($"Visualisation type {result.Visualization.ChartType}");
         }
     }
 

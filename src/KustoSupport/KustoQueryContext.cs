@@ -63,25 +63,42 @@ public class KustoQueryContext
         return Materialise(res as TabularResult);
     }
 
-    public IReadOnlyCollection<OrderedDictionary> RunTabularQueryToDictionarySet(string query)
+    public (VisualizationState, IReadOnlyCollection<OrderedDictionary>) RunTabularQueryToDictionarySet(string query)
     {
         //handling for "special" commands
         if (query.Trim() == ".tables")
         {
-            return _tables.Select(table => new OrderedDictionary
+            return (VisualizationState.Empty, _tables.Select(table => new OrderedDictionary
                     {
                         ["Name"] = table.Name,
                         ["Length"] = table.Length,
                     }
                 )
-                .ToArray();
+                .ToArray());
         }
 
         var result =
             _engine.Evaluate(query,
                 _fullDebug, _fullDebug
             );
-        return GetDictionarySet(result as TabularResult);
+        if (result is TabularResult res)
+        {
+            return (res.VisualizationState, GetDictionarySet(res));
+        }
+
+        if (result is ScalarResult s)
+        {
+            var o = new OrderedDictionary
+            {
+                ["value"] = s.Value
+            };
+            return (VisualizationState.Empty, new[]
+            {
+                o
+            });
+        }
+
+        return (VisualizationState.Empty, GetDictionarySet(TabularResult.Empty));
     }
 
     public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
@@ -99,10 +116,11 @@ public class KustoQueryContext
 
             // Note: Hold the lock until the query is complete to ensure that tables don't change
             // in the middle of execution.
-            var results = RunTabularQueryToDictionarySet(query);
+            var (state, results) = RunTabularQueryToDictionarySet(query);
             return new KustoQueryResult<OrderedDictionary>(query, results,
-                                                           (int)watch.ElapsedMilliseconds,
-                                                           string.Empty);
+                state,
+                (int)watch.ElapsedMilliseconds,
+                string.Empty);
         }
         catch (Exception ex)
         {

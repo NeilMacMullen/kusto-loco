@@ -4038,6 +4038,18 @@ aaathis is a test";
         vis.Items["legend"].Should().Be("visible");
         vis.Items["ymax"].Should().Be(100);
     }
+
+    [Fact]
+    public void WhenNoRenderSpecifiedVisualisationShouldBeEmpty()
+    {
+        var engine = new BabyKustoEngine();
+        var query = "print X=1";
+        var result = (TabularResult)engine.Evaluate(query, true, true);
+        var vis = result.VisualizationState;
+        vis.Should().Be(VisualizationState.Empty);
+    }
+
+
 #if false
         [Fact]
         public void Union_Works()
