@@ -313,6 +313,9 @@ internal static class BuiltInScalarFunctions
                     .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
                     .ToArray()
             ));
+        functions.Add(DebugEmit, new ScalarFunctionInfo(new ScalarOverloadInfo(new DebugEmitImpl(),
+            ScalarTypes.Int,
+            ScalarTypes.String)));
         functions.Add(Levenshtein, new ScalarFunctionInfo(new ScalarOverloadInfo(new LevenshteinDistanceImpl(),
             ScalarTypes.Int,
             ScalarTypes.String,
@@ -325,10 +328,8 @@ internal static class BuiltInScalarFunctions
         functions.Add(DateTimeToIso, new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeToIsoImpl(),
             ScalarTypes.String,
             ScalarTypes.DateTime)));
-
-
-
     }
+
     /// <summary>
     ///     We don't do anything inside this function, however we need this so that the Kusto engine can ensure that the static
     ///     constructor is called and functions are registered
@@ -343,6 +344,7 @@ internal static class BuiltInScalarFunctions
         var newFunctions = functions.Concat(AdditionalFunctionSymbols).ToArray();
         BabyKustoEngine.GlobalStateInstance = BabyKustoEngine.GlobalStateInstance.WithFunctions(newFunctions);
     }
+
     public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
         List<Parameter> parameters)
     {
@@ -368,7 +370,15 @@ internal static class BuiltInScalarFunctions
         overload = BuiltInsHelper.PickOverload(functionInfo.Overloads, arguments);
         return overload != null;
     }
+
     #region AdditionalFunctionSymbols
+
+    public static readonly FunctionSymbol DebugEmit =
+        new FunctionSymbol("debug_emit", ScalarTypes.Int,
+                new Parameter("value1", ScalarTypes.String)
+            ).ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
 
     public static readonly FunctionSymbol Levenshtein =
         new FunctionSymbol("levenshtein", ScalarTypes.Int, new Parameter("value1", ScalarTypes.String),

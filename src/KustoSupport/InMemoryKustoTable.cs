@@ -19,11 +19,11 @@ namespace KustoSupport;
 /// <remarks>
 ///     TODO This is currently a bit incomplete - more type support is needed
 /// </remarks>
-public class InMemoryKustoTable : BaseKustoTable
+public class TableBuilder : BaseKustoTable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    private InMemoryKustoTable(TableSymbol tableSym, IEnumerable<BaseColumnBuilder> builders, int length) : base(
+    private TableBuilder(TableSymbol tableSym, IEnumerable<BaseColumn> builders, int length) : base(
         tableSym,
         length)
     {
@@ -31,12 +31,37 @@ public class InMemoryKustoTable : BaseKustoTable
         Length = length;
     }
 
-    public BaseColumnBuilder[] Builders { get; }
+    public BaseColumn[] Builders { get; }
+
+    public static TableBuilder CreateEmpty(string name, int length) =>
+        new(
+            new TableSymbol(name, Array.Empty<ColumnSymbol>()),
+            Array.Empty<BaseColumn>(),
+            length);
+
+
+    public TableBuilder WithColumn(string name, BaseColumn column)
+    {
+        var cs = new ColumnSymbol(name, column.Type);
+        var ts = new TableSymbol(Name,
+            Type.Columns.Append(cs));
+
+
+        return new TableBuilder(ts,
+            Builders.Append(column).ToArray(),
+            Length);
+    }
+
+    public TableBuilder WithIndexColumn<T>(string name, T? value)
+    {
+        var indexColumn = new SingleValueColumn<T>(value, Length);
+        return WithColumn(name, indexColumn);
+    }
 
 
     public override IEnumerable<ITableChunk> GetData()
     {
-        yield return new TableChunk(this, Builders.Select(b => b.ToColumn()).ToArray());
+        yield return new TableChunk(this, Builders);
     }
 
 
@@ -46,17 +71,17 @@ public class InMemoryKustoTable : BaseKustoTable
     /// <summary>
     ///     Shares the data in a table under a different name
     /// </summary>
-    public InMemoryKustoTable ShareAs(string newName)
+    public TableBuilder ShareAs(string newName)
     {
         var newTableSymbol = new TableSymbol(newName, Type.Columns, Type.Description);
-        return new InMemoryKustoTable(newTableSymbol, Builders, Length);
+        return new TableBuilder(newTableSymbol, Builders, Length);
     }
 
 
-    public static InMemoryKustoTable FromDefinition(KustoTableDefinition definition)
+    public static TableBuilder FromDefinition(KustoTableDefinition definition)
         => new(definition.Symbol, definition.Columns, definition.RowCount);
 
-    public static InMemoryKustoTable CreateFromRows<T>(string name, IReadOnlyCollection<T> rows)
+    public static TableBuilder CreateFromRows<T>(string name, IReadOnlyCollection<T> rows)
     {
         var tableDefinition = FromRecords(name, rows);
         return FromDefinition(tableDefinition);
@@ -84,6 +109,7 @@ public class InMemoryKustoTable : BaseKustoTable
         return FromRows(tableName, records, columnDefinitions);
     }
 
+
     public static KustoTableDefinition FromRows<T>(string tableName,
         IReadOnlyCollection<T> rows,
         IReadOnlyCollection<KustoColumnDefinition<T>> columnDefinitions)
@@ -99,7 +125,7 @@ public class InMemoryKustoTable : BaseKustoTable
 
         return new KustoTableDefinition(tableSymbol, allBuilders, rows.Count);
 
-        BaseColumnBuilder Create(KustoColumnDefinition<T> c)
+        BaseColumn Create(KustoColumnDefinition<T> c)
         {
             var builder = ColumnHelpers.CreateBuilder(c.Type);
             foreach (var r in rows)
@@ -107,11 +133,11 @@ public class InMemoryKustoTable : BaseKustoTable
                 builder.Add(c.Value(r));
             }
 
-            return builder;
+            return builder.ToColumn();
         }
     }
 
-    public static InMemoryKustoTable FromOrderedDictionarySet(string tableName,
+    public static TableBuilder FromOrderedDictionarySet(string tableName,
         IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
         //currently we rely on the dictionary having valid types and avoiding null values in unfortunate places

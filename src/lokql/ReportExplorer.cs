@@ -378,7 +378,7 @@ internal class ReportExplorer
         internal static void Run(ReportExplorer exp, Options o)
         {
             exp.GetCurrentContext()
-                .AddTable(InMemoryKustoTable
+                .AddTable(TableBuilder
                     .FromOrderedDictionarySet(o.As,
                         exp._prevResult.Results));
             Logger.Info($"Table '{o.As}' now available");
@@ -427,7 +427,7 @@ internal class ReportExplorer
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
             Logger.Info("File loaded.... adding to context");
             exp.GetCurrentContext()
-                .AddTable(InMemoryKustoTable
+                .AddTable(TableBuilder
                     .FromOrderedDictionarySet(tableName,
                         dict));
             Logger.Info($"Table '{tableName}' now available");
@@ -539,7 +539,7 @@ internal class ReportExplorer
 
             InferTypes(records.ToArray());
             exp.GetCurrentContext()
-                .AddTable(InMemoryKustoTable
+                .AddTable(TableBuilder
                     .FromOrderedDictionarySet(tableName,
                         records));
             Logger.Info($"Table '{tableName}' now available");
@@ -578,7 +578,7 @@ internal class ReportExplorer
             Logger.Info("File loaded.... adding to context");
 
             exp.GetCurrentContext()
-                .AddTable(InMemoryKustoTable
+                .AddTable(TableBuilder
                     .FromOrderedDictionarySet(tableName,
                         rows));
             Logger.Info($"Table '{tableName}' now available");
@@ -604,7 +604,7 @@ internal class ReportExplorer
         internal static void Run(ReportExplorer exp, Options o)
         {
             Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
-            var table = exp.GetCurrentContext().GetTable(o.CurrentName) as InMemoryKustoTable;
+            var table = exp.GetCurrentContext().GetTable(o.CurrentName) as TableBuilder;
             exp.GetCurrentContext().AddTable(table.ShareAs(KustoQueryContext.UnescapeTableName(o.As)));
         }
 

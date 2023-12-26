@@ -26,7 +26,12 @@ internal partial class TreeEvaluator
         var impl = node.GetOrSetCache(
             () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
                 node.ResultKind, node.ResultType));
-
+        //TODO - some kinds of expression (and/or) could be short-circuited but
+        //this approach evaluates nodes from the bottom up before we can get
+        //to the sort-circuiting It's hard to see how to overcome this except by 
+        //1) flagging and/or as possible short-circuit operations
+        //2) checking here for the short circuit if one of the arms of the expression 
+        //   is single value.  But of course we won't find that until we try to evaluate...
         var leftVal = node.Left.Accept(this, context);
         var rightVal = node.Right.Accept(this, context);
         Debug.Assert(leftVal != null && rightVal != null);

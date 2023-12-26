@@ -45,14 +45,14 @@ public class KustoQueryContext
 
     public void AddTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records)
     {
-        var table = InMemoryKustoTable.CreateFromRows(tableName, records);
+        var table = TableBuilder.CreateFromRows(tableName, records);
         AddTable(table);
     }
 
 
     public void AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {
-        var table = InMemoryKustoTable.CreateFromRows(tableName, records);
+        var table = TableBuilder.CreateFromRows(tableName, records);
         var chunked = ChunkedKustoTable.FromTable(table, chunkSize);
         AddTable(chunked);
     }

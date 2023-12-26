@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using BabyKusto.Core;
 using FluentAssertions;
 using KustoSupport;
 using LogSetup;
@@ -28,5 +28,26 @@ public class OperatorTests
         Console.WriteLine(schema);
         schema.Should().Contain(nameof(Row.Name));
         schema.Should().Contain(nameof(Row.Value));
+    }
+
+    [TestMethod]
+    public async Task IndexColumnsWork()
+    {
+        var context = CreateContext();
+
+        var tableLength = 10;
+        var table = TableBuilder.CreateEmpty("data", tableLength);
+
+        var invocationCountForIndex = 0;
+        var lazy = new SingleValueLambdaColumn<string?>(() =>
+        {
+            invocationCountForIndex++;
+            return "a";
+        }, tableLength);
+        table = table
+            .WithColumn("lazy", lazy);
+        context.AddTable(table);
+        await context.RunQuery("data | where  lazy == 'a' | count");
+        invocationCountForIndex.Should().Be(1);
     }
 }

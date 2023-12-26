@@ -1,4 +1,4 @@
-﻿using BabyKusto.Core.Util;
+﻿using BabyKusto.Core;
 using Kusto.Language.Symbols;
 
 namespace KustoSupport;
@@ -11,5 +11,5 @@ namespace KustoSupport;
 /// </remarks>
 public readonly record struct KustoTableDefinition(
     TableSymbol Symbol,
-    IReadOnlyCollection<BaseColumnBuilder> Columns,
+    IReadOnlyCollection<BaseColumn> Columns,
     int RowCount);

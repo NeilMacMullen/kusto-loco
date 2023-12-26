@@ -34,7 +34,7 @@ public static class CsvLoader
         var records = LoadAsOrderedDictionary(reader);
 
         context
-            .AddTable(InMemoryKustoTable
+            .AddTable(TableBuilder
                 .FromOrderedDictionarySet(tableName,
                     records));
     }
