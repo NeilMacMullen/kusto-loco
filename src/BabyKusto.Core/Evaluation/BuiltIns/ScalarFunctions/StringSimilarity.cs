@@ -29,7 +29,7 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
             data[i] = CalculateSimilarity(left[i] ?? string.Empty, right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     public double CalculateSimilarity(string left, string right)

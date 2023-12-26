@@ -42,6 +42,6 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.HaversineDistance(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

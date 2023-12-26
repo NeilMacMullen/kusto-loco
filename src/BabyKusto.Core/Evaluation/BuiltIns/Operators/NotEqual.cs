@@ -28,7 +28,7 @@ internal class NotEqualIntOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] != right[i];
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -53,7 +53,7 @@ internal class NotEqualLongOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] != right[i];
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -78,7 +78,7 @@ internal class NotEqualDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] != right[i];
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -104,7 +104,7 @@ internal class NotEqualStringOperatorImpl : IScalarFunctionImpl
             data[i] = (left[i] ?? string.Empty) != (right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -129,7 +129,7 @@ internal class NotEqualTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] != right[i];
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -154,6 +154,6 @@ internal class NotEqualDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] != right[i];
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

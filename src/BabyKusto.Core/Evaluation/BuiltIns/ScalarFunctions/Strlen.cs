@@ -26,6 +26,6 @@ internal class StrlenFunctionImpl : IScalarFunctionImpl
             data[i] = (column[i] ?? string.Empty).Length;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

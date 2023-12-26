@@ -29,6 +29,6 @@ internal class ContainsCsOperatorImpl : IScalarFunctionImpl
             data[i] = (left[i] ?? string.Empty).Contains(right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

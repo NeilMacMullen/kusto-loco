@@ -31,7 +31,7 @@ internal class MultiplyIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -59,7 +59,7 @@ internal class MultiplyLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -87,7 +87,7 @@ internal class MultiplyDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -116,6 +116,6 @@ internal class MultiplyLongTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value * right.Value.Ticks) : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

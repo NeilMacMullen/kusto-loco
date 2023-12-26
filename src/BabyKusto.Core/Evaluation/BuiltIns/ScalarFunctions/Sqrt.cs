@@ -29,7 +29,7 @@ internal class SqrtFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(value);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static double? Impl(double? input)

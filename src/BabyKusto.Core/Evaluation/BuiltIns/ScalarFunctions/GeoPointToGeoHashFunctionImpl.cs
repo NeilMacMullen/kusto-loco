@@ -40,6 +40,6 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.GeoHash(p1LonColumn[i], p1LatColumn[i], resColumn[i]);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

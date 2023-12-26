@@ -30,7 +30,7 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
             data[i] = WeirdAnd(left[i], right[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     // Null handling is weird in real Kusto. Observations:

@@ -32,7 +32,7 @@ internal class DivideIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue && right.Value != 0 ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -61,7 +61,7 @@ internal class DivideLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue && right.Value != 0 ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -89,7 +89,7 @@ internal class DivideDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -122,6 +122,6 @@ internal class DivideTimeSpanOperatorImpl : IScalarFunctionImpl
                 : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

@@ -31,6 +31,6 @@ internal class StartsWithOperatorImpl : IScalarFunctionImpl
                 .StartsWith((right[i] ?? string.Empty).ToUpperInvariant());
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

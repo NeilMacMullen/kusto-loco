@@ -31,7 +31,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,7 +61,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,7 +91,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,7 +121,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,7 +151,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -181,7 +181,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(column[i]);
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -241,7 +241,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = column[i];
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
     }
 }

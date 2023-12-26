@@ -43,6 +43,6 @@ internal class ContainsOperatorImpl : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

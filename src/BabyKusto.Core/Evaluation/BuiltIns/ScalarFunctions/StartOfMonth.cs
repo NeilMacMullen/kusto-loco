@@ -27,7 +27,7 @@ internal class StartOfMonthFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(dates[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static DateTime? Impl(DateTime? input)

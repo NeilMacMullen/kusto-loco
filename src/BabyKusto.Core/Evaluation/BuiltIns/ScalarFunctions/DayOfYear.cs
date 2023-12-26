@@ -27,7 +27,7 @@ internal class DayOfYearFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(dates[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static int? Impl(DateTime? input)

@@ -36,7 +36,5 @@ public class ColumnBuilder<T> : BaseColumnBuilder
         _data.Add((T?)value);
     }
 
-    public override BaseColumn ToColumn() => ColumnFactory.Create(
-        TypeMapping.SymbolForType(typeof(T)),
-        _data.ToArray());
+    public override BaseColumn ToColumn() => ColumnFactory.Create(_data.ToArray());
 }

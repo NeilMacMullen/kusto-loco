@@ -47,7 +47,7 @@ internal class MatchRegexOperatorImpl : IScalarFunctionImpl
             data[i] = GetResult(cacheEntry.Regex!, values[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static Regex GetRegex(string? pattern) => new(pattern ?? string.Empty);

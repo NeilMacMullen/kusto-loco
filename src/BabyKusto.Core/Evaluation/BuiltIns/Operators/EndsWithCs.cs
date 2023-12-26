@@ -29,6 +29,6 @@ internal class EndsWithCsOperatorImpl : IScalarFunctionImpl
             data[i] = (left[i] ?? string.Empty).EndsWith(right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

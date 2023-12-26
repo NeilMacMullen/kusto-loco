@@ -30,6 +30,6 @@ internal class LevenshteinDistanceImpl : IScalarFunctionImpl
             data[i] = Levenshtein.Distance(left[i], right[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

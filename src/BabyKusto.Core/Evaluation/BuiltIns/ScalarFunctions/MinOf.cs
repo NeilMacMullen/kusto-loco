@@ -45,7 +45,7 @@ internal class MinOfIntFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -88,7 +88,7 @@ internal class MinOfLongFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -131,6 +131,6 @@ internal class MinOfDoubleFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

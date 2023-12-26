@@ -33,7 +33,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     .Equals((right[i] ?? string.Empty).ToLowerInvariant());
             }
 
-            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+            return new ColumnarResult(ColumnFactory.Create(data));
         }
     }
 }

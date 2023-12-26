@@ -262,7 +262,7 @@ public static class ColumnHelpers
             columnData[i] = (T?)data[i];
         }
 
-        return new InMemoryColumn<T>(typeSymbol, columnData);
+        return new InMemoryColumn<T>(columnData);
     }
 
     private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -274,7 +274,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToInt32(item);
         }
 
-        return ColumnFactory.Create(typeSymbol, columnData);
+        return ColumnFactory.Create(columnData);
     }
 
     private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -286,7 +286,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToInt64(item);
         }
 
-        return ColumnFactory.Create(typeSymbol, columnData);
+        return ColumnFactory.Create(columnData);
     }
 
     private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -298,7 +298,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToDouble(item);
         }
 
-        return ColumnFactory.Create(typeSymbol, columnData);
+        return ColumnFactory.Create(columnData);
     }
 
     private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data, TypeSymbol typeSymbol)
@@ -310,7 +310,7 @@ public static class ColumnHelpers
             columnData[i] = item == null ? null : Convert.ToBoolean(item);
         }
 
-        return ColumnFactory.Create(typeSymbol, columnData);
+        return ColumnFactory.Create(columnData);
     }
 
     private static TypedBaseColumn<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount) =>

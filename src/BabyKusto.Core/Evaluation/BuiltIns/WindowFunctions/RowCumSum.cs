@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
@@ -46,7 +45,7 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
             data[i] = accumulator;
         }
 
-        return new ColumnarResult(new InMemoryColumn<int?>(ScalarTypes.Int, data));
+        return new ColumnarResult(new InMemoryColumn<int?>(data));
     }
 }
 
@@ -89,7 +88,7 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
             data[i] = accumulator;
         }
 
-        return new ColumnarResult(new InMemoryColumn<long?>(ScalarTypes.Long, data));
+        return new ColumnarResult(new InMemoryColumn<long?>(data));
     }
 }
 
@@ -132,7 +131,7 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
             data[i] = accumulator;
         }
 
-        return new ColumnarResult(new InMemoryColumn<double?>(ScalarTypes.Real, data));
+        return new ColumnarResult(new InMemoryColumn<double?>(data));
     }
 }
 
@@ -175,6 +174,6 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
             data[i] = accumulator;
         }
 
-        return new ColumnarResult(new InMemoryColumn<TimeSpan?>(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(new InMemoryColumn<TimeSpan?>(data));
     }
 }

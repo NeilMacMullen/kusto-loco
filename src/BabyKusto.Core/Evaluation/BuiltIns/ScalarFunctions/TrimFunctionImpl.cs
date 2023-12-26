@@ -39,7 +39,7 @@ internal abstract class TrimFunctionCore : IScalarFunctionImpl
             data[i] = Trim(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     protected abstract string Trim(object? regex, object? target);

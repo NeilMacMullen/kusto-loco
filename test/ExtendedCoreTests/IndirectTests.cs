@@ -13,7 +13,7 @@ public class IndirectTests
     {
         var originalData = Enumerable.Range(0, sourceCount)
             .Select(i => i.ToString()).ToArray();
-        var cs = new InMemoryColumn<string>(ScalarTypes.String, originalData);
+        var cs = new InMemoryColumn<string>(originalData);
         var backing = MappedColumn<string>.Create(
             Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0).ToImmutableArray()
             , cs);

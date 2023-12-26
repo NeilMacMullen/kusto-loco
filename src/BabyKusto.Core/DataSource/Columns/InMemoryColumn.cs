@@ -1,5 +1,5 @@
 ﻿using System;
-using Kusto.Language.Symbols;
+using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core;
 
@@ -7,8 +7,8 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
 {
     private readonly T?[] _data;
 
-    public InMemoryColumn(TypeSymbol type, T?[] data)
-        : base(type) =>
+    public InMemoryColumn(T?[] data)
+        : base(TypeMapping.SymbolForType(typeof(T))) =>
         _data = data ?? throw new ArgumentNullException(nameof(data));
 
 
@@ -25,7 +25,7 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
         //TODO - we really ought to be able to get away with copying
         //the data here
         Array.Copy(_data, start, slicedData, 0, length);
-        return ColumnFactory.Create(Type, slicedData);
+        return ColumnFactory.Create(slicedData);
     }
 
     public override void ForEach(Action<object?> action)

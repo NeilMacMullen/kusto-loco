@@ -38,7 +38,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
                 data[i] = PtToJson(pt.Latitude, pt.Longitude);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static JsonObject PtToJson(double latitude, double longitude) =>

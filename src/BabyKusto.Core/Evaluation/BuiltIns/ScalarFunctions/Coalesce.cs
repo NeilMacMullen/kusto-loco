@@ -45,7 +45,7 @@ internal class CoalesceBoolFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -87,7 +87,7 @@ internal class CoalesceIntFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -129,7 +129,7 @@ internal class CoalesceLongFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -171,7 +171,7 @@ internal class CoalesceDoubleFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -213,7 +213,7 @@ internal class CoalesceDateTimeFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -255,7 +255,7 @@ internal class CoalesceTimeSpanFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -297,6 +297,6 @@ internal class CoalesceStringFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

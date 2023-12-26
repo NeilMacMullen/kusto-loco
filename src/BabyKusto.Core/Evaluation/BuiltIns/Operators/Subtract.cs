@@ -31,7 +31,7 @@ internal class SubtractIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -60,7 +60,7 @@ internal class SubtractLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -89,7 +89,7 @@ internal class SubtractDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -119,7 +119,7 @@ internal class SubtractTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value.Ticks - right.Value.Ticks) : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -149,7 +149,7 @@ internal class SubtractDateTimeTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
 
@@ -179,6 +179,6 @@ internal class SubtractDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value - right.Value : null;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

@@ -31,6 +31,6 @@ internal class EndsWithOperatorImpl : IScalarFunctionImpl
                 .EndsWith((right[i] ?? string.Empty).ToUpperInvariant());
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 }

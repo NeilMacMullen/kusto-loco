@@ -55,7 +55,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             data[i] = val;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypeFromNetType(typeof(T)), data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static TypeSymbol ScalarTypeFromNetType(Type t)

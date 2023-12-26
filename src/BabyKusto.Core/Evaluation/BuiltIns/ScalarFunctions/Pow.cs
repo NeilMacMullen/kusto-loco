@@ -30,7 +30,7 @@ internal class PowFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(xCol[i], yCol[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private static double? Impl(double? x, double? y)
