@@ -21,8 +21,8 @@ internal class MultiplyIntOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<int?>)(arguments[0].Column);
-        var rightCol = (Column<int?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new int?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -31,7 +31,7 @@ internal class MultiplyIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -49,8 +49,8 @@ internal class MultiplyLongOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<long?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new long?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -59,7 +59,7 @@ internal class MultiplyLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -77,8 +77,8 @@ internal class MultiplyDoubleOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<double?>)(arguments[0].Column);
-        var rightCol = (Column<double?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new double?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -87,7 +87,7 @@ internal class MultiplyDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value * right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -106,8 +106,8 @@ internal class MultiplyLongTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new TimeSpan?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -116,6 +116,6 @@ internal class MultiplyLongTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value * right.Value.Ticks) : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
     }
 }

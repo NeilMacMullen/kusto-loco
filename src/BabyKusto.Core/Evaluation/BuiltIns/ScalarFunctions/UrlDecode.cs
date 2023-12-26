@@ -20,7 +20,7 @@ internal class UrlDecodeFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var urlCol = (Column<string?>)arguments[0].Column;
+        var urlCol = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new string?[urlCol.RowCount];
         for (var i = 0; i < urlCol.RowCount; i++)
@@ -28,7 +28,7 @@ internal class UrlDecodeFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(urlCol[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? url)

@@ -13,12 +13,12 @@ internal class MakeSetIntFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<int?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -50,12 +50,12 @@ internal class MakeSetLongFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<long?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -87,12 +87,12 @@ internal class MakeSetDoubleFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<double?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -124,12 +124,12 @@ internal class MakeSetTimeSpanFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -161,12 +161,12 @@ internal class MakeSetDateTimeFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<DateTime?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -198,12 +198,12 @@ internal class MakeSetStringFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (Column<string?>)arguments[0].Column;
+        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (Column<long?>)arguments[1].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)

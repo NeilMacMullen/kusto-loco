@@ -13,8 +13,8 @@ internal class SumIfIntFunctionImpl : IAggregateImpl
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-        var expression = (Column<int?>)arguments[0].Column;
-        var predicate = (Column<bool?>)arguments[1].Column;
+        var expression = (TypedBaseColumn<int?>)arguments[0].Column;
+        var predicate = (TypedBaseColumn<bool?>)arguments[1].Column;
         var sum = 0;
         for (var i = 0; i < predicate.RowCount; i++)
         {
@@ -39,8 +39,8 @@ internal class SumIfLongFunctionImpl : IAggregateImpl
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-        var expression = (Column<long?>)arguments[0].Column;
-        var predicate = (Column<bool?>)arguments[1].Column;
+        var expression = (TypedBaseColumn<long?>)arguments[0].Column;
+        var predicate = (TypedBaseColumn<bool?>)arguments[1].Column;
         long sum = 0;
         for (var i = 0; i < predicate.RowCount; i++)
         {
@@ -65,8 +65,8 @@ internal class SumIfDoubleFunctionImpl : IAggregateImpl
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-        var expression = (Column<double?>)arguments[0].Column;
-        var predicate = (Column<bool?>)arguments[1].Column;
+        var expression = (TypedBaseColumn<double?>)arguments[0].Column;
+        var predicate = (TypedBaseColumn<bool?>)arguments[1].Column;
         double sum = 0;
         for (var i = 0; i < predicate.RowCount; i++)
         {

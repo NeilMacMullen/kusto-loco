@@ -12,7 +12,7 @@ internal class MaxAggregateIntImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<int?>)arguments[0].Column;
+        var column = (TypedBaseColumn<int?>)arguments[0].Column;
         int? max = null;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -32,7 +32,7 @@ internal class MaxAggregateLongImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<long?>)arguments[0].Column;
+        var column = (TypedBaseColumn<long?>)arguments[0].Column;
         long? max = null;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -52,7 +52,7 @@ internal class MaxAggregateDoubleImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<double?>)arguments[0].Column;
+        var column = (TypedBaseColumn<double?>)arguments[0].Column;
         double? max = null;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -72,7 +72,7 @@ internal class MaxAggregateDateTimeImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<DateTime?>)arguments[0].Column;
+        var column = (TypedBaseColumn<DateTime?>)arguments[0].Column;
         DateTime? max = null;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -92,7 +92,7 @@ internal class MaxAggregateTimeSpanImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<TimeSpan?>)arguments[0].Column;
+        var column = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
         TimeSpan? max = null;
         for (var i = 0; i < column.RowCount; i++)
         {

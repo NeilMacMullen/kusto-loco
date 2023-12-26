@@ -19,7 +19,7 @@ internal class DayOfMonthFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var dates = (Column<DateTime?>)arguments[0].Column;
+        var dates = (TypedBaseColumn<DateTime?>)arguments[0].Column;
 
         var data = new int?[dates.RowCount];
         for (var i = 0; i < dates.RowCount; i++)
@@ -27,7 +27,7 @@ internal class DayOfMonthFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(dates[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 
     private static int? Impl(DateTime? input)

@@ -21,8 +21,8 @@ internal class GreaterThanIntOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<int?>)(arguments[0].Column);
-        var rightCol = (Column<int?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -31,7 +31,7 @@ internal class GreaterThanIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -49,8 +49,8 @@ internal class GreaterThanLongOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<long?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -59,7 +59,7 @@ internal class GreaterThanLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -77,8 +77,8 @@ internal class GreaterThanDoubleOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<double?>)(arguments[0].Column);
-        var rightCol = (Column<double?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -87,7 +87,7 @@ internal class GreaterThanDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -105,8 +105,8 @@ internal class GreaterThanTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -115,7 +115,7 @@ internal class GreaterThanTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -133,8 +133,8 @@ internal class GreaterThanDateTimeOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<DateTime?>)(arguments[0].Column);
-        var rightCol = (Column<DateTime?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<DateTime?>)(arguments[1].Column);
 
         var data = new bool?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -143,6 +143,6 @@ internal class GreaterThanDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left > right : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

@@ -24,8 +24,8 @@ internal class ContainsOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<string?>)(arguments[0].Column);
-        var right = (Column<string?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<string?>)(arguments[1].Column);
         var data = new bool?[left.RowCount];
 
         var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
@@ -43,6 +43,6 @@ internal class ContainsOperatorImpl : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

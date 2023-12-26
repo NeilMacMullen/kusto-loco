@@ -20,10 +20,10 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
 
-        var columns = new Column<string?>[2];
+        var columns = new TypedBaseColumn<string?>[2];
         for (var i = 0; i < arguments.Length; i++)
         {
-            columns[i] = (Column<string?>)arguments[i].Column;
+            columns[i] = (TypedBaseColumn<string?>)arguments[i].Column;
         }
 
         var rowCount = columns[0].RowCount;
@@ -33,7 +33,7 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
             data[i] = Evaluate(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 
     protected JsonArray? Evaluate(string? source, string? delimiter)

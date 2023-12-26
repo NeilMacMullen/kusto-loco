@@ -20,8 +20,8 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<string?>)(arguments[0].Column);
-        var right = (Column<string?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<string?>)(arguments[1].Column);
 
         var data = new double?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -29,7 +29,7 @@ internal class StringSimilarityImpl : IScalarFunctionImpl
             data[i] = CalculateSimilarity(left[i] ?? string.Empty, right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 
     public double CalculateSimilarity(string left, string right)

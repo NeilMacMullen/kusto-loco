@@ -18,7 +18,7 @@ internal class UnaryMinusIntOperatorImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<int?>)(arguments[0].Column);
+        var column = (TypedBaseColumn<int?>)(arguments[0].Column);
 
         var data = new int?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -26,7 +26,7 @@ internal class UnaryMinusIntOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -41,7 +41,7 @@ internal class UnaryMinusLongOperatorImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<long?>)(arguments[0].Column);
+        var column = (TypedBaseColumn<long?>)(arguments[0].Column);
 
         var data = new long?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -49,7 +49,7 @@ internal class UnaryMinusLongOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -64,7 +64,7 @@ internal class UnaryMinusDoubleOperatorImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<double?>)(arguments[0].Column);
+        var column = (TypedBaseColumn<double?>)(arguments[0].Column);
 
         var data = new double?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -72,7 +72,7 @@ internal class UnaryMinusDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -87,7 +87,7 @@ internal class UnaryMinusTimeSpanOperatorImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<TimeSpan?>)(arguments[0].Column);
+        var column = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
 
         var data = new TimeSpan?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -95,6 +95,6 @@ internal class UnaryMinusTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = -column[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
     }
 }

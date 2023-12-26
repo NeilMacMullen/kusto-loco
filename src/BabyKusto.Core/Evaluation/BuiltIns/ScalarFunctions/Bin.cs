@@ -23,8 +23,8 @@ internal class BinIntFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<int?>)(arguments[0].Column);
-        var rightCol = (Column<int?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new int?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -33,7 +33,7 @@ internal class BinIntFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -75,8 +75,8 @@ internal class BinLongFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<long?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new long?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -85,7 +85,7 @@ internal class BinLongFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -127,8 +127,8 @@ internal class BinDoubleFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<double?>)(arguments[0].Column);
-        var rightCol = (Column<double?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new double?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -137,7 +137,7 @@ internal class BinDoubleFunctionImpl : IScalarFunctionImpl
             data[i] = Floor(left, right);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -173,8 +173,8 @@ internal class BinDateTimeTimeSpanFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<DateTime?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new DateTime?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -184,6 +184,6 @@ internal class BinDateTimeTimeSpanFunctionImpl : IScalarFunctionImpl
             data[i] = floor.HasValue ? new DateTime(floor.Value) : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 }

@@ -13,14 +13,14 @@ internal class MakeListIfIntFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<int?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -55,14 +55,14 @@ internal class MakeListIfLongFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<long?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -97,14 +97,14 @@ internal class MakeListIfDoubleFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<double?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -139,14 +139,14 @@ internal class MakeListIfTimeSpanFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<TimeSpan?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -181,14 +181,14 @@ internal class MakeListIfDateTimeFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<DateTime?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -223,14 +223,14 @@ internal class MakeListIfStringFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (Column<string?>)arguments[0].Column;
-        var predicatesColumn = (Column<bool?>)arguments[1].Column;
+        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
         Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (Column<long?>)arguments[2].Column;
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)

@@ -22,8 +22,8 @@ internal class DivideIntOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<int?>)(arguments[0].Column);
-        var rightCol = (Column<int?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new int?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -32,7 +32,7 @@ internal class DivideIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue && right.Value != 0 ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -51,8 +51,8 @@ internal class DivideLongOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<long?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new long?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -61,7 +61,7 @@ internal class DivideLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue && right.Value != 0 ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -79,8 +79,8 @@ internal class DivideDoubleOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<double?>)(arguments[0].Column);
-        var rightCol = (Column<double?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new double?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -89,7 +89,7 @@ internal class DivideDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value / right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -110,8 +110,8 @@ internal class DivideTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new double?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -122,6 +122,6 @@ internal class DivideTimeSpanOperatorImpl : IScalarFunctionImpl
                 : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }

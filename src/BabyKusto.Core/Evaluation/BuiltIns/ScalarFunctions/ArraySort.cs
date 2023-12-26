@@ -29,7 +29,7 @@ internal class ArraySortFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<JsonNode?>)arguments[0].Column;
+        var column = (TypedBaseColumn<JsonNode?>)arguments[0].Column;
 
         var data = new JsonNode?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -38,7 +38,7 @@ internal class ArraySortFunctionImpl : IScalarFunctionImpl
             data[i] = array == null ? null : Do(array);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Dynamic, data));
     }
 
     private JsonArray Do(JsonArray array)

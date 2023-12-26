@@ -24,10 +24,10 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 4);
-        var p1LonColumn = (Column<double?>)arguments[0].Column;
-        var p1LatColumn = (Column<double?>)arguments[1].Column;
-        var p2LonColumn = (Column<double?>)arguments[2].Column;
-        var p2LatColumn = (Column<double?>)arguments[3].Column;
+        var p1LonColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var p1LatColumn = (TypedBaseColumn<double?>)arguments[1].Column;
+        var p2LonColumn = (TypedBaseColumn<double?>)arguments[2].Column;
+        var p2LatColumn = (TypedBaseColumn<double?>)arguments[3].Column;
         Debug.Assert(p1LonColumn.RowCount == p1LatColumn.RowCount && p1LonColumn.RowCount == p2LonColumn.RowCount &&
                      p1LonColumn.RowCount == p2LatColumn.RowCount);
 
@@ -42,6 +42,6 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.HaversineDistance(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
             }
         });
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }

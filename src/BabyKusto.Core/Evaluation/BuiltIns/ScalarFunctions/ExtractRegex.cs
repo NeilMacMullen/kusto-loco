@@ -30,9 +30,9 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
         Debug.Assert(
             arguments[0].Column.RowCount == arguments[1].Column.RowCount &&
             arguments[0].Column.RowCount == arguments[2].Column.RowCount);
-        var patterns = (Column<string?>)(arguments[0].Column);
-        var captureGroups = (Column<long?>)(arguments[1].Column);
-        var values = (Column<string?>)(arguments[2].Column);
+        var patterns = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var captureGroups = (TypedBaseColumn<long?>)(arguments[1].Column);
+        var values = (TypedBaseColumn<string?>)(arguments[2].Column);
 
         var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
         var data = new string?[values.RowCount];
@@ -47,7 +47,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
             data[i] = GetResult(cacheEntry.Regex!, captureGroups[i], values[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 
     private static Regex GetRegex(string? pattern) => new(pattern ?? string.Empty);

@@ -11,7 +11,7 @@ internal class CountIfFunctionImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<bool?>)arguments[0].Column;
+        var column = (TypedBaseColumn<bool?>)arguments[0].Column;
         long count = 0;
         for (var i = 0; i < column.RowCount; i++)
         {

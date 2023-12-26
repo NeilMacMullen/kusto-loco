@@ -11,7 +11,7 @@ internal class SumAggregateIntImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<int?>)arguments[0].Column;
+        var column = (TypedBaseColumn<int?>)arguments[0].Column;
         long sum = 0;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -31,7 +31,7 @@ internal class SumAggregateLongImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<long?>)arguments[0].Column;
+        var column = (TypedBaseColumn<long?>)arguments[0].Column;
         long sum = 0;
         for (var i = 0; i < column.RowCount; i++)
         {
@@ -51,7 +51,7 @@ internal class SumAggregateDoubleImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<double?>)arguments[0].Column;
+        var column = (TypedBaseColumn<double?>)arguments[0].Column;
         double sum = 0;
         for (var i = 0; i < column.RowCount; i++)
         {

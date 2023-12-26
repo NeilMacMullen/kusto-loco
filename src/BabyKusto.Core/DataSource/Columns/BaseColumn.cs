@@ -14,6 +14,4 @@ public abstract class BaseColumn
 
     public abstract BaseColumn Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
-
-    public static Column<T> Create<T>(TypeSymbol type, T[] data) => new(type, data);
 }

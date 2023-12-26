@@ -21,12 +21,12 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var p1LonColumn = (Column<double?>)arguments[0].Column;
-        var p1LatColumn = (Column<double?>)arguments[1].Column;
+        var p1LonColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var p1LatColumn = (TypedBaseColumn<double?>)arguments[1].Column;
 
         var rowCount = p1LonColumn.RowCount;
         var resColumn = arguments.Length > 2
-            ? (Column<long?>)arguments[2].Column
+            ? (TypedBaseColumn<long?>)arguments[2].Column
             : new SingleValueColumn<long?>(ScalarTypes.Long, DefaultResolution, rowCount);
 
         var data = new string[rowCount];
@@ -40,6 +40,6 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.GeoHash(p1LonColumn[i], p1LatColumn[i], resColumn[i]);
             }
         });
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 }

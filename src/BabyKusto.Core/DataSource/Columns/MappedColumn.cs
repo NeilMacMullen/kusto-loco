@@ -6,13 +6,13 @@ namespace BabyKusto.Core;
 /// <summary>
 ///     Allows a column to arbitrarily remap rows to those in another column
 /// </summary>
-public class MappedColumn<T> : Column<T>
+public class MappedColumn<T> : TypedBaseColumn<T>
 {
     private readonly ImmutableArray<int> _lookups;
-    public readonly Column<T> BackingColumn;
+    public readonly TypedBaseColumn<T> BackingColumn;
 
-    private MappedColumn(ImmutableArray<int> lookups, Column<T> backing)
-        : base(backing.Type, Array.Empty<T>())
+    private MappedColumn(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
+        : base(backing.Type)
     {
         _lookups = lookups;
         BackingColumn = backing;
@@ -21,7 +21,7 @@ public class MappedColumn<T> : Column<T>
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
     public override int RowCount => _lookups.Length;
 
-    public static Column<T> Create(ImmutableArray<int> lookups, Column<T> backing)
+    public static TypedBaseColumn<T> Create(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
     {
         if (backing is SingleValueColumn<T> single)
             return single.ResizeTo(lookups.Length);

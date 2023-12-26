@@ -21,7 +21,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         {
             Debug.Assert(arguments.Length == 1);
-            var inputCol = (Column<DateTime?>)arguments[0].Column;
+            var inputCol = (TypedBaseColumn<DateTime?>)arguments[0].Column;
 
             var data = new string?[inputCol.RowCount];
             for (var i = 0; i < inputCol.RowCount; i++)
@@ -29,7 +29,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                 data[i] = Impl(inputCol[i]);
             }
 
-            return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
         }
 
         private static string? Impl(DateTime? input)

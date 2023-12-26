@@ -51,7 +51,7 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (Column<JsonNode?>)items.Column;
+            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
@@ -59,7 +59,7 @@ internal partial class TreeEvaluator
                 data[i] = IndexIntoPossibleJsonArray(itemsCol[i], node.Index);
             }
 
-            var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
+            var column = new InMemoryColumn<JsonNode?>(ScalarTypes.Dynamic, data);
             return new ColumnarResult(column);
         }
 
@@ -79,7 +79,7 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (Column<JsonNode?>)items.Column;
+            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
@@ -87,7 +87,7 @@ internal partial class TreeEvaluator
                     if (obj.TryGetPropertyValue(node.MemberName, out var value))
                         data[i] = value;
 
-            var column = new Column<JsonNode?>(ScalarTypes.Dynamic, data);
+            var column = new InMemoryColumn<JsonNode?>(ScalarTypes.Dynamic, data);
             return new ColumnarResult(column);
         }
 

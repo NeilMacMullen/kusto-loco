@@ -13,7 +13,7 @@ public class IndirectTests
     {
         var originalData = Enumerable.Range(0, sourceCount)
             .Select(i => i.ToString()).ToArray();
-        var cs = new Column<string>(ScalarTypes.String, originalData);
+        var cs = new InMemoryColumn<string>(ScalarTypes.String, originalData);
         var backing = MappedColumn<string>.Create(
             Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0).ToImmutableArray()
             , cs);
@@ -34,7 +34,7 @@ public class IndirectTests
     [TestMethod]
     public void IndirectionFollowedViaCasting()
     {
-        var backing = (Column<string>)MakeDecimatedColumn(100);
+        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
         backing.RowCount.Should().Be(10);
         backing[0].Should().Be("0");
         backing[1].Should().Be("10");
@@ -45,7 +45,7 @@ public class IndirectTests
     [TestMethod]
     public void SlicingIndirectedColumnCanWork()
     {
-        var backing = (Column<string>)MakeDecimatedColumn(100);
+        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
         var sliced = backing.Slice(5, 2);
         sliced.RowCount.Should().Be(2);
         sliced.GetRawDataValue(0).Should().Be("50");

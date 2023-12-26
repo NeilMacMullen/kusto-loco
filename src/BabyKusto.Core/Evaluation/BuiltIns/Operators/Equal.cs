@@ -19,8 +19,8 @@ internal class EqualIntOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<int?>)(arguments[0].Column);
-        var right = (Column<int?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -28,7 +28,7 @@ internal class EqualIntOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -44,8 +44,8 @@ internal class EqualLongOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<long?>)(arguments[0].Column);
-        var right = (Column<long?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -53,7 +53,7 @@ internal class EqualLongOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -69,8 +69,8 @@ internal class EqualDoubleOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<double?>)(arguments[0].Column);
-        var right = (Column<double?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -78,7 +78,7 @@ internal class EqualDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -95,8 +95,8 @@ internal class EqualStringOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<string?>)(arguments[0].Column);
-        var right = (Column<string?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<string?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -104,7 +104,7 @@ internal class EqualStringOperatorImpl : IScalarFunctionImpl
             data[i] = string.Equals(left[i] ?? string.Empty, right[i] ?? string.Empty, StringComparison.Ordinal);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -120,8 +120,8 @@ internal class EqualTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<TimeSpan?>)(arguments[0].Column);
-        var right = (Column<TimeSpan?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -129,7 +129,7 @@ internal class EqualTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -145,8 +145,8 @@ internal class EqualDateTimeOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<DateTime?>)(arguments[0].Column);
-        var right = (Column<DateTime?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<DateTime?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -154,6 +154,6 @@ internal class EqualDateTimeOperatorImpl : IScalarFunctionImpl
             data[i] = left[i] == right[i];
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

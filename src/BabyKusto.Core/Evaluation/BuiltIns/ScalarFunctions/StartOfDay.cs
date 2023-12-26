@@ -19,7 +19,7 @@ internal class StartOfDayFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var dates = (Column<DateTime?>)arguments[0].Column;
+        var dates = (TypedBaseColumn<DateTime?>)arguments[0].Column;
 
         var data = new DateTime?[dates.RowCount];
         for (var i = 0; i < dates.RowCount; i++)
@@ -27,7 +27,7 @@ internal class StartOfDayFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(dates[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 
     private static DateTime? Impl(DateTime? input)
