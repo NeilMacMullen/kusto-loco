@@ -18,42 +18,42 @@ public static class ColumnHelpers
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
         {
-            return CreateFromIntsObjectArray(data, typeSymbol);
+            return CreateFromIntsObjectArray(data);
         }
 
         if (typeSymbol == ScalarTypes.Long)
         {
-            return CreateFromLongsObjectArray(data, typeSymbol);
+            return CreateFromLongsObjectArray(data);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return CreateFromDoublesObjectArray(data, typeSymbol);
+            return CreateFromDoublesObjectArray(data);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return CreateFromBoolsObjectArray(data, typeSymbol);
+            return CreateFromBoolsObjectArray(data);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return CreateFromObjectArray<string>(data, typeSymbol);
+            return CreateFromObjectArray<string>(data);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return CreateFromObjectArray<DateTime?>(data, typeSymbol);
+            return CreateFromObjectArray<DateTime?>(data);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return CreateFromObjectArray<TimeSpan?>(data, typeSymbol);
+            return CreateFromObjectArray<TimeSpan?>(data);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return CreateFromObjectArray<JsonNode?>(data, typeSymbol);
+            return CreateFromObjectArray<JsonNode?>(data);
         }
 
         // TODO: Support all data types
@@ -66,42 +66,42 @@ public static class ColumnHelpers
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
         {
-            return CreateFromInt(value, typeSymbol, numRows);
+            return CreateFromInt(value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.Long)
         {
-            return CreateFromLong(value, typeSymbol, numRows);
+            return CreateFromLong(value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return CreateFromDouble(value, typeSymbol, numRows);
+            return CreateFromDouble(value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return CreateFromBool(value, typeSymbol, numRows);
+            return CreateFromBool(value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return CreateFromScalar((string?)value, typeSymbol, numRows);
+            return CreateFromScalar((string?)value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return CreateFromScalar((DateTime?)value, typeSymbol, numRows);
+            return CreateFromScalar((DateTime?)value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return CreateFromScalar((TimeSpan?)value, typeSymbol, numRows);
+            return CreateFromScalar((TimeSpan?)value, numRows);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return CreateFromScalar((JsonNode?)value, typeSymbol, numRows);
+            return CreateFromScalar((JsonNode?)value, numRows);
         }
 
         // TODO: Support all data types
@@ -254,7 +254,7 @@ public static class ColumnHelpers
     public static TypedBaseColumn<T> MapColumn<T>(TypedBaseColumn<T> other, ImmutableArray<int> mapping) =>
         MappedColumn<T>.Create(mapping, other);
 
-    private static TypedBaseColumn<T> CreateFromObjectArray<T>(object?[] data, TypeSymbol typeSymbol)
+    private static TypedBaseColumn<T> CreateFromObjectArray<T>(object?[] data)
     {
         var columnData = new T?[data.Length];
         for (var i = 0; i < data.Length; i++)
@@ -265,7 +265,7 @@ public static class ColumnHelpers
         return new InMemoryColumn<T>(columnData);
     }
 
-    private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data, TypeSymbol typeSymbol)
+    private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data)
     {
         var columnData = new int?[data.Length];
         for (var i = 0; i < data.Length; i++)
@@ -277,7 +277,7 @@ public static class ColumnHelpers
         return ColumnFactory.Create(columnData);
     }
 
-    private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data, TypeSymbol typeSymbol)
+    private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data)
     {
         var columnData = new long?[data.Length];
         for (var i = 0; i < data.Length; i++)
@@ -289,7 +289,7 @@ public static class ColumnHelpers
         return ColumnFactory.Create(columnData);
     }
 
-    private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data, TypeSymbol typeSymbol)
+    private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data)
     {
         var columnData = new double?[data.Length];
         for (var i = 0; i < data.Length; i++)
@@ -301,7 +301,7 @@ public static class ColumnHelpers
         return ColumnFactory.Create(columnData);
     }
 
-    private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data, TypeSymbol typeSymbol)
+    private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
     {
         var columnData = new bool?[data.Length];
         for (var i = 0; i < data.Length; i++)
@@ -313,20 +313,20 @@ public static class ColumnHelpers
         return ColumnFactory.Create(columnData);
     }
 
-    private static TypedBaseColumn<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount) =>
+    private static TypedBaseColumn<T> CreateFromScalar<T>(T value, int rowCount) =>
         new SingleValueColumn<T>(value, rowCount);
 
-    private static TypedBaseColumn<int?> CreateFromInt(object? value, TypeSymbol typeSymbol, int rowCount) =>
-        CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), typeSymbol, rowCount);
+    private static TypedBaseColumn<int?> CreateFromInt(object? value, int rowCount) =>
+        CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), rowCount);
 
-    private static TypedBaseColumn<long?> CreateFromLong(object? value, TypeSymbol typeSymbol, int rowCount) =>
-        CreateFromScalar<long?>(value == null ? null : Convert.ToInt64(value), typeSymbol, rowCount);
+    private static TypedBaseColumn<long?> CreateFromLong(object? value, int rowCount) =>
+        CreateFromScalar<long?>(value == null ? null : Convert.ToInt64(value), rowCount);
 
-    private static TypedBaseColumn<double?> CreateFromDouble(object? value, TypeSymbol typeSymbol, int rowCount) =>
-        CreateFromScalar<double?>(value == null ? null : Convert.ToDouble(value), typeSymbol, rowCount);
+    private static TypedBaseColumn<double?> CreateFromDouble(object? value, int rowCount) =>
+        CreateFromScalar<double?>(value == null ? null : Convert.ToDouble(value), rowCount);
 
-    private static TypedBaseColumn<bool?> CreateFromBool(object? value, TypeSymbol typeSymbol, int rowCount) =>
-        CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), typeSymbol, rowCount);
+    private static TypedBaseColumn<bool?> CreateFromBool(object? value, int rowCount) =>
+        CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), rowCount);
 
     private enum MappingType
     {
