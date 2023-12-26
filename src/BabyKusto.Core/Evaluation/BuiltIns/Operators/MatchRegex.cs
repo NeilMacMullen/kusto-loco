@@ -27,8 +27,8 @@ internal class MatchRegexOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var values = (Column<string?>)(arguments[0].Column);
-        var patterns = (Column<string?>)(arguments[1].Column);
+        var values = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var patterns = (TypedBaseColumn<string?>)(arguments[1].Column);
         // TODO NPM - this pattern would be worth generalising...
         //it's likely there are lots of times that tables have "runs" 
         //of data and caching the value of the last fetch makes sense
@@ -47,7 +47,7 @@ internal class MatchRegexOperatorImpl : IScalarFunctionImpl
             data[i] = GetResult(cacheEntry.Regex!, values[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 
     private static Regex GetRegex(string? pattern) => new(pattern ?? string.Empty);

@@ -21,9 +21,9 @@ internal class ReplaceStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 3);
-        var textCol = (Column<string?>)arguments[0].Column;
-        var lookupCol = (Column<string?>)arguments[1].Column;
-        var rewriteCol = (Column<string?>)arguments[2].Column;
+        var textCol = (TypedBaseColumn<string?>)arguments[0].Column;
+        var lookupCol = (TypedBaseColumn<string?>)arguments[1].Column;
+        var rewriteCol = (TypedBaseColumn<string?>)arguments[2].Column;
 
         var data = new string?[textCol.RowCount];
         for (var i = 0; i < textCol.RowCount; i++)
@@ -31,7 +31,7 @@ internal class ReplaceStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(textCol[i], lookupCol[i], rewriteCol[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? text, string? lookup, string? rewrite)

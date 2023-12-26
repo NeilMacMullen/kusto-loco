@@ -35,7 +35,7 @@ internal class CoalesceBoolFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<bool?>)arguments[i].Column;
+                var column = (TypedBaseColumn<bool?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -45,7 +45,7 @@ internal class CoalesceBoolFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -77,7 +77,7 @@ internal class CoalesceIntFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<int?>)arguments[i].Column;
+                var column = (TypedBaseColumn<int?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -87,7 +87,7 @@ internal class CoalesceIntFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -119,7 +119,7 @@ internal class CoalesceLongFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<long?>)arguments[i].Column;
+                var column = (TypedBaseColumn<long?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -129,7 +129,7 @@ internal class CoalesceLongFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -161,7 +161,7 @@ internal class CoalesceDoubleFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<double?>)arguments[i].Column;
+                var column = (TypedBaseColumn<double?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -171,7 +171,7 @@ internal class CoalesceDoubleFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -203,7 +203,7 @@ internal class CoalesceDateTimeFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<DateTime?>)arguments[i].Column;
+                var column = (TypedBaseColumn<DateTime?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -213,7 +213,7 @@ internal class CoalesceDateTimeFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 }
 
@@ -245,7 +245,7 @@ internal class CoalesceTimeSpanFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<TimeSpan?>)arguments[i].Column;
+                var column = (TypedBaseColumn<TimeSpan?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue)
                 {
@@ -255,7 +255,7 @@ internal class CoalesceTimeSpanFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
     }
 }
 
@@ -287,7 +287,7 @@ internal class CoalesceStringFunctionImpl : IScalarFunctionImpl
         {
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<string?>)arguments[i].Column;
+                var column = (TypedBaseColumn<string?>)arguments[i].Column;
                 var item = column[j];
                 if (!string.IsNullOrEmpty(item))
                 {
@@ -297,6 +297,6 @@ internal class CoalesceStringFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 }

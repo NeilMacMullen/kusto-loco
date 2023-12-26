@@ -20,8 +20,8 @@ internal class NotStartsWithCsOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<string?>)(arguments[0].Column);
-        var right = (Column<string?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<string?>)(arguments[1].Column);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -29,6 +29,6 @@ internal class NotStartsWithCsOperatorImpl : IScalarFunctionImpl
             data[i] = !(left[i] ?? string.Empty).StartsWith(right[i] ?? string.Empty);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

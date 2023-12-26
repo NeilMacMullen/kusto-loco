@@ -22,8 +22,8 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
         {
             Debug.Assert(arguments.Length == 2);
             Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-            var left = (Column<string?>)(arguments[0].Column);
-            var right = (Column<string?>)(arguments[1].Column);
+            var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+            var right = (TypedBaseColumn<string?>)(arguments[1].Column);
 
             var data = new bool?[left.RowCount];
 
@@ -33,7 +33,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
                     .Equals((right[i] ?? string.Empty).ToLowerInvariant());
             }
 
-            return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+            return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
         }
     }
 }

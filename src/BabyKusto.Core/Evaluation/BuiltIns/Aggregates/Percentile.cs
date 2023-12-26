@@ -13,8 +13,8 @@ internal class PercentileAggregateIntImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
-        var valuesCol = (Column<int?>)arguments[0].Column;
-        var percentilesCol = (Column<double?>)arguments[1].Column;
+        var valuesCol = (TypedBaseColumn<int?>)arguments[0].Column;
+        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)
@@ -41,8 +41,8 @@ internal class PercentileAggregateLongImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
-        var valuesCol = (Column<long?>)arguments[0].Column;
-        var percentilesCol = (Column<double?>)arguments[1].Column;
+        var valuesCol = (TypedBaseColumn<long?>)arguments[0].Column;
+        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)
@@ -69,8 +69,8 @@ internal class PercentileAggregateDoubleImpl : IAggregateImpl
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
-        var valuesCol = (Column<double?>)arguments[0].Column;
-        var percentilesCol = (Column<double?>)arguments[1].Column;
+        var valuesCol = (TypedBaseColumn<double?>)arguments[0].Column;
+        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)

@@ -8,14 +8,14 @@ namespace BabyKusto.Core;
 ///     Represents a column formed of one or more sections which are processed in order
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class ReassembledChunkColumn<T> : Column<T>
+public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
 {
     private readonly int _Length;
 
     private readonly Section[] BackingColumns;
 
-    public ReassembledChunkColumn(IEnumerable<Column<T>> backing)
-        : base(backing.First().Type, Array.Empty<T>())
+    public ReassembledChunkColumn(IEnumerable<TypedBaseColumn<T>> backing)
+        : base(backing.First().Type)
     {
         var sections = new List<Section>();
         var offset = 0;
@@ -41,7 +41,7 @@ public class ReassembledChunkColumn<T> : Column<T>
 
     public override int RowCount => _Length;
 
-    private (int, Column<T>) IndirectIndex(int index)
+    private (int, TypedBaseColumn<T>) IndirectIndex(int index)
     {
         foreach (var s in BackingColumns)
         {
@@ -72,5 +72,5 @@ public class ReassembledChunkColumn<T> : Column<T>
         return chunk[i];
     }
 
-    private readonly record struct Section(int Offset, int Length, Column<T> BackingColumn);
+    private readonly record struct Section(int Offset, int Length, TypedBaseColumn<T> BackingColumn);
 }

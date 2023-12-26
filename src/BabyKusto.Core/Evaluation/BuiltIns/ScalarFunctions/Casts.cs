@@ -19,7 +19,7 @@ internal class ToIntStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<string?>)arguments[0].Column;
+        var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new int?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -27,7 +27,7 @@ internal class ToIntStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -52,7 +52,7 @@ internal class ToLongStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<string?>)arguments[0].Column;
+        var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new long?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -60,7 +60,7 @@ internal class ToLongStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,7 +85,7 @@ internal class ToDoubleStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<string?>)arguments[0].Column;
+        var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new double?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -93,7 +93,7 @@ internal class ToDoubleStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -113,7 +113,7 @@ internal class ToBoolStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<string?>)arguments[0].Column;
+        var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new bool?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -121,7 +121,7 @@ internal class ToBoolStringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(column[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -21,8 +21,8 @@ internal class PowFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
-        var xCol = (Column<double?>)(arguments[0].Column);
-        var yCol = (Column<double?>)(arguments[1].Column);
+        var xCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var yCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new double?[xCol.RowCount];
         for (var i = 0; i < xCol.RowCount; i++)
@@ -30,7 +30,7 @@ internal class PowFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(xCol[i], yCol[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 
     private static double? Impl(double? x, double? y)

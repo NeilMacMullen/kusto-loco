@@ -22,9 +22,9 @@ internal class SubstringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 3);
-        var inputCol = (Column<string?>)arguments[0].Column;
-        var startCol = (Column<long?>)arguments[1].Column;
-        var lengthCol = (Column<long?>)arguments[2].Column;
+        var inputCol = (TypedBaseColumn<string?>)arguments[0].Column;
+        var startCol = (TypedBaseColumn<long?>)arguments[1].Column;
+        var lengthCol = (TypedBaseColumn<long?>)arguments[2].Column;
 
         var data = new string?[inputCol.RowCount];
         for (var i = 0; i < inputCol.RowCount; i++)
@@ -32,7 +32,7 @@ internal class SubstringFunctionImpl : IScalarFunctionImpl
             data[i] = Impl(inputCol[i], startCol[i], lengthCol[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 
     private static string? Impl(string? input, long? start, long? length)

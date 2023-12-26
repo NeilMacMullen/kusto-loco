@@ -28,12 +28,12 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         var caseLength = arguments.Length / 2;
-        var fallback = (Column<T?>)arguments.Last().Column;
+        var fallback = (TypedBaseColumn<T?>)arguments.Last().Column;
         var condValues = Enumerable.Range(0, caseLength)
             .Select(i => new
             {
-                Pred = (Column<bool?>)arguments[i * 2].Column,
-                Val = (Column<T?>)arguments[i * 2 + 1].Column
+                Pred = (TypedBaseColumn<bool?>)arguments[i * 2].Column,
+                Val = (TypedBaseColumn<T?>)arguments[i * 2 + 1].Column
             })
             .ToArray();
 
@@ -55,7 +55,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             data[i] = val;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypeFromNetType(typeof(T)), data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypeFromNetType(typeof(T)), data));
     }
 
     private static TypeSymbol ScalarTypeFromNetType(Type t)

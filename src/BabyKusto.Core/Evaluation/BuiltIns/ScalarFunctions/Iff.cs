@@ -23,9 +23,9 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<bool?>)(arguments[1].Column);
-        var ifFalseCol = (Column<bool?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<bool?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<bool?>)(arguments[2].Column);
 
         var data = new bool?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -34,7 +34,7 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }
 
@@ -54,9 +54,9 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<int?>)(arguments[1].Column);
-        var ifFalseCol = (Column<int?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<int?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<int?>)(arguments[2].Column);
 
         var data = new int?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -65,7 +65,7 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -85,9 +85,9 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<long?>)(arguments[1].Column);
-        var ifFalseCol = (Column<long?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<long?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<long?>)(arguments[2].Column);
 
         var data = new long?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -96,7 +96,7 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -116,9 +116,9 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<double?>)(arguments[1].Column);
-        var ifFalseCol = (Column<double?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<double?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<double?>)(arguments[2].Column);
 
         var data = new double?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -127,7 +127,7 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -147,9 +147,9 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<string?>)(arguments[1].Column);
-        var ifFalseCol = (Column<string?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<string?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<string?>)(arguments[2].Column);
 
         var data = new string?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -158,7 +158,7 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 }
 
@@ -178,9 +178,9 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<DateTime?>)(arguments[1].Column);
-        var ifFalseCol = (Column<DateTime?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<DateTime?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<DateTime?>)(arguments[2].Column);
 
         var data = new DateTime?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -189,7 +189,7 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 }
 
@@ -209,9 +209,9 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (Column<bool?>)(arguments[0].Column);
-        var ifTrueCol = (Column<TimeSpan?>)(arguments[1].Column);
-        var ifFalseCol = (Column<TimeSpan?>)(arguments[2].Column);
+        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var ifTrueCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
+        var ifFalseCol = (TypedBaseColumn<TimeSpan?>)(arguments[2].Column);
 
         var data = new TimeSpan?[predicateCol.RowCount];
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -220,6 +220,6 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
             data[i] = predicateCol[i] == true ? ifTrue : ifFalse;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
     }
 }

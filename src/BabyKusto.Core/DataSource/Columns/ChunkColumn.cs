@@ -7,14 +7,14 @@ namespace BabyKusto.Core;
 ///     of the source column to be used
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class ChunkColumn<T> : Column<T>
+public class ChunkColumn<T> : TypedBaseColumn<T>
 {
     private readonly int _length;
     private readonly int _offset;
-    public readonly Column<T> BackingColumn;
+    public readonly TypedBaseColumn<T> BackingColumn;
 
-    private ChunkColumn(int offset, int length, Column<T> backing)
-        : base(backing.Type, Array.Empty<T>())
+    private ChunkColumn(int offset, int length, TypedBaseColumn<T> backing)
+        : base(backing.Type)
     {
         _offset = offset;
         _length = length;
@@ -24,7 +24,7 @@ public class ChunkColumn<T> : Column<T>
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
     public override int RowCount => _length;
 
-    public static Column<T> Create(int offset, int length, Column<T> backing)
+    public static TypedBaseColumn<T> Create(int offset, int length, TypedBaseColumn<T> backing)
     {
         if (backing is SingleValueColumn<T> single)
             return single.ResizeTo(length);

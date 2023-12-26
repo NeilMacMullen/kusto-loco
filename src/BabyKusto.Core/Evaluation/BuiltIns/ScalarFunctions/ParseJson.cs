@@ -20,7 +20,7 @@ internal class ParseJsonStringFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<string?>)arguments[0].Column;
+        var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var data = new JsonNode?[column.RowCount];
         for (var i = 0; i < column.RowCount; i++)
@@ -28,7 +28,7 @@ internal class ParseJsonStringFunctionImpl : IScalarFunctionImpl
             data[i] = ParseInternal(column[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Dynamic, data));
     }
 
     private static JsonNode? ParseInternal(string? input)
@@ -67,7 +67,7 @@ internal class ParseJsonDynamicFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<JsonNode?>)arguments[0].Column;
+        var column = (TypedBaseColumn<JsonNode?>)arguments[0].Column;
 
         return new ColumnarResult(column);
     }

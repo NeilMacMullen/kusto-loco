@@ -19,7 +19,7 @@ internal class AgoFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var column = (Column<TimeSpan?>)arguments[0].Column;
+        var column = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
 
         var data = new DateTime?[column.RowCount];
         var now = DateTime.UtcNow;
@@ -32,6 +32,6 @@ internal class AgoFunctionImpl : IScalarFunctionImpl
             }
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 }

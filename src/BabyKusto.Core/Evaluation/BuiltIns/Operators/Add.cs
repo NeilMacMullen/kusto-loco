@@ -21,8 +21,8 @@ internal class AddIntOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<int?>)(arguments[0].Column);
-        var rightCol = (Column<int?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
         var data = new int?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -31,7 +31,7 @@ internal class AddIntOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -50,8 +50,8 @@ internal class AddLongOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<long?>)(arguments[0].Column);
-        var rightCol = (Column<long?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
 
         var data = new long?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -60,7 +60,7 @@ internal class AddLongOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -79,8 +79,8 @@ internal class AddDoubleOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<double?>)(arguments[0].Column);
-        var rightCol = (Column<double?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
 
         var data = new double?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -89,7 +89,7 @@ internal class AddDoubleOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }
 
@@ -109,8 +109,8 @@ internal class AddTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<TimeSpan?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new TimeSpan?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -119,7 +119,7 @@ internal class AddTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? new TimeSpan(left.Value.Ticks + right.Value.Ticks) : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.TimeSpan, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.TimeSpan, data));
     }
 }
 
@@ -139,8 +139,8 @@ internal class AddDateTimeTimeSpanOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (Column<DateTime?>)(arguments[0].Column);
-        var rightCol = (Column<TimeSpan?>)(arguments[1].Column);
+        var leftCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
+        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
 
         var data = new DateTime?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
@@ -149,6 +149,6 @@ internal class AddDateTimeTimeSpanOperatorImpl : IScalarFunctionImpl
             data[i] = left.HasValue && right.HasValue ? left.Value + right.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.DateTime, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.DateTime, data));
     }
 }

@@ -19,7 +19,7 @@ internal class IsEmptyFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (Column<string?>)(arguments[0].Column);
+        var valueCol = (TypedBaseColumn<string?>)(arguments[0].Column);
 
         var data = new bool?[valueCol.RowCount];
         for (var i = 0; i < valueCol.RowCount; i++)
@@ -28,6 +28,6 @@ internal class IsEmptyFunctionImpl : IScalarFunctionImpl
             data[i] = string.IsNullOrEmpty(value);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

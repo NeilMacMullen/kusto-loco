@@ -24,10 +24,10 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length > 0);
-        var columns = new Column<string?>[arguments.Length];
+        var columns = new TypedBaseColumn<string?>[arguments.Length];
         for (var i = 0; i < arguments.Length; i++)
         {
-            columns[i] = (Column<string?>)arguments[i].Column;
+            columns[i] = (TypedBaseColumn<string?>)arguments[i].Column;
         }
 
         var data = new string?[columns[0].RowCount];
@@ -44,6 +44,6 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
             builder.Clear();
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.String, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.String, data));
     }
 }

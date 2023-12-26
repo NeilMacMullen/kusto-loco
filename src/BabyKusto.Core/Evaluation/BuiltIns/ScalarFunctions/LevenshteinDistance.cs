@@ -21,8 +21,8 @@ internal class LevenshteinDistanceImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (Column<string?>)(arguments[0].Column);
-        var right = (Column<string?>)(arguments[1].Column);
+        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<string?>)(arguments[1].Column);
 
         var data = new int?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -30,6 +30,6 @@ internal class LevenshteinDistanceImpl : IScalarFunctionImpl
             data[i] = Levenshtein.Distance(left[i], right[i]);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }

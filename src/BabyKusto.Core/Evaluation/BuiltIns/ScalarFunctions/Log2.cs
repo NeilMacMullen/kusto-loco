@@ -22,7 +22,7 @@ internal class Log2FunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (Column<double?>)(arguments[0].Column);
+        var valueCol = (TypedBaseColumn<double?>)(arguments[0].Column);
 
         var data = new double?[valueCol.RowCount];
         for (var i = 0; i < valueCol.RowCount; i++)
@@ -31,7 +31,7 @@ internal class Log2FunctionImpl : IScalarFunctionImpl
             data[i] = Impl(value);
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 
     private static double? Impl(double? input)

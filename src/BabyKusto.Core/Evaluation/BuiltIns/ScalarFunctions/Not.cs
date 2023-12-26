@@ -19,7 +19,7 @@ internal class NotFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (Column<bool?>)(arguments[0].Column);
+        var valueCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
 
         var data = new bool?[valueCol.RowCount];
         for (var i = 0; i < valueCol.RowCount; i++)
@@ -28,6 +28,6 @@ internal class NotFunctionImpl : IScalarFunctionImpl
             data[i] = value.HasValue ? !value.Value : null;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Bool, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Bool, data));
     }
 }

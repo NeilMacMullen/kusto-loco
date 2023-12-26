@@ -34,7 +34,7 @@ internal class MinOfIntFunctionImpl : IScalarFunctionImpl
             int? min = null;
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<int?>)arguments[i].Column;
+                var column = (TypedBaseColumn<int?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue && (!min.HasValue || item.Value < min.Value))
                 {
@@ -45,7 +45,7 @@ internal class MinOfIntFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Int, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Int, data));
     }
 }
 
@@ -77,7 +77,7 @@ internal class MinOfLongFunctionImpl : IScalarFunctionImpl
             long? min = null;
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<long?>)arguments[i].Column;
+                var column = (TypedBaseColumn<long?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue && (!min.HasValue || item.Value < min.Value))
                 {
@@ -88,7 +88,7 @@ internal class MinOfLongFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Long, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Long, data));
     }
 }
 
@@ -120,7 +120,7 @@ internal class MinOfDoubleFunctionImpl : IScalarFunctionImpl
             double? min = null;
             for (var i = 0; i < arguments.Length; i++)
             {
-                var column = (Column<double?>)arguments[i].Column;
+                var column = (TypedBaseColumn<double?>)arguments[i].Column;
                 var item = column[j];
                 if (item.HasValue && (!min.HasValue || item.Value < min.Value))
                 {
@@ -131,6 +131,6 @@ internal class MinOfDoubleFunctionImpl : IScalarFunctionImpl
             data[j] = min;
         }
 
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Real, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Real, data));
     }
 }

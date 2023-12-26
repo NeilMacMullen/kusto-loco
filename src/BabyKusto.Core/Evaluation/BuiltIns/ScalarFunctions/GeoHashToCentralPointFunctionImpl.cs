@@ -22,7 +22,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var hash = (Column<string?>)arguments[0].Column;
+        var hash = (TypedBaseColumn<string?>)arguments[0].Column;
 
         var rowCount = hash.RowCount;
 
@@ -38,7 +38,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
                 data[i] = PtToJson(pt.Latitude, pt.Longitude);
             }
         });
-        return new ColumnarResult(BaseColumn.Create(ScalarTypes.Dynamic, data));
+        return new ColumnarResult(ColumnFactory.Create(ScalarTypes.Dynamic, data));
     }
 
     private static JsonObject PtToJson(double latitude, double longitude) =>
