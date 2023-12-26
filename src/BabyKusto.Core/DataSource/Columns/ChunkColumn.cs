@@ -14,7 +14,6 @@ public class ChunkColumn<T> : TypedBaseColumn<T>
     public readonly TypedBaseColumn<T> BackingColumn;
 
     private ChunkColumn(int offset, int length, TypedBaseColumn<T> backing)
-        : base(backing.Type)
     {
         _offset = offset;
         _length = length;

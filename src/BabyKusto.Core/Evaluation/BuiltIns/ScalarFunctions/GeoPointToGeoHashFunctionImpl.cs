@@ -27,7 +27,7 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
         var rowCount = p1LonColumn.RowCount;
         var resColumn = arguments.Length > 2
             ? (TypedBaseColumn<long?>)arguments[2].Column
-            : new SingleValueColumn<long?>(ScalarTypes.Long, DefaultResolution, rowCount);
+            : new SingleValueColumn<long?>(DefaultResolution, rowCount);
 
         var data = new string[rowCount];
 

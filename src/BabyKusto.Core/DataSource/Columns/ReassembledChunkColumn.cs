@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BabyKusto.Core;
 
@@ -15,7 +14,6 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
     private readonly Section[] BackingColumns;
 
     public ReassembledChunkColumn(IEnumerable<TypedBaseColumn<T>> backing)
-        : base(backing.First().Type)
     {
         var sections = new List<Section>();
         var offset = 0;

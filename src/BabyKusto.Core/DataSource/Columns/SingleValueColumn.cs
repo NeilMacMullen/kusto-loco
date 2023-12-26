@@ -1,5 +1,4 @@
 ﻿using System;
-using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core;
 
@@ -9,8 +8,7 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
 
     private readonly T? Value;
 
-    public SingleValueColumn(TypeSymbol type, T? value, int nominalRowCount)
-        : base(type)
+    public SingleValueColumn(T? value, int nominalRowCount)
     {
         _rowCount = nominalRowCount;
         Value = value;
@@ -27,9 +25,9 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
         }
     }
 
-    public override BaseColumn Slice(int start, int length) => new SingleValueColumn<T>(Type, Value, length);
+    public override BaseColumn Slice(int start, int length) => new SingleValueColumn<T>(Value, length);
 
     public override object? GetRawDataValue(int index) => Value;
 
-    public TypedBaseColumn<T> ResizeTo(int lookupsLength) => new SingleValueColumn<T>(Type, Value, lookupsLength);
+    public TypedBaseColumn<T> ResizeTo(int lookupsLength) => new SingleValueColumn<T>(Value, lookupsLength);
 }

@@ -1,12 +1,12 @@
-﻿using Kusto.Language.Symbols;
+﻿using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core;
 
 public abstract class TypedBaseColumn<T> : BaseColumn
 
 {
-    protected TypedBaseColumn(TypeSymbol type)
-        : base(type)
+    protected TypedBaseColumn()
+        : base(TypeMapping.SymbolForType(typeof(T)))
     {
     }
 

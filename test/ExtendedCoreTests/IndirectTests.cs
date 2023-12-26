@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using BabyKusto.Core;
 using BabyKusto.Core.Util;
 using FluentAssertions;
-using Kusto.Language.Symbols;
 
 namespace ExtendedCoreTests;
 
@@ -66,10 +65,20 @@ public class IndirectTests
     [TestMethod]
     public void IndirectingSingleValueColumnReturnsSingleValue()
     {
-        var sv = new SingleValueColumn<string>(ScalarTypes.String, "HELLO", 100);
+        var sv = new SingleValueColumn<string>("HELLO", 100);
         var second = ColumnHelpers.MapColumn(sv, new[] { 0, 1 }.ToImmutableArray());
         second.GetType().Should().Be(typeof(SingleValueColumn<string>));
         second.RowCount.Should().Be(2);
         second.GetRawDataValue(0).Should().Be("HELLO");
+    }
+
+    [TestMethod]
+    public void SlicingSingleValueColumnReturnsSingleValue()
+    {
+        var sv = new SingleValueColumn<string>("HELLO", 100);
+        var sliced = sv.Slice(10, 20);
+        sliced.Should().BeOfType<SingleValueColumn<string>>();
+        sliced.RowCount.Should().Be(20);
+        sliced.GetRawDataValue(0).Should().Be("HELLO");
     }
 }

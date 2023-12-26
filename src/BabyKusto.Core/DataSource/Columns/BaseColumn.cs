@@ -5,8 +5,7 @@ namespace BabyKusto.Core;
 
 public abstract class BaseColumn
 {
-    protected BaseColumn(TypeSymbol type) => Type = type ?? throw new ArgumentNullException(nameof(type));
-
+    protected BaseColumn(TypeSymbol type) => Type = type;
     public TypeSymbol Type { get; }
     public abstract int RowCount { get; }
 

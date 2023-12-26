@@ -1,5 +1,4 @@
 ﻿using System;
-using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core;
 
@@ -7,8 +6,7 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
 {
     private readonly T?[] _data;
 
-    public InMemoryColumn(T?[] data)
-        : base(TypeMapping.SymbolForType(typeof(T))) =>
+    public InMemoryColumn(T?[] data) =>
         _data = data ?? throw new ArgumentNullException(nameof(data));
 
 

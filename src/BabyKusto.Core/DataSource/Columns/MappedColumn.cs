@@ -12,7 +12,6 @@ public class MappedColumn<T> : TypedBaseColumn<T>
     public readonly TypedBaseColumn<T> BackingColumn;
 
     private MappedColumn(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
-        : base(backing.Type)
     {
         _lookups = lookups;
         BackingColumn = backing;

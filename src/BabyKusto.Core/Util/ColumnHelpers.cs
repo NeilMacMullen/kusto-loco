@@ -314,7 +314,7 @@ public static class ColumnHelpers
     }
 
     private static TypedBaseColumn<T> CreateFromScalar<T>(T value, TypeSymbol typeSymbol, int rowCount) =>
-        new SingleValueColumn<T>(typeSymbol, value, rowCount);
+        new SingleValueColumn<T>(value, rowCount);
 
     private static TypedBaseColumn<int?> CreateFromInt(object? value, TypeSymbol typeSymbol, int rowCount) =>
         CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), typeSymbol, rowCount);
