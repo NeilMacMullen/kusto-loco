@@ -18,5 +18,7 @@ public class EvaluationResult
     public bool IsColumnar => this is ColumnarResult;
     public bool IsTabular => this is TabularResult;
 
+    public virtual int RowCount => 0;
+
     public override string ToString() => $"{GetType().Name}: {SchemaDisplay.GetText(Type)}";
 }

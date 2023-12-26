@@ -12,6 +12,7 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
     {
         _rowCount = nominalRowCount;
         Value = value;
+        hints = ColumnHints.HoldsSingleValue;
     }
 
     public override T? this[int index] => Value;

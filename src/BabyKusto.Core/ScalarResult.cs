@@ -18,4 +18,6 @@ public sealed class ScalarResult : EvaluationResult
     }
 
     public object? Value { get; }
+
+    public override int RowCount => 1;
 }

@@ -21,8 +21,14 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var right = (TypedBaseColumn<bool?>)(arguments[1].Column);
+
+        var left = (TypedBaseColumn<bool?>)arguments[0].Column;
+        var right = (TypedBaseColumn<bool?>)arguments[1].Column;
+        //short-circuiting for indexed columns
+        if (left.IsSingleValue && (left[0] == false))
+            return new ColumnarResult(left);
+        if (right.IsSingleValue && (right[0] == false))
+            return new ColumnarResult(right);
 
         var data = new bool?[left.RowCount];
         for (var i = 0; i < left.RowCount; i++)
@@ -33,8 +39,9 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
         return new ColumnarResult(ColumnFactory.Create(data));
     }
 
-    // Null handling is weird in real Kusto. Observations:
-    //
+    // Nulls are treated as "unknown/any" for logical operations in Kusto.
+    // That means that we can short-circuit some combinations
+    // but not others
     // Query:
     // let nil=tobool("");
     // union
@@ -52,9 +59,9 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
     //       ; true   ;           ; true
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool? WeirdAnd(bool? left, bool? right) =>
-        (left.HasValue && right.HasValue)
-            ? (left.Value && right.Value)
-            : ((left.HasValue && !left.Value) || (right.HasValue && !right.Value))
+        left.HasValue && right.HasValue
+            ? left.Value && right.Value
+            : (left.HasValue && !left.Value) || (right.HasValue && !right.Value)
                 ? false
                 : null;
 }

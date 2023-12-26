@@ -123,6 +123,15 @@ internal static class BuiltInsHelper
         //if columnar args are all SingleValue
         //cast back to Scalars and call InvokeScalar
         //the expand back again
+
+        if (columnarArgs.All(c => c.IsSingleValue))
+        {
+            var logicalRowCount = columnarArgs.Max(c => c.RowCount);
+            columnarArgs = columnarArgs.Select(c => c.SliceToTopRow()).ToArray();
+            var topRowResult = impl.InvokeColumnar(columnarArgs);
+            return topRowResult.Inflate(logicalRowCount);
+        }
+
         var result = impl.InvokeColumnar(columnarArgs);
         Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
