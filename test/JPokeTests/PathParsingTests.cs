@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using FluentAssertions;
 
 namespace TestProject1;
@@ -32,5 +34,19 @@ public class PathParsingTests
         p.Elements.First().Name.Should().Be("");
         p.Elements.First().IsIndex.Should().BeTrue();
         p.Elements.ElementAt(1).Name.Should().Be("second");
+    }
+
+    [TestMethod]
+    public void JsonNodeIsRendered()
+    {
+        var obj = new[]
+        {
+            new { a = 1, b = 2 },
+            new { a = 3, b = 4 },
+        };
+        var s = JsonSerializer.Serialize(obj);
+        var o = JsonNode.Parse(s);
+        o.Should().BeOfType<JsonArray>();
+        JsonSerializer.Serialize(o).Should().Be(s);
     }
 }

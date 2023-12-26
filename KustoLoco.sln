@@ -54,15 +54,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPoke", "src\JPoke\JPoke.csproj", "{55EFCE63-7109-495B-9B87-36600002C1E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JPoke", "src\JPoke\JPoke.csproj", "{55EFCE63-7109-495B-9B87-36600002C1E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPokeTests", "test\JPokeTests\JPokeTests.csproj", "{276FBA77-6674-452B-B5F2-A8A8455CA30D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JPokeTests", "test\JPokeTests\JPokeTests.csproj", "{276FBA77-6674-452B-B5F2-A8A8455CA30D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VegaGenerator", "src\VegaGenerator\VegaGenerator.csproj", "{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VegaGenerator", "src\VegaGenerator\VegaGenerator.csproj", "{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokql", "src\lokql\lokql.csproj", "{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lokql", "src\lokql\lokql.csproj", "{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedStringFunctionality", "src\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj", "{C7CD877B-6D18-459F-AFE8-69239B7D68B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedStringFunctionality", "src\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj", "{C7CD877B-6D18-459F-AFE8-69239B7D68B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rendering", "src\Rendering\Rendering.csproj", "{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessWatcher", "samples\ProcessWatcher\ProcessWatcher.csproj", "{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -146,6 +150,14 @@ Global
 		{C7CD877B-6D18-459F-AFE8-69239B7D68B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7CD877B-6D18-459F-AFE8-69239B7D68B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7CD877B-6D18-459F-AFE8-69239B7D68B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +183,8 @@ Global
 		{FDC0BA15-4B9B-4F26-B62B-C43F4D9B257D} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{133DEB9A-D7C2-4E9D-959E-AFD2C7D71CBC} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{C7CD877B-6D18-459F-AFE8-69239B7D68B3} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
