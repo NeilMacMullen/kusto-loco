@@ -5,14 +5,9 @@ using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using NLog;
 
-#pragma warning disable CS8604 // Possible null reference argument.
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-
-#pragma warning disable CS8603 // Possible null reference return.
-
 namespace KustoSupport;
 
+#pragma warning disable CS8604, CS8602, CS8603
 /// <summary>
 ///     Provides a simple way to create a Kusto ITableSource
 /// </summary>
@@ -23,15 +18,15 @@ public class TableBuilder : BaseKustoTable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    private TableBuilder(TableSymbol tableSym, IEnumerable<BaseColumn> builders, int length) : base(
+    private TableBuilder(TableSymbol tableSym, IEnumerable<BaseColumn> columns, int length) : base(
         tableSym,
         length)
     {
-        Builders = builders.ToArray();
+        Columns = columns.ToArray();
         Length = length;
     }
 
-    public BaseColumn[] Builders { get; }
+    public BaseColumn[] Columns { get; }
 
     public static TableBuilder CreateEmpty(string name, int length) =>
         new(
@@ -48,7 +43,7 @@ public class TableBuilder : BaseKustoTable
 
 
         return new TableBuilder(ts,
-            Builders.Append(column).ToArray(),
+            Columns.Append(column).ToArray(),
             Length);
     }
 
@@ -61,7 +56,7 @@ public class TableBuilder : BaseKustoTable
 
     public override IEnumerable<ITableChunk> GetData()
     {
-        yield return new TableChunk(this, Builders);
+        yield return new TableChunk(this, Columns);
     }
 
 
@@ -74,7 +69,7 @@ public class TableBuilder : BaseKustoTable
     public TableBuilder ShareAs(string newName)
     {
         var newTableSymbol = new TableSymbol(newName, Type.Columns, Type.Description);
-        return new TableBuilder(newTableSymbol, Builders, Length);
+        return new TableBuilder(newTableSymbol, Columns, Length);
     }
 
 
@@ -119,11 +114,11 @@ public class TableBuilder : BaseKustoTable
                 .Select(p => new ColumnSymbol(p.Name, p.Type))
                 .ToArray());
 
-        var allBuilders = columnDefinitions
+        var allColumns = columnDefinitions
             .Select(Create)
             .ToArray();
 
-        return new KustoTableDefinition(tableSymbol, allBuilders, rows.Count);
+        return new KustoTableDefinition(tableSymbol, allColumns, rows.Count);
 
         BaseColumn Create(KustoColumnDefinition<T> c)
         {
