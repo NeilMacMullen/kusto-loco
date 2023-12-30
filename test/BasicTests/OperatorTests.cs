@@ -50,4 +50,50 @@ public class OperatorTests
         await context.RunQuery("data | where  lazy == 'a' | count");
         invocationCountForIndex.Should().Be(1);
     }
+
+    [TestMethod]
+    public async Task IntOperationsAreCorrectlyPerformed()
+    {
+        //this may seem like an odd test but it checks for correct
+        //handling of unexpected Kusto behaviour where any operation
+        //on a pair of ints tends to end up with a long result
+        //this risks putting the syntax analyser at odds with
+        //arithmetic operations that might otherwise try to 
+        //use C# rules
+
+        var tableLength = 10;
+        var context = CreateContext();
+        var table = TableBuilder.CreateEmpty("data", tableLength);
+
+        var c1 = new SingleValueColumn<int?>(1, tableLength);
+        table = table
+            .WithColumn("c1", c1)
+            .WithColumn("c2", c1);
+        context.AddTable(table);
+        //add.cs
+        (await context.RunQuery("data | extend p=c1+c2"))
+            .Error.Should().BeEmpty();
+        //subtract.cs
+        (await context.RunQuery("data | extend p=c1-c2"))
+            .Error.Should().BeEmpty();
+
+        //Multiply.cs
+        (await context.RunQuery("data | extend p=c1*c2"))
+            .Error.Should().BeEmpty();
+
+        //Divide.cs
+        (await context.RunQuery("data | extend p=c1/c2"))
+            .Error.Should().BeEmpty();
+
+        //Modulo.cs
+        (await context.RunQuery("data | extend p=c1 % c2"))
+            .Error.Should().BeEmpty();
+
+        //Binning
+        (await context.RunQuery("data | extend p=bin(c1,c2)"))
+            .Error.Should().BeEmpty();
+
+        (await context.RunQuery("data | summarize p=max(c1) by c2 "))
+            .Error.Should().BeEmpty();
+    }
 }

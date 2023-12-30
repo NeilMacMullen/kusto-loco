@@ -14,7 +14,9 @@ internal class MultiplyIntOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (int?)arguments[0].Value;
         var right = (int?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Int, left.HasValue && right.HasValue ? left.Value * right.Value : null);
+        return new ScalarResult(
+            ScalarTypes.Long,
+            left.HasValue && right.HasValue ? left.Value * right.Value : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -24,7 +26,7 @@ internal class MultiplyIntOperatorImpl : IScalarFunctionImpl
         var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
         var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
 
-        var data = new int?[leftCol.RowCount];
+        var data = new long?[leftCol.RowCount];
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
