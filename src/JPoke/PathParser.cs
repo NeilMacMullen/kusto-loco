@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
+namespace JPoke;
+
 public class PathParser
 {
     public static JPathElement ParseElement(string element)
@@ -8,7 +10,7 @@ public class PathParser
         var match = Regex.Match(element, @"(.*)\[\s*(\d*)\s*]");
         var isArray = match.Success;
         var elementRoot = isArray ? match.Groups[1].Value : element;
-        var index = 
+        var index =
             int.TryParse(match.Groups[2].Value, out var v) ? v : -1;
         return new JPathElement(elementRoot, isArray, index);
     }
@@ -19,24 +21,17 @@ public class PathParser
         return new JPath(
             elements.Select(ParseElement).ToImmutableArray());
     }
+}
 
-    public readonly record struct JSplitPath(JPath Parent, JPath Child)
-    {
-        public JSplitPath Create(JPath initial) => new(JPath.Empty, initial);
+public readonly record struct JPathElement(string Name, bool IsIndex, int Index);
 
-        public JSplitPath Descend() => new(Parent.Append(Child.Elements.First()), Child.Descend());
-    }
+public readonly record struct JPath(ImmutableArray<JPathElement> Elements)
+{
+    public static readonly JPath Empty = new(ImmutableArray<JPathElement>.Empty);
+    public bool IsTerminal => Elements.Length == 1;
+    public int Length => Elements.Length;
 
-    public readonly record struct JPathElement(string Name, bool IsIndex, int Index);
+    public JPath Descend() => new(Elements.Slice(1, Elements.Length - 1));
 
-    public readonly record struct JPath(ImmutableArray<JPathElement> Elements)
-    {
-        public static readonly JPath Empty = new(ImmutableArray<JPathElement>.Empty);
-        public bool IsTerminal => Elements.Length == 1;
-        public int Length => Elements.Length;
-
-        public JPath Descend() => new(Elements.Slice(1, Elements.Length - 1));
-
-        public JPath Append(JPathElement el) => new(Elements.Append(el).ToImmutableArray());
-    }
+    public JPath Append(JPathElement el) => new(Elements.Append(el).ToImmutableArray());
 }

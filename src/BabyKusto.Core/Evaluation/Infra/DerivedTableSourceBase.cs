@@ -7,12 +7,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Kusto.Language.Symbols;
 using Microsoft.Extensions.Internal;
+using NLog;
 
 namespace BabyKusto.Core.Evaluation;
 
 internal abstract class DerivedTableSourceBase<TContext> : ITableSource
 {
-    public DerivedTableSourceBase(ITableSource source) => Source = source;
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private bool _alreadyIterated;
+    protected DerivedTableSourceBase(ITableSource source) => Source = source;
     protected ITableSource Source { get; }
 
     public abstract TableSymbol Type { get; }
@@ -92,6 +95,9 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
 
     private ITableChunk ProcessLastChunkInternal(TContext context)
     {
+        if (_alreadyIterated)
+            Logger.Warn($"Warning - unnecessary extra iteration of {GetType().Name}");
+        _alreadyIterated = true;
         var newChunk = ProcessLastChunk(context);
         if (newChunk != TableChunk.Empty && newChunk.Table != this)
         {

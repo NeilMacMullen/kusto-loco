@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using NLog;
+﻿using NLog;
 
 namespace KustoSupport;
 
@@ -16,13 +15,13 @@ public class KustoQueryHelper
     /// <remarks>
     ///     This not very efficient but extremely convenient for testing
     /// </remarks>
-    public static async Task<IReadOnlyCollection<TR>> SimpleQuery<T, TR>(IReadOnlyCollection<T> rows, string query)
+    public static async Task<IReadOnlyCollection<TR>> SimpleQueryTo<T, TR>(IReadOnlyCollection<T> rows, string query)
     {
-        var result = await SimpleQueryToOrderedDictionary(rows, query);
-        return KustoQueryContext.DeserialiseTo<TR>(result.Results);
+        var result = await SimpleQuery(rows, query);
+        return KustoQueryContext.DeserialiseTo<TR>(result);
     }
 
-    public static async Task<KustoQueryResult<OrderedDictionary>> SimpleQueryToOrderedDictionary<T>(
+    public static async Task<KustoQueryResult> SimpleQuery<T>(
         IReadOnlyCollection<T> rows, string query)
     {
         var tableName = $"Table{Guid.NewGuid():N}";
@@ -30,7 +29,7 @@ public class KustoQueryHelper
     }
 
 
-    public static async Task<KustoQueryResult<OrderedDictionary>> RunQuery<T>(string tableName,
+    public static async Task<KustoQueryResult> RunQuery<T>(string tableName,
         IReadOnlyCollection<T> rows,
         string query, bool appendQueryToTableName)
     {
@@ -44,10 +43,11 @@ public class KustoQueryHelper
 ";
         }
 
-        return await context.RunQuery(query);
+        return await context.RunTabularQueryAsync(query);
     }
 
-    public static async Task<KustoQueryResult<OrderedDictionary>> RunQuery<T>(string tableName,
+
+    public static async Task<KustoQueryResult> RunQuery<T>(string tableName,
         IReadOnlyCollection<T> rows,
         string query)
         => await RunQuery(tableName, rows, query, true);

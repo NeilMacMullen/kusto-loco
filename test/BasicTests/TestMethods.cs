@@ -1,3 +1,4 @@
+using Extensions;
 using KustoSupport;
 using LogSetup;
 using NLog;
@@ -6,7 +7,6 @@ namespace BasicTests;
 
 public abstract class TestMethods
 {
-
     public TestMethods()
     {
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
@@ -17,13 +17,9 @@ public abstract class TestMethods
     protected async Task<string> LastLineOfResult(string query)
     {
         var context = CreateContext();
-        var result = await context.RunQuery(query);
+        var result = await context.RunTabularQueryAsync(query);
         //return the last line 
         Console.WriteLine($"{result.Error}");
-        return KustoFormatter.Tabulate(result.Results)
-            .Trim()
-            .Split(Environment.NewLine)
-            .Last().Trim();
+        return result.GetRow(result.Height - 1).JoinString();
     }
-
 }

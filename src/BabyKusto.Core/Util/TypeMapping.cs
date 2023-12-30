@@ -41,6 +41,8 @@ public static class TypeMapping
     {
         if (KustoToNetToLookup.TryGetValue(ts, out var type))
             return type;
+        if (ts is DynamicPrimitiveSymbol ds)
+            return TypeForSymbol(ds.UnderlyingType);
         throw new NotImplementedException($"No .Net type  equivalent for typeSymbol {ts.Name}");
     }
 }

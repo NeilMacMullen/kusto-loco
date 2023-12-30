@@ -13,6 +13,7 @@ namespace ProcessWatcher
     public partial class MainWindow : Window
     {
         private readonly DispatcherTimer timer = new();
+        private ImmutableArray<ProcessDetail> ProcessHistory = ImmutableArray<ProcessDetail>.Empty;
         private ImmutableArray<ProcessDetail> ProcessList = ImmutableArray<ProcessDetail>.Empty;
 
         public MainWindow()
@@ -26,30 +27,59 @@ namespace ProcessWatcher
         private void TimerOnTick(object? sender, EventArgs e)
         {
             var now = DateTime.UtcNow;
-            var processes = Process.GetProcesses()
-                .Select(p => new ProcessDetail(now, p.ProcessName, p.Threads.Count))
-                .ToArray();
-            ProcessList = ImmutableArray<ProcessDetail>.Empty.AddRange(processes);
+            ProcessList = Process.GetProcesses()
+                .Select(p => new ProcessDetail(
+                    Time: now,
+                    Name: p.ProcessName,
+                    Threads: p.Threads.Count,
+                    Id: p.Id,
+                    WorkingSet: p.WorkingSet64,
+                    Handles: p.HandleCount
+                ))
+                .ToImmutableArray();
+
+            ProcessHistory =
+                ProcessHistory.AddRange(ProcessList);
+
+            var max = 100000;
+            if (ProcessHistory.Length > max)
+                ProcessHistory = ProcessHistory.TakeLast(max).ToImmutableArray();
         }
 
         private async void Go(object sender, RoutedEventArgs e)
         {
             await webview.EnsureCoreWebView2Async();
             var c = new KustoQueryContext();
-
             c.AddTableFromRecords("p", ProcessList);
-            var result = await c.RunQuery(Query.Text);
+            c.AddTableFromRecords("h", ProcessHistory);
+            var result = c.RunTabularQuery(Query.Text);
 
             var html = KustoResultRenderer.RenderToHmtl("title", result);
 
             webview.NavigateToString(html);
-            dataGrid.AutoGenerateColumns = true;
+            FillInDataGrid(result);
+        }
+
+        private void FillInDataGrid(KustoQueryResult result)
+        {
+            var maxDataGrid = 100;
             var dt = new DataTable();
-            dt.Columns.Add("test");
-            dt.Rows.Add(1);
-            dataGrid.ItemsSource = dt.Rows;
+
+            foreach (var col in result.ColumnNames())
+                dt.Columns.Add(col);
+
+            foreach (var row in result.EnumerateRows().Take(maxDataGrid))
+                dt.Rows.Add(row);
+
+            dataGrid.ItemsSource = dt.DefaultView;
         }
     }
 
-    public readonly record struct ProcessDetail(DateTime Time, string Name, int Threads);
+    public readonly record struct ProcessDetail(
+        DateTime Time,
+        string Name,
+        int Threads,
+        int Id,
+        long WorkingSet,
+        int Handles);
 }

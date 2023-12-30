@@ -28,52 +28,51 @@ internal class ReportExplorer
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(FormatTypes.Ascii, 10);
-    private KustoQueryResult<OrderedDictionary> _prevResult;
+    private KustoQueryResult _prevResult;
 
     public ReportExplorer(FolderContext folders) => _folders = folders;
 
     private KustoQueryContext GetCurrentContext() => _context;
 
-    private void DisplayResults(KustoQueryResult<OrderedDictionary> result)
+    private void DisplayResults(KustoQueryResult result)
     {
         if (result.Error.IsNotBlank())
             ShowError(result.Error);
         else
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            if (!result.Results.Any())
+            if (result.Height == 0)
             {
                 Console.WriteLine("No results");
             }
             else
             {
-                var display = result with
-                {
-                    Results = result.Results.Take(_currentDisplayOptions.MaxToDisplay)
-                        .ToArray()
-                };
+                var od = result.AsOrderedDictionarySet();
+                var display = od.Take(_currentDisplayOptions.MaxToDisplay)
+                    .ToArray();
+
 
                 switch (_currentDisplayOptions.Format)
                 {
                     case FormatTypes.Ascii:
-                        Console.WriteLine(Tabulate(display));
+                        Console.WriteLine(KustoFormatter.Tabulate(display));
                         break;
                     case FormatTypes.Json:
                         Console.WriteLine(ToJson(display));
                         break;
                     case FormatTypes.Csv:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, false));
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(display, false));
                         break;
                     case FormatTypes.Txt:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(display.Results, true));
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(display, true));
                         break;
                 }
 
-                if (display.Results.Count != result.Results.Count)
+                if (display.Count() != result.Height)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(
-                        $"Display was truncated to first {display.Results.Count} of {result.Results.Count}.  Use '.display --max' to change this behaviour");
+                        $"Display was truncated to first {display.Count()} of {result.Height}.  Use '.display --max' to change this behaviour");
                 }
             }
 
@@ -148,7 +147,7 @@ internal class ReportExplorer
                 }
             }
 
-            var result = await GetCurrentContext().RunQuery(query);
+            var result = GetCurrentContext().RunTabularQuery(query);
             _prevResult = result;
             DisplayResults(result);
         }
@@ -160,10 +159,12 @@ internal class ReportExplorer
         Console.WriteLine();
     }
 
-
-    private static string ToJson(KustoQueryResult<OrderedDictionary> result)
-        => JsonSerializer.Serialize(result.Results,
+    private static string ToJson(IReadOnlyCollection<OrderedDictionary> result)
+        => JsonSerializer.Serialize(result,
             new JsonSerializerOptions { WriteIndented = true });
+
+    private static string ToJson(KustoQueryResult result)
+        => ToJson(result.AsOrderedDictionarySet());
 
     private static void ShowError(string message)
     {
@@ -173,8 +174,8 @@ internal class ReportExplorer
     }
 
 
-    private static string Tabulate(KustoQueryResult<OrderedDictionary> result)
-        => KustoFormatter.Tabulate(result.Results);
+    private static string Tabulate(IReadOnlyCollection<OrderedDictionary> result)
+        => KustoFormatter.Tabulate(result);
 
 
     private static string ToFullPath(string file, string folder, string extension)
@@ -325,11 +326,12 @@ internal class ReportExplorer
             var filename = ToFullPath(o.File, exp._folders.OutputFolder, o.Format.ToString().ToLowerInvariant());
             var text = o.Format switch
             {
-                FormatTypes.Json => ToJson(exp._prevResult),
-                FormatTypes.Ascii => Tabulate(exp._prevResult),
-                FormatTypes.Csv => KustoFormatter.WriteToCsvString(exp._prevResult.Results, o.SkipHeader),
-                FormatTypes.Txt => KustoFormatter.WriteToCsvString(exp._prevResult.Results, true),
-                _ => ToJson(exp._prevResult)
+                FormatTypes.Json => ToJson(exp._prevResult.AsOrderedDictionarySet()),
+                FormatTypes.Ascii => Tabulate(exp._prevResult.AsOrderedDictionarySet()),
+                FormatTypes.Csv => KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(),
+                    o.SkipHeader),
+                FormatTypes.Txt => KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), true),
+                _ => ToJson(exp._prevResult.AsOrderedDictionarySet())
             };
 
             Logger.Info($"Saving to {filename}...");
@@ -380,7 +382,7 @@ internal class ReportExplorer
             exp.GetCurrentContext()
                 .AddTable(TableBuilder
                     .FromOrderedDictionarySet(o.As,
-                        exp._prevResult.Results));
+                        exp._prevResult.AsOrderedDictionarySet()));
             Logger.Info($"Table '{o.As}' now available");
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
 using BabyKusto.Core;
+using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using NLog;
@@ -162,5 +163,12 @@ public class TableBuilder : BaseKustoTable
             Enumerable.Range(0, dictionaries.Count).ToArray(),
             columnDefinitions);
         return FromDefinition(definition);
+    }
+
+    public static ITableSource FromScalarResult(ScalarResult scalar)
+    {
+        var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
+        return CreateEmpty("result", 1)
+            .WithColumn("value", column);
     }
 }

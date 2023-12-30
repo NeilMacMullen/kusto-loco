@@ -101,11 +101,38 @@ public class KustoQueryContext
         return (VisualizationState.Empty, GetDictionarySet(TabularResult.Empty));
     }
 
-    public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
+    //temporary until we plumb lazy table load back in
+    public Task<KustoQueryResult> RunTabularQueryAsync(string query) => Task.FromResult(RunTabularQuery(query));
 
-    public async Task<KustoQueryResult<OrderedDictionary>> RunQuery(string query)
+    public KustoQueryResult RunTabularQuery(string query)
     {
         var watch = Stopwatch.StartNew();
+        //handling for "special" commands
+        if (query.Trim() == ".tables")
+        {
+            //TODO
+        }
+
+        try
+        {
+            var result =
+                _engine.Evaluate(query,
+                    _fullDebug, _fullDebug
+                );
+            return new KustoQueryResult(query, result, (int)watch.ElapsedMilliseconds,
+                string.Empty);
+        }
+        catch (Exception ex)
+        {
+            return new KustoQueryResult(query, EvaluationResult.Null, 0, ex.Message);
+        }
+    }
+
+
+    public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
+
+    private async Task<KustoQueryResult> RunQuery(string query)
+    {
         try
         {
             // Get tables referenced in query
@@ -116,24 +143,14 @@ public class KustoQueryContext
 
             // Note: Hold the lock until the query is complete to ensure that tables don't change
             // in the middle of execution.
-            var (state, results) = RunTabularQueryToDictionarySet(query);
-            return new KustoQueryResult<OrderedDictionary>(query, results,
-                state,
-                (int)watch.ElapsedMilliseconds,
-                string.Empty);
+            return await RunTabularQueryAsync(query);
         }
         catch (Exception ex)
         {
-            return new KustoQueryResult<OrderedDictionary>(query, Array.Empty<OrderedDictionary>(), 0, ex.Message);
+            return new KustoQueryResult(query, EvaluationResult.Null, 0, ex.Message);
         }
     }
 
-    public async Task<KustoQueryResult<T>> RunTabularQueryToRecordSet<T>(string query)
-    {
-        var d = await RunQuery(query);
-        var rows = DeserialiseTo<T>(d.Results);
-        return new KustoQueryResult<T>(d.Query, rows, d.QueryDuration, d.Error);
-    }
 
     public static IReadOnlyCollection<OrderedDictionary> GetDictionarySet(TabularResult tabularResult)
     {
@@ -147,8 +164,9 @@ public class KustoQueryContext
                 var d = new OrderedDictionary();
                 for (var c = 0; c < chunk.Columns.Length; c++)
                 {
-                    var v = chunk.Columns[c].GetRawDataValue(i);
-                    d[table.Type.Columns[c].Name] = v;
+                    var dataValue = chunk.Columns[c].GetRawDataValue(i);
+                    var columnName = table.Type.Columns[c].Name;
+                    d[columnName] = dataValue;
                 }
 
                 items.Add(d);
@@ -184,19 +202,15 @@ public class KustoQueryContext
     /// <summary>
     ///     Deserialises a Dictionary-based result to objects
     /// </summary>
-    public static IReadOnlyCollection<T> DeserialiseTo<T>(IReadOnlyCollection<OrderedDictionary> results)
+    public static IReadOnlyCollection<T> DeserialiseTo<T>(KustoQueryResult results)
     {
         //this is horrible but I don't have time to research how to do it ourselves and the bottom line
         //is that we are expecting results sets to be small to running through the JsonSerializer is
         //"good enough" for now...
 
-        T ToType(OrderedDictionary d)
-        {
-            var json = JsonSerializer.Serialize(d);
-            return JsonSerializer.Deserialize<T>(json);
-        }
 
-        return results.Select(ToType).ToArray();
+        var json = JsonSerializer.Serialize(results.AsOrderedDictionarySet());
+        return JsonSerializer.Deserialize<T[]>(json);
     }
 
     /// <summary>

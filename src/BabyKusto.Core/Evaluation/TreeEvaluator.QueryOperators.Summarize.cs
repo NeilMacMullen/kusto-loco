@@ -128,7 +128,8 @@ internal partial class TreeEvaluator
             foreach (var summarySet in context.BucketizedTables.Values)
             {
                 // populate the initial summary indices 
-                for (var i = 0; i < summarySet.ByValues.Length; i++) resultColumns[i].Add(summarySet.ByValues[i]);
+                for (var i = 0; i < summarySet.ByValues.Length; i++)
+                    resultColumns[i].Add(summarySet.ByValues[i]);
 
                 //now merge the chunks for this bucket before running any aggregation function...
 

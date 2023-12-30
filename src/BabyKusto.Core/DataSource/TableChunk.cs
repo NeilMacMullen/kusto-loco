@@ -38,6 +38,7 @@ public class TableChunk : ITableChunk
         {
             if (columns[i].Type.Simplify() != tableSymbol.Columns[i].Type.Simplify())
             {
+                //TODO - nasty hack to fix up Kusto's odd integer rules.
                 throw new ArgumentException(
                     $"Mismatched column[{i}] type in chunk, got {SchemaDisplay.GetText(columns[i].Type)}, expected {SchemaDisplay.GetText(tableSymbol.Columns[i].Type)}.");
             }

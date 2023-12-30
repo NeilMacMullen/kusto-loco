@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
-using System.Formats.Asn1;
 using System.Globalization;
 using System.Text;
 using CsvHelper;
 using Extensions;
+
 #pragma warning disable CS8604 // Possible null reference argument.
 
 #pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
@@ -15,6 +15,8 @@ namespace KustoSupport;
 
 public static class KustoFormatter
 {
+    public static string Tabulate(KustoQueryResult result) => Tabulate(result.AsOrderedDictionarySet());
+
     public static string Tabulate(IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
         var sb = new StringBuilder();
@@ -50,8 +52,8 @@ public static class KustoFormatter
 
         int MaxColumnSize(int key)
             => dictionaries.Select(d => SafeGet(d, key).Length)
-                           .Append(headerLengths[key])
-                           .Max();
+                .Append(headerLengths[key])
+                .Max();
     }
 
     public static string WriteToCsvString(IReadOnlyCollection<OrderedDictionary> dictionaries, bool skipHeader)

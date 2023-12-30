@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core;
@@ -35,4 +36,12 @@ public class InMemoryTableSource : ITableSource
 
     public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
         _data.ToAsyncEnumerable();
+
+    public static InMemoryTableSource FromITableSource(ITableSource other)
+    {
+        var chunk = ChunkHelpers.Reassemble(other.GetData().ToArray());
+
+        return new InMemoryTableSource(other.Type,
+            chunk.Columns);
+    }
 }

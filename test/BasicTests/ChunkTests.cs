@@ -22,8 +22,8 @@ public class ChunkTests
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToArray();
 
         context.AddChunkedTableFromRecords("data", rows, 2);
-        var result = (await context.RunQuery("data | take 5"));
-        result.Results.Count.Should().Be(5);
+        var result = (await context.RunTabularQueryAsync("data | take 5"));
+        result.Height.Should().Be(5);
         //TODO - here compare tabulated output for more coverage
     }
 
@@ -35,8 +35,8 @@ public class ChunkTests
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToArray();
 
         context.AddChunkedTableFromRecords("data", rows, 2);
-        var result = (await context.RunQuery("data | count"));
-        KustoFormatter.Tabulate(result.Results).Should().Contain("20");
+        var result = (await context.RunTabularQueryAsync("data | count"));
+        KustoFormatter.Tabulate(result).Should().Contain("20");
     }
 
     [TestMethod]
@@ -46,7 +46,7 @@ public class ChunkTests
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToArray();
 
         context.AddChunkedTableFromRecords("data", rows, 2);
-        var result = (await context.RunQuery("data | where Value < 10 | count"));
-        KustoFormatter.Tabulate(result.Results).Should().Contain("10");
+        var result = (await context.RunTabularQueryAsync("data | where Value < 10 | count"));
+        KustoFormatter.Tabulate(result).Should().Contain("10");
     }
 }

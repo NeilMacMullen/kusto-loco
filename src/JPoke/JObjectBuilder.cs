@@ -7,6 +7,8 @@ using System.Text.Json.Serialization.Metadata;
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
+namespace JPoke;
+
 public class JObjectBuilder
 {
     private readonly JsonNode _root;
@@ -41,7 +43,7 @@ public class JObjectBuilder
         return arr[index] as T;
     }
 
-    public JObjectBuilder Set(JsonNode current, PathParser.JPath path, object value)
+    public JObjectBuilder Set(JsonNode current, JPath path, object value)
     {
         var container = current as JsonObject;
         var element = path.Elements.First();
