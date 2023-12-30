@@ -606,8 +606,12 @@ internal class ReportExplorer
         internal static void Run(ReportExplorer exp, Options o)
         {
             Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
+            //TODO - hide until a better way of sharing tables is found
+            throw new NotImplementedException();
+            /*
             var table = exp.GetCurrentContext().GetTable(o.CurrentName) as TableBuilder;
             exp.GetCurrentContext().AddTable(table.ShareAs(KustoQueryContext.UnescapeTableName(o.As)));
+            */
         }
 
         [Verb("synomym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]

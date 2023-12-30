@@ -1,21 +1,24 @@
 ﻿using BabyKusto.Core;
+using Kusto.Language.Symbols;
 
 namespace KustoSupport;
 
 #pragma warning disable CS8604, CS8602, CS8603
-public class ChunkedKustoTable : BaseKustoTable
+public class ChunkedKustoTable : ITableSource
 {
     private readonly int _chunkSize;
     private readonly ITableSource _source;
 
-    private ChunkedKustoTable(BaseKustoTable source, int chunkSize) :base(source.Type,source.Length)
+    private ChunkedKustoTable(ITableSource source, int chunkSize)
     {
         _source = source;
         _chunkSize = chunkSize;
     }
 
-   
-    public override IEnumerable<ITableChunk> GetData()
+
+    public TableSymbol Type => _source.Type;
+
+    public IEnumerable<ITableChunk> GetData()
     {
         foreach (var c in _source.GetData())
         {
@@ -26,8 +29,8 @@ public class ChunkedKustoTable : BaseKustoTable
         }
     }
 
-    public override IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
+    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
         throw new NotImplementedException();
 
-    public static ChunkedKustoTable FromTable(BaseKustoTable source, int chunkSize) => new(source, chunkSize);
+    public static ChunkedKustoTable FromTable(ITableSource source, int chunkSize) => new(source, chunkSize);
 }

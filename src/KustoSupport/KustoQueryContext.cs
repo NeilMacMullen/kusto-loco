@@ -21,7 +21,7 @@ public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly BabyKustoEngine _engine = new();
-    private readonly List<BaseKustoTable> _tables = new();
+    private readonly List<ITableSource> _tables = new();
 
     private bool _fullDebug;
 
@@ -30,7 +30,11 @@ public class KustoQueryContext
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
-    public void AddTable(BaseKustoTable table)
+    public void AddTable(TableBuilder builder)
+        => AddTable(builder.ToTableSource());
+
+
+    public void AddTable(ITableSource table)
     {
         if (_tables.Any(t => t.Name == table.Name))
             throw new ArgumentException($"Context already contains a table named '{table.Name}'");
@@ -38,7 +42,7 @@ public class KustoQueryContext
         _engine.AddGlobalTable(table);
     }
 
-    public BaseKustoTable GetTable(string name)
+    public ITableSource GetTable(string name)
     {
         return _tables.Single(t => UnescapeTableName(t.Name) == name);
     }
@@ -53,7 +57,8 @@ public class KustoQueryContext
     public void AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {
         var table = TableBuilder.CreateFromRows(tableName, records);
-        var chunked = ChunkedKustoTable.FromTable(table, chunkSize);
+        var chunked = ChunkedKustoTable
+            .FromTable(table.ToTableSource(), chunkSize);
         AddTable(chunked);
     }
 
@@ -71,7 +76,7 @@ public class KustoQueryContext
             return (VisualizationState.Empty, _tables.Select(table => new OrderedDictionary
                     {
                         ["Name"] = table.Name,
-                        ["Length"] = table.Length,
+                        ["Length"] = 0 //table.Length --tables don't always have a length
                     }
                 )
                 .ToArray());
@@ -241,7 +246,7 @@ public class KustoQueryContext
         return tables.Select(UnescapeTableName).Distinct().ToArray();
     }
 
-    public IEnumerable<BaseKustoTable> Tables() => _tables;
+    public IEnumerable<ITableSource> Tables() => _tables;
 
     public static string UnescapeTableName(string tableName)
     {

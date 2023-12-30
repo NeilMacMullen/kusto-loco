@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,16 +8,6 @@ using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core;
-
-public class NullTableSource : ITableSource
-{
-    public static readonly NullTableSource Instance = new();
-    public TableSymbol Type { get; } = TableSymbol.Empty;
-    public IEnumerable<ITableChunk> GetData() => Array.Empty<ITableChunk>();
-
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-        => AsyncEnumerable.Empty<ITableChunk>();
-}
 
 public class InMemoryTableSource : ITableSource
 {

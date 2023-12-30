@@ -21,7 +21,9 @@ public class ChunkColumn<T> : TypedBaseColumn<T>
     }
 
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
+
     public override int RowCount => _length;
+
 
     public static TypedBaseColumn<T> Create(int offset, int length, TypedBaseColumn<T> backing)
     {

@@ -22,9 +22,9 @@ public static class ChunkSplitter
         while (offset < totalSize)
         {
             var takeSize = Math.Min(chunkSize, totalSize - offset);
-            var chunkCols = 
-                source.Columns.Select(col=>ColumnHelpers.MapColumn(col,offset,takeSize)).ToArray();
-            chunks.Add(new TableChunk(source.Table,chunkCols));
+            var chunkCols =
+                source.Columns.Select(col => ColumnHelpers.MapColumn(col, offset, takeSize)).ToArray();
+            chunks.Add(new TableChunk(source.Table, chunkCols));
             offset += takeSize;
         }
 

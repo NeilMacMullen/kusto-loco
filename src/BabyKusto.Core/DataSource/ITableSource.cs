@@ -10,6 +10,7 @@ namespace BabyKusto.Core;
 public interface ITableSource
 {
     TableSymbol Type { get; }
+    public string Name => Type.Name;
 
     IEnumerable<ITableChunk> GetData();
     IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default);

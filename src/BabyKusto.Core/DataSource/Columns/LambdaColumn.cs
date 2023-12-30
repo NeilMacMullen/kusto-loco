@@ -15,10 +15,9 @@ public class LambdaColumn<T> : TypedBaseColumn<T>
     }
 
 
-    public override int RowCount => _length;
-
     public override T? this[int index] => _dataFetcher(index);
 
+    public override int RowCount => _length;
 
     public override object? GetRawDataValue(int index) => this[index];
 

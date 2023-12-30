@@ -16,6 +16,7 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
     }
 
     public override T? this[int index] => Value;
+
     public override int RowCount => _rowCount;
 
     public override void ForEach(Action<object?> action)

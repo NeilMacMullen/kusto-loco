@@ -18,7 +18,9 @@ public class MappedColumn<T> : TypedBaseColumn<T>
     }
 
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
+
     public override int RowCount => _lookups.Length;
+
 
     public static TypedBaseColumn<T> Create(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
     {

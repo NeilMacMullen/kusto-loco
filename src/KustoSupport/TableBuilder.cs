@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Immutable;
 using System.Collections.Specialized;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
@@ -15,37 +16,38 @@ namespace KustoSupport;
 /// <remarks>
 ///     TODO This is currently a bit incomplete - more type support is needed
 /// </remarks>
-public class TableBuilder : BaseKustoTable
+public class TableBuilder
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    public readonly int Length;
+    public readonly string Name;
 
-    private TableBuilder(TableSymbol tableSym, IEnumerable<BaseColumn> columns, int length) : base(
-        tableSym,
-        length)
+    private ImmutableArray<string> _columnNames = ImmutableArray<string>.Empty;
+
+    private ImmutableArray<BaseColumn> _columns = ImmutableArray<BaseColumn>.Empty;
+
+    private TableBuilder(string name, IEnumerable<BaseColumn> columns,
+        IEnumerable<string> columnNames, int length)
     {
-        Columns = columns.ToArray();
+        _columns = columns.ToImmutableArray();
+        _columnNames = columnNames.ToImmutableArray();
         Length = length;
+        Name = name;
     }
-
-    public BaseColumn[] Columns { get; }
 
     public static TableBuilder CreateEmpty(string name, int length) =>
         new(
-            new TableSymbol(name, Array.Empty<ColumnSymbol>()),
+            name,
             Array.Empty<BaseColumn>(),
+            Array.Empty<string>(),
             length);
 
 
     public TableBuilder WithColumn(string name, BaseColumn column)
     {
-        var cs = new ColumnSymbol(name, column.Type);
-        var ts = new TableSymbol(Name,
-            Type.Columns.Append(cs));
-
-
-        return new TableBuilder(ts,
-            Columns.Append(column).ToArray(),
-            Length);
+        _columns = _columns.Add(column);
+        _columnNames = _columnNames.Add(name);
+        return this;
     }
 
     public TableBuilder WithIndexColumn<T>(string name, T? value)
@@ -55,35 +57,9 @@ public class TableBuilder : BaseKustoTable
     }
 
 
-    public override IEnumerable<ITableChunk> GetData()
-    {
-        yield return new TableChunk(this, Columns);
-    }
+    public static TableBuilder CreateFromRows<T>(string name, IReadOnlyCollection<T> rows) => FromRecords(name, rows);
 
-
-    public override IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-        => throw new NotSupportedException();
-
-    /// <summary>
-    ///     Shares the data in a table under a different name
-    /// </summary>
-    public TableBuilder ShareAs(string newName)
-    {
-        var newTableSymbol = new TableSymbol(newName, Type.Columns, Type.Description);
-        return new TableBuilder(newTableSymbol, Columns, Length);
-    }
-
-
-    public static TableBuilder FromDefinition(KustoTableDefinition definition)
-        => new(definition.Symbol, definition.Columns, definition.RowCount);
-
-    public static TableBuilder CreateFromRows<T>(string name, IReadOnlyCollection<T> rows)
-    {
-        var tableDefinition = FromRecords(name, rows);
-        return FromDefinition(tableDefinition);
-    }
-
-    private static KustoTableDefinition FromRecords<T>(string tableName, IReadOnlyCollection<T> records)
+    private static TableBuilder FromRecords<T>(string tableName, IReadOnlyCollection<T> records)
     {
         var columnDefinitions = typeof(T).GetProperties()
             .Select(p => p.PropertyType switch
@@ -105,21 +81,14 @@ public class TableBuilder : BaseKustoTable
         return FromRows(tableName, records, columnDefinitions);
     }
 
-
-    public static KustoTableDefinition FromRows<T>(string tableName,
+    public static TableBuilder FromRows<T>(string tableName,
         IReadOnlyCollection<T> rows,
         IReadOnlyCollection<KustoColumnDefinition<T>> columnDefinitions)
     {
-        var tableSymbol =
-            new TableSymbol(tableName, columnDefinitions
-                .Select(p => new ColumnSymbol(p.Name, p.Type))
-                .ToArray());
-
-        var allColumns = columnDefinitions
-            .Select(Create)
-            .ToArray();
-
-        return new KustoTableDefinition(tableSymbol, allColumns, rows.Count);
+        return new TableBuilder(tableName,
+            columnDefinitions.Select(Create).ToArray(),
+            columnDefinitions.Select(c => c.Name).ToArray(),
+            rows.Count);
 
         BaseColumn Create(KustoColumnDefinition<T> c)
         {
@@ -159,16 +128,25 @@ public class TableBuilder : BaseKustoTable
             })
             .ToList();
 
-        var definition = FromRows(tableName,
+        return FromRows(tableName,
             Enumerable.Range(0, dictionaries.Count).ToArray(),
             columnDefinitions);
-        return FromDefinition(definition);
     }
 
     public static ITableSource FromScalarResult(ScalarResult scalar)
     {
         var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
         return CreateEmpty("result", 1)
-            .WithColumn("value", column);
+            .WithColumn("value", column)
+            .ToTableSource();
+    }
+
+    public ITableSource ToTableSource()
+    {
+        var syms = _columnNames.Zip(_columns).Select(cs =>
+                new ColumnSymbol(cs.First, cs.Second.Type))
+            .ToArray();
+        var ts = new TableSymbol(Name, syms);
+        return new InMemoryTableSource(ts, _columns.ToArray());
     }
 }

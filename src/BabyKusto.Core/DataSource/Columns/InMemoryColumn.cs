@@ -10,10 +10,9 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
         _data = data ?? throw new ArgumentNullException(nameof(data));
 
 
-    public override int RowCount => _data.Length;
-
     public override T? this[int index] => _data[index];
 
+    public override int RowCount => _data.Length;
 
     public override object? GetRawDataValue(int index) => _data[index];
 

@@ -63,13 +63,13 @@ public class OperatorTests
 
         var tableLength = 10;
         var context = CreateContext();
-        var table = TableBuilder.CreateEmpty("data", tableLength);
+
 
         var c1 = new SingleValueColumn<int?>(1, tableLength);
-        table = table
+        var builder = TableBuilder.CreateEmpty("data", tableLength)
             .WithColumn("c1", c1)
             .WithColumn("c2", c1);
-        context.AddTable(table);
+        context.AddTable(builder);
         //add.cs
         (await context.RunTabularQueryAsync("data | extend p=c1+c2"))
             .Error.Should().BeEmpty();

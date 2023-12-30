@@ -14,10 +14,11 @@ public abstract class BaseColumn
     protected ColumnHints hints;
     protected BaseColumn(TypeSymbol type) => Type = type;
     public TypeSymbol Type { get; }
-    public abstract int RowCount { get; }
 
     public bool IsSingleValue => hints.HasFlag(ColumnHints.HoldsSingleValue)
                                  | (RowCount == 1);
+
+    public abstract int RowCount { get; }
 
     public abstract object? GetRawDataValue(int index);
 

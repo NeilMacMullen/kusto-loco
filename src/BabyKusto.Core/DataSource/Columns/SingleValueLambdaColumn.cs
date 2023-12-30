@@ -14,11 +14,10 @@ public class SingleValueLambdaColumn<T> : TypedBaseColumn<T>
         hints = ColumnHints.HoldsSingleValue;
     }
 
-    public override int RowCount => _length;
 
     public override T? this[int index] => _dataFetcher();
 
-
+    public override int RowCount => _length;
     public override object? GetRawDataValue(int index) => this[index];
 
     public override BaseColumn Slice(int start, int length) => new SingleValueLambdaColumn<T>(_dataFetcher, length);
