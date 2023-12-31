@@ -41,7 +41,7 @@ public class KustoResultRenderer
         if (result.Height == 0)
             return result.Error;
         var headers = result.ColumnDefinitions();
-        var types = headers.Select(h => h.Type).ToArray();
+        var types = headers.Select(h => h.UnderlyingType).ToArray();
 
         string AxisType(Type t)
         {

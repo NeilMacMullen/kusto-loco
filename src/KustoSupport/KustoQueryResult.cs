@@ -73,8 +73,14 @@ public class KustoQueryResult
 
     public ColumnResult[] ColumnDefinitions()
     {
-        return Table.Type.Columns.Select(c => new ColumnResult(c.Name,
-            TypeMapping.TypeForSymbol(c.Type))).ToArray();
+        return Table.Type
+            .Columns
+            .Select((c, i) => new ColumnResult(
+                c.Name,
+                i,
+                TypeMapping.UnderlyingTypeForSymbol(c.Type))
+            )
+            .ToArray();
     }
 
     public string[] ColumnNames() => ColumnDefinitions().Select(c => c.Name).ToArray();
@@ -108,4 +114,6 @@ public class KustoQueryResult
 
         return items;
     }
+
+    public IEnumerable<object?> EnumerateColumnData(ColumnResult col) => Table.GetColumnData(col.Index);
 }

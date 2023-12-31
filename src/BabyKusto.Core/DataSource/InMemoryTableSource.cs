@@ -9,8 +9,12 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core;
 
+/// <summary>
+///     Use primary for EvaluationResults when all data has been materialized and is available
+/// </summary>
 public class InMemoryTableSource : ITableSource
 {
+    //actually only ever one chunk
     private readonly ITableChunk[] _data;
 
     public InMemoryTableSource(TableSymbol type, BaseColumn[] columns)
@@ -32,5 +36,16 @@ public class InMemoryTableSource : ITableSource
 
         return new InMemoryTableSource(other.Type,
             chunk.Columns);
+    }
+
+    public IEnumerable<object?> GetColumnData(int n)
+    {
+        var col =
+            _data[0].Columns[n];
+        var len = col.RowCount;
+
+        return
+            Enumerable.Range(0, len)
+                .Select(i => col.GetRawDataValue(i));
     }
 }

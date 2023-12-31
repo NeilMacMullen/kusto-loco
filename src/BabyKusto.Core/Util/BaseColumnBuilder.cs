@@ -1,4 +1,6 @@
-﻿namespace BabyKusto.Core.Util;
+﻿using System;
+
+namespace BabyKusto.Core.Util;
 
 public abstract class BaseColumnBuilder
 {
@@ -7,4 +9,6 @@ public abstract class BaseColumnBuilder
     public abstract void Add(object? value);
     public abstract void AddRange(BaseColumnBuilder other);
     public abstract BaseColumn ToColumn();
+
+    public abstract Array GetDataAsArray();
 }

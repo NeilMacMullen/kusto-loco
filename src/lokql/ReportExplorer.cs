@@ -12,6 +12,7 @@ using CsvHelper;
 using Extensions;
 using KustoSupport;
 using NLog;
+using ParquetSupport;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
@@ -166,6 +167,12 @@ internal class ReportExplorer
     private static string ToJson(KustoQueryResult result)
         => ToJson(result.AsOrderedDictionarySet());
 
+
+    private static async Task ToParquet(string path, KustoQueryResult result)
+    {
+        await ParquetFileOps.Save(path, result);
+    }
+
     private static void ShowError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -199,7 +206,8 @@ internal class ReportExplorer
         Json,
         Csv,
         Txt,
-        Unspecified
+        Unspecified,
+        Parquet
     }
 
     internal readonly record struct DisplayOptions(FormatTypes Format, int MaxToDisplay);
@@ -221,13 +229,13 @@ internal class ReportExplorer
                     typeof(SynTableCommand.Options),
                     typeof(AllTablesCommand.Options),
                     typeof(LoadCsvCommand.Options),
-                    typeof(LoadIdsCommand.Options)
+                    typeof(LoadIdsCommand.Options),
+                    typeof(LoadParquetCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
                 .WithParsed<AllTablesCommand.Options>(o => AllTablesCommand.Run(this, o))
                 .WithParsed<ExitCommand.Options>(o => ExitCommand.Run(this, o))
-                .WithParsed<SaveCommand.Options>(o => SaveCommand.Run(this, o))
                 .WithParsed<FormatCommand.Options>(o => FormatCommand.Run(this, o))
                 .WithParsed<SynTableCommand.Options>(o => SynTableCommand.Run(this, o))
                 .WithParsedAsync<RunScriptCommand.Options>(o => RunScriptCommand.RunAsync(this, o))
@@ -235,6 +243,8 @@ internal class ReportExplorer
                 .WithParsedAsync<LoadCommand.Options>(o => LoadCommand.RunAsync(this, o))
                 .WithParsedAsync<LoadCsvCommand.Options>(o => LoadCsvCommand.RunAsync(this, o))
                 .WithParsedAsync<LoadIdsCommand.Options>(o => LoadIdsCommand.RunAsync(this, o))
+                .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
+                .WithParsedAsync<LoadParquetCommand.Options>(o => LoadParquetCommand.RunAsync(this, o))
             ;
     }
 
@@ -321,18 +331,32 @@ internal class ReportExplorer
 
     public static class SaveCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.OutputFolder, o.Format.ToString().ToLowerInvariant());
-            var text = o.Format switch
+            string text;
+            switch (o.Format)
             {
-                FormatTypes.Json => ToJson(exp._prevResult.AsOrderedDictionarySet()),
-                FormatTypes.Ascii => Tabulate(exp._prevResult.AsOrderedDictionarySet()),
-                FormatTypes.Csv => KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(),
-                    o.SkipHeader),
-                FormatTypes.Txt => KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), true),
-                _ => ToJson(exp._prevResult.AsOrderedDictionarySet())
-            };
+                case FormatTypes.Parquet:
+                    await ToParquet(filename, exp._prevResult);
+                    Logger.Info($"Wrote parquet file {filename}");
+                    return;
+                case FormatTypes.Json:
+                    text = ToJson(exp._prevResult.AsOrderedDictionarySet());
+                    break;
+                case FormatTypes.Ascii:
+                    text = Tabulate(exp._prevResult.AsOrderedDictionarySet());
+                    break;
+                case FormatTypes.Csv:
+                    text = KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), o.SkipHeader);
+                    break;
+                case FormatTypes.Txt:
+                    text = KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), true);
+                    break;
+                default:
+                    text = ToJson(exp._prevResult.AsOrderedDictionarySet());
+                    break;
+            }
 
             Logger.Info($"Saving to {filename}...");
             File.WriteAllText(filename, text);
@@ -548,6 +572,37 @@ internal class ReportExplorer
         }
 
         [Verb("loadcsv", aliases: ["lj"],
+            HelpText = "loads a previous-saved json query result as a new table")]
+        internal class Options
+        {
+            [Value(0, HelpText = "Name of file", Required = true)]
+            public string File { get; set; } = string.Empty;
+
+            [Value(1, HelpText = "Name of table (defaults to name of file)")]
+            public string As { get; set; } = string.Empty;
+        }
+    }
+
+
+    public static class LoadParquetCommand
+    {
+        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        {
+            await Task.CompletedTask;
+            var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".parquet");
+
+
+            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
+
+            var table = await ParquetFileOps.LoadFromFile(filename, tableName);
+
+
+            exp.GetCurrentContext()
+                .AddTable(table);
+            Logger.Info($"Table '{tableName}' now available");
+        }
+
+        [Verb("loadparquet", aliases: ["lj"],
             HelpText = "loads a previous-saved json query result as a new table")]
         internal class Options
         {

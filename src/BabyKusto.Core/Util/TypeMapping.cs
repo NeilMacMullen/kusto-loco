@@ -39,6 +39,14 @@ public static class TypeMapping
             .ToDictionary(kv => kv.Value.Type, kv => kv.Key);
     }
 
+    /// <summary>
+    ///     Returns the TypeSymbol associated with the .Net type
+    /// </summary>
+    /// <remarks>
+    ///     Multiple .Net types can map to the same TypeSymbol and this method
+    ///     also allows us to map nullable types.  So for example
+    ///     float,float?,double,double?  all map to ScalarTypes.Real
+    /// </remarks>
     public static TypeSymbol SymbolForType(Type type)
     {
         if (NetToKustoLookup.TryGetValue(UnderlyingType(type), out var ts))
@@ -46,12 +54,19 @@ public static class TypeMapping
         throw new NotImplementedException($"No TypeSymbol equivalent for .Net type {type.Name}");
     }
 
-    public static Type TypeForSymbol(TypeSymbol ts)
+    /// <summary>
+    ///     Gets the "core" .Net type associated with the TypeSymbol
+    /// </summary>
+    /// <remarks>
+    ///     Even though the data in columns is stored as NULLABLE, we return
+    ///     'int' vs 'int?' etc
+    /// </remarks>
+    public static Type UnderlyingTypeForSymbol(TypeSymbol ts)
     {
         if (KustoToNetToLookup.TryGetValue(ts, out var type))
             return type;
         if (ts is DynamicPrimitiveSymbol ds)
-            return TypeForSymbol(ds.UnderlyingType);
+            return UnderlyingTypeForSymbol(ds.UnderlyingType);
         throw new NotImplementedException($"No .Net type  equivalent for typeSymbol {ts.Name}");
     }
 

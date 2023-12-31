@@ -11,6 +11,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0-preview-23531-01" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.1.1" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageVersion Include="Parquet.Net" Version="4.18.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="xunit" Version="2.6.4" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.6" />

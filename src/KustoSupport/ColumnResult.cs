@@ -1,3 +1,3 @@
 ﻿namespace KustoSupport;
 
-public readonly record struct ColumnResult(string Name, Type Type);
+public readonly record struct ColumnResult(string Name, int Index, Type UnderlyingType);

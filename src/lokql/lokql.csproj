@@ -18,6 +18,7 @@
     <ProjectReference Include="..\JPoke\JPoke.csproj" />
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\LogSetup\LogSetup.csproj" />
+    <ProjectReference Include="..\Parquet\ParquetSupport.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
     <ProjectReference Include="..\VegaGenerator\VegaGenerator.csproj" />
   </ItemGroup>

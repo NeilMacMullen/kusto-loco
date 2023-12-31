@@ -64,9 +64,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lokql", "src\lokql\lokql.cs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedStringFunctionality", "src\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj", "{C7CD877B-6D18-459F-AFE8-69239B7D68B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rendering", "src\Rendering\Rendering.csproj", "{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rendering", "src\Rendering\Rendering.csproj", "{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessWatcher", "samples\ProcessWatcher\ProcessWatcher.csproj", "{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessWatcher", "samples\ProcessWatcher\ProcessWatcher.csproj", "{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParquetSupport", "src\Parquet\ParquetSupport.csproj", "{81019EDB-C726-4008-9E1D-DCA7FF984030}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -158,6 +160,10 @@ Global
 		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81019EDB-C726-4008-9E1D-DCA7FF984030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81019EDB-C726-4008-9E1D-DCA7FF984030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81019EDB-C726-4008-9E1D-DCA7FF984030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81019EDB-C726-4008-9E1D-DCA7FF984030}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +191,7 @@ Global
 		{C7CD877B-6D18-459F-AFE8-69239B7D68B3} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{7FBDE055-4454-4BB2-82A3-5F2085ABA41D} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{81019EDB-C726-4008-9E1D-DCA7FF984030} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
