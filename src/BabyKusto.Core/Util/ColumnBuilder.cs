@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core.Util;
@@ -33,7 +34,10 @@ public class ColumnBuilder<T> : BaseColumnBuilder
 
     public override void Add(object? value)
     {
-        _data.Add((T?)value);
+        if (typeof(T) == typeof(JsonNode))
+            _data.Add((T?)value);
+        else
+            _data.Add(TypeMapping.CastOrConvertToNullable<T>(value));
     }
 
     public override BaseColumn ToColumn() => ColumnFactory.Create(_data.ToArray());

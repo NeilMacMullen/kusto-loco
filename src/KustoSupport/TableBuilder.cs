@@ -50,6 +50,23 @@ public class TableBuilder
         return this;
     }
 
+    public TableBuilder WithColumn<T>(string name, IReadOnlyCollection<T> items)
+    {
+        var column = ColumnFactory.Create(items.ToArray());
+        return WithColumn(name, column);
+    }
+
+    public TableBuilder WithColumn(string name, Type type, IReadOnlyCollection<object?> items)
+    {
+        var builder = ColumnHelpers.CreateBuilder(type);
+        foreach (var item in items)
+        {
+            builder.Add(item);
+        }
+
+        return WithColumn(name, builder.ToColumn());
+    }
+
     public TableBuilder WithIndexColumn<T>(string name, T? value)
     {
         var indexColumn = new SingleValueColumn<T>(value, Length);
@@ -61,45 +78,15 @@ public class TableBuilder
 
     private static TableBuilder FromRecords<T>(string tableName, IReadOnlyCollection<T> records)
     {
-        var columnDefinitions = typeof(T).GetProperties()
-            .Select(p => p.PropertyType switch
-            {
-                _ when p.PropertyType == typeof(int) =>
-                    new KustoColumnDefinition<T>(p.Name, ScalarTypes.Int,
-                        x => p.GetValue(x)),
-                _ when p.PropertyType == typeof(DateTime) =>
-                    new KustoColumnDefinition<T>(p.Name, ScalarTypes.DateTime,
-                        x => p.GetValue(x)),
-                _ when p.PropertyType == typeof(double) =>
-                    new KustoColumnDefinition<T>(p.Name, ScalarTypes.Real,
-                        x => p.GetValue(x)),
-                _ => new KustoColumnDefinition<T>(p.Name, ScalarTypes.String,
-                    x => p.GetValue(x).ToString()),
-            })
-            .ToList();
-
-        return FromRows(tableName, records, columnDefinitions);
-    }
-
-    public static TableBuilder FromRows<T>(string tableName,
-        IReadOnlyCollection<T> rows,
-        IReadOnlyCollection<KustoColumnDefinition<T>> columnDefinitions)
-    {
-        return new TableBuilder(tableName,
-            columnDefinitions.Select(Create).ToArray(),
-            columnDefinitions.Select(c => c.Name).ToArray(),
-            rows.Count);
-
-        BaseColumn Create(KustoColumnDefinition<T> c)
+        var builder = CreateEmpty(tableName, records.Count);
+        foreach (var p in typeof(T).GetProperties())
         {
-            var builder = ColumnHelpers.CreateBuilder(c.Type);
-            foreach (var r in rows)
-            {
-                builder.Add(c.Value(r));
-            }
+            var data = records.Select(r => p.GetValue(r)).ToArray();
 
-            return builder.ToColumn();
+            builder.WithColumn(p.Name, p.PropertyType, data);
         }
+
+        return builder;
     }
 
     public static TableBuilder FromOrderedDictionarySet(string tableName,
@@ -111,26 +98,15 @@ public class TableBuilder
             .Select(de => de.Key.ToString())
             .Select(h => new { ColumnName = h, Type = firstDictionary[h].GetType() })
             .ToArray();
-        var columnDefinitions = headers
-            .Select(h => h switch
-            {
-                _ when h.Type == typeof(int) =>
-                    new KustoColumnDefinition<int>(h.ColumnName, ScalarTypes.Int,
-                        x => dictionaries.ElementAt(x)[h.ColumnName]),
-                _ when h.Type == typeof(DateTime) =>
-                    new KustoColumnDefinition<int>(h.ColumnName, ScalarTypes.DateTime,
-                        x => dictionaries.ElementAt(x)[h.ColumnName]),
-                _ when h.Type == typeof(double) =>
-                    new KustoColumnDefinition<int>(h.ColumnName, ScalarTypes.Real,
-                        x => dictionaries.ElementAt(x)[h.ColumnName]),
-                _ => new KustoColumnDefinition<int>(h.ColumnName, ScalarTypes.String,
-                    x => dictionaries.ElementAt(x)[h.ColumnName].ToString()),
-            })
-            .ToList();
 
-        return FromRows(tableName,
-            Enumerable.Range(0, dictionaries.Count).ToArray(),
-            columnDefinitions);
+        var builder = CreateEmpty(tableName, dictionaries.Count);
+        foreach (var header in headers)
+        {
+            var data = dictionaries.Select(d => d[header.ColumnName]).ToArray();
+            builder.WithColumn(header.ColumnName, header.Type, data);
+        }
+
+        return builder;
     }
 
     public static ITableSource FromScalarResult(ScalarResult scalar)

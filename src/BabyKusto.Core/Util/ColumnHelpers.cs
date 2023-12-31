@@ -51,6 +51,11 @@ public static class ColumnHelpers
             return CreateFromObjectArray<TimeSpan?>(data);
         }
 
+        if (typeSymbol == ScalarTypes.Guid)
+        {
+            return CreateFromObjectArray<Guid?>(data);
+        }
+
         if (typeSymbol == ScalarTypes.Dynamic)
         {
             return CreateFromObjectArray<JsonNode?>(data);
@@ -121,8 +126,7 @@ public static class ColumnHelpers
         return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
     }
 
-    public static BaseColumnBuilder CreateBuilder(Type type)
-        => CreateBuilder(TypeMapping.SymbolForType(type));
+    public static BaseColumnBuilder CreateBuilder(Type type) => CreateBuilder(TypeMapping.SymbolForType(type));
 
 
     public static BaseColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
@@ -156,6 +160,11 @@ public static class ColumnHelpers
         if (typeSymbol == ScalarTypes.DateTime)
         {
             return new ColumnBuilder<DateTime?>();
+        }
+
+        if (typeSymbol == ScalarTypes.Guid)
+        {
+            return new ColumnBuilder<Guid?>();
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)

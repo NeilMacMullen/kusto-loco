@@ -7,7 +7,7 @@
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Fastenshtein" Version="1.0.0.8" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
-    <PackageVersion Include="NLog" Version="5.2.7" />
+    <PackageVersion Include="NLog" Version="5.2.8" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0-preview-23531-01" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.1.1" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.1.1" />
