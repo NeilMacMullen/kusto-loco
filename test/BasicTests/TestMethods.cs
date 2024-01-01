@@ -20,6 +20,7 @@ public abstract class TestMethods
         var result = await context.RunTabularQueryAsync(query);
         //return the last line 
         Console.WriteLine($"{result.Error}");
+        Console.WriteLine($"{KustoFormatter.Tabulate(result, 10)}");
         return result.GetRow(result.Height - 1).JoinString();
     }
 }

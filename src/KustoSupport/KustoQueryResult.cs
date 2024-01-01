@@ -1,14 +1,19 @@
 ﻿using System.Collections.Specialized;
+using System.Text.Json;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Util;
-using Kusto.Language.Symbols;
+using NLog;
+
+#pragma warning disable CS8603 // Possible null reference return.
 
 namespace KustoSupport;
 
 #pragma warning disable CS8601
 public class KustoQueryResult
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     /// <summary>
     ///     Provides the results of a Kusto query as a collection of dictionaries
     /// </summary>
@@ -17,40 +22,20 @@ public class KustoQueryResult
     ///     In the future we may provide a more "column-oriented" result where the type of the columns
     ///     is explicitly provided but for the moment this allows easy json serialisation
     /// </remarks>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public KustoQueryResult(string Query,
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        EvaluationResult results,
-        int QueryDuration,
-        string Error)
+    public KustoQueryResult(string query,
+        InMemoryTableSource results,
+        VisualizationState vis,
+        int queryDuration,
+        string error)
     {
-        this.Query = Query;
-        switch (results)
-        {
-            case ScalarResult scalar:
-                Visualization = VisualizationState.Empty;
-                var s = TableBuilder.FromScalarResult(scalar);
-                Table = InMemoryTableSource.FromITableSource(s);
-                Height = 1;
-                break;
-            case TabularResult tabular:
-                Visualization = tabular.VisualizationState;
-                var sourceTable = tabular.Value;
-                Table = InMemoryTableSource.FromITableSource(sourceTable);
-                Height = Table.GetData().Single().RowCount;
-                break;
-            default:
-                Visualization = VisualizationState.Empty;
-                Table = new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>());
-                Height = 0;
-                break;
-        }
+        Query = query;
+        Table = results;
+        Visualization = vis;
+        Height = results.RowCount;
 
-
-        this.QueryDuration = QueryDuration;
-        this.Error = Error;
+        QueryDuration = queryDuration;
+        Error = error;
     }
-
 
     public string Query { get; init; }
 
@@ -95,9 +80,8 @@ public class KustoQueryResult
     {
         var items = new List<OrderedDictionary>();
 
-        var table = Table;
         var columns = ColumnDefinitions();
-        var chunk = table.GetData().First();
+        var chunk = Table.GetData().First();
         for (var row = 0; row < Height; row++)
         {
             var d = new OrderedDictionary();
@@ -116,4 +100,22 @@ public class KustoQueryResult
     }
 
     public IEnumerable<object?> EnumerateColumnData(ColumnResult col) => Table.GetColumnData(col.Index);
+
+    /// <summary>
+    ///     Deserialises a Dictionary-based result to objects
+    /// </summary>
+    public IReadOnlyCollection<T> DeserialiseTo<T>()
+    {
+        //this is horrible but I don't have time to research how to do it ourselves and the bottom line
+        //is that we are expecting results sets to be small to running through the JsonSerializer is
+        //"good enough" for now...
+
+        var json = ToJsonString();
+        return JsonSerializer.Deserialize<T[]>(json);
+    }
+
+    /// <summary>
+    ///     Deserialises a Dictionary-based result to objects
+    /// </summary>
+    public string ToJsonString() => JsonSerializer.Serialize(AsOrderedDictionarySet());
 }

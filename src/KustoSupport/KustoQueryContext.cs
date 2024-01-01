@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using Extensions;
@@ -65,45 +63,7 @@ public class KustoQueryContext
     public int BenchmarkQuery(string query)
     {
         var res = _engine.Evaluate(query, _fullDebug, _fullDebug);
-        return Materialise(res as TabularResult);
-    }
-
-    public (VisualizationState, IReadOnlyCollection<OrderedDictionary>) RunTabularQueryToDictionarySet(string query)
-    {
-        //handling for "special" commands
-        if (query.Trim() == ".tables")
-        {
-            return (VisualizationState.Empty, _tables.Select(table => new OrderedDictionary
-                    {
-                        ["Name"] = table.Name,
-                        ["Length"] = 0 //table.Length --tables don't always have a length
-                    }
-                )
-                .ToArray());
-        }
-
-        var result =
-            _engine.Evaluate(query,
-                _fullDebug, _fullDebug
-            );
-        if (result is TabularResult res)
-        {
-            return (res.VisualizationState, GetDictionarySet(res));
-        }
-
-        if (result is ScalarResult s)
-        {
-            var o = new OrderedDictionary
-            {
-                ["value"] = s.Value
-            };
-            return (VisualizationState.Empty, new[]
-            {
-                o
-            });
-        }
-
-        return (VisualizationState.Empty, GetDictionarySet(TabularResult.Empty));
+        return res.RowCount;
     }
 
     //temporary until we plumb lazy table load back in
@@ -124,15 +84,36 @@ public class KustoQueryContext
                 _engine.Evaluate(query,
                     _fullDebug, _fullDebug
                 );
-            return new KustoQueryResult(query, result, (int)watch.ElapsedMilliseconds,
+            var (table, vis) = TableFromEvaluationResult(result);
+
+            return new KustoQueryResult(query, table, vis, (int)watch.ElapsedMilliseconds,
                 string.Empty);
         }
         catch (Exception ex)
         {
-            return new KustoQueryResult(query, EvaluationResult.Null, 0, ex.Message);
+            var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
+            return new KustoQueryResult(query, table, vis, 0, ex.Message);
         }
     }
 
+    private (InMemoryTableSource, VisualizationState) TableFromEvaluationResult(EvaluationResult results)
+    {
+        switch (results)
+        {
+            case ScalarResult scalar:
+
+                return (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult(scalar))
+                    , VisualizationState.Empty);
+            case TabularResult tabular:
+
+                return (InMemoryTableSource.FromITableSource(tabular.Value), tabular.VisualizationState);
+
+            default:
+
+                return (new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>()),
+                    VisualizationState.Empty);
+        }
+    }
 
     public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
 
@@ -152,71 +133,11 @@ public class KustoQueryContext
         }
         catch (Exception ex)
         {
-            return new KustoQueryResult(query, EvaluationResult.Null, 0, ex.Message);
+            var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
+            return new KustoQueryResult(query, table, vis, 0, ex.Message);
         }
     }
 
-
-    public static IReadOnlyCollection<OrderedDictionary> GetDictionarySet(TabularResult tabularResult)
-    {
-        var items = new List<OrderedDictionary>();
-
-        var table = tabularResult.Value;
-        foreach (var chunk in table.GetData())
-        {
-            for (var i = 0; i < chunk.RowCount; i++)
-            {
-                var d = new OrderedDictionary();
-                for (var c = 0; c < chunk.Columns.Length; c++)
-                {
-                    var dataValue = chunk.Columns[c].GetRawDataValue(i);
-                    var columnName = table.Type.Columns[c].Name;
-                    d[columnName] = dataValue;
-                }
-
-                items.Add(d);
-            }
-        }
-
-
-        return items;
-    }
-
-    public static int Materialise(TabularResult tabularResult)
-    {
-        var count = 0;
-
-        var table = tabularResult.Value;
-        foreach (var chunk in table.GetData())
-        {
-            for (var i = 0; i < chunk.RowCount; i++)
-            {
-                for (var c = 0; c < chunk.Columns.Length; c++)
-                {
-                    var v = chunk.Columns[c].GetRawDataValue(i);
-                    count++;
-                }
-            }
-        }
-
-
-        return count;
-    }
-
-
-    /// <summary>
-    ///     Deserialises a Dictionary-based result to objects
-    /// </summary>
-    public static IReadOnlyCollection<T> DeserialiseTo<T>(KustoQueryResult results)
-    {
-        //this is horrible but I don't have time to research how to do it ourselves and the bottom line
-        //is that we are expecting results sets to be small to running through the JsonSerializer is
-        //"good enough" for now...
-
-
-        var json = JsonSerializer.Serialize(results.AsOrderedDictionarySet());
-        return JsonSerializer.Deserialize<T[]>(json);
-    }
 
     /// <summary>
     ///     Gets a list of all table references within a Kusto query

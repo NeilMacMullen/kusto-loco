@@ -23,6 +23,7 @@ public class InMemoryTableSource : ITableSource
         _data = new ITableChunk[] { new TableChunk(this, columns) };
     }
 
+    public int RowCount => _data.First().RowCount;
     public TableSymbol Type { get; }
 
     public IEnumerable<ITableChunk> GetData() => _data;

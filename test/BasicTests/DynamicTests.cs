@@ -53,4 +53,13 @@ public class DynamicTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("2");
     }
+
+    [TestMethod]
+    public async Task DynamicArray()
+    {
+        var query = @"print geo_geohash_to_central_point('sunny')";
+
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("coordinates");
+    }
 }

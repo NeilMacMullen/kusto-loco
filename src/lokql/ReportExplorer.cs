@@ -48,38 +48,33 @@ internal class ReportExplorer
             }
             else
             {
-                var od = result.AsOrderedDictionarySet();
-                var display = od.Take(_currentDisplayOptions.MaxToDisplay)
-                    .ToArray();
-
-
+                var max = _currentDisplayOptions.MaxToDisplay;
                 switch (_currentDisplayOptions.Format)
                 {
                     case FormatTypes.Ascii:
-                        Console.WriteLine(KustoFormatter.Tabulate(display));
+                        Console.WriteLine(KustoFormatter.Tabulate(result, max));
                         break;
                     case FormatTypes.Json:
-                        Console.WriteLine(ToJson(display));
+                        Console.WriteLine(result.ToJsonString());
                         break;
                     case FormatTypes.Csv:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(display, false));
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(result, max, false));
                         break;
                     case FormatTypes.Txt:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(display, true));
+                        Console.WriteLine(KustoFormatter.WriteToCsvString(result, max, true));
                         break;
                 }
 
-                if (display.Count() != result.Height)
+                if (_currentDisplayOptions.MaxToDisplay < result.Height)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(
-                        $"Display was truncated to first {display.Count()} of {result.Height}.  Use '.display --max' to change this behaviour");
+                        $"Display was truncated to first {max} of {result.Height}.  Use '.display --max' to change this behaviour");
                 }
             }
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Query took {result.QueryDuration}ms");
-            Console.WriteLine($"Visualisation type {result.Visualization.ChartType}");
         }
     }
 
@@ -148,6 +143,7 @@ internal class ReportExplorer
                 }
             }
 
+
             var result = GetCurrentContext().RunTabularQuery(query);
             _prevResult = result;
             DisplayResults(result);
@@ -159,13 +155,6 @@ internal class ReportExplorer
 
         Console.WriteLine();
     }
-
-    private static string ToJson(IReadOnlyCollection<OrderedDictionary> result)
-        => JsonSerializer.Serialize(result,
-            new JsonSerializerOptions { WriteIndented = true });
-
-    private static string ToJson(KustoQueryResult result)
-        => ToJson(result.AsOrderedDictionarySet());
 
 
     private static async Task ToParquet(string path, KustoQueryResult result)
@@ -179,10 +168,6 @@ internal class ReportExplorer
         Console.WriteLine("Error:");
         Console.WriteLine(message);
     }
-
-
-    private static string Tabulate(IReadOnlyCollection<OrderedDictionary> result)
-        => KustoFormatter.Tabulate(result);
 
 
     private static string ToFullPath(string file, string folder, string extension)
@@ -245,6 +230,7 @@ internal class ReportExplorer
                 .WithParsedAsync<LoadIdsCommand.Options>(o => LoadIdsCommand.RunAsync(this, o))
                 .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
                 .WithParsedAsync<LoadParquetCommand.Options>(o => LoadParquetCommand.RunAsync(this, o))
+                .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
             ;
     }
 
@@ -342,19 +328,19 @@ internal class ReportExplorer
                     Logger.Info($"Wrote parquet file {filename}");
                     return;
                 case FormatTypes.Json:
-                    text = ToJson(exp._prevResult.AsOrderedDictionarySet());
+                    text = exp._prevResult.ToJsonString();
                     break;
                 case FormatTypes.Ascii:
-                    text = Tabulate(exp._prevResult.AsOrderedDictionarySet());
+                    text = KustoFormatter.Tabulate(exp._prevResult);
                     break;
                 case FormatTypes.Csv:
-                    text = KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), o.SkipHeader);
+                    text = KustoFormatter.WriteToCsvString(exp._prevResult, int.MaxValue, o.SkipHeader);
                     break;
                 case FormatTypes.Txt:
-                    text = KustoFormatter.WriteToCsvString(exp._prevResult.AsOrderedDictionarySet(), true);
+                    text = KustoFormatter.WriteToCsvString(exp._prevResult, int.MaxValue, true);
                     break;
                 default:
-                    text = ToJson(exp._prevResult.AsOrderedDictionarySet());
+                    text = exp._prevResult.ToJsonString();
                     break;
             }
 
@@ -440,10 +426,6 @@ internal class ReportExplorer
 
     public static class LoadCommand
     {
-        /*
-        private static readonly JsonSerializerOptions SensizeSerializerOptions =
-            new JsonSerializerOptions().WithSensizePreferences().AddJsonConverters(new SpecializedJsonTypeConverter());
-        */
         internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".json");

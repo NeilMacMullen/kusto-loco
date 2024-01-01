@@ -66,7 +66,7 @@ public static class ParquetFileOps
         foreach (var c in rg)
         {
             var type = c.Field.ClrType;
-            Logger.Info($"reading column {c.Field.Name} of type {c.Field.Name}");
+            Logger.Debug($"reading column {c.Field.Name} of type {c.Field.Name}");
             var colBuilder = ColumnHelpers.CreateBuilder(type);
             foreach (var o in c.Data)
             {

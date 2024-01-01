@@ -67,6 +67,8 @@ public static class TypeMapping
             return type;
         if (ts is DynamicPrimitiveSymbol ds)
             return UnderlyingTypeForSymbol(ds.UnderlyingType);
+        if (ts.Name == "dynamic")
+            return UnderlyingTypeForSymbol(ScalarTypes.Dynamic);
         throw new NotImplementedException($"No .Net type  equivalent for typeSymbol {ts.Name}");
     }
 

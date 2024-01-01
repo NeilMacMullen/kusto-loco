@@ -15,48 +15,53 @@ namespace KustoSupport;
 
 public static class KustoFormatter
 {
-    public static string Tabulate(KustoQueryResult result) => Tabulate(result.AsOrderedDictionarySet());
-
-    public static string Tabulate(IReadOnlyCollection<OrderedDictionary> dictionaries)
+    public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
     {
+        if (result.Height == 0)
+            return "no results";
+        var columns = result.ColumnDefinitions();
         var sb = new StringBuilder();
-        if (!dictionaries.Any())
+
+        var displayHeight = Math.Min(max, result.Height);
+
+        string[] MakeStringColumn(ColumnResult c)
+            => new[] { c.Name }
+                .Concat(result.EnumerateColumnData(c).Take(max))
+                .Select(o => o?.ToString() ?? string.Empty)
+                .ToArray();
+
+        string[] PadToMax(string[] a)
         {
-            sb.AppendLine("No results");
+            var maxWidth = a.Select(s => s.Length).Max();
+            return a.Select(s => s.PadRight(maxWidth)).ToArray();
         }
 
-        var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
+        var cells = columns.Select(MakeStringColumn)
+            .Select(PadToMax)
+            .ToArray();
 
-        var headerLengths = headers.Select(h => h.Length).ToArray();
 
-        var keyCount = Enumerable.Range(0, dictionaries.First().Count).ToArray();
-        var maxColumnSizes = keyCount
-            .ToDictionary(i => i, MaxColumnSize);
-
-        var headerLine = JoinToLine(headers.Select(PadForColumn));
-        sb.AppendLine(headerLine);
-        sb.AppendLine(keyCount.Select(hl => "".PadRight(MaxColumnSize(hl), '-')).JoinString("-+-"));
-        foreach (var d in dictionaries)
+        for (var r = 0; r <= displayHeight; r++)
         {
-            var line = JoinToLine(keyCount.Select(c => PadForColumn(SafeGet(d, c), c)));
-            sb.AppendLine(line);
+            var line = cells.Select(c => c[r]).ToArray();
+            sb.AppendLine(JoinToLine(line));
+            if (r == 0)
+            {
+                var dividerLine = line.Select(c => "".PadRight(c.Length, '-'));
+                sb.AppendLine(JoinToLine(dividerLine));
+            }
         }
 
         return sb.ToString();
 
-        string PadForColumn(string s, int c) => s.PadRight(maxColumnSizes[c]);
 
         string JoinToLine(IEnumerable<string> columns) => columns.JoinString(" | ");
-
-        string SafeGet(IOrderedDictionary dict, int key) => dict[key]?.ToString() ?? string.Empty;
-
-        int MaxColumnSize(int key)
-            => dictionaries.Select(d => SafeGet(d, key).Length)
-                .Append(headerLengths[key])
-                .Max();
     }
 
-    public static string WriteToCsvString(IReadOnlyCollection<OrderedDictionary> dictionaries, bool skipHeader)
+    public static string WriteToCsvString(KustoQueryResult result, int max, bool skipHeaders) =>
+        WriteToCsvString(result.AsOrderedDictionarySet(), max, skipHeaders);
+
+    public static string WriteToCsvString(IReadOnlyCollection<OrderedDictionary> dictionaries, int max, bool skipHeader)
     {
         var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
         var writer = new StringWriter();
@@ -72,7 +77,7 @@ public static class KustoFormatter
 
             csv.NextRecord();
 
-            foreach (var item in dictionaries)
+            foreach (var item in dictionaries.Take(max))
             {
                 foreach (var heading in headers)
                 {
@@ -86,9 +91,9 @@ public static class KustoFormatter
         return writer.ToString();
     }
 
-    public static void WriteToCsv(string path, IReadOnlyCollection<OrderedDictionary> dictionaries)
+    public static void WriteToCsv(string path, KustoQueryResult result)
     {
-        var str = WriteToCsvString(dictionaries, false);
+        var str = WriteToCsvString(result, int.MaxValue, false);
         File.WriteAllText(path, str);
     }
 }

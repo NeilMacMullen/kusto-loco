@@ -18,7 +18,7 @@ public class KustoQueryHelper
     public static async Task<IReadOnlyCollection<TR>> SimpleQueryTo<T, TR>(IReadOnlyCollection<T> rows, string query)
     {
         var result = await SimpleQuery(rows, query);
-        return KustoQueryContext.DeserialiseTo<TR>(result);
+        return result.DeserialiseTo<TR>();
     }
 
     public static async Task<KustoQueryResult> SimpleQuery<T>(
