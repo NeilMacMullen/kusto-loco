@@ -3,12 +3,15 @@ using System.Collections.Specialized;
 using System.Globalization;
 using CsvHelper;
 using KustoSupport;
+using NLog;
 
 namespace CsvSupport;
 
 #pragma warning disable CS8602, CS8604, CS8600
 public static class CsvLoader
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     public static List<OrderedDictionary> LoadAsOrderedDictionary(TextReader reader)
     {
         var records = new List<OrderedDictionary>();
@@ -17,14 +20,19 @@ public static class CsvLoader
         csv.Read();
         csv.ReadHeader();
         var keys = csv.Context.Reader.HeaderRecord;
+        var c = 0;
         while (csv.Read())
         {
             var dict = new OrderedDictionary();
             foreach (var header in keys)
                 dict[header] = csv.GetField<string>(header);
             records.Add(dict);
+            c++;
+            if (c % 100_000 == 0)
+                Logger.Info($"{c} records read");
         }
 
+        Logger.Info("inferring types...");
         InferTypes(records.ToArray());
         return records;
     }
@@ -32,7 +40,7 @@ public static class CsvLoader
     public static void Load(TextReader reader, KustoQueryContext context, string tableName)
     {
         var records = LoadAsOrderedDictionary(reader);
-
+        Logger.Info("adding table...");
         context
             .AddTable(TableBuilder
                 .FromOrderedDictionarySet(tableName,
@@ -51,7 +59,7 @@ public static class CsvLoader
     {
         var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
         var columnCount = dictionaries.First().Count;
-        var rowCount = dictionaries.Length;
+        var rowCount = Math.Min(dictionaries.Length, 1000);
 
         var typeTriers = new Func<string, (bool, object)>[]
         {

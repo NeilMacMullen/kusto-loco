@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommandLine;
-using CsvHelper;
+using CsvSupport;
 using Extensions;
 using KustoSupport;
 using NLog;
@@ -473,83 +471,16 @@ internal class ReportExplorer
         }
     }
 
-    private static void InferTypes(
-        OrderedDictionary[] dictionaries)
-    {
-        var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
-        var columnCount = dictionaries.First().Count;
-        var rowCount = dictionaries.Length;
-
-        var typeTriers = new Func<string, (bool, object)>[]
-        {
-            s => (int.TryParse(s, out var i), i),
-            s => (double.TryParse(s, out var i), i),
-            s => (DateTime.TryParse(s, out var i), i),
-            s => (bool.TryParse(s, out var i), i),
-        };
-
-        for (var c = 0; c < columnCount; c++)
-        {
-            var column = dictionaries.Select(d => (string)d[c]).ToArray();
-
-            var transformed = new object[rowCount];
-            var inferredType = false;
-            foreach (var type in typeTriers)
-            {
-                var processedAll = true;
-                for (var i = 0; i < rowCount; i++)
-                {
-                    var (parsed, val) = type(column[i]);
-                    if (parsed)
-                        transformed[i] = val;
-                    else
-                    {
-                        processedAll = false;
-                        break;
-                    }
-                }
-
-                if (!processedAll) continue;
-                inferredType = true;
-                break;
-            }
-
-            if (!inferredType) continue;
-            for (var r = 0; r < rowCount; r++)
-                dictionaries[r][headers[c]] = transformed[r];
-        }
-    }
-
     public static class LoadCsvCommand
     {
         internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
             await Task.CompletedTask;
             var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".csv");
-
-            var records = new List<OrderedDictionary>();
-            using (TextReader fileReader = new StreamReader(filename))
-            {
-                var csv = new CsvReader(fileReader, CultureInfo.InvariantCulture);
-                csv.Read();
-                csv.ReadHeader();
-                var keys = csv.Context.Reader.HeaderRecord;
-                while (csv.Read())
-                {
-                    var dict = new OrderedDictionary();
-                    foreach (var header in keys)
-                        dict[header] = csv.GetField<string>(header);
-                    records.Add(dict);
-                }
-            }
-
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
 
-            InferTypes(records.ToArray());
-            exp.GetCurrentContext()
-                .AddTable(TableBuilder
-                    .FromOrderedDictionarySet(tableName,
-                        records));
+
+            CsvLoader.Load(filename, exp.GetCurrentContext(), tableName);
             Logger.Info($"Table '{tableName}' now available");
         }
 
