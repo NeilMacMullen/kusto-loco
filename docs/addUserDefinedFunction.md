@@ -10,7 +10,18 @@ In BuiltInScalarFunctions add a declaration similar to
 ```
 at the end of BuiltInScalarFunctions static constructor
 
-You will also need to provide a FunctionSymbol in the AdditionalFunctionSymbols region in the same file.
+You will also need to provide a FunctionSymbol in the AdditionalFunctionSymbols region in the same file and add it to the AdditionalFunctionSymbols list..
+
+```CSharp
+    public static readonly FunctionSymbol DateTimeToIso =
+        new FunctionSymbol("datetime_to_iso", ScalarTypes.String, new Parameter("value1", ScalarTypes.DateTime))
+            .ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
+    public static readonly FunctionSymbol[] AdditionalFunctionSymbols =
+        { Levenshtein, StringSimilarity, DateTimeToIso };
+```
+
 
 In the ScalarFuntions folder add an implenetation class.  This needs to provide both InvokeScalar and InvokeColumnar methods.  The InvokeColumnar method generally needs to...
 - cast the input arguments to the appropriate type of column(s)
