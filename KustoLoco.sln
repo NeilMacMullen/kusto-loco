@@ -45,8 +45,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geo", "src\Geo\Geo.csproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A5579A8E-4198-4EC3-9F20-46BBAC53B97F}"
 	ProjectSection(SolutionItems) = preProject
+		docs\additionalFunctions.md = docs\additionalFunctions.md
+		docs\addUserDefinedFunction.md = docs\addUserDefinedFunction.md
 		docs\internal-representation.png = docs\internal-representation.png
 		OldReadMe.md = OldReadMe.md
+		docs\plannedWork.md = docs\plannedWork.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{44F51B35-D6EE-402F-93C7-3C43B1FD62B2}"
@@ -68,7 +71,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rendering", "src\Rendering\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessWatcher", "samples\ProcessWatcher\ProcessWatcher.csproj", "{7FBDE055-4454-4BB2-82A3-5F2085ABA41D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParquetSupport", "src\Parquet\ParquetSupport.csproj", "{81019EDB-C726-4008-9E1D-DCA7FF984030}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParquetSupport", "src\Parquet\ParquetSupport.csproj", "{81019EDB-C726-4008-9E1D-DCA7FF984030}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
