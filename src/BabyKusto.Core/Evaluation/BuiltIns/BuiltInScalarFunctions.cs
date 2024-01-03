@@ -177,6 +177,11 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfYearFunctionImpl(), ScalarTypes.DateTime,
                 ScalarTypes.DateTime)));
 
+        functions.Add(Functions.DatetimeUtcToLocal,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(), ScalarTypes.DateTime,
+                ScalarTypes.DateTime, ScalarTypes.String)));
+
+
         var iffFunctionInfo = new ScalarFunctionInfo(
             new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool, ScalarTypes.Bool,
                 ScalarTypes.Bool),

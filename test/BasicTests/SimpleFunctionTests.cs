@@ -153,4 +153,12 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("1.00:00:00");
     }
+
+    [TestMethod]
+    public async Task DateTimeToLocal()
+    {
+        var query = @"print datetime_utc_to_local(datetime(2015-12-31 23:59:59.9), 'US/Eastern')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2015-12-31 18:59:59.9000");
+    }
 }

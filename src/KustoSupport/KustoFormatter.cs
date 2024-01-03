@@ -21,7 +21,9 @@ public static class KustoFormatter
         return o switch
         {
             null => string.Empty,
-            DateTime d => d.ToString("u"),
+            DateTime d => d.Kind == DateTimeKind.Local
+                ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
+                : d.ToString("u"),
             _ => o.ToString()
         };
 #pragma warning restore CS8603 // Possible null reference return.
@@ -67,7 +69,7 @@ public static class KustoFormatter
         return sb.ToString();
 
 
-        string JoinToLine(IEnumerable<string> columns) => columns.JoinString(" | ");
+        string JoinToLine(IEnumerable<string> cols) => cols.JoinString(" | ");
     }
 
     public static string WriteToCsvString(KustoQueryResult result, int max, bool skipHeaders) =>
