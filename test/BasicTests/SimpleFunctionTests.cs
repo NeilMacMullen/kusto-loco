@@ -96,4 +96,37 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("part");
     }
+
+
+    [TestMethod]
+    public async Task ToLower()
+    {
+        var query = @"print c=tolower('ABCdef')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("abcdef");
+    }
+
+    [TestMethod]
+    public async Task ToUpper()
+    {
+        var query = @"print c=toupper('ABCdef')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("ABCDEF");
+    }
+
+    [TestMethod]
+    public async Task Strlen()
+    {
+        var query = @"print c=strlen('ABCdef')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("6");
+    }
+
+    [TestMethod]
+    public async Task SubString()
+    {
+        var query = @"print c=substring('ABCdef',2,3)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("Cde");
+    }
 }
