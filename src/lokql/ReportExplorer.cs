@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BabyKusto.Core.Evaluation;
 using CommandLine;
 using CsvSupport;
 using Extensions;
@@ -68,6 +69,12 @@ internal class ReportExplorer
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(
                         $"Display was truncated to first {max} of {result.Height}.  Use '.display --max' to change this behaviour");
+                }
+
+                //auto render
+                if (result.Visualization != VisualizationState.Empty)
+                {
+                    RenderCommand.Run(this, new RenderCommand.Options());
                 }
             }
 
@@ -368,7 +375,7 @@ internal class ReportExplorer
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
             // var text = KustoResultRenderer.RenderToTable(result);
-            var text = KustoResultRenderer.RenderToLineChart(result.Query, result);
+            var text = KustoResultRenderer.RenderToHtml(result.Query, result);
             File.WriteAllText(fileName, text);
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
