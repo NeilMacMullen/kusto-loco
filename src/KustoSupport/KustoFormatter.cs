@@ -15,6 +15,18 @@ namespace KustoSupport;
 
 public static class KustoFormatter
 {
+    public static string ObjectToKustoString(object? o)
+    {
+#pragma warning disable CS8603 // Possible null reference return.
+        return o switch
+        {
+            null => string.Empty,
+            DateTime d => d.ToString("u"),
+            _ => o.ToString()
+        };
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+
     public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
     {
         if (result.Height == 0)
@@ -27,7 +39,7 @@ public static class KustoFormatter
         string[] MakeStringColumn(ColumnResult c)
             => new[] { c.Name }
                 .Concat(result.EnumerateColumnData(c).Take(max))
-                .Select(o => o?.ToString() ?? string.Empty)
+                .Select(ObjectToKustoString)
                 .ToArray();
 
         string[] PadToMax(string[] a)

@@ -21,6 +21,8 @@ public abstract class TestMethods
         //return the last line 
         Console.WriteLine($"{result.Error}");
         Console.WriteLine($"{KustoFormatter.Tabulate(result, 10)}");
-        return result.GetRow(result.Height - 1).JoinString();
+        return result.GetRow(result.Height - 1)
+            .Select(KustoFormatter.ObjectToKustoString)
+            .JoinString();
     }
 }

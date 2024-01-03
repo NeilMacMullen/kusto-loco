@@ -137,4 +137,20 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("abc");
     }
+
+    [TestMethod]
+    public async Task DateTimeBin()
+    {
+        var query = @"print bin(datetime(1970-05-11 13:45:07), 1d)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1970-05-11 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task TimespanFormatting()
+    {
+        var query = @"print 1d";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.00:00:00");
+    }
 }
