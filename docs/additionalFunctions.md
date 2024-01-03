@@ -1,4 +1,4 @@
-# Addition Functions
+# Additional Functions
 
 Kusto-loco supports a number of "non-standard" functions.  Note that these may be subject to change.
 
@@ -17,3 +17,7 @@ Returns a number from 0...1.0 indicating how similar two strings are.  This is c
 
 ## datetime_to_iso
 Formats a DateTime value as a string in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+
+## trimws
+
+Trims leading and following whitespace from a string (ala C# string.Trim())

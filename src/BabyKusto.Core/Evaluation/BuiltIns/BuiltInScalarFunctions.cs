@@ -336,6 +336,10 @@ internal static class BuiltInScalarFunctions
         functions.Add(DateTimeToIso, new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeToIsoImpl(),
             ScalarTypes.String,
             ScalarTypes.DateTime)));
+
+        functions.Add(TrimWs, new ScalarFunctionInfo(new ScalarOverloadInfo(new TrimWsFunctionImpl(),
+            ScalarTypes.String,
+            ScalarTypes.String)));
     }
 
     /// <summary>
@@ -403,8 +407,13 @@ internal static class BuiltInScalarFunctions
             .ConstantFoldable()
             .WithResultNameKind(ResultNameKind.None);
 
+    public static readonly FunctionSymbol TrimWs =
+        new FunctionSymbol("trimws", ScalarTypes.String, new Parameter("value1", ScalarTypes.String))
+            .ConstantFoldable()
+            .WithResultNameKind(ResultNameKind.None);
+
     public static readonly FunctionSymbol[] AdditionalFunctionSymbols =
-        { Levenshtein, StringSimilarity, DateTimeToIso };
+        { DebugEmit, Levenshtein, StringSimilarity, DateTimeToIso, TrimWs };
 
     #endregion
 }

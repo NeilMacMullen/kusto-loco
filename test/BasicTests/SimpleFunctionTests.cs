@@ -129,4 +129,12 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("Cde");
     }
+
+    [TestMethod]
+    public async Task Trimws()
+    {
+        var query = @"print c=trimws('   abc   ')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("abc");
+    }
 }
