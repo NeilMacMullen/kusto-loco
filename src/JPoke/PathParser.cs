@@ -7,31 +7,28 @@ public class PathParser
 {
     public static JPathElement ParseElement(string element)
     {
-        var match = Regex.Match(element, @"(.*)\[\s*(\d*)\s*]");
+        var match = Regex.Match(element, @"(.*)\[\s*(\S*)\s*]");
         var isArray = match.Success;
         var elementRoot = isArray ? match.Groups[1].Value : element;
-        var index =
-            int.TryParse(match.Groups[2].Value, out var v) ? v : -1;
-        return new JPathElement(elementRoot, isArray, index);
+        if (!isArray)
+            return new JPathElement(elementRoot, JPathIndex.None);
+        var indexer = match.Groups[2].Value;
+        //the syntax '[]' is equivalent to '[-1]'
+        return indexer.Length == 0
+            ? new JPathElement(elementRoot, JPathIndex.CreateRelative(-1))
+            : "+-".Contains(indexer[0])
+                ? new JPathElement(elementRoot, JPathIndex.CreateRelative(
+                    int.Parse(indexer[1..])))
+                : new JPathElement(elementRoot, JPathIndex.CreateAbsolute(
+                    int.Parse(indexer)));
     }
 
     public static JPath Parse(string path)
     {
+        if (path.Trim().Length == 0)
+            return JPath.Empty;
         var elements = path.Split(".").ToArray();
         return new JPath(
             elements.Select(ParseElement).ToImmutableArray());
     }
-}
-
-public readonly record struct JPathElement(string Name, bool IsIndex, int Index);
-
-public readonly record struct JPath(ImmutableArray<JPathElement> Elements)
-{
-    public static readonly JPath Empty = new(ImmutableArray<JPathElement>.Empty);
-    public bool IsTerminal => Elements.Length == 1;
-    public int Length => Elements.Length;
-
-    public JPath Descend() => new(Elements.Slice(1, Elements.Length - 1));
-
-    public JPath Append(JPathElement el) => new(Elements.Append(el).ToImmutableArray());
 }

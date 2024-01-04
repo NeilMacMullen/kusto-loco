@@ -1,4 +1,5 @@
 ﻿using Extensions;
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 public static class VegaGenerator
@@ -122,7 +123,6 @@ public static class VegaGenerator
         public bool disable { get; set; }
     }
 
-    public record VegaDataSource(string name = "dataSource");
 
     public record VegaMark
     {

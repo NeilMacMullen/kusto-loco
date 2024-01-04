@@ -55,13 +55,13 @@ public class KustoResultRenderer
               "timepivot" => VegaGenerator.LineChart,
             */
 
-            "barchart" => RenderToChart(title, BarChart, result, NoOp, NoOp),
-            "linechart" => RenderToChart(title, LineChart, result, NoOp, NoOp),
-            "piechart" => RenderToChart(title, PieChart, result, MakePieChart, NoOp),
-            "areachart" => RenderToChart(title, AreaChart, result, NoOp, NoOp),
-            "stackedareachart" => RenderToChart(title, AreaChart, result, NoOp, MakeStacked),
+            "barchart" => RenderToChart(title, BarChart, result, NoOp),
+            "linechart" => RenderToChart(title, LineChart, result, NoOp),
+            "piechart" => RenderToChart(title, PieChart, result, MakePieChart),
+            "areachart" => RenderToChart(title, AreaChart, result, NoOp),
+            "stackedareachart" => RenderToChart(title, AreaChart, result, MakeStacked),
 
-            "ladderchart" => RenderToChart(title, BarChart, result, MakeTimeLineChart, NoOp),
+            "ladderchart" => RenderToChart(title, BarChart, result, MakeTimeLineChart),
 
             /*
             "piechart" => VegaGenerator.PieChart,
@@ -77,7 +77,7 @@ public class KustoResultRenderer
             "columnchart" => VegaGenerator.BarChart,
             */
 
-            _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp, NoOp)
+            _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp)
         };
     }
 
@@ -90,57 +90,35 @@ public class KustoResultRenderer
     }
 
     public static string RenderToChart(string title, string vegaType, KustoQueryResult result,
-        Action<VegaChart> vmutate,
         Action<JObjectBuilder> jmutate)
     {
         if (result.Height == 0)
             return result.Error;
-        var b = RenderToJObjectBuilder(vegaType, result, vmutate, jmutate);
+        var b = RenderToJObjectBuilder(vegaType, result, jmutate);
         return VegaMaker.MakeHtml(title, b.Serialize());
     }
 
-    public static void MakePieChart(VegaChart s)
-    {
-        s.mark = s.mark with { type = PieChart };
-        s.encoding.theta = s.encoding.y;
-        s.encoding.color = new VegaColorDefinition
-        {
-            field = s.encoding.x.field,
-            type = AxisTypeNominal
-        };
-        s.encoding.y = null;
-        s.encoding.x = null;
-    }
 
-    public static void MakeEventChart(VegaChart s)
+    public static void MakePieChart(JObjectBuilder b)
     {
-        s.mark = s.mark with
-        {
-            type = BarChart,
-            width = 1 // Fixed pixel width
-        };
-        s.encoding.color = new VegaColorDefinition
-        {
-            field = s.encoding.y.field,
-            type = AxisTypeNominal,
-            title = s.encoding.y.title,
-        };
-        s.encoding.y = null;
+        b.Set("mark.type", PieChart);
+        b.Move("encoding.y", "encoding.theta");
+        b.Set("encoding.color.type", AxisTypeNominal);
+        b.Copy("encoding.x.field", "encoding.color.field");
+        b.Remove("encoding.y");
+        b.Remove("encoding.x");
     }
 
 
-    public static void MakeTimeLineChart(VegaChart s)
+    public static void MakeTimeLineChart(JObjectBuilder b)
     {
-        s.mark = s.mark with { type = BarChart };
-        s.encoding.x2 = s.encoding.y;
-        s.encoding.y = new VegaSeries
-        {
-            type = AxisTypeOrdinal,
-            title = s.encoding.color.title,
-            field = s.encoding.color.field
-        };
+        b.Set("mark.type", BarChart);
+        b.Move("encoding.y", "encoding.x2");
 
-        s.config.legend = new VegaLegend { disable = true };
+        b.Set("encoding.y.type", AxisTypeOrdinal);
+        b.Copy("encoding.color.title", "encoding.y.title");
+        b.Copy("encoding.color.field", "encoding.y.field");
+        b.Set("config.legend.disable", true);
     }
 
     public static void MakeStacked(JObjectBuilder b)
@@ -158,7 +136,6 @@ public class KustoResultRenderer
 
     public static JObjectBuilder RenderToJObjectBuilder(string chartType,
         KustoQueryResult result,
-        Action<VegaChart> vmutate,
         Action<JObjectBuilder> jmutate)
     {
         var headers = result.ColumnDefinitions();
@@ -177,7 +154,7 @@ public class KustoResultRenderer
             color
         );
 
-        vmutate(spec);
+
         var b = JObjectBuilder.FromObject(spec);
         var rows = result.AsOrderedDictionarySet();
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "lokql": {
+      "commandName": "Project",
+      "commandLineArgs": "explore --workin c:\\kusto"
+    }
+  }
+}
