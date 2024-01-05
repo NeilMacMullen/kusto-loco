@@ -2,7 +2,6 @@
 
 using CommandLine;
 
-#pragma warning disable CS8604
 public static class StandardParsers
 {
     public static readonly Parser Default = new(settings =>

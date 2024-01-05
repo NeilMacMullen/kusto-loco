@@ -9,7 +9,6 @@ using NLog;
 
 namespace KustoSupport;
 
-#pragma warning disable CS8601
 public class KustoQueryResult
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();

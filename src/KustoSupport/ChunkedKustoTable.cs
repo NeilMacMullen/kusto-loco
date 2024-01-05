@@ -3,7 +3,6 @@ using Kusto.Language.Symbols;
 
 namespace KustoSupport;
 
-#pragma warning disable CS8604, CS8602, CS8603
 public class ChunkedKustoTable : ITableSource
 {
     private readonly int _chunkSize;

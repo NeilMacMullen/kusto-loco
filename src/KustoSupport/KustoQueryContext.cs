@@ -7,9 +7,6 @@ using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using NLog;
 
-#pragma warning disable CS8603 // Possible null reference return.
-#pragma warning disable CS8604 // Possible null reference argument.
-
 namespace KustoSupport;
 
 /// <summary>

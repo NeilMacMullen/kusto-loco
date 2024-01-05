@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS8618
-public static class VegaMaker
+﻿public static class VegaMaker
 {
     public static string MakeHtml(string title,string spec)
     {
