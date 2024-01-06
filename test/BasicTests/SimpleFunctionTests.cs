@@ -162,23 +162,48 @@ datatable(Size:int) [50]
         result.Should().Be("2015-12-31 18:59:59.9000");
     }
 
+
     [TestMethod]
-    public async Task RowNumber()
+    public async Task Range()
     {
-        var query = @"print 'a' | extend r =row_number(0)";
+        var query = @"range i from 1 to 10 step 1";
         var result = await LastLineOfResult(query);
-        result.Should().Be("a,0");
+        result.Should().Be("10");
     }
 
     [TestMethod]
-    public async Task RowNumber2()
+    public async Task RangeDescending()
     {
-        var query = @" 
-datatable(x:int) [10,20,30,49,50]
-|extend r=row_number(x)
-";
-
+        var query = @"range i from 10 to 1 step -1";
         var result = await LastLineOfResult(query);
-        result.Should().Be("50,4");
+        result.Should().Be("1");
+    }
+
+
+    [TestMethod]
+    public async Task RowNumberNoParam()
+    {
+        var query = @"range i from 10 to 20 step 1 | extend r =row_number()";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("20,10");
+    }
+
+    [TestMethod]
+    public async Task RowNumberStartingAt7()
+    {
+        var query = @"range i from 1 to 5 step 1 | extend r =row_number(7)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("5,11");
+    }
+
+    [TestMethod]
+    public async Task RowNumberWithRanking()
+    {
+        var query = @"range i from 1 to 100 step 1 
+| extend r =row_number(1,i%10==0) 
+| where r==1 
+| count";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("11");
     }
 }

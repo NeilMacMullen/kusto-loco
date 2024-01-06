@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns.Impl;
 using BabyKusto.Core.InternalRepresentation;
@@ -234,10 +233,25 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(new ScalarOverloadInfo(new ExtractRegexFunctionImpl(), ScalarTypes.String,
                 ScalarTypes.String, ScalarTypes.Long, ScalarTypes.String)));
 
+        var rowNumberHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
         functions.Add(Functions.RowNumber,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new RowNumberFunctionImpl(),
-                ScalarTypes.Long,
-                ScalarTypes.Long)));
+                    rowNumberHints,
+                    ScalarTypes.Long),
+                //variant that accepts initial index value as first item
+                new ScalarOverloadInfo(new RowNumberFunctionImpl(),
+                    rowNumberHints,
+                    ScalarTypes.Long,
+                    ScalarTypes.Long),
+                //variant that accepts initial index value as first item
+                //and flag to reset rank as second
+                new ScalarOverloadInfo(new RowNumberFunctionImpl(),
+                    rowNumberHints,
+                    ScalarTypes.Long,
+                    ScalarTypes.Long,
+                    ScalarTypes.Bool)
+            )
+        );
 
 
         functions.Add(Functions.ParseJson, new ScalarFunctionInfo(
@@ -368,18 +382,6 @@ internal static class BuiltInScalarFunctions
         BabyKustoEngine.GlobalStateInstance = BabyKustoEngine.GlobalStateInstance.WithFunctions(newFunctions);
     }
 
-    public static ScalarOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
-        List<Parameter> parameters)
-    {
-        if (!TryGetOverload(symbol, arguments, parameters, out var overload))
-        {
-            throw new NotImplementedException(
-                $"Function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
-        }
-
-        Debug.Assert(overload != null);
-        return overload;
-    }
 
     public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
         out ScalarOverloadInfo? overload)

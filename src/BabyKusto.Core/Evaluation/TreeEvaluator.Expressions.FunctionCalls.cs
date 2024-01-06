@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.InternalRepresentation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation;
@@ -15,9 +16,17 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitBuiltInScalarFunctionCall(IRBuiltInScalarFunctionCallNode node,
         EvaluationContext context)
     {
+        var hints = node.OverloadInfo.EvaluationHints;
+        var isSelfGeneratingData =
+            hints.HasFlag(EvaluationHints.ForceColumnarEvaluation);
+
+        var resultKind = node.ResultKind;
+        if (isSelfGeneratingData)
+            resultKind = EvaluatedExpressionKind.Columnar;
+
         var impl = node.GetOrSetCache(
             () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
-                node.ResultKind, node.ResultType));
+                resultKind, node.ResultType, hints));
 
         var arguments = new EvaluationResult[node.Arguments.ChildCount];
         for (var i = 0; i < node.Arguments.ChildCount; i++)
@@ -25,6 +34,22 @@ internal partial class TreeEvaluator
             var argVal = node.Arguments.GetChild(i).Accept(this, context);
             Debug.Assert(argVal != null);
             arguments[i] = argVal;
+        }
+
+        if (isSelfGeneratingData)
+        {
+            //if the function "self generates" data we need to insert a 
+            //'dummy' column that defines the length so that the 
+            //function knows how many rows to generate for if that's 
+            //not apparent from the other arguments.
+            //TODO - really we should change the signature of the Invoke
+            //method to pass in EvaluationContext - this is a bit of a hack
+            var rowCount = context.Chunk.RowCount;
+            var dummy =
+                new ColumnarResult(
+                    ColumnHelpers.CreateFromScalar(0, ScalarTypes.Int, rowCount)
+                );
+            arguments = new[] { dummy }.Concat(arguments).ToArray();
         }
 
         return impl(arguments);

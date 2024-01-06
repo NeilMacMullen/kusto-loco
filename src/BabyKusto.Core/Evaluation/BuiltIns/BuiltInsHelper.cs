@@ -107,7 +107,7 @@ internal static class BuiltInsHelper
 
 
     private static EvaluationResult CreateResultForColumnarInvocation(IScalarFunctionImpl impl,
-        EvaluationResult[] arguments, TypeSymbol expectedResultType)
+        EvaluationResult[] arguments, TypeSymbol expectedResultType, EvaluationHints hints)
     {
         var columnarArgs = CreateResultArray(arguments);
 
@@ -124,7 +124,7 @@ internal static class BuiltInsHelper
         //cast back to Scalars and call InvokeScalar
         //the expand back again
 
-        if (columnarArgs.All(c => c.IsSingleValue))
+        if (!hints.HasFlag(EvaluationHints.ForceColumnarEvaluation) && columnarArgs.All(c => c.IsSingleValue))
         {
             var logicalRowCount = columnarArgs.Max(c => c.RowCount);
             columnarArgs = columnarArgs.Select(c => c.SliceToTopRow()).ToArray();
@@ -141,14 +141,14 @@ internal static class BuiltInsHelper
     // TODO: Support named parameters
     public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IScalarFunctionImpl impl,
         EvaluatedExpressionKind resultKind,
-        TypeSymbol expectedResultType)
+        TypeSymbol expectedResultType, EvaluationHints hints)
     {
         return resultKind switch
         {
             EvaluatedExpressionKind.Scalar => arguments =>
                 CreateResultForScalarInvocation(impl, arguments, expectedResultType),
             EvaluatedExpressionKind.Columnar => arguments =>
-                CreateResultForColumnarInvocation(impl, arguments, expectedResultType),
+                CreateResultForColumnarInvocation(impl, arguments, expectedResultType, hints),
             _ => throw new InvalidOperationException($"Unexpected result kind {resultKind}")
         };
     }
