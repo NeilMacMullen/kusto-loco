@@ -206,4 +206,29 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("11");
     }
+
+    [TestMethod]
+    public async Task Rand()
+    {
+        //difficult to test randomness but ensure we got
+        //5 different values and they were all <1
+        var query = @"range i from 1 to 5 step 1 
+| extend r =rand()
+| where r >=0 and r <1
+| summarize by r | count ";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("5");
+    }
+
+    [TestMethod]
+    public async Task RandInt()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"range i from 1 to 5 step 1 
+| extend r =rand(100)
+| where toint(r) != r
+| count ";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("0");
+    }
 }

@@ -253,6 +253,18 @@ internal static class BuiltInScalarFunctions
             )
         );
 
+        var randHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
+        functions.Add(Functions.Rand,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new RandFunctionImpl(),
+                    randHints,
+                    ScalarTypes.Real),
+                new ScalarOverloadInfo(new RandFunctionImpl(),
+                    randHints,
+                    ScalarTypes.Real,
+                    ScalarTypes.Long)
+            )
+        );
+
 
         functions.Add(Functions.ParseJson, new ScalarFunctionInfo(
             new ScalarOverloadInfo(new ParseJsonDynamicFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Dynamic),
