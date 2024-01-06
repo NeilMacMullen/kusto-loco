@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BabyKusto.Core;
 
@@ -13,6 +14,8 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
 
     private readonly Section[] BackingColumns;
 
+    private Section _lastHitSection;
+
     public ReassembledChunkColumn(IEnumerable<TypedBaseColumn<T>> backing)
     {
         var sections = new List<Section>();
@@ -24,7 +27,9 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
             sections.Add(s);
         }
 
+
         BackingColumns = sections.ToArray();
+        _lastHitSection = sections.First();
         _Length = offset;
     }
 
@@ -41,16 +46,29 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
 
     private (int, TypedBaseColumn<T>) IndirectIndex(int index)
     {
-        foreach (var s in BackingColumns)
+        //most accesses are sequential so we can avoid a lot of scanning by just
+        //assuming the last section we used will serve the current request
+        if (!IndexInSection(_lastHitSection, index))
         {
-            if (index >= s.Offset && index < (s.Offset + s.Length))
-                return (index - s.Offset, s.BackingColumn);
+            _lastHitSection = Section.Empty;
+            foreach (var section in BackingColumns)
+            {
+                if (IndexInSection(section, index))
+                {
+                    _lastHitSection = section;
+                    break;
+                }
+            }
         }
 
-        throw new InvalidOperationException(
-            $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
-    }
+        if (_lastHitSection == Section.Empty)
+            throw new InvalidOperationException(
+                $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
 
+        return (index - _lastHitSection.Offset, _lastHitSection.BackingColumn);
+
+        static bool IndexInSection(Section s, int i) => i >= s.Offset && i < (s.Offset + s.Length);
+    }
 
     public override void ForEach(Action<object?> action)
     {
@@ -70,5 +88,8 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
         return chunk[i];
     }
 
-    private readonly record struct Section(int Offset, int Length, TypedBaseColumn<T> BackingColumn);
+    private readonly record struct Section(int Offset, int Length, TypedBaseColumn<T> BackingColumn)
+    {
+        public static readonly Section Empty = new(0, 0, ColumnFactory.Create(Array.Empty<T>()));
+    }
 }

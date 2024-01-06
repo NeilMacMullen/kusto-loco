@@ -46,7 +46,7 @@ namespace BabyKusto.Core.Evaluation
         private class RangeResultTable<T> : ITableSource
             where T : struct, INumber<T>
         {
-            private const int MaxRowsPerChunk = 100;
+            private const int MaxRowsPerChunk = 100_000;
 
             private readonly T _from;
             private readonly T _step;
@@ -75,8 +75,6 @@ namespace BabyKusto.Core.Evaluation
 
             public IEnumerable<ITableChunk> GetData()
             {
-                var columnType = Type.Columns[0].Type;
-
                 var direction = _to >= _from ? T.One : -T.One;
                 var stepDirection = _step >= T.Zero ? T.One : -T.One;
 
