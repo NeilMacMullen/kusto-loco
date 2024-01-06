@@ -234,6 +234,12 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(new ScalarOverloadInfo(new ExtractRegexFunctionImpl(), ScalarTypes.String,
                 ScalarTypes.String, ScalarTypes.Long, ScalarTypes.String)));
 
+        functions.Add(Functions.RowNumber,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new RowNumberFunctionImpl(),
+                ScalarTypes.Long,
+                ScalarTypes.Long)));
+
+
         functions.Add(Functions.ParseJson, new ScalarFunctionInfo(
             new ScalarOverloadInfo(new ParseJsonDynamicFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.Dynamic),
             new ScalarOverloadInfo(new ParseJsonStringFunctionImpl(), ScalarTypes.Dynamic, ScalarTypes.String)));

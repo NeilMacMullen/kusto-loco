@@ -35,7 +35,8 @@ TODO:Example here
 - Regex operations use C# regex format
 - GeoHash limited to precision of 12 
 - No clustering
-- Rendering ?
+- Rendering is translated via vega-lite
+- row_number method is non-compliant
 
 TODO 
 

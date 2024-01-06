@@ -161,4 +161,24 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("2015-12-31 18:59:59.9000");
     }
+
+    [TestMethod]
+    public async Task RowNumber()
+    {
+        var query = @"print 'a' | extend r =row_number(0)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("a,0");
+    }
+
+    [TestMethod]
+    public async Task RowNumber2()
+    {
+        var query = @" 
+datatable(x:int) [10,20,30,49,50]
+|extend r=row_number(x)
+";
+
+        var result = await LastLineOfResult(query);
+        result.Should().Be("50,4");
+    }
 }
