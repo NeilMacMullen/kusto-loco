@@ -32,7 +32,7 @@ public static class CsvLoader
                 Logger.Info($"{c} records read");
         }
 
-        Logger.Info("inferring types...");
+
         InferTypes(records.ToArray());
         return records;
     }
@@ -40,7 +40,7 @@ public static class CsvLoader
     public static void Load(TextReader reader, KustoQueryContext context, string tableName)
     {
         var records = LoadAsOrderedDictionary(reader);
-        Logger.Info("adding table...");
+
         context
             .AddTable(TableBuilder
                 .FromOrderedDictionarySet(tableName,
