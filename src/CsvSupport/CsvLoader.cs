@@ -106,4 +106,44 @@ public static class CsvLoader
         var reader = new StringReader(csv.Trim());
         Load(reader, context, tableName);
     }
+
+
+    public static string WriteToCsvString(KustoQueryResult result, int max, bool skipHeaders) =>
+        WriteToCsvString(result.AsOrderedDictionarySet(), max, skipHeaders);
+
+    public static string WriteToCsvString(IReadOnlyCollection<OrderedDictionary> dictionaries, int max, bool skipHeader)
+    {
+        var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
+        var writer = new StringWriter();
+        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        {
+            if (!skipHeader)
+            {
+                foreach (var heading in headers)
+                {
+                    csv.WriteField(heading);
+                }
+            }
+
+            csv.NextRecord();
+
+            foreach (var item in dictionaries.Take(max))
+            {
+                foreach (var heading in headers)
+                {
+                    csv.WriteField(item[heading]);
+                }
+
+                csv.NextRecord();
+            }
+        }
+
+        return writer.ToString();
+    }
+
+    public static void WriteToCsv(string path, KustoQueryResult result)
+    {
+        var str = WriteToCsvString(result, int.MaxValue, false);
+        File.WriteAllText(path, str);
+    }
 }

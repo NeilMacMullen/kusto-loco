@@ -63,7 +63,7 @@ public class KustoQueryContext
         return res.RowCount;
     }
 
-    public KustoQueryResult RunTabularQuery(string query)
+    public KustoQueryResult RunTabularQueryWithoutDemandBasedTableLoading(string query)
     {
         var watch = Stopwatch.StartNew();
         //handling for "special" commands
@@ -141,7 +141,7 @@ public class KustoQueryContext
 
             // Note: Hold the lock until the query is complete to ensure that tables don't change
             // in the middle of execution.
-            return RunTabularQuery(query);
+            return RunTabularQueryWithoutDemandBasedTableLoading(query);
         }
         catch (Exception ex)
         {

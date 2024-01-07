@@ -1,13 +1,8 @@
-﻿using System.Collections.Specialized;
-using System.CommandLine.Parsing;
+﻿using System.CommandLine.Parsing;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using BabyKusto.Core.Evaluation;
 using CommandLine;
-using CsvSupport;
 using Extensions;
 using KustoSupport;
 using NLog;
@@ -23,12 +18,18 @@ internal class ReportExplorer
     private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
+    private readonly OurTableLoader _loader;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(FormatTypes.Ascii, 10);
     private KustoQueryResult _prevResult;
 
-    public ReportExplorer(FolderContext folders) => _folders = folders;
+    public ReportExplorer(FolderContext folders)
+    {
+        _loader = new OurTableLoader(folders.OutputFolder);
+        _context.AddLazyTableLoader(_loader);
+        _folders = folders;
+    }
 
     private KustoQueryContext GetCurrentContext() => _context;
 
@@ -46,21 +47,8 @@ internal class ReportExplorer
             else
             {
                 var max = _currentDisplayOptions.MaxToDisplay;
-                switch (_currentDisplayOptions.Format)
-                {
-                    case FormatTypes.Ascii:
-                        Console.WriteLine(KustoFormatter.Tabulate(result, max));
-                        break;
-                    case FormatTypes.Json:
-                        Console.WriteLine(result.ToJsonString());
-                        break;
-                    case FormatTypes.Csv:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(result, max, false));
-                        break;
-                    case FormatTypes.Txt:
-                        Console.WriteLine(KustoFormatter.WriteToCsvString(result, max, true));
-                        break;
-                }
+
+                Console.WriteLine(KustoFormatter.Tabulate(result, max));
 
                 if (_currentDisplayOptions.MaxToDisplay < result.Height)
                 {
@@ -147,7 +135,7 @@ internal class ReportExplorer
             }
 
 
-            var result = GetCurrentContext().RunTabularQuery(query);
+            var result = await GetCurrentContext().RunTabularQueryAsync(query);
             _prevResult = result;
             DisplayResults(result);
         }
@@ -215,10 +203,7 @@ internal class ReportExplorer
                     typeof(SaveQueryCommand.Options),
                     typeof(MaterializeCommand.Options),
                     typeof(SynTableCommand.Options),
-                    typeof(AllTablesCommand.Options),
-                    typeof(LoadCsvCommand.Options),
-                    typeof(LoadIdsCommand.Options),
-                    typeof(LoadParquetCommand.Options)
+                    typeof(AllTablesCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -229,10 +214,7 @@ internal class ReportExplorer
                 .WithParsedAsync<RunScriptCommand.Options>(o => RunScriptCommand.RunAsync(this, o))
                 .WithParsedAsync<SaveQueryCommand.Options>(o => SaveQueryCommand.RunAsync(this, o))
                 .WithParsedAsync<LoadCommand.Options>(o => LoadCommand.RunAsync(this, o))
-                .WithParsedAsync<LoadCsvCommand.Options>(o => LoadCsvCommand.RunAsync(this, o))
-                .WithParsedAsync<LoadIdsCommand.Options>(o => LoadIdsCommand.RunAsync(this, o))
                 .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
-                .WithParsedAsync<LoadParquetCommand.Options>(o => LoadParquetCommand.RunAsync(this, o))
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
             ;
     }
@@ -322,33 +304,7 @@ internal class ReportExplorer
     {
         internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
-            var filename = ToFullPath(o.File, exp._folders.OutputFolder, o.Format.ToString().ToLowerInvariant());
-            string text;
-            switch (o.Format)
-            {
-                case FormatTypes.Parquet:
-                    await ToParquet(filename, exp._prevResult);
-                    Logger.Info($"Wrote parquet file {filename}");
-                    return;
-                case FormatTypes.Json:
-                    text = exp._prevResult.ToJsonString();
-                    break;
-                case FormatTypes.Ascii:
-                    text = KustoFormatter.Tabulate(exp._prevResult);
-                    break;
-                case FormatTypes.Csv:
-                    text = KustoFormatter.WriteToCsvString(exp._prevResult, int.MaxValue, o.SkipHeader);
-                    break;
-                case FormatTypes.Txt:
-                    text = KustoFormatter.WriteToCsvString(exp._prevResult, int.MaxValue, true);
-                    break;
-                default:
-                    text = exp._prevResult.ToJsonString();
-                    break;
-            }
-
-            Logger.Info($"Saving to {filename}...");
-            File.WriteAllText(filename, text);
+            await exp._loader.SaveResult(exp._prevResult, o.File);
         }
 
         [Verb("save", aliases: ["sv"], HelpText = "save last results to file")]
@@ -357,8 +313,6 @@ internal class ReportExplorer
             [Value(0, HelpText = "Name of file", Required = true)]
             public string File { get; set; } = string.Empty;
 
-            [Value(1, HelpText = "Format: ascii/json/csv/txt (default is csv)")]
-            public FormatTypes Format { get; set; } = FormatTypes.Csv;
 
             [Option('b', "bare", HelpText = "Skips header for csv (useful when generating id lists)")]
             public bool SkipHeader { get; set; }
@@ -431,41 +385,12 @@ internal class ReportExplorer
     {
         internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
-            var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".json");
-            Logger.Info($"Loading from stream '{filename}'..");
-            await using var stream = File.OpenRead(filename);
-            var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(stream);
-            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
-            Logger.Info("File loaded.... adding to context");
-            exp.GetCurrentContext()
-                .AddTable(TableBuilder
-                    .FromOrderedDictionarySet(tableName,
-                        dict));
-            Logger.Info($"Table '{tableName}' now available");
+            var tableName = o.As.OrWhenBlank(o.File);
+            await exp._loader.LoadTable(exp._context, o.File, tableName);
         }
 
-        private class SpecializedJsonTypeConverter : JsonConverter<object>
-        {
-            public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-                => reader.TokenType switch
-                {
-                    JsonTokenType.True => true,
-                    JsonTokenType.False => false,
-                    JsonTokenType.Number => reader.GetDouble(),
-                    JsonTokenType.String when reader.TryGetDateTime(out var datetime) => datetime,
-                    JsonTokenType.String => reader.GetString(),
-                    _ => throw new NotSupportedException("Not supported Type conversion")
-                };
-
-
-            public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [Verb("loadjson", aliases: ["lj"],
-            HelpText = "loads a previous-saved json query result as a new table")]
+        [Verb("load", aliases: ["ld"],
+            HelpText = "loads a data file")]
         internal class Options
         {
             [Value(0, HelpText = "Name of file", Required = true)]
@@ -473,103 +398,6 @@ internal class ReportExplorer
 
             [Value(1, HelpText = "Name of table (defaults to name of file)")]
             public string As { get; set; } = string.Empty;
-        }
-    }
-
-    public static class LoadCsvCommand
-    {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
-        {
-            await Task.CompletedTask;
-            var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".csv");
-            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
-
-
-            CsvLoader.Load(filename, exp.GetCurrentContext(), tableName);
-            Logger.Info($"Table '{tableName}' now available");
-        }
-
-        [Verb("loadcsv", aliases: ["lj"],
-            HelpText = "loads a previous-saved json query result as a new table")]
-        internal class Options
-        {
-            [Value(0, HelpText = "Name of file", Required = true)]
-            public string File { get; set; } = string.Empty;
-
-            [Value(1, HelpText = "Name of table (defaults to name of file)")]
-            public string As { get; set; } = string.Empty;
-        }
-    }
-
-
-    public static class LoadParquetCommand
-    {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
-        {
-            await Task.CompletedTask;
-            var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".parquet");
-
-
-            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
-
-            var table = await ParquetFileOps.LoadFromFile(filename, tableName);
-
-
-            exp.GetCurrentContext()
-                .AddTable(table);
-            Logger.Info($"Table '{tableName}' now available");
-        }
-
-        [Verb("loadparquet", aliases: ["lj"],
-            HelpText = "loads a previous-saved json query result as a new table")]
-        internal class Options
-        {
-            [Value(0, HelpText = "Name of file", Required = true)]
-            public string File { get; set; } = string.Empty;
-
-            [Value(1, HelpText = "Name of table (defaults to name of file)")]
-            public string As { get; set; } = string.Empty;
-        }
-    }
-
-    public static class LoadIdsCommand
-    {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
-        {
-            var filename = ToFullPath(o.File, exp._folders.OutputFolder, ".txt");
-            var lines = await File.ReadAllLinesAsync(filename);
-            var key = o.Property;
-            var rows = lines.Select(l => l.Trim())
-                .Where(t => t.Length > 0)
-                .Select(t =>
-                {
-                    var o = new OrderedDictionary();
-                    o[key] = t;
-                    return o;
-                })
-                .ToArray();
-
-            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(filename));
-            Logger.Info("File loaded.... adding to context");
-
-            exp.GetCurrentContext()
-                .AddTable(TableBuilder
-                    .FromOrderedDictionarySet(tableName,
-                        rows));
-            Logger.Info($"Table '{tableName}' now available");
-        }
-
-        [Verb("loaditems", aliases: ["ids"],
-            HelpText = "loads a previous-saved json query result as a new table")]
-        internal class Options
-        {
-            [Value(0, HelpText = "Name of file", Required = true)]
-            public string File { get; set; } = string.Empty;
-
-            [Value(1, HelpText = "Name of table (defaults to name of file)")]
-            public string As { get; set; } = string.Empty;
-
-            [Value(2, HelpText = "Property Name")] public string Property { get; set; } = "Id";
         }
     }
 
@@ -613,11 +441,11 @@ internal class ReportExplorer
         internal class Options
         {
             [Option('f', HelpText = "Format: ascii/json/csv")]
-            public FormatTypes Format { get; set; } = FormatTypes.Unspecified;
+            public FormatTypes Format { get; } = FormatTypes.Unspecified;
 
 
             [Option('m', HelpText = "Maximum number of items to display in console")]
-            public int Max { get; set; } = -1;
+            public int Max { get; } = -1;
         }
     }
 

@@ -52,7 +52,7 @@ namespace ProcessWatcher
             var c = new KustoQueryContext();
             c.AddTableFromRecords("p", ProcessList);
             c.AddTableFromRecords("h", ProcessHistory);
-            var result = c.RunTabularQuery(Query.Text);
+            var result = c.RunTabularQueryWithoutDemandBasedTableLoading(Query.Text);
 
             var html = KustoResultRenderer.RenderToHtml("title", result);
 

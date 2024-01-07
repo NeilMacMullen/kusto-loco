@@ -114,7 +114,7 @@ public class KustoQueryResult
     }
 
     /// <summary>
-    ///     Deserialises a Dictionary-based result to objects
+    ///     Serialises a result to an array of dictionaries
     /// </summary>
     public string ToJsonString() => JsonSerializer.Serialize(AsOrderedDictionarySet());
 }
