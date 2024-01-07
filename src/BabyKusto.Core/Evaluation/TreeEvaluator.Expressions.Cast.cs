@@ -76,6 +76,22 @@ internal partial class TreeEvaluator
                         columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToString(item)));
                         return new ColumnarResult(builder.ToColumn());
                     },
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.DateTime => arguments =>
+                    {
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<DateTime?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToString(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
+                    EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.TimeSpan => arguments =>
+                    {
+                        Debug.Assert(arguments.Length == 1);
+                        var columnResult = (ColumnarResult)arguments[0];
+                        var builder = new ColumnBuilder<TimeSpan?>();
+                        columnResult.Column.ForEach(item => builder.Add(item == null ? null : Convert.ToString(item)));
+                        return new ColumnarResult(builder.ToColumn());
+                    },
                     EvaluatedExpressionKind.Columnar => throw new InvalidOperationException(
                         $"Unexpected target cast type for columnar value: {SchemaDisplay.GetText(node.ResultType)}"),
                     _ => throw new InvalidOperationException($"Unexpected expression result kind {node.ResultKind}")

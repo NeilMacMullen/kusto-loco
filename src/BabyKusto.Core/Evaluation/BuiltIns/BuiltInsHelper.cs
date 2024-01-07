@@ -36,11 +36,17 @@ internal static class BuiltInsHelper
                 var simplifiedArgType = argument.ResultType.Simplify();
                 var simplifiedParamType = parameterType.Simplify();
 
+                //TODO The parser can sometimes fail to figure out the type of the parameter
+                //and therefore emits 'Unknown'  That might need to false matches 
+                //-this needs to be reviewed at some point
                 var thisCompatible =
-                    simplifiedArgType == simplifiedParamType ||
-                    (simplifiedArgType is ScalarSymbol scalarArg && simplifiedParamType is ScalarSymbol scalarParam &&
-                     scalarParam.IsWiderThan(scalarArg)) ||
-                    simplifiedParamType == ScalarTypes.String; // TODO: Is it true that anything is coercible to string?
+                        simplifiedArgType == simplifiedParamType ||
+                        (simplifiedArgType is ScalarSymbol scalarArg &&
+                         simplifiedParamType is ScalarSymbol scalarParam &&
+                         scalarParam.IsWiderThan(scalarArg)) ||
+                        simplifiedParamType == ScalarTypes.String
+                        || simplifiedArgType == ScalarTypes.Unknown // really ?
+                    ; // TODO: Is it true that anything is coercible to string?
 
                 if (!thisCompatible)
                 {
