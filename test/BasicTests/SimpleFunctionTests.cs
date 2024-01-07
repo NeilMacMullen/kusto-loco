@@ -231,4 +231,98 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("0");
     }
+
+
+    [TestMethod]
+    public async Task BetweenLong()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"range x from 1 to 100 step 1
+| where x between (50 .. 55)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("55");
+    }
+
+    [TestMethod]
+    public async Task BetweenInt()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"range i from 1 to 100 step 1
+| extend i=toint(i) | where i between (50 .. 55)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("55");
+    }
+
+    [TestMethod]
+    public async Task RangeDateTime()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2023-01-30 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task RangeDateTimeFiltered()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
+| where x > datetime(2022-01-01)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2023-01-30 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task RangeTimeSpan()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from 1d to 20d step 1d";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("20.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task RangeTimeSpanFiltered()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from 1d to 20d step 1d | where x < 5d ";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task BetweenDateTime()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
+| where x between (datetime(2023-01-10) .. datetime(2023-01-15))";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2023-01-15 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task BetweenDateTimeTimepan()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"
+range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
+| where x between (datetime(2023-01-10) .. 3d)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2023-01-13 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task NotBetweenLong()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"range x from 1 to 10 step 1
+| where x !between (9 .. 11)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("8");
+    }
 }
