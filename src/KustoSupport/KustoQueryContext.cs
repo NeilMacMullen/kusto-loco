@@ -16,7 +16,7 @@ public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly BabyKustoEngine _engine = new();
-    private readonly List<ITableSource> _tables = new();
+    private readonly List<ITableSource> _tables = [];
 
     private bool _fullDebug;
 
@@ -63,17 +63,12 @@ public class KustoQueryContext
         return res.RowCount;
     }
 
-    //temporary until we plumb lazy table load back in
-    public Task<KustoQueryResult> RunTabularQueryAsync(string query) => Task.FromResult(RunTabularQuery(query));
-
     public KustoQueryResult RunTabularQuery(string query)
     {
         var watch = Stopwatch.StartNew();
         //handling for "special" commands
         if (query.Trim() == ".tables")
-        {
-            //TODO
-        }
+            return CreateTableList(query);
 
         try
         {
@@ -91,6 +86,26 @@ public class KustoQueryContext
             var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
             return new KustoQueryResult(query, table, vis, 0, ex.Message);
         }
+    }
+
+    private KustoQueryResult CreateTableList(string query)
+    {
+        var rows = _tables.SelectMany(table
+                => table.Type.Columns.Select((c, i) =>
+                    new
+                    {
+                        Table = table.Name,
+                        Column = c.Name,
+                        Type = c.Type.Name,
+                        Ordinal = i
+                    }
+                ))
+            .ToArray();
+
+        var tr = TableBuilder.CreateFromRows("tables", rows)
+            .ToTableSource() as InMemoryTableSource;
+
+        return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
     }
 
     private (InMemoryTableSource, VisualizationState) TableFromEvaluationResult(EvaluationResult results)
@@ -114,7 +129,7 @@ public class KustoQueryContext
 
     public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
 
-    private async Task<KustoQueryResult> RunQuery(string query)
+    public async Task<KustoQueryResult> RunTabularQueryAsync(string query)
     {
         try
         {
@@ -126,7 +141,7 @@ public class KustoQueryContext
 
             // Note: Hold the lock until the query is complete to ensure that tables don't change
             // in the middle of execution.
-            return await RunTabularQueryAsync(query);
+            return RunTabularQuery(query);
         }
         catch (Exception ex)
         {
@@ -149,13 +164,13 @@ public class KustoQueryContext
         var code = KustoCode.Parse(query).Analyze();
 
         SyntaxElement.WalkNodes(code.Syntax,
-            @operator =>
+            op =>
             {
-                if (@operator is Expression e && e.RawResultType is TableSymbol &&
-                    @operator.Kind.ToString() == "NameReference")
+                if (op is Expression { RawResultType: TableSymbol } e &&
+                    op.Kind.ToString() == "NameReference")
                     tables.Add(e.RawResultType.Name);
             });
-        // //special case handling for when query is _only_ a table name without any operators
+        //special case handling for when query is _only_ a table name without any operators
         if (!tables.Any() && query.Tokenise().Length == 1)
         {
             tables.Add(query.Trim());
