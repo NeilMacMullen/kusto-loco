@@ -16,7 +16,7 @@ internal class IRBuiltInScalarFunctionCallNode : IRExpressionNode
     {
         Signature = signature ?? throw new ArgumentNullException(nameof(signature));
         OverloadInfo = overloadInfo ?? throw new ArgumentNullException(nameof(overloadInfo));
-        Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
+        Parameters = parameters ?? new List<Parameter>();
         Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
     }
 
@@ -35,8 +35,8 @@ internal class IRBuiltInScalarFunctionCallNode : IRExpressionNode
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-         =>
-        visitor.VisitBuiltInScalarFunctionCall(this, context);
+        =>
+            visitor.VisitBuiltInScalarFunctionCall(this, context);
 
     public override string ToString() =>
         $"BuiltInScalarFunctionCall({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";

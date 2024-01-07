@@ -13,6 +13,8 @@ namespace BabyKusto.Core.Evaluation
 {
     internal partial class TreeEvaluator
     {
+        private const int MaxRowsPerChunk = 100_000;
+
         public override EvaluationResult VisitRangeOperator(IRRangeOperatorNode node, EvaluationContext context)
         {
             var fromExpressionResult = (ScalarResult)node.FromExpression.Accept(this, context);
@@ -38,16 +40,21 @@ namespace BabyKusto.Core.Evaluation
 
                 if (columnType == ScalarTypes.Real)
                     return new RangeResultTable<double>(from, to, step, resultType);
+                if (columnType == ScalarTypes.TimeSpan)
+                    return new RangeResultTableForTimeSpan(from, to, step, resultType);
+
+                if (columnType == ScalarTypes.DateTime)
+                    return new RangeResultTableForDateTime(from, to, step, resultType);
 
                 throw new NotImplementedException($"Range operator not implemented for type: {columnType}");
             }
         }
 
+        private static T GetValue<T>(object value) => (T)Convert.ChangeType(value, typeof(T));
+
         private class RangeResultTable<T> : ITableSource
             where T : struct, INumber<T>
         {
-            private const int MaxRowsPerChunk = 100_000;
-
             private readonly T _from;
             private readonly T _step;
             private readonly T _to;
@@ -64,11 +71,9 @@ namespace BabyKusto.Core.Evaluation
                     return;
                 }
 
-                _from = GetValue(from.Value);
-                _to = GetValue(to.Value);
-                _step = GetValue(step.Value);
-
-                static T GetValue(object value) => (T)Convert.ChangeType(value, typeof(T));
+                _from = GetValue<T>(from.Value);
+                _to = GetValue<T>(to.Value);
+                _step = GetValue<T>(step.Value);
             }
 
             public TableSymbol Type { get; }
@@ -90,6 +95,144 @@ namespace BabyKusto.Core.Evaluation
                     : val => val >= _to;
 
                 var chunk = new T?[MaxRowsPerChunk];
+                var i = 0;
+                for (var val = _from; isDone(val); val += _step)
+                {
+                    chunk[i++] = val;
+
+                    if (i != MaxRowsPerChunk)
+                        continue;
+
+                    yield return new TableChunk(this, new BaseColumn[] { ColumnFactory.Create(chunk) });
+                    i = 0;
+                }
+
+                if (i <= 0)
+                    yield break;
+
+                // Smaller end chunk
+                Array.Resize(ref chunk, i);
+
+                yield return new TableChunk(this, new BaseColumn[] { ColumnFactory.Create(chunk) });
+            }
+
+            public IAsyncEnumerable<ITableChunk> GetDataAsync(
+                CancellationToken cancellation = default)
+                => GetData().ToAsyncEnumerable();
+        }
+
+        private class RangeResultTableForTimeSpan : ITableSource
+        {
+            private readonly TimeSpan _from;
+            private readonly TimeSpan _step;
+            private readonly TimeSpan _to;
+
+            public RangeResultTableForTimeSpan(ScalarResult from, ScalarResult to, ScalarResult step,
+                TableSymbol resultType)
+            {
+                Type = resultType;
+                if (from.Value is null || to.Value is null || step.Value is null)
+                {
+                    // Return empty table
+                    _from = TimeSpan.Zero;
+                    _to = TimeSpan.Zero;
+                    _step = TimeSpan.MaxValue;
+                    return;
+                }
+
+                _from = GetValue<TimeSpan>(from.Value);
+                _to = GetValue<TimeSpan>(to.Value);
+                _step = GetValue<TimeSpan>(step.Value);
+            }
+
+            public TableSymbol Type { get; }
+
+            public IEnumerable<ITableChunk> GetData()
+            {
+                var direction = _to >= _from ? 1 : -1;
+                var stepDirection = _step >= TimeSpan.Zero ? 1 : -1;
+
+                if (_step == TimeSpan.Zero || direction != stepDirection)
+                {
+                    yield return new TableChunk(this,
+                        new BaseColumn[] { ColumnFactory.Create(Array.Empty<DateTime?>()) });
+                    yield break;
+                }
+
+                Func<TimeSpan, bool> isDone = direction == 1
+                    ? val => val <= _to
+                    : val => val >= _to;
+
+                var chunk = new TimeSpan?[MaxRowsPerChunk];
+                var i = 0;
+                for (var val = _from; isDone(val); val += _step)
+                {
+                    chunk[i++] = val;
+
+                    if (i != MaxRowsPerChunk)
+                        continue;
+
+                    yield return new TableChunk(this, new BaseColumn[] { ColumnFactory.Create(chunk) });
+                    i = 0;
+                }
+
+                if (i <= 0)
+                    yield break;
+
+                // Smaller end chunk
+                Array.Resize(ref chunk, i);
+
+                yield return new TableChunk(this, new BaseColumn[] { ColumnFactory.Create(chunk) });
+            }
+
+            public IAsyncEnumerable<ITableChunk> GetDataAsync(
+                CancellationToken cancellation = default)
+                => GetData().ToAsyncEnumerable();
+        }
+
+        private class RangeResultTableForDateTime : ITableSource
+        {
+            private readonly DateTime _from;
+            private readonly TimeSpan _step;
+            private readonly DateTime _to;
+
+            public RangeResultTableForDateTime(ScalarResult from, ScalarResult to, ScalarResult step,
+                TableSymbol resultType)
+            {
+                Type = resultType;
+                if (from.Value is null || to.Value is null || step.Value is null)
+                {
+                    // Return empty table
+                    _from = DateTime.MinValue;
+                    _to = DateTime.MinValue;
+                    _step = TimeSpan.MaxValue;
+                    return;
+                }
+
+                _from = GetValue<DateTime>(from.Value);
+                _to = GetValue<DateTime>(to.Value);
+                _step = GetValue<TimeSpan>(step.Value);
+            }
+
+            public TableSymbol Type { get; }
+
+            public IEnumerable<ITableChunk> GetData()
+            {
+                var direction = _to >= _from ? 1 : -1;
+                var stepDirection = _step >= TimeSpan.Zero ? 1 : -1;
+
+                if (_step == TimeSpan.Zero || direction != stepDirection)
+                {
+                    yield return new TableChunk(this,
+                        new BaseColumn[] { ColumnFactory.Create(Array.Empty<DateTime?>()) });
+                    yield break;
+                }
+
+                Func<DateTime, bool> isDone = direction == 1
+                    ? val => val <= _to
+                    : val => val >= _to;
+
+                var chunk = new DateTime?[MaxRowsPerChunk];
                 var i = 0;
                 for (var val = _from; isDone(val); val += _step)
                 {

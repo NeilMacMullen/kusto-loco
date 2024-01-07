@@ -187,6 +187,33 @@ internal static class BuiltInOperators
                 new ScalarOverloadInfo(new LogicalOrOperatorImpl(), ScalarTypes.Bool, ScalarTypes.Bool,
                     ScalarTypes.Bool)));
 
+        //the "extra" parameter here is because the between couple is expanded to two
+        //separate columns
+        operators.Add(Operators.Between,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new IntBetweenOperatorImpl(false), ScalarTypes.Bool,
+                    ScalarTypes.Int, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BetweenOperatorImpl<long>(false), ScalarTypes.Bool,
+                    ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BetweenOperatorImpl<DateTime>(false), ScalarTypes.Bool,
+                    ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.DateTime),
+                new ScalarOverloadInfo(new BetweenOperatorDateTimeWithTimespanImpl(false), ScalarTypes.Bool,
+                    ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.TimeSpan)
+            )
+        );
+
+        operators.Add(Operators.NotBetween,
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new IntBetweenOperatorImpl(true), ScalarTypes.Bool,
+                    ScalarTypes.Int, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BetweenOperatorImpl<long>(true), ScalarTypes.Bool,
+                    ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
+                new ScalarOverloadInfo(new BetweenOperatorImpl<int>(true), ScalarTypes.Bool,
+                    ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
+                new ScalarOverloadInfo(new BetweenOperatorImpl<DateTime>(true), ScalarTypes.Bool,
+                    ScalarTypes.DateTime, ScalarTypes.DateTime, ScalarTypes.DateTime))
+        );
+
         operators.Add(Operators.Contains,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new ContainsOperatorImpl(), ScalarTypes.Bool,
                 ScalarTypes.String, ScalarTypes.String)));
@@ -229,10 +256,9 @@ internal static class BuiltInOperators
                 ScalarTypes.String, ScalarTypes.String)));
     }
 
-    public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments,
-        List<Parameter> parameters)
+    public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments)
     {
-        if (!TryGetOverload(symbol, arguments, parameters, out var overload))
+        if (!TryGetOverload(symbol, arguments, out var overload))
         {
             throw new NotImplementedException(
                 $"Operator {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
@@ -241,7 +267,7 @@ internal static class BuiltInOperators
         return overload!;
     }
 
-    public static bool TryGetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
+    public static bool TryGetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments,
         out ScalarOverloadInfo? overload)
     {
         if (!operators.TryGetValue(symbol, out var operatorInfo))

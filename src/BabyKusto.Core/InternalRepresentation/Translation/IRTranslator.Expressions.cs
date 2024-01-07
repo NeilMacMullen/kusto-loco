@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
@@ -18,6 +19,27 @@ namespace BabyKusto.Core.InternalRepresentation;
 
 internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 {
+    public override IRNode VisitBetweenExpression(BetweenExpression node)
+    {
+        var couple = node.Right.Accept(this)
+            as IRExpressionCoupleNode;
+        var signature = node.ReferencedSignature;
+
+        var leftRange = couple!._left;
+        var rightRange = couple._right;
+
+        var parameterExpression = node.Left.Accept(this) as IRExpressionNode;
+
+        //between used after datetime range thinks type is unknown...
+        var irArguments = new[] { parameterExpression!, leftRange, rightRange };
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+
+        //ApplyTypeCoercions(irArguments, overloadInfo);
+
+        return new IRBuiltInScalarFunctionCallNode(signature,
+            overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
+    }
+
     public override IRNode VisitSimpleNamedExpression(SimpleNamedExpression node) => node.Expression.Accept(this);
 
     public override IRNode VisitNameReference(NameReference node)
@@ -28,6 +50,19 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
             if (index >= 0)
             {
                 return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, index);
+            }
+            //if the node referenced symbol has type unknown because it may have come
+            //from an expression that failed to be evaluated (possibly bug in parser) then 
+            //try a more relaxed fit..
+
+            if (node.ResultType == ScalarTypes.Unknown)
+            {
+                var matchingNames = _rowScope.Members.FirstIndex(t => t.Name == node.ReferencedSymbol.Name);
+
+                if (matchingNames >= 0)
+                {
+                    return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, matchingNames);
+                }
             }
         }
 
@@ -151,11 +186,19 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         var irRight = (IRExpressionNode)node.Right.Accept(this);
 
         var irArguments = new[] { irLeft, irRight };
-        var parameters = signature.GetArgumentParameters(new[] { node.Left, node.Right });
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments, parameters);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRBinaryExpressionNode(signature, overloadInfo, irArguments[0], irArguments[1], node.ResultType);
+    }
+
+
+    public override IRNode VisitExpressionCouple(ExpressionCouple node)
+    {
+        var irLeft = (IRExpressionNode)node.First.Accept(this);
+        var irRight = (IRExpressionNode)node.Second.Accept(this);
+
+        return new IRExpressionCoupleNode(irLeft, irRight);
     }
 
     public override IRNode VisitPrefixUnaryExpression(PrefixUnaryExpression node)
@@ -166,8 +209,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
 
         var irArguments = new[] { irExpression };
-        var parameters = signature.GetArgumentParameters(new[] { node.Expression });
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments, parameters);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRUnaryExpressionNode(signature, overloadInfo, irExpression, node.ResultType);
