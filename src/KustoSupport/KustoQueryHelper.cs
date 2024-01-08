@@ -28,6 +28,13 @@ public class KustoQueryHelper
         return await RunQuery(tableName, rows, query, true);
     }
 
+    public static async Task<IReadOnlyCollection<R>> SimpleQueryToAndFrom<T, R>(
+        IReadOnlyCollection<T> rows, string query)
+    {
+        var result = await SimpleQuery(rows, query);
+        return result.DeserialiseTo<R>();
+    }
+
 
     public static async Task<KustoQueryResult> RunQuery<T>(string tableName,
         IReadOnlyCollection<T> rows,

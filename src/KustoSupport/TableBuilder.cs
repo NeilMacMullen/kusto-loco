@@ -35,12 +35,12 @@ public class TableBuilder
         Name = name;
     }
 
-    public static TableBuilder CreateEmpty(string name, int length) =>
-        new(
-            name,
-            Array.Empty<BaseColumn>(),
-            Array.Empty<string>(),
-            length);
+    public static TableBuilder CreateEmpty(string name, int length)
+        => new(
+               name,
+               Array.Empty<BaseColumn>(),
+               Array.Empty<string>(),
+               length);
 
 
     public TableBuilder WithColumn(string name, BaseColumn column)
@@ -50,7 +50,7 @@ public class TableBuilder
         return this;
     }
 
-    public TableBuilder WithColumn<T>(string name, IReadOnlyCollection<T> items)
+    public TableBuilder WithColumn<T>(string name, IEnumerable<T> items)
     {
         var column = ColumnFactory.Create(items.ToArray());
         return WithColumn(name, column);
@@ -95,9 +95,9 @@ public class TableBuilder
         //currently we rely on the dictionary having valid types and avoiding null values in unfortunate places
         var firstDictionary = dictionaries.First();
         var headers = firstDictionary.Cast<DictionaryEntry>()
-            .Select(de => de.Key.ToString())
-            .Select(h => new { ColumnName = h, Type = firstDictionary[h].GetType() })
-            .ToArray();
+                                     .Select(de => de.Key.ToString())
+                                     .Select(h => new { ColumnName = h, Type = firstDictionary[h].GetType() })
+                                     .ToArray();
 
         var builder = CreateEmpty(tableName, dictionaries.Count);
         foreach (var header in headers)
@@ -113,15 +113,16 @@ public class TableBuilder
     {
         var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
         return CreateEmpty("result", 1)
-            .WithColumn("value", column)
-            .ToTableSource();
+               .WithColumn("value", column)
+               .ToTableSource();
     }
 
     public ITableSource ToTableSource()
     {
-        var syms = _columnNames.Zip(_columns).Select(cs =>
-                new ColumnSymbol(cs.First, cs.Second.Type))
-            .ToArray();
+        var syms = _columnNames.Zip(_columns)
+                               .Select(cs =>
+                                           new ColumnSymbol(cs.First, cs.Second.Type))
+                               .ToArray();
         var ts = new TableSymbol(Name, syms);
         return new InMemoryTableSource(ts, _columns.ToArray());
     }

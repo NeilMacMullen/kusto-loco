@@ -3,6 +3,7 @@ using System.Text.Json;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Util;
+using Extensions;
 using NLog;
 
 #pragma warning disable CS8603 // Possible null reference return.
@@ -49,22 +50,23 @@ public class KustoQueryResult
 
     public object?[] GetRow(int row)
         => Enumerable.Range(0, Width)
-            .Select(c => Get(c, row)).ToArray();
+                     .Select(c => Get(c, row))
+                     .ToArray();
 
-    public IEnumerable<object?[]> EnumerateRows() =>
-        Enumerable.Range(0, Height)
-            .Select(GetRow);
+    public IEnumerable<object?[]> EnumerateRows()
+        => Enumerable.Range(0, Height)
+                     .Select(GetRow);
 
     public ColumnResult[] ColumnDefinitions()
     {
         return Table.Type
-            .Columns
-            .Select((c, i) => new ColumnResult(
-                c.Name,
-                i,
-                TypeMapping.UnderlyingTypeForSymbol(c.Type))
-            )
-            .ToArray();
+                    .Columns
+                    .Select((c, i) => new ColumnResult(
+                                                       c.Name,
+                                                       i,
+                                                       TypeMapping.UnderlyingTypeForSymbol(c.Type))
+                           )
+                    .ToArray();
     }
 
     public string[] ColumnNames() => ColumnDefinitions().Select(c => c.Name).ToArray();
@@ -75,13 +77,14 @@ public class KustoQueryResult
         return chunk.Columns[col].GetRawDataValue(row);
     }
 
-    public IReadOnlyCollection<OrderedDictionary> AsOrderedDictionarySet()
+    public IReadOnlyCollection<OrderedDictionary> AsOrderedDictionarySet(int max = int.MaxValue)
     {
         var items = new List<OrderedDictionary>();
 
         var columns = ColumnDefinitions();
         var chunk = Table.GetData().First();
-        for (var row = 0; row < Height; row++)
+        var rowsToTake = Math.Min(max, Height);
+        for (var row = 0; row < rowsToTake; row++)
         {
             var d = new OrderedDictionary();
 
@@ -103,18 +106,23 @@ public class KustoQueryResult
     /// <summary>
     ///     Deserialises a Dictionary-based result to objects
     /// </summary>
-    public IReadOnlyCollection<T> DeserialiseTo<T>()
+    public IReadOnlyCollection<T> DeserialiseTo<T>(int max = int.MaxValue)
     {
         //this is horrible but I don't have time to research how to do it ourselves and the bottom line
         //is that we are expecting results sets to be small to running through the JsonSerializer is
         //"good enough" for now...
 
-        var json = ToJsonString();
+        var json = ToJsonString(max);
         return JsonSerializer.Deserialize<T[]>(json);
     }
 
     /// <summary>
     ///     Serialises a result to an array of dictionaries
     /// </summary>
-    public string ToJsonString() => JsonSerializer.Serialize(AsOrderedDictionarySet());
+    public string ToJsonString(int max = int.MaxValue) => JsonSerializer.Serialize(AsOrderedDictionarySet(max));
+
+    public IReadOnlyCollection<OrderedDictionary> ResultOrErrorAsSet()
+        => Error.IsNotBlank()
+               ? [new OrderedDictionary { ["QUERY ERROR"] = Error }]
+               : AsOrderedDictionarySet();
 }
