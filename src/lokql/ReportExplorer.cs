@@ -6,7 +6,10 @@ using CommandLine;
 using Extensions;
 using KustoSupport;
 using NLog;
-using ParquetSupport;
+using static KustoSupport.KustoFormatter;
+
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local setters are
+// required on Options properties by CommandLineParser library
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
@@ -21,7 +24,7 @@ public class ReportExplorer
     private readonly IKustoQueryContextTableLoader _loader;
     private readonly StringBuilder commandBuffer = new();
 
-    private DisplayOptions _currentDisplayOptions = new(FormatTypes.Ascii, 10);
+    private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
     public ReportExplorer(FolderContext folders, IKustoQueryContextTableLoader loader)
@@ -31,7 +34,7 @@ public class ReportExplorer
         _folders = folders;
     }
 
-    public ReportExplorer(FolderContext folders) : this(folders, new OurTableLoader(folders.OutputFolder))
+    public ReportExplorer(FolderContext folders) : this(folders, new StandardFormatAdaptor(folders.OutputFolder))
     {
     }
 
@@ -52,13 +55,14 @@ public class ReportExplorer
             {
                 var max = _currentDisplayOptions.MaxToDisplay;
 
-                Console.WriteLine(KustoFormatter.Tabulate(result, max));
+                var prefs = new DisplayPreferences(78, 0, max);
+                Console.WriteLine(Tabulate(result, prefs));
 
                 if (_currentDisplayOptions.MaxToDisplay < result.Height)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(
-                                      $"Display was truncated to first {max} of {result.Height}.  Use '.display --max' to change this behaviour");
+                        $"Display was truncated to first {max} of {result.Height}.  Use '.display --max' to change this behaviour");
                 }
 
                 //auto render
@@ -152,11 +156,6 @@ public class ReportExplorer
     }
 
 
-    private static async Task ToParquet(string path, KustoQueryResult result)
-    {
-        await ParquetFileOps.Save(path, result);
-    }
-
     private static void ShowError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -168,8 +167,8 @@ public class ReportExplorer
     private static string ToFullPath(string file, string folder, string extension)
     {
         var path = Path.IsPathRooted(file)
-                       ? file
-                       : Path.Combine(folder, file);
+            ? file
+            : Path.Combine(folder, file);
         if (!Path.HasExtension(path))
             path = Path.ChangeExtension(path, extension);
         return path;
@@ -180,46 +179,37 @@ public class ReportExplorer
         string ScriptFolder,
         string QueryFolder);
 
-    internal enum FormatTypes
-    {
-        Ascii,
-        Json,
-        Csv,
-        Txt,
-        Unspecified,
-        Parquet
-    }
 
-    internal readonly record struct DisplayOptions(FormatTypes Format, int MaxToDisplay);
+    internal readonly record struct DisplayOptions(int MaxToDisplay);
 
     #region internal commands
 
     private Task RunInternalCommand(string[] args)
     {
         return StandardParsers.Default.ParseArguments(args,
-                                                      typeof(ExitCommand.Options),
-                                                      typeof(SaveCommand.Options),
-                                                      typeof(RenderCommand.Options),
-                                                      typeof(LoadCommand.Options),
-                                                      typeof(FormatCommand.Options),
-                                                      typeof(RunScriptCommand.Options),
-                                                      typeof(QueryCommand.Options),
-                                                      typeof(SaveQueryCommand.Options),
-                                                      typeof(MaterializeCommand.Options),
-                                                      typeof(SynTableCommand.Options),
-                                                      typeof(AllTablesCommand.Options)
-                                                     )
-                              .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
-                              .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
-                              .WithParsed<AllTablesCommand.Options>(o => AllTablesCommand.Run(this, o))
-                              .WithParsed<ExitCommand.Options>(o => ExitCommand.Run(this, o))
-                              .WithParsed<FormatCommand.Options>(o => FormatCommand.Run(this, o))
-                              .WithParsed<SynTableCommand.Options>(o => SynTableCommand.Run(this, o))
-                              .WithParsedAsync<RunScriptCommand.Options>(o => RunScriptCommand.RunAsync(this, o))
-                              .WithParsedAsync<SaveQueryCommand.Options>(o => SaveQueryCommand.RunAsync(this, o))
-                              .WithParsedAsync<LoadCommand.Options>(o => LoadCommand.RunAsync(this, o))
-                              .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
-                              .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
+                    typeof(ExitCommand.Options),
+                    typeof(SaveCommand.Options),
+                    typeof(RenderCommand.Options),
+                    typeof(LoadCommand.Options),
+                    typeof(FormatCommand.Options),
+                    typeof(RunScriptCommand.Options),
+                    typeof(QueryCommand.Options),
+                    typeof(SaveQueryCommand.Options),
+                    typeof(MaterializeCommand.Options),
+                    typeof(SynTableCommand.Options),
+                    typeof(AllTablesCommand.Options)
+                )
+                .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
+                .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
+                .WithParsed<AllTablesCommand.Options>(o => AllTablesCommand.Run(this, o))
+                .WithParsed<ExitCommand.Options>(o => ExitCommand.Run(this, o))
+                .WithParsed<FormatCommand.Options>(o => FormatCommand.Run(this, o))
+                .WithParsed<SynTableCommand.Options>(o => SynTableCommand.Run(this, o))
+                .WithParsedAsync<RunScriptCommand.Options>(o => RunScriptCommand.RunAsync(this, o))
+                .WithParsedAsync<SaveQueryCommand.Options>(o => SaveQueryCommand.RunAsync(this, o))
+                .WithParsedAsync<LoadCommand.Options>(o => LoadCommand.RunAsync(this, o))
+                .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
+                .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
             ;
     }
 
@@ -238,7 +228,7 @@ public class ReportExplorer
         }
 
         [Verb("run", aliases: ["script", "r"],
-              HelpText = "run a script")]
+            HelpText = "run a script")]
         internal class Options
         {
             [Value(0, HelpText = "Name of script", Required = true)]
@@ -257,7 +247,7 @@ public class ReportExplorer
         }
 
         [Verb("query", aliases: ["q"],
-              HelpText = "run a multi-line query from a file")]
+            HelpText = "run a multi-line query from a file")]
         internal class Options
         {
             [Value(0, HelpText = "Name of queryFile", Required = true)]
@@ -277,10 +267,10 @@ public class ReportExplorer
             var q = exp._prevResult.Query;
             if (!o.NoSplit)
                 q = q
-                    .Tokenise("|")
-                    .JoinString($"{Environment.NewLine}| ")
-                    .Tokenise(";")
-                    .JoinString($";{Environment.NewLine}")
+                        .Tokenise("|")
+                        .JoinString($"{Environment.NewLine}| ")
+                        .Tokenise(";")
+                        .JoinString($";{Environment.NewLine}")
                     ;
 
             var text = $@"//{o.Comment}
@@ -290,7 +280,7 @@ public class ReportExplorer
         }
 
         [Verb("savequery", aliases: ["sq"],
-              HelpText = "save a query to a file so you can use it again")]
+            HelpText = "save a query to a file so you can use it again")]
         internal class Options
         {
             [Value(0, HelpText = "Name of queryFile", Required = true)]
@@ -339,9 +329,6 @@ public class ReportExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
-
-            [Value(1, HelpText = "Format: ascii/json/csv (default is csv)")]
-            public FormatTypes Format { get; set; } = FormatTypes.Csv;
         }
     }
 
@@ -349,15 +336,16 @@ public class ReportExplorer
     {
         internal static void Run(ReportExplorer exp, Options o)
         {
+            var mat = TableBuilder.FromTable(exp._prevResult.Table,
+                KustoQueryContext.UnescapeTableName(o.As)
+            );
             exp.GetCurrentContext()
-               .AddTable(TableBuilder
-                             .FromOrderedDictionarySet(o.As,
-                                                       exp._prevResult.AsOrderedDictionarySet()));
+                .AddTable(mat);
             Logger.Info($"Table '{o.As}' now available");
         }
 
         [Verb("materialize", aliases: ["materialise", "mat"],
-              HelpText = "save last results back into context as a table")]
+            HelpText = "save last results back into context as a table")]
         internal class Options
         {
             [Value(0, Required = true, HelpText = "Name of table")]
@@ -372,13 +360,13 @@ public class ReportExplorer
         {
             var context = exp._context;
             var tableNames = context.TableNames
-                                    .Select(t => $"['{t}']")
-                                    .JoinAsLines();
+                .Select(t => $"['{t}']")
+                .JoinAsLines();
             Console.WriteLine(tableNames);
         }
 
         [Verb("listtables", aliases: ["ls", "alltables", "at"],
-              HelpText = "Lists all available tables in the global context")]
+            HelpText = "Lists all available tables in the global context")]
         internal class Options
         {
         }
@@ -388,12 +376,12 @@ public class ReportExplorer
     {
         internal static async Task RunAsync(ReportExplorer exp, Options o)
         {
-            var tableName = o.As.OrWhenBlank(o.File);
+            var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
             await exp._loader.LoadTable(exp._context, o.File, tableName);
         }
 
         [Verb("load", aliases: ["ld"],
-              HelpText = "loads a data file")]
+            HelpText = "loads a data file")]
         internal class Options
         {
             [Value(0, HelpText = "Name of file", Required = true)]
@@ -410,12 +398,12 @@ public class ReportExplorer
         internal static void Run(ReportExplorer exp, Options o)
         {
             Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
-            //TODO - hide until a better way of sharing tables is found
-            throw new NotImplementedException();
-            /*
-            var table = exp.GetCurrentContext().GetTable(o.CurrentName) as TableBuilder;
-            exp.GetCurrentContext().AddTable(table.ShareAs(KustoQueryContext.UnescapeTableName(o.As)));
-            */
+
+
+            var t = exp.GetCurrentContext().GetTable(
+                KustoQueryContext.UnescapeTableName(o.CurrentName));
+            exp.GetCurrentContext().Share(t,
+                KustoQueryContext.UnescapeTableName(o.As));
         }
 
         [Verb("synomym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]
@@ -433,8 +421,6 @@ public class ReportExplorer
     {
         internal static void Run(ReportExplorer exp, Options o)
         {
-            if (o.Format != FormatTypes.Unspecified)
-                exp._currentDisplayOptions = exp._currentDisplayOptions with { Format = o.Format };
             if (o.Max > 0)
                 exp._currentDisplayOptions = exp._currentDisplayOptions with { MaxToDisplay = o.Max };
             Logger.Info($"Set: {exp._currentDisplayOptions}");
@@ -443,12 +429,8 @@ public class ReportExplorer
         [Verb("display", aliases: ["d"], HelpText = "change the output format")]
         internal class Options
         {
-            [Option('f', HelpText = "Format: ascii/json/csv")]
-            public FormatTypes Format { get; } = FormatTypes.Unspecified;
-
-
             [Option('m', HelpText = "Maximum number of items to display in console")]
-            public int Max { get; } = -1;
+            public int Max { get; set; } = -1;
         }
     }
 

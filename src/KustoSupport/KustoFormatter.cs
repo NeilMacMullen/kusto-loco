@@ -15,13 +15,13 @@ public static class KustoFormatter
     {
 #pragma warning disable CS8603 // Possible null reference return.
         return o switch
-               {
-                   null => string.Empty,
-                   DateTime d => d.Kind == DateTimeKind.Local
-                                     ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
-                                     : d.ToString("u"),
-                   _ => o.ToString()
-               };
+        {
+            null => string.Empty,
+            DateTime d => d.Kind == DateTimeKind.Local
+                ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
+                : d.ToString("u"),
+            _ => o.ToString()
+        };
 #pragma warning restore CS8603 // Possible null reference return.
     }
 
@@ -34,34 +34,46 @@ public static class KustoFormatter
     {
         var table = TableBuilder.FromOrderedDictionarySet(string.Empty, dictionaries);
         var result = new KustoQueryResult(string.Empty, table.ToTableSource() as InMemoryTableSource,
-                                          VisualizationState.Empty, 0, string.Empty);
+            VisualizationState.Empty, 0, string.Empty);
         return Tabulate(result);
     }
 
     public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
+        => Tabulate(result, new DisplayPreferences(int.MaxValue, 0, max));
+
+    public static string Tabulate(KustoQueryResult result, DisplayPreferences prefs)
     {
         if (result.Height == 0)
             return "no results";
         var columns = result.ColumnDefinitions();
         var sb = new StringBuilder();
 
+        var max = prefs.Length;
+
         var displayHeight = Math.Min(max, result.Height);
+        var maxColumnWidth = prefs.ScreenWidth / columns.Length;
+
 
         string[] MakeStringColumn(ColumnResult c)
             => new[] { c.Name }
-               .Concat(result.EnumerateColumnData(c).Take(max))
-               .Select(ObjectToKustoString)
-               .ToArray();
+                .Concat(result.EnumerateColumnData(c)
+                    .Skip(prefs.StartOffset)
+                    .Take(max))
+                .Select(ObjectToKustoString)
+                .ToArray();
 
         string[] PadToMax(string[] a)
         {
             var maxWidth = a.Select(s => s.Length).Max();
-            return a.Select(s => s.PadRight(maxWidth)).ToArray();
+
+            return a.Select(s => s.PadRight(maxWidth))
+                .Select(s => s[..Math.Min(s.Length, maxColumnWidth)])
+                .ToArray();
         }
 
         var cells = columns.Select(MakeStringColumn)
-                           .Select(PadToMax)
-                           .ToArray();
+            .Select(PadToMax)
+            .ToArray();
 
 
         for (var r = 0; r <= displayHeight; r++)
@@ -80,4 +92,6 @@ public static class KustoFormatter
 
         string JoinToLine(IEnumerable<string> cols) => cols.JoinString(" | ");
     }
+
+    public readonly record struct DisplayPreferences(int ScreenWidth, int StartOffset, int Length);
 }

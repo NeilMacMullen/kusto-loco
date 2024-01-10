@@ -40,7 +40,7 @@ public class KustoQueryResult
     public string Query { get; init; }
 
 
-    private InMemoryTableSource Table { get; }
+    public InMemoryTableSource Table { get; }
     public int QueryDuration { get; init; }
     public string Error { get; init; }
     public VisualizationState Visualization { get; init; }
@@ -50,23 +50,23 @@ public class KustoQueryResult
 
     public object?[] GetRow(int row)
         => Enumerable.Range(0, Width)
-                     .Select(c => Get(c, row))
-                     .ToArray();
+            .Select(c => Get(c, row))
+            .ToArray();
 
     public IEnumerable<object?[]> EnumerateRows()
         => Enumerable.Range(0, Height)
-                     .Select(GetRow);
+            .Select(GetRow);
 
     public ColumnResult[] ColumnDefinitions()
     {
         return Table.Type
-                    .Columns
-                    .Select((c, i) => new ColumnResult(
-                                                       c.Name,
-                                                       i,
-                                                       TypeMapping.UnderlyingTypeForSymbol(c.Type))
-                           )
-                    .ToArray();
+            .Columns
+            .Select((c, i) => new ColumnResult(
+                c.Name,
+                i,
+                TypeMapping.UnderlyingTypeForSymbol(c.Type))
+            )
+            .ToArray();
     }
 
     public string[] ColumnNames() => ColumnDefinitions().Select(c => c.Name).ToArray();
@@ -124,6 +124,6 @@ public class KustoQueryResult
 
     public IReadOnlyCollection<OrderedDictionary> ResultOrErrorAsSet()
         => Error.IsNotBlank()
-               ? [new OrderedDictionary { ["QUERY ERROR"] = Error }]
-               : AsOrderedDictionarySet();
+            ? [new OrderedDictionary { ["QUERY ERROR"] = Error }]
+            : AsOrderedDictionarySet();
 }

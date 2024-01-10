@@ -59,13 +59,16 @@ public static class CsvLoader
     {
         var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
         var columnCount = dictionaries.First().Count;
-        var rowCount = Math.Min(dictionaries.Length, 1000);
+        var rowCount = dictionaries.Length;
 
         var typeTriers = new Func<string, (bool, object)>[]
         {
             s => (int.TryParse(s, out var i), i),
+            s => (long.TryParse(s, out var i), i),
             s => (double.TryParse(s, out var i), i),
             s => (DateTime.TryParse(s, out var i), i),
+            s => (Guid.TryParse(s, out var i), i),
+            s => (TimeSpan.TryParse(s, out var i), i),
             s => (bool.TryParse(s, out var i), i),
         };
 
@@ -73,14 +76,23 @@ public static class CsvLoader
         {
             var column = dictionaries.Select(d => (string)d[c]).ToArray();
 
-            var transformed = new object[rowCount];
+            var transformed = new object?[rowCount];
             var inferredType = false;
-            foreach (var type in typeTriers)
+            foreach (var typeParser in typeTriers)
             {
                 var processedAll = true;
                 for (var i = 0; i < rowCount; i++)
                 {
-                    var (parsed, val) = type(column[i]);
+                    var cell = column[i];
+                    //blank cells tell us nothing about type since data may
+                    //be missing
+                    if (string.IsNullOrWhiteSpace(cell))
+                    {
+                        transformed[i] = null;
+                        continue;
+                    }
+
+                    var (parsed, val) = typeParser(cell);
                     if (parsed)
                         transformed[i] = val;
                     else
@@ -95,7 +107,8 @@ public static class CsvLoader
                 break;
             }
 
-            if (!inferredType) continue;
+            if (!inferredType)
+                continue;
             for (var r = 0; r < rowCount; r++)
                 dictionaries[r][headers[c]] = transformed[r];
         }

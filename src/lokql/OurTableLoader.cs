@@ -5,12 +5,12 @@ using KustoSupport;
 using ParquetSupport;
 
 #pragma warning disable CS8618, CS8604
-public class OurTableLoader : IKustoQueryContextTableLoader
+public class StandardFormatAdaptor : IKustoQueryContextTableLoader
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly string[] _paths;
 
-    public OurTableLoader(params string[] paths)
+    public StandardFormatAdaptor(params string[] paths)
     {
         _paths = paths;
         _loaders =
@@ -38,8 +38,8 @@ public class OurTableLoader : IKustoQueryContextTableLoader
 
 
         var filePaths = Path.IsPathRooted(path)
-                            ? [path]
-                            : _paths.Select(p => Path.Combine(p, path));
+            ? [path]
+            : _paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
             await loader.TrySave(filepath, result);
@@ -50,7 +50,7 @@ public class OurTableLoader : IKustoQueryContextTableLoader
 
     public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName)
     {
-        var alreadyPresent = context.TableNames.Contains(path);
+        var alreadyPresent = context.TableNames.Contains(tableName);
         if (alreadyPresent)
             return true;
 
@@ -58,8 +58,8 @@ public class OurTableLoader : IKustoQueryContextTableLoader
 
 
         var filePaths = Path.IsPathRooted(path)
-                            ? [path]
-                            : _paths.Select(p => Path.Combine(p, path));
+            ? [path]
+            : _paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
             if (!Path.Exists(filepath)) break;
@@ -121,7 +121,7 @@ public class JsonArrayTableAdaptor : IFileBasedTableAccess
         var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
         var table = TableBuilder
             .FromOrderedDictionarySet(name,
-                                      dict);
+                dict);
         context.AddTable(table);
         return Task.FromResult(true);
     }
@@ -150,8 +150,8 @@ public class TextTableAdaptor : IFileBasedTableAccess
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
     {
         var lines = File.ReadAllLines(path)
-                        .Select(l => new { Line = l })
-                        .ToArray();
+            .Select(l => new { Line = l })
+            .ToArray();
         var table = TableBuilder.CreateFromRows(name, lines).ToTableSource();
         context.AddTable(table);
         return Task.FromResult(true);
