@@ -126,4 +126,11 @@ public class TableBuilder
         var ts = new TableSymbol(Name, syms);
         return new InMemoryTableSource(ts, _columns.ToArray());
     }
+
+    public static ITableSource FromTable(ITableSource table, string requestedTableName)
+    {
+        if (table is not InMemoryTableSource ims)
+            throw new NotImplementedException("can currently only shared generated tables");
+        return ims.ShareAs(requestedTableName);
+    }
 }

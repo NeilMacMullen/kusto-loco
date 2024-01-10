@@ -15,7 +15,9 @@ internal class LessThanIntOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (int?)arguments[0].Value;
         var right = (int?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left < right : null);
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue
+                                                      ? left < right
+                                                      : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -29,7 +31,9 @@ internal class LessThanIntOperatorImpl : IScalarFunctionImpl
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = left.HasValue && right.HasValue ? left < right : null;
+            data[i] = left.HasValue && right.HasValue
+                          ? left < right
+                          : null;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));
@@ -45,7 +49,9 @@ internal class LessThanLongOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (long?)arguments[0].Value;
         var right = (long?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left < right : null);
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue
+                                                      ? left < right
+                                                      : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -58,8 +64,9 @@ internal class LessThanLongOperatorImpl : IScalarFunctionImpl
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
-            Logger.Debug($"{left} comp {right}");
-            data[i] = left.HasValue && right.HasValue ? left < right : null;
+            data[i] = left.HasValue && right.HasValue
+                          ? left < right
+                          : null;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));
@@ -73,7 +80,9 @@ internal class LessThanDoubleOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (double?)arguments[0].Value;
         var right = (double?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left < right : null);
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue
+                                                      ? left < right
+                                                      : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -87,7 +96,9 @@ internal class LessThanDoubleOperatorImpl : IScalarFunctionImpl
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = left.HasValue && right.HasValue ? left < right : null;
+            data[i] = left.HasValue && right.HasValue
+                          ? left < right
+                          : null;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));
@@ -101,7 +112,9 @@ internal class LessThanTimeSpanOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (TimeSpan?)arguments[0].Value;
         var right = (TimeSpan?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left < right : null);
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue
+                                                      ? left < right
+                                                      : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -115,7 +128,9 @@ internal class LessThanTimeSpanOperatorImpl : IScalarFunctionImpl
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = left.HasValue && right.HasValue ? left < right : null;
+            data[i] = left.HasValue && right.HasValue
+                          ? left < right
+                          : null;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));
@@ -129,7 +144,9 @@ internal class LessThanDateTimeOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         var left = (DateTime?)arguments[0].Value;
         var right = (DateTime?)arguments[1].Value;
-        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue ? left < right : null);
+        return new ScalarResult(ScalarTypes.Bool, left.HasValue && right.HasValue
+                                                      ? left < right
+                                                      : null);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -143,7 +160,9 @@ internal class LessThanDateTimeOperatorImpl : IScalarFunctionImpl
         for (var i = 0; i < leftCol.RowCount; i++)
         {
             var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = left.HasValue && right.HasValue ? left < right : null;
+            data[i] = left.HasValue && right.HasValue
+                          ? left < right
+                          : null;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));

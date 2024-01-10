@@ -12,6 +12,7 @@ public static class VegaGenerator
     public const string AxisTypeNominal = "nominal";
     public const string BarChart = "bar";
     public const string PieChart = "arc";
+    public const string GridChart = "rect";
 
 
     public static VegaChart Spec(
@@ -24,63 +25,63 @@ public static class VegaGenerator
     )
     {
         var encoding = new VegaEncoding
-            {
-                x = new VegaSeries
-                {
-                    field = xSeries.QualifiedColumnName,
-                    type = xAxisType,
-                    axis = new VegaAxis
-                        { title = xSeries.Text, minExtent = 0 },
-                    title = xSeries.Text,
-                },
-                y = new VegaSeries
-                {
-                    field = ySeries.QualifiedColumnName,
-                    type = yAxisType,
-                    axis = new VegaAxis
-                        { title = ySeries.Text, minExtent = 60 },
-                    title = ySeries.Text,
-                }
-            }
+                       {
+                           x = new VegaSeries
+                               {
+                                   field = xSeries.QualifiedColumnName,
+                                   type = xAxisType,
+                                   axis = new VegaAxis
+                                          { title = xSeries.Text, minExtent = 0 },
+                                   title = xSeries.Text,
+                               },
+                           y = new VegaSeries
+                               {
+                                   field = ySeries.QualifiedColumnName,
+                                   type = yAxisType,
+                                   axis = new VegaAxis
+                                          { title = ySeries.Text, minExtent = 60 },
+                                   title = ySeries.Text,
+                               }
+                       }
             ;
         if (colorSeries.QualifiedColumnName.IsNotBlank())
             encoding.color = new VegaColorDefinition
-            {
-                field = colorSeries.QualifiedColumnName,
-                type = AxisTypeNominal,
-                title = colorSeries.Text,
-            };
+                             {
+                                 field = colorSeries.QualifiedColumnName,
+                                 type = AxisTypeNominal,
+                                 title = colorSeries.Text,
+                             };
 
         var chart = new VegaChart(
-            chartType,
-            encoding
-        );
+                                  chartType,
+                                  encoding
+                                 );
         return chart;
     }
 
     public static VegaTransform CreateCumulativeRanking(string sourceData, string outputName)
     {
         return new VegaTransform
-        {
-            sort =
-            [
-                new VegaSeries
-                {
-                    field = sourceData,
-                    axis = new VegaAxis()
-                }
-            ],
-            window =
-            [
-                new VegaWindow
-                {
-                    op = "percent_rank",
-                    field = "count",
-                    @as = outputName
-                }
-            ],
-            frame = new object?[] { null, 0 }
-        };
+               {
+                   sort =
+                   [
+                       new VegaSeries
+                       {
+                           field = sourceData,
+                           axis = new VegaAxis()
+                       }
+                   ],
+                   window =
+                   [
+                       new VegaWindow
+                       {
+                           op = "percent_rank",
+                           field = "count",
+                           @as = outputName
+                       }
+                   ],
+                   frame = new object?[] { null, 0 }
+               };
     }
 
     public class VegaAxis

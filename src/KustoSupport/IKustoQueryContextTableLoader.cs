@@ -9,4 +9,7 @@ public interface IKustoQueryContextTableLoader
     ///     Called with a list of table names referenced by a query
     /// </summary>
     public Task LoadTablesAsync(KustoQueryContext context, IReadOnlyCollection<string> tableNames);
+
+    Task<bool> LoadTable(KustoQueryContext context, string path, string tableName);
+    Task SaveResult(KustoQueryResult result, string path);
 }

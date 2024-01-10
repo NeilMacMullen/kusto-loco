@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System.Collections.Specialized;
+using System.Text;
+using BabyKusto.Core;
+using BabyKusto.Core.Evaluation;
 using Extensions;
 
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -12,14 +15,27 @@ public static class KustoFormatter
     {
 #pragma warning disable CS8603 // Possible null reference return.
         return o switch
-        {
-            null => string.Empty,
-            DateTime d => d.Kind == DateTimeKind.Local
-                ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
-                : d.ToString("u"),
-            _ => o.ToString()
-        };
+               {
+                   null => string.Empty,
+                   DateTime d => d.Kind == DateTimeKind.Local
+                                     ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
+                                     : d.ToString("u"),
+                   _ => o.ToString()
+               };
 #pragma warning restore CS8603 // Possible null reference return.
+    }
+
+    /// <summary>
+    ///     rather roundabout way of turning ordereded dictionaries into tabulated text
+    /// </summary>
+    /// <param name="dictionaries"></param>
+    /// <returns></returns>
+    public static string Tabulate(IReadOnlyCollection<OrderedDictionary> dictionaries)
+    {
+        var table = TableBuilder.FromOrderedDictionarySet(string.Empty, dictionaries);
+        var result = new KustoQueryResult(string.Empty, table.ToTableSource() as InMemoryTableSource,
+                                          VisualizationState.Empty, 0, string.Empty);
+        return Tabulate(result);
     }
 
     public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
@@ -33,9 +49,9 @@ public static class KustoFormatter
 
         string[] MakeStringColumn(ColumnResult c)
             => new[] { c.Name }
-                .Concat(result.EnumerateColumnData(c).Take(max))
-                .Select(ObjectToKustoString)
-                .ToArray();
+               .Concat(result.EnumerateColumnData(c).Take(max))
+               .Select(ObjectToKustoString)
+               .ToArray();
 
         string[] PadToMax(string[] a)
         {
@@ -44,8 +60,8 @@ public static class KustoFormatter
         }
 
         var cells = columns.Select(MakeStringColumn)
-            .Select(PadToMax)
-            .ToArray();
+                           .Select(PadToMax)
+                           .ToArray();
 
 
         for (var r = 0; r <= displayHeight; r++)

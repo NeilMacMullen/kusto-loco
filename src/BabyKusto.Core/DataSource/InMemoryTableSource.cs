@@ -28,15 +28,22 @@ public class InMemoryTableSource : ITableSource
 
     public IEnumerable<ITableChunk> GetData() => _data;
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
-        _data.ToAsyncEnumerable();
+    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
+        => _data.ToAsyncEnumerable();
+
+    //TODO - this is brittle and will break with empty tables
+    public InMemoryTableSource ShareAs(string newName)
+    {
+        var ts = new TableSymbol(newName, Type.Columns);
+        return new InMemoryTableSource(ts, _data.Single().Columns);
+    }
 
     public static InMemoryTableSource FromITableSource(ITableSource other)
     {
         var chunk = ChunkHelpers.Reassemble(other.GetData().ToArray());
 
         return new InMemoryTableSource(other.Type,
-            chunk.Columns);
+                                       chunk.Columns);
     }
 
     public IEnumerable<object?> GetColumnData(int n)
@@ -47,6 +54,6 @@ public class InMemoryTableSource : ITableSource
 
         return
             Enumerable.Range(0, len)
-                .Select(i => col.GetRawDataValue(i));
+                      .Select(i => col.GetRawDataValue(i));
     }
 }

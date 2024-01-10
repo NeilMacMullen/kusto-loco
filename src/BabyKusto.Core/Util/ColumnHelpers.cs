@@ -195,19 +195,19 @@ public static class ColumnHelpers
         return MapColumn(new[] { other }, mapping, MappingType.Arbitrary);
     }
 
-    public static BaseColumn ReassembleInOrder(BaseColumn[] others) =>
-        MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
+    public static BaseColumn ReassembleInOrder(BaseColumn[] others)
+        => MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
     private static TypedBaseColumn<T> Create<T>(ImmutableArray<int> mapping, TypedBaseColumn<T>[] other,
         MappingType mapType)
     {
         return mapType switch
-        {
-            MappingType.Arbitrary => MapColumn(other[0], mapping),
-            MappingType.Chunk => ChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
-            MappingType.Reassembly => new ReassembledChunkColumn<T>(other),
-            _ => throw new NotImplementedException()
-        };
+               {
+                   MappingType.Arbitrary => MapColumn(other[0], mapping),
+                   MappingType.Chunk => ChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
+                   MappingType.Reassembly => new ReassembledChunkColumn<T>(other),
+                   _ => throw new NotImplementedException()
+               };
     }
 
     private static BaseColumn MapColumn(IEnumerable<BaseColumn> others, ImmutableArray<int> mapping,
@@ -256,12 +256,12 @@ public static class ColumnHelpers
 
         // TODO: Support all data types
         throw new NotImplementedException(
-            $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+                                          $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
 
-    public static TypedBaseColumn<T> MapColumn<T>(TypedBaseColumn<T> other, ImmutableArray<int> mapping) =>
-        MappedColumn<T>.Create(mapping, other);
+    public static TypedBaseColumn<T> MapColumn<T>(TypedBaseColumn<T> other, ImmutableArray<int> mapping)
+        => MappedColumn<T>.Create(mapping, other);
 
     private static TypedBaseColumn<T> CreateFromObjectArray<T>(object?[] data)
     {
@@ -280,7 +280,9 @@ public static class ColumnHelpers
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
-            columnData[i] = item == null ? null : Convert.ToInt32(item);
+            columnData[i] = item == null
+                                ? null
+                                : Convert.ToInt32(item);
         }
 
         return ColumnFactory.Create(columnData);
@@ -292,7 +294,9 @@ public static class ColumnHelpers
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
-            columnData[i] = item == null ? null : Convert.ToInt64(item);
+            columnData[i] = item == null
+                                ? null
+                                : Convert.ToInt64(item);
         }
 
         return ColumnFactory.Create(columnData);
@@ -304,7 +308,9 @@ public static class ColumnHelpers
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
-            columnData[i] = item == null ? null : Convert.ToDouble(item);
+            columnData[i] = item == null
+                                ? null
+                                : Convert.ToDouble(item);
         }
 
         return ColumnFactory.Create(columnData);
@@ -316,26 +322,36 @@ public static class ColumnHelpers
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
-            columnData[i] = item == null ? null : Convert.ToBoolean(item);
+            columnData[i] = item == null
+                                ? null
+                                : Convert.ToBoolean(item);
         }
 
         return ColumnFactory.Create(columnData);
     }
 
-    private static TypedBaseColumn<T> CreateFromScalar<T>(T value, int rowCount) =>
-        new SingleValueColumn<T>(value, rowCount);
+    private static TypedBaseColumn<T> CreateFromScalar<T>(T value, int rowCount)
+        => new SingleValueColumn<T>(value, rowCount);
 
-    private static TypedBaseColumn<int?> CreateFromInt(object? value, int rowCount) =>
-        CreateFromScalar<int?>(value == null ? null : Convert.ToInt32(value), rowCount);
+    private static TypedBaseColumn<int?> CreateFromInt(object? value, int rowCount)
+        => CreateFromScalar<int?>(value == null
+                                      ? null
+                                      : Convert.ToInt32(value), rowCount);
 
-    private static TypedBaseColumn<long?> CreateFromLong(object? value, int rowCount) =>
-        CreateFromScalar<long?>(value == null ? null : Convert.ToInt64(value), rowCount);
+    private static TypedBaseColumn<long?> CreateFromLong(object? value, int rowCount)
+        => CreateFromScalar<long?>(value == null
+                                       ? null
+                                       : Convert.ToInt64(value), rowCount);
 
-    private static TypedBaseColumn<double?> CreateFromDouble(object? value, int rowCount) =>
-        CreateFromScalar<double?>(value == null ? null : Convert.ToDouble(value), rowCount);
+    private static TypedBaseColumn<double?> CreateFromDouble(object? value, int rowCount)
+        => CreateFromScalar<double?>(value == null
+                                         ? null
+                                         : Convert.ToDouble(value), rowCount);
 
-    private static TypedBaseColumn<bool?> CreateFromBool(object? value, int rowCount) =>
-        CreateFromScalar<bool?>(value == null ? null : Convert.ToBoolean(value), rowCount);
+    private static TypedBaseColumn<bool?> CreateFromBool(object? value, int rowCount)
+        => CreateFromScalar<bool?>(value == null
+                                       ? null
+                                       : Convert.ToBoolean(value), rowCount);
 
     private enum MappingType
     {

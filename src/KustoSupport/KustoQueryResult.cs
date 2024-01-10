@@ -107,19 +107,20 @@ public class KustoQueryResult
     ///     Deserialises a Dictionary-based result to objects
     /// </summary>
     public IReadOnlyCollection<T> DeserialiseTo<T>(int max = int.MaxValue)
+        => DeserialiseTo<T>(AsOrderedDictionarySet(max));
+
+    public static IReadOnlyCollection<T> DeserialiseTo<T>(IEnumerable<OrderedDictionary> dictionaries)
     {
         //this is horrible but I don't have time to research how to do it ourselves and the bottom line
         //is that we are expecting results sets to be small to running through the JsonSerializer is
         //"good enough" for now...
 
-        var json = ToJsonString(max);
+        var json = ToJsonString(dictionaries);
         return JsonSerializer.Deserialize<T[]>(json);
     }
 
-    /// <summary>
-    ///     Serialises a result to an array of dictionaries
-    /// </summary>
-    public string ToJsonString(int max = int.MaxValue) => JsonSerializer.Serialize(AsOrderedDictionarySet(max));
+    public string ToJsonString() => ToJsonString(AsOrderedDictionarySet());
+    public static string ToJsonString(object o) => JsonSerializer.Serialize(o);
 
     public IReadOnlyCollection<OrderedDictionary> ResultOrErrorAsSet()
         => Error.IsNotBlank()

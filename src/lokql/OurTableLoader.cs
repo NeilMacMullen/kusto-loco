@@ -5,7 +5,7 @@ using KustoSupport;
 using ParquetSupport;
 
 #pragma warning disable CS8618, CS8604
-internal class OurTableLoader : IKustoQueryContextTableLoader
+public class OurTableLoader : IKustoQueryContextTableLoader
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly string[] _paths;
@@ -15,10 +15,10 @@ internal class OurTableLoader : IKustoQueryContextTableLoader
         _paths = paths;
         _loaders =
         [
-            new Csv(),
-            new Pqt(),
-            new Txt(),
-            new JA()
+            new CsvTableAdaptor(),
+            new ParquetTableAdaptor(),
+            new TextTableAdaptor(),
+            new JsonArrayTableAdaptor()
         ];
     }
 
@@ -38,8 +38,8 @@ internal class OurTableLoader : IKustoQueryContextTableLoader
 
 
         var filePaths = Path.IsPathRooted(path)
-            ? [path]
-            : _paths.Select(p => Path.Combine(p, path));
+                            ? [path]
+                            : _paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
             await loader.TrySave(filepath, result);
@@ -58,8 +58,8 @@ internal class OurTableLoader : IKustoQueryContextTableLoader
 
 
         var filePaths = Path.IsPathRooted(path)
-            ? [path]
-            : _paths.Select(p => Path.Combine(p, path));
+                            ? [path]
+                            : _paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
             if (!Path.Exists(filepath)) break;
@@ -93,7 +93,7 @@ public interface IFileBasedTableAccess
     public Task TrySave(string path, KustoQueryResult result);
 }
 
-public class Csv : IFileBasedTableAccess
+public class CsvTableAdaptor : IFileBasedTableAccess
 {
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
     {
@@ -113,7 +113,7 @@ public class Csv : IFileBasedTableAccess
 /// <summary>
 ///     Reads an array of objects in a json file
 /// </summary>
-public class JA : IFileBasedTableAccess
+public class JsonArrayTableAdaptor : IFileBasedTableAccess
 {
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
     {
@@ -121,7 +121,7 @@ public class JA : IFileBasedTableAccess
         var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
         var table = TableBuilder
             .FromOrderedDictionarySet(name,
-                dict);
+                                      dict);
         context.AddTable(table);
         return Task.FromResult(true);
     }
@@ -136,7 +136,7 @@ public class JA : IFileBasedTableAccess
     }
 }
 
-public class Txt : IFileBasedTableAccess
+public class TextTableAdaptor : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".txt"];
 
@@ -150,7 +150,8 @@ public class Txt : IFileBasedTableAccess
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
     {
         var lines = File.ReadAllLines(path)
-            .Select(l => new { Line = l }).ToArray();
+                        .Select(l => new { Line = l })
+                        .ToArray();
         var table = TableBuilder.CreateFromRows(name, lines).ToTableSource();
         context.AddTable(table);
         return Task.FromResult(true);
@@ -158,7 +159,7 @@ public class Txt : IFileBasedTableAccess
 }
 
 
-public class Pqt : IFileBasedTableAccess
+public class ParquetTableAdaptor : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".parquet"];
 
@@ -180,8 +181,7 @@ public class NullFileLoader : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [];
 
-    public Task TrySave(string path, KustoQueryResult result) =>
-        Task.CompletedTask;
+    public Task TrySave(string path, KustoQueryResult result) => Task.CompletedTask;
 
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name) => Task.FromResult(false);
 }

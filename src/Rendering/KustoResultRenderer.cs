@@ -32,53 +32,54 @@ public class KustoResultRenderer
         return sb.ToString();
     }
 
-    public static string RenderToHtml(string title, KustoQueryResult result) =>
-        result.Visualization.ChartType.IsNotBlank()
-            ? KustoToVegaChartType("title", result)
-            : RenderToTable(result);
+    public static string RenderToHtml(string title, KustoQueryResult result)
+        => result.Visualization.ChartType.IsNotBlank()
+               ? KustoToVegaChartType("title", result)
+               : RenderToTable(result);
 
     public static string KustoToVegaChartType(string title, KustoQueryResult result)
     {
         var state = result.Visualization;
         return state.ChartType switch
-        {
-            /*
-            "table" => VegaGenerator.LineChart,
-            "list" => VegaGenerator.LineChart,
-            "ladderchart" => VegaGenerator.LineChart,
-            "timeline" => VegaGenerator.LineChart,
-            "3Dchart" => VegaGenerator.LineChart,
-            "card" => VegaGenerator.LineChart,
-            "treemap" => VegaGenerator.LineChart,
-            "plotly" => VegaGenerator.LineChart,
-            "graph " => VegaGenerator.LineChart,
-              "timepivot" => VegaGenerator.LineChart,
-            */
+               {
+                   /*
+                   "table" => VegaGenerator.LineChart,
+                   "list" => VegaGenerator.LineChart,
+                   "ladderchart" => VegaGenerator.LineChart,
+                   "timeline" => VegaGenerator.LineChart,
+                   "3Dchart" => VegaGenerator.LineChart,
+                   "card" => VegaGenerator.LineChart,
+                   "treemap" => VegaGenerator.LineChart,
+                   "plotly" => VegaGenerator.LineChart,
+                   "graph " => VegaGenerator.LineChart,
+                     "timepivot" => VegaGenerator.LineChart,
+                   */
 
-            "barchart" => RenderToChart(title, BarChart, result, NoOp),
-            "linechart" => RenderToChart(title, LineChart, result, NoOp),
-            "piechart" => RenderToChart(title, PieChart, result, MakePieChart),
-            "areachart" => RenderToChart(title, AreaChart, result, NoOp),
-            "stackedareachart" => RenderToChart(title, AreaChart, result, MakeStacked),
+                   "barchart" => RenderToChart(title, BarChart, result, NoOp),
+                   "linechart" => RenderToChart(title, LineChart, result, NoOp),
+                   "piechart" => RenderToChart(title, PieChart, result, MakePieChart),
+                   "areachart" => RenderToChart(title, AreaChart, result, NoOp),
+                   "stackedareachart" => RenderToChart(title, AreaChart, result, MakeStacked),
 
-            "ladderchart" => RenderToChart(title, BarChart, result, MakeTimeLineChart),
+                   "ladderchart" => RenderToChart(title, BarChart, result, MakeTimeLineChart),
+                   "scatterchart" => RenderToChart(title, GridChart, result, MakeGridChart),
 
-            /*
-            "piechart" => VegaGenerator.PieChart,
+                   /*
+                   "piechart" => VegaGenerator.PieChart,
 
-            "timechart" => VegaGenerator.LineChart,
-            "linechart" => VegaGenerator.LineChart,
-            "anomalychart" => VegaGenerator.LineChart,
-            "pivotchart" => VegaGenerator.LineChart,
-            "areachart" => VegaGenerator.AreaChart,
-            "stackedareachart" => VegaGenerator.AreaChart,
-            "scatterchart" => VegaGenerator.LineChart,
+                   "timechart" => VegaGenerator.LineChart,
+                   "linechart" => VegaGenerator.LineChart,
+                   "anomalychart" => VegaGenerator.LineChart,
+                   "pivotchart" => VegaGenerator.LineChart,
+                   "areachart" => VegaGenerator.AreaChart,
+                   "stackedareachart" => VegaGenerator.AreaChart,
 
-            "columnchart" => VegaGenerator.BarChart,
-            */
 
-            _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp)
-        };
+                   "columnchart" => VegaGenerator.BarChart,
+                   */
+
+                   _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp)
+               };
     }
 
     public static void NoOp(JObjectBuilder o)
@@ -121,6 +122,12 @@ public class KustoResultRenderer
         b.Set("config.legend.disable", true);
     }
 
+    public static void MakeGridChart(JObjectBuilder b)
+    {
+        b.Set("config.axis.grid", "true");
+        b.Set("config.axis.tickband", "extent");
+    }
+
     public static void MakeStacked(JObjectBuilder b)
     {
         b.Set("encoding.y.aggregate", "sum");
@@ -146,13 +153,13 @@ public class KustoResultRenderer
         if (headers.Length > 2) color = new ColumnAndName(headers[2].Name, headers[2].Name);
 
         var spec = Spec(
-            chartType,
-            InferSuitableAxisType(types[0]),
-            InferSuitableAxisType(types[1]),
-            new ColumnAndName(headers.First().Name, headers.First().Name),
-            new ColumnAndName(headers[1].Name, headers[1].Name),
-            color
-        );
+                        chartType,
+                        InferSuitableAxisType(types[0]),
+                        InferSuitableAxisType(types[1]),
+                        new ColumnAndName(headers.First().Name, headers.First().Name),
+                        new ColumnAndName(headers[1].Name, headers[1].Name),
+                        color
+                       );
 
 
         var b = JObjectBuilder.FromObject(spec);
@@ -174,15 +181,15 @@ public class KustoResultRenderer
         }
 
         var numericTypes = new[]
-        {
-            typeof(int), typeof(long), typeof(double), typeof(float),
-        };
+                           {
+                               typeof(int), typeof(long), typeof(double), typeof(float),
+                           };
         if (numericTypes.Contains(t))
             return AxisTypeQuantity;
 
         return t == typeof(DateTime)
-            ? AxisTypeTime
-            : AxisTypeOrdinal;
+                   ? AxisTypeTime
+                   : AxisTypeOrdinal;
     }
 
     private static string InferChartTypeFromAxisTypes(string[] axisTypes)
