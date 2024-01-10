@@ -249,6 +249,10 @@ public static class ColumnHelpers
             return Create(mapping, others.Cast<TypedBaseColumn<TimeSpan?>>().ToArray(), mapType);
         }
 
+        if (typeSymbol == ScalarTypes.Guid)
+        {
+            return Create(mapping, others.Cast<TypedBaseColumn<Guid?>>().ToArray(), mapType);
+        }
         if (typeSymbol == ScalarTypes.Dynamic)
         {
             return Create(mapping, others.Cast<TypedBaseColumn<JsonNode?>>().ToArray(), mapType);
