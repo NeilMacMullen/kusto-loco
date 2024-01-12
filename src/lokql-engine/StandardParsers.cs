@@ -1,15 +1,12 @@
-﻿
-
-using CommandLine;
-
+﻿using CommandLine;
 public static class StandardParsers
 {
     public static readonly Parser Default = new(settings =>
-    {
-        settings.CaseInsensitiveEnumValues = true;
-        settings.CaseSensitive = false;
-        settings.HelpWriter = Console.Out;
-    });
+                                                  {
+                                                      settings.CaseInsensitiveEnumValues = true;
+                                                      settings.CaseSensitive = false;
+                                                      settings.HelpWriter = Console.Out;
+                                                  });
 }
 
 
