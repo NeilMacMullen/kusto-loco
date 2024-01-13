@@ -100,7 +100,8 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.ToLower,
             new ScalarFunctionInfo(ToLowerFunctionImpl.Overload));
 
-        functions.Add(Functions.ToUpper, new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
+        functions.Add(Functions.ToUpper,
+            new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
 
         functions.Add(Functions.ReplaceString,
             new ScalarFunctionInfo(ReplaceStringFunctionImpl.Overload));
@@ -110,11 +111,10 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(SubstringFunctionImpl.Overload));
 
         var binFunctionInfo = new ScalarFunctionInfo(
-            new ScalarOverloadInfo(new BinIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
-            new ScalarOverloadInfo(new BinLongFunctionImpl(), ScalarTypes.Long, ScalarTypes.Long, ScalarTypes.Long),
-            new ScalarOverloadInfo(new BinDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real, ScalarTypes.Real),
-            new ScalarOverloadInfo(new BinDateTimeTimeSpanFunctionImpl(), ScalarTypes.DateTime, ScalarTypes.DateTime,
-                ScalarTypes.TimeSpan));
+            BinIntFunctionImpl.Overload,
+            BinLongFunctionImpl.Overload,
+            BinDoubleFunctionImpl.Overload,
+            BinDateTimeTimeSpanFunctionImpl.Overload);
         functions.Add(Functions.Bin, binFunctionInfo);
         functions.Add(Functions.Floor, binFunctionInfo);
 
@@ -364,18 +364,10 @@ internal static class BuiltInScalarFunctions
         functions.Add(DebugEmit, new ScalarFunctionInfo(new ScalarOverloadInfo(new DebugEmitImpl(),
             ScalarTypes.Int,
             ScalarTypes.String)));
-        functions.Add(Levenshtein, new ScalarFunctionInfo(new ScalarOverloadInfo(new LevenshteinDistanceImpl(),
-            ScalarTypes.Int,
-            ScalarTypes.String,
-            ScalarTypes.String)));
-        functions.Add(StringSimilarity, new ScalarFunctionInfo(new ScalarOverloadInfo(new StringSimilarityImpl(),
-            ScalarTypes.Real,
-            ScalarTypes.String,
-            ScalarTypes.String)));
+        functions.Add(Levenshtein, new ScalarFunctionInfo(LevenshteinDistanceImpl.Overload));
+        functions.Add(StringSimilarity, new ScalarFunctionInfo(StringSimilarityImpl.Overload));
 
-        functions.Add(DateTimeToIso, new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeToIsoImpl(),
-            ScalarTypes.String,
-            ScalarTypes.DateTime)));
+        functions.Add(DateTimeToIso, new ScalarFunctionInfo(DateTimeToIsoImpl.Overload));
 
         functions.Add(TrimWs, new ScalarFunctionInfo(TrimWsFunctionImpl.Overload));
     }

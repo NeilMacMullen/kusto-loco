@@ -2,188 +2,74 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Kusto.Language.Symbols;
+using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-internal class BinIntFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class BinIntFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        var left = (int?)arguments[0].Value;
-        var right = (int?)arguments[1].Value;
-
-        return new ScalarResult(ScalarTypes.Long, Floor(left, right));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (TypedBaseColumn<int?>)(arguments[0].Column);
-        var rightCol = (TypedBaseColumn<int?>)(arguments[1].Column);
-
-        var data = new long?[leftCol.RowCount];
-        for (var i = 0; i < leftCol.RowCount; i++)
-        {
-            var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = Floor(left, right);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static long? Floor(int? left, int? right)
+    private static long Impl(int left, int right)
     {
-        if (left.HasValue && right.HasValue)
+        if (right <= 0)
         {
-            if (right <= 0)
-            {
-                // TODO: Should be null (perhaps?)
-                return 0;
-            }
-
-            var remn = left.Value % right.Value;
-            if (remn < 0)
-            {
-                remn += right.Value;
-            }
-
-            return left.Value - remn;
+            // TODO: Should be null (perhaps?)
+            return 0;
         }
 
-        return null;
+        var remn = left % right;
+        if (remn < 0)
+        {
+            remn += right;
+        }
+
+        return left - remn;
     }
 }
 
-internal class BinLongFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class BinLongFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        var left = (long?)arguments[0].Value;
-        var right = (long?)arguments[1].Value;
-
-        return new ScalarResult(ScalarTypes.Long, Floor(left, right));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (TypedBaseColumn<long?>)(arguments[0].Column);
-        var rightCol = (TypedBaseColumn<long?>)(arguments[1].Column);
-
-        var data = new long?[leftCol.RowCount];
-        for (var i = 0; i < leftCol.RowCount; i++)
-        {
-            var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = Floor(left, right);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static long? Floor(long? left, long? right)
+    internal static long Impl(long left, long right)
     {
-        if (left.HasValue && right.HasValue)
+        if (right <= 0)
         {
-            if (right <= 0)
-            {
-                // TODO: Should be null (perhaps?)
-                return 0;
-            }
-
-            var remn = left.Value % right.Value;
-            if (remn < 0)
-            {
-                remn += right.Value;
-            }
-
-            return left.Value - remn;
+            // TODO: Should be null (perhaps?)
+            return 0;
         }
 
-        return null;
+        var remn = left % right;
+        if (remn < 0)
+        {
+            remn += right;
+        }
+
+        return left - remn;
     }
 }
 
-internal class BinDoubleFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class BinDoubleFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        var left = (double?)arguments[0].Value;
-        var right = (double?)arguments[1].Value;
-
-        return new ScalarResult(ScalarTypes.Real, Floor(left, right));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (TypedBaseColumn<double?>)(arguments[0].Column);
-        var rightCol = (TypedBaseColumn<double?>)(arguments[1].Column);
-
-        var data = new double?[leftCol.RowCount];
-        for (var i = 0; i < leftCol.RowCount; i++)
-        {
-            var (left, right) = (leftCol[i], rightCol[i]);
-            data[i] = Floor(left, right);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static double? Floor(double? left, double? right)
+    internal static double Impl(double left, double right)
     {
-        if (left.HasValue && right.HasValue)
+        if (right <= 0)
         {
-            if (right <= 0)
-            {
-                // TODO: Should be null (perhaps?)
-                return 0;
-            }
-
-            return Math.Floor(left.Value / right.Value) * right.Value;
+            // TODO: Should be null (perhaps?)
+            return 0;
         }
 
-        return null;
+        return Math.Floor(left / right) * right;
     }
 }
 
-internal class BinDateTimeTimeSpanFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class BinDateTimeTimeSpanFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        var left = (DateTime?)arguments[0].Value;
-        var right = (TimeSpan?)arguments[1].Value;
-        var floor = BinLongFunctionImpl.Floor(left?.Ticks, right?.Ticks);
-        return new ScalarResult(ScalarTypes.DateTime, floor.HasValue ? new DateTime(floor.Value) : null);
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var leftCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
-        var rightCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
-
-        var data = new DateTime?[leftCol.RowCount];
-        for (var i = 0; i < leftCol.RowCount; i++)
-        {
-            var (left, right) = (leftCol[i], rightCol[i]);
-            var floor = BinLongFunctionImpl.Floor(left?.Ticks, right?.Ticks);
-            data[i] = floor.HasValue ? new DateTime(floor.Value) : null;
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
+    internal static DateTime Impl(DateTime left, TimeSpan right) =>
+        new(BinLongFunctionImpl.Impl(left.Ticks, right.Ticks));
 }
