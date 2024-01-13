@@ -17,6 +17,7 @@ namespace SourceGeneration
             {
                 var dbg = new CodeAcccumulator();
                 var className = classDeclaration.Identifier.ValueText;
+                className += "Impl";
 
                 var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
                 var implMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
@@ -34,11 +35,13 @@ namespace SourceGeneration
 
                 dbg.AppendLine("#nullable enable");
 
-                dbg.AppendLine($"{modifiers} class {className}");
+                dbg.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
                 dbg.EnterCodeBlock();
                 foreach (var implMethod in implMethods)
                 {
                     GenerateImplementation(dbg, className, implMethod);
+
+                    dbg.AppendLine(implMethod.ToFullString());
                 }
 
                 dbg.ExitCodeBlock();

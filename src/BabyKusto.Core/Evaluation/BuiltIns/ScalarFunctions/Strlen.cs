@@ -3,12 +3,10 @@
 
 using BabyKusto.Core.Util;
 
-// ReSharper disable PartialTypeWithSinglePart
-
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation]
-internal partial class StrlenFunctionImpl : IScalarFunctionImpl
+internal class StrlenFunction
 {
     public long Impl(string s) => s.Length;
 }

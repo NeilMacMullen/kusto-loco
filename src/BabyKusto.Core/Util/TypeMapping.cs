@@ -8,6 +8,7 @@ namespace BabyKusto.Core.Util;
 
 public class KustoImplementationAttribute : Attribute
 {
+    public string Keyword { get; set; } = string.Empty;
 }
 
 public static class TypeMapping

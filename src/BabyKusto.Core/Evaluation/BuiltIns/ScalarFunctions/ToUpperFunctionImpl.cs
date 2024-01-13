@@ -1,11 +1,9 @@
 ﻿using BabyKusto.Core.Util;
 
-// ReSharper disable PartialTypeWithSinglePart
-
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-public partial class ToUpperFunctionImpl : IScalarFunctionImpl
+[KustoImplementation(Keyword = "Functions.ToUpper")]
+public class ToUpperFunction
 {
     private static string ToUpperImpl(string s) => s.ToUpperInvariant();
 }
