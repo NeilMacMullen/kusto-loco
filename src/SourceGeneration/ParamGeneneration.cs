@@ -24,8 +24,26 @@ namespace SourceGeneration
         public static string MakeTypedVariable(Param p) =>
             $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.Index}].Value;";
 
+        /*
+          internal static ScalarOverloadInfo CreateOverloadInfo() =>
+               new(new ToUpperFunctionImpl(), TypeMapping.SymbolForType(typeof(string)),
+                   TypeMapping.SymbolForType(typeof(string)));
+         */
 
-        public static string BuildScalarMethod(CodeAcccumulator dbg, ImplementationMethod method)
+        public static void BuildOverloadInfo(CodeAcccumulator dbg, ImplementationMethod method)
+        {
+            var parameters = method.Arguments;
+            var ret = method.ReturnType;
+            dbg.AppendLine("internal static ScalarOverloadInfo Overload =>");
+            dbg.AppendLine($"new(new {method.ClassName}(),");
+            var mappedTypes = new[] { method.ReturnType }.Concat(method.Arguments)
+                .Select(p => $"TypeMapping.SymbolForType(typeof({p.Type}))");
+            var arglist = string.Join(",", mappedTypes);
+            dbg.AppendLine(arglist);
+            dbg.AppendStatement(")");
+        }
+
+        public static void BuildScalarMethod(CodeAcccumulator dbg, ImplementationMethod method)
         {
             var parameters = method.Arguments;
             var ret = method.ReturnType;
@@ -47,10 +65,9 @@ namespace SourceGeneration
             dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
             dbg.AppendStatement("return new ScalarResult(returnType,data)");
             dbg.ExitCodeBlock();
-            return dbg.ToString();
         }
 
-        public static string BuildColumnarMethod(CodeAcccumulator dbg, ImplementationMethod method)
+        public static void BuildColumnarMethod(CodeAcccumulator dbg, ImplementationMethod method)
         {
             var parameters = method.Arguments;
             var ret = method.ReturnType;
@@ -70,8 +87,6 @@ namespace SourceGeneration
 
             dbg.AppendStatement("return new ColumnarResult(ColumnFactory.Create(data))");
             dbg.ExitCodeBlock();
-
-            return dbg.ToString();
         }
 
 

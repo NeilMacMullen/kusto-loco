@@ -96,16 +96,13 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
 
         functions.Add(Functions.Strlen,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StrlenFunctionImpl(), ScalarTypes.Long,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(StrlenFunctionImpl.Overload));
 
         functions.Add(Functions.ToLower,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ToLowerFunctionImpl(), ScalarTypes.String,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(ToLowerFunctionImpl.Overload));
 
         functions.Add(Functions.ToUpper,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ToUpperFunctionImpl(), ScalarTypes.String,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
 
         functions.Add(Functions.ReplaceString,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new ReplaceStringFunctionImpl(), ScalarTypes.String,

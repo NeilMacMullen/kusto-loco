@@ -23,7 +23,7 @@ namespace SourceGeneration
                     .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
                     .ToArray();
 
-
+                dbg.AppendStatement("using Kusto.Language.Symbols");
                 dbg.AppendStatement("using System.Diagnostics");
                 foreach (var u in GetUsingList(classDeclaration))
                 {
@@ -38,7 +38,7 @@ namespace SourceGeneration
                 dbg.EnterCodeBlock();
                 foreach (var implMethod in implMethods)
                 {
-                    GenerateImplementation(dbg, implMethod);
+                    GenerateImplementation(dbg, className, implMethod);
                 }
 
                 dbg.ExitCodeBlock();
@@ -59,7 +59,8 @@ namespace SourceGeneration
             context.RegisterForSyntaxNotifications(() => new AttributedClassReceiver());
         }
 
-        private static void GenerateImplementation(CodeAcccumulator dbg, MethodDeclarationSyntax method)
+        private static void GenerateImplementation(CodeAcccumulator dbg, string className,
+            MethodDeclarationSyntax method)
         {
             var parameters = method.ParameterList.Parameters
                 .Select((p, i) => new Param(i, p.Identifier.ValueText, p.Type.ToFullString()))
@@ -67,7 +68,8 @@ namespace SourceGeneration
 
             var ret = new Param(0, string.Empty, method.ReturnType.ToFullString());
 
-            var m = new ImplementationMethod(method.Identifier.ValueText, ret, parameters);
+            var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters);
+            ParamGeneneration.BuildOverloadInfo(dbg, m);
             ParamGeneneration.BuildScalarMethod(dbg, m);
             ParamGeneneration.BuildColumnarMethod(dbg, m);
         }
@@ -105,11 +107,14 @@ namespace SourceGeneration
         public readonly string Name;
         public readonly Param ReturnType;
 
-        public ImplementationMethod(string name, Param returnType, Param[] arguments)
+        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments)
         {
+            ClassName = className;
             Name = name;
             ReturnType = returnType;
             Arguments = arguments;
         }
+
+        public string ClassName { get; }
     }
 }
