@@ -1,30 +1,11 @@
-﻿using System.Diagnostics;
-using Kusto.Language.Symbols;
+﻿using BabyKusto.Core.Util;
+
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-internal class ToLowerFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+public partial class ToLowerFunctionImpl : IScalarFunctionImpl
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var text = (string?)arguments[0].Value;
-        return new ScalarResult(ScalarTypes.String, ToLower(text));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var column = (TypedBaseColumn<string?>)arguments[0].Column;
-
-        var data = new string[column.RowCount];
-        for (var i = 0; i < column.RowCount; i++)
-        {
-            data[i] = ToLower(column[i]);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
-    private static string ToLower(string? s) => s?.ToLowerInvariant() ?? string.Empty;
+    private static string ToLowerImpl(string s) => s.ToLowerInvariant();
 }

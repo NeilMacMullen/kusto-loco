@@ -16,8 +16,6 @@ namespace SourceGeneration
             {
                 var syntaxAttributes = cds.AttributeLists.SelectMany(e => e.Attributes)
                     .Where(e => e.Name.NormalizeWhitespace().ToFullString() == "KustoImplementation");
-
-
                 if (syntaxAttributes.Any())
                 {
                     found.Add(cds);

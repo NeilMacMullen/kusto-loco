@@ -11,9 +11,10 @@ namespace SourceGeneration
         public void Execute(GeneratorExecutionContext context)
         {
             var syntaxReceiver = (AttributedClassReceiver)context.SyntaxReceiver;
-            var dbg = new CodeAcccumulator();
+
             foreach (var classDeclaration in syntaxReceiver.found)
             {
+                var dbg = new CodeAcccumulator();
                 var className = classDeclaration.Identifier.ValueText;
                 var implMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                     .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
