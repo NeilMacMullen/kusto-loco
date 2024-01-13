@@ -6,6 +6,10 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Util;
 
+public class KustoImplementationAttribute : Attribute
+{
+}
+
 public static class TypeMapping
 {
     private static readonly Dictionary<Type, KustoType> NetToKustoLookup = new()

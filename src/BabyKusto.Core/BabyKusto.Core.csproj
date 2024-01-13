@@ -6,6 +6,7 @@
     <Nullable Condition=" '$(TargetFramework)' == 'netstandard2.0' ">annotations</Nullable>
     <Nullable Condition=" '$(TargetFramework)' != 'netstandard2.0' ">enable</Nullable>
     <LangVersion>11</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -33,6 +34,10 @@
     <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
     <ProjectReference Include="..\Geo\Geo.csproj" />
+    <ProjectReference Include="..\SourceGeneration\SourceGeneration.csproj" 
+                      
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />

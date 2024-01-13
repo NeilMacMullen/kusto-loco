@@ -325,4 +325,26 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("8");
     }
+
+    [TestMethod]
+    [Ignore("not yet implemented")]
+    public async Task HasAny()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"print x='line1' | where x has_any('a','b')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("8");
+    }
+
+
+    [TestMethod]
+    [Ignore("not yet implemented")]
+    public async Task Arg_max()
+    {
+        //ensure we didn't get any fractional values
+        var query = @"print x=1,y=2 | summarize arg_max(x,*) by y"
+            ;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("8");
+    }
 }
