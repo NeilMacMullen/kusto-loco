@@ -32,8 +32,6 @@ namespace SourceGeneration
 
         public static void BuildOverloadInfo(CodeAcccumulator dbg, ImplementationMethod method)
         {
-            var parameters = method.Arguments;
-            var ret = method.ReturnType;
             dbg.AppendLine("internal static ScalarOverloadInfo Overload =>");
             dbg.AppendLine($"new(new {method.ClassName}(),");
             var mappedTypes = new[] { method.ReturnType }.Concat(method.Arguments)
@@ -54,7 +52,7 @@ namespace SourceGeneration
             dbg.AppendStatement($"{GetNullableType(ret)} data=null");
             dbg.AppendLine("for(var i=0;i < 1;i++)");
             dbg.EnterCodeBlock();
-            PerformNullChecks(dbg, parameters, false);
+            PerformNullChecks(dbg, method, false, "data");
 
 
             var pvals = string.Join(",", parameters.Select(Val));
@@ -76,10 +74,10 @@ namespace SourceGeneration
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
-            dbg.AppendStatement($"var data = new {ret.Type}[{RowCount}]");
+            dbg.AppendStatement($"var data = new {GetNullableType(ret)}[{RowCount}]");
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            PerformNullChecks(dbg, parameters, true);
+            PerformNullChecks(dbg, method, true, $"data[{RowIndex}]");
             var pvals = string.Join(",", parameters.Select(Val));
 
             dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
@@ -106,15 +104,27 @@ namespace SourceGeneration
             }
         }
 
-        public static void PerformNullChecks(CodeAcccumulator dbg, Param[] parameters, bool fromColumn)
+        public static void PerformNullChecks(CodeAcccumulator dbg, ImplementationMethod method,
+            bool fromColumn, string assignEmptyStringTo)
         {
+            var parameters = method.Arguments;
             foreach (var p in parameters)
             {
                 if (fromColumn)
                     dbg.AppendLine($"var {p.Name} = {IndexedColumn(p)};");
-                dbg.AppendLine(p.IsString
-                    ? $"if (string.IsNullOrEmpty({p.Name})) continue;"
-                    : $"if ({p.Name} == null) continue;");
+                if (p.IsString)
+                {
+                    dbg.AppendStatement($"{p.Name} = {p.Name}?? string.Empty");
+                }
+                else
+                {
+                    dbg.AppendLine($"if ({p.Name} == null)");
+                    dbg.EnterCodeBlock();
+                    if (method.ReturnType.IsString)
+                        dbg.AppendStatement($"{assignEmptyStringTo}=string.Empty");
+                    dbg.AppendStatement("continue");
+                    dbg.ExitCodeBlock();
+                }
             }
         }
 

@@ -2,50 +2,19 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
-using Kusto.Language.Symbols;
+using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-internal class SubstringFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class SubstringFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    private static string Impl(string input, long start, long length)
     {
-        Debug.Assert(arguments.Length == 3);
-        var input = (string?)arguments[0].Value;
-        var start = (long?)arguments[1].Value;
-        var length = (long?)arguments[2].Value;
-
-        return new ScalarResult(ScalarTypes.String, Impl(input, start, length));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 3);
-        var inputCol = (TypedBaseColumn<string?>)arguments[0].Column;
-        var startCol = (TypedBaseColumn<long?>)arguments[1].Column;
-        var lengthCol = (TypedBaseColumn<long?>)arguments[2].Column;
-
-        var data = new string?[inputCol.RowCount];
-        for (var i = 0; i < inputCol.RowCount; i++)
-        {
-            data[i] = Impl(inputCol[i], startCol[i], lengthCol[i]);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
-    private static string? Impl(string? input, long? start, long? length)
-    {
-        if (string.IsNullOrEmpty(input))
-        {
-            return string.Empty;
-        }
-
-        var effectiveStart = start.HasValue ? Math.Max(0, Math.Min(start.Value, input.Length)) : 0;
+        var effectiveStart = Math.Max(0, Math.Min(start, input.Length));
         var maxAllowableLength = input.Length - effectiveStart;
         var effectiveLength =
-            length.HasValue ? Math.Max(0, Math.Min(length.Value, maxAllowableLength)) : maxAllowableLength;
+            Math.Max(0, Math.Min(length, maxAllowableLength));
         return input.Substring((int)effectiveStart, (int)effectiveLength);
     }
 }

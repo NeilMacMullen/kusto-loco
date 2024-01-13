@@ -2,43 +2,12 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
-using Kusto.Language.Symbols;
+using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-internal class LogFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class LogFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var value = (double?)arguments[0].Value;
-
-        return new ScalarResult(ScalarTypes.Real, Impl(value));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<double?>)(arguments[0].Column);
-
-        var data = new double?[valueCol.RowCount];
-        for (var i = 0; i < valueCol.RowCount; i++)
-        {
-            var value = valueCol[i];
-            data[i] = Impl(value);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
-    private static double? Impl(double? input)
-    {
-        if (input.HasValue)
-        {
-            return Math.Log(input.Value);
-        }
-
-        return null;
-    }
+    private static double Impl(double input) => Math.Log(input);
 }

@@ -347,4 +347,28 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("8");
     }
+
+    [TestMethod]
+    public async Task LogTest()
+    {
+        var query = @"print v1 = log(4.5)";
+        var result = await LastLineOfResult(query);
+        result.Should().StartWith("1.504");
+    }
+
+    [TestMethod]
+    public async Task LogTest2()
+    {
+        var query = @"datatable(a:real) [4.5,4.5] | project v1 = log(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().StartWith("1.504");
+    }
+
+    [TestMethod]
+    public async Task StrLen()
+    {
+        var query = @"datatable(a:string) [''] | project v1 = strlen(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("0");
+    }
 }

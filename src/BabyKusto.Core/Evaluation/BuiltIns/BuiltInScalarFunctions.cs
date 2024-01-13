@@ -78,8 +78,7 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         functions.Add(Functions.Ago,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new AgoFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.TimeSpan)));
+            new ScalarFunctionInfo(AgoFunctionImpl.Overload));
 
         // TODO: Support N-ary functions properly
         functions.Add(
@@ -101,19 +100,14 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.ToLower,
             new ScalarFunctionInfo(ToLowerFunctionImpl.Overload));
 
-        functions.Add(Functions.ToUpper,
-            new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
+        functions.Add(Functions.ToUpper, new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
 
         functions.Add(Functions.ReplaceString,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ReplaceStringFunctionImpl(), ScalarTypes.String,
-                ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
+            new ScalarFunctionInfo(ReplaceStringFunctionImpl.Overload));
 
-        // TODO: Signature should be `string substring(string, int, int)`. But const literals are evaluated as long's by default and we do not support narrowing at this time.
         functions.Add(
             Functions.Substring,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new SubstringFunctionImpl(), ScalarTypes.String, ScalarTypes.String,
-                    ScalarTypes.Long, ScalarTypes.Long)));
+            new ScalarFunctionInfo(SubstringFunctionImpl.Overload));
 
         var binFunctionInfo = new ScalarFunctionInfo(
             new ScalarOverloadInfo(new BinIntFunctionImpl(), ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
@@ -125,53 +119,40 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.Floor, binFunctionInfo);
 
         functions.Add(Functions.Exp,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ExpFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            new ScalarFunctionInfo(ExpFunctionImpl.Overload));
         functions.Add(Functions.Log,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new LogFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            new ScalarFunctionInfo(LogFunctionImpl.Overload));
         functions.Add(Functions.Log10,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new Log10FunctionImpl(), ScalarTypes.Real,
-                ScalarTypes.Real)));
+            new ScalarFunctionInfo(Log10FunctionImpl.Overload));
         functions.Add(Functions.Log2,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new Log2FunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            new ScalarFunctionInfo(Log2FunctionImpl.Overload));
         functions.Add(Functions.Pow,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new PowFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real,
-                ScalarTypes.Real)));
+            new ScalarFunctionInfo(PowFunctionImpl.Overload));
         functions.Add(Functions.Sqrt,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new SqrtFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real)));
+            new ScalarFunctionInfo(SqrtFunctionImpl.Overload));
 
         functions.Add(Functions.DayOfWeek,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfWeekFunctionImpl(), ScalarTypes.TimeSpan,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(DayOfWeekFunctionImpl.Overload));
         functions.Add(Functions.DayOfMonth,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfMonthFunctionImpl(), ScalarTypes.Int,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(DayOfMonthFunctionImpl.Overload));
         functions.Add(Functions.DayOfYear,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new DayOfYearFunctionImpl(), ScalarTypes.Int,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(DayOfYearFunctionImpl.Overload));
         functions.Add(Functions.StartOfDay,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfDayFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(StartOfDayFunctionImpl.Overload));
         functions.Add(Functions.EndOfDay,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfDayFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(EndOfDayFunctionImpl.Overload));
         functions.Add(Functions.StartOfWeek,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfWeekFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(StartOfWeekFunctionImpl.Overload));
         functions.Add(Functions.EndOfWeek,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfWeekFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(EndOfWeekFunctionImpl.Overload));
         functions.Add(Functions.StartOfMonth,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfMonthFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(StartOfMonthFunctionImpl.Overload));
         functions.Add(Functions.EndOfMonth,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfMonthFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(EndOfMonthFunctionImpl.Overload));
         functions.Add(Functions.StartOfYear,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartOfYearFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(StartOfYearFunctionImpl.Overload));
         functions.Add(Functions.EndOfYear,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndOfYearFunctionImpl(), ScalarTypes.DateTime,
-                ScalarTypes.DateTime)));
+            new ScalarFunctionInfo(EndOfYearFunctionImpl.Overload));
 
         functions.Add(Functions.DatetimeUtcToLocal,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(), ScalarTypes.DateTime,
@@ -371,9 +352,7 @@ internal static class BuiltInScalarFunctions
             ScalarTypes.String,
             ScalarTypes.DateTime)));
 
-        functions.Add(TrimWs, new ScalarFunctionInfo(new ScalarOverloadInfo(new TrimWsFunctionImpl(),
-            ScalarTypes.String,
-            ScalarTypes.String)));
+        functions.Add(TrimWs, new ScalarFunctionInfo(TrimWsFunctionImpl.Overload));
     }
 
     /// <summary>

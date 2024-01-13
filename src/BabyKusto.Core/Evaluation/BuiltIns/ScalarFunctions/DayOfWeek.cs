@@ -2,43 +2,15 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Diagnostics;
-using Kusto.Language.Symbols;
+using BabyKusto.Core.Util;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-internal class DayOfWeekFunctionImpl : IScalarFunctionImpl
+[KustoImplementation]
+internal class DayOfWeekFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var date = (DateTime?)arguments[0].Value;
-        return new ScalarResult(ScalarTypes.TimeSpan, Impl(date));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var dates = (TypedBaseColumn<DateTime?>)arguments[0].Column;
-
-        var data = new TimeSpan?[dates.RowCount];
-        for (var i = 0; i < dates.RowCount; i++)
-        {
-            data[i] = Impl(dates[i]);
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
-    private static TimeSpan? Impl(DateTime? input)
-    {
-        if (input.HasValue)
-        {
-            // Sunday: 0, Monday: 1, etc...
-            // Luckily, this matches how enum DayOfWeek is defined
-            return TimeSpan.FromDays((int)input.Value.DayOfWeek);
-        }
-
-        return null;
-    }
+    private static TimeSpan Impl(DateTime input) =>
+        // Sunday: 0, Monday: 1, etc...
+        // Luckily, this matches how enum DayOfWeek is defined
+        TimeSpan.FromDays((int)input.DayOfWeek);
 }

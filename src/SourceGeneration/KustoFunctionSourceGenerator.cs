@@ -19,6 +19,31 @@ namespace SourceGeneration
                 var className = classDeclaration.Identifier.ValueText;
                 className += "Impl";
 
+
+                var syntaxAttributes = classDeclaration.AttributeLists.SelectMany(e => e.Attributes)
+                    .Where(e => e.Name.NormalizeWhitespace().ToFullString() == "KustoImplementation")
+                    .ToArray();
+                foreach (var sa in syntaxAttributes)
+                {
+                    if (sa.ArgumentList == null)
+                        continue;
+                    dbg.AppendLine($"// {sa.ToFullString()}");
+                    dbg.AppendLine($"// args {sa.ArgumentList?.ToFullString() ?? "no args"}");
+
+                    foreach (var a in sa.ArgumentList.Arguments)
+                    {
+                        dbg.AppendLine($"// {a.ToFullString()}");
+                        var arg = a.NameEquals.Name.Identifier.ValueText;
+                        var val = a.Expression.ToString();
+                        if (val.Contains("Functions"))
+                        {
+                            val = val.Substring(1, val.Length - 2);
+                            dbg.AppendStatement($"// public static FunctionSymbol F=> {val}");
+                        }
+                    }
+                }
+
+
                 var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
                 var implMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                     .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
