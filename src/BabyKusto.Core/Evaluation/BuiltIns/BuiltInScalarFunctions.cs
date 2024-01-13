@@ -19,7 +19,7 @@ internal static class BuiltInScalarFunctions
     {
         RegisterAdditionalFunctionSymbols();
         functions.Add(Functions.Not,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Bool)));
+            new ScalarFunctionInfo(NotFunctionImpl.Overload));
 
         functions.Add(
             Functions.IsNull,
@@ -30,10 +30,9 @@ internal static class BuiltInScalarFunctions
                 new ScalarOverloadInfo(new IsNullDoubleFunctionImpl(), ScalarTypes.Bool, ScalarTypes.Real),
                 new ScalarOverloadInfo(new IsNullDateTimeFunctionImpl(), ScalarTypes.Bool, ScalarTypes.DateTime),
                 new ScalarOverloadInfo(new IsNullTimeSpanFunctionImpl(), ScalarTypes.Bool, ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new IsNullStringFunctionImpl(), ScalarTypes.Bool, ScalarTypes.String)));
+                IsNullStringFunctionImpl.Overload));
         functions.Add(Functions.IsEmpty,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new IsEmptyFunctionImpl(), ScalarTypes.Bool,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(IsEmptyFunctionImpl.Overload));
 
         functions.Add(
             Functions.MinOf,

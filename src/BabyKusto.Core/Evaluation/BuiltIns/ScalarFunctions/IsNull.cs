@@ -161,31 +161,6 @@ internal class IsNullTimeSpanFunctionImpl : IScalarFunctionImpl
 
         return new ColumnarResult(ColumnFactory.Create(data));
     }
-}
 
-internal class IsNullStringFunctionImpl : IScalarFunctionImpl
-{
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        Debug.Assert(arguments[0].Value is null or string);
-
-        // Strings can never be null. Nulls are always interpreted as empty strings.
-        return new ScalarResult(ScalarTypes.Bool, false);
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<string?>)(arguments[0].Column);
-
-        var data = new bool?[valueCol.RowCount];
-        for (var i = 0; i < valueCol.RowCount; i++)
-        {
-            // Strings can never be null. Nulls are always interpreted as empty strings.
-            data[i] = false;
-        }
-
-        return new ColumnarResult(ColumnFactory.Create(data));
-    }
+    internal static bool Impl(string s) => false;
 }
