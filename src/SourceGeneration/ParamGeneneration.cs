@@ -27,8 +27,8 @@ namespace SourceGeneration
 
         public static string BuildScalarMethod(CodeAcccumulator dbg, ImplementationMethod method)
         {
-            var parameters = method._arguments;
-            var ret = method._returnType;
+            var parameters = method.Arguments;
+            var ret = method.ReturnType;
             dbg.AppendLine("public ScalarResult InvokeScalar(ScalarResult[] arguments)");
             dbg.EnterCodeBlock();
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
@@ -41,7 +41,7 @@ namespace SourceGeneration
 
             var pvals = string.Join(",", parameters.Select(Val));
 
-            dbg.AppendStatement($"data = {method._name}({pvals})");
+            dbg.AppendStatement($"data = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
 
             dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
@@ -52,8 +52,8 @@ namespace SourceGeneration
 
         public static string BuildColumnarMethod(CodeAcccumulator dbg, ImplementationMethod method)
         {
-            var parameters = method._arguments;
-            var ret = method._returnType;
+            var parameters = method.Arguments;
+            var ret = method.ReturnType;
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
@@ -65,7 +65,7 @@ namespace SourceGeneration
             PerformNullChecks(dbg, parameters, true);
             var pvals = string.Join(",", parameters.Select(Val));
 
-            dbg.AppendStatement($"data[{RowIndex}] = {method._name}({pvals})");
+            dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
 
             dbg.AppendStatement("return new ColumnarResult(ColumnFactory.Create(data))");
