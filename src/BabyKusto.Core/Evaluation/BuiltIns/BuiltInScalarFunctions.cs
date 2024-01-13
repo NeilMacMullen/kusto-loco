@@ -202,27 +202,23 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.Iif, iffFunctionInfo);
 
         functions.Add(Functions.ToInt,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ToIntStringFunctionImpl(), ScalarTypes.Int,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(ToIntStringFunctionImpl.Overload));
         functions.Add(Functions.ToLong,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ToLongStringFunctionImpl(), ScalarTypes.Long,
-                ScalarTypes.String)));
-        var toDoubleFunctionInfo = new ScalarFunctionInfo(new ScalarOverloadInfo(new ToDoubleStringFunctionImpl(),
-            ScalarTypes.Real, ScalarTypes.String));
+            new ScalarFunctionInfo(ToLongStringFunctionImpl.Overload));
+        var toDoubleFunctionInfo = new ScalarFunctionInfo(ToDoubleStringFunctionImpl.Overload);
         functions.Add(Functions.ToReal, toDoubleFunctionInfo);
         functions.Add(Functions.ToDouble, toDoubleFunctionInfo);
         functions.Add(Functions.ToBool,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ToBoolStringFunctionImpl(), ScalarTypes.Bool,
-                ScalarTypes.String)));
+            new ScalarFunctionInfo(ToBoolStringFunctionImpl.Overload));
 
         functions.Add(Functions.ToString, new ScalarFunctionInfo(
-            new ScalarOverloadInfo(new ToStringFromIntFunctionImpl(), ScalarTypes.String, ScalarTypes.Int),
-            new ScalarOverloadInfo(new ToStringFromLongFunctionImpl(), ScalarTypes.String, ScalarTypes.Long),
-            new ScalarOverloadInfo(new ToStringFromRealFunctionImpl(), ScalarTypes.String, ScalarTypes.Real),
-            new ScalarOverloadInfo(new ToStringFromTimeSpanFunctionImpl(), ScalarTypes.String, ScalarTypes.TimeSpan),
-            new ScalarOverloadInfo(new ToStringFromDateTimeFunctionImpl(), ScalarTypes.String, ScalarTypes.DateTime),
+            ToStringFromIntFunctionImpl.Overload,
+            ToStringFromLongFunctionImpl.Overload,
+            ToStringFromRealFunctionImpl.Overload,
+            ToStringFromTimeSpanFunctionImpl.Overload,
+            ToStringFromDateTimeFunctionImpl.Overload,
             new ScalarOverloadInfo(new ToStringFromDynamicFunctionImpl(), ScalarTypes.String, ScalarTypes.Dynamic),
-            new ScalarOverloadInfo(new ToStringFromStringFunctionImpl(), ScalarTypes.String, ScalarTypes.String)));
+            ToStringFromStringFunctionImpl.Overload));
 
         functions.Add(Functions.UrlEncode_Component,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(), ScalarTypes.String,
