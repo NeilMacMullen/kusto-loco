@@ -118,6 +118,31 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.Bin, binFunctionInfo);
         functions.Add(Functions.Floor, binFunctionInfo);
 
+        functions.Add(Functions.GetYear,
+            new ScalarFunctionInfo(GetYearFunctionImpl.Overload));
+        functions.Add(Functions.MonthOfYear,
+            new ScalarFunctionInfo(GetMonthFunctionImpl.Overload));
+        functions.Add(Functions.HourOfDay,
+            new ScalarFunctionInfo(GetMonthFunctionImpl.Overload));
+
+
+        functions.Add(Functions.Abs,
+            new ScalarFunctionInfo(AbsFunctionImpl.Overload));
+        functions.Add(Functions.Sin,
+            new ScalarFunctionInfo(SinFunctionImpl.Overload));
+        functions.Add(Functions.Cos,
+            new ScalarFunctionInfo(CosFunctionImpl.Overload));
+        functions.Add(Functions.Tan,
+            new ScalarFunctionInfo(TanFunctionImpl.Overload));
+        functions.Add(Functions.Sign,
+            new ScalarFunctionInfo(SignFunctionImpl.Overload));
+        functions.Add(Functions.Round,
+            new ScalarFunctionInfo(RoundFunctionImpl.Overload));
+        functions.Add(Functions.Radians,
+            new ScalarFunctionInfo(RadiansFunctionImpl.Overload));
+        functions.Add(Functions.Degrees,
+            new ScalarFunctionInfo(DegreesFunctionImpl.Overload));
+
         functions.Add(Functions.Exp,
             new ScalarFunctionInfo(ExpFunctionImpl.Overload));
         functions.Add(Functions.Log,
