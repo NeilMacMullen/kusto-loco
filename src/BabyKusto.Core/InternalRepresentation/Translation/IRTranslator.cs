@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Microsoft.Extensions.Internal;
@@ -11,8 +12,11 @@ namespace BabyKusto.Core.InternalRepresentation;
 
 internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 {
+    private readonly Dictionary<FunctionSymbol, ScalarFunctionInfo> _functions;
     private readonly Dictionary<string, EvaluatedExpressionKind> _inScopeSymbolInfos = new();
     private TableSymbol _rowScope = TableSymbol.Empty;
+
+    public IRTranslator(Dictionary<FunctionSymbol, ScalarFunctionInfo> functions) => _functions = functions;
 
     private void SetInScopeSymbolInfo(string name, EvaluatedExpressionKind resultKind)
     {

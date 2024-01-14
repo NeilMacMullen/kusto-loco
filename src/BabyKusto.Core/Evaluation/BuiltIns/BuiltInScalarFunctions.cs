@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BabyKusto.Core.Evaluation.BuiltIns.Impl;
-using BabyKusto.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 
@@ -13,11 +12,10 @@ namespace BabyKusto.Core.Evaluation.BuiltIns;
 
 internal static class BuiltInScalarFunctions
 {
-    private static readonly Dictionary<FunctionSymbol, ScalarFunctionInfo> functions = new();
+    internal static readonly Dictionary<FunctionSymbol, ScalarFunctionInfo> functions = new();
 
     static BuiltInScalarFunctions()
     {
-        RegisterAdditionalFunctionSymbols();
         functions.Add(Functions.Not,
             new ScalarFunctionInfo(NotFunctionImpl.Overload));
 
@@ -346,77 +344,5 @@ internal static class BuiltInScalarFunctions
                     .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
                     .ToArray()
             ));
-        functions.Add(DebugEmit, new ScalarFunctionInfo(new ScalarOverloadInfo(new DebugEmitImpl(),
-            ScalarTypes.Int,
-            ScalarTypes.String)));
-        functions.Add(Levenshtein, new ScalarFunctionInfo(LevenshteinDistanceImpl.Overload));
-        functions.Add(StringSimilarity, new ScalarFunctionInfo(StringSimilarityImpl.Overload));
-
-        functions.Add(DateTimeToIso, new ScalarFunctionInfo(DateTimeToIsoImpl.Overload));
-
-        functions.Add(TrimWs, new ScalarFunctionInfo(TrimWsFunctionImpl.Overload));
     }
-
-    /// <summary>
-    ///     We don't do anything inside this function, however we need this so that the Kusto engine can ensure that the static
-    ///     constructor is called and functions are registered
-    /// </summary>
-    public static void Initialize()
-    {
-    }
-
-    private static void RegisterAdditionalFunctionSymbols()
-    {
-        var functions = BabyKustoEngine.GlobalStateInstance.Functions;
-        var newFunctions = functions.Concat(AdditionalFunctionSymbols).ToArray();
-        BabyKustoEngine.GlobalStateInstance = BabyKustoEngine.GlobalStateInstance.WithFunctions(newFunctions);
-    }
-
-
-    public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
-        out ScalarOverloadInfo? overload)
-    {
-        if (!functions.TryGetValue(symbol, out var functionInfo))
-        {
-            overload = null;
-            return false;
-        }
-
-        overload = BuiltInsHelper.PickOverload(functionInfo.Overloads, arguments);
-        return overload != null;
-    }
-
-    #region AdditionalFunctionSymbols
-
-    public static readonly FunctionSymbol DebugEmit =
-        new FunctionSymbol("debug_emit", ScalarTypes.Int,
-                new Parameter("value1", ScalarTypes.String)
-            ).ConstantFoldable()
-            .WithResultNameKind(ResultNameKind.None);
-
-
-    public static readonly FunctionSymbol Levenshtein =
-        new FunctionSymbol("levenshtein", ScalarTypes.Int, new Parameter("value1", ScalarTypes.String),
-                new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
-            .WithResultNameKind(ResultNameKind.None);
-
-    public static readonly FunctionSymbol StringSimilarity =
-        new FunctionSymbol("string_similarity", ScalarTypes.Real, new Parameter("value1", ScalarTypes.String),
-                new Parameter("value2", ScalarTypes.String)).ConstantFoldable()
-            .WithResultNameKind(ResultNameKind.None);
-
-    public static readonly FunctionSymbol DateTimeToIso =
-        new FunctionSymbol("datetime_to_iso", ScalarTypes.String, new Parameter("value1", ScalarTypes.DateTime))
-            .ConstantFoldable()
-            .WithResultNameKind(ResultNameKind.None);
-
-    public static readonly FunctionSymbol TrimWs =
-        new FunctionSymbol("trimws", ScalarTypes.String, new Parameter("value1", ScalarTypes.String))
-            .ConstantFoldable()
-            .WithResultNameKind(ResultNameKind.None);
-
-    public static readonly FunctionSymbol[] AdditionalFunctionSymbols =
-        { DebugEmit, Levenshtein, StringSimilarity, DateTimeToIso, TrimWs };
-
-    #endregion
 }

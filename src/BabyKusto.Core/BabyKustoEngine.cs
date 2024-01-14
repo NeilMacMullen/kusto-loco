@@ -22,11 +22,7 @@ public class BabyKustoEngine
 
     static BabyKustoEngine()
     {
-        //ensure added functions are registered before engine is set up
-        BuiltInScalarFunctions.Initialize();
     }
-
-    public static GlobalState GlobalStateInstance { get; set; } = GlobalState.Default;
 
     public void AddGlobalTable(ITableSource table)
     {
@@ -41,13 +37,22 @@ public class BabyKustoEngine
 
     public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
     {
-        // TODO: davidni: Set up global state somehwere proper where it would be done just once
-
         Logger.Trace("Evaluate called");
+        //combine all available functions
+        var allFuncs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+        //some functions are implicitly implemented so use the existing default
+        //set as a baseline
+        var allSupported = GlobalState.Default.Functions.Concat(allFuncs.Keys)
+            .Distinct().ToArray();
+        var state = GlobalState.Default
+            .WithFunctions(allSupported);
+
         var db = new DatabaseSymbol(
             "MyDb",
             _globalTables.Select(table => table.Type).ToArray());
-        var globals = GlobalStateInstance.WithDatabase(db);
+
+        var globals = state.WithDatabase(db);
 
         var code = KustoCode.ParseAndAnalyze(query, globals);
         if (dumpKustoTree)
@@ -70,7 +75,7 @@ public class BabyKustoEngine
         }
 
         Logger.Trace("visiting with IRTranslator...");
-        var irVisitor = new IRTranslator();
+        var irVisitor = new IRTranslator(allFuncs);
 
         var ir = code.Syntax.Accept(irVisitor);
 

@@ -254,7 +254,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
             IRFunctionBodyNode irFunctionBody;
             {
-                var nestedTranslator = new IRTranslator();
+                var nestedTranslator = new IRTranslator(_functions);
                 for (var i = 0; i < arguments.Length; i++)
                 {
                     // NOTE: For now we only support type coercions for scalars. Bad things may happen for tabular inputs, oh well...
@@ -275,7 +275,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var functionSymbol = (FunctionSymbol)signature.Symbol;
-        if (BuiltInScalarFunctions.TryGetOverload(functionSymbol, irArguments, parameters,
+        if (FunctionFinder.TryGetOverload(_functions, functionSymbol, irArguments, parameters,
                 out var functionOverload))
         {
             Debug.Assert(functionOverload != null);
