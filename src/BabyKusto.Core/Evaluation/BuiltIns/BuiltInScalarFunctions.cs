@@ -113,34 +113,21 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(GetMonthFunctionImpl.Overload));
 
         AbsFunction.Register(functions);
+        SinFunction.Register(functions);
+        CosFunction.Register(functions);
+        TanFunction.Register(functions);
+        SignFunction.Register(functions);
+        RoundFunction.Register(functions);
+        RadiansFunction.Register(functions);
+        DegreesFunction.Register(functions);
+        LogFunction.Register(functions);
+        ExpFunction.Register(functions);
 
-        functions.Add(Functions.Sin,
-            new ScalarFunctionInfo(SinFunctionImpl.Overload));
-        functions.Add(Functions.Cos,
-            new ScalarFunctionInfo(CosFunctionImpl.Overload));
-        functions.Add(Functions.Tan,
-            new ScalarFunctionInfo(TanFunctionImpl.Overload));
-        functions.Add(Functions.Sign,
-            new ScalarFunctionInfo(SignFunctionImpl.Overload));
-        functions.Add(Functions.Round,
-            new ScalarFunctionInfo(RoundFunctionImpl.Overload));
-        functions.Add(Functions.Radians,
-            new ScalarFunctionInfo(RadiansFunctionImpl.Overload));
-        functions.Add(Functions.Degrees,
-            new ScalarFunctionInfo(DegreesFunctionImpl.Overload));
+        Log10Function.Register(functions);
+        Log2Function.Register(functions);
+        PowFunction.Register(functions);
+        SqrtFunction.Register(functions);
 
-        functions.Add(Functions.Exp,
-            new ScalarFunctionInfo(ExpFunctionImpl.Overload));
-        functions.Add(Functions.Log,
-            new ScalarFunctionInfo(LogFunctionImpl.Overload));
-        functions.Add(Functions.Log10,
-            new ScalarFunctionInfo(Log10FunctionImpl.Overload));
-        functions.Add(Functions.Log2,
-            new ScalarFunctionInfo(Log2FunctionImpl.Overload));
-        functions.Add(Functions.Pow,
-            new ScalarFunctionInfo(PowFunctionImpl.Overload));
-        functions.Add(Functions.Sqrt,
-            new ScalarFunctionInfo(SqrtFunctionImpl.Overload));
 
         functions.Add(Functions.DayOfWeek,
             new ScalarFunctionInfo(DayOfWeekFunctionImpl.Overload));
