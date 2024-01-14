@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -15,65 +16,65 @@ namespace SourceGeneration
 
             foreach (var classDeclaration in syntaxReceiver.found)
             {
-                var dbg = new CodeAcccumulator();
-                var className = classDeclaration.Identifier.ValueText;
-                className += "Impl";
+                var wrapperClassName = classDeclaration.Identifier.ValueText;
 
-
-                var syntaxAttributes = classDeclaration.AttributeLists.SelectMany(e => e.Attributes)
-                    .Where(e => e.Name.NormalizeWhitespace().ToFullString() == "KustoImplementation")
-                    .ToArray();
-                foreach (var sa in syntaxAttributes)
-                {
-                    if (sa.ArgumentList == null)
-                        continue;
-                    dbg.AppendLine($"// {sa.ToFullString()}");
-                    dbg.AppendLine($"// args {sa.ArgumentList?.ToFullString() ?? "no args"}");
-
-                    foreach (var a in sa.ArgumentList.Arguments)
-                    {
-                        dbg.AppendLine($"// {a.ToFullString()}");
-                        var arg = a.NameEquals.Name.Identifier.ValueText;
-                        var val = a.Expression.ToString();
-                        if (val.Contains("Functions"))
-                        {
-                            val = val.Substring(1, val.Length - 2);
-                            dbg.AppendStatement($"// public static FunctionSymbol F=> {val}");
-                        }
-                    }
-                }
+                var kustoAttributes = AttributeAsHelper<KustoImplementationAttribute>(classDeclaration);
 
 
                 var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
-                var implMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
+
+                var implementationMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                     .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
                     .ToArray();
 
-                dbg.AppendStatement("using Kusto.Language.Symbols");
-                dbg.AppendStatement("using System.Diagnostics");
-                dbg.AppendStatement("using BabyKusto.Core.Util");
-
-                foreach (var u in GetUsingList(classDeclaration))
+                var implMethodClasses = new List<string>();
+                foreach (var implMethod in implementationMethods)
                 {
-                    dbg.AppendLine(u);
+                    var code = new CodeEmitter();
+
+                    var className = wrapperClassName + implMethod.Identifier.ValueText;
+                    implMethodClasses.Add(className);
+                    EmitHeader(code, classDeclaration);
+                    code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
+                    code.EnterCodeBlock();
+                    GenerateImplementation(code, className, implMethod);
+
+                    code.AppendLine(implMethod.ToFullString());
+                    code.ExitCodeBlock();
+                    // Add the source code to the compilation
+                    context.AddSource($"{className}.g.cs", code.ToString());
                 }
 
-                dbg.AppendStatement($"namespace {GetNamespaceFrom(classDeclaration)}");
-
-                dbg.AppendLine("#nullable enable");
-
-                dbg.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
-                dbg.EnterCodeBlock();
-                foreach (var implMethod in implMethods)
+                var wrapperCode = new CodeEmitter();
+                try
                 {
-                    GenerateImplementation(dbg, className, implMethod);
+                    EmitHeader(wrapperCode, classDeclaration);
+                    wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
+                    wrapperCode.EnterCodeBlock();
+                    EmitFunctionSymbol(wrapperCode, kustoAttributes);
+                    //create the registration
+                    wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
 
-                    dbg.AppendLine(implMethod.ToFullString());
+                    var overloads = string.Join(",", implMethodClasses.Select(s => $"{s}.Overload"));
+                    wrapperCode.AppendLine(overloads);
+
+
+                    wrapperCode.AppendStatement(")");
+                    wrapperCode.AppendLine(
+                        "public static void Register(Dictionary<FunctionSymbol,ScalarFunctionInfo> f)");
+
+                    wrapperCode.AppendStatement("=> f.Add(Func,S)");
+
+                    wrapperCode.ExitCodeBlock();
+                }
+                catch (Exception ex)
+                {
+                    wrapperCode.LogException(ex);
                 }
 
-                dbg.ExitCodeBlock();
                 // Add the source code to the compilation
-                context.AddSource($"{className}.g.cs", dbg.ToString());
+                if (modifiers.Contains("partial"))
+                    context.AddSource($"{wrapperClassName}.g.cs", wrapperCode.ToString());
             }
         }
 
@@ -89,7 +90,70 @@ namespace SourceGeneration
             context.RegisterForSyntaxNotifications(() => new AttributedClassReceiver());
         }
 
-        private static void GenerateImplementation(CodeAcccumulator dbg, string className,
+        private void EmitHeader(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
+        {
+            EmitUsings(code, classDeclaration);
+            code.AppendStatement($"namespace {GetNamespaceFrom(classDeclaration)}");
+            code.AppendLine("#nullable enable");
+        }
+
+        public void EmitUsings(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
+        {
+            code.AppendStatement("using Kusto.Language");
+            code.AppendStatement("using Kusto.Language.Symbols");
+            code.AppendStatement("using System.Diagnostics");
+            code.AppendStatement("using BabyKusto.Core.Util");
+            code.AppendStatement("using System.Collections.Generic");
+
+
+            foreach (var u in GetUsingList(classDeclaration))
+            {
+                code.AppendLine(u);
+            }
+        }
+
+        private static CustomAttributeHelper<T> AttributeAsHelper<T>(ClassDeclarationSyntax classDeclaration)
+            where T : Attribute
+        {
+            var attributes = classDeclaration.AttributeLists
+                .SelectMany(e => e.Attributes)
+                .Where(e => e.Name.NormalizeWhitespace().ToFullString() ==
+                            CustomAttributeHelper<T>.Name())
+                .ToArray();
+
+            if (!attributes.Any())
+            {
+                return new CustomAttributeHelper<T>(new Dictionary<string, string>
+                {
+                    ["error"] = "no attributes"
+                });
+            }
+
+            var dict = new Dictionary<string, string>
+            {
+                ["error"] = "null ArgumentList"
+            };
+
+            var sa = attributes.First();
+            if (sa.ArgumentList != null)
+                dict = sa.ArgumentList.Arguments.ToDictionary(
+                    a => a.NameEquals.Name.Identifier.ValueText,
+                    a => a.Expression.ToString()
+                );
+
+            return new CustomAttributeHelper<T>(dict);
+        }
+
+        private void EmitFunctionSymbol(CodeEmitter code, CustomAttributeHelper<KustoImplementationAttribute> attr)
+        {
+            var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
+            if (funcSymbol.Contains("Functions"))
+            {
+                code.AppendStatement($"public static readonly FunctionSymbol Func = {funcSymbol}");
+            }
+        }
+
+        private static void GenerateImplementation(CodeEmitter dbg, string className,
             MethodDeclarationSyntax method)
         {
             var parameters = method.ParameterList.Parameters

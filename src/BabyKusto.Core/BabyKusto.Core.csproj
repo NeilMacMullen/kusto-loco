@@ -34,8 +34,8 @@
     <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
     <ProjectReference Include="..\Geo\Geo.csproj" />
-    <ProjectReference Include="..\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
-    <ProjectReference Include="..\SourceGeneratorDependencies\SourceGeneratorDependencies.csproj" />
+    <ProjectReference Include="..\SourceGenDependencies\SourceGenDependencies.csproj" />
+    <ProjectReference Include="..\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />

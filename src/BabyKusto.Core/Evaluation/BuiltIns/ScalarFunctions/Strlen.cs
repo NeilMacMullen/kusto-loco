@@ -1,12 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using SourceGeneratorDependencies;
+
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class StrlenFunction
+[KustoImplementation(Keyword = "Functions.Strlen")]
+internal partial class StrlenFunction
 {
     public long Impl(string s) => s.Length;
 }

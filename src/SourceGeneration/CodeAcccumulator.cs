@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace SourceGeneration
 {
-    public class CodeAcccumulator
+    public class CodeEmitter
     {
         private readonly StringBuilder dbg = new StringBuilder();
         private int indentLevel;
@@ -31,6 +32,27 @@ namespace SourceGeneration
         public void AppendStatement(string s)
         {
             AppendLine($"{s};");
+        }
+
+        public void EnterCommentBlock()
+        {
+            AppendLine("/*");
+            indentLevel++;
+        }
+
+        public void ExitCommentBlock()
+        {
+            indentLevel--;
+            AppendLine("*/");
+        }
+
+        public void LogException(Exception exception)
+        {
+            EnterCommentBlock();
+            AppendLine("INTERNAL ERROR");
+            AppendLine(exception.Message);
+            AppendLine(exception.ToString());
+            ExitCommentBlock();
         }
     }
 }

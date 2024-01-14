@@ -93,8 +93,8 @@ internal static class BuiltInScalarFunctions
                 new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String, ScalarTypes.String,
                     ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
 
-        functions.Add(Functions.Strlen,
-            new ScalarFunctionInfo(StrlenFunctionImpl.Overload));
+        StrlenFunction.Register(functions);
+
 
         functions.Add(Functions.ToLower,
             new ScalarFunctionInfo(ToLowerFunctionImpl.Overload));

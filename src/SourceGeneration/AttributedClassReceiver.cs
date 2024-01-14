@@ -15,7 +15,8 @@ namespace SourceGeneration
             if (syntaxNode is ClassDeclarationSyntax cds && cds.AttributeLists.Count > 0)
             {
                 var syntaxAttributes = cds.AttributeLists.SelectMany(e => e.Attributes)
-                    .Where(e => e.Name.NormalizeWhitespace().ToFullString() == "KustoImplementation");
+                    .Where(e => e.Name.NormalizeWhitespace().ToFullString()
+                                == CustomAttributeHelper<KustoImplementationAttribute>.Name());
                 if (syntaxAttributes.Any())
                 {
                     found.Add(cds);

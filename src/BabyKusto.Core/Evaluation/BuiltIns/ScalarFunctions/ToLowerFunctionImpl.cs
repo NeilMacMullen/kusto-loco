@@ -1,9 +1,7 @@
-﻿using SourceGeneratorDependencies;
-
-namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
+﻿namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation]
 public class ToLowerFunction
 {
-    private static string ToLowerImpl(string s) => s.ToLowerInvariant();
+    private static string Impl(string s) => s.ToLowerInvariant();
 }

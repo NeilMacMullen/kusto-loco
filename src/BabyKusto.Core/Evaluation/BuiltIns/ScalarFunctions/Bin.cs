@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using SourceGeneratorDependencies;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 

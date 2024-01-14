@@ -30,7 +30,7 @@ namespace SourceGeneration
                    TypeMapping.SymbolForType(typeof(string)));
          */
 
-        public static void BuildOverloadInfo(CodeAcccumulator dbg, ImplementationMethod method)
+        public static void BuildOverloadInfo(CodeEmitter dbg, ImplementationMethod method)
         {
             dbg.AppendLine("internal static ScalarOverloadInfo Overload =>");
             dbg.AppendLine($"new(new {method.ClassName}(),");
@@ -41,7 +41,7 @@ namespace SourceGeneration
             dbg.AppendStatement(")");
         }
 
-        public static void BuildScalarMethod(CodeAcccumulator dbg, ImplementationMethod method)
+        public static void BuildScalarMethod(CodeEmitter dbg, ImplementationMethod method)
         {
             var parameters = method.Arguments;
             var ret = method.ReturnType;
@@ -65,7 +65,7 @@ namespace SourceGeneration
             dbg.ExitCodeBlock();
         }
 
-        public static void BuildColumnarMethod(CodeAcccumulator dbg, ImplementationMethod method)
+        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method)
         {
             var parameters = method.Arguments;
             var ret = method.ReturnType;
@@ -88,7 +88,7 @@ namespace SourceGeneration
         }
 
 
-        public static void AddTypedColumns(CodeAcccumulator dbg, Param[] parameters)
+        public static void AddTypedColumns(CodeEmitter dbg, Param[] parameters)
         {
             foreach (var p in parameters)
             {
@@ -96,7 +96,7 @@ namespace SourceGeneration
             }
         }
 
-        public static void AddTypedVariables(CodeAcccumulator dbg, Param[] parameters)
+        public static void AddTypedVariables(CodeEmitter dbg, Param[] parameters)
         {
             foreach (var p in parameters)
             {
@@ -104,7 +104,7 @@ namespace SourceGeneration
             }
         }
 
-        public static void PerformNullChecks(CodeAcccumulator dbg, ImplementationMethod method,
+        public static void PerformNullChecks(CodeEmitter dbg, ImplementationMethod method,
             bool fromColumn, string assignEmptyStringTo)
         {
             var parameters = method.Arguments;
