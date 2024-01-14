@@ -1,6 +1,6 @@
 ﻿// ReSharper disable PartialTypeWithSinglePart
 
-namespace MyNamespace;
+namespace CustomFunctions;
 
 [KustoImplementation(Keyword = "fizz")]
 public partial class FizzFunction
