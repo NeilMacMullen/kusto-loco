@@ -31,5 +31,4 @@ internal class DebugEmitImpl : IScalarFunctionImpl
 
         return new ColumnarResult(ColumnFactory.Create(data));
     }
-   
 }
