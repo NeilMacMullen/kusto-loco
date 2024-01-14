@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-internal class ScalarFunctionInfo
+public class ScalarFunctionInfo
 {
     public ScalarFunctionInfo(params ScalarOverloadInfo[] overloads) => Overloads = overloads;
 

@@ -104,6 +104,9 @@ namespace SourceGeneration
             code.AppendStatement("using System.Diagnostics");
             code.AppendStatement("using BabyKusto.Core.Util");
             code.AppendStatement("using System.Collections.Generic");
+            code.AppendStatement("using BabyKusto.Core.Evaluation.BuiltIns");
+            code.AppendStatement("using BabyKusto.Core.Evaluation");
+            code.AppendStatement("using BabyKusto.Core");
 
 
             foreach (var u in GetUsingList(classDeclaration))

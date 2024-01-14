@@ -5,7 +5,7 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-internal sealed class ScalarOverloadInfo : OverloadInfoBase
+public sealed class ScalarOverloadInfo : OverloadInfoBase
 {
     public EvaluationHints EvaluationHints;
 

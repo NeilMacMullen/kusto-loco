@@ -12,7 +12,7 @@ namespace BabyKusto.Core.Evaluation.BuiltIns;
 ///     - May only use the row context in which it is defined
 ///     - Can only refer to tables (and views) that are in the accessible schema
 /// </summary>
-internal interface IScalarFunctionImpl
+public interface IScalarFunctionImpl
 {
     ScalarResult InvokeScalar(ScalarResult[] arguments);
 

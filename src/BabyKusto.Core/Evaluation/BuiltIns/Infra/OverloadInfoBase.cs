@@ -6,7 +6,7 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns;
 
-internal abstract class OverloadInfoBase
+public abstract class OverloadInfoBase
 {
     protected OverloadInfoBase(TypeSymbol returnType, params TypeSymbol[] parameterTypes)
     {
