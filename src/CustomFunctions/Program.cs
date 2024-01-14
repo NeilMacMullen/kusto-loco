@@ -11,12 +11,14 @@ namespace CustomFunctions
         {
             var d = new Dictionary<FunctionSymbol, ScalarFunctionInfo>();
             FizzFunction.Register(d);
+
             var numbers = Enumerable.Range(0, 100)
                 .Select(i => new Number(i, string.Empty))
                 .ToArray();
 
 
             var context = new KustoQueryContext();
+            context.AddFunctions(d);
             context.AddTableFromRecords("numbers", numbers);
             var o = await context.RunTabularQueryAsync(
                 "numbers | extend FizzBuzz = fizz(N)");

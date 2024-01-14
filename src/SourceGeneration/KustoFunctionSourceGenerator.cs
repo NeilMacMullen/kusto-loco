@@ -154,6 +154,21 @@ namespace SourceGeneration
             {
                 code.AppendStatement($"public static readonly FunctionSymbol Func = {funcSymbol}");
             }
+            else
+            {
+                /*
+                  new FunctionSymbol("debug_emit", ScalarTypes.Int,
+                           new Parameter("value1", ScalarTypes.String)
+                       ).ConstantFoldable()
+                       .WithResultNameKind(ResultNameKind.None);
+                 */
+                code.AppendLine("public static readonly FunctionSymbol Func =");
+                code.AppendLine($"new FunctionSymbol(\"{funcSymbol}\", ");
+                code.AppendLine("ScalarTypes.String,");
+                code.AppendLine("new Parameter(\"value1\", ScalarTypes.Int)");
+                code.AppendLine(" ).ConstantFoldable()");
+                code.AppendStatement(" .WithResultNameKind(ResultNameKind.None)");
+            }
         }
 
         private static void GenerateImplementation(CodeEmitter dbg, string className,

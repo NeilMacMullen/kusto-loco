@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using Extensions;
 using Kusto.Language;
 using Kusto.Language.Symbols;
@@ -21,9 +22,13 @@ public class KustoQueryContext
     private bool _fullDebug;
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
-
-
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
+
+    //TODO - ugh - don't like exposing this in this way
+    public void AddFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
+    {
+        _engine.AddAdditionalFunctions(funcs);
+    }
 
     public void AddTable(TableBuilder builder) => AddTable(builder.ToTableSource());
 

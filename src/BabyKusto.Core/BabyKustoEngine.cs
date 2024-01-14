@@ -20,6 +20,8 @@ public class BabyKustoEngine
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly List<ITableSource> _globalTables = new();
 
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
+
     static BabyKustoEngine()
     {
     }
@@ -35,11 +37,17 @@ public class BabyKustoEngine
         _globalTables.Add(table);
     }
 
+    public void AddAdditionalFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
+    {
+        _additionalfuncs = funcs;
+    }
+
     public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
     {
         Logger.Trace("Evaluate called");
         //combine all available functions
         var allFuncs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
+            .Concat(_additionalfuncs)
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         //some functions are implicitly implemented so use the existing default
         //set as a baseline
