@@ -4,13 +4,15 @@
 using System;
 using System.Runtime.CompilerServices;
 
+// ReSharper disable PartialTypeWithSinglePart
+
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class BinIntFunction
+[KustoImplementation(Keyword = "Functions.Bin")]
+internal partial class BinFunction
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static long Impl(int left, int right)
+    private static long IntImpl(int left, int right)
     {
         if (right <= 0)
         {
@@ -26,13 +28,10 @@ internal class BinIntFunction
 
         return left - remn;
     }
-}
 
-[KustoImplementation]
-internal class BinLongFunction
-{
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static long Impl(long left, long right)
+    internal static long LongImpl(long left, long right)
     {
         if (right <= 0)
         {
@@ -48,13 +47,9 @@ internal class BinLongFunction
 
         return left - remn;
     }
-}
 
-[KustoImplementation]
-internal class BinDoubleFunction
-{
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static double Impl(double left, double right)
+    internal static double DoubleImpl(double left, double right)
     {
         if (right <= 0)
         {
@@ -64,11 +59,7 @@ internal class BinDoubleFunction
 
         return Math.Floor(left / right) * right;
     }
-}
 
-[KustoImplementation]
-internal class BinDateTimeTimeSpanFunction
-{
-    internal static DateTime Impl(DateTime left, TimeSpan right) =>
-        new(BinLongFunctionImpl.Impl(left.Ticks, right.Ticks));
+    internal static DateTime TimeImpl(DateTime left, TimeSpan right) =>
+        new(BinFunctionLongImpl.LongImpl(left.Ticks, right.Ticks));
 }

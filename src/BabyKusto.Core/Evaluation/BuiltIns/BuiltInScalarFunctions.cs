@@ -94,13 +94,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String, ScalarTypes.String, ScalarTypes.String, ScalarTypes.String)));
 
         StrlenFunction.Register(functions);
-
-
-        functions.Add(Functions.ToLower,
-            new ScalarFunctionInfo(ToLowerFunctionImpl.Overload));
-
-        functions.Add(Functions.ToUpper,
-            new ScalarFunctionInfo(ToUpperFunctionImpl.Overload));
+        ToLowerFunction.Register(functions);
+        ToUpperFunction.Register(functions);
 
         functions.Add(Functions.ReplaceString,
             new ScalarFunctionInfo(ReplaceStringFunctionImpl.Overload));
@@ -109,13 +104,8 @@ internal static class BuiltInScalarFunctions
             Functions.Substring,
             new ScalarFunctionInfo(SubstringFunctionImpl.Overload));
 
-        var binFunctionInfo = new ScalarFunctionInfo(
-            BinIntFunctionImpl.Overload,
-            BinLongFunctionImpl.Overload,
-            BinDoubleFunctionImpl.Overload,
-            BinDateTimeTimeSpanFunctionImpl.Overload);
-        functions.Add(Functions.Bin, binFunctionInfo);
-        functions.Add(Functions.Floor, binFunctionInfo);
+        BinFunction.Register(functions);
+        functions.Add(Functions.Floor, BinFunction.S);
 
         functions.Add(Functions.GetYear,
             new ScalarFunctionInfo(GetYearFunctionImpl.Overload));
