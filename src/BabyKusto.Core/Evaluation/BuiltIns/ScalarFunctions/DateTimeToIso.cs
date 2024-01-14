@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+// ReSharper disable PartialTypeWithSinglePart
 
 using System;
 using System.Globalization;
 
-
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl
 {
-    [KustoImplementation]
-    internal class DateTimeToIso
+    [KustoImplementation(Keyword = "datetime_to_iso")]
+    internal partial class DateTimeToIso
     {
         private static string Impl(DateTime input)
             => input.ToString("o", CultureInfo.InvariantCulture);

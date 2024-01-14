@@ -112,9 +112,8 @@ internal static class BuiltInScalarFunctions
         functions.Add(Functions.HourOfDay,
             new ScalarFunctionInfo(GetMonthFunctionImpl.Overload));
 
+        AbsFunction.Register(functions);
 
-        functions.Add(Functions.Abs,
-            new ScalarFunctionInfo(AbsFunctionImpl.Overload));
         functions.Add(Functions.Sin,
             new ScalarFunctionInfo(SinFunctionImpl.Overload));
         functions.Add(Functions.Cos,

@@ -27,18 +27,19 @@ namespace SourceGeneration
                     .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
                     .ToArray();
 
-                var implMethodClasses = new List<string>();
+                var implMethodClasses = new List<ImplementationMethod>();
+
                 foreach (var implMethod in implementationMethods)
                 {
                     var code = new CodeEmitter();
 
                     var className = wrapperClassName + implMethod.Identifier.ValueText;
-                    implMethodClasses.Add(className);
+
                     EmitHeader(code, classDeclaration);
                     code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
                     code.EnterCodeBlock();
-                    GenerateImplementation(code, className, implMethod);
-
+                    var m = GenerateImplementation(code, className, implMethod);
+                    implMethodClasses.Add(m);
                     code.AppendLine(implMethod.ToFullString());
                     code.ExitCodeBlock();
                     // Add the source code to the compilation
@@ -51,11 +52,12 @@ namespace SourceGeneration
                     EmitHeader(wrapperCode, classDeclaration);
                     wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
                     wrapperCode.EnterCodeBlock();
-                    EmitFunctionSymbol(wrapperCode, kustoAttributes);
+                    EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
                     //create the registration
                     wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
 
-                    var overloads = string.Join(",", implMethodClasses.Select(s => $"{s}.Overload"));
+                    var overloads = string.Join(",",
+                        implMethodClasses.Select(s => $"{wrapperClassName}{s.Name}.Overload"));
                     wrapperCode.AppendLine(overloads);
 
 
@@ -147,7 +149,15 @@ namespace SourceGeneration
             return new CustomAttributeHelper<T>(dict);
         }
 
-        private void EmitFunctionSymbol(CodeEmitter code, CustomAttributeHelper<KustoImplementationAttribute> attr)
+        private string Opt(int i, int numRequired)
+        {
+            var m = i >= numRequired ? 0 : 1;
+            return $"minOccurring:{m}";
+        }
+
+        private void EmitFunctionSymbol(CodeEmitter code,
+            CustomAttributeHelper<KustoImplementationAttribute> attr,
+            List<ImplementationMethod> implementationMethods)
         {
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             if (funcSymbol.Contains("Functions"))
@@ -156,22 +166,28 @@ namespace SourceGeneration
             }
             else
             {
-                /*
-                  new FunctionSymbol("debug_emit", ScalarTypes.Int,
-                           new Parameter("value1", ScalarTypes.String)
-                       ).ConstantFoldable()
-                       .WithResultNameKind(ResultNameKind.None);
-                 */
+                //figure out return type...
+                var returnType = ParamGeneneration.ScalarType(implementationMethods.First().ReturnType);
+                var longest = implementationMethods.OrderBy(f => f.Arguments.Length)
+                    .Last();
+                var shortest = implementationMethods.Min(f => f.Arguments.Length);
+
+                var args = longest.Arguments
+                    .Select((a, i) =>
+                        $"new Parameter(\"{a.Name}\", ScalarTypes.{ParamGeneneration.ScalarType(a)},{Opt(i, shortest)})")
+                    .ToArray();
+
                 code.AppendLine("public static readonly FunctionSymbol Func =");
                 code.AppendLine($"new FunctionSymbol(\"{funcSymbol}\", ");
-                code.AppendLine("ScalarTypes.String,");
-                code.AppendLine("new Parameter(\"value1\", ScalarTypes.Int)");
+                code.AppendLine($"ScalarTypes.{returnType},");
+
+                code.AppendLine(string.Join(",", args));
                 code.AppendLine(" ).ConstantFoldable()");
                 code.AppendStatement(" .WithResultNameKind(ResultNameKind.None)");
             }
         }
 
-        private static void GenerateImplementation(CodeEmitter dbg, string className,
+        private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
             MethodDeclarationSyntax method)
         {
             var parameters = method.ParameterList.Parameters
@@ -184,6 +200,7 @@ namespace SourceGeneration
             ParamGeneneration.BuildOverloadInfo(dbg, m);
             ParamGeneneration.BuildScalarMethod(dbg, m);
             ParamGeneneration.BuildColumnarMethod(dbg, m);
+            return m;
         }
 
 

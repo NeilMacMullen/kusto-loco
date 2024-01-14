@@ -129,5 +129,23 @@ namespace SourceGeneration
         }
 
         private static string IndexedColumn(Param p) => $"{ColumnName(p)}[{RowIndex}]";
+
+        public static string GetNonNullableType(Param p) => GetNullableType(p).Replace("?", "");
+
+        public static string ScalarType(Param p)
+        {
+            var t = GetNonNullableType(p);
+            switch (t)
+            {
+                case "string":
+                    return "String";
+                case "int":
+                    return "Int";
+                case "long": return "Long";
+                case "double": return "Real";
+                case "bool": return "Bool";
+                default: return t;
+            }
+        }
     }
 }

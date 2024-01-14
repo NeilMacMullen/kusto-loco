@@ -1,11 +1,13 @@
 ﻿using System;
 using AdvancedStringFunctionality;
 
+// ReSharper disable PartialTypeWithSinglePart
+
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class StringSimilarity
+[KustoImplementation(Keyword = "string_similarity")]
+internal partial class StringSimilarity
 {
     public double Impl(string left, string right)
     {
