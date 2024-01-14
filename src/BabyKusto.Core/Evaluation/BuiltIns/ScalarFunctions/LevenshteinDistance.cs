@@ -1,5 +1,5 @@
-﻿using BabyKusto.Core.Util;
-using Fastenshtein;
+﻿using Fastenshtein;
+using SourceGeneratorDependencies;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 

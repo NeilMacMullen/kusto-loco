@@ -1,5 +1,5 @@
 ﻿using System;
-using BabyKusto.Core.Util;
+using SourceGeneratorDependencies;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 

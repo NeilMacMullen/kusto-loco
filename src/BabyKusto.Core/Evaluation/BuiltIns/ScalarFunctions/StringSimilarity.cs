@@ -1,6 +1,6 @@
 ﻿using System;
 using AdvancedStringFunctionality;
-using BabyKusto.Core.Util;
+using SourceGeneratorDependencies;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 

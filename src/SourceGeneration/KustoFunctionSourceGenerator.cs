@@ -51,6 +51,8 @@ namespace SourceGeneration
 
                 dbg.AppendStatement("using Kusto.Language.Symbols");
                 dbg.AppendStatement("using System.Diagnostics");
+                dbg.AppendStatement("using BabyKusto.Core.Util");
+
                 foreach (var u in GetUsingList(classDeclaration))
                 {
                     dbg.AppendLine(u);

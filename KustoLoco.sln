@@ -75,7 +75,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParquetSupport", "src\Parqu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lokql-engine", "src\lokql-engine\lokql-engine.csproj", "{DA457CB0-AF41-474F-9848-6D5F879BC535}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneration", "src\SourceGeneration\SourceGeneration.csproj", "{49FD4F48-01C5-435E-97EE-6120E3E18828}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneration", "src\SourceGeneration\SourceGeneration.csproj", "{49FD4F48-01C5-435E-97EE-6120E3E18828}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorDependencies", "src\SourceGeneratorDependencies\SourceGeneratorDependencies.csproj", "{B205540E-3B0E-4D86-BAF4-2734829CF26F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,6 +181,10 @@ Global
 		{49FD4F48-01C5-435E-97EE-6120E3E18828}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49FD4F48-01C5-435E-97EE-6120E3E18828}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49FD4F48-01C5-435E-97EE-6120E3E18828}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B205540E-3B0E-4D86-BAF4-2734829CF26F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B205540E-3B0E-4D86-BAF4-2734829CF26F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B205540E-3B0E-4D86-BAF4-2734829CF26F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B205540E-3B0E-4D86-BAF4-2734829CF26F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +215,7 @@ Global
 		{81019EDB-C726-4008-9E1D-DCA7FF984030} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{DA457CB0-AF41-474F-9848-6D5F879BC535} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{49FD4F48-01C5-435E-97EE-6120E3E18828} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
+		{B205540E-3B0E-4D86-BAF4-2734829CF26F} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
