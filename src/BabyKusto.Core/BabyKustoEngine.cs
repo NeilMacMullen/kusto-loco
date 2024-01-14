@@ -15,6 +15,8 @@ using NLog;
 
 namespace BabyKusto.Core;
 
+public readonly record struct FunctionInfo(string Name, bool Implemented);
+
 public class BabyKustoEngine
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -42,6 +44,19 @@ public class BabyKustoEngine
         _additionalfuncs = funcs;
     }
 
+    public IReadOnlyCollection<FunctionInfo> GetImplementedList()
+    {
+        var funcs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
+            .Select(f => new FunctionInfo(f.Key.Name, true))
+            .ToArray();
+        var notImplemented =
+            GlobalState.Default.Functions.Except(BuiltInScalarFunctions.functions.Keys)
+                .Select(f => new FunctionInfo(f.Name, false))
+                .ToArray();
+        return funcs.Concat(notImplemented)
+            .OrderBy(f => f.Name).ToArray();
+    }
+
     public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
     {
         Logger.Trace("Evaluate called");
@@ -53,6 +68,7 @@ public class BabyKustoEngine
         //set as a baseline
         var allSupported = GlobalState.Default.Functions.Concat(allFuncs.Keys)
             .Distinct().ToArray();
+
         var state = GlobalState.Default
             .WithFunctions(allSupported);
 

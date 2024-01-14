@@ -22,6 +22,12 @@ public class KustoQueryContext
     private bool _fullDebug;
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
+
+    public KustoQueryContext()
+    {
+        AddTableFromRecords("_functions", _engine.GetImplementedList());
+    }
+
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
     //TODO - ugh - don't like exposing this in this way
