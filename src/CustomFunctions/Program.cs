@@ -8,22 +8,25 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
+        var context = new KustoQueryContext();
+
+        //register new function
         var d = new Dictionary<FunctionSymbol, ScalarFunctionInfo>();
         FizzFunction.Register(d);
+        context.AddFunctions(d);
 
+
+        //set up some data
         var numbers = Enumerable.Range(0, 100)
             .Select(i => new Number(i, string.Empty))
             .ToArray();
 
-
-        var context = new KustoQueryContext();
-        context.AddFunctions(d);
         context.AddTableFromRecords("numbers", numbers);
+        //run a query using our custom function
         var o = await context.RunTabularQueryAsync(
             "numbers | extend FizzBuzz = fizz(N)");
-        Console.WriteLine(o.Error);
-        var x = o.DeserialiseTo<Number>();
-        foreach (var fb in x)
+
+        foreach (var fb in o.DeserialiseTo<Number>())
             Console.WriteLine(fb);
     }
 
