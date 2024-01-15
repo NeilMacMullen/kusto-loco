@@ -94,6 +94,7 @@ internal static class BuiltInScalarFunctions
         StrlenFunction.Register(functions);
         ToLowerFunction.Register(functions);
         ToUpperFunction.Register(functions);
+        ToDateTimeFunction.Register(functions);
 
         functions.Add(Functions.ReplaceString,
             new ScalarFunctionInfo(ReplaceStringFunctionImpl.Overload));
