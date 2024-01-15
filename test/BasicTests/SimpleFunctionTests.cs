@@ -371,4 +371,31 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("0");
     }
+
+
+    [TestMethod]
+    public async Task ToDateTime()
+    {
+        var query = @"print D=todatetime('15/01/2024 12:35:35')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2024-01-15 12:35:35Z");
+    }
+
+    [TestMethod]
+    public async Task ToDateTime2()
+    {
+        var query = @"print D=todatetime('2024/01/15 12:35:35')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2024-01-15 12:35:35Z");
+    }
+
+
+
+    [TestMethod]
+    public async Task ToDateTimeFmt()
+    {
+        var query = @"print D=todatetimefmt('2024-01-15 12:35:35','yyyy-MM-dd HH:mm:ss')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2024-01-15 12:35:35Z");
+    }
 }
