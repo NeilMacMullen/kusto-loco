@@ -33,9 +33,9 @@ public class MappedColumn<T> : TypedBaseColumn<T>
 
     public override void ForEach(Action<object?> action)
     {
-        foreach (var i in _lookups)
+        foreach(var i in _lookups)
         {
-            action(this[i]);
+            action(BackingColumn[i]);
         }
     }
 
