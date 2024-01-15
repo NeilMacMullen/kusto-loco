@@ -51,7 +51,8 @@ public static class KustoFormatter
         var max = prefs.Length;
 
         var displayHeight = Math.Min(max, result.Height);
-        var maxColumnWidth = prefs.ScreenWidth / columns.Length;
+        var maxColumnWidth = prefs.ScreenWidth;
+        var screenWidth = Math.Max(10, prefs.ScreenWidth);
 
 
         string[] MakeStringColumn(ColumnResult c)
@@ -71,7 +72,8 @@ public static class KustoFormatter
                 .ToArray();
         }
 
-        var cells = columns.Select(MakeStringColumn)
+        var cells = columns
+            .Select(MakeStringColumn)
             .Select(PadToMax)
             .ToArray();
 
@@ -90,7 +92,16 @@ public static class KustoFormatter
         return sb.ToString();
 
 
-        string JoinToLine(IEnumerable<string> cols) => cols.JoinString(" | ");
+        string JoinToLine(IEnumerable<string> cols)
+        {
+            var naive = cols.JoinString(" | ");
+            if (naive.Length > screenWidth)
+            {
+                naive = naive[..(screenWidth - 3)] + "...";
+            }
+
+            return naive;
+        }
     }
 
     public readonly record struct DisplayPreferences(int ScreenWidth, int StartOffset, int Length);

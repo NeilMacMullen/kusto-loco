@@ -40,6 +40,22 @@ public class ReportExplorer
 
     private KustoQueryContext GetCurrentContext() => _context;
 
+    private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+
+
+        var prefs = new DisplayPreferences(Console.WindowWidth, start, maxToDisplay);
+        Console.WriteLine(Tabulate(result, prefs));
+
+        if (maxToDisplay < result.Height)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(
+                $"Display was truncated to first {maxToDisplay} of {result.Height}.  Use '.display --max' to change this behaviour");
+        }
+    }
+
     private void DisplayResults(KustoQueryResult result)
     {
         if (result.Error.IsNotBlank())
@@ -54,17 +70,7 @@ public class ReportExplorer
             else
             {
                 var max = _currentDisplayOptions.MaxToDisplay;
-
-                var prefs = new DisplayPreferences(78, 0, max);
-                Console.WriteLine(Tabulate(result, prefs));
-
-                if (_currentDisplayOptions.MaxToDisplay < result.Height)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(
-                        $"Display was truncated to first {max} of {result.Height}.  Use '.display --max' to change this behaviour");
-                }
-
+                ShowResultsToConsole(result, 0, max);
                 //auto render
                 if (result.Visualization != VisualizationState.Empty)
                 {
@@ -84,18 +90,17 @@ public class ReportExplorer
         if (initialScript.IsNotBlank())
         {
             await RunInput($".run {initialScript}");
-        }
 
 
-        while (true)
-        {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("KQL> ");
-            var query = Console.ReadLine();
-            await RunInput(query);
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("KQL> ");
+                var query = Console.ReadLine();
+                await RunInput(query);
+            }
         }
     }
-
 
     private async Task ExecuteAsync(string line)
     {
@@ -197,7 +202,8 @@ public class ReportExplorer
                     typeof(SaveQueryCommand.Options),
                     typeof(MaterializeCommand.Options),
                     typeof(SynTableCommand.Options),
-                    typeof(AllTablesCommand.Options)
+                    typeof(AllTablesCommand.Options),
+                    typeof(ShowCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -210,6 +216,7 @@ public class ReportExplorer
                 .WithParsedAsync<LoadCommand.Options>(o => LoadCommand.RunAsync(this, o))
                 .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
+                .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
             ;
     }
 
@@ -313,6 +320,24 @@ public class ReportExplorer
         }
     }
 
+    public static class ShowCommand
+    {
+        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        {
+            exp.ShowResultsToConsole(exp._prevResult, o.Offset, o.NumToShow);
+            await Task.CompletedTask;
+        }
+
+        [Verb("show", HelpText = "show the last results again")]
+        internal class Options
+        {
+            [Value(0, HelpText = "Rows to show")] public int NumToShow { get; set; } = 50;
+
+
+            [Value(1, HelpText = "Offset to show data from")]
+            public int Offset { get; set; } = 0;
+        }
+    }
 
     public static class RenderCommand
     {
