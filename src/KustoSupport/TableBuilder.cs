@@ -96,7 +96,7 @@ public class TableBuilder
         var firstDictionary = dictionaries.First();
         var headers = firstDictionary.Cast<DictionaryEntry>()
                                      .Select(de => de.Key.ToString())
-                                     .Select(h => new { ColumnName = h, Type = firstDictionary[h].GetType() })
+                                     .Select(h => new { ColumnName = h, Type = firstDictionary[h]?.GetType()??typeof(string) })
                                      .ToArray();
 
         var builder = CreateEmpty(tableName, dictionaries.Count);
