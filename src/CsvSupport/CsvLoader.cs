@@ -2,6 +2,8 @@
 using System.Collections.Specialized;
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using KustoSupport;
 using NLog;
 
@@ -128,7 +130,7 @@ public static class CsvLoader
     {
         var headers = dictionaries.First().Cast<DictionaryEntry>().Select(de => de.Key.ToString()).ToArray();
         var writer = new StringWriter();
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        using (var csv = CreateStreamWriter(writer,CsvFileConfiguration.Default))
         {
             if (!skipHeader)
             {
@@ -159,4 +161,142 @@ public static class CsvLoader
         var str = WriteToCsvString(result, int.MaxValue, false);
         File.WriteAllText(path, str);
     }
+
+
+    public static CultureInfo CultureUkUs()
+    {
+        var trulyInvariant = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+        trulyInvariant.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
+        return trulyInvariant;
+    }
+
+    /// <summary>
+    ///     Creates a CsvWriter for the supplied stream
+    /// </summary>
+    /// <remarks>
+    ///     Uses a culture based on InvariantCulture but with an unambiguous date pattern
+    /// </remarks>
+    public static CsvWriter CreateStreamWriter(TextWriter stream,CsvFileConfiguration configuration)
+    {
+        var config = new CsvConfiguration(CultureUkUs());
+        configuration.MutateConfiguration(config);
+        var writer = new CsvWriter(stream, config);
+
+        configuration.MutateContext(writer.Context);
+        return writer;
+    }
+
+}
+
+/// <summary>
+///     Holds a pair of actions that control how CSV files are read and written
+/// </summary>
+/// <remarks>
+///     Rather annoyingly CsvHelper requires two-stage configuration do to all we want
+/// </remarks>
+public readonly struct CsvFileConfiguration
+{
+    /// <summary>
+    ///     mutates the CsvHelper.CsvConfiguration object before creating reader/writer
+    /// </summary>
+    public readonly Action<CsvConfiguration> MutateConfiguration;
+
+    /// <summary>
+    ///     mutates the CsvHelper.CsvContext at start of reading/writing
+    /// </summary>
+    public readonly Action<CsvContext> MutateContext;
+
+    private CsvFileConfiguration(Action<CsvConfiguration> mutateConfiguration, Action<CsvContext> mutateContext) :
+        this()
+    {
+        MutateConfiguration = mutateConfiguration;
+        MutateContext = mutateContext;
+    }
+
+
+    private CsvFileConfiguration Combine(Action<CsvConfiguration> configurationMutator,
+        Action<CsvContext> contextMutator)
+    {
+        var currentConfig = MutateConfiguration;
+        var currentContext = MutateContext;
+        return new CsvFileConfiguration(
+                                        c =>
+                                        {
+                                            currentConfig(c);
+                                            configurationMutator(c);
+                                        },
+                                        c =>
+                                        {
+                                            currentContext(c);
+                                            contextMutator(c);
+                                        }
+                                       );
+    }
+
+    /// <summary>
+    ///     Add a class map to an existing configuration
+    /// </summary>
+    public CsvFileConfiguration WithClassMap<T>()
+        where T : ClassMap
+        => Combine(_ => { },
+                   c => c.RegisterClassMap<T>());
+
+    /// <summary>
+    ///     Add a type converter to an existing configuration
+    /// </summary>
+    public CsvFileConfiguration WithTypeConverter<T>(ITypeConverter converter)
+        => Combine(_ => { },
+                   c => c.TypeConverterCache.AddConverter<T>(converter));
+
+
+    /// <summary>
+    ///     Allows the CsvConfiguration object which controls column interpretation to be changed
+    /// </summary>
+    public CsvFileConfiguration WithColumnConfiguration(Action<CsvConfiguration> configurer)
+        => Combine(configurer, _ => { });
+
+
+    /// <summary>
+    ///     Mangles incoming header names so they can be better matched
+    /// </summary>
+    public CsvFileConfiguration WithHeaderMangling(Func<string, string> mangleFunction)
+        => WithColumnConfiguration(cfg => cfg.PrepareHeaderForMatch = args => mangleFunction(args.Header));
+
+
+    /// <summary>
+    ///     Removes spaces in headers and ignores case when matching
+    /// </summary>
+    public CsvFileConfiguration WithStandardHeaderMangling()
+        => WithHeaderMangling(h => h.Trim().Replace(" ", string.Empty).ToLowerInvariant());
+
+    /// <summary>
+    ///     Empty configuration that does nothing but apply US/UK culture
+    /// </summary>
+    public static readonly CsvFileConfiguration Empty = new(_ => { }, _ => { });
+
+    /// <summary>
+    ///     Default configuration that knows how to convert SensorIds
+    /// </summary>
+    /// <remarks>
+    ///     It may be worth adding other common type converters here
+    /// </remarks>
+    public static readonly CsvFileConfiguration Default =
+        Empty;
+
+    /// <summary>
+    ///     Useful configuration for flexibly reading csv with missing columns
+    /// </summary>
+    public static readonly CsvFileConfiguration AllowMissingColumns
+        = Default.WithColumnConfiguration(IgnoreMissingColumns);
+
+    private static void IgnoreMissingColumns(CsvConfiguration config)
+    {
+        config.MissingFieldFound = null;
+        config.HeaderValidated = null;
+        config.PrepareHeaderForMatch = args => args.Header.ToLower();
+    }
+
+
+    public static readonly CsvFileConfiguration NoHeader
+        = Default.WithColumnConfiguration(c => c.HasHeaderRecord = false);
 }
