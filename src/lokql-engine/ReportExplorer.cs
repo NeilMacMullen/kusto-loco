@@ -90,15 +90,14 @@ public class ReportExplorer
         if (initialScript.IsNotBlank())
         {
             await RunInput($".run {initialScript}");
+        }
 
-
-            while (true)
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("KQL> ");
-                var query = Console.ReadLine();
-                await RunInput(query);
-            }
+        while (true)
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("KQL> ");
+            var query = Console.ReadLine();
+            await RunInput(query);
         }
     }
 
