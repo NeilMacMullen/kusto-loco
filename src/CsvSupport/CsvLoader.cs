@@ -63,30 +63,28 @@ public static class CsvLoader
 
     public static void WriteToCsvStream(KustoQueryResult result, int max, bool skipHeader, TextWriter writer)
     {
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        if (!skipHeader)
         {
-            if (!skipHeader)
+            foreach (var heading in result.ColumnNames())
             {
-                foreach (var heading in result.ColumnNames())
-                {
-                    csv.WriteField(heading);
-                }
+                csv.WriteField(heading);
+            }
+        }
+
+        csv.NextRecord();
+
+        foreach (var r in result.EnumerateRows())
+        {
+            foreach (var cell in r)
+            {
+                var toPrint = cell is DateTime dt
+                    ? dt.ToString("o", CultureInfo.InvariantCulture)
+                    : Convert.ToString(cell, CultureInfo.InvariantCulture);
+                csv.WriteField(toPrint);
             }
 
             csv.NextRecord();
-
-            foreach (var r in result.EnumerateRows())
-            {
-                foreach (var cell in r)
-                {
-                    var toPrint = cell is DateTime dt
-                        ? dt.ToString("o", CultureInfo.InvariantCulture)
-                        : Convert.ToString(cell, CultureInfo.InvariantCulture);
-                    csv.WriteField(toPrint);
-                }
-
-                csv.NextRecord();
-            }
         }
     }
 
