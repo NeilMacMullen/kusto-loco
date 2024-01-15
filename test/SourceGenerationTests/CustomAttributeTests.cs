@@ -9,8 +9,14 @@ public class CustomAttributeTests
     [TestMethod]
     public void NameOfAttributeIsCorrectlyDetermined()
     {
-        CustomAttributeHelper<KustoImplementationAttribute>.Name()
+        CustomAttributeHelper<MyTestAttribute>.Name()
             .Should()
-            .Be("KustoImplementation");
+            .Be("MyTest");
     }
+}
+
+
+public class MyTestAttribute : Attribute
+{
+
 }

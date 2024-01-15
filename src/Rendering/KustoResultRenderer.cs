@@ -45,7 +45,6 @@ public class KustoResultRenderer
                    /*
                    "table" => VegaGenerator.LineChart,
                    "list" => VegaGenerator.LineChart,
-                   "ladderchart" => VegaGenerator.LineChart,
                    "timeline" => VegaGenerator.LineChart,
                    "3Dchart" => VegaGenerator.LineChart,
                    "card" => VegaGenerator.LineChart,
@@ -65,16 +64,10 @@ public class KustoResultRenderer
                    "scatterchart" => RenderToChart(title, GridChart, result, MakeGridChart),
 
                    /*
-                   "piechart" => VegaGenerator.PieChart,
 
                    "timechart" => VegaGenerator.LineChart,
-                   "linechart" => VegaGenerator.LineChart,
                    "anomalychart" => VegaGenerator.LineChart,
                    "pivotchart" => VegaGenerator.LineChart,
-                   "areachart" => VegaGenerator.AreaChart,
-                   "stackedareachart" => VegaGenerator.AreaChart,
-
-
                    "columnchart" => VegaGenerator.BarChart,
                    */
 

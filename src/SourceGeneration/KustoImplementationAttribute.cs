@@ -4,7 +4,7 @@
 //SourceGenDependencies because I can't get the build
 //system to understand that the external project is 
 //referenced.
-public class KustoImplementationAttribute : Attribute
+internal class KustoImplementationAttribute : Attribute
 {
     public string Keyword { get; set; } = string.Empty;
 }
