@@ -9,20 +9,30 @@ namespace pskql;
 [Cmdlet(VerbsData.Edit, "Kql")]
 public class PsKqlCmdlet : Cmdlet
 {
+    private const string TableName = "data";
     private readonly List<PSObject> _objects = [];
+    private bool _noQueryPrefix;
 
     // Declare the parameters for the cmdlet.
     [Parameter(ValueFromPipeline = true)] public PSObject Item { get; set; } = new(string.Empty);
 
-    [Parameter(Position = 0,HelpMessage = "KQL query string fragment. Default value is 'getschema'")] public string Query { get; set; } = "getschema";
+    [Parameter(Position = 0, HelpMessage = "KQL query string fragment. Default value is 'getschema'")]
+    public string Query { get; set; } = "getschema";
 
-    [Parameter(HelpMessage = "Queries are usually implicitly prefixed with 'data |' but this can be disabled with this switch" )] public bool NoQueryPrefix { get; set; }
+    [Parameter(HelpMessage =
+        "Queries are usually implicitly prefixed with 'data |' but this can be disabled with this switch"
+    )]
+    public SwitchParameter NoQueryPrefix
+    {
+        get => _noQueryPrefix;
+        set => _noQueryPrefix = value;
+    }
+
     protected override void ProcessRecord()
     {
         _objects.Add(Item);
     }
 
-    private const string TableName = "data";
     protected override void EndProcessing()
     {
         var builder = TableBuilder.CreateEmpty(TableName, _objects.Count);
@@ -94,8 +104,8 @@ public class PsKqlCmdlet : Cmdlet
             else
             {
                 var html = KustoResultRenderer.RenderToHtml("no title", result);
-                var filename = Path.ChangeExtension(Path.GetTempFileName(),".html");
-                File.WriteAllText(filename,html);
+                var filename = Path.ChangeExtension(Path.GetTempFileName(), ".html");
+                File.WriteAllText(filename, html);
                 Process.Start(new ProcessStartInfo { FileName = filename, UseShellExecute = true });
             }
         }

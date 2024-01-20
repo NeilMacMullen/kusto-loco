@@ -53,23 +53,9 @@ internal static class BuiltInOperators
                     ScalarTypes.DateTime, ScalarTypes.TimeSpan),
                 new ScalarOverloadInfo(new SubtractDateTimeOperatorImpl(), ScalarTypes.TimeSpan, ScalarTypes.DateTime,
                     ScalarTypes.DateTime)));
-        /*
-        operators.Add(
-            Operators.Multiply,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new MultiplyIntOperatorImpl(), ScalarTypes.Int, ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new MultiplyLongOperatorImpl(), ScalarTypes.Long, ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new MultiplyDoubleOperatorImpl(), ScalarTypes.Real, ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new MultiplyLongTimeSpanOperatorImpl(), ScalarTypes.TimeSpan, ScalarTypes.Long,
-                    ScalarTypes.TimeSpan))
-            
-            
-            );
-        */
+        
         MultiplyFunction.Register(operators);
+
         operators.Add(
             Operators.Divide,
             new ScalarFunctionInfo(
