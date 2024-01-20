@@ -399,4 +399,21 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("2024-01-15 12:35:35Z");
     }
+
+
+    [TestMethod]
+    public async Task MultiplyTimespan()
+    {
+        var query = "print D=1d * 10";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("10.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task MultiplyTimespanR()
+    {
+        var query = "print D=10*1d";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("10.00:00:00");
+    }
 }

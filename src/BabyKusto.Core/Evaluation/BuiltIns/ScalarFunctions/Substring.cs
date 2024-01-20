@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
+// ReSharper disable PartialTypeWithSinglePart
 using System;
 
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class SubstringFunction
+[KustoImplementation(Keyword = "Functions.Substring")]
+internal partial class SubstringFunction
 {
     private static string Impl(string input, long start, long length)
     {

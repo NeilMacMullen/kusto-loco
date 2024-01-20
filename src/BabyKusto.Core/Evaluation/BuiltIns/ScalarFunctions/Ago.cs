@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
+// ReSharper disable PartialTypeWithSinglePart
 using System;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class AgoFunction
+[KustoImplementation(Keyword = "Functions.Ago")]
+internal partial class AgoFunction
 {
     private static DateTime Impl(TimeSpan t) => DateTime.UtcNow - t;
 }

@@ -74,9 +74,8 @@ internal static class BuiltInScalarFunctions
 
         functions.Add(Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
-        functions.Add(Functions.Ago,
-            new ScalarFunctionInfo(AgoFunctionImpl.Overload));
-
+        AgoFunction.Register(functions);
+        FormatDateTime.Register(functions);
         // TODO: Support N-ary functions properly
         functions.Add(
             Functions.Strcat,
@@ -95,13 +94,8 @@ internal static class BuiltInScalarFunctions
         ToLowerFunction.Register(functions);
         ToUpperFunction.Register(functions);
         ToDateTimeFunction.Register(functions);
-
-        functions.Add(Functions.ReplaceString,
-            new ScalarFunctionInfo(ReplaceStringFunctionImpl.Overload));
-
-        functions.Add(
-            Functions.Substring,
-            new ScalarFunctionInfo(SubstringFunctionImpl.Overload));
+        ReplaceStringFunction.Register(functions);
+        SubstringFunction.Register(functions);
 
         BinFunction.Register(functions);
         functions.Add(Functions.Floor, BinFunction.S);

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class ReplaceStringFunction
+[KustoImplementation(Keyword = "Functions.ReplaceString")]
+internal partial class ReplaceStringFunction
 {
     private static string Impl(string text, string lookup, string rewrite)
         => text.Replace(lookup, rewrite);

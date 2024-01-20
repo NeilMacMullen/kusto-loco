@@ -52,7 +52,7 @@ namespace SourceGeneration
                     EmitHeader(wrapperCode, classDeclaration);
                     wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
                     wrapperCode.EnterCodeBlock();
-                    EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
+                    var symbolType = EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
                     //create the registration
                     wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
 
@@ -63,7 +63,7 @@ namespace SourceGeneration
 
                     wrapperCode.AppendStatement(")");
                     wrapperCode.AppendLine(
-                        "public static void Register(Dictionary<FunctionSymbol,ScalarFunctionInfo> f)");
+                        $"public static void Register(Dictionary<{symbolType}Symbol,ScalarFunctionInfo> f)");
 
                     wrapperCode.AppendStatement("=> f.Add(Func,S)");
 
@@ -155,14 +155,21 @@ namespace SourceGeneration
             return $"minOccurring:{m}";
         }
 
-        private void EmitFunctionSymbol(CodeEmitter code,
+        private string EmitFunctionSymbol(CodeEmitter code,
             CustomAttributeHelper<KustoImplementationAttribute> attr,
             List<ImplementationMethod> implementationMethods)
         {
+            var symbolType = "Function";
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
-            if (funcSymbol.Contains("Functions"))
+            if (  funcSymbol.Contains("Functions"))
             {
                 code.AppendStatement($"public static readonly FunctionSymbol Func = {funcSymbol}");
+            }
+            else
+            if (funcSymbol.Contains("Operators"))
+            {
+                code.AppendStatement($"public static readonly OperatorSymbol Func = {funcSymbol}");
+                symbolType = "Operator";
             }
             else
             {
@@ -185,6 +192,8 @@ namespace SourceGeneration
                 code.AppendLine(" ).ConstantFoldable()");
                 code.AppendStatement(" .WithResultNameKind(ResultNameKind.None)");
             }
+
+            return symbolType;
         }
 
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
