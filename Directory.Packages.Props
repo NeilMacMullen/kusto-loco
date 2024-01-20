@@ -8,6 +8,7 @@
     <PackageVersion Include="Fastenshtein" Version="1.0.0.8" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.4.1" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
     <PackageVersion Include="NLog" Version="5.2.8" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0-preview-23531-01" />

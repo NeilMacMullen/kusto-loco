@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Text.Json;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Util;
@@ -102,6 +103,11 @@ public class TableBuilder
         var builder = CreateEmpty(tableName, dictionaries.Count);
         foreach (var header in headers)
         {
+            if (header.Type == typeof(JsonElement))
+            {
+                Logger.Warn($"IGNORING COLUMN {header.ColumnName} because it seems to be structured data ");
+                continue;
+            }
             var data = dictionaries.Select(d => d[header.ColumnName]).ToArray();
             builder.WithColumn(header.ColumnName, header.Type, data);
         }

@@ -77,11 +77,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lokql-engine", "src\lokql-e
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneration", "src\SourceGeneration\SourceGeneration.csproj", "{49FD4F48-01C5-435E-97EE-6120E3E18828}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenerationTests", "test\SourceGenerationTests\SourceGenerationTests.csproj", "{ECCC4976-711C-4097-9D12-4DF1C63D37B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGenerationTests", "test\SourceGenerationTests\SourceGenerationTests.csproj", "{ECCC4976-711C-4097-9D12-4DF1C63D37B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenDependencies", "src\SourceGenDependencies\SourceGenDependencies.csproj", "{4761B336-B163-45C4-818E-3F985081C42D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGenDependencies", "src\SourceGenDependencies\SourceGenDependencies.csproj", "{4761B336-B163-45C4-818E-3F985081C42D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFunctions", "src\CustomFunctions\CustomFunctions.csproj", "{CBF83B50-C11B-4049-9318-3B510F377015}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFunctions", "src\CustomFunctions\CustomFunctions.csproj", "{CBF83B50-C11B-4049-9318-3B510F377015}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pskql", "src\pskql\pskql.csproj", "{6DE623AB-CF79-47C5-AAF5-81DCB371F63F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -197,6 +199,10 @@ Global
 		{CBF83B50-C11B-4049-9318-3B510F377015}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBF83B50-C11B-4049-9318-3B510F377015}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBF83B50-C11B-4049-9318-3B510F377015}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE623AB-CF79-47C5-AAF5-81DCB371F63F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DE623AB-CF79-47C5-AAF5-81DCB371F63F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DE623AB-CF79-47C5-AAF5-81DCB371F63F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DE623AB-CF79-47C5-AAF5-81DCB371F63F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,6 +236,7 @@ Global
 		{ECCC4976-711C-4097-9D12-4DF1C63D37B0} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{4761B336-B163-45C4-818E-3F985081C42D} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 		{CBF83B50-C11B-4049-9318-3B510F377015} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{6DE623AB-CF79-47C5-AAF5-81DCB371F63F} = {17CA2597-13D2-4A89-AFCC-B5E7170DB32F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
