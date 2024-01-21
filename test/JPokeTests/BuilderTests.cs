@@ -86,6 +86,22 @@ public class BuilderTests
     }
 
     [TestMethod]
+    public void ObjectCanBeModified()
+    {
+        var b = JObjectBuilder.CreateEmpty();
+        b.Set("abc.def", 5);
+        b.Set("abc.def", 6);
+        var expected = new
+        {
+            abc = new
+            {
+                def = 6
+            }
+        };
+        Check(b, expected);
+    }
+
+    [TestMethod]
     public void ArrayCanBeAdded()
     {
         var b = JObjectBuilder.CreateEmpty();

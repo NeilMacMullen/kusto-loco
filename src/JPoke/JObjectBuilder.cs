@@ -192,6 +192,8 @@ public class JObjectBuilder
             switch (matchType)
             {
                 case MatchType.Object:
+                    if (jPath.IsTerminal)
+                        parent._root.ReplaceWith(value);
                     //success
                     return parent;
 

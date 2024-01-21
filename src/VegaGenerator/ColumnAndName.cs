@@ -1,1 +1,1 @@
-﻿public readonly record struct ColumnAndName(string QualifiedColumnName, string Text);
+﻿public readonly record struct ColumnAndName(string QualifiedColumnName, string Text, string VegaSeriesType);
