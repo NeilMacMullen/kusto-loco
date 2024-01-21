@@ -168,6 +168,11 @@ internal static class BuiltInsHelper
             throw new InvalidOperationException($"Unexpected result kind {resultKind}");
         }
 
+        //TODO - this looks completely broken as soon as we try to use chunks or
+        //multiple windowed functions !!!
+        //we need some proper context to hold the lastwindowarg/previousResult in !!!
+        //this is probably why kusto insists that columns should be serialised for
+        //windowed functions
         ColumnarResult[]? lastWindowArgs = null;
         ColumnarResult? previousResult = null;
         //TODO - this is very similar to GetScalarImplementation except that we are calling InvokeWindow
