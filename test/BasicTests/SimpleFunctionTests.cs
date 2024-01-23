@@ -424,4 +424,12 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("99");
     }
+
+    [TestMethod]
+    public async Task TimeSpanBin()
+    {
+        var query = "print D=bin(26h,1d)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.00:00:00");
+    }
 }

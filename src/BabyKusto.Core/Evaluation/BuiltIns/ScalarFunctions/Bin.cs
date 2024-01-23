@@ -62,4 +62,7 @@ internal partial class BinFunction
 
     internal static DateTime TimeImpl(DateTime left, TimeSpan right) =>
         new(BinFunctionLongImpl.LongImpl(left.Ticks, right.Ticks));
+
+    internal static TimeSpan TimeSpanImpl(TimeSpan left, TimeSpan right) =>
+        new(BinFunctionLongImpl.LongImpl(left.Ticks, right.Ticks));
 }
