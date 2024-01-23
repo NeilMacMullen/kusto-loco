@@ -416,4 +416,12 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("10.00:00:00");
     }
+
+    [TestMethod]
+    public async Task AbsInt()
+    {
+        var query = "print D=abs(toint(-99))";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("99");
+    }
 }
