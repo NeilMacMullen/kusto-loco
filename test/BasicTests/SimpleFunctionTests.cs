@@ -441,7 +441,31 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var query = "range x from 1 to 10 step 0";
         var context = CreateContext();
         var result = await context.RunTabularQueryAsync(query);
-        result.Height.Should().Be(0);
-        //result.Error.Should().Contain("The expression must not be the value: 0");
+        result.Error.Should().Contain("The expression must not be the value: 0");
+    }
+
+
+    [TestMethod]
+    public async Task TimespanDiv()
+    {
+        var query = "print 10d/2";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("5.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task TimespanDiv2()
+    {
+        var query = "print 10d/2.5";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task ToTimespan()
+    {
+        var query = " print totimespan('1.02:04:45')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.02:04:45");
     }
 }
