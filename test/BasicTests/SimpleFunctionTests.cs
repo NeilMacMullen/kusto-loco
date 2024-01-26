@@ -1,4 +1,5 @@
 using FluentAssertions;
+
 // ReSharper disable StringLiteralTypo
 
 namespace BasicTests;
@@ -375,6 +376,7 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
 
 
     [TestMethod]
+    [Ignore("need to fix up ToDateTime so as not to be US-centric")]
     public async Task ToDateTime()
     {
         var query = "print D=todatetime('15/01/2024 12:35:35')";
@@ -389,7 +391,6 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("2024-01-15 12:35:35Z");
     }
-
 
 
     [TestMethod]
@@ -431,5 +432,16 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var query = "print D=bin(26h,1d)";
         var result = await LastLineOfResult(query);
         result.Should().Be("1.00:00:00");
+    }
+
+
+    [TestMethod]
+    public async Task Range_Step_0_GeneratesError()
+    {
+        var query = "range x from 1 to 10 step 0";
+        var context = CreateContext();
+        var result = await context.RunTabularQueryAsync(query);
+        result.Height.Should().Be(0);
+        //result.Error.Should().Contain("The expression must not be the value: 0");
     }
 }

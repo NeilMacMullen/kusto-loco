@@ -3208,7 +3208,7 @@ cs:int
     }
 
     [Fact(Skip =
-        "Known bug in window function implementations where a table is evaluated more than once. For now, using materialize() works around this")]
+                 "Known bug in window function implementations where a table is evaluated more than once. For now, using materialize() works around this")]
     public void Window_RowCumSum_MultipleEvaluations()
     {
         // Arrange
@@ -3980,20 +3980,6 @@ aaathis is a test";
         Test(query, expected);
     }
 
-    [Fact]
-    public void Range_Step_0()
-    {
-        // Arrange
-        var query = "range x from 1 to 10 step 0";
-
-        var expected = """
-                       x:long
-                       ------------------
-                       """;
-
-        // Act & Assert
-        Test(query, expected);
-    }
 
     [Fact]
     public void Range_0_to_0_step_1()

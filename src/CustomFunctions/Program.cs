@@ -1,4 +1,5 @@
-﻿using BabyKusto.Core.Evaluation.BuiltIns;
+﻿using System.Collections.Immutable;
+using BabyKusto.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
 using KustoSupport;
 
@@ -19,7 +20,7 @@ internal class Program
         //set up some data
         var numbers = Enumerable.Range(0, 100)
             .Select(i => new Number(i, string.Empty))
-            .ToArray();
+            .ToImmutableArray();
 
         context.AddTableFromRecords("numbers", numbers);
         //run a query using our custom function

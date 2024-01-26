@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using CsvSupport;
 using FluentAssertions;
 using KustoSupport;
@@ -33,7 +34,7 @@ def,30
         public async Task Count()
         {
             var context = new KustoQueryContext();
-            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToArray();
+            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
             context.AddTableFromRecords("data", rows);
             var result = (await context.RunTabularQueryAsync("data | count"));
@@ -45,7 +46,7 @@ def,30
         public async Task Where()
         {
             var context = new KustoQueryContext();
-            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToArray();
+            var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
             context.AddTableFromRecords("data", rows);
             var result = (await context.RunTabularQueryAsync("data | where Value < 10 | count"));

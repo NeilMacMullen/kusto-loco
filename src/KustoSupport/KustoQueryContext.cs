@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Evaluation.BuiltIns;
@@ -22,11 +23,6 @@ public class KustoQueryContext
     private bool _fullDebug;
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
-
-    public KustoQueryContext()
-    {
-        AddTableFromRecords("_functions", _engine.GetImplementedList());
-    }
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
@@ -52,7 +48,13 @@ public class KustoQueryContext
         return _tables.Single(t => UnescapeTableName(t.Name) == name);
     }
 
-    public void AddTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records)
+    public void OldAddTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records)
+    {
+        var table = TableBuilder.OldCreateFromRows(tableName, records);
+        AddTable(table);
+    }
+
+    public void AddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
     {
         var table = TableBuilder.CreateFromRows(tableName, records);
         AddTable(table);
@@ -61,7 +63,7 @@ public class KustoQueryContext
 
     public void AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {
-        var table = TableBuilder.CreateFromRows(tableName, records);
+        var table = TableBuilder.OldCreateFromRows(tableName, records);
         var chunked = ChunkedKustoTable
             .FromTable(table.ToTableSource(), chunkSize);
         AddTable(chunked);
@@ -84,12 +86,12 @@ public class KustoQueryContext
         {
             var result =
                 _engine.Evaluate(query,
-                    _fullDebug, _fullDebug
-                );
+                                 _fullDebug, _fullDebug
+                                );
             var (table, vis) = TableFromEvaluationResult(result);
 
             return new KustoQueryResult(query, table, vis, (int)watch.ElapsedMilliseconds,
-                string.Empty);
+                                        string.Empty);
         }
         catch (Exception ex)
         {
@@ -103,31 +105,31 @@ public class KustoQueryContext
         if (expandColumns)
         {
             var rows = _tables.SelectMany(table
-                    => table.Type.Columns.Select((c, i) =>
-                        new
-                        {
-                            Table = table.Name,
-                            Column = c.Name,
-                            Type = c.Type.Name,
-                            Ordinal = i
-                        }
-                    ))
-                .ToArray();
+                                              => table.Type.Columns.Select((c, i) =>
+                                                                               new
+                                                                               {
+                                                                                   Table = table.Name,
+                                                                                   Column = c.Name,
+                                                                                   Type = c.Type.Name,
+                                                                                   Ordinal = i
+                                                                               }
+                                                                          ))
+                              .ToImmutableArray();
             ;
 
             var tr = TableBuilder.CreateFromRows("tables", rows)
-                .ToTableSource() as InMemoryTableSource;
+                                 .ToTableSource() as InMemoryTableSource;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
         }
         else
         {
             var rows = _tables.Select(table => new { Table = table.Name, Columns = table.Type.Columns.Count })
-                    .ToArray()
+                              .ToImmutableArray()
                 ;
 
             var tr = TableBuilder.CreateFromRows("tables", rows)
-                .ToTableSource() as InMemoryTableSource;
+                                 .ToTableSource() as InMemoryTableSource;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
         }
@@ -140,7 +142,7 @@ public class KustoQueryContext
             case ScalarResult scalar:
 
                 return (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult(scalar))
-                    , VisualizationState.Empty);
+                        , VisualizationState.Empty);
             case TabularResult tabular:
 
                 return (InMemoryTableSource.FromITableSource(tabular.Value), tabular.VisualizationState);
@@ -148,7 +150,7 @@ public class KustoQueryContext
             default:
 
                 return (new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>()),
-                    VisualizationState.Empty);
+                        VisualizationState.Empty);
         }
     }
 
@@ -189,12 +191,12 @@ public class KustoQueryContext
         var code = KustoCode.Parse(query).Analyze();
 
         SyntaxElement.WalkNodes(code.Syntax,
-            op =>
-            {
-                if (op is Expression { RawResultType: TableSymbol } e &&
-                    op.Kind.ToString() == "NameReference")
-                    tables.Add(e.RawResultType.Name);
-            });
+                                op =>
+                                {
+                                    if (op is Expression { RawResultType: TableSymbol } e &&
+                                        op.Kind.ToString() == "NameReference")
+                                        tables.Add(e.RawResultType.Name);
+                                });
         //special case handling for when query is _only_ a table name without any operators
         if (!tables.Any() && query.Tokenise().Length == 1)
         {
@@ -220,9 +222,9 @@ public class KustoQueryContext
     public static KustoQueryContext WithFullDebug()
     {
         var context = new KustoQueryContext
-        {
-            _fullDebug = true
-        };
+                      {
+                          _fullDebug = true
+                      };
         return context;
     }
 

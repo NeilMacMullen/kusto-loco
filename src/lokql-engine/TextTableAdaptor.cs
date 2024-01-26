@@ -1,4 +1,5 @@
-﻿using KustoSupport;
+﻿using System.Collections.Immutable;
+using KustoSupport;
 
 public class TextTableAdaptor : IFileBasedTableAccess
 {
@@ -14,8 +15,8 @@ public class TextTableAdaptor : IFileBasedTableAccess
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
     {
         var lines = File.ReadAllLines(path)
-            .Select(l => new { Line = l })
-            .ToArray();
+                        .Select(l => new { Line = l })
+                        .ToImmutableArray();
         var table = TableBuilder.CreateFromRows(name, lines).ToTableSource();
         context.AddTable(table);
         return Task.FromResult(true);

@@ -38,10 +38,10 @@ public class TableBuilder
 
     public static TableBuilder CreateEmpty(string name, int length)
         => new(
-            name,
-            Array.Empty<BaseColumn>(),
-            Array.Empty<string>(),
-            length);
+               name,
+               Array.Empty<BaseColumn>(),
+               Array.Empty<string>(),
+               length);
 
 
     public TableBuilder WithColumn(string name, BaseColumn column)
@@ -75,7 +75,11 @@ public class TableBuilder
     }
 
 
-    public static TableBuilder CreateFromRows<T>(string name, IReadOnlyCollection<T> rows) => FromRecords(name, rows);
+    public static TableBuilder OldCreateFromRows<T>(string name, IReadOnlyCollection<T> rows)
+        => FromRecords(name, rows);
+
+
+    public static TableBuilder CreateFromRows<T>(string name, ImmutableArray<T> rows) => FromWrappedRecords(name, rows);
 
     private static TableBuilder FromRecords<T>(string tableName, IReadOnlyCollection<T> records)
     {
@@ -90,15 +94,50 @@ public class TableBuilder
         return builder;
     }
 
+    private static TableBuilder FromWrappedRecords<T>(string tableName, ImmutableArray<T> records)
+    {
+        var builder = CreateEmpty(tableName, records.Length);
+        foreach (var p in typeof(T).GetProperties())
+        {
+            var propertyType = p.PropertyType;
+            if (propertyType == typeof(int))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, int?>(records, o => (int?)p.GetValue(o)));
+            if (propertyType == typeof(long))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, long?>(records, o => (long?)p.GetValue(o)));
+            if (propertyType == typeof(float))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (float?)p.GetValue(o)));
+            if (propertyType == typeof(double))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (double?)p.GetValue(o)));
+            if (propertyType == typeof(string))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, string?>(records, o => (string?)p.GetValue(o)));
+            if (propertyType == typeof(DateTime))
+                builder.WithColumn(p.Name,
+                                   new LambdaWrappedColumn<T, DateTime?>(records, o => (DateTime?)p.GetValue(o)));
+            if (propertyType == typeof(TimeSpan))
+                builder.WithColumn(p.Name,
+                                   new LambdaWrappedColumn<T, TimeSpan?>(records, o => (TimeSpan?)p.GetValue(o)));
+            if (propertyType == typeof(bool))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, bool?>(records, o => (bool?)p.GetValue(o)));
+            if (propertyType == typeof(Guid))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, Guid?>(records, o => (Guid?)p.GetValue(o)));
+        }
+
+        return builder;
+    }
+
     public static TableBuilder FromOrderedDictionarySet(string tableName,
         IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
         //currently we rely on the dictionary having valid types and avoiding null values in unfortunate places
         var firstDictionary = dictionaries.First();
         var headers = firstDictionary.Cast<DictionaryEntry>()
-            .Select(de => de.Key.ToString())
-            .Select(h => new { ColumnName = h, Type = firstDictionary[h]?.GetType() ?? typeof(string) })
-            .ToArray();
+                                     .Select(de => de.Key.ToString())
+                                     .Select(h => new
+                                                  {
+                                                      ColumnName = h,
+                                                      Type = firstDictionary[h]?.GetType() ?? typeof(string)
+                                                  })
+                                     .ToArray();
 
         var builder = CreateEmpty(tableName, dictionaries.Count);
         foreach (var header in headers)
@@ -108,6 +147,7 @@ public class TableBuilder
                 Logger.Warn($"IGNORING COLUMN {header.ColumnName} because it seems to be structured data ");
                 continue;
             }
+
             var data = dictionaries.Select(d => d[header.ColumnName]).ToArray();
             builder.WithColumn(header.ColumnName, header.Type, data);
         }
@@ -119,16 +159,16 @@ public class TableBuilder
     {
         var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
         return CreateEmpty("result", 1)
-            .WithColumn("value", column)
-            .ToTableSource();
+               .WithColumn("value", column)
+               .ToTableSource();
     }
 
     public ITableSource ToTableSource()
     {
         var syms = _columnNames.Zip(_columns)
-            .Select(cs =>
-                new ColumnSymbol(cs.First, cs.Second.Type))
-            .ToArray();
+                               .Select(cs =>
+                                           new ColumnSymbol(cs.First, cs.Second.Type))
+                               .ToArray();
         var ts = new TableSymbol(Name, syms);
         return new InMemoryTableSource(ts, _columns.ToArray());
     }

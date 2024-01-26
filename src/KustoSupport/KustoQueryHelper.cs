@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using System.Collections.Immutable;
+using NLog;
 
 namespace KustoSupport;
 
@@ -10,52 +11,59 @@ public class KustoQueryHelper
     public static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
-    ///     Performs a one-shot query against a record set
+    ///     Run a very basic query against a set of rows
     /// </summary>
-    /// <remarks>
-    ///     This not very efficient but extremely convenient for testing
-    /// </remarks>
-    public static async Task<IReadOnlyCollection<TR>> SimpleQueryTo<T, TR>(IReadOnlyCollection<T> rows, string query)
-    {
-        var result = await SimpleQuery(rows, query);
-        return result.DeserialiseTo<TR>();
-    }
-
+    /// <remarks></remarks>
     public static async Task<KustoQueryResult> SimpleQuery<T>(
-        IReadOnlyCollection<T> rows, string query)
+        ImmutableArray<T> rows, string query)
     {
         var tableName = $"Table{Guid.NewGuid():N}";
-        return await RunQuery(tableName, rows, query, true);
+        return await RunQueryWithTableNamePiped(tableName, rows, query);
     }
 
+    /// <summary>
+    ///     Runs a basic query from a set of rows to a different projection
+    /// </summary>
+    /// <remarks> Will just throw/return empty if the result is not as expected</remarks>
     public static async Task<IReadOnlyCollection<R>> SimpleQueryToAndFrom<T, R>(
-        IReadOnlyCollection<T> rows, string query)
+        ImmutableArray<T> rows, string query)
     {
         var result = await SimpleQuery(rows, query);
         return result.DeserialiseTo<R>();
     }
 
-
+    /// <summary>
+    ///     Runs a query against the supplied rows.
+    /// </summary>
+    /// <remarks>
+    ///     The
+    /// </remarks>
     public static async Task<KustoQueryResult> RunQuery<T>(string tableName,
-        IReadOnlyCollection<T> rows,
-        string query, bool appendQueryToTableName)
+        ImmutableArray<T> rows,
+        string query)
     {
+        Logger.Info("Create context");
         var context = new KustoQueryContext();
+        Logger.Info("Adding table from records");
         context.AddTableFromRecords(tableName, rows);
-        //fix up query...
-        if (appendQueryToTableName)
-        {
-            query = $@"{tableName} |
-{query}
-";
-        }
+        Logger.Info("Running...");
 
         return await context.RunTabularQueryAsync(query);
     }
 
-
-    public static async Task<KustoQueryResult> RunQuery<T>(string tableName,
-        IReadOnlyCollection<T> rows,
+    /// <summary>
+    ///     Runs a query against the supplied records
+    /// </summary>
+    /// <remarks>
+    ///     The query should contain the name of the query, e.g. "data | count"
+    /// </remarks>
+    public static Task<KustoQueryResult> RunQueryWithTableNamePiped<T>(string tableName,
+        ImmutableArray<T> rows,
         string query)
-        => await RunQuery(tableName, rows, query, true);
+    {
+        query = PipeTableName(tableName, query);
+        return RunQuery(tableName, rows, query);
+    }
+
+    public static string PipeTableName(string tableName, string query) => $"{tableName} | {query}";
 }
