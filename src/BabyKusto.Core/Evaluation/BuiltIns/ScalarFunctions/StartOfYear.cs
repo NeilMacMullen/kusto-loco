@@ -3,11 +3,12 @@
 
 using System;
 
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class StartOfYearFunction
+[KustoImplementation(Keyword = "Functions.StartOfYear")]
+internal partial class StartOfYearFunction
 {
     private static DateTime Impl(DateTime input) =>
         new(

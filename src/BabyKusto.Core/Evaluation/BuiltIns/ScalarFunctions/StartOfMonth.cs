@@ -3,11 +3,12 @@
 
 using System;
 
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class StartOfMonthFunction
+[KustoImplementation(Keyword = "Functions.StartOfMonth")]
+internal partial class StartOfMonthFunction
 {
     private static DateTime Impl(DateTime input) =>
         new(

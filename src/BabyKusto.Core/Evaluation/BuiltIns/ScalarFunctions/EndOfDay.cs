@@ -3,11 +3,12 @@
 
 using System;
 
+// ReSharper disable PartialTypeWithSinglePart// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class EndOfDayFunction
+[KustoImplementation(Keyword = "Functions.EndOfDay")]
+internal partial class EndOfDayFunction
 {
     private static DateTime Impl(DateTime input) =>
         new DateTime(

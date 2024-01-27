@@ -135,27 +135,19 @@ internal static class BuiltInScalarFunctions
         SqrtFunction.Register(functions);
         DayOfWeekFunction.Register(functions);
 
+        DayOfMonthFunction.Register(functions);
 
-        functions.Add(Functions.DayOfMonth,
-            new ScalarFunctionInfo(DayOfMonthFunctionImpl.Overload));
-        functions.Add(Functions.DayOfYear,
-            new ScalarFunctionInfo(DayOfYearFunctionImpl.Overload));
-        functions.Add(Functions.StartOfDay,
-            new ScalarFunctionInfo(StartOfDayFunctionImpl.Overload));
-        functions.Add(Functions.EndOfDay,
-            new ScalarFunctionInfo(EndOfDayFunctionImpl.Overload));
-        functions.Add(Functions.StartOfWeek,
-            new ScalarFunctionInfo(StartOfWeekFunctionImpl.Overload));
-        functions.Add(Functions.EndOfWeek,
-            new ScalarFunctionInfo(EndOfWeekFunctionImpl.Overload));
-        functions.Add(Functions.StartOfMonth,
-            new ScalarFunctionInfo(StartOfMonthFunctionImpl.Overload));
-        functions.Add(Functions.EndOfMonth,
-            new ScalarFunctionInfo(EndOfMonthFunctionImpl.Overload));
-        functions.Add(Functions.StartOfYear,
-            new ScalarFunctionInfo(StartOfYearFunctionImpl.Overload));
-        functions.Add(Functions.EndOfYear,
-            new ScalarFunctionInfo(EndOfYearFunctionImpl.Overload));
+        DayOfYearFunction.Register(functions);
+        StartOfDayFunction.Register(functions);
+        EndOfDayFunction.Register(functions);
+
+        StartOfWeekFunction.Register(functions);
+
+        EndOfWeekFunction.Register(functions);
+        StartOfMonthFunction.Register(functions);
+        EndOfMonthFunction.Register(functions);
+        StartOfYearFunction.Register(functions);
+        EndOfYearFunction.Register(functions);
 
         functions.Add(Functions.DatetimeUtcToLocal,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(),
