@@ -20,121 +20,17 @@ internal static class BuiltInOperators
         UnaryMinusFunction.Register(operators);
 
         AddFunction.Register(operators);
-        operators.Add(
-            Operators.Subtract,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new SubtractIntOperatorImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new SubtractLongOperatorImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new SubtractDoubleOperatorImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new SubtractTimeSpanOperatorImpl(),
-                    ScalarTypes.TimeSpan, ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new SubtractDateTimeTimeSpanOperatorImpl(),
-                    ScalarTypes.DateTime,
-                    ScalarTypes.DateTime, ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new SubtractDateTimeOperatorImpl(),
-                    ScalarTypes.TimeSpan, ScalarTypes.DateTime,
-                    ScalarTypes.DateTime)));
+        SubtractFunction.Register(operators);
+
 
         MultiplyFunction.Register(operators);
         DivideFunction.Register(operators);
+        ModuloFunction.Register(operators);
 
-        operators.Add(
-            Operators.Modulo,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new ModuloIntOperatorImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int, ScalarTypes.Int),
-                new ScalarOverloadInfo(new ModuloLongOperatorImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new ModuloDoubleOperatorImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new ModuloDateTimeTimeSpanOperatorImpl(),
-                    ScalarTypes.TimeSpan,
-                    ScalarTypes.DateTime, ScalarTypes.TimeSpan)));
-
-        operators.Add(
-            Operators.GreaterThan,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new GreaterThanIntOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new GreaterThanLongOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new GreaterThanDoubleOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new GreaterThanTimeSpanOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new GreaterThanDateTimeOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.DateTime,
-                    ScalarTypes.DateTime)));
-
-        operators.Add(
-            Operators.GreaterThanOrEqual,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new GreaterThanOrEqualIntOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new GreaterThanOrEqualLongOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new GreaterThanOrEqualDoubleOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new GreaterThanOrEqualTimeSpanOperatorImpl(),
-                    ScalarTypes.Bool,
-                    ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new GreaterThanOrEqualDateTimeOperatorImpl(),
-                    ScalarTypes.Bool,
-                    ScalarTypes.DateTime, ScalarTypes.DateTime)));
-
-        operators.Add(
-            Operators.LessThan,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new LessThanIntOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new LessThanLongOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new LessThanDoubleOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new LessThanTimeSpanOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new LessThanDateTimeOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.DateTime,
-                    ScalarTypes.DateTime)));
-
-        operators.Add(
-            Operators.LessThanOrEqual,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new LessThanOrEqualIntOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new LessThanOrEqualLongOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new LessThanOrEqualDoubleOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new LessThanOrEqualTimeSpanOperatorImpl(),
-                    ScalarTypes.Bool,
-                    ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new LessThanOrEqualDateTimeOperatorImpl(),
-                    ScalarTypes.Bool,
-                    ScalarTypes.DateTime, ScalarTypes.DateTime)));
+        GreaterThanFunction.Register(operators);
+        GreaterThanOrEqualFunction.Register(operators);
+        LessThanFunction.Register(operators);
+        LessThanOrEqualFunction.Register(operators);
 
         operators.Add(
             Operators.Equal,
