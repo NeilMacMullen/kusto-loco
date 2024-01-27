@@ -32,48 +32,10 @@ internal static class BuiltInOperators
         LessThanFunction.Register(operators);
         LessThanOrEqualFunction.Register(operators);
 
-        operators.Add(
-            Operators.Equal,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new EqualIntOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Int, ScalarTypes.Int),
-                new ScalarOverloadInfo(new EqualLongOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new EqualDoubleOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new EqualStringOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.String,
-                    ScalarTypes.String),
-                new ScalarOverloadInfo(new EqualTimeSpanOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new EqualDateTimeOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.DateTime,
-                    ScalarTypes.DateTime)));
+        EqualFunction.Register(operators);
+        EqualTildeFunction.Register(operators);
 
-        operators.Add(
-            Operators.NotEqual,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new NotEqualIntOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new NotEqualLongOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new NotEqualDoubleOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new NotEqualStringOperatorImpl(), ScalarTypes.Bool,
-                    ScalarTypes.String,
-                    ScalarTypes.String),
-                new ScalarOverloadInfo(new NotEqualTimeSpanOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan),
-                new ScalarOverloadInfo(new NotEqualDateTimeOperatorImpl(),
-                    ScalarTypes.Bool, ScalarTypes.DateTime,
-                    ScalarTypes.DateTime)));
+        NotEqualFunction.Register(operators);
 
         operators.Add(
             Operators.And,
@@ -128,43 +90,22 @@ internal static class BuiltInOperators
                     ScalarTypes.DateTime, ScalarTypes.DateTime,
                     ScalarTypes.DateTime))
         );
+        ContainsFunction.Register(operators);
+        ContainsCsFunction.Register(operators);
 
-        operators.Add(Operators.Contains,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ContainsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.ContainsCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ContainsCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotContains,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotContainsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotContainsCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotContainsCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.StartsWith,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartsWithOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.StartsWithCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new StartsWithCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotStartsWith,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotStartsWithOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotStartsWithCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotStartsWithCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.EndsWith,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndsWithOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.EndsWithCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new EndsWithCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotEndsWith,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotEndsWithOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
-        operators.Add(Operators.NotEndsWithCs,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new NotEndsWithCsOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
+        NotContainsFunction.Register(operators);
+        NotContainsCsFunction.Register(operators);
+
+        StartsWithFunction.Register(operators);
+        StartsWithCsFunction.Register(operators);
+        NotStartsWithFunction.Register(operators);
+        NotStartsWithCsFunction.Register(operators);
+
+        EndsWithFunction.Register(operators);
+        EndsWithCsFunction.Register(operators);
+        NotEndsWithFunction.Register(operators);
+        NotEndsWithCsFunction.Register(operators);
+
 
         operators.Add(Operators.MatchRegex,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new MatchRegexOperatorImpl(), ScalarTypes.Bool,

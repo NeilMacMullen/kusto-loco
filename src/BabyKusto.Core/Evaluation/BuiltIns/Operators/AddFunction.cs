@@ -1,5 +1,6 @@
 ﻿using System;
 
+// ReSharper disable PartialTypeWithSinglePart
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation(Keyword = "Operators.Add")]

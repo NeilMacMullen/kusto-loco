@@ -34,8 +34,7 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.TimeSpan),
                 IsNullStringFunctionImpl.Overload));
 
-        functions.Add(Functions.IsEmpty,
-            new ScalarFunctionInfo(IsEmptyFunctionImpl.Overload));
+        IsEmptyFunction.Register(functions);
 
         functions.Add(
             Functions.MinOf,
