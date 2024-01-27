@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class NotFunction
+[KustoImplementation(Keyword = "Functions.Not")]
+internal partial class NotFunction
 {
     internal static bool Impl(bool v) => !v;
 }

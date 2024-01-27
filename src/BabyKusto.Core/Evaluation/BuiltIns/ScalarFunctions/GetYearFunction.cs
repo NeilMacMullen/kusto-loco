@@ -1,9 +1,10 @@
 ﻿using System;
 
+// ReSharper disable PartialTypeWithSinglePart
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class GetYearFunction
+[KustoImplementation(Keyword = "Functions.GetYear")]
+internal partial class GetYearFunction
 {
     private static int Impl(DateTime date) => date.Year;
 }

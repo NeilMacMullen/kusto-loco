@@ -3,11 +3,12 @@
 
 using System;
 
+// ReSharper disable PartialTypeWithSinglePart
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class DayOfWeekFunction
+[KustoImplementation(Keyword = "Functions.DayOfWeek")]
+internal partial class DayOfWeekFunction
 {
     private static TimeSpan Impl(DateTime input) =>
         // Sunday: 0, Monday: 1, etc...
