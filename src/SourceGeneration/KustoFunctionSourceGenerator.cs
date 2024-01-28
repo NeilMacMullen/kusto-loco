@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGeneration;
 
 namespace SourceGeneration
 {
@@ -18,7 +19,9 @@ namespace SourceGeneration
             {
                 var wrapperClassName = classDeclaration.Identifier.ValueText;
 
-                var kustoAttributes = AttributeAsHelper<KustoImplementationAttribute>(classDeclaration);
+                var kustoAttributes =
+                    new AttributeDecoder(
+                        AttributeAsHelper<KustoImplementationAttribute>(classDeclaration));
 
 
                 var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
@@ -52,7 +55,7 @@ namespace SourceGeneration
                     EmitHeader(wrapperCode, classDeclaration);
                     wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
                     wrapperCode.EnterCodeBlock();
-                    var symbolType = EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
+                    EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
                     //create the registration
                     wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
 
@@ -63,7 +66,7 @@ namespace SourceGeneration
 
                     wrapperCode.AppendStatement(")");
                     wrapperCode.AppendLine(
-                        $"public static void Register(Dictionary<{symbolType}Symbol,ScalarFunctionInfo> f)");
+                        $"public static void Register(Dictionary<{kustoAttributes.SymbolTypeName},ScalarFunctionInfo> f)");
 
                     wrapperCode.AppendStatement("=> f.Add(Func,S)");
 
@@ -155,23 +158,17 @@ namespace SourceGeneration
             return $"minOccurring:{m}";
         }
 
-        private string EmitFunctionSymbol(CodeEmitter code,
-            CustomAttributeHelper<KustoImplementationAttribute> attr,
+        private void EmitFunctionSymbol(CodeEmitter code,
+            AttributeDecoder attr,
             List<ImplementationMethod> implementationMethods)
         {
-            var symbolType = "Function";
-            var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
-            if (funcSymbol.Contains("Functions"))
+            if (attr.IsBuiltIn)
             {
-                code.AppendStatement($"public static readonly FunctionSymbol Func = {funcSymbol}");
-            }
-            else if (funcSymbol.Contains("Operators"))
-            {
-                code.AppendStatement($"public static readonly OperatorSymbol Func = {funcSymbol}");
-                symbolType = "Operator";
+                code.AppendStatement($"public static readonly {attr.SymbolTypeName} Func = {attr.SymbolName}");
             }
             else
             {
+                //assume it's a function
                 //figure out return type...
                 var returnType = ParamGeneneration.ScalarType(implementationMethods.First().ReturnType);
                 var longest = implementationMethods.OrderBy(f => f.TypedArguments.Length)
@@ -184,15 +181,13 @@ namespace SourceGeneration
                     .ToArray();
 
                 code.AppendLine("public static readonly FunctionSymbol Func =");
-                code.AppendLine($"new FunctionSymbol(\"{funcSymbol}\", ");
+                code.AppendLine($"new FunctionSymbol(\"{attr.SymbolName}\", ");
                 code.AppendLine($"ScalarTypes.{returnType},");
 
                 code.AppendLine(string.Join(",", args));
                 code.AppendLine(" ).ConstantFoldable()");
                 code.AppendStatement(" .WithResultNameKind(ResultNameKind.None)");
             }
-
-            return symbolType;
         }
 
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
@@ -237,4 +232,44 @@ namespace SourceGeneration
             }
         }
     }
+}
+
+internal class AttributeDecoder
+{
+    public ImplementationType ImplementationType;
+    public bool IsBuiltIn;
+
+    public string SymbolName;
+
+    internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
+    {
+        var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
+        SymbolName = funcSymbol;
+
+        if (funcSymbol.Contains("Functions"))
+        {
+            IsBuiltIn = true;
+            ImplementationType = ImplementationType.Function;
+        }
+        else if (funcSymbol.Contains("Operators"))
+        {
+            IsBuiltIn = true;
+            ImplementationType = ImplementationType.Operator;
+        }
+        else if (funcSymbol.Contains("Aggregates"))
+        {
+            IsBuiltIn = true;
+            ImplementationType = ImplementationType.Aggregate;
+        }
+        else ImplementationType = ImplementationType.Function;
+    }
+
+    public string SymbolTypeName => $"{ImplementationType}Symbol";
+}
+
+internal enum ImplementationType
+{
+    Function,
+    Operator,
+    Aggregate
 }
