@@ -7,12 +7,25 @@
 
         public Param(int index, string name, string type)
         {
-            Index = index;
+            ColumnIndex = index;
             Name = name.Trim();
             Type = type.Trim();
         }
 
-        public int Index { get; }
+        /// <summary>
+        ///     The index into the table that is being processed
+        /// </summary>
+        public int ColumnIndex { get; }
+
         public bool IsString => Type.Contains("string");
+
+        /// <summary>
+        ///     Transforms a Param ColumnIndex
+        /// </summary>
+        /// <remarks>
+        ///     When we have a context parameter at the beginning, we need
+        ///     to shift all the columnIndices so that it's ignored
+        /// </remarks>
+        public Param ShiftIndexLeft() => new Param(ColumnIndex - 1, Name, Type);
     }
 }

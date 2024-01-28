@@ -19,10 +19,10 @@ namespace SourceGeneration
             => p.Type.Replace("?", "") + "?";
 
         public static string MakeTypedColumn(Param p) =>
-            $"var {ColumnName(p)} = (TypedBaseColumn<{GetNullableType(p)}>) arguments[{p.Index}].Column;";
+            $"var {ColumnName(p)} = (TypedBaseColumn<{GetNullableType(p)}>) arguments[{p.ColumnIndex}].Column;";
 
         public static string MakeTypedVariable(Param p) =>
-            $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.Index}].Value;";
+            $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.ColumnIndex}].Value;";
 
         /*
           internal static ScalarOverloadInfo CreateOverloadInfo() =>
@@ -34,7 +34,7 @@ namespace SourceGeneration
         {
             dbg.AppendLine("internal static ScalarOverloadInfo Overload =>");
             dbg.AppendLine($"new(new {method.ClassName}(),");
-            var mappedTypes = new[] { method.ReturnType }.Concat(method.Arguments)
+            var mappedTypes = new[] { method.ReturnType }.Concat(method.TypedArguments)
                 .Select(p => $"TypeMapping.SymbolForType(typeof({p.Type}))");
             var arglist = string.Join(",", mappedTypes);
             dbg.AppendLine(arglist);
@@ -43,20 +43,26 @@ namespace SourceGeneration
 
         public static void BuildScalarMethod(CodeEmitter dbg, ImplementationMethod method)
         {
-            var parameters = method.Arguments;
+            var parameters = method.TypedArguments;
             var ret = method.ReturnType;
             dbg.AppendLine("public ScalarResult InvokeScalar(ScalarResult[] arguments)");
             dbg.EnterCodeBlock();
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedVariables(dbg, parameters);
             dbg.AppendStatement($"{GetNullableType(ret)} data=null");
+            if (method.HasContext)
+            {
+                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+            }
+
             dbg.AppendLine("for(var i=0;i < 1;i++)");
             dbg.EnterCodeBlock();
             PerformNullChecks(dbg, method, false, "data");
 
 
             var pvals = string.Join(",", parameters.Select(Val));
-
+            if (method.HasContext)
+                pvals = $"context,{pvals}";
             dbg.AppendStatement($"data = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
 
@@ -67,7 +73,7 @@ namespace SourceGeneration
 
         public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method)
         {
-            var parameters = method.Arguments;
+            var parameters = method.TypedArguments;
             var ret = method.ReturnType;
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
@@ -75,11 +81,17 @@ namespace SourceGeneration
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
             dbg.AppendStatement($"var data = new {GetNullableType(ret)}[{RowCount}]");
+            if (method.HasContext)
+            {
+                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+            }
+
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
             PerformNullChecks(dbg, method, true, $"data[{RowIndex}]");
             var pvals = string.Join(",", parameters.Select(Val));
-
+            if (method.HasContext)
+                pvals = $"context,{pvals}";
             dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
 
@@ -107,7 +119,7 @@ namespace SourceGeneration
         public static void PerformNullChecks(CodeEmitter dbg, ImplementationMethod method,
             bool fromColumn, string assignEmptyStringTo)
         {
-            var parameters = method.Arguments;
+            var parameters = method.TypedArguments;
             foreach (var p in parameters)
             {
                 if (fromColumn)

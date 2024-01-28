@@ -161,12 +161,11 @@ namespace SourceGeneration
         {
             var symbolType = "Function";
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
-            if (  funcSymbol.Contains("Functions"))
+            if (funcSymbol.Contains("Functions"))
             {
                 code.AppendStatement($"public static readonly FunctionSymbol Func = {funcSymbol}");
             }
-            else
-            if (funcSymbol.Contains("Operators"))
+            else if (funcSymbol.Contains("Operators"))
             {
                 code.AppendStatement($"public static readonly OperatorSymbol Func = {funcSymbol}");
                 symbolType = "Operator";
@@ -175,11 +174,11 @@ namespace SourceGeneration
             {
                 //figure out return type...
                 var returnType = ParamGeneneration.ScalarType(implementationMethods.First().ReturnType);
-                var longest = implementationMethods.OrderBy(f => f.Arguments.Length)
+                var longest = implementationMethods.OrderBy(f => f.TypedArguments.Length)
                     .Last();
-                var shortest = implementationMethods.Min(f => f.Arguments.Length);
+                var shortest = implementationMethods.Min(f => f.TypedArguments.Length);
 
-                var args = longest.Arguments
+                var args = longest.TypedArguments
                     .Select((a, i) =>
                         $"new Parameter(\"{a.Name}\", ScalarTypes.{ParamGeneneration.ScalarType(a)},{Opt(i, shortest)})")
                     .ToArray();
@@ -237,22 +236,5 @@ namespace SourceGeneration
                 s = s.Parent;
             }
         }
-    }
-
-    public class ImplementationMethod
-    {
-        public readonly Param[] Arguments;
-        public readonly string Name;
-        public readonly Param ReturnType;
-
-        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments)
-        {
-            ClassName = className;
-            Name = name;
-            ReturnType = returnType;
-            Arguments = arguments;
-        }
-
-        public string ClassName { get; }
     }
 }
