@@ -24,15 +24,9 @@ namespace SourceGeneration
         public static string MakeTypedVariable(Param p) =>
             $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.ColumnIndex}].Value;";
 
-        /*
-          internal static ScalarOverloadInfo CreateOverloadInfo() =>
-               new(new ToUpperFunctionImpl(), TypeMapping.SymbolForType(typeof(string)),
-                   TypeMapping.SymbolForType(typeof(string)));
-         */
-
         public static void BuildOverloadInfo(CodeEmitter dbg, ImplementationMethod method)
         {
-            dbg.AppendLine("internal static ScalarOverloadInfo Overload =>");
+            dbg.AppendLine("internal static ScalarOverloadInfo  Overload =>");
             dbg.AppendLine($"new(new {method.ClassName}(),");
             var mappedTypes = new[] { method.ReturnType }.Concat(method.TypedArguments)
                 .Select(p => $"TypeMapping.SymbolForType(typeof({p.Type}))");

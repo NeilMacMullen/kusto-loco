@@ -41,7 +41,7 @@ namespace SourceGeneration
                     EmitHeader(code, classDeclaration);
                     code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
                     code.EnterCodeBlock();
-                    var m = GenerateImplementation(code, className, implMethod);
+                    var m = GenerateImplementation(code, className, implMethod, kustoAttributes);
                     implMethodClasses.Add(m);
                     code.AppendLine(implMethod.ToFullString());
                     code.ExitCodeBlock();
@@ -180,8 +180,8 @@ namespace SourceGeneration
                         $"new Parameter(\"{a.Name}\", ScalarTypes.{ParamGeneneration.ScalarType(a)},{Opt(i, shortest)})")
                     .ToArray();
 
-                code.AppendLine("public static readonly FunctionSymbol Func =");
-                code.AppendLine($"new FunctionSymbol(\"{attr.SymbolName}\", ");
+                code.AppendLine($"public static readonly {attr.SymbolTypeName} Func =");
+                code.AppendLine($"new {attr.SymbolTypeName}(\"{attr.SymbolName}\", ");
                 code.AppendLine($"ScalarTypes.{returnType},");
 
                 code.AppendLine(string.Join(",", args));
@@ -191,7 +191,7 @@ namespace SourceGeneration
         }
 
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
-            MethodDeclarationSyntax method)
+            MethodDeclarationSyntax method, AttributeDecoder attr)
         {
             var parameters = method.ParameterList.Parameters
                 .Select((p, i) => new Param(i, p.Identifier.ValueText, p.Type.ToFullString()))
@@ -199,7 +199,7 @@ namespace SourceGeneration
 
             var ret = new Param(0, string.Empty, method.ReturnType.ToFullString());
 
-            var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters);
+            var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters, attr);
             ParamGeneneration.BuildOverloadInfo(dbg, m);
             ParamGeneneration.BuildScalarMethod(dbg, m);
             ParamGeneneration.BuildColumnarMethod(dbg, m);
@@ -234,7 +234,7 @@ namespace SourceGeneration
     }
 }
 
-internal class AttributeDecoder
+public class AttributeDecoder
 {
     public ImplementationType ImplementationType;
     public bool IsBuiltIn;
@@ -261,13 +261,32 @@ internal class AttributeDecoder
             IsBuiltIn = true;
             ImplementationType = ImplementationType.Aggregate;
         }
-        else ImplementationType = ImplementationType.Function;
+        else
+        {
+            var category = attr.GetStringFor(nameof(KustoImplementationAttribute.Category));
+            if (category == string.Empty)
+                ImplementationType = ImplementationType.Function;
+            else
+                ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
+        }
     }
 
     public string SymbolTypeName => $"{ImplementationType}Symbol";
+
+    public string OverloadName()
+    {
+        switch (ImplementationType)
+
+        {
+            case ImplementationType.Operator:
+            case ImplementationType.Function: return "ScalarOverloadInfo";
+            default:
+                return "not yet implemented";
+        }
+    }
 }
 
-internal enum ImplementationType
+public enum ImplementationType
 {
     Function,
     Operator,

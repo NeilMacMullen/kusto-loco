@@ -7,9 +7,11 @@ namespace SourceGeneration
     {
         public readonly string Name;
         public readonly Param ReturnType;
+        public AttributeDecoder AttributeDecoder;
         public bool HasContext;
 
-        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments)
+        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments,
+            AttributeDecoder attr)
         {
             ClassName = className;
             Name = name;
@@ -27,5 +29,7 @@ namespace SourceGeneration
         public Param[] TypedArguments => HasContext ? AllArguments.Skip(1).ToArray() : AllArguments;
         public Param ContextArgument => HasContext ? AllArguments.First() : throw new InvalidOperationException();
         public string ClassName { get; }
+
+        public string OverloadName => AttributeDecoder.OverloadName();
     }
 }
