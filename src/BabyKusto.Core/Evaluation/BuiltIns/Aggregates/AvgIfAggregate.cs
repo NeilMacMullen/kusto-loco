@@ -3,11 +3,13 @@
 // ReSharper disable PartialTypeWithSinglePart
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "Aggregates.Avg")]
-internal partial class AvgAggregate
+[KustoImplementation(Keyword = "Aggregates.AvgIf")]
+internal partial class AvgIfAggregate
 {
-    internal static double IntImpl(NumericAggregate context, int n)
+    internal static double IntImpl(NumericAggregate context, int n, bool t)
     {
+        if (!t)
+            return 0;
         context.Count++;
         context.Total += n;
         return 0;
@@ -17,8 +19,10 @@ internal partial class AvgAggregate
         ? null
         : context.Total / context.Count;
 
-    internal static double LongImpl(NumericAggregate context, long n)
+    internal static double LongImpl(NumericAggregate context, long n, bool t)
     {
+        if (!t)
+            return 0;
         context.Count++;
         context.Total += n;
         return 0;
@@ -28,8 +32,10 @@ internal partial class AvgAggregate
         ? null
         : context.Total / context.Count;
 
-    internal static double DoubleImpl(NumericAggregate context, double n)
+    internal static double DoubleImpl(NumericAggregate context, double n, bool t)
     {
+        if (!t)
+            return 0;
         context.Count++;
         context.Total += n;
         return 0;
@@ -39,8 +45,10 @@ internal partial class AvgAggregate
         ? null
         : context.Total / context.Count;
 
-    internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
+    internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n, bool t)
     {
+        if (!t)
+            return TimeSpan.Zero;
         context.Count++;
         context.Total += n.Ticks;
         return TimeSpan.Zero;
@@ -51,8 +59,10 @@ internal partial class AvgAggregate
         ? null
         : new TimeSpan((long)context.Total / context.Count);
 
-    internal static DateTime DtImpl(NumericAggregate context, DateTime n)
+    internal static DateTime DtImpl(NumericAggregate context, DateTime n, bool t)
     {
+        if (!t)
+            return DateTime.MinValue;
         context.Count++;
         context.Total += n.Ticks;
         return DateTime.MinValue;

@@ -502,4 +502,12 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Contain("2023-06-11");
     }
+
+    [TestMethod]
+    public async Task SumTimeSpan()
+    {
+        var query = "datatable(a:timespan) [1d,3d,2d] | summarize sum(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("6.00:00:00");
+    }
 }

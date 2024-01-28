@@ -60,58 +60,15 @@ internal static class BuiltInAggregates
                     ScalarTypes.String,
                     ScalarTypes.Bool)));
 
-        aggregates.Add(
-            Aggregates.SumIf,
-            new AggregateInfo(
-                new AggregateOverloadInfo(new SumIfIntFunctionImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int,
-                    ScalarTypes.Bool),
-                new AggregateOverloadInfo(new SumIfLongFunctionImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long,
-                    ScalarTypes.Bool),
-                new AggregateOverloadInfo(new SumIfDoubleFunctionImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Bool)));
-
         AvgAggregate.Register(aggregates);
+        AvgIfAggregate.Register(aggregates);
+        SumAggregate.Register(aggregates);
+        SumIfAggregate.Register(aggregates);
+        MinAggregate.Register(aggregates);
+        MinIfAggregate.Register(aggregates);
+        MaxAggregate.Register(aggregates);
+        MaxIfAggregate.Register(aggregates);
 
-        aggregates.Add(
-            Aggregates.Sum,
-            new AggregateInfo(
-                new AggregateOverloadInfo(new SumAggregateIntImpl(), ScalarTypes.Long,
-                    ScalarTypes.Int),
-                new AggregateOverloadInfo(new SumAggregateLongImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new AggregateOverloadInfo(new SumAggregateDoubleImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real)));
-
-        aggregates.Add(
-            Aggregates.Min,
-            new AggregateInfo(
-                new AggregateOverloadInfo(new MinAggregateIntImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new AggregateOverloadInfo(new MinAggregateLongImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new AggregateOverloadInfo(new MinAggregateDoubleImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new AggregateOverloadInfo(new MinAggregateDateTimeImpl(), ScalarTypes.DateTime,
-                    ScalarTypes.DateTime),
-                new AggregateOverloadInfo(new MinAggregateTimeSpanImpl(), ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan)));
-
-        aggregates.Add(
-            Aggregates.Max,
-            new AggregateInfo(
-                new AggregateOverloadInfo(new MaxAggregateIntImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int),
-                new AggregateOverloadInfo(new MaxAggregateLongImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new AggregateOverloadInfo(new MaxAggregateDoubleImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real),
-                new AggregateOverloadInfo(new MaxAggregateDateTimeImpl(), ScalarTypes.DateTime,
-                    ScalarTypes.DateTime),
-                new AggregateOverloadInfo(new MaxAggregateTimeSpanImpl(), ScalarTypes.TimeSpan,
-                    ScalarTypes.TimeSpan)));
 
         var takeAnyOverloads = new AggregateInfo(
             new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Bool,
