@@ -369,6 +369,14 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
     [TestMethod]
     public async Task StrLen()
     {
+        var query = "datatable(a:string) ['abc'] | project v1 = strlen(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+    [TestMethod]
+    public async Task StrLen0()
+    {
         var query = "datatable(a:string) [''] | project v1 = strlen(a)";
         var result = await LastLineOfResult(query);
         result.Should().Be("0");
@@ -442,7 +450,7 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var context = CreateContext();
         var result = await context.RunTabularQueryAsync(query);
         result.Height.Should().Be(0);
-        if (result.Error.Length!=0)
+        if (result.Error.Length != 0)
             result.Error.Should().Contain("The expression must not be the value: 0");
     }
 
@@ -469,5 +477,29 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var query = " print totimespan('1.02:04:45')";
         var result = await LastLineOfResult(query);
         result.Should().Be("1.02:04:45");
+    }
+
+    [TestMethod]
+    public async Task AvgNumber()
+    {
+        var query = "datatable(a:long) [1,3,2] | summarize avg(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task AvgTimeSpan()
+    {
+        var query = "datatable(a:timespan) [1d,3d,2d] | summarize avg(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2.00:00:00");
+    }
+
+    [TestMethod]
+    public async Task AvgDateTime()
+    {
+        var query = "datatable(a:datetime) [datetime(2023-06-10),datetime(2023-06-12)] | summarize avg(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2023-06-11");
     }
 }
