@@ -106,10 +106,7 @@ internal static class BuiltInOperators
         NotEndsWithFunction.Register(operators);
         NotEndsWithCsFunction.Register(operators);
 
-
-        operators.Add(Operators.MatchRegex,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new MatchRegexOperatorImpl(), ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String)));
+        MatchRegexFunction.Register(operators);
     }
 
     public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments)
