@@ -26,7 +26,7 @@ namespace SourceGeneration
 
         public static void BuildOverloadInfo(CodeEmitter dbg, ImplementationMethod method)
         {
-            dbg.AppendLine("internal static ScalarOverloadInfo  Overload =>");
+            dbg.AppendLine($"internal static {method.OverloadName}  Overload =>");
             dbg.AppendLine($"new(new {method.ClassName}(),");
             var mappedTypes = new[] { method.ReturnType }.Concat(method.TypedArguments)
                 .Select(p => $"TypeMapping.SymbolForType(typeof({p.Type}))");

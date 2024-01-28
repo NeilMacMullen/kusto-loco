@@ -13,6 +13,7 @@ namespace SourceGeneration
         public ImplementationMethod(string className, string name, Param returnType, Param[] arguments,
             AttributeDecoder attr)
         {
+            AttributeDecoder = attr;
             ClassName = className;
             Name = name;
             ReturnType = returnType;
@@ -31,5 +32,7 @@ namespace SourceGeneration
         public string ClassName { get; }
 
         public string OverloadName => AttributeDecoder.OverloadName();
+        public bool HasScalar => AttributeDecoder.IsFuncOrOp;
+        public bool HasColumnar => AttributeDecoder.IsFuncOrOp;
     }
 }

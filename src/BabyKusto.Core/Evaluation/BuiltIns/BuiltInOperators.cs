@@ -15,6 +15,7 @@ internal static class BuiltInOperators
 {
     private static readonly Dictionary<OperatorSymbol, ScalarFunctionInfo> operators = new();
 
+
     static BuiltInOperators()
     {
         UnaryMinusFunction.Register(operators);

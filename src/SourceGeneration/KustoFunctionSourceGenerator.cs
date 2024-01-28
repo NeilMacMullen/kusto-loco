@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGeneration;
 
 namespace SourceGeneration
 {
@@ -13,73 +12,84 @@ namespace SourceGeneration
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            var syntaxReceiver = (AttributedClassReceiver)context.SyntaxReceiver;
-
-            foreach (var classDeclaration in syntaxReceiver.found)
+            try
             {
-                var wrapperClassName = classDeclaration.Identifier.ValueText;
-
-                var kustoAttributes =
-                    new AttributeDecoder(
-                        AttributeAsHelper<KustoImplementationAttribute>(classDeclaration));
-
-
-                var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
-
-                var implementationMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
-                    .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
-                    .ToArray();
-
-                var implMethodClasses = new List<ImplementationMethod>();
-
-                foreach (var implMethod in implementationMethods)
+                var syntaxReceiver = (AttributedClassReceiver)context.SyntaxReceiver;
+                Console.WriteLine("Code generator running...");
+                foreach (var classDeclaration in syntaxReceiver.found)
                 {
-                    var code = new CodeEmitter();
+                    var wrapperClassName = classDeclaration.Identifier.ValueText;
 
-                    var className = wrapperClassName + implMethod.Identifier.ValueText;
+                    var kustoAttributes =
+                        new AttributeDecoder(
+                            AttributeAsHelper<KustoImplementationAttribute>(classDeclaration));
 
-                    EmitHeader(code, classDeclaration);
-                    code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
-                    code.EnterCodeBlock();
-                    var m = GenerateImplementation(code, className, implMethod, kustoAttributes);
-                    implMethodClasses.Add(m);
-                    code.AppendLine(implMethod.ToFullString());
-                    code.ExitCodeBlock();
+
+                    var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
+
+                    var implementationMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
+                        .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
+                        .ToArray();
+
+                    var implMethodClasses = new List<ImplementationMethod>();
+
+                    foreach (var implMethod in implementationMethods)
+                    {
+                        var code = new CodeEmitter();
+
+                        var className = wrapperClassName + implMethod.Identifier.ValueText;
+
+                        EmitHeader(code, classDeclaration);
+                        code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
+                        code.EnterCodeBlock();
+                        var m = GenerateImplementation(code, className, implMethod, kustoAttributes);
+                        implMethodClasses.Add(m);
+                        code.AppendLine(implMethod.ToFullString());
+                        code.ExitCodeBlock();
+                        // Add the source code to the compilation
+                        context.AddSource($"{className}.g.cs", code.ToString());
+                    }
+
+                    var wrapperCode = new CodeEmitter();
+                    try
+                    {
+                        EmitHeader(wrapperCode, classDeclaration);
+                        wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
+                        wrapperCode.EnterCodeBlock();
+                        EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
+                        //create the registration
+                        wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
+
+                        var overloads = string.Join(",",
+                            implMethodClasses.Select(s => $"{wrapperClassName}{s.Name}.Overload"));
+                        wrapperCode.AppendLine(overloads);
+
+
+                        wrapperCode.AppendStatement(")");
+                        wrapperCode.AppendLine(
+                            $"public static void Register(Dictionary<{kustoAttributes.SymbolTypeName},ScalarFunctionInfo> f)");
+
+                        wrapperCode.AppendStatement("=> f.Add(Func,S)");
+
+                        wrapperCode.ExitCodeBlock();
+                    }
+                    catch (Exception ex)
+                    {
+                        wrapperCode.LogException(ex);
+                    }
+
                     // Add the source code to the compilation
-                    context.AddSource($"{className}.g.cs", code.ToString());
+                    if (modifiers.Contains("partial"))
+                        context.AddSource($"{wrapperClassName}.g.cs", wrapperCode.ToString());
                 }
-
-                var wrapperCode = new CodeEmitter();
-                try
-                {
-                    EmitHeader(wrapperCode, classDeclaration);
-                    wrapperCode.AppendLine($"{modifiers} class {wrapperClassName}");
-                    wrapperCode.EnterCodeBlock();
-                    EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
-                    //create the registration
-                    wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
-
-                    var overloads = string.Join(",",
-                        implMethodClasses.Select(s => $"{wrapperClassName}{s.Name}.Overload"));
-                    wrapperCode.AppendLine(overloads);
-
-
-                    wrapperCode.AppendStatement(")");
-                    wrapperCode.AppendLine(
-                        $"public static void Register(Dictionary<{kustoAttributes.SymbolTypeName},ScalarFunctionInfo> f)");
-
-                    wrapperCode.AppendStatement("=> f.Add(Func,S)");
-
-                    wrapperCode.ExitCodeBlock();
-                }
-                catch (Exception ex)
-                {
-                    wrapperCode.LogException(ex);
-                }
-
-                // Add the source code to the compilation
-                if (modifiers.Contains("partial"))
-                    context.AddSource($"{wrapperClassName}.g.cs", wrapperCode.ToString());
+            }
+            catch (Exception e)
+            {
+                var c = new CodeEmitter();
+                c.AppendStatement("SOURCE GENERATOR EXCEPTION");
+                c.LogException(e);
+                context.AddSource("sourcegeneratorexception", c.ToString());
+                // throw;
             }
         }
 
@@ -190,6 +200,7 @@ namespace SourceGeneration
             }
         }
 
+
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
             MethodDeclarationSyntax method, AttributeDecoder attr)
         {
@@ -201,8 +212,10 @@ namespace SourceGeneration
 
             var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters, attr);
             ParamGeneneration.BuildOverloadInfo(dbg, m);
-            ParamGeneneration.BuildScalarMethod(dbg, m);
-            ParamGeneneration.BuildColumnarMethod(dbg, m);
+            if (m.HasScalar)
+                ParamGeneneration.BuildScalarMethod(dbg, m);
+            if (m.HasColumnar)
+                ParamGeneneration.BuildColumnarMethod(dbg, m);
             return m;
         }
 
@@ -230,58 +243,6 @@ namespace SourceGeneration
 
                 s = s.Parent;
             }
-        }
-    }
-}
-
-public class AttributeDecoder
-{
-    public ImplementationType ImplementationType;
-    public bool IsBuiltIn;
-
-    public string SymbolName;
-
-    internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
-    {
-        var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
-        SymbolName = funcSymbol;
-
-        if (funcSymbol.Contains("Functions"))
-        {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Function;
-        }
-        else if (funcSymbol.Contains("Operators"))
-        {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Operator;
-        }
-        else if (funcSymbol.Contains("Aggregates"))
-        {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Aggregate;
-        }
-        else
-        {
-            var category = attr.GetStringFor(nameof(KustoImplementationAttribute.Category));
-            if (category == string.Empty)
-                ImplementationType = ImplementationType.Function;
-            else
-                ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
-        }
-    }
-
-    public string SymbolTypeName => $"{ImplementationType}Symbol";
-
-    public string OverloadName()
-    {
-        switch (ImplementationType)
-
-        {
-            case ImplementationType.Operator:
-            case ImplementationType.Function: return "ScalarOverloadInfo";
-            default:
-                return "not yet implemented";
         }
     }
 }
