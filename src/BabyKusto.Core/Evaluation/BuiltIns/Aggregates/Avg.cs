@@ -7,6 +7,12 @@ using Kusto.Language.Symbols;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
+public class AvgAcc
+{
+    public int Count;
+    public double Total;
+}
+
 internal class AvgAggregateIntImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
@@ -26,8 +32,8 @@ internal class AvgAggregateIntImpl : IAggregateImpl
         }
 
         return new ScalarResult(ScalarTypes.Real, count == 0
-                                                      ? null
-                                                      : sum / count);
+            ? null
+            : sum / count);
     }
 }
 
@@ -50,8 +56,8 @@ internal class AvgAggregateLongImpl : IAggregateImpl
         }
 
         return new ScalarResult(ScalarTypes.Real, count == 0
-                                                      ? null
-                                                      : sum / count);
+            ? null
+            : sum / count);
     }
 }
 
@@ -74,8 +80,8 @@ internal class AvgAggregateDoubleImpl : IAggregateImpl
         }
 
         return new ScalarResult(ScalarTypes.Real, count == 0
-                                                      ? null
-                                                      : sum / count);
+            ? null
+            : sum / count);
     }
 }
 
@@ -98,7 +104,7 @@ internal class AvgAggregateTimeSpanImpl : IAggregateImpl
         }
 
         return new ScalarResult(ScalarTypes.TimeSpan, count == 0
-                                                          ? null
-                                                          : new TimeSpan((long)(sum / count)));
+            ? null
+            : new TimeSpan((long)(sum / count)));
     }
 }

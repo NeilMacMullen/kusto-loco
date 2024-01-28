@@ -38,10 +38,42 @@ public class AttributeDecoder
         }
     }
 
-    public string SymbolTypeName => $"{ImplementationType}Symbol";
+    public string SymbolTypeName
+    {
+        get
+        {
+            switch (ImplementationType)
+            {
+                case ImplementationType.Function:
+                case ImplementationType.Aggregate:
+                    return "FunctionSymbol";
+                case ImplementationType.Operator:
+                    return "OperatorSymbol";
+                default: return "no symbol";
+            }
+        }
+    }
 
     public bool IsFuncOrOp => ImplementationType == ImplementationType.Function ||
                               ImplementationType == ImplementationType.Operator;
+
+
+    public string BaseClassName
+    {
+        get
+        {
+            switch (ImplementationType)
+            {
+                case ImplementationType.Function:
+
+                case ImplementationType.Operator:
+                    return "IScalarFunctionImpl";
+                case ImplementationType.Aggregate:
+                    return "IAggregateImpl";
+                default: return "no symbol";
+            }
+        }
+    }
 
 
     public string OverloadName()
@@ -52,6 +84,23 @@ public class AttributeDecoder
             case ImplementationType.Operator:
             case ImplementationType.Function:
                 return "ScalarOverloadInfo";
+            case ImplementationType.Aggregate:
+                return "AggregateOverloadInfo";
+            default:
+                return "not yet implemented";
+        }
+    }
+
+    public string OverloadWrapperName()
+    {
+        switch (ImplementationType)
+
+        {
+            case ImplementationType.Operator:
+            case ImplementationType.Function:
+                return "ScalarFunctionInfo";
+            case ImplementationType.Aggregate:
+                return "AggregateInfo";
             default:
                 return "not yet implemented";
         }

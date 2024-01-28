@@ -30,6 +30,9 @@ namespace SourceGeneration
                     var implementationMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                         .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
                         .ToArray();
+                    var endMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
+                        .Where(m => m.Identifier.ValueText.EndsWith("ImplFinish"))
+                        .ToArray();
 
                     var implMethodClasses = new List<ImplementationMethod>();
 
@@ -40,11 +43,13 @@ namespace SourceGeneration
                         var className = wrapperClassName + implMethod.Identifier.ValueText;
 
                         EmitHeader(code, classDeclaration);
-                        code.AppendLine($"{modifiers} class {className} : IScalarFunctionImpl");
+                        code.AppendLine($"{modifiers} class {className} : {kustoAttributes.BaseClassName}");
                         code.EnterCodeBlock();
                         var m = GenerateImplementation(code, className, implMethod, kustoAttributes);
                         implMethodClasses.Add(m);
                         code.AppendLine(implMethod.ToFullString());
+                        foreach (var endMethod in endMethods.Where(e => e.Identifier.ValueText.Contains(m.Name)))
+                            code.AppendLine(endMethod.ToFullString());
                         code.ExitCodeBlock();
                         // Add the source code to the compilation
                         context.AddSource($"{className}.g.cs", code.ToString());
@@ -58,7 +63,8 @@ namespace SourceGeneration
                         wrapperCode.EnterCodeBlock();
                         EmitFunctionSymbol(wrapperCode, kustoAttributes, implMethodClasses);
                         //create the registration
-                        wrapperCode.AppendLine(@"public static ScalarFunctionInfo S=new ScalarFunctionInfo(");
+                        var overloadWrapperName = kustoAttributes.OverloadWrapperName();
+                        wrapperCode.AppendLine($"public static {overloadWrapperName} S=new {overloadWrapperName}(");
 
                         var overloads = string.Join(",",
                             implMethodClasses.Select(s => $"{wrapperClassName}{s.Name}.Overload"));
@@ -67,7 +73,7 @@ namespace SourceGeneration
 
                         wrapperCode.AppendStatement(")");
                         wrapperCode.AppendLine(
-                            $"public static void Register(Dictionary<{kustoAttributes.SymbolTypeName},ScalarFunctionInfo> f)");
+                            $"public static void Register(Dictionary<{kustoAttributes.SymbolTypeName},{overloadWrapperName}> f)");
 
                         wrapperCode.AppendStatement("=> f.Add(Func,S)");
 
@@ -216,6 +222,8 @@ namespace SourceGeneration
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
                 ParamGeneneration.BuildColumnarMethod(dbg, m);
+            if (m.AttributeDecoder.ImplementationType == ImplementationType.Aggregate)
+                ParamGeneneration.BuildInvokeMethod(dbg, m);
             return m;
         }
 

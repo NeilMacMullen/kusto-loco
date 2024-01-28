@@ -93,6 +93,34 @@ namespace SourceGeneration
             dbg.ExitCodeBlock();
         }
 
+        public static void BuildInvokeMethod(CodeEmitter dbg, ImplementationMethod method)
+        {
+            var parameters = method.TypedArguments;
+            var ret = method.ReturnType;
+            dbg.AppendLine("public ScalarResult Invoke(ITableChunk chunk,ColumnarResult[] arguments)");
+            dbg.EnterCodeBlock();
+            dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
+            AddTypedColumns(dbg, parameters);
+            dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
+
+            if (method.HasContext)
+            {
+                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+            }
+
+            dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
+            dbg.EnterCodeBlock();
+            PerformNullChecks(dbg, method, true, $"data[{RowIndex}]");
+            var pvals = string.Join(",", parameters.Select(Val));
+            if (method.HasContext)
+                pvals = $"context,{pvals}";
+            dbg.AppendStatement($"{method.Name}({pvals})");
+            dbg.ExitCodeBlock();
+            dbg.AppendStatement($"var result = {method.Name}Finish(context)");
+            dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
+            dbg.AppendStatement("return new ScalarResult(returnType,result)");
+            dbg.ExitCodeBlock();
+        }
 
         public static void AddTypedColumns(CodeEmitter dbg, Param[] parameters)
         {
