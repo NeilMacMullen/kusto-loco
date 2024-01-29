@@ -6,4 +6,7 @@ public record VisualizationState(string ChartType, ImmutableDictionary<string, o
 {
     public static readonly VisualizationState Empty =
         new(string.Empty, ImmutableDictionary<string, object>.Empty);
+
+    public string PropertyOr(string propertyName, string fallback)
+        => Items.TryGetValue(propertyName, out var v) ? v.ToString() ?? fallback : fallback;
 }

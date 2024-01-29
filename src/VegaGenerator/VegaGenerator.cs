@@ -1,4 +1,5 @@
-﻿using JPoke;
+﻿using System.Collections.Specialized;
+using JPoke;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
@@ -7,10 +8,7 @@ public class VegaChart
 {
     public JObjectBuilder _builder;
 
-    public VegaChart()
-    {
-        _builder = JObjectBuilder.CreateEmpty();
-    }
+    public VegaChart() => _builder = JObjectBuilder.CreateEmpty();
 
     private string ToVegaString(object o)
     {
@@ -19,6 +17,7 @@ public class VegaChart
     }
 
     private string Axis(VegaAxisName name) => $"encoding.{ToVegaString(name)}";
+
     public void AddSeries(VegaAxisName axisName, ColumnDescription column)
     {
         var axis = Axis(axisName);
@@ -56,31 +55,68 @@ public class VegaChart
         {
             chart.ConvertToPie();
         }
+
         return chart;
     }
 
     private void RenameAxis(VegaAxisName source, VegaAxisName target)
         => _builder.Move(Axis(source), Axis(target));
+
     private void ConvertToPie()
     {
-       RenameAxis(VegaAxisName.X,VegaAxisName.Color);
-       RenameAxis(VegaAxisName.Y, VegaAxisName.Theta);
+        RenameAxis(VegaAxisName.X, VegaAxisName.Color);
+        RenameAxis(VegaAxisName.Y, VegaAxisName.Theta);
     }
 
     public void ConvertToTimeline()
     {
-      
-        RenameAxis(VegaAxisName.Y,VegaAxisName.X2);
+        RenameAxis(VegaAxisName.Y, VegaAxisName.X2);
         RenameAxis(VegaAxisName.Color, VegaAxisName.Y);
         DisableLegend();
-        
     }
 
-    private void DisableLegend()
+    private VegaChart DisableLegend()
     {
         _builder.Set("config.legend.disable", true);
+        return this;
     }
 
+    public VegaChart StackAxis(VegaAxisName axis)
+    {
+        _builder.Set($"{Axis(axis)}.aggregate", "sum");
+        return this;
+    }
+
+    public static VegaAxisType InferSuitableAxisType(Type t)
+    {
+        var numericTypes = new[]
+        {
+            typeof(int), typeof(long), typeof(double), typeof(float),
+            typeof(uint), typeof(ulong), typeof(byte), typeof(decimal)
+        };
+        if (numericTypes.Contains(t))
+            return VegaAxisType.Quantitative;
+
+        if (t == typeof(TimeSpan))
+            return VegaAxisType.Ordinal;
+
+        return t == typeof(DateTime)
+            ? VegaAxisType.Temporal
+            : VegaAxisType.Nominal;
+    }
+
+    public void InjectData(IEnumerable<OrderedDictionary> rows)
+    {
+        _builder.Set("data.values", rows);
+    }
+
+    public void FillContainer()
+    {
+        _builder.Set("width", "container");
+        _builder.Set("height", "container");
+    }
+
+    public string Serialize() => _builder.Serialize();
 }
 
 public enum VegaMark
@@ -108,5 +144,4 @@ public enum VegaAxisName
     X2,
     Theta,
     Color
-
 }
