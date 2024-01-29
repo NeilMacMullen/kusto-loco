@@ -1,0 +1,1 @@
+﻿public readonly record struct ColumnDescription(string QualifiedColumnName, string Text, VegaAxisType VegaAxisType);

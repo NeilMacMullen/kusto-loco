@@ -3,7 +3,7 @@ using System.Text;
 using Extensions;
 using JPoke;
 using KustoSupport;
-using static VegaGenerator;
+
 
 #pragma warning disable CS8618, CS8600, CS8602, CS8604
 public class KustoResultRenderer
@@ -44,16 +44,16 @@ public class KustoResultRenderer
         var state = result.Visualization;
         return state.ChartType switch
         {
-            "columnchart" => RenderToChart(title, BarChart, result, MakeColumnChart, AllowedColumnTypes.ColumnChart),
+            "columnchart" => RenderToChart(title, VegaMark.Bar, result, MakeColumnChart, AllowedColumnTypes.ColumnChart),
 
-            "barchart" => RenderToChart(title, BarChart, result, MakeBarChart, AllowedColumnTypes.BarChart),
-            "linechart" => RenderToChart(title, LineChart, result, NoOp, AllowedColumnTypes.LineChart),
-            "piechart" => RenderToChart(title, PieChart, result, MakePieChart, AllowedColumnTypes.ColumnChart),
-            "areachart" => RenderToChart(title, AreaChart, result, NoOp, AllowedColumnTypes.LineChart),
-            "stackedareachart" => RenderToChart(title, AreaChart, result, MakeStacked, AllowedColumnTypes.LineChart),
+            "barchart" => RenderToChart(title, VegaMark.Bar, result, MakeBarChart, AllowedColumnTypes.BarChart),
+            "linechart" => RenderToChart(title, VegaMark.Line, result, NoOp, AllowedColumnTypes.LineChart),
+            "piechart" => RenderToChart(title, VegaMark.Arc, result, MakePieChart, AllowedColumnTypes.ColumnChart),
+            "areachart" => RenderToChart(title, VegaMark.Area, result, NoOp, AllowedColumnTypes.LineChart),
+            "stackedareachart" => RenderToChart(title, VegaMark.Area, result, MakeStacked, AllowedColumnTypes.LineChart),
 
-            "ladderchart" => RenderToChart(title, BarChart, result, MakeTimeLineChart, AllowedColumnTypes.LadderChart),
-            "scatterchart" => RenderToChart(title, "point", result, MakeScatter, AllowedColumnTypes.Unrestricted),
+            "ladderchart" => RenderToChart(title, VegaMark.Bar, result, MakeTimeLineChart, AllowedColumnTypes.LadderChart),
+            "scatterchart" => RenderToChart(title, VegaMark.Point, result, MakeScatter, AllowedColumnTypes.Unrestricted),
 
 
             _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp, AllowedColumnTypes.Unrestricted)
@@ -67,29 +67,29 @@ public class KustoResultRenderer
         return "default";
     }
 
-    private static void MakeBarChart(KustoQueryResult result, JObjectBuilder b)
+    private static void MakeBarChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == "stacked")
         {
-            b.Set("encoding.x.aggregate", "sum");
+            b._builder.Set("encoding.x.aggregate", "sum");
         }
     }
 
-    private static void MakeColumnChart(KustoQueryResult result, JObjectBuilder b)
+    private static void MakeColumnChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == "stacked")
         {
-            b.Set("encoding.y.aggregate", "sum");
+            b._builder.Set("encoding.y.aggregate", "sum");
         }
     }
 
-    public static void NoOp(KustoQueryResult result, JObjectBuilder o)
+    public static void NoOp(KustoQueryResult result, VegaChart o)
     {
     }
 
 
-    public static string RenderToChart(string title, string vegaType, KustoQueryResult result,
-        Action<KustoQueryResult, JObjectBuilder> jmutate, ImmutableArray<ExpectedColumnSet> expected)
+    public static string RenderToChart(string title, VegaMark vegaType, KustoQueryResult result,
+        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected)
     {
         if (result.Height == 0)
             return result.Error;
@@ -98,45 +98,42 @@ public class KustoResultRenderer
     }
 
 
-    public static void MakePieChart(KustoQueryResult result, JObjectBuilder b)
+    public static void MakePieChart(KustoQueryResult result, VegaChart b)
     {
-        b.Set("mark.type", PieChart);
-        b.Move("encoding.y", "encoding.theta");
-        b.Set("encoding.color.type", AxisTypeNominal);
-        b.Copy("encoding.x.field", "encoding.color.field");
-        b.Remove("encoding.y");
-        b.Remove("encoding.x");
     }
 
 
-    public static void MakeTimeLineChart(KustoQueryResult result, JObjectBuilder b)
+    public static void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
     {
-        b.Set("mark.type", BarChart);
+        var b = chart._builder;
+        b.Set("mark.type", VegaMark.Bar);
         b.Move("encoding.y", "encoding.x2");
 
-        b.Set("encoding.y.type", AxisTypeOrdinal);
+        b.Set("encoding.y.type", VegaAxisType.Ordinal);
         b.Copy("encoding.color.title", "encoding.y.title");
         b.Copy("encoding.color.field", "encoding.y.field");
         b.Set("config.legend.disable", true);
     }
 
-    public static void MakeScatter(KustoQueryResult result, JObjectBuilder b)
+    public static void MakeScatter(KustoQueryResult result, VegaChart b)
     {
     }
 
 
-    public static void MakeGridChart(JObjectBuilder b)
+    public static void MakeGridChart(VegaChart chart)
     {
+        var b = chart._builder;
         b.Set("config.axis.grid", "true");
         b.Set("config.axis.tickband", "extent");
     }
 
-    public static void MakeStacked(KustoQueryResult result, JObjectBuilder b)
+    public static void MakeStacked(KustoQueryResult result, VegaChart chart)
     {
+        var b = chart._builder;
         b.Set("encoding.y.aggregate", "sum");
     }
 
-    public static string InferChartTypeFromResult(KustoQueryResult result)
+    public static VegaMark InferChartTypeFromResult(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
         var types = headers.Select(h => h.UnderlyingType).ToArray();
@@ -144,12 +141,12 @@ public class KustoResultRenderer
         return InferChartTypeFromAxisTypes(types.Select(InferSuitableAxisType).ToArray());
     }
 
-    public static ColumnAndName[] GetColumns(KustoQueryResult result)
+    public static ColumnDescription[] GetColumns(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
-        var allColumns = headers.Select(h => new ColumnAndName(h.Name, h.Name,
+        var allColumns = headers.Select(h => new ColumnDescription(h.Name, h.Name,
                 InferSuitableAxisType(h.UnderlyingType)))
-            .Concat(Enumerable.Range(0, 3).Select(i => new ColumnAndName(string.Empty, string.Empty, string.Empty)))
+            .Concat(Enumerable.Range(0, 3).Select(i => new ColumnDescription(string.Empty, string.Empty, VegaAxisType.Nominal)))
             .Take(3)
             .ToArray();
 
@@ -157,10 +154,10 @@ public class KustoResultRenderer
     }
 
     //try to reorder columns in a way that makes most sensor for the desired chart type
-    public static ColumnAndName[] TryMatch(ColumnAndName[] columns, ImmutableArray<ExpectedColumnSet> expectedColumns)
+    public static ColumnDescription[] TryMatch(ColumnDescription[] columns, ImmutableArray<ExpectedColumnSet> expectedColumns)
     {
-        bool IsMatch(ExpectedColumnSet ex, ColumnAndName c1, ColumnAndName c2)
-            => ex.X.Contains(c1.VegaSeriesType) && ex.Y.Contains(c2.VegaSeriesType);
+        bool IsMatch(ExpectedColumnSet ex, ColumnDescription c1, ColumnDescription c2)
+            => ex.X.Contains(c1.VegaAxisType) && ex.Y.Contains(c2.VegaAxisType);
 
 
         foreach (var e in expectedColumns)
@@ -175,15 +172,15 @@ public class KustoResultRenderer
         return columns;
     }
 
-    public static JObjectBuilder RenderToJObjectBuilder(string chartType,
+    public static JObjectBuilder RenderToJObjectBuilder(VegaMark chartType,
         KustoQueryResult result,
-        Action<KustoQueryResult, JObjectBuilder> jmutate, ImmutableArray<ExpectedColumnSet> expectedColumns)
+        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expectedColumns)
     {
         var columns = GetColumns(result);
 
         columns = TryMatch(columns, expectedColumns);
 
-        var spec = Spec(
+        var spec = VegaChart.CreateVegaChart(
             chartType,
             columns[0],
             columns[1],
@@ -191,18 +188,18 @@ public class KustoResultRenderer
         );
 
 
-        var b = JObjectBuilder.FromObject(spec);
+        var b = spec._builder;
         var rows = result.AsOrderedDictionarySet();
 
         b.Set("data.values", rows);
-        jmutate(result, b);
+        jmutate(result, spec);
 
         b.Set("width", "container");
         b.Set("height", "container");
         return b;
     }
 
-    private static string InferSuitableAxisType(Type t)
+    private static VegaAxisType InferSuitableAxisType(Type t)
     {
         if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
@@ -214,41 +211,41 @@ public class KustoResultRenderer
             typeof(int), typeof(long), typeof(double), typeof(float),
         };
         if (numericTypes.Contains(t))
-            return AxisTypeQuantity;
+            return VegaAxisType.Quantitative;
 
         return t == typeof(DateTime)
-            ? AxisTypeTime
-            : AxisTypeOrdinal;
+            ? VegaAxisType.Temporal
+            : VegaAxisType.Nominal;
     }
 
-    private static string InferChartTypeFromAxisTypes(string[] axisTypes)
+    private static VegaMark InferChartTypeFromAxisTypes(VegaAxisType[] axisTypes)
     {
         var x = axisTypes[0];
         var y = axisTypes.Skip(1).ToArray();
 
-        if (x == AxisTypeOrdinal)
-            return BarChart;
-        return LineChart;
+        if (x == VegaAxisType.Ordinal)
+            return VegaMark.Bar;
+        return VegaMark.Line;
     }
 }
 
-public readonly record struct ExpectedColumnSet(string X, string Y);
+public readonly record struct ExpectedColumnSet(VegaAxisType[] X, VegaAxisType[] Y);
 
 public static class AllowedColumnTypes
 {
     public static ImmutableArray<ExpectedColumnSet> Unrestricted = ImmutableArray<ExpectedColumnSet>.Empty;
 
     public static ImmutableArray<ExpectedColumnSet> LineChart =
-        [new ExpectedColumnSet($"{AxisTypeQuantity}{AxisTypeTime}", $"{AxisTypeQuantity}")];
+        [new ExpectedColumnSet([VegaAxisType.Quantitative,VegaAxisType.Temporal], [VegaAxisType.Quantitative])];
 
     public static ImmutableArray<ExpectedColumnSet> BarChart =
-        [new ExpectedColumnSet($"{AxisTypeQuantity}{AxisTypeTime}", $"{AxisTypeNominal}{AxisTypeOrdinal}")];
+        [new ExpectedColumnSet([VegaAxisType.Quantitative,VegaAxisType.Temporal], [VegaAxisType.Nominal,VegaAxisType.Ordinal])];
 
     public static ImmutableArray<ExpectedColumnSet> ColumnChart =
     [
-        new ExpectedColumnSet($"{AxisTypeTime}{AxisTypeOrdinal}", $"{AxisTypeQuantity}{AxisTypeTime}")
+        new ExpectedColumnSet([VegaAxisType.Temporal,VegaAxisType.Ordinal], [VegaAxisType.Quantitative,VegaAxisType.Temporal])
     ];
 
     public static ImmutableArray<ExpectedColumnSet> LadderChart =
-        [new ExpectedColumnSet($"{AxisTypeTime}", $"{AxisTypeTime}")];
+        [new ExpectedColumnSet([VegaAxisType.Temporal],[VegaAxisType.Temporal])];
 }

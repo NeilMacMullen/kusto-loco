@@ -1,182 +1,112 @@
-﻿using Extensions;
+﻿using JPoke;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-public static class VegaGenerator
+
+public class VegaChart
 {
-    public const string AreaChart = "area";
-    public const string LineChart = "line";
-    public const string AxisTypeTime = "temporal";
-    public const string AxisTypeQuantity = "quantitative";
-    public const string AxisTypeOrdinal = "ordinal";
-    public const string AxisTypeNominal = "nominal";
-    public const string BarChart = "bar";
-    public const string PieChart = "arc";
-    public const string GridChart = "rect";
+    public JObjectBuilder _builder;
 
+    public VegaChart()
+    {
+        _builder = JObjectBuilder.CreateEmpty();
+    }
 
-    public static VegaChart Spec(
-        string chartType,
-        ColumnAndName xSeries,
-        ColumnAndName ySeries,
-        ColumnAndName colorSeries
+    private string ToVegaString(object o)
+    {
+        if (o == null) throw new ArgumentNullException(nameof(o));
+        return o.ToString()!.ToLowerInvariant();
+    }
+
+    private string Axis(VegaAxisName name) => $"encoding.{ToVegaString(name)}";
+    public void AddSeries(VegaAxisName axisName, ColumnDescription column)
+    {
+        var axis = Axis(axisName);
+        _builder.Set($"{axis}.axis.title", column.Text);
+        _builder.Set($"{axis}.field", column.QualifiedColumnName);
+        _builder.Set($"{axis}.type", ToVegaString(column.VegaAxisType));
+    }
+
+    public void SetMark(VegaMark mark)
+    {
+        _builder.Set("mark.type", ToVegaString(mark));
+        _builder.Set("mark.tooltip", true);
+    }
+
+    public void SetTitle(string title)
+    {
+        _builder.Set("title", title);
+    }
+
+    public static VegaChart CreateVegaChart(
+        VegaMark chartType,
+        ColumnDescription xSeries,
+        ColumnDescription ySeries,
+        ColumnDescription colorSeries
     )
     {
-        var encoding = new VegaEncoding
-            {
-                x = new VegaSeries
-                {
-                    field = xSeries.QualifiedColumnName,
-                    type = xSeries.VegaSeriesType,
-                    axis = new VegaAxis
-                        { title = xSeries.Text, minExtent = 0 },
-                    title = xSeries.Text,
-                },
-                y = new VegaSeries
-                {
-                    field = ySeries.QualifiedColumnName,
-                    type = ySeries.VegaSeriesType,
-                    axis = new VegaAxis
-                        { title = ySeries.Text, minExtent = 60 },
-                    title = ySeries.Text,
-                }
-            }
-            ;
-        if (colorSeries.QualifiedColumnName.IsNotBlank())
-            encoding.color = new VegaColorDefinition
-            {
-                field = colorSeries.QualifiedColumnName,
-                type = AxisTypeNominal,
-                title = colorSeries.Text,
-            };
+        var chart = new VegaChart();
+        chart.SetMark(chartType);
+        chart.AddSeries(VegaAxisName.X, xSeries);
+        chart.AddSeries(VegaAxisName.Y, ySeries);
+        if (colorSeries.QualifiedColumnName.Length != 0)
+            chart.AddSeries(VegaAxisName.Color, colorSeries);
 
-        var chart = new VegaChart(
-            chartType,
-            encoding
-        );
+        if (chartType == VegaMark.Arc)
+        {
+            chart.ConvertToPie();
+        }
         return chart;
     }
 
-    public static VegaTransform CreateCumulativeRanking(string sourceData, string outputName)
+    private void RenameAxis(VegaAxisName source, VegaAxisName target)
+        => _builder.Move(Axis(source), Axis(target));
+    private void ConvertToPie()
     {
-        return new VegaTransform
-        {
-            sort =
-            [
-                new VegaSeries
-                {
-                    field = sourceData,
-                    axis = new VegaAxis()
-                }
-            ],
-            window =
-            [
-                new VegaWindow
-                {
-                    op = "percent_rank",
-                    field = "count",
-                    @as = outputName
-                }
-            ],
-            frame = new object?[] { null, 0 }
-        };
+       RenameAxis(VegaAxisName.X,VegaAxisName.Color);
+       RenameAxis(VegaAxisName.Y, VegaAxisName.Theta);
     }
 
-    public class VegaAxis
+    public void ConvertToTimeline()
     {
-        public string title { get; set; } = string.Empty;
-        public int minExtent { get; set; }
+      
+        RenameAxis(VegaAxisName.Y,VegaAxisName.X2);
+        RenameAxis(VegaAxisName.Color, VegaAxisName.Y);
+        DisableLegend();
+        
     }
 
-    public class VegaField
+    private void DisableLegend()
     {
-        public string field { get; set; } = string.Empty;
-        public string type { get; set; } = string.Empty;
+        _builder.Set("config.legend.disable", true);
     }
 
-    public class VegaSeries : VegaField
-    {
-        public VegaAxis axis { get; set; } = new();
-        public bool bin { get; set; }
-        public string title { get; set; }
-    }
+}
 
-    public class VegaEncoding
-    {
-        public VegaSeries? x { get; set; }
-        public VegaSeries? x2 { get; set; }
-        public VegaSeries? y { get; set; }
+public enum VegaMark
+{
+    Area,
+    Line,
+    Bar,
+    Arc,
+    Grid,
+    Point
+}
 
-        /// <summary>
-        ///     used for pie charts
-        /// </summary>
-        /// [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public VegaField? theta { get; set; }
+public enum VegaAxisType
+{
+    Temporal,
+    Quantitative,
+    Ordinal,
+    Nominal
+}
 
-        public VegaColorDefinition? color { get; set; }
-    }
+public enum VegaAxisName
+{
+    X,
+    Y,
+    X2,
+    Theta,
+    Color
 
-    public class VegaLegend
-    {
-        public string orient { get; set; } = "bottom-left";
-        public bool disable { get; set; }
-    }
-
-
-    public record VegaMark
-    {
-        public string type { get; set; } = LineChart;
-
-        public double? width { get; set; }
-
-        /// <summary>
-        ///     Turns on tooltips
-        /// </summary>
-        /// <remarks>
-        ///     In the future it may be better to support "nearest" or even cursor based tooltips.
-        ///     See https://stackoverflow.com/questions/74796097/vega-lite-line-mark-show-tooltip-at-a-distance
-        ///     and https://vega.github.io/vega-lite/examples/interactive_multi_line_pivot_tooltip.html
-        /// </remarks>
-        public bool tooltip { get; set; } = true;
-    }
-
-    public class VegaChart
-    {
-        public VegaChart(string mark, VegaEncoding encoding)
-        {
-            this.mark = this.mark with { type = mark };
-            this.encoding = encoding;
-        }
-
-        public string title { get; set; } = string.Empty;
-        public VegaMark mark { get; set; } = new();
-        public VegaEncoding encoding { get; set; }
-        public VegaTransform[] transform { get; set; } = Array.Empty<VegaTransform>();
-        public VegaConfig? config { get; set; } = new();
-    }
-
-    public class VegaConfig
-    {
-        public VegaLegend? legend { get; set; } = new();
-    }
-
-    public class VegaColorDefinition : VegaField
-    {
-        public VegaLegend? Legend = null;
-        public string title { get; set; } = string.Empty;
-    }
-
-    public class VegaTransform
-    {
-        public VegaSeries[] sort { get; set; } = Array.Empty<VegaSeries>();
-        public VegaWindow[] window { get; set; } = Array.Empty<VegaWindow>();
-        public object?[] frame { get; set; } = Array.Empty<object>();
-    }
-
-    public class VegaWindow
-    {
-        public string op { get; set; }
-        public string field { get; set; }
-        public string @as { get; set; }
-    }
 }
