@@ -10,15 +10,16 @@ public class BuilderTests
     private void Check(JObjectBuilder b, object expected)
     {
         var e = JsonSerializer.Serialize(expected, new
-            JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+                                                   JsonSerializerOptions
+                                                   {
+                                                       WriteIndented = true
+                                                   });
         Console.WriteLine($"expected:{e}");
         var actual = b.Serialize();
         Console.WriteLine($"  actual:{actual}");
         actual
-            .Should().Be(e);
+            .Should()
+            .Be(e);
     }
 
     [TestMethod]
@@ -27,12 +28,12 @@ public class BuilderTests
         var b = JObjectBuilder.CreateEmpty();
         b.Set("abc.def", 123);
         var expected = new
-        {
-            abc = new
-            {
-                def = 123
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = 123
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -43,13 +44,13 @@ public class BuilderTests
         b.Set("abc.def", 123);
         b.Set("abc.xyz", 456);
         var expected = new
-        {
-            abc = new
-            {
-                def = 123,
-                xyz = 456
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = 123,
+                                     xyz = 456
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -60,12 +61,12 @@ public class BuilderTests
         b.Set("abc.def[0]", 123);
 
         var expected = new
-        {
-            abc = new
-            {
-                def = new[] { 123 }
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = new[] { 123 }
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -76,12 +77,12 @@ public class BuilderTests
         b.Set("abc.def", new { xyz = 5 });
 
         var expected = new
-        {
-            abc = new
-            {
-                def = new { xyz = 5 }
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = new { xyz = 5 }
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -92,12 +93,12 @@ public class BuilderTests
         b.Set("abc.def", 5);
         b.Set("abc.def", 6);
         var expected = new
-        {
-            abc = new
-            {
-                def = 6
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = 6
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -109,12 +110,12 @@ public class BuilderTests
         b.Set("abc.def", arr);
 
         var expected = new
-        {
-            abc = new
-            {
-                def = arr
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = arr
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -125,18 +126,18 @@ public class BuilderTests
         var b = JObjectBuilder.CreateEmpty();
         b.Set("abc.def[0].a", 123);
         var expected = new
-        {
-            abc = new
-            {
-                def = new[]
-                {
-                    new
-                    {
-                        a = 123
-                    }
-                }
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = new[]
+                                           {
+                                               new
+                                               {
+                                                   a = 123
+                                               }
+                                           }
+                                 }
+                       };
         Check(b, expected);
     }
 
@@ -147,12 +148,32 @@ public class BuilderTests
         b.Set("abc.def[1]", 123);
 
         var expected = new
-        {
-            abc = new
-            {
-                def = new int?[] { null, 123 }
-            }
-        };
+                       {
+                           abc = new
+                                 {
+                                     def = new int?[] { null, 123 }
+                                 }
+                       };
+        Check(b, expected);
+    }
+
+
+    [TestMethod]
+    public void ValueCanBeGot()
+    {
+        var b = JObjectBuilder.CreateEmpty();
+        b.Set("abc.def", new { xyz = 5 });
+
+        b.Get("abc.def.xyz", 0).Should().Be(5);
+    }
+
+    [TestMethod]
+    public void RawArrayIndexCanBeSet()
+    {
+        var b = JObjectBuilder.CreateEmpty();
+        b.Set("[0]", 1);
+
+        var expected = new[] { 1 };
         Check(b, expected);
     }
 }

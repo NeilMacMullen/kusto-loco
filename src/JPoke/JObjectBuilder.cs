@@ -23,7 +23,7 @@ public readonly record struct JOptions(bool ShouldCreate);
 
 public class JObjectBuilder
 {
-    private readonly JsonNode _root;
+    private JsonNode _root;
 
     private JObjectBuilder(JsonNode root) => _root = root;
 
@@ -108,6 +108,13 @@ public class JObjectBuilder
         return GetNextForObject(path, options);
     }
 
+    public T Get<T>(string pathstr, T fallbackValue)
+    {
+        var r = Search(pathstr);
+        if (r.Match == MatchType.Object)
+            return r.ResultOrParent.GetAsValue<T>();
+        return fallbackValue;
+    }
 
     public GetResult GetNextForObject(JPath path, JOptions options)
     {
@@ -127,12 +134,17 @@ public class JObjectBuilder
                     //TODO - if we want to support multi-dimensional arrays
                     //we will need a way of specifying and descending array levels
                     return top.IsIndex
-                        ? builder.GetNextForArray(path, options)
-                        : builder.GetNextForObject(path.Descend(), options);
+                               ? builder.GetNextForArray(path, options)
+                               : builder.GetNextForObject(path.Descend(), options);
                 }
             }
 
             return new GetResult(MatchType.MissingObjectProperty, this, path);
+        }
+
+        if (_root is JsonArray arr)
+        {
+            return new GetResult(MatchType.Object, this, path);
         }
 
         //otherwise something has gone wrong - we've descended to a terminal
@@ -184,8 +196,8 @@ public class JObjectBuilder
     public JObjectBuilder Set(JPath jpath, object value)
     {
         var options = new JOptions(false);
-        var n = 100;
-        while (n-- > 0)
+        var maxStructureDepth = 100;
+        while (maxStructureDepth-- > 0)
         {
             var (matchType, parent, jPath) = GetNextForObject(jpath, options);
 
@@ -193,7 +205,16 @@ public class JObjectBuilder
             {
                 case MatchType.Object:
                     if (jPath.IsTerminal)
-                        parent._root.ReplaceWith(value);
+                    {
+                        if (_root is JsonArray arr)
+                        {
+                            //TODO - Needs proper indexer
+                            arr.Add(ObjectToJsonNode(value));
+                        }
+                        else
+                            parent._root.ReplaceWith(value);
+                    }
+
                     //success
                     return parent;
 
@@ -205,7 +226,16 @@ public class JObjectBuilder
 
                     var parentObject = parent.ReferenceNode() as JsonObject;
                     if (jPath.Top.IsIndex)
-                        EnsureContainerHasArrayAt(parentObject, jPath.Top.Name);
+                    {
+                        //special logic to cope with root objects that are arrays rather than nodes...
+                        if (jPath.Top.Name == string.Empty)
+                        {
+                            if (_root is not JsonArray)
+                                _root = new JsonArray();
+                        }
+                        else
+                            EnsureContainerHasArrayAt(parentObject, jPath.Top.Name);
+                    }
                     else
                         EnsureContainerHasObjectAt(parentObject, jPath.Top.Name);
 
@@ -215,13 +245,13 @@ public class JObjectBuilder
                     if (jPath.IsTerminal)
                     {
                         SetValueInArray(parent.ReferenceNode() as JsonArray, jPath.Top.Index,
-                            () => null, ObjectToJsonNode(value));
+                                        () => null, ObjectToJsonNode(value));
                         return this;
                     }
                     //add an empty object - TODO - this ignores the case of nested arrays
 
                     SetValueInArray(parent.ReferenceNode() as JsonArray, jPath.Top.Index,
-                        () => null, new JsonObject());
+                                    () => null, new JsonObject());
                     break;
                 default:
                     throw new NotImplementedException($"unhandled case {matchType}");
@@ -248,11 +278,11 @@ public class JObjectBuilder
         return tree;
     }
 
-    public string Serialize() =>
-        _root.ToJsonString(new JsonSerializerOptions
-        {
-            WriteIndented = true, TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-        });
+    public string Serialize()
+        => _root.ToJsonString(new JsonSerializerOptions
+                              {
+                                  WriteIndented = true, TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+                              });
 
     public T GetAsValue<T>()
     {
@@ -298,4 +328,6 @@ public class JObjectBuilder
         Copy(source, dest);
         Remove(source);
     }
+
+    public JsonNode ToJsonObject() => throw new NotImplementedException();
 }
