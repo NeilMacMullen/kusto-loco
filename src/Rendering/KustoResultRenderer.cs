@@ -31,15 +31,15 @@ public class KustoResultRenderer
         return sb.ToString();
     }
 
-    public static string RenderToHtml(string title, KustoQueryResult result)
+    public static string RenderToHtml(KustoQueryResult result)
         => result.Visualization.ChartType.IsNotBlank()
-               ? KustoToVegaChartType("title", result)
+               ? KustoToVegaChartType(result)
                : RenderToTable(result);
 
 
-    public static string KustoToVegaChartType(string title, KustoQueryResult result)
+    public static string KustoToVegaChartType(KustoQueryResult result)
     {
-        title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
+       var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
         var state = result.Visualization;
         return state.ChartType switch
                {

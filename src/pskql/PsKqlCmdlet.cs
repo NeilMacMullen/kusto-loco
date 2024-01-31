@@ -103,7 +103,7 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                var html = KustoResultRenderer.RenderToHtml("no title", result);
+                var html = KustoResultRenderer.RenderToHtml(result);
                 var filename = Path.ChangeExtension(Path.GetTempFileName(), ".html");
                 File.WriteAllText(filename, html);
                 Process.Start(new ProcessStartInfo { FileName = filename, UseShellExecute = true });

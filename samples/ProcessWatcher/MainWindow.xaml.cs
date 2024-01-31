@@ -54,7 +54,7 @@ namespace ProcessWatcher
             c.AddTableFromRecords("h", ProcessHistory);
             var result = c.RunTabularQueryWithoutDemandBasedTableLoading(Query.Text);
 
-            var html = KustoResultRenderer.RenderToHtml("title", result);
+            var html = KustoResultRenderer.RenderToHtml(result);
 
             webview.NavigateToString(html);
             FillInDataGrid(result);

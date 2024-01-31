@@ -344,7 +344,7 @@ public class ReportExplorer
         {
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
-            var text = KustoResultRenderer.RenderToHtml(result.Query, result);
+            var text = KustoResultRenderer.RenderToHtml(result);
             File.WriteAllText(fileName, text);
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
@@ -353,6 +353,7 @@ public class ReportExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
+
         }
     }
 
