@@ -9,7 +9,9 @@
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <TextBox Name="Query" TextChanged="Go" FontSize="20" 
+            <TextBox Name="Query" TextChanged="Go" 
+                     PreviewKeyDown="Query_OnKeyDown"
+                     FontSize="20" 
                      AcceptsReturn="True"
                      MinLines="5"/>
         </DockPanel>
