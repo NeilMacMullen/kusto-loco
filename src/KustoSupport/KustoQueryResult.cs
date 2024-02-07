@@ -14,6 +14,9 @@ public class KustoQueryResult
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+    public static readonly KustoQueryResult Empty = new(string.Empty,
+        InMemoryTableSource.Empty, VisualizationState.Empty, 0, string.Empty);
+
     /// <summary>
     ///     Provides the results of a Kusto query as a collection of dictionaries
     /// </summary>

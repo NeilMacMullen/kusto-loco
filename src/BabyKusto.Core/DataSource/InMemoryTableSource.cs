@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,6 +15,8 @@ namespace BabyKusto.Core;
 /// </summary>
 public class InMemoryTableSource : ITableSource
 {
+    public static readonly InMemoryTableSource Empty = new(TableSymbol.Empty, Array.Empty<BaseColumn>());
+
     //actually only ever one chunk
     private readonly ITableChunk[] _data;
 
@@ -25,7 +28,6 @@ public class InMemoryTableSource : ITableSource
 
     public int RowCount => _data.First().RowCount;
     public TableSymbol Type { get; }
-
     public IEnumerable<ITableChunk> GetData() => _data;
 
     public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
@@ -43,7 +45,7 @@ public class InMemoryTableSource : ITableSource
         var chunk = ChunkHelpers.Reassemble(other.GetData().ToArray());
 
         return new InMemoryTableSource(other.Type,
-                                       chunk.Columns);
+            chunk.Columns);
     }
 
     public IEnumerable<object?> GetColumnData(int n)
@@ -54,6 +56,6 @@ public class InMemoryTableSource : ITableSource
 
         return
             Enumerable.Range(0, len)
-                      .Select(i => col.GetRawDataValue(i));
+                .Select(i => col.GetRawDataValue(i));
     }
 }

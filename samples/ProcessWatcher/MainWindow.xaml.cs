@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using BabyKusto.Core.Evaluation;
 using KustoSupport;
 
 namespace ProcessWatcher;
@@ -14,6 +15,7 @@ namespace ProcessWatcher;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private readonly ReportExplorer explorer;
     private readonly DispatcherTimer timer = new();
     private ImmutableArray<ProcessDetail> ProcessHistory = ImmutableArray<ProcessDetail>.Empty;
     private ImmutableArray<ProcessDetail> ProcessList = ImmutableArray<ProcessDetail>.Empty;
@@ -24,6 +26,14 @@ public partial class MainWindow : Window
         timer.Interval = TimeSpan.FromSeconds(1);
         timer.Tick += TimerOnTick;
         timer.IsEnabled = true;
+
+        var workin = @"C:\kusto";
+        var context =
+            new ReportExplorer.FolderContext(
+                workin,
+                workin,
+                workin);
+        explorer = new ReportExplorer(context);
     }
 
     private void TimerOnTick(object? sender, EventArgs e)
@@ -57,20 +67,28 @@ public partial class MainWindow : Window
         c.AddTableFromRecords("h", ProcessHistory);
         var i = Query.GetLineIndexFromCharacterIndex(Query.CaretIndex);
         var sb = new StringBuilder();
-        while (i >= 1 && Query.GetLineText(i-1).Trim().Length > 0)
+        while (i >= 1 && Query.GetLineText(i - 1).Trim().Length > 0)
             i--;
         while (i < Query.LineCount && Query.GetLineText(i).Trim().Length > 0)
         {
             sb.AppendLine(Query.GetLineText(i));
             i++;
         }
-            
-        var result = c.RunTabularQueryWithoutDemandBasedTableLoading(sb.ToString());
 
-        var html = KustoResultRenderer.RenderToHtml(result);
+        //var result = c.RunTabularQueryWithoutDemandBasedTableLoading(sb.ToString());
 
-        webview.NavigateToString(html);
-        FillInDataGrid(result);
+        var result = await explorer.RunInput(sb.ToString(), false);
+        if (result.Height > 0)
+        {
+            if (result.Visualization != VisualizationState.Empty)
+            {
+                var html = KustoResultRenderer.RenderToHtml(result);
+
+                webview.NavigateToString(html);
+            }
+
+            FillInDataGrid(result);
+        }
     }
 
     private void Go(object sender, RoutedEventArgs e)
@@ -93,12 +111,10 @@ public partial class MainWindow : Window
 
     private async void Query_OnKeyDown(object sender, KeyEventArgs e)
     {
-
-       
-            if (e.Key == Key.Enter)
+        if (e.Key == Key.Enter)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
                 e.Handled = true;
                 await RunQuery();
             }

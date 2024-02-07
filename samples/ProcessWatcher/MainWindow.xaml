@@ -7,18 +7,50 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <DockPanel DockPanel.Dock="Top">
-            <TextBox Name="Query" TextChanged="Go" 
-                     PreviewKeyDown="Query_OnKeyDown"
-                     FontSize="20" 
-                     AcceptsReturn="True"
-                     MinLines="5"/>
-        </DockPanel>
-        <DockPanel>
+   
+        <Grid>
+            <Grid.RowDefinitions>
+         
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <DataGrid Name="dataGrid" DockPanel.Dock="Left"/>
-            <wv2:WebView2 Name="webview"/>
-        </DockPanel>
-    </DockPanel>
+
+            <TextBox Grid.Row="0"
+                     Name="Query" TextChanged="Go"
+                     PreviewKeyDown="Query_OnKeyDown"
+                     FontSize="20"
+                     AcceptsReturn="True"
+                     MinHeight="100" />
+
+            <GridSplitter Grid.Row="1"
+                          VerticalAlignment="Stretch"
+                          Height="5" 
+                          HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+
+                </Grid.ColumnDefinitions>
+
+
+                <DataGrid Name="dataGrid" Grid.Column="0" />
+
+
+                <GridSplitter Grid.Column="1"
+                          HorizontalAlignment="Stretch"
+                          Width="5"
+                          VerticalAlignment="Stretch"/>
+
+                <wv2:WebView2 Name="webview" Grid.Column="2" />
+
+
+            </Grid>
+            </Grid>
+       
+
 </Window>

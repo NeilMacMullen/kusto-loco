@@ -89,7 +89,7 @@ public class ReportExplorer
 
         if (initialScript.IsNotBlank())
         {
-            await RunInput($".run {initialScript}");
+            await RunInput($".run {initialScript}", true);
         }
 
         while (true)
@@ -97,7 +97,7 @@ public class ReportExplorer
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write("KQL> ");
             var query = Console.ReadLine();
-            await RunInput(query);
+            await RunInput(query, true);
         }
     }
 
@@ -106,24 +106,24 @@ public class ReportExplorer
         Console.ForegroundColor = ConsoleColor.Blue;
 
         Console.WriteLine($"KQL> {line}");
-        await RunInput(line);
+        await RunInput(line, true);
     }
 
-    private async Task RunInput(string query)
+    public async Task<KustoQueryResult> RunInput(string query, bool display)
     {
         query = query.Trim();
         //support comments
-        if (query.StartsWith("#") | query.IsBlank()) return;
+        if (query.StartsWith("#") | query.IsBlank()) return KustoQueryResult.Empty;
         if (query.EndsWith("\\"))
         {
             commandBuffer.Append(query.Substring(0, query.Length - 1) + " ");
-            return;
+            return KustoQueryResult.Empty;
         }
 
         if (query.EndsWith("|"))
         {
             commandBuffer.Append(query);
-            return;
+            return KustoQueryResult.Empty;
         }
 
         commandBuffer.Append(query);
@@ -142,14 +142,17 @@ public class ReportExplorer
                         break;
                     default:
                         await RunInternalCommand(tokens);
-                        return;
+                        return KustoQueryResult.Empty;
                 }
             }
 
 
             var result = await GetCurrentContext().RunTabularQueryAsync(query);
-            _prevResult = result;
-            DisplayResults(result);
+            if (result.Error.Length == 0)
+                _prevResult = result;
+            if (display)
+                DisplayResults(result);
+            return result;
         }
         catch (Exception ex)
         {
@@ -157,6 +160,7 @@ public class ReportExplorer
         }
 
         Console.WriteLine();
+        return KustoQueryResult.Empty;
     }
 
 
@@ -353,7 +357,6 @@ public class ReportExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
-
         }
     }
 
