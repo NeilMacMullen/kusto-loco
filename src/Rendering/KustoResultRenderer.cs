@@ -68,16 +68,11 @@ public class KustoResultRenderer
                };
     }
 
-    private static void MakeLineChart(KustoQueryResult arg1, VegaChart arg2)
+    private static void MakeLineChart(KustoQueryResult result, VegaChart chart)
     {
-        if (arg1.ColumnDefinitions().Length > 2)
+        if (result.ColumnDefinitions().Length > 2)
         {
-            var seriesColumn = arg1.ColumnDefinitions()[2];
-            var data = arg1.EnumerateColumnData(seriesColumn)
-                           .Select(c => c?.ToString().NullToEmpty() !)
-                           .Distinct()
-                           .ToArray();
-            arg2.UseCursorTooltip(data);
+            chart.UseCursorTooltip();
         }
     }
 

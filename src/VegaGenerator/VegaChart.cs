@@ -197,4 +197,54 @@ public class VegaChart
         _builder.Move($"{Axis(VegaAxisName.Y)}", $"layer[0].{Axis(VegaAxisName.Y)}");
         return this;
     }
+	
+    public VegaChart UseCursorTooltip()
+    {
+        var xAxisField = _builder.Get($"{Axis(VegaAxisName.X)}.field", string.Empty);
+        var yAxisField = _builder.Get($"{Axis(VegaAxisName.Y)}.field", string.Empty);
+        var colorAxisField = _builder.Get($"{Axis(VegaAxisName.Color)}.field", string.Empty);
+
+        //note to cope with spaces and invalid chars in the x-axis name we use bracket rather than dot notation
+        //to embed it in the calculate expression
+        var rulerLayer = $$$"""
+                            [
+                            {
+                             "layer": [
+                                {"mark": "line"},
+                                {"transform": [{"filter": {"param": "hover", "empty": false}}], "mark": "point"}
+                              ]
+                            },
+                            {
+                              "transform": [
+                              {"pivot": "{{{colorAxisField}}}", "value": "{{{yAxisField}}}", "groupby": ["{{{xAxisField}}}"]},
+                                {"calculate": "datetime(datum['{{{xAxisField}}}'])", "as": "{{{xAxisField}}}"}
+                            
+                              ],
+                              "mark": { "type" : "rule",
+                                   "tooltip": {"content": "data"}
+                                     },
+                              "encoding": {
+                                "opacity": {
+                                  "condition": {"value": 0.3, "param": "hover", "empty": false},
+                                  "value": 0
+                                }
+                              },
+                              "params": [{
+                                "name": "hover",
+                                "select": {
+                                  "type": "point",
+                                  "fields": ["{{{xAxisField}}}"],
+                                  "nearest": true,
+                                  "on": "pointerover",
+                                  "clear": "pointerout"
+                                }
+                              }]
+                            }
+                            ]
+                            """;
+        var layerBuilder = JObjectBuilder.FromJsonText(rulerLayer);
+        _builder.Set("layer", layerBuilder.ReferenceNode());
+        _builder.Move($"{Axis(VegaAxisName.Y)}", $"layer[0].{Axis(VegaAxisName.Y)}");
+        return this;
+    }
 }
