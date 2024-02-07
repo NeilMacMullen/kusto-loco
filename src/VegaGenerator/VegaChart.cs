@@ -66,13 +66,20 @@ public class VegaChart
         return this;
     }
 
+    private VegaChart CopyAxis(VegaAxisName source, VegaAxisName target)
+    {
+        _builder.Copy(Axis(source), Axis(target));
+        return this;
+    }
+
+
     private VegaChart ConvertToPie()
         => RenameAxis(VegaAxisName.X, VegaAxisName.Color)
             .RenameAxis(VegaAxisName.Y, VegaAxisName.Theta);
 
     public VegaChart ConvertToTimeline()
         => RenameAxis(VegaAxisName.Y, VegaAxisName.X2)
-           .RenameAxis(VegaAxisName.Color, VegaAxisName.Y)
+            .CopyAxis(VegaAxisName.Color, VegaAxisName.Y)
            .DisableLegend();
 
     private VegaChart DisableLegend()
@@ -121,6 +128,13 @@ public class VegaChart
     {
         _builder.Set("width", "container");
         _builder.Set("height", "container");
+        return this;
+    }
+
+    public VegaChart SetSize(int width, int height)
+    {
+        _builder.Set("width", width);
+        _builder.Set("height", height);
         return this;
     }
 
@@ -245,6 +259,18 @@ public class VegaChart
         var layerBuilder = JObjectBuilder.FromJsonText(rulerLayer);
         _builder.Set("layer", layerBuilder.ReferenceNode());
         _builder.Move($"{Axis(VegaAxisName.Y)}", $"layer[0].{Axis(VegaAxisName.Y)}");
+        return this;
+    }
+
+
+    public VegaChart AddFacet(ColumnDescription column)
+    {
+        _builder.Set("encoding.facet", new
+        {
+            field = column.QualifiedColumnName,
+            columns = 1
+        });
+      
         return this;
     }
 }

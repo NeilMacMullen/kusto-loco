@@ -115,6 +115,7 @@ public class KustoResultRenderer
     public static void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
     {
         chart.ConvertToTimeline();
+        
     }
 
 
@@ -129,12 +130,13 @@ public class KustoResultRenderer
     public static ColumnDescription[] GetColumns(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
+        var needed = Math.Max(3 - headers.Length,0);
         var allColumns = headers.Select(h => new ColumnDescription(h.Name, h.Name,
                                                                    InferSuitableAxisType(h.UnderlyingType)))
-                                .Concat(Enumerable.Range(0, 3)
+                                .Concat(Enumerable.Range(0, needed)
                                                   .Select(i => new ColumnDescription(string.Empty, string.Empty,
                                                               VegaAxisType.Nominal)))
-                                .Take(3)
+                               
                                 .ToArray();
 
         return allColumns;
@@ -174,14 +176,21 @@ public class KustoResultRenderer
                                              columns[1],
                                              columns[2]
                                             );
-
+       
 
         var rows = result.AsOrderedDictionarySet();
         spec.InjectData(rows);
-
+      
         jmutate(result, spec);
 
-        spec.FillContainer();
+        
+        if (columns.Length >= 4)
+        {
+            spec.AddFacet(columns[3]);
+            spec.SetSize(1800, 100);
+        }
+        else
+            spec.FillContainer();
         return spec;
     }
 
