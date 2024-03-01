@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Data;
-using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -16,16 +15,11 @@ namespace ProcessWatcher;
 public partial class MainWindow : Window
 {
     private readonly ReportExplorer explorer;
-    private readonly DispatcherTimer timer = new();
-    private ImmutableArray<ProcessDetail> ProcessHistory = ImmutableArray<ProcessDetail>.Empty;
-    private ImmutableArray<ProcessDetail> ProcessList = ImmutableArray<ProcessDetail>.Empty;
+    private readonly EmbeddedConsole _console;
 
     public MainWindow()
     {
         InitializeComponent();
-        timer.Interval = TimeSpan.FromSeconds(1);
-        timer.Tick += TimerOnTick;
-        timer.IsEnabled = true;
 
         var workin = @"C:\kusto";
         var context =
@@ -33,38 +27,14 @@ public partial class MainWindow : Window
                 workin,
                 workin,
                 workin);
-        explorer = new ReportExplorer(context);
+        _console = new EmbeddedConsole(OutputText);
+        explorer = new ReportExplorer(_console,context);
     }
-
-    private void TimerOnTick(object? sender, EventArgs e)
-    {
-        var now = DateTime.UtcNow;
-        ProcessList = Process.GetProcesses()
-            .Select(p => new ProcessDetail(
-                now,
-                p.ProcessName,
-                p.Threads.Count,
-                p.Id,
-                p.WorkingSet64,
-                p.HandleCount
-            ))
-            .ToImmutableArray();
-
-        ProcessHistory =
-            ProcessHistory.AddRange(ProcessList);
-
-        var max = 100000;
-        if (ProcessHistory.Length > max)
-            ProcessHistory = ProcessHistory.TakeLast(max).ToImmutableArray();
-    }
-
 
     private async Task RunQuery()
     {
         await webview.EnsureCoreWebView2Async();
         var c = new KustoQueryContext();
-        c.AddTableFromRecords("p", ProcessList);
-        c.AddTableFromRecords("h", ProcessHistory);
         var i = Query.GetLineIndexFromCharacterIndex(Query.CaretIndex);
         var sb = new StringBuilder();
         while (i >= 1 && Query.GetLineText(i - 1).Trim().Length > 0)
@@ -76,8 +46,11 @@ public partial class MainWindow : Window
         }
 
         //var result = c.RunTabularQueryWithoutDemandBasedTableLoading(sb.ToString());
+        _console.Init();
 
         var result = await explorer.RunInput(sb.ToString(), false);
+        _console.RenderToRichTextBox();
+
         if (result.Height > 0)
         {
             if (result.Visualization != VisualizationState.Empty)
@@ -121,11 +94,3 @@ public partial class MainWindow : Window
         }
     }
 }
-
-public readonly record struct ProcessDetail(
-    DateTime Time,
-    string Name,
-    int Threads,
-    int Id,
-    long WorkingSet,
-    int Handles);

@@ -3,54 +3,64 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProcessWatcher"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-   
-        <Grid>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-         
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-
             <TextBox Grid.Row="0"
                      Name="Query" TextChanged="Go"
                      PreviewKeyDown="Query_OnKeyDown"
+                     FontFamily="Consolas"
                      FontSize="20"
                      AcceptsReturn="True"
                      MinHeight="100" />
-
             <GridSplitter Grid.Row="1"
                           VerticalAlignment="Stretch"
-                          Height="5" 
-                          HorizontalAlignment="Stretch"/>
+                          Height="5"
+                          HorizontalAlignment="Stretch" />
+            <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas" />
+        </Grid>
 
-        <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+        <GridSplitter Grid.Column="1"
+                      VerticalAlignment="Stretch"
+                      Width="5"
+                      HorizontalAlignment="Stretch" />
 
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <DataGrid  Grid.Row="0"  Name="dataGrid" />
+            <GridSplitter Grid.Row="1"
+                          VerticalAlignment="Stretch"
+                          Height="5"
+                          HorizontalAlignment="Stretch" />
+
+            <wv2:WebView2  Grid.Row="2"  Name="webview" />
 
 
-                <DataGrid Name="dataGrid" Grid.Column="0" />
 
+        </Grid>
+    </Grid>
 
-                <GridSplitter Grid.Column="1"
-                          HorizontalAlignment="Stretch"
-                          Width="5"
-                          VerticalAlignment="Stretch"/>
-
-                <wv2:WebView2 Name="webview" Grid.Column="2" />
-
-
-            </Grid>
-            </Grid>
-       
 
 </Window>

@@ -7,6 +7,14 @@ public static class StandardParsers
                                                       settings.CaseSensitive = false;
                                                       settings.HelpWriter = Console.Out;
                                                   });
+
+    public static Parser CreateWithHelpWriter(TextWriter writer)
+    =>  new(settings =>
+    {
+        settings.CaseInsensitiveEnumValues = true;
+        settings.CaseSensitive = false;
+        settings.HelpWriter =writer;
+    });
 }
 
 

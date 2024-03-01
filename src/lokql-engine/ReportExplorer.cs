@@ -21,20 +21,22 @@ public class ReportExplorer
     private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
+    private readonly IConsole _outputConsole;
     private readonly IKustoQueryContextTableLoader _loader;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public ReportExplorer(FolderContext folders, IKustoQueryContextTableLoader loader)
+    public ReportExplorer(IConsole outputConsole,FolderContext folders, IKustoQueryContextTableLoader loader)
     {
+        _outputConsole = outputConsole;
         _loader = loader;
         _context.AddLazyTableLoader(_loader);
         _folders = folders;
     }
 
-    public ReportExplorer(FolderContext folders) : this(folders, new StandardFormatAdaptor(folders.OutputFolder))
+    public ReportExplorer(IConsole outputConsole,FolderContext folders) : this(outputConsole,folders, new StandardFormatAdaptor(folders.OutputFolder))
     {
     }
 
@@ -42,16 +44,17 @@ public class ReportExplorer
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
-        Console.ForegroundColor = ConsoleColor.Green;
+
+        _outputConsole.SetForegroundColor(ConsoleColor.Green);
 
 
-        var prefs = new DisplayPreferences(Console.WindowWidth, start, maxToDisplay);
-        Console.WriteLine(Tabulate(result, prefs));
+        var prefs = new DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
+        _outputConsole.WriteLine(Tabulate(result, prefs));
 
         if (maxToDisplay < result.Height)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(
+            _outputConsole.SetForegroundColor(ConsoleColor.Red);
+            _outputConsole.WriteLine(
                 $"Display was truncated to first {maxToDisplay} of {result.Height}.  Use '.display --max' to change this behaviour");
         }
     }
@@ -62,10 +65,10 @@ public class ReportExplorer
             ShowError(result.Error);
         else
         {
-            Console.ForegroundColor = ConsoleColor.Green;
+            _outputConsole.SetForegroundColor(ConsoleColor.Green);
             if (result.Height == 0)
             {
-                Console.WriteLine("No results");
+                _outputConsole.WriteLine("No results");
             }
             else
             {
@@ -78,14 +81,14 @@ public class ReportExplorer
                 }
             }
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Query took {result.QueryDuration}ms");
+            _outputConsole.SetForegroundColor(ConsoleColor.Yellow);
+            _outputConsole.WriteLine($"Query took {result.QueryDuration}ms");
         }
     }
 
     public async Task RunInteractive(string initialScript)
     {
-        Console.WriteLine("Use '.help' to list commands");
+        _outputConsole.WriteLine("Use '.help' to list commands");
 
         if (initialScript.IsNotBlank())
         {
@@ -94,18 +97,18 @@ public class ReportExplorer
 
         while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("KQL> ");
-            var query = Console.ReadLine();
+            _outputConsole.SetForegroundColor(ConsoleColor.Blue);
+            _outputConsole.Write("KQL> ");
+            var query = _outputConsole.ReadLine();
             await RunInput(query, true);
         }
     }
 
     private async Task ExecuteAsync(string line)
     {
-        Console.ForegroundColor = ConsoleColor.Blue;
+        _outputConsole.SetForegroundColor( ConsoleColor.Blue);
 
-        Console.WriteLine($"KQL> {line}");
+        _outputConsole.WriteLine($"KQL> {line}");
         await RunInput(line, true);
     }
 
@@ -150,7 +153,7 @@ public class ReportExplorer
             var result = await GetCurrentContext().RunTabularQueryAsync(query);
             if (result.Error.Length == 0)
                 _prevResult = result;
-            if (display)
+      //      if (display)
                 DisplayResults(result);
             return result;
         }
@@ -159,16 +162,16 @@ public class ReportExplorer
             ShowError(ex.Message);
         }
 
-        Console.WriteLine();
+       
         return KustoQueryResult.Empty;
     }
 
 
-    private static void ShowError(string message)
+    private void ShowError(string message)
     {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Error:");
-        Console.WriteLine(message);
+        _outputConsole.SetForegroundColor(ConsoleColor.DarkRed);
+        _outputConsole.WriteLine("Error:");
+        _outputConsole.WriteLine(message);
     }
 
 
@@ -194,7 +197,7 @@ public class ReportExplorer
 
     private Task RunInternalCommand(string[] args)
     {
-        return StandardParsers.Default.ParseArguments(args,
+        return StandardParsers.CreateWithHelpWriter(_outputConsole.Writer).ParseArguments(args,
                     typeof(ExitCommand.Options),
                     typeof(SaveCommand.Options),
                     typeof(RenderCommand.Options),
@@ -390,7 +393,7 @@ public class ReportExplorer
             var tableNames = context.TableNames
                 .Select(t => $"['{t}']")
                 .JoinAsLines();
-            Console.WriteLine(tableNames);
+            exp._outputConsole.WriteLine(tableNames);
         }
 
         [Verb("listtables", aliases: ["ls", "alltables", "at"],

@@ -17,7 +17,8 @@ internal class CmdExplore
                 options.WorkIn.OrWhenBlank(options.Results),
                 options.WorkIn.OrWhenBlank(options.Scripts),
                 options.WorkIn.OrWhenBlank(options.Queries));
-        var explorer = new ReportExplorer(context);
+        var console = new SystemConsole();
+        var explorer = new ReportExplorer(console,context);
 
         await explorer.RunInteractive(options.Run);
     }
