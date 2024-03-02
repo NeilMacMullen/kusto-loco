@@ -219,7 +219,7 @@ public readonly record struct ExpectedColumnSet(VegaAxisType[] X, VegaAxisType[]
 
 public static class AllowedColumnTypes
 {
-    public static ImmutableArray<ExpectedColumnSet> Unrestricted = ImmutableArray<ExpectedColumnSet>.Empty;
+    public static ImmutableArray<ExpectedColumnSet> Unrestricted = [];
 
     public static ImmutableArray<ExpectedColumnSet> LineChart =
         [new ExpectedColumnSet([VegaAxisType.Quantitative, VegaAxisType.Temporal], [VegaAxisType.Quantitative])];

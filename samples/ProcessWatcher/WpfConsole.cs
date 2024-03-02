@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Text;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -9,40 +6,37 @@ using System.Windows.Media;
 
 namespace ProcessWatcher;
 
-
-
-public class EmbeddedConsoleWriter : TextWriter
-{
-    private readonly EmbeddedConsole _console;
-
-    public EmbeddedConsoleWriter(EmbeddedConsole console)
-    {
-        _console = console;
-    }
-
-    public override Encoding Encoding {
-        get { return Encoding.UTF8; }
-    }
-
-    public override void Write(char value)
-    {
-        _console.Write(value.ToString());
-    }
-}
-
-public class EmbeddedConsole : IConsole
+/// <summary>
+///     Simple IConsole implementation that allows a RichTextBox to emulate a console for output text
+/// </summary>
+/// <remarks>
+///     Rather than mess around with different dispatcher contexts, we just mandate that the client
+///     app needs to render the buffered text at the end of the operation.
+/// </remarks>
+public class WpfConsole : IConsole
 {
     private readonly RichTextBox _control;
-
-    public EmbeddedConsole(RichTextBox control)
-    {
-        _control = control;
-        _writer = new EmbeddedConsoleWriter(this);
-    }
-    private readonly record struct ColoredText (ConsoleColor Color,string Text);
     private readonly List<ColoredText> _lines = new();
-    ConsoleColor _currentColor = ConsoleColor.Red;
-    private readonly EmbeddedConsoleWriter _writer;
+
+    private ConsoleColor _currentColor = ConsoleColor.Red;
+
+    public WpfConsole(RichTextBox control) => _control = control;
+
+    //calculate the number of visible columns in the RichTextBox
+    public int VisibleColumns
+    {
+        get
+        {
+            var typeface = new Typeface(_control.FontFamily, _control.FontStyle, _control.FontWeight,
+                _control.FontStretch);
+            var n = 50;
+            var formattedText = new FormattedText("".PadRight(n, 'w'), CultureInfo.InvariantCulture,
+                FlowDirection.LeftToRight,
+                typeface, _control.FontSize, Brushes.Black,
+                VisualTreeHelper.GetDpi(_control).PixelsPerDip);
+            return (int)(_control.ActualWidth * n * 0.9 / formattedText.WidthIncludingTrailingWhitespace);
+        }
+    }
 
     public void Write(string s)
     {
@@ -51,47 +45,27 @@ public class EmbeddedConsole : IConsole
 
     public void SetForegroundColor(ConsoleColor color)
     {
-       _currentColor= color;
+        _currentColor = color;
     }
 
-    public int WindowWidth
-    {
-        get;
-        private set;
-    }
+    public int WindowWidth { get; private set; }
 
-    public void Init()
+
+    public string ReadLine() => string.Empty;
+
+    /// <summary>
+    ///     Prepare for new text output and calculate the width of the console window
+    /// </summary>
+    public void PrepareForOutput()
     {
         _lines.Clear();
-       
-        WindowWidth=Math.Max(10, VisibleColumns);
-
-    }
-    //calculate the number of visible columns in the RichTextBox
-    public int VisibleColumns
-    {
-        get
-        {
-            var typeface = new Typeface(_control.FontFamily, _control.FontStyle, _control.FontWeight, _control.FontStretch);
-            var n = 50;
-            var formattedText = new FormattedText("".PadRight(n,'w'), CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
-                typeface, _control.FontSize, Brushes.Black,
-                VisualTreeHelper.GetDpi(_control).PixelsPerDip);
-            return (int)(_control.ActualWidth *n*0.9 / formattedText.WidthIncludingTrailingWhitespace);
-        }
-    }
-
-    public TextWriter Writer => _writer;
-
-    public string ReadLine()
-    {
-       return string.Empty;
+        WindowWidth = Math.Max(10, VisibleColumns);
     }
 
 
-    public static void AppendText(RichTextBox box, string text, Brush color)
+    private static void AppendText(RichTextBox box, string text, Brush color)
     {
-        text  = text.Replace("\r", "");
+        text = text.Replace("\r", "");
         var tr = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd)
         {
             Text = text
@@ -101,9 +75,15 @@ public class EmbeddedConsole : IConsole
             tr.ApplyPropertyValue(TextElement.ForegroundProperty,
                 color);
         }
-        catch (FormatException) { }
+        catch (FormatException)
+        {
+        }
     }
-    public void RenderToRichTextBox()
+
+    /// <summary>
+    ///     Renders queued text to the RichTextBox that backs up this console
+    /// </summary>
+    public void RenderTextBufferToWpfControl()
     {
         _control.Document.Blocks.Clear();
         _control.Document.LineHeight = 1;
@@ -111,7 +91,6 @@ public class EmbeddedConsole : IConsole
         {
             AppendText(_control, line.Text, GetColor(line.Color));
         }
-      
     }
 
     private Brush GetColor(ConsoleColor lineColor)
@@ -151,6 +130,9 @@ public class EmbeddedConsole : IConsole
             case ConsoleColor.White:
                 return Brushes.White;
         }
+
         return Brushes.Black;
     }
+
+    private readonly record struct ColoredText(ConsoleColor Color, string Text);
 }

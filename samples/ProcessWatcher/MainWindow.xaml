@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:processWatcher="clr-namespace:ProcessWatcher"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="LokqlDX" Height="450" Width="800"
+        Loaded="MainWindow_OnLoaded">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -22,24 +24,22 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBox Grid.Row="0"
-                     Name="Query" TextChanged="Go"
-                     PreviewKeyDown="Query_OnKeyDown"
-                     FontFamily="Consolas"
-                     FontSize="20"
-                     AcceptsReturn="True"
-                     MinHeight="100" />
+            <processWatcher:QueryEditor x:Name="Editor" Grid.Row="0" RunEvent="OnQueryEditorRunTextBlock" />
+
             <GridSplitter Grid.Row="1"
                           VerticalAlignment="Stretch"
                           Height="5"
-                          HorizontalAlignment="Stretch" />
-            <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas" />
+                          HorizontalAlignment="Stretch"
+                          Background="DarkGray"/>
+            <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
+                         Background="Black"/>
         </Grid>
 
         <GridSplitter Grid.Column="1"
                       VerticalAlignment="Stretch"
                       Width="5"
-                      HorizontalAlignment="Stretch" />
+                      HorizontalAlignment="Stretch"
+                      Background="DarkGray"/>
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
@@ -48,14 +48,22 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-            <DataGrid  Grid.Row="0"  Name="dataGrid" />
+            <DockPanel Grid.Row="0" >
+                <DockPanel  DockPanel.Dock="Top">
+                    <Label DockPanel.Dock="Left">Rows to display:</Label>
+                    <TextBox Name="VisibleDataGridRows" VerticalContentAlignment="Center">1000</TextBox>
+                </DockPanel>
+               
+                <DataGrid   Name="dataGrid" />
+            </DockPanel>
+          
             <GridSplitter Grid.Row="1"
                           VerticalAlignment="Stretch"
                           Height="5"
-                          HorizontalAlignment="Stretch" />
+                          HorizontalAlignment="Stretch" 
+                          Background="DarkGray"/>
 
-            <wv2:WebView2  Grid.Row="2"  Name="webview" />
+            <wv2:WebView2  Grid.Row="2"  Name="webview" DefaultBackgroundColor="Black"/>
 
 
 

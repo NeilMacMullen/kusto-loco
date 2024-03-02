@@ -4,7 +4,7 @@ namespace JPoke;
 
 public readonly record struct JPath(ImmutableArray<JPathElement> Elements)
 {
-    public static readonly JPath Empty = new(ImmutableArray<JPathElement>.Empty);
+    public static readonly JPath Empty = new([]);
     public bool IsTerminal => Elements.Length <= 1;
     public int Length => Elements.Length;
     public JPathElement Top => Length > 0 ? Elements[0] : JPathElement.Empty;

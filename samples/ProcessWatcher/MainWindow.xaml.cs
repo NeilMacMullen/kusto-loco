@@ -1,21 +1,14 @@
-﻿using System.Collections.Immutable;
-using System.Data;
-using System.Text;
+﻿using System.Data;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
 using BabyKusto.Core.Evaluation;
 using KustoSupport;
 
 namespace ProcessWatcher;
 
-/// <summary>
-///     Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
+    private readonly WpfConsole _console;
     private readonly ReportExplorer explorer;
-    private readonly EmbeddedConsole _console;
 
     public MainWindow()
     {
@@ -27,70 +20,77 @@ public partial class MainWindow : Window
                 workin,
                 workin,
                 workin);
-        _console = new EmbeddedConsole(OutputText);
-        explorer = new ReportExplorer(_console,context);
+        _console = new WpfConsole(OutputText);
+        explorer = new ReportExplorer(_console, context);
     }
 
-    private async Task RunQuery()
+
+    private async Task RunQuery(string query)
     {
-        await webview.EnsureCoreWebView2Async();
-        var c = new KustoQueryContext();
-        var i = Query.GetLineIndexFromCharacterIndex(Query.CaretIndex);
-        var sb = new StringBuilder();
-        while (i >= 1 && Query.GetLineText(i - 1).Trim().Length > 0)
-            i--;
-        while (i < Query.LineCount && Query.GetLineText(i).Trim().Length > 0)
+        //start capturing console output from the engine
+        _console.PrepareForOutput();
+        //run the supplied lines of kusto/commands
+        var result = await explorer.RunInput(query, false);
+        _console.RenderTextBufferToWpfControl();
+
+        //if there are no results leave the previously rendered results in place
+        if (result.Height == 0)
+            return;
+
+        if (result.Visualization != VisualizationState.Empty)
         {
-            sb.AppendLine(Query.GetLineText(i));
-            i++;
+            //annoying we have to do this, but it's the only way to get the webview to render
+            await webview.EnsureCoreWebView2Async();
+            //generate the html and display it
+            var html = KustoResultRenderer.RenderToHtml(result);
+            webview.NavigateToString(html);
         }
 
-        //var result = c.RunTabularQueryWithoutDemandBasedTableLoading(sb.ToString());
-        _console.Init();
-
-        var result = await explorer.RunInput(sb.ToString(), false);
-        _console.RenderToRichTextBox();
-
-        if (result.Height > 0)
-        {
-            if (result.Visualization != VisualizationState.Empty)
-            {
-                var html = KustoResultRenderer.RenderToHtml(result);
-
-                webview.NavigateToString(html);
-            }
-
-            FillInDataGrid(result);
-        }
-    }
-
-    private void Go(object sender, RoutedEventArgs e)
-    {
+        FillInDataGrid(result);
     }
 
     private void FillInDataGrid(KustoQueryResult result)
     {
-        var maxDataGrid = 100;
+        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed) ? parsed : 100;
+
         var dt = new DataTable();
 
         foreach (var col in result.ColumnNames())
             dt.Columns.Add(col);
 
-        foreach (var row in result.EnumerateRows().Take(maxDataGrid))
+        foreach (var row in result.EnumerateRows().Take(maxDataGridRows))
             dt.Rows.Add(row);
 
         dataGrid.ItemsSource = dt.DefaultView;
     }
 
-    private async void Query_OnKeyDown(object sender, KeyEventArgs e)
+    /// <summary>
+    ///     Called when user presses CTRL-ENTER in the query editor
+    /// </summary>
+    private async void OnQueryEditorRunTextBlock(object? sender, QueryEditorRunEventArgs eventArgs)
     {
-        if (e.Key == Key.Enter)
-        {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))
-            {
-                e.Handled = true;
-                await RunQuery();
-            }
-        }
+        await RunQuery(eventArgs.Query);
+    }
+
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Editor.SetText(@"
+# move the cursor over a block of lines and press CTRL-ENTER to run
+# commands prefixed with '.' are special commands.  Use .help  to list
+
+.help 
+
+# loads a CSV file into a table called 'data'
+
+.load c:\data\mydata.csv data
+
+# gets the distribution of values in the 'Name' column
+
+data 
+| summarize count() by Name 
+| render barchart
+
+
+");
     }
 }

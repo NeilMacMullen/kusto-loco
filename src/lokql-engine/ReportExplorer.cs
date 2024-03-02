@@ -21,14 +21,14 @@ public class ReportExplorer
     private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
-    private readonly IConsole _outputConsole;
     private readonly IKustoQueryContextTableLoader _loader;
+    private readonly IConsole _outputConsole;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public ReportExplorer(IConsole outputConsole,FolderContext folders, IKustoQueryContextTableLoader loader)
+    public ReportExplorer(IConsole outputConsole, FolderContext folders, IKustoQueryContextTableLoader loader)
     {
         _outputConsole = outputConsole;
         _loader = loader;
@@ -36,7 +36,8 @@ public class ReportExplorer
         _folders = folders;
     }
 
-    public ReportExplorer(IConsole outputConsole,FolderContext folders) : this(outputConsole,folders, new StandardFormatAdaptor(folders.OutputFolder))
+    public ReportExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
+        new StandardFormatAdaptor(folders.OutputFolder))
     {
     }
 
@@ -44,7 +45,6 @@ public class ReportExplorer
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
-
         _outputConsole.SetForegroundColor(ConsoleColor.Green);
 
 
@@ -59,7 +59,7 @@ public class ReportExplorer
         }
     }
 
-    private void DisplayResults(KustoQueryResult result)
+    private void DisplayResults(KustoQueryResult result, bool autoRender)
     {
         if (result.Error.IsNotBlank())
             ShowError(result.Error);
@@ -75,7 +75,8 @@ public class ReportExplorer
                 var max = _currentDisplayOptions.MaxToDisplay;
                 ShowResultsToConsole(result, 0, max);
                 //auto render
-                if (result.Visualization != VisualizationState.Empty)
+
+                if (autoRender && result.Visualization != VisualizationState.Empty)
                 {
                     RenderCommand.Run(this, new RenderCommand.Options());
                 }
@@ -106,13 +107,13 @@ public class ReportExplorer
 
     private async Task ExecuteAsync(string line)
     {
-        _outputConsole.SetForegroundColor( ConsoleColor.Blue);
+        _outputConsole.SetForegroundColor(ConsoleColor.Blue);
 
         _outputConsole.WriteLine($"KQL> {line}");
         await RunInput(line, true);
     }
 
-    public async Task<KustoQueryResult> RunInput(string query, bool display)
+    public async Task<KustoQueryResult> RunInput(string query, bool autoRender)
     {
         query = query.Trim();
         //support comments
@@ -153,8 +154,8 @@ public class ReportExplorer
             var result = await GetCurrentContext().RunTabularQueryAsync(query);
             if (result.Error.Length == 0)
                 _prevResult = result;
-      //      if (display)
-                DisplayResults(result);
+
+            DisplayResults(result, autoRender);
             return result;
         }
         catch (Exception ex)
@@ -162,7 +163,7 @@ public class ReportExplorer
             ShowError(ex.Message);
         }
 
-       
+
         return KustoQueryResult.Empty;
     }
 
@@ -197,7 +198,9 @@ public class ReportExplorer
 
     private Task RunInternalCommand(string[] args)
     {
-        return StandardParsers.CreateWithHelpWriter(_outputConsole.Writer).ParseArguments(args,
+        var textWriter = new ConsoleTextWriter(_outputConsole);
+        return StandardParsers.CreateWithHelpWriter(textWriter)
+                .ParseArguments(args,
                     typeof(ExitCommand.Options),
                     typeof(SaveCommand.Options),
                     typeof(RenderCommand.Options),

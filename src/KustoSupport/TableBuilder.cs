@@ -23,9 +23,9 @@ public class TableBuilder
     public readonly int Length;
     public readonly string Name;
 
-    private ImmutableArray<string> _columnNames = ImmutableArray<string>.Empty;
+    private ImmutableArray<string> _columnNames = [];
 
-    private ImmutableArray<BaseColumn> _columns = ImmutableArray<BaseColumn>.Empty;
+    private ImmutableArray<BaseColumn> _columns = [];
 
     private TableBuilder(string name, IEnumerable<BaseColumn> columns,
         IEnumerable<string> columnNames, int length)
@@ -38,10 +38,10 @@ public class TableBuilder
 
     public static TableBuilder CreateEmpty(string name, int length)
         => new(
-               name,
-               Array.Empty<BaseColumn>(),
-               Array.Empty<string>(),
-               length);
+            name,
+            [],
+            [],
+            length);
 
 
     public TableBuilder WithColumn(string name, BaseColumn column)
@@ -112,10 +112,10 @@ public class TableBuilder
                 builder.WithColumn(p.Name, new LambdaWrappedColumn<T, string?>(records, o => (string?)p.GetValue(o)));
             if (propertyType == typeof(DateTime))
                 builder.WithColumn(p.Name,
-                                   new LambdaWrappedColumn<T, DateTime?>(records, o => (DateTime?)p.GetValue(o)));
+                    new LambdaWrappedColumn<T, DateTime?>(records, o => (DateTime?)p.GetValue(o)));
             if (propertyType == typeof(TimeSpan))
                 builder.WithColumn(p.Name,
-                                   new LambdaWrappedColumn<T, TimeSpan?>(records, o => (TimeSpan?)p.GetValue(o)));
+                    new LambdaWrappedColumn<T, TimeSpan?>(records, o => (TimeSpan?)p.GetValue(o)));
             if (propertyType == typeof(bool))
                 builder.WithColumn(p.Name, new LambdaWrappedColumn<T, bool?>(records, o => (bool?)p.GetValue(o)));
             if (propertyType == typeof(Guid))
@@ -131,13 +131,13 @@ public class TableBuilder
         //currently we rely on the dictionary having valid types and avoiding null values in unfortunate places
         var firstDictionary = dictionaries.First();
         var headers = firstDictionary.Cast<DictionaryEntry>()
-                                     .Select(de => de.Key.ToString())
-                                     .Select(h => new
-                                                  {
-                                                      ColumnName = h,
-                                                      Type = firstDictionary[h]?.GetType() ?? typeof(string)
-                                                  })
-                                     .ToArray();
+            .Select(de => de.Key.ToString())
+            .Select(h => new
+            {
+                ColumnName = h,
+                Type = firstDictionary[h]?.GetType() ?? typeof(string)
+            })
+            .ToArray();
 
         var builder = CreateEmpty(tableName, dictionaries.Count);
         foreach (var header in headers)
@@ -159,16 +159,16 @@ public class TableBuilder
     {
         var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
         return CreateEmpty("result", 1)
-               .WithColumn("value", column)
-               .ToTableSource();
+            .WithColumn("value", column)
+            .ToTableSource();
     }
 
     public ITableSource ToTableSource()
     {
         var syms = _columnNames.Zip(_columns)
-                               .Select(cs =>
-                                           new ColumnSymbol(cs.First, cs.Second.Type))
-                               .ToArray();
+            .Select(cs =>
+                new ColumnSymbol(cs.First, cs.Second.Type))
+            .ToArray();
         var ts = new TableSymbol(Name, syms);
         return new InMemoryTableSource(ts, _columns.ToArray());
     }

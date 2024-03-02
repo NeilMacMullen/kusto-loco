@@ -27,7 +27,7 @@ public static class StringExtensions
     public static string[] Tokenise(this string input, string separationCharacters)
     {
         if (input == null)
-            return Array.Empty<string>();
+            return [];
         return input.Split(separationCharacters.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .Where(t => t.Length != 0)
