@@ -192,8 +192,6 @@ public class KustoQueryContext
             // Ensure that tables are loaded into the query context
             await _lazyTableLoader.LoadTablesAsync(this, requiredTables);
 
-            // Note: Hold the lock until the query is complete to ensure that tables don't change
-            // in the middle of execution.
             return RunTabularQueryWithoutDemandBasedTableLoading(query);
         }
         catch (Exception ex)
