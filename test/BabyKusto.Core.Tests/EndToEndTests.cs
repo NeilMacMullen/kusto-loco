@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
@@ -3208,7 +3209,7 @@ cs:int
     }
 
     [Fact(Skip =
-                 "Known bug in window function implementations where a table is evaluated more than once. For now, using materialize() works around this")]
+        "Known bug in window function implementations where a table is evaluated more than once. For now, using materialize() works around this")]
     public void Window_RowCumSum_MultipleEvaluations()
     {
         // Arrange
@@ -3799,7 +3800,8 @@ aaathis is a test";
     private static void Test(string query, string expectedOutput)
     {
         var engine = new BabyKustoEngine();
-        var result = (TabularResult)engine.Evaluate(query, true, true);
+        var result = (TabularResult)engine.Evaluate(
+            Array.Empty<ITableSource>(), query, true, true);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
@@ -4018,7 +4020,7 @@ aaathis is a test";
     {
         var engine = new BabyKustoEngine();
         var query = "print X=1 | render barchart with (legend=visible,ymax=100)";
-        var result = (TabularResult)engine.Evaluate(query, true, true);
+        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query, true, true);
         var vis = result.VisualizationState;
         vis.ChartType.Should().Be("barchart");
         vis.Items["legend"].Should().Be("visible");
@@ -4030,7 +4032,7 @@ aaathis is a test";
     {
         var engine = new BabyKustoEngine();
         var query = "print X=1";
-        var result = (TabularResult)engine.Evaluate(query, true, true);
+        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query, true, true);
         var vis = result.VisualizationState;
         vis.Should().Be(VisualizationState.Empty);
     }

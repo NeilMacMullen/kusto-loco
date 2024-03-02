@@ -370,11 +370,7 @@ public class ReportExplorer
     {
         internal static void Run(ReportExplorer exp, Options o)
         {
-            var mat = TableBuilder.FromTable(exp._prevResult.Table,
-                KustoQueryContext.UnescapeTableName(o.As)
-            );
-            exp.GetCurrentContext()
-                .AddTable(mat);
+            exp.GetCurrentContext().MaterializeResultAsTable(exp._prevResult, o.As);
             Logger.Info($"Table '{o.As}' now available");
         }
 
@@ -433,11 +429,7 @@ public class ReportExplorer
         {
             Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
 
-
-            var t = exp.GetCurrentContext().GetTable(
-                KustoQueryContext.UnescapeTableName(o.CurrentName));
-            exp.GetCurrentContext().Share(t,
-                KustoQueryContext.UnescapeTableName(o.As));
+            exp.GetCurrentContext().ShareTable(o.CurrentName, o.As);
         }
 
         [Verb("synomym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]

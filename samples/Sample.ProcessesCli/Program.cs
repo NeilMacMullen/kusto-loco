@@ -44,7 +44,8 @@ static void ShowDemos()
     var demos = new[]
     {
         (Title: "Example: counting the total number of processes:", Query: @"Processes | count"),
-        (Title: "Example: Find the process using the most memory:", Query: @"Processes | project name, memMB=workingSet/1024/1024 | order by memMB desc | take 1")
+        (Title: "Example: Find the process using the most memory:",
+            Query: @"Processes | project name, memMB=workingSet/1024/1024 | order by memMB desc | take 1")
     };
 
     foreach (var demo in demos)
@@ -68,8 +69,9 @@ static void ExecuteReplQuery(string query)
 {
     var processesTable = new ProcessesTable("Processes");
     var engine = new BabyKustoEngine();
-    engine.AddGlobalTable(processesTable);
-    var result = engine.Evaluate(query, dumpIRTree: false); // Set dumpIRTree = true to see the internal tree representation
+    var result = engine.Evaluate(
+        [processesTable],
+        query, dumpIRTree: false); // Set dumpIRTree = true to see the internal tree representation
 
     Console.WriteLine();
     result.Dump(Console.Out);

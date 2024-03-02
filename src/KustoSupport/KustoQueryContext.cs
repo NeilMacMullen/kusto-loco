@@ -17,20 +17,22 @@ namespace KustoSupport;
 public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private readonly BabyKustoEngine _engine = new();
-    private readonly List<ITableSource> _tables = [];
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = new();
 
     private bool _fullDebug;
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
 
+    private List<ITableSource> _tables = [];
+
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
     //TODO - ugh - don't like exposing this in this way
-    public void AddFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
+    public void AddFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> additionalFunctions)
     {
-        _engine.AddAdditionalFunctions(funcs);
+        _additionalFunctions = additionalFunctions;
     }
+
 
     public void AddTable(TableBuilder builder) => AddTable(builder.ToTableSource());
 
@@ -39,13 +41,34 @@ public class KustoQueryContext
     {
         if (_tables.Any(t => t.Name == table.Name))
             throw new ArgumentException($"Context already contains a table named '{table.Name}'");
+        RemoveTable(table.Name);
         _tables.Add(table);
-        _engine.AddGlobalTable(table);
     }
 
-    public ITableSource GetTable(string name)
+
+    /// <summary>
+    ///     Remove the named table if it exists, otherwise do nothing
+    /// </summary>
+    /// <remarks>
+    ///     Supplied name may be framed with escapes
+    /// </remarks>
+    public void RemoveTable(string tableName)
     {
-        return _tables.Single(t => UnescapeTableName(t.Name) == name);
+        tableName = KustoNameEscaping.RemoveFraming(tableName);
+        _tables = _tables.Where(t => t.Name != tableName).ToList();
+    }
+
+
+    /// <summary>
+    ///     Renames a table
+    /// </summary>
+    /// <remarks>
+    ///     Will overwrite any existing table with the new name
+    /// </remarks>
+    public void RenameTable(string oldName, string newName)
+    {
+        ShareTable(oldName, newName);
+        RemoveTable(oldName);
     }
 
     public void OldAddTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records)
@@ -71,13 +94,16 @@ public class KustoQueryContext
 
     public int BenchmarkQuery(string query)
     {
-        var res = _engine.Evaluate(query, _fullDebug, _fullDebug);
+        var engine = new BabyKustoEngine();
+        var res = engine.Evaluate(_tables, query, _fullDebug, _fullDebug);
         return res.RowCount;
     }
 
     public KustoQueryResult RunTabularQueryWithoutDemandBasedTableLoading(string query)
     {
         var watch = Stopwatch.StartNew();
+        var engine = new BabyKustoEngine();
+        engine.AddAdditionalFunctions(_additionalFunctions);
         //handling for "special" commands
         if (query.Trim() == ".tables")
             return CreateTableList(query, false);
@@ -85,7 +111,7 @@ public class KustoQueryContext
         try
         {
             var result =
-                _engine.Evaluate(query,
+                engine.Evaluate(_tables, query,
                     _fullDebug, _fullDebug
                 );
             var (table, vis) = TableFromEvaluationResult(result);
@@ -203,21 +229,11 @@ public class KustoQueryContext
             tables.Add(query.Trim());
         }
 
-        return tables.Select(UnescapeTableName).Distinct().ToArray();
+        return tables.Select(KustoNameEscaping.RemoveFraming).Distinct().ToArray();
     }
 
     public IEnumerable<ITableSource> Tables() => _tables;
 
-    public static string UnescapeTableName(string tableName)
-    {
-        if ((tableName.StartsWith("['") && tableName.EndsWith("']")) ||
-            (tableName.StartsWith("[\"") && tableName.EndsWith("\"]"))
-           )
-            return tableName.Substring(2, tableName.Length - 4);
-        return tableName;
-    }
-
-    public static string EnsureEscapedTableName(string tableName) => $"['{UnescapeTableName(tableName)}']";
 
     public static KustoQueryContext WithFullDebug()
     {
@@ -228,11 +244,24 @@ public class KustoQueryContext
         return context;
     }
 
-    public ITableSource Share(ITableSource source, string requestedTableName)
+    /// <summary>
+    ///     Makes an existing table available under a different name
+    /// </summary>
+    /// <remarks>
+    ///     If the target name is already in use, the old table will be removed
+    /// </remarks>
+    public void ShareTable(string sourceName, string requestedTableName)
     {
-        var sharedTable = TableBuilder.FromTable(source, requestedTableName);
-        AddTable(sharedTable);
-        return sharedTable;
+        sourceName = KustoNameEscaping.RemoveFraming(sourceName);
+        requestedTableName = KustoNameEscaping.RemoveFraming(requestedTableName);
+        var matches = _tables.Where(t => t.Name == sourceName).ToArray();
+        if (matches.Any())
+        {
+            //in case there's already a table under the target name, remove it...
+            RemoveTable(requestedTableName);
+            var sharedTable = TableBuilder.FromTable(matches.First(), requestedTableName);
+            AddTable(sharedTable);
+        }
     }
 
     public async Task<IReadOnlyCollection<T>> RunTabularQueryToRecordSet<T>(string query)
@@ -241,5 +270,16 @@ public class KustoQueryContext
         if (result.Error.IsNotBlank())
             throw new InvalidOperationException($"{result.Error}");
         return result.DeserialiseTo<T>();
+    }
+
+    /// <summary>
+    ///     Takes the results from an earlier query and materializes them as a table
+    /// </summary>
+    public void MaterializeResultAsTable(KustoQueryResult queryResult, string tableName)
+    {
+        var mat = TableBuilder.FromTable(queryResult.Table,
+            KustoNameEscaping.RemoveFraming(tableName)
+        );
+        AddTable(mat);
     }
 }

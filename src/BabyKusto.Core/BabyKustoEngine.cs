@@ -20,23 +20,12 @@ public readonly record struct FunctionInfo(string Name, bool Implemented);
 public class BabyKustoEngine
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private readonly List<ITableSource> _globalTables = new();
+
 
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
 
     static BabyKustoEngine()
     {
-    }
-
-    public void AddGlobalTable(ITableSource table)
-    {
-        Logger.Trace($"Adding table  {table.Type.Name} ");
-        if (string.IsNullOrEmpty(table.Type.Name))
-        {
-            throw new ArgumentNullException($"{nameof(table)}.{nameof(table.Type)}.{nameof(table.Type.Name)}");
-        }
-
-        _globalTables.Add(table);
     }
 
     public void AddAdditionalFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
@@ -57,7 +46,9 @@ public class BabyKustoEngine
             .OrderBy(f => f.Name).ToArray();
     }
 
-    public EvaluationResult Evaluate(string query, bool dumpKustoTree = false, bool dumpIRTree = false)
+    public EvaluationResult Evaluate(
+        IReadOnlyCollection<ITableSource> tables,
+        string query, bool dumpKustoTree = false, bool dumpIRTree = false)
     {
         Logger.Trace("Evaluate called");
         //combine all available functions
@@ -72,9 +63,7 @@ public class BabyKustoEngine
         var state = GlobalState.Default
             .WithFunctions(allSupported);
 
-        var db = new DatabaseSymbol(
-            "MyDb",
-            _globalTables.Select(table => table.Type).ToArray());
+        var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).ToArray());
 
         var globals = state.WithDatabase(db);
 
@@ -112,7 +101,7 @@ public class BabyKustoEngine
 
         Logger.Trace("Adding tables to scope...");
         var scope = new LocalScope();
-        foreach (var table in _globalTables)
+        foreach (var table in tables)
         {
             scope.AddSymbol(table.Type, TabularResult.CreateUnvisualized(table));
         }

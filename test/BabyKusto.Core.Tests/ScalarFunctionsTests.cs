@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Extensions;
@@ -12,9 +13,9 @@ public class ScalarFunctionsTests
     public void TestLevenshtein()
     {
         var query = """
-                let Table1 = datatable(value1:string,value2:string)['test123','test124'];
-                Table1 | where levenshtein(value1, value2) == 1
-                """;
+                    let Table1 = datatable(value1:string,value2:string)['test123','test124'];
+                    Table1 | where levenshtein(value1, value2) == 1
+                    """;
 
         var expected = @"
 value1:string; value2:string
@@ -29,8 +30,8 @@ test123; test124
     public void TestSimilarityFunction()
     {
         var query = """
-                print s= toint((string_similarity('test123', 'test124') *100))
-                """;
+                    print s= toint((string_similarity('test123', 'test124') *100))
+                    """;
         var expected = @"
 s:int
 ------------------
@@ -43,9 +44,9 @@ s:int
     public void TestSimilarityFunctionWithBlankInput()
     {
         var query = """
-                let Table1 = datatable(value1:string,value2:string)['test123',''];
-                Table1 | where string_similarity(value1, value2) < 0.9
-                """;
+                    let Table1 = datatable(value1:string,value2:string)['test123',''];
+                    Table1 | where string_similarity(value1, value2) < 0.9
+                    """;
         var expected = @"
 value1:string; value2:string
 ------------------
@@ -87,7 +88,9 @@ iso:string
     private static void Test(string query, string expectedOutput)
     {
         var engine = new BabyKustoEngine();
-        var result = (TabularResult?)engine.Evaluate(query);
+        var result = (TabularResult?)engine.Evaluate(
+            Array.Empty<ITableSource>(),
+            query);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
