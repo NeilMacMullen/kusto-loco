@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JPoke\JPoke.csproj" />
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\VegaGenerator\VegaGenerator.csproj" />
   </ItemGroup>

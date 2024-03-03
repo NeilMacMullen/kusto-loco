@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CsvSupport\CsvSupport.csproj" />
-    <ProjectReference Include="..\JPoke\JPoke.csproj" />
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\lokql-engine\lokql-engine.csproj" />

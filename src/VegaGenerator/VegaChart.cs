@@ -80,7 +80,7 @@ public class VegaChart
     public VegaChart ConvertToTimeline()
         => RenameAxis(VegaAxisName.Y, VegaAxisName.X2)
             .CopyAxis(VegaAxisName.Color, VegaAxisName.Y)
-           .DisableLegend();
+            .DisableLegend();
 
     private VegaChart DisableLegend()
     {
@@ -97,10 +97,10 @@ public class VegaChart
     public static VegaAxisType InferSuitableAxisType(Type t)
     {
         var numericTypes = new[]
-                           {
-                               typeof(int), typeof(long), typeof(double), typeof(float),
-                               typeof(uint), typeof(ulong), typeof(byte), typeof(decimal)
-                           };
+        {
+            typeof(int), typeof(long), typeof(double), typeof(float),
+            typeof(uint), typeof(ulong), typeof(byte), typeof(decimal)
+        };
         if (numericTypes.Contains(t))
             return VegaAxisType.Quantitative;
 
@@ -108,8 +108,8 @@ public class VegaChart
             return VegaAxisType.Ordinal;
 
         return t == typeof(DateTime)
-                   ? VegaAxisType.Temporal
-                   : VegaAxisType.Nominal;
+            ? VegaAxisType.Temporal
+            : VegaAxisType.Nominal;
     }
 
     public VegaChart InjectData(IEnumerable<OrderedDictionary> rows)
@@ -149,11 +149,11 @@ public class VegaChart
     {
         _builder.Set("transform[0].sort[0]", new { field = sourceData });
         _builder.Set("transform[0].window[0]", new
-                                               {
-                                                   op = "percent_rank",
-                                                   field = "count",
-                                                   @as = outputName
-                                               });
+        {
+            op = "percent_rank",
+            field = "count",
+            @as = outputName
+        });
         _builder.Set("transform[0].frame", new object?[] { null, 0 });
 
         _builder.Set($"{Axis(VegaAxisName.Y)}.field", outputName);
@@ -168,11 +168,11 @@ public class VegaChart
         var colorAxisField = _builder.Get($"{Axis(VegaAxisName.Color)}.field", string.Empty);
 
         var toolTips = seriesNames.Select(s => new
-                                               {
-                                                   field = s,
-                                                   type = ToVegaString(VegaAxisType.Quantitative)
-                                               })
-                                  .ToArray();
+            {
+                field = s,
+                type = ToVegaString(VegaAxisType.Quantitative)
+            })
+            .ToArray();
 
 
         var rulerLayer = $$$"""
@@ -206,12 +206,12 @@ public class VegaChart
                             ]
                             """;
         var layerBuilder = JObjectBuilder.FromJsonText(rulerLayer);
-        _builder.Set("layer", layerBuilder.ReferenceNode());
+        _builder.Set("layer", layerBuilder);
         _builder.Set("layer[1].encoding.tooltip", toolTips);
         _builder.Move($"{Axis(VegaAxisName.Y)}", $"layer[0].{Axis(VegaAxisName.Y)}");
         return this;
     }
-	
+
     public VegaChart UseCursorTooltip()
     {
         var xAxisField = _builder.Get($"{Axis(VegaAxisName.X)}.field", string.Empty);
@@ -257,7 +257,7 @@ public class VegaChart
                             ]
                             """;
         var layerBuilder = JObjectBuilder.FromJsonText(rulerLayer);
-        _builder.Set("layer", layerBuilder.ReferenceNode());
+        _builder.Set("layer", layerBuilder);
         _builder.Move($"{Axis(VegaAxisName.Y)}", $"layer[0].{Axis(VegaAxisName.Y)}");
         return this;
     }
@@ -270,7 +270,7 @@ public class VegaChart
             field = column.QualifiedColumnName,
             columns = 1
         });
-      
+
         return this;
     }
 }
