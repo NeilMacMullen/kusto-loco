@@ -3,11 +3,11 @@ using System.Diagnostics;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Evaluation.BuiltIns;
-using Extensions;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using NLog;
+using NotNullStrings;
 
 namespace KustoSupport;
 
@@ -222,7 +222,7 @@ public class KustoQueryContext
                     tables.Add(e.RawResultType.Name);
             });
         //special case handling for when query is _only_ a table name without any operators
-        if (!tables.Any() && query.Tokenise().Length == 1)
+        if (!tables.Any() && query.Tokenize().Length == 1)
         {
             tables.Add(query.Trim());
         }

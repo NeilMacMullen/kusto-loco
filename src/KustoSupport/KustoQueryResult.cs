@@ -3,8 +3,8 @@ using System.Text.Json;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
 using BabyKusto.Core.Util;
-using Extensions;
 using NLog;
+using NotNullStrings;
 
 #pragma warning disable CS8603 // Possible null reference return.
 

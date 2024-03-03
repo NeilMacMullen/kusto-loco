@@ -2,7 +2,7 @@
 using System.Text;
 using BabyKusto.Core;
 using BabyKusto.Core.Evaluation;
-using Extensions;
+using NotNullStrings;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
@@ -26,7 +26,7 @@ public static class KustoFormatter
     }
 
     /// <summary>
-    ///     rather roundabout way of turning ordereded dictionaries into tabulated text
+    ///     rather roundabout way of turning ordered dictionaries into tabulated text
     /// </summary>
     /// <param name="dictionaries"></param>
     /// <returns></returns>

@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Text;
 using BabyKusto.Core.Evaluation;
 using CommandLine;
-using Extensions;
 using KustoSupport;
 using NLog;
+using NotNullStrings;
 using static KustoSupport.KustoFormatter;
 
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local setters are
@@ -283,9 +283,9 @@ public class ReportExplorer
             var q = exp._prevResult.Query;
             if (!o.NoSplit)
                 q = q
-                        .Tokenise("|")
+                        .Tokenize("|")
                         .JoinString($"{Environment.NewLine}| ")
-                        .Tokenise(";")
+                        .Tokenize(";")
                         .JoinString($";{Environment.NewLine}")
                     ;
 

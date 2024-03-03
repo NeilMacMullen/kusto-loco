@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using Extensions;
 using NLog;
+using NotNullStrings;
 
 /// <summary>
 ///     Provides some summary info on a report
@@ -18,7 +18,7 @@ internal class CmdExplore
                 options.WorkIn.OrWhenBlank(options.Scripts),
                 options.WorkIn.OrWhenBlank(options.Queries));
         var console = new SystemConsole();
-        var explorer = new ReportExplorer(console,context);
+        var explorer = new ReportExplorer(console, context);
 
         await explorer.RunInteractive(options.Run);
     }
@@ -26,7 +26,6 @@ internal class CmdExplore
     [Verb("explore")]
     public class Options
     {
-
         [Option(HelpText = "Folder containing '.dfr' scripts")]
         public string Scripts { get; set; } = string.Empty;
 

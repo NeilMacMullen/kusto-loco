@@ -10,8 +10,4 @@
     <PackageReference Include="Fastenshtein" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
-  </ItemGroup>
-
 </Project>

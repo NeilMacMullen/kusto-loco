@@ -1,7 +1,7 @@
-using Extensions;
 using KustoSupport;
 using LogSetup;
 using NLog;
+using NotNullStrings;
 
 namespace BasicTests;
 

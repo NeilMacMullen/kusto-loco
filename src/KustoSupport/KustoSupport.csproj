@@ -10,12 +10,12 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="NLog" />
+    <PackageReference Include="NotNullStrings" />
   </ItemGroup>
 
  
   <ItemGroup>
     <ProjectReference Include="..\BabyKusto.Core\BabyKusto.Core.csproj" />
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
 
 </Project>

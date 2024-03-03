@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
     <ProjectReference Include="..\JPoke\JPoke.csproj" />
   </ItemGroup>
 

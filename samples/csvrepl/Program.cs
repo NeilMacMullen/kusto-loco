@@ -1,6 +1,6 @@
 ﻿using CsvSupport;
-using Extensions;
 using KustoSupport;
+using NotNullStrings;
 
 var context = new KustoQueryContext();
 

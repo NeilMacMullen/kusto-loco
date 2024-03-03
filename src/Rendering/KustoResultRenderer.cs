@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
-using Extensions;
 using KustoSupport;
+using NotNullStrings;
 
 #pragma warning disable CS8618, CS8600, CS8602, CS8604
 public class KustoResultRenderer
@@ -33,39 +33,39 @@ public class KustoResultRenderer
 
     public static string RenderToHtml(KustoQueryResult result)
         => result.Visualization.ChartType.IsNotBlank()
-               ? KustoToVegaChartType(result)
-               : RenderToTable(result);
+            ? KustoToVegaChartType(result)
+            : RenderToTable(result);
 
 
     public static string KustoToVegaChartType(KustoQueryResult result)
     {
-       var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
+        var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
         var state = result.Visualization;
         return state.ChartType switch
-               {
-                   KustoChartTypes.Column => RenderToChart(title, VegaMark.Bar, result, MakeColumnChart,
-                                                           AllowedColumnTypes.ColumnChart),
+        {
+            KustoChartTypes.Column => RenderToChart(title, VegaMark.Bar, result, MakeColumnChart,
+                AllowedColumnTypes.ColumnChart),
 
-                   KustoChartTypes.Bar => RenderToChart(title, VegaMark.Bar, result, MakeBarChart,
-                                                        AllowedColumnTypes.BarChart),
-                   KustoChartTypes.Line => RenderToChart(title, VegaMark.Line, result, MakeLineChart,
-                                                         AllowedColumnTypes.LineChart),
-                   KustoChartTypes.Pie => RenderToChart(title, VegaMark.Arc, result, NoOp,
-                                                        AllowedColumnTypes.ColumnChart),
-                   KustoChartTypes.Area => RenderToChart(title, VegaMark.Area, result, NoOp,
-                                                         AllowedColumnTypes.LineChart),
-                   KustoChartTypes.StackedArea => RenderToChart(title, VegaMark.Area, result, MakeStackedArea,
-                                                                AllowedColumnTypes.LineChart),
+            KustoChartTypes.Bar => RenderToChart(title, VegaMark.Bar, result, MakeBarChart,
+                AllowedColumnTypes.BarChart),
+            KustoChartTypes.Line => RenderToChart(title, VegaMark.Line, result, MakeLineChart,
+                AllowedColumnTypes.LineChart),
+            KustoChartTypes.Pie => RenderToChart(title, VegaMark.Arc, result, NoOp,
+                AllowedColumnTypes.ColumnChart),
+            KustoChartTypes.Area => RenderToChart(title, VegaMark.Area, result, NoOp,
+                AllowedColumnTypes.LineChart),
+            KustoChartTypes.StackedArea => RenderToChart(title, VegaMark.Area, result, MakeStackedArea,
+                AllowedColumnTypes.LineChart),
 
-                   KustoChartTypes.Ladder => RenderToChart(title, VegaMark.Bar, result, MakeTimeLineChart,
-                                                           AllowedColumnTypes.LadderChart),
-                   KustoChartTypes.Scatter => RenderToChart(title, VegaMark.Point, result, NoOp,
-                                                            AllowedColumnTypes.Unrestricted),
+            KustoChartTypes.Ladder => RenderToChart(title, VegaMark.Bar, result, MakeTimeLineChart,
+                AllowedColumnTypes.LadderChart),
+            KustoChartTypes.Scatter => RenderToChart(title, VegaMark.Point, result, NoOp,
+                AllowedColumnTypes.Unrestricted),
 
 
-                   _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp,
-                                      AllowedColumnTypes.Unrestricted)
-               };
+            _ => RenderToChart(title, InferChartTypeFromResult(result), result, NoOp,
+                AllowedColumnTypes.Unrestricted)
+        };
     }
 
     private static void MakeLineChart(KustoQueryResult result, VegaChart chart)
@@ -115,7 +115,6 @@ public class KustoResultRenderer
     public static void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
     {
         chart.ConvertToTimeline();
-        
     }
 
 
@@ -130,14 +129,13 @@ public class KustoResultRenderer
     public static ColumnDescription[] GetColumns(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
-        var needed = Math.Max(3 - headers.Length,0);
+        var needed = Math.Max(3 - headers.Length, 0);
         var allColumns = headers.Select(h => new ColumnDescription(h.Name, h.Name,
-                                                                   InferSuitableAxisType(h.UnderlyingType)))
-                                .Concat(Enumerable.Range(0, needed)
-                                                  .Select(i => new ColumnDescription(string.Empty, string.Empty,
-                                                              VegaAxisType.Nominal)))
-                               
-                                .ToArray();
+                InferSuitableAxisType(h.UnderlyingType)))
+            .Concat(Enumerable.Range(0, needed)
+                .Select(i => new ColumnDescription(string.Empty, string.Empty,
+                    VegaAxisType.Nominal)))
+            .ToArray();
 
         return allColumns;
     }
@@ -171,19 +169,19 @@ public class KustoResultRenderer
         // columns = TryMatch(columns, expectedColumns);
 
         var spec = VegaChart.CreateVegaChart(
-                                             chartType,
-                                             columns[0],
-                                             columns[1],
-                                             columns[2]
-                                            );
-       
+            chartType,
+            columns[0],
+            columns[1],
+            columns[2]
+        );
+
 
         var rows = result.AsOrderedDictionarySet();
         spec.InjectData(rows);
-      
+
         jmutate(result, spec);
 
-        
+
         if (columns.Length >= 4)
         {
             spec.AddFacet(columns[3]);
@@ -191,6 +189,7 @@ public class KustoResultRenderer
         }
         else
             spec.FillContainer();
+
         return spec;
     }
 
@@ -227,13 +226,13 @@ public static class AllowedColumnTypes
     public static ImmutableArray<ExpectedColumnSet> BarChart =
     [
         new ExpectedColumnSet([VegaAxisType.Quantitative, VegaAxisType.Temporal],
-                              [VegaAxisType.Nominal, VegaAxisType.Ordinal])
+            [VegaAxisType.Nominal, VegaAxisType.Ordinal])
     ];
 
     public static ImmutableArray<ExpectedColumnSet> ColumnChart =
     [
         new ExpectedColumnSet([VegaAxisType.Temporal, VegaAxisType.Ordinal],
-                              [VegaAxisType.Quantitative, VegaAxisType.Temporal])
+            [VegaAxisType.Quantitative, VegaAxisType.Temporal])
     ];
 
     public static ImmutableArray<ExpectedColumnSet> LadderChart =
