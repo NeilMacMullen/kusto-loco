@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="VegaGenerator" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
-    <ProjectReference Include="..\VegaGenerator\VegaGenerator.csproj" />
   </ItemGroup>
 
 </Project>

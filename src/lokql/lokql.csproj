@@ -22,7 +22,6 @@
     <ProjectReference Include="..\lokql-engine\lokql-engine.csproj" />
     <ProjectReference Include="..\Parquet\ParquetSupport.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
-    <ProjectReference Include="..\VegaGenerator\VegaGenerator.csproj" />
   </ItemGroup>
 
 </Project>
