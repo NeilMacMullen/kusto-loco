@@ -23,11 +23,7 @@ public class BabyKustoEngine
 
 
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
-
-    static BabyKustoEngine()
-    {
-    }
-
+  
     public void AddAdditionalFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
     {
         _additionalfuncs = funcs;
