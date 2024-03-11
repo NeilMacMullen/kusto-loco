@@ -4,8 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using BabyKusto.Core.Util;
 using Kusto.Language.Syntax;
-using Microsoft.Extensions.Internal;
+
 
 namespace BabyKusto.Core.InternalRepresentation;
 

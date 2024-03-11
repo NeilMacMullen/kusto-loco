@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using BabyKusto.Core;
 using BabyKusto.Core.Util;
 using CsvHelper;
 using KustoSupport;
@@ -7,18 +8,20 @@ using NLog;
 namespace CsvSupport;
 
 #pragma warning disable CS8602, CS8604, CS8600
-public static class CsvLoader
+public class CsvLoader : ITableLoader
 {
+
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-    public static void Load(TextReader reader, KustoQueryContext context, string tableName)
+    private static ITableSource Load(TextReader reader, string tableName)
     {
         var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         csv.Read();
         csv.ReadHeader();
         var keys = csv.Context.Reader.HeaderRecord;
-        var builders = keys.Select(_ => new ColumnBuilder<string>())
+        var builders = keys
+            .Select(_ => new ColumnBuilder<string>())
             .ToArray();
         var rowCount = 0;
         while (csv.Read())
@@ -33,8 +36,9 @@ public static class CsvLoader
                 Logger.Info($"{rowCount} records read");
         }
 
-        var inferredColumns = builders.Select(b =>
-            ColumnTypeInferencer.AutoInfer(b.ToColumn())).ToArray();
+        var inferredColumns = builders
+            .Select(b => ColumnTypeInferrer.AutoInfer(b.ToColumn()))
+            .ToArray();
 
         var table = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++)
@@ -43,21 +47,23 @@ public static class CsvLoader
         }
 
         var t = table.ToTableSource();
-        context.AddTable(t);
+        return t;
+
     }
 
 
-    public static void Load(string filename, KustoQueryContext context, string tableName)
+    public static ITableSource Load(string filename,string tableName)
     {
         using TextReader fileReader = new StreamReader(filename);
-        Load(fileReader, context, tableName);
+        return Load(fileReader,tableName);
     }
 
 
     public static void LoadFromString(string csv, string tableName, KustoQueryContext context)
     {
         var reader = new StringReader(csv.Trim());
-        Load(reader, context, tableName);
+        var table =Load(reader, tableName);
+        context.AddTable(table);
     }
 
 
@@ -93,4 +99,37 @@ public static class CsvLoader
         using var writer = new StreamWriter(path);
         WriteToCsvStream(result, int.MaxValue, false, writer);
     }
+
+    public Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
+    {
+        try
+        {
+            var table = Load(path, tableName);
+            return Task.FromResult(new TableLoadResult(table, string.Empty));
+        }
+        catch (Exception e)
+        {
+            return Task.FromResult(new TableLoadResult(NullTableSource.Instance, e.Message));
+        }
+    }
+
+    public bool RequiresTypeInference { get; } = true;
 }
+
+
+public class ConsoleProgressReporter : IProgress<string>
+{
+    public void Report(string value)
+    {
+        Console.WriteLine(value);
+    }
+}
+
+public class NullProgressReporter : IProgress<string>
+{
+    public void Report(string value)
+    {
+       
+    }
+}
+

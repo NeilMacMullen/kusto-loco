@@ -4,7 +4,8 @@
 using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
-using TDigest;
+using TDigestNet;
+
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
@@ -22,7 +23,7 @@ internal class PercentileAggregateIntImpl : IAggregateImpl
             throw new InvalidOperationException("Requested percentile must not be null.");
         }
 
-        var digest = new MergingDigest(compression: 100);
+        var digest = new TDigest(compression: 100);
         for (var i = 0; i < valuesCol.RowCount; i++)
         {
             var item = valuesCol[i];
@@ -50,7 +51,7 @@ internal class PercentileAggregateLongImpl : IAggregateImpl
             throw new InvalidOperationException("Requested percentile must not be null.");
         }
 
-        var digest = new MergingDigest(compression: 100);
+        var digest = new TDigest(compression: 100);
         for (var i = 0; i < valuesCol.RowCount; i++)
         {
             var item = valuesCol[i];
@@ -78,7 +79,7 @@ internal class PercentileAggregateDoubleImpl : IAggregateImpl
             throw new InvalidOperationException("Requested percentile must not be null.");
         }
 
-        var digest = new MergingDigest(compression: 100);
+        var digest = new TDigest(compression: 100);
         for (var i = 0; i < valuesCol.RowCount; i++)
         {
             var item = valuesCol[i];

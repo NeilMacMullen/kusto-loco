@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace ProcessWatcher
+namespace lokqlDx
 {
     /// <summary>
     ///     Simple text editor for running queries

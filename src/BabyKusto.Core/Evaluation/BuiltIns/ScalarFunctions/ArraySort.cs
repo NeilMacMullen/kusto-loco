@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
-using Microsoft.Extensions.Internal;
 
 namespace BabyKusto.Core.Evaluation.BuiltIns.Impl;
 
@@ -152,9 +152,7 @@ internal class ArraySortFunctionImpl : IScalarFunctionImpl
             // TODO: Sort guids, but we don't support them now...
             return 0;
 
-            throw new InvalidOperationException(
-                $"Unsupported comparison between {TypeNameHelper.GetTypeDisplayName(vA)} and {TypeNameHelper.GetTypeDisplayName(vB)}");
-
+      
             static object? ExtractValue(JsonValue value)
             {
                 var result = value.GetValue<object?>();

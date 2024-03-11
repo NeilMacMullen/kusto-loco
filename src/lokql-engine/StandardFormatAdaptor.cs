@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using CsvSupport;
 using KustoSupport;
 
 #pragma warning disable CS8618, CS8604
@@ -61,7 +62,7 @@ public class StandardFormatAdaptor : IKustoQueryContextTableLoader
         {
             if (!Path.Exists(filepath)) break;
 
-            var success = await loader.TryLoad(filepath, context, tableName);
+            var success = await loader.TryLoad(filepath, context, tableName,new NullProgressReporter());
             if (success)
                 break;
         }

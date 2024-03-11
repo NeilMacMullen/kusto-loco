@@ -4,8 +4,9 @@
 using System;
 using System.IO;
 using BabyKusto.Core.Evaluation;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
-using Microsoft.Extensions.Internal;
+
 
 namespace BabyKusto.Core.Extensions;
 

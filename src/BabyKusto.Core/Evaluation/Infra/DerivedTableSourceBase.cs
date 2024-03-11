@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
-using Microsoft.Extensions.Internal;
+
 using NLog;
 
 namespace BabyKusto.Core.Evaluation;

@@ -9,11 +9,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using BabyKusto.Core.Evaluation.BuiltIns;
 using BabyKusto.Core.Extensions;
+using BabyKusto.Core.Util;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
-using Microsoft.Extensions.Internal;
+
 
 namespace BabyKusto.Core.InternalRepresentation;
 

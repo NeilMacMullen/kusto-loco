@@ -1,10 +1,19 @@
-﻿using CsvSupport;
+﻿using System.Runtime.InteropServices;
+using CsvSupport;
 using KustoSupport;
 using NotNullStrings;
 
-var context = new KustoQueryContext();
 
-CsvLoader.Load(args.First(), context, "data");
+var result = await new CsvLoader().LoadTable(args.First(), "data",new ConsoleProgressReporter());
+if (result.Error.IsNotBlank())
+{
+    Console.WriteLine(result.Error);
+    return;
+}
+
+var context = new KustoQueryContext();
+context.AddTable(result.Table);
+
 while (true)
 {
     Console.Write(">");
@@ -18,3 +27,5 @@ while (true)
         Console.WriteLine($"{res.QueryDuration}ms");
     }
 }
+
+

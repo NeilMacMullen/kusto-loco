@@ -3,7 +3,7 @@ using System.Windows;
 using BabyKusto.Core.Evaluation;
 using KustoSupport;
 
-namespace ProcessWatcher;
+namespace lokqlDx;
 
 public partial class MainWindow : Window
 {

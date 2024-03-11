@@ -9,7 +9,7 @@ using NLog;
 public class JsonArrayTableAdaptor : IFileBasedTableAccess
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
+    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
     {
         var text = File.ReadAllText(path);
         var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
@@ -38,6 +38,7 @@ public class JsonArrayTableAdaptor : IFileBasedTableAccess
         context.AddTable(table);
         return Task.FromResult(true);
     }
+
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".json"];
 

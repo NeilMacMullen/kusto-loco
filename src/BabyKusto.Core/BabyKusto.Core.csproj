@@ -28,14 +28,14 @@
     <PackageReference Include="NLog" />
     <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="T-Digest.NET" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\opensource\modified\t-digest-csharp\TDigest\TDigest.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
     <ProjectReference Include="..\Geo\Geo.csproj" />
-    <ProjectReference Include="..\SourceGenDependencies\SourceGenDependencies.csproj" />
-    <ProjectReference Include="..\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />

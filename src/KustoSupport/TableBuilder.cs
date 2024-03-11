@@ -14,9 +14,6 @@ namespace KustoSupport;
 /// <summary>
 ///     Provides a simple way to create a Kusto ITableSource
 /// </summary>
-/// <remarks>
-///     TODO This is currently a bit incomplete - more type support is needed
-/// </remarks>
 public class TableBuilder
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();

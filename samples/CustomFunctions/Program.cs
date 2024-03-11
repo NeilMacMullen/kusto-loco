@@ -16,7 +16,6 @@ internal class Program
         FizzFunction.Register(d);
         context.AddFunctions(d);
 
-
         //set up some data
         var numbers = Enumerable.Range(0, 100)
             .Select(i => new Number(i, string.Empty))

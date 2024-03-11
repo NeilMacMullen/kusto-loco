@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace ProcessWatcher;
+namespace lokqlDx;
 
 /// <summary>
 ///     Simple IConsole implementation that allows a RichTextBox to emulate a console for output text

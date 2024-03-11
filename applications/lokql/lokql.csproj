@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsvSupport\CsvSupport.csproj" />
-    <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
-    <ProjectReference Include="..\LogSetup\LogSetup.csproj" />
-    <ProjectReference Include="..\lokql-engine\lokql-engine.csproj" />
-    <ProjectReference Include="..\Parquet\ParquetSupport.csproj" />
-    <ProjectReference Include="..\Rendering\Rendering.csproj" />
+    <ProjectReference Include="..\..\src\CsvSupport\CsvSupport.csproj" />
+    <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\..\src\LogSetup\LogSetup.csproj" />
+    <ProjectReference Include="..\..\src\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\src\Parquet\ParquetSupport.csproj" />
+    <ProjectReference Include="..\..\src\Rendering\Rendering.csproj" />
   </ItemGroup>
 
 </Project>

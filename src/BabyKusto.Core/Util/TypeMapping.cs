@@ -10,7 +10,7 @@ public static class TypeMapping
 {
     private static readonly Dictionary<Type, KustoType> NetToKustoLookup = new()
     {
-        //direct type mappings from net to kust
+        //direct type mappings from net to kusto
         [typeof(int)] = new KustoType(ScalarTypes.Int, true),
         [typeof(long)] = new KustoType(ScalarTypes.Long, true),
         [typeof(double)] = new KustoType(ScalarTypes.Real, true),
@@ -95,4 +95,12 @@ public static class TypeMapping
                 : (T?)Convert.ChangeType(value, typeof(T));
 
     private readonly record struct KustoType(TypeSymbol Type, bool IsPrimary);
+}
+
+public static class TypeNameHelper
+{
+    public static string GetTypeDisplayName<T>(T type)
+    {
+        return typeof(T).Name;
+    }
 }

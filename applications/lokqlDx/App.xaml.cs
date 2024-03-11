@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace ProcessWatcher
+namespace lokqlDx
 {
     /// <summary>
     /// Interaction logic for App.xaml

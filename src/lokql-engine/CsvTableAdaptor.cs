@@ -3,10 +3,11 @@ using KustoSupport;
 
 public class CsvTableAdaptor : IFileBasedTableAccess
 {
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
+    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
     {
-        CsvLoader.Load(path, context, name);
-        return Task.FromResult(true);
+        var result = await new CsvLoader().LoadTable(path, name,progressReporter);
+        context.AddTable(result.Table);
+        return true;
     }
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".csv"];

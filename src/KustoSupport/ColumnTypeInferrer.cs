@@ -1,0 +1,76 @@
+﻿using System.Globalization;
+using BabyKusto.Core;
+using BabyKusto.Core.Util;
+using Kusto.Language.Symbols;
+using NLog;
+
+namespace KustoSupport;
+
+/// <summary>
+/// Tries to infer the type of a column based on its contents
+/// </summary>
+/// <remarks>
+/// Inferring the type is error-prone. Excel is infamous for example, for turning things that look like
+/// long sequences of digits into floating point numbers and throwing away the significant bits!
+/// </remarks>
+public static class ColumnTypeInferrer
+{
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private static readonly TypeTrier [] TypeTriers =
+    [
+
+        //don't bother with int .... Kusto is natively "long"
+        //so this would just lead to excessive casts
+        new TypeTrier(typeof(long), s => (long.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(double), s => (double.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(Guid), s => (Guid.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(TimeSpan), s => (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(bool), s => (bool.TryParse(s, out var i), i))
+    ];
+    
+    public static BaseColumn AutoInfer(BaseColumn source)
+    {
+        if (source.Type != ScalarTypes.String)
+            return source;
+
+        var stringColumn = (TypedBaseColumn<string>)source;
+
+     
+        //attempt each type in turn until we find one that works
+        foreach (var t in TypeTriers)
+        {
+            var processedAll = true;
+            var builder = ColumnHelpers.CreateBuilder(t.Type);
+            for (var i = 0; i < stringColumn.RowCount; i++)
+            {
+                var cell = stringColumn[i];
+                //blank cells tell us nothing about type since data may
+                //be missing
+                if (string.IsNullOrWhiteSpace(cell))
+                {
+                    builder.Add(null);
+                    continue;
+                }
+
+                var (parsed, val) = t.Parser(cell);
+                if (parsed)
+                    builder.Add(val);
+                else
+                {
+                    //one failure is enough to give up on this type
+                    processedAll = false;
+                    break;
+                }
+            }
+
+            if (processedAll)
+                return builder.ToColumn();
+        }
+
+        //if we ran out of conversions to try, just return the original column 
+        return source;
+    }
+
+    private readonly record struct TypeTrier(Type Type, Func<string, (bool, object)> Parser);
+}

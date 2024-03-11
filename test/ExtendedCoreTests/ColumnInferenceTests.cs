@@ -24,27 +24,27 @@ public class ColumnInferenceTests
     public void SingleFloat()
     {
         var src = Create("0.5");
-        ColumnTypeInferencer.AutoInfer(src).Type.Should().Be(ScalarTypes.Real);
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.Real);
     }
 
     [TestMethod]
     public void SingleInt()
     {
         var src = Create("5");
-        ColumnTypeInferencer.AutoInfer(src).Type.Should().Be(ScalarTypes.Long);
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.Long);
     }
 
     [TestMethod]
     public void NullThenInt()
     {
         var src = Create(null, "5");
-        ColumnTypeInferencer.AutoInfer(src).Type.Should().Be(ScalarTypes.Long);
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.Long);
     }
 
     [TestMethod]
     public void IntsThenString()
     {
         var src = Create("5", "6", "abc");
-        ColumnTypeInferencer.AutoInfer(src).Type.Should().Be(ScalarTypes.String);
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.String);
     }
 }

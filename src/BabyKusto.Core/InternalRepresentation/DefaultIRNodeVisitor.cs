@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
-using Microsoft.Extensions.Internal;
+using BabyKusto.Core.Util;
+
 
 namespace BabyKusto.Core.InternalRepresentation;
 

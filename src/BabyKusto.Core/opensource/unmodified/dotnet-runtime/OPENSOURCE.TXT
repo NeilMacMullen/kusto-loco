@@ -1,5 +1,0 @@
-Taken from:
-  Repo:      https://github.com/dotnet/runtime
-  File path: /src/libraries/Common/src/Extensions/TypeNameHelper/TypeNameHelper.cs
-  Commit ID: 10d8964fb00f8a24586f562d83feac9dbb0cafac
-  Permalink: https://github.com/dotnet/runtime/blob/10d8964fb00f8a24586f562d83feac9dbb0cafac/src/libraries/Common/src/Extensions/TypeNameHelper/TypeNameHelper.cs

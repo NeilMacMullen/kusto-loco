@@ -10,10 +10,10 @@ public class ParquetTableAdaptor : IFileBasedTableAccess
         await ParquetFileOps.Save(path, result);
     }
 
-    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name)
+    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
     {
-        var table = await ParquetFileOps.LoadFromFile(path, name);
-        context.AddTable(table);
+        var result = await new ParquetFileOps().LoadTable(path, name,progressReporter);
+        context.AddTable(result.Table);
         return true;
     }
 }

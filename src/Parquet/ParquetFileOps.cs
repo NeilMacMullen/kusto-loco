@@ -8,7 +8,7 @@ using Parquet.Schema;
 
 namespace ParquetSupport;
 
-public static class ParquetFileOps
+public class ParquetFileOps : ITableLoader
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -78,4 +78,12 @@ public static class ParquetFileOps
 
         return tableBuilder.ToTableSource();
     }
+
+    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
+    {
+        var table = await LoadFromFile(path, tableName);
+        return new TableLoadResult(table,string.Empty);
+    }
+
+    public bool RequiresTypeInference { get; } = false;
 }

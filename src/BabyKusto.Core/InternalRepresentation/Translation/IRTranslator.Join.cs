@@ -4,10 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BabyKusto.Core.Util;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
-using Microsoft.Extensions.Internal;
+
 
 namespace BabyKusto.Core.InternalRepresentation;
 
