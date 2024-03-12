@@ -6,7 +6,9 @@ using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource.Columns;
 using NLog;
+using KustoLoco.Core.DataSource;
 
 namespace KustoSupport;
 

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

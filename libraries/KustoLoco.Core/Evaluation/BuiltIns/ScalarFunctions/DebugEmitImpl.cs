@@ -1,4 +1,5 @@
 ﻿using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 using NLog;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 /// <summary>
 ///     Allows a column to arbitrarily remap rows to those in another column

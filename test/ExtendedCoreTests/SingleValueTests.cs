@@ -1,5 +1,6 @@
 using KustoLoco.Core;
 using FluentAssertions;
+using KustoLoco.Core.DataSource;
 
 namespace ExtendedCoreTests;
 

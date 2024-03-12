@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
-using KustoLoco.Core.Extensions;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Extensions;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 public class TableChunk : ITableChunk
 {

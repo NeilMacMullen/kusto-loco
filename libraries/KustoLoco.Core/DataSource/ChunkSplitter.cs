@@ -4,7 +4,7 @@ using System.Linq;
 using KustoLoco.Core.Util;
 using NLog;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 public static class ChunkSplitter
 {

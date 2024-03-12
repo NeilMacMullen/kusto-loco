@@ -6,6 +6,7 @@ using System.Threading;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.ProcessQuerier;
 

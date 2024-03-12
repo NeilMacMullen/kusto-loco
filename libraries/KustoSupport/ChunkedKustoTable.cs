@@ -1,5 +1,7 @@
 ﻿using KustoLoco.Core;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
+
 
 namespace KustoSupport;
 

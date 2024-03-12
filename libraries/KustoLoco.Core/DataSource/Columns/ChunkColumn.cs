@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 /// <summary>
 ///     A ChunkColumn is less sophisticated than a Mapped column - it just allows a contiguous block

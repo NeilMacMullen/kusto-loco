@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 public class LambdaWrappedColumn<TRow, T> : TypedBaseColumn<T>
 {

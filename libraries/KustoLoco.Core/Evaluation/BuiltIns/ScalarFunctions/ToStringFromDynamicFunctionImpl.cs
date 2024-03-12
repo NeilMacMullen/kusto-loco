@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

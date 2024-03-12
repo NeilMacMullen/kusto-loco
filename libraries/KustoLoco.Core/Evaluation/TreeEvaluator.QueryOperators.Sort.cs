@@ -10,6 +10,7 @@ using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 using IComparer = System.Collections.IComparer;
 
 namespace KustoLoco.Core.Evaluation;

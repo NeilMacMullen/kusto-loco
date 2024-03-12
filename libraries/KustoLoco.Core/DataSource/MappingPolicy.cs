@@ -1,8 +1,8 @@
-﻿namespace KustoLoco.Core;
+﻿namespace KustoLoco.Core.DataSource;
 
 public enum MappingPolicy
 {
-    Passthru,
+    PassThrough,
     Map,
     SingleValue
 }

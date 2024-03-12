@@ -7,6 +7,7 @@ using System.Linq;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Evaluation;
 

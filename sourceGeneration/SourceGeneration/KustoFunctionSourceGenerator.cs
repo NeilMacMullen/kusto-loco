@@ -127,6 +127,7 @@ namespace SourceGeneration
             code.AppendStatement("using System.Collections.Generic");
             code.AppendStatement("using KustoLoco.Core.Evaluation.BuiltIns");
             code.AppendStatement("using KustoLoco.Core.Evaluation");
+            code.AppendStatement("using KustoLoco.Core.DataSource");
             code.AppendStatement("using KustoLoco.Core");
 
 

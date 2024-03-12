@@ -1,6 +1,6 @@
 ﻿using KustoLoco.Core.Util;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 public static class ColumnFactory
 {

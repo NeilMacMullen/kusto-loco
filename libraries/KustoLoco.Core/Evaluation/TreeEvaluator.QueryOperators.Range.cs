@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Threading;
 using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Evaluation
 {

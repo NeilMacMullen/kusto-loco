@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
-
+using KustoLoco.Core.DataSource;
 using NLog;
 
 namespace KustoLoco.Core.Evaluation;

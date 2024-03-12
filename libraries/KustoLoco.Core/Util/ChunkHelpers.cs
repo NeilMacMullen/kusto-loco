@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Util;
 

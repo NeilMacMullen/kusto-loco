@@ -1,7 +1,7 @@
 ﻿using System;
 using KustoLoco.Core.Util;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 public class LambdaColumn<T> : TypedBaseColumn<T>
 {
