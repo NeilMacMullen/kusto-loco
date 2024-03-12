@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text.Json;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;

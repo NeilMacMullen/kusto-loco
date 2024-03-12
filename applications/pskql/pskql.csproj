@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
-    <ProjectReference Include="..\..\libraries\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
   </ItemGroup>
 

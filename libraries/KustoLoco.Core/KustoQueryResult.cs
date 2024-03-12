@@ -1,6 +1,8 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Text.Json;
-using KustoLoco.Core;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;

@@ -8,7 +8,7 @@ namespace CustomFunctions;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static async Task Main()
     {
         var context = new KustoQueryContext();
 
@@ -23,11 +23,12 @@ internal class Program
             .ToImmutableArray();
 
         context.AddTableFromRecords("numbers", numbers);
-        //run a query using our custom function
-        var o = await context.RunTabularQueryAsync(
-            "numbers | extend FizzBuzz = fizz(N)");
 
-        foreach (var fb in o.DeserialiseTo<Number>())
+        //run a query using our custom function
+        var query = "numbers | extend FizzBuzz = fizz(N)";
+        var results = await context.RunTabularQueryAsync(query);
+
+        foreach (var fb in results.DeserialiseTo<Number>())
             Console.WriteLine(fb);
     }
 
