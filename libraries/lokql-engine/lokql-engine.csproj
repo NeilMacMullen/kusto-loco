@@ -13,9 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
-    <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
-    <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>
 

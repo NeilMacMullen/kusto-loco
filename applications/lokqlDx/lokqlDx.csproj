@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
   </ItemGroup>
 
 </Project>
