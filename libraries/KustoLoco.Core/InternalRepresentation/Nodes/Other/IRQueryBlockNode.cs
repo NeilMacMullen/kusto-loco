@@ -2,8 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Other;
 
 internal class IRQueryBlockNode : IRNode
 {

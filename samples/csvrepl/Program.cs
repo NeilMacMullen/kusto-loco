@@ -3,7 +3,9 @@ using KustoLoco.FileFormats;
 using KustoLoco.Core;
 using NotNullStrings;
 
-var result = await new CsvLoader().LoadTable(args.First(), "data", new ConsoleProgressReporter());
+var result = await new CsvLoader()
+    .LoadTable(args.First(), "data", new ConsoleProgressReporter());
+
 if (result.Error.IsNotBlank())
 {
     Console.WriteLine(result.Error);

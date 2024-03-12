@@ -5,7 +5,7 @@ using System;
 using System.Collections.Immutable;
 using Kusto.Language.Symbols;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 internal class IRRenderOperatorNode : IRQueryOperatorNode
 {

@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
-using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRBinaryExpressionNode : IRExpressionNode
 {

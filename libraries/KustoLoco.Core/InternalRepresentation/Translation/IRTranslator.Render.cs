@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using KustoLoco.Core.Util;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 
 namespace KustoLoco.Core.InternalRepresentation;

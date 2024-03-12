@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using Kusto.Language.Symbols;
 using NLog;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal enum EvaluatedExpressionKind
 {

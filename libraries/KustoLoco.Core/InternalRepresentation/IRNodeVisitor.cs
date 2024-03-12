@@ -1,6 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
+
 namespace KustoLoco.Core.InternalRepresentation;
 
 internal abstract class IRNodeVisitor<TResult, TContext>

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
 internal class IRExpressionStatementNode : IRStatementNode
 {

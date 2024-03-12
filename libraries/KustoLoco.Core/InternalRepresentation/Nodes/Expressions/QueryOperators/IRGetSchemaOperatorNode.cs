@@ -1,7 +1,7 @@
 ﻿using Kusto.Language.Symbols;
 using NLog;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 internal class IRGetSchemaOperatorNode : IRQueryOperatorNode
 {

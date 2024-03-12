@@ -8,6 +8,8 @@ using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 namespace KustoLoco.Core.Evaluation;
 

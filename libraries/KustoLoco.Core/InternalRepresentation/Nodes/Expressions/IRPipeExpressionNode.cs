@@ -3,8 +3,9 @@
 
 using System;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRPipeExpressionNode : IRExpressionNode
 {

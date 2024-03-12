@@ -2,6 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 using KustoLoco.Core.Util;
 
 

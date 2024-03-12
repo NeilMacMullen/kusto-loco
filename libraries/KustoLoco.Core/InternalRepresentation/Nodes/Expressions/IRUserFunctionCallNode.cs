@@ -4,8 +4,9 @@
 using System;
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRUserFunctionCallNode : IRExpressionNode
 {

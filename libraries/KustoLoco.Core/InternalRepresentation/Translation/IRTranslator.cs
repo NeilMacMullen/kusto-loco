@@ -7,6 +7,9 @@ using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
 
 namespace KustoLoco.Core.InternalRepresentation;

@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using KustoLoco.Core.InternalRepresentation;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 namespace KustoLoco.Core.Evaluation;
 

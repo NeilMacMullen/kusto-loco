@@ -6,6 +6,7 @@ using System.Diagnostics;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 namespace KustoLoco.Core.Evaluation;
 

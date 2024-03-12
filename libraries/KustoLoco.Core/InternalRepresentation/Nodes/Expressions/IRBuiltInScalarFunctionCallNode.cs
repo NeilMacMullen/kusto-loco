@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRBuiltInScalarFunctionCallNode : IRExpressionNode
 {

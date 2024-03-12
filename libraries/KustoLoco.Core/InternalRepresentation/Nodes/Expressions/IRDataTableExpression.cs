@@ -4,7 +4,7 @@
 using System;
 using Kusto.Language.Symbols;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRDataTableExpression : IRExpressionNode
 {

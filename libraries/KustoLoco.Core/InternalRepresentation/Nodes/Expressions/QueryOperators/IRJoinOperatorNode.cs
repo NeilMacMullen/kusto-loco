@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 internal enum IRJoinKind
 {

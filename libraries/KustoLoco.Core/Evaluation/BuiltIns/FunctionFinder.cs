@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 

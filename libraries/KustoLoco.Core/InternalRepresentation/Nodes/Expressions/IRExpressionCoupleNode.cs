@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 internal class IRExpressionCoupleNode : IRNode
 {

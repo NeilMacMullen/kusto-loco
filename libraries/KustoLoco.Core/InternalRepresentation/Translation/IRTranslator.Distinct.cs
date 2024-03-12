@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 namespace KustoLoco.Core.InternalRepresentation;
 

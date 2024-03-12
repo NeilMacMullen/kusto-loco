@@ -3,6 +3,9 @@
 
 using System.Linq;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
 namespace KustoLoco.Core.InternalRepresentation;
 

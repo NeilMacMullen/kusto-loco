@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 namespace KustoLoco.Core.Evaluation;
 

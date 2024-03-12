@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 namespace KustoLoco.Core.InternalRepresentation;
 

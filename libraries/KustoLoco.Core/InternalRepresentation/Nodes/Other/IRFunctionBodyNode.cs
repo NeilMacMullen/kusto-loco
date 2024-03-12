@@ -3,8 +3,10 @@
 
 using System;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Other;
 
 internal class IRFunctionBodyNode : IRNode
 {

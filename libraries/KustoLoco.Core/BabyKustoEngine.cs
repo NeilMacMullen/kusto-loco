@@ -11,6 +11,9 @@ using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 using NLog;
 
 namespace KustoLoco.Core;

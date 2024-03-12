@@ -3,8 +3,9 @@
 
 using System;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
-namespace KustoLoco.Core.InternalRepresentation;
+namespace KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
 internal class IRLetStatementNode : IRStatementNode
 {
