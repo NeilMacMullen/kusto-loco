@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KustoLoco.Core\KustoLoco.Core.csproj" />
-    <ProjectReference Include="..\..\src\LogSetup\LogSetup.csproj" />
+    <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
   </ItemGroup>
 
 </Project>
