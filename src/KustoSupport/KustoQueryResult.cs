@@ -1,8 +1,8 @@
 ﻿using System.Collections.Specialized;
 using System.Text.Json;
-using BabyKusto.Core;
-using BabyKusto.Core.Evaluation;
-using BabyKusto.Core.Util;
+using KustoLoco.Core;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Util;
 using NLog;
 using NotNullStrings;
 

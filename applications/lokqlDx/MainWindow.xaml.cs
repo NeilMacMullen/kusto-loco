@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Windows;
-using BabyKusto.Core.Evaluation;
+using KustoLoco.Core.Evaluation;
 using KustoSupport;
 
 namespace lokqlDx;

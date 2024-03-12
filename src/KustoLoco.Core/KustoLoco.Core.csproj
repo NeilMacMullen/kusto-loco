@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <!-- Lots of spurious warnings when enabling nullable support and targeting old frameworks, so we only enable it for new-ish targets -->
+    <Nullable Condition=" '$(TargetFramework)' == 'netstandard2.0' ">annotations</Nullable>
+    <Nullable Condition=" '$(TargetFramework)' != 'netstandard2.0' ">enable</Nullable>
+    <LangVersion>11</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageVersion>0.1.8-preview</PackageVersion>
+    <PackageTags>kusto;kql</PackageTags>
+    <Description>
+      A self-contained execution engine for the Kusto Query Language (KQL) written in C#.
+    </Description>
+    <RepositoryUrl>https://github.com/davidnx/baby-kusto-csharp</RepositoryUrl>
+    <PackageReadmeFile>README-NUGET.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="KustoLoco.Core.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Kusto.Language" />
+    <PackageReference Include="NLog" />
+    <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="T-Digest.NET" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
+    <ProjectReference Include="..\Geo\Geo.csproj" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Import Project="..\..\eng\targets\EmbedProjectRefs.targets" />
+
+</Project>

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BabyKusto.Core\BabyKusto.Core.csproj" />
+    <ProjectReference Include="..\..\src\KustoLoco.Core\KustoLoco.Core.csproj" />
     <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\..\src\LogSetup\LogSetup.csproj" />
   </ItemGroup>

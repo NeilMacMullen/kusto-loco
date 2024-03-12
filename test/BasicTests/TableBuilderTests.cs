@@ -1,5 +1,5 @@
 using System.Collections.Specialized;
-using BabyKusto.Core.Util;
+using KustoLoco.Core.Util;
 using KustoSupport;
 
 namespace BasicTests;

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
-using BabyKusto.Core.Evaluation;
-using BabyKusto.Core.Util;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Util;
 using KustoSupport;
 
 namespace pskql;

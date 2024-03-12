@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using BabyKusto.Core;
+using KustoLoco.Core;
 using FluentAssertions;
 using KustoSupport;
 using LogSetup;

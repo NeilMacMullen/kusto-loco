@@ -2,12 +2,12 @@
 // Licensed under the MIT License.
 
 using System;
-using BabyKusto.Core;
-using BabyKusto.Core.Extensions;
-using BabyKusto.ProcessQuerier;
+using KustoLoco.Core;
+using KustoLoco.Core.Extensions;
+using KustoLoco.ProcessQuerier;
 
 Console.WriteLine(@"/----------------------------------------------------------------\");
-Console.WriteLine(@"| Welcome to BabyKusto.ProcessQuerier. You can write KQL queries |");
+Console.WriteLine(@"| Welcome to KustoLoco.ProcessQuerier. You can write KQL queries |");
 Console.WriteLine(@"| and explore the live list of processes on your machine.        |");
 Console.WriteLine(@"\----------------------------------------------------------------/");
 Console.WriteLine();

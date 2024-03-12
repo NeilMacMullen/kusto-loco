@@ -1,4 +1,4 @@
-## BabyKusto.ProcessQuerier
+## KustoLoco.ProcessQuerier
 
 A trivial example of using BabyKusto with real data,
 serving as a tool to explore live processes running on the current machine
@@ -10,7 +10,7 @@ It serves as a REPL and new queries can be evaluated at will.
 
 ```
 /----------------------------------------------------------------\
-| Welcome to BabyKusto.ProcessQuerier. You can write KQL queries |
+| Welcome to KustoLoco.ProcessQuerier. You can write KQL queries |
 | and explore the live list of processes on your machine.        |
 \----------------------------------------------------------------/
 

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using BabyKusto.Core;
-using BabyKusto.Core.Util;
+using KustoLoco.Core;
+using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 
-namespace BabyKusto.ProcessQuerier;
+namespace KustoLoco.ProcessQuerier;
 
 public class ProcessesTable : ITableSource
 {

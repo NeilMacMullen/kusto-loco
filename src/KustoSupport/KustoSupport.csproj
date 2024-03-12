@@ -15,7 +15,7 @@
 
  
   <ItemGroup>
-    <ProjectReference Include="..\BabyKusto.Core\BabyKusto.Core.csproj" />
+    <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
   </ItemGroup>
 
 </Project>

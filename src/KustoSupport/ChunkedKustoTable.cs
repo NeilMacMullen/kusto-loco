@@ -1,4 +1,4 @@
-﻿using BabyKusto.Core;
+﻿using KustoLoco.Core;
 using Kusto.Language.Symbols;
 
 namespace KustoSupport;

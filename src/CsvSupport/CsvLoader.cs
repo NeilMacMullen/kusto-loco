@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
-using BabyKusto.Core;
-using BabyKusto.Core.Util;
+using KustoLoco.Core;
+using KustoLoco.Core.Util;
 using CsvHelper;
 using KustoSupport;
 using NLog;

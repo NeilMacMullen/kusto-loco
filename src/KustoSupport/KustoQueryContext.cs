@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using BabyKusto.Core;
-using BabyKusto.Core.Evaluation;
-using BabyKusto.Core.Evaluation.BuiltIns;
+using KustoLoco.Core;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;

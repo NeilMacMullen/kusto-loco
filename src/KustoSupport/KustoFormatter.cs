@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Text;
-using BabyKusto.Core;
-using BabyKusto.Core.Evaluation;
+using KustoLoco.Core;
+using KustoLoco.Core.Evaluation;
 using NotNullStrings;
 
 #pragma warning disable CS8604 // Possible null reference argument.

@@ -1,0 +1,67 @@
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Kusto.Language.Symbols;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+
+internal class LogicalOrOperatorImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var left = (bool?)arguments[0].Value;
+        var right = (bool?)arguments[1].Value;
+        return new ScalarResult(ScalarTypes.Bool, WeirdOr(left, right));
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var left = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var right = (TypedBaseColumn<bool?>)(arguments[1].Column);
+
+        //short-circuiting for indexed columns
+        if (left.IsSingleValue && (left[0] == true))
+            return new ColumnarResult(left);
+        if (right.IsSingleValue && (right[0] == true))
+            return new ColumnarResult(right);
+
+        var data = new bool?[left.RowCount];
+        for (var i = 0; i < left.RowCount; i++)
+        {
+            data[i] = WeirdOr(left[i], right[i]);
+        }
+
+        return new ColumnarResult(ColumnFactory.Create(data));
+    }
+
+    // Nulls are treated as "unknown/any" for logical operations in Kusto.
+    // That means that we can short-circuit some combinations
+    // but not others
+    // Query:
+    // let nil=tobool("");
+    // union
+    //     (print a=nil, b=nil),
+    //     (print a=nil, b=false),
+    //     (print a=nil, b=true)
+    // | project a, b, AandB = a and b, AorB = a or b
+    //
+    // Result:
+    //
+    // a:bool; b: bool; AandB:bool; AorB:bool
+    // --------------------------------------
+    //       ;        ;           ;
+    //       ; false  ; false     ;
+    //       ; true   ;           ; true
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool? WeirdOr(bool? left, bool? right) =>
+        (left.HasValue && right.HasValue)
+            ? (left.Value || right.Value)
+            : ((left.HasValue && left.Value) || (right.HasValue && right.Value))
+                ? true
+                : null;
+}

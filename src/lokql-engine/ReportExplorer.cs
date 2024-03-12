@@ -1,7 +1,7 @@
 ﻿using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Text;
-using BabyKusto.Core.Evaluation;
+using KustoLoco.Core.Evaluation;
 using CommandLine;
 using KustoSupport;
 using NLog;

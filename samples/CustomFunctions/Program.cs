@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using BabyKusto.Core.Evaluation.BuiltIns;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
 using KustoSupport;
 
