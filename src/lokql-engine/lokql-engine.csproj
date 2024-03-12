@@ -13,9 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CsvSupport\CsvSupport.csproj" />
+    <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
-    <ProjectReference Include="..\Parquet\ParquetSupport.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>
 

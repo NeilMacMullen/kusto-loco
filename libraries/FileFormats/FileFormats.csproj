@@ -4,14 +4,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>KustoLoco.FileFormats</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
+    <PackageReference Include="Parquet.Net" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\..\src\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
   </ItemGroup>
 
 </Project>

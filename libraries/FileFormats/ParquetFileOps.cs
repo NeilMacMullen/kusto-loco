@@ -6,7 +6,7 @@ using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
 
-namespace ParquetSupport;
+namespace KustoLoco.FileFormats;
 
 public class ParquetFileOps : ITableLoader
 {

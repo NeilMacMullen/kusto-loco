@@ -1,13 +1,12 @@
 ﻿using System.Globalization;
+using CsvHelper;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
-using CsvHelper;
 using KustoSupport;
 using NLog;
 
-namespace CsvSupport;
+namespace KustoLoco.FileFormats;
 
-#pragma warning disable CS8602, CS8604, CS8600
 public class CsvLoader : ITableLoader
 {
 
@@ -115,21 +114,3 @@ public class CsvLoader : ITableLoader
 
     public bool RequiresTypeInference { get; } = true;
 }
-
-
-public class ConsoleProgressReporter : IProgress<string>
-{
-    public void Report(string value)
-    {
-        Console.WriteLine(value);
-    }
-}
-
-public class NullProgressReporter : IProgress<string>
-{
-    public void Report(string value)
-    {
-       
-    }
-}
-

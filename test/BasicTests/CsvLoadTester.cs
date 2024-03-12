@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
-using CsvSupport;
 using FluentAssertions;
+using KustoLoco.FileFormats;
 using KustoSupport;
 
 namespace BasicTests

@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using CsvSupport;
+using KustoLoco.FileFormats;
 using KustoSupport;
 
 namespace Benchmarks
