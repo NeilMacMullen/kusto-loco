@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics;
+using KustoLoco.Core.DataSource;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

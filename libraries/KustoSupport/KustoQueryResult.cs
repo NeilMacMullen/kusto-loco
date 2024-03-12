@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Text.Json;
 using KustoLoco.Core;
+using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using NLog;
@@ -8,7 +9,8 @@ using NotNullStrings;
 
 #pragma warning disable CS8603 // Possible null reference return.
 
-namespace KustoSupport;
+namespace KustoLoco.Core;
+
 
 public class KustoQueryResult
 {

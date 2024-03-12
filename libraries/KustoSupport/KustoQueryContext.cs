@@ -6,10 +6,11 @@ using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.DataSource;
 using NLog;
 using NotNullStrings;
 
-namespace KustoSupport;
+namespace KustoLoco.Core;
 
 /// <summary>
 ///     Provides a context for complex queries or persistent tables

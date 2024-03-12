@@ -1,7 +1,8 @@
 ﻿using System.Collections.Immutable;
 using NLog;
 
-namespace KustoSupport;
+namespace KustoLoco.Core;
+
 
 /// <summary>
 ///     Provides simplified Kusto querying

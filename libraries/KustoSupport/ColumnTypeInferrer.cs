@@ -4,7 +4,8 @@ using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using NLog;
 
-namespace KustoSupport;
+namespace KustoLoco.Core;
+
 
 /// <summary>
 /// Tries to infer the type of a column based on its contents

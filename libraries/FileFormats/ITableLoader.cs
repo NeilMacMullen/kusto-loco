@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.FileFormats;
+﻿
+
+namespace KustoLoco.FileFormats;
 
 public interface ITableLoader
 {
@@ -11,3 +13,6 @@ public interface ITableLoader
     /// </summary>
     public bool RequiresTypeInference { get; }
 }
+
+
+

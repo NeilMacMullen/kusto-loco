@@ -1,4 +1,5 @@
-﻿namespace KustoSupport;
+﻿namespace KustoLoco.Core;
+
 
 /// <summary>
 ///     Default implementation of table loader that doesn't actually load any tables

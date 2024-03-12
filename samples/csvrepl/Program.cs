@@ -1,6 +1,6 @@
 ﻿
 using KustoLoco.FileFormats;
-using KustoSupport;
+using KustoLoco.Core;
 using NotNullStrings;
 
 var result = await new CsvLoader().LoadTable(args.First(), "data", new ConsoleProgressReporter());

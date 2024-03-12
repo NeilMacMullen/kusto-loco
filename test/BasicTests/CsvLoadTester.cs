@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using FluentAssertions;
+using KustoLoco.Core;
 using KustoLoco.FileFormats;
-using KustoSupport;
 
 namespace BasicTests
 {

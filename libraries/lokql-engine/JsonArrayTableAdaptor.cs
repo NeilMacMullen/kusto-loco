@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Text.Json;
-using KustoSupport;
+using KustoLoco.Core;
 using NLog;
 
 /// <summary>

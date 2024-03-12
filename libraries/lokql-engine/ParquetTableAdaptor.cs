@@ -1,5 +1,6 @@
-﻿using KustoLoco.FileFormats;
-using KustoSupport;
+﻿using KustoLoco.Core;
+using KustoLoco.FileFormats;
+
 
 
 public class ParquetTableAdaptor : IFileBasedTableAccess

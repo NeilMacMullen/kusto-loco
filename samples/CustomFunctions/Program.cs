@@ -1,7 +1,8 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
-using KustoSupport;
+using KustoLoco.Core;
+
 
 namespace CustomFunctions;
 

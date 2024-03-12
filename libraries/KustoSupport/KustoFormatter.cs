@@ -1,13 +1,13 @@
 ﻿using System.Collections.Specialized;
 using System.Text;
-using KustoLoco.Core;
+using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using NotNullStrings;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
+namespace KustoLoco.Core;
 
-namespace KustoSupport;
 
 public static class KustoFormatter
 {

@@ -1,4 +1,5 @@
-﻿namespace KustoSupport;
+﻿namespace KustoLoco.Core;
+
 
 /// <summary>
 ///     Implementation of table loader to perform easy adaptation between Functional and Interface style

@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using KustoLoco.FileFormats;
-using KustoSupport;
+using KustoLoco.Core;
 
 namespace Benchmarks
 {

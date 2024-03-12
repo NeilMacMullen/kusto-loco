@@ -5,11 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
-using KustoLoco.Core.DataSource;
+using KustoLoco.Core.Util;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 /// <summary>
 ///     Use primary for EvaluationResults when all data has been materialized and is available

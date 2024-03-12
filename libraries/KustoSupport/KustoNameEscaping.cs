@@ -1,4 +1,5 @@
-﻿namespace KustoSupport;
+﻿namespace KustoLoco.Core;
+
 
 /// <summary>
 ///     Provides escaping for  names of tables and columns.

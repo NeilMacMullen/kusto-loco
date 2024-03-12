@@ -1,4 +1,4 @@
-using KustoSupport;
+using KustoLoco.Core;
 using LogSetup;
 using NLog;
 using NotNullStrings;

@@ -3,11 +3,10 @@ using System.Diagnostics;
 using System.Text;
 using KustoLoco.Core.Evaluation;
 using CommandLine;
+using KustoLoco.Core;
 using KustoLoco.Rendering;
-using KustoSupport;
 using NLog;
 using NotNullStrings;
-using static KustoSupport.KustoFormatter;
 
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local setters are
 // required on Options properties by CommandLineParser library
@@ -49,8 +48,8 @@ public class ReportExplorer
         _outputConsole.SetForegroundColor(ConsoleColor.Green);
 
 
-        var prefs = new DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
-        _outputConsole.WriteLine(Tabulate(result, prefs));
+        var prefs = new KustoFormatter.DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
+        _outputConsole.WriteLine(KustoFormatter.Tabulate(result, prefs));
 
         if (maxToDisplay < result.Height)
         {

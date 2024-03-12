@@ -1,6 +1,6 @@
 ﻿
 using KustoLoco.FileFormats;
-using KustoSupport;
+using KustoLoco.Core;
 
 public class CsvTableAdaptor : IFileBasedTableAccess
 {

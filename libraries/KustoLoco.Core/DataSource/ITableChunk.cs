@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 public interface ITableChunk
 {

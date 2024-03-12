@@ -1,9 +1,7 @@
 using System.Collections.Immutable;
-using KustoLoco.Core;
 using FluentAssertions;
-using KustoSupport;
+using KustoLoco.Core;
 using LogSetup;
-
 using LogLevel = NLog.LogLevel;
 
 namespace BasicTests;
@@ -16,7 +14,10 @@ public class OperatorTests
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
+    private static KustoQueryContext CreateContext()
+    {
+        return KustoQueryContext.WithFullDebug();
+    }
 
     [TestMethod]
     public async Task GetSchema()
@@ -25,7 +26,7 @@ public class OperatorTests
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
         context.AddTableFromRecords("data", rows);
-        var result = (await context.RunTabularQueryAsync("data | getschema"));
+        var result = await context.RunTabularQueryAsync("data | getschema");
         var schema = KustoFormatter.Tabulate(result);
         Console.WriteLine(schema);
         schema.Should().Contain(nameof(Row.Name));
@@ -42,10 +43,10 @@ public class OperatorTests
 
         var invocationCountForIndex = 0;
         var lazy = new SingleValueLambdaColumn<string?>(() =>
-                                                        {
-                                                            invocationCountForIndex++;
-                                                            return "a";
-                                                        }, tableLength);
+        {
+            invocationCountForIndex++;
+            return "a";
+        }, tableLength);
         table = table
             .WithColumn("lazy", lazy);
         context.AddTable(table);
@@ -69,8 +70,8 @@ public class OperatorTests
 
         var c1 = new SingleValueColumn<int?>(1, tableLength);
         var builder = TableBuilder.CreateEmpty("data", tableLength)
-                                  .WithColumn("c1", c1)
-                                  .WithColumn("c2", c1);
+            .WithColumn("c1", c1)
+            .WithColumn("c2", c1);
         context.AddTable(builder);
         //add.cs
         (await context.RunTabularQueryAsync("data | extend p=c1+c2"))

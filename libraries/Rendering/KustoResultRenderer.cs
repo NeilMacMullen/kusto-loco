@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
-using KustoSupport;
+using KustoLoco.Core;
 using NotNullStrings;
 
 namespace KustoLoco.Rendering;

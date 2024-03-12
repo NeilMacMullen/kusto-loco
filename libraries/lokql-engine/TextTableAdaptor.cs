@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using KustoSupport;
+using KustoLoco.Core;
 
 public class TextTableAdaptor : IFileBasedTableAccess
 {

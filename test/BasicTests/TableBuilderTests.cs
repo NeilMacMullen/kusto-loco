@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 using KustoLoco.Core.Util;
-using KustoSupport;
+using KustoLoco.Core;
 
 namespace BasicTests;
 

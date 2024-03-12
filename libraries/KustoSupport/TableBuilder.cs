@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Text.Json;
-using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
@@ -10,7 +9,8 @@ using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using KustoLoco.Core.DataSource;
 
-namespace KustoSupport;
+namespace KustoLoco.Core;
+
 
 #pragma warning disable CS8604, CS8602, CS8603
 /// <summary>

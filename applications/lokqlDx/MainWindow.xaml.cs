@@ -2,7 +2,7 @@
 using System.Windows;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Rendering;
-using KustoSupport;
+using KustoLoco.Core;
 
 namespace lokqlDx;
 

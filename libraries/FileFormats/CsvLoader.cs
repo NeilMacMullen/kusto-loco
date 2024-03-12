@@ -2,7 +2,6 @@
 using CsvHelper;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
-using KustoSupport;
 using NLog;
 
 namespace KustoLoco.FileFormats;

@@ -1,4 +1,5 @@
-﻿namespace KustoSupport;
+﻿namespace KustoLoco.Core;
+
 
 /// <summary>
 ///     Interface to allow KustoQueryContext to lazily load tables as required

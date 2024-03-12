@@ -1,5 +1,5 @@
 using FluentAssertions;
-using KustoSupport;
+using KustoLoco.Core;
 using LogSetup;
 using NLog;
 

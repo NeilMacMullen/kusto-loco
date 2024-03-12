@@ -1,4 +1,4 @@
-﻿using KustoSupport;
+﻿using KustoLoco.Core;
 
 public interface IFileBasedTableAccess
 {

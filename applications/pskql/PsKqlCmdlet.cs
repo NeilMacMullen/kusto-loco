@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
+using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using KustoLoco.Rendering;
-using KustoSupport;
+
 
 namespace pskql;
 

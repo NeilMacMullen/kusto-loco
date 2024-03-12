@@ -1,6 +1,6 @@
 ﻿
 using KustoLoco.FileFormats;
-using KustoSupport;
+using KustoLoco.Core;
 
 #pragma warning disable CS8618, CS8604
 public class StandardFormatAdaptor : IKustoQueryContextTableLoader
