@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
+    <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\libraries\KustoSupport\KustoSupport.csproj" />
     <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
   </ItemGroup>
 

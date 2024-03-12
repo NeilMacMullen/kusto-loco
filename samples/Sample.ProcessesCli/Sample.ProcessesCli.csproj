@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
   </ItemGroup>
 
 </Project>

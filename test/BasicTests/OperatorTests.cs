@@ -3,7 +3,8 @@ using KustoLoco.Core;
 using FluentAssertions;
 using KustoSupport;
 using LogSetup;
-using NLog;
+
+using LogLevel = NLog.LogLevel;
 
 namespace BasicTests;
 
