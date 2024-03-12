@@ -3,6 +3,7 @@
 
 using System;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Extensions;
 
 namespace KustoLoco.Core.DataSource;

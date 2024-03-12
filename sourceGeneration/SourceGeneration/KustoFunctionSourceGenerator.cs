@@ -122,14 +122,14 @@ namespace SourceGeneration
         {
             code.AppendStatement("using Kusto.Language");
             code.AppendStatement("using Kusto.Language.Symbols");
-            code.AppendStatement("using System.Diagnostics");
             code.AppendStatement("using KustoLoco.Core.Util");
-            code.AppendStatement("using System.Collections.Generic");
             code.AppendStatement("using KustoLoco.Core.Evaluation.BuiltIns");
             code.AppendStatement("using KustoLoco.Core.Evaluation");
             code.AppendStatement("using KustoLoco.Core.DataSource");
             code.AppendStatement("using KustoLoco.Core");
-
+            code.AppendStatement("using KustoLoco.Core.DataSource.Columns");
+            code.AppendStatement("using System.Diagnostics");
+            code.AppendStatement("using System.Collections.Generic");
 
             foreach (var u in GetUsingList(classDeclaration))
             {

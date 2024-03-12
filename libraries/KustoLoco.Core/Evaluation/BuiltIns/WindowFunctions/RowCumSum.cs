@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using KustoLoco.Core.DataSource.Columns;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text.Json.Nodes;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

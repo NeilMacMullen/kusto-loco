@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 
 namespace KustoLoco.Core.Util;
 

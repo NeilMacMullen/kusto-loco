@@ -1,7 +1,7 @@
 ﻿using System;
 using Kusto.Language.Symbols;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 [Flags]
 public enum ColumnHints

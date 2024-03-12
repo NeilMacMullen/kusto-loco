@@ -1,6 +1,6 @@
 ﻿using KustoLoco.Core.Util;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 public abstract class TypedBaseColumn<T> : BaseColumn
 

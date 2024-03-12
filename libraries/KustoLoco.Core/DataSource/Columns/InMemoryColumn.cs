@@ -1,7 +1,6 @@
 ﻿using System;
-using KustoLoco.Core.DataSource;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 public class InMemoryColumn<T> : TypedBaseColumn<T>
 {

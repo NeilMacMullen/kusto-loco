@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Kusto.Language.Symbols;
-using KustoLoco.Core.DataSource;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 /// <summary>
 ///     The NullTableSource used as a placeholder

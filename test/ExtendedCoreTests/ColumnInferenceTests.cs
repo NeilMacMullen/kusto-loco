@@ -2,6 +2,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Util;
 using FluentAssertions;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource.Columns;
 using LogSetup;
 using NLog;
 

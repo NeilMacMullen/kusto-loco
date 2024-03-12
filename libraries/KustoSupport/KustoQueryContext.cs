@@ -7,6 +7,7 @@ using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using NotNullStrings;
 

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using CsvHelper;
 using KustoLoco.Core;
+using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Util;
 using NLog;
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.DataSource;

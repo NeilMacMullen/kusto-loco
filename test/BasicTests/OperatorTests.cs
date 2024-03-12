@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using FluentAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.DataSource.Columns;
 using LogSetup;
 using LogLevel = NLog.LogLevel;
 

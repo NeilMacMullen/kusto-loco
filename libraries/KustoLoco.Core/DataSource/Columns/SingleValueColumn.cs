@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 public class SingleValueColumn<T> : TypedBaseColumn<T>
 {

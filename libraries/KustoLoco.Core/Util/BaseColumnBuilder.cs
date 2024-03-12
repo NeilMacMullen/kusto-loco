@@ -1,4 +1,5 @@
 ﻿using System;
+using KustoLoco.Core.DataSource.Columns;
 
 namespace KustoLoco.Core.Util;
 

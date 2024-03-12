@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Core.Evaluation;
+﻿using KustoLoco.Core.DataSource;
+
+namespace KustoLoco.Core.Evaluation;
 
 public sealed class TabularResult : EvaluationResult
 {

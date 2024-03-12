@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 using TDigestNet;
 
 

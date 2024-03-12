@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using KustoLoco.Core.DataSource;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource.Columns;
 
 /// <summary>
 ///     Represents a column formed of one or more sections which are processed in order

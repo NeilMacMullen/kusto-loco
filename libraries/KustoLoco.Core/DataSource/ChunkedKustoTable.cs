@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using Kusto.Language.Symbols;
-using KustoLoco.Core.DataSource;
 
-namespace KustoLoco.Core;
+namespace KustoLoco.Core.DataSource;
 
 public class ChunkedKustoTable : ITableSource
 {
