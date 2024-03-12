@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>KustoLoco.Rendering</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
   </ItemGroup>
 
 </Project>

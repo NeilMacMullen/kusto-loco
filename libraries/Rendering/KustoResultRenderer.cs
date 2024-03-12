@@ -3,6 +3,8 @@ using System.Text;
 using KustoSupport;
 using NotNullStrings;
 
+namespace KustoLoco.Rendering;
+
 #pragma warning disable CS8618, CS8600, CS8602, CS8604
 public class KustoResultRenderer
 {

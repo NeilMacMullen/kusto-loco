@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using KustoLoco.Core.Evaluation;
 using CommandLine;
+using KustoLoco.Rendering;
 using KustoSupport;
 using NLog;
 using NotNullStrings;

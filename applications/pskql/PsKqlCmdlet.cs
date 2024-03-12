@@ -2,6 +2,7 @@
 using System.Management.Automation;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
+using KustoLoco.Rendering;
 using KustoSupport;
 
 namespace pskql;

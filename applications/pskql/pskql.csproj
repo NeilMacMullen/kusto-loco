@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
-    <ProjectReference Include="..\..\src\Rendering\Rendering.csproj" />
+    <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
   </ItemGroup>
 
 </Project>

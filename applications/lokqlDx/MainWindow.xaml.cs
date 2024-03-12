@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Windows;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.Rendering;
 using KustoSupport;
 
 namespace lokqlDx;

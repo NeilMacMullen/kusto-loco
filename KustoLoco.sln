@@ -47,7 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedStringFunctionality", "src\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj", "{C7CD877B-6D18-459F-AFE8-69239B7D68B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rendering", "src\Rendering\Rendering.csproj", "{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rendering", "libraries\Rendering\Rendering.csproj", "{3516DC9F-BB29-42B1-AEA0-A2EB7B8CD073}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lokql-engine", "src\lokql-engine\lokql-engine.csproj", "{DA457CB0-AF41-474F-9848-6D5F879BC535}"
 EndProject
