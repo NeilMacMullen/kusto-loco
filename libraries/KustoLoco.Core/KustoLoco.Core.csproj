@@ -19,9 +19,6 @@
     <PackageReadmeFile>README-NUGET.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="KustoLoco.Core.Tests" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
