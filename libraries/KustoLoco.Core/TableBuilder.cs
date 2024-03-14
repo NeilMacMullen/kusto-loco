@@ -19,6 +19,9 @@ namespace KustoLoco.Core;
 /// <summary>
 ///     Provides a simple way to create a Kusto ITableSource
 /// </summary>
+/// <remarks>
+/// A TableBuilder is a mutable object that allows you to create a Kusto ITableSource by adding columns to it.
+/// </remarks>
 public class TableBuilder
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -38,6 +41,13 @@ public class TableBuilder
         Name = name;
     }
 
+    /// <summary>
+    /// Creates an empty TableBuilder with the given name and length
+    /// </summary>
+    /// <remarks>
+    /// All columns within the table are required to have the same length so this needs to be declared
+    /// here
+    /// </remarks>
     public static TableBuilder CreateEmpty(string name, int length)
         => new(
             name,
@@ -45,22 +55,36 @@ public class TableBuilder
             [],
             length);
 
-
+    /// <summary>
+    /// Adds a column to the builder 
+    /// </summary>
+    /// <remarks>
+    ///  Should only be used when the client code must deal with columns of data where there's
+    /// very little advance type information
+    /// </remarks>
     public TableBuilder WithColumn(string name, BaseColumn column)
     {
         _columns = _columns.Add(column);
         _columnNames = _columnNames.Add(name);
         return this;
     }
-
+    /// <summary>
+    /// Adds a column of data to builder by copying it into a new array
+    /// </summary>
     public TableBuilder WithColumn<T>(string name, IEnumerable<T> items)
     {
         var column = ColumnFactory.Create(items.ToArray());
         return WithColumn(name, column);
     }
 
+    /// <summary>
+    /// Creates a column from collection of items where we know the type
+    /// </summary>
     public TableBuilder WithColumn(string name, Type type, IReadOnlyCollection<object?> items)
     {
+        //TODO - since we know the length of the column we could use a more efficient allocation scheme in the builder
+        //TODO - in fact this is only currently called from places we have already forced a ToArray so
+        //we're doing a double copy here
         var builder = ColumnHelpers.CreateBuilder(type);
         foreach (var item in items)
         {

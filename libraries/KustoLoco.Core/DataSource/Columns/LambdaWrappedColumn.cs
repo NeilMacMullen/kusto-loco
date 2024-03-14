@@ -3,6 +3,13 @@ using System.Collections.Immutable;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
+/// <summary>
+/// Provides an efficient way to access an array of existing values
+/// </summary>
+/// <remarks>
+/// When we're provided with an immutable array of records, we can simply share the array and provide a lambda per
+/// column to access the data.
+/// </remarks>
 public class LambdaWrappedColumn<TRow, T> : TypedBaseColumn<T>
 {
     private readonly Func<TRow, T> _dataFetcher;

@@ -2,6 +2,14 @@
 
 namespace KustoLoco.Core.DataSource.Columns;
 
+/// <summary>
+/// A column that holds a single value
+/// </summary>
+/// <remarks>
+/// This is a special case of a column that holds a single value. This is actually quite common when we perform summarizations
+/// or filtering operations.  Single-value columns can also efficiently represent "index" columns since a single filter comparison
+/// can select a large number of rows.
+/// </remarks>
 public class SingleValueColumn<T> : TypedBaseColumn<T>
 {
     private readonly int _rowCount;
