@@ -3,7 +3,7 @@ using KustoLoco.FileFormats;
 using KustoLoco.Core;
 
 #pragma warning disable CS8618, CS8604
-public class StandardFormatAdaptor : IKustoQueryContextTableLoader
+public class StandardFormatAdaptor : ITableSerializer
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly string[] _paths;

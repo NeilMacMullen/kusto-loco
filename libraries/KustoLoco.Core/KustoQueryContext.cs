@@ -17,12 +17,21 @@ using NotNullStrings;
 namespace KustoLoco.Core;
 
 /// <summary>
-///     Provides a context for complex queries or persistent tables
+///     Provides a context for queries across a set of tables
 /// </summary>
+/// <remarks>
+/// Querying is thread-safe, but adding/removing tables is not.  Care must be taken to
+/// ensure that queries are not issued while tables are being added or removed. This needs
+/// particular care when using lazy table loading since one query may cause the loaded table
+/// list to change while another query is in progress.
+///
+/// A Fluent syntax is supported BUT the context is not immutable so operations will return the
+/// original mutated context.
+/// </remarks>
 public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = new();
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
 
     private bool _fullDebug;
 
@@ -42,12 +51,13 @@ public class KustoQueryContext
     public void AddTable(TableBuilder builder) => AddTable(builder.ToTableSource());
 
 
-    public void AddTable(ITableSource table)
+    public KustoQueryContext AddTable(ITableSource table)
     {
         if (_tables.Any(t => t.Name == table.Name))
             throw new ArgumentException($"Context already contains a table named '{table.Name}'");
         RemoveTable(table.Name);
         _tables.Add(table);
+        return this;
     }
 
 
@@ -57,10 +67,11 @@ public class KustoQueryContext
     /// <remarks>
     ///     Supplied name may be framed with escapes
     /// </remarks>
-    public void RemoveTable(string tableName)
+    public KustoQueryContext RemoveTable(string tableName)
     {
         tableName = KustoNameEscaping.RemoveFraming(tableName);
         _tables = _tables.Where(t => t.Name != tableName).ToList();
+        return this;
     }
 
 
@@ -70,31 +81,34 @@ public class KustoQueryContext
     /// <remarks>
     ///     Will overwrite any existing table with the new name
     /// </remarks>
-    public void RenameTable(string oldName, string newName)
+    public KustoQueryContext RenameTable(string oldName, string newName)
     {
         ShareTable(oldName, newName);
         RemoveTable(oldName);
+        return this;
     }
 
-    public void OldAddTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records)
+    public void OldAddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
     {
         var table = TableBuilder.OldCreateFromRows(tableName, records);
         AddTable(table);
     }
 
-    public void AddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
+    public KustoQueryContext AddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
     {
         var table = TableBuilder.CreateFromRows(tableName, records);
         AddTable(table);
+        return this;
     }
 
 
-    public void AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
+    public KustoQueryContext AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {
         var table = TableBuilder.OldCreateFromRows(tableName, records);
         var chunked = ChunkedKustoTable
             .FromTable(table.ToTableSource(), chunkSize);
         AddTable(chunked);
+        return this;
     }
 
     public int BenchmarkQuery(string query)
@@ -146,7 +160,6 @@ public class KustoQueryContext
                         }
                     ))
                 .ToImmutableArray();
-            ;
 
             var tr = TableBuilder.CreateFromRows("tables", rows)
                 .ToTableSource() as InMemoryTableSource;
@@ -185,7 +198,17 @@ public class KustoQueryContext
         }
     }
 
-    public void AddLazyTableLoader(IKustoQueryContextTableLoader loader) => _lazyTableLoader = loader;
+    /// <summary>
+    /// Sets the table loader for the context
+    /// </summary>
+    /// <remarks>
+    /// This allows the context to lazily load tables as required by queries
+    /// </remarks>
+    public KustoQueryContext SetTableLoader(IKustoQueryContextTableLoader loader)
+    {
+        _lazyTableLoader = loader;
+        return this;
+    }
 
     public async Task<KustoQueryResult> RunTabularQueryAsync(string query)
     {

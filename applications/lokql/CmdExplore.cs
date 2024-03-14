@@ -13,12 +13,12 @@ internal class CmdExplore
     public static async Task RunAsync(Options options)
     {
         var context =
-            new ReportExplorer.FolderContext(
+            new InteractiveTableExplorer.FolderContext(
                 options.WorkIn.OrWhenBlank(options.Results),
                 options.WorkIn.OrWhenBlank(options.Scripts),
                 options.WorkIn.OrWhenBlank(options.Queries));
         var console = new SystemConsole();
-        var explorer = new ReportExplorer(console, context);
+        var explorer = new InteractiveTableExplorer(console, context);
 
         await explorer.RunInteractive(options.Run);
     }

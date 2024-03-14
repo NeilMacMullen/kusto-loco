@@ -2,87 +2,45 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Linq;
 using KustoLoco.Core;
-using KustoLoco.Core.Extensions;
-using KustoLoco.ProcessQuerier;
+using NotNullStrings;
+using Sample.ProcessesCli;
+using Spectre.Console;
 
-Console.WriteLine(@"/----------------------------------------------------------------\");
-Console.WriteLine(@"| Welcome to KustoLoco.ProcessQuerier. You can write KQL queries |");
-Console.WriteLine(@"| and explore the live list of processes on your machine.        |");
-Console.WriteLine(@"\----------------------------------------------------------------/");
-Console.WriteLine();
-
-ShowDemos();
-
-while (true)
+if (args.Length == 0)
 {
-    try
-    {
-        PrintCaret();
-        var query = Console.ReadLine();
-        if (query == null || query == "exit")
-        {
-            return;
-        }
+    Console.WriteLine(
+        @"
 
-        ExecuteReplQuery(query);
-    }
-    catch (Exception ex)
-    {
-        var lastColor = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Error:");
-        Console.WriteLine(ex);
-        Console.ForegroundColor = lastColor;
-    }
-
-    Console.WriteLine();
+This program demonstrates the use of KQL to query the current process list.  Invoke it like....
+processes.exe");
+    return;
 }
 
-static void ShowDemos()
-{
-    var demos = new[]
-    {
-        (Title: "Example: counting the total number of processes:", Query: @"Processes | count"),
-        (Title: "Example: Find the process using the most memory:",
-            Query: @"Processes | project name, memMB=workingSet/1024/1024 | order by memMB desc | take 1")
-    };
+var processes = ProcessReader.GetProcesses();
+var query = args.First();
 
-    foreach (var demo in demos)
-    {
-        ShowDemo(demo.Title, demo.Query);
-    }
+var result = await new KustoQueryContext()
+    .AddTableFromRecords("processes", processes)
+    .RunTabularQueryAsync(query);
+
+if (result.Error.IsNotBlank())
+{
+    AnsiConsole.MarkupLineInterpolated($"[red]{result.Error}[/]");
+    return;
 }
 
-static void ShowDemo(string title, string query)
+//set up Spectre.Console table
+var table = new Table();
+
+// Add columns with header names
+foreach (var column in result.ColumnDefinitions()) table.AddColumn(column.Name);
+// Add rows.  Note that data can be null here  
+foreach (var row in result.EnumerateRows())
 {
-    var lastColor = Console.ForegroundColor;
-    Console.ForegroundColor = ConsoleColor.White;
-    Console.WriteLine(title);
-    Console.ForegroundColor = lastColor;
-    PrintCaret();
-    Console.WriteLine(query);
-    ExecuteReplQuery(query);
+    var rowCells = row.Select(r => r?.ToString() ?? string.Empty).ToArray();
+    table.AddRow(rowCells);
 }
 
-static void ExecuteReplQuery(string query)
-{
-    var processesTable = new ProcessesTable("Processes");
-    var engine = new BabyKustoEngine();
-    var result = engine.Evaluate(
-        [processesTable],
-        query, dumpIRTree: false); // Set dumpIRTree = true to see the internal tree representation
-
-    Console.WriteLine();
-    result.Dump(Console.Out);
-    Console.WriteLine();
-}
-
-
-static void PrintCaret()
-{
-    var lastColor = Console.ForegroundColor;
-    Console.ForegroundColor = ConsoleColor.Cyan;
-    Console.Write("> ");
-    Console.ForegroundColor = lastColor;
-}
+AnsiConsole.Write(table);

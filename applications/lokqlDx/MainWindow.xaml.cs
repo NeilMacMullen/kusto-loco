@@ -9,7 +9,7 @@ namespace lokqlDx;
 public partial class MainWindow : Window
 {
     private readonly WpfConsole _console;
-    private readonly ReportExplorer explorer;
+    private readonly InteractiveTableExplorer explorer;
 
     public MainWindow()
     {
@@ -17,12 +17,12 @@ public partial class MainWindow : Window
 
         var workin = @"C:\kusto";
         var context =
-            new ReportExplorer.FolderContext(
+            new InteractiveTableExplorer.FolderContext(
                 workin,
                 workin,
                 workin);
         _console = new WpfConsole(OutputText);
-        explorer = new ReportExplorer(_console, context);
+        explorer = new InteractiveTableExplorer(_console, context);
     }
 
 

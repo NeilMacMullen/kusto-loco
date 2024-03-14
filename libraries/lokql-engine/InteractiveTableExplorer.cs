@@ -13,30 +13,37 @@ using NotNullStrings;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-#pragma warning disable CS8604 // Possible null reference argument.
 
-public class ReportExplorer
+/// <summary>
+/// A repl for exploring kusto tables
+/// </summary>
+/// <remarks>
+/// This class is used as the heart of the CLI and UI version of "lokql"  As well as providing demand-based loading of tables,
+/// it also provides a number of commands to interact with the data, such as saving, loading, rendering and materializing tables.
+/// Query results can also be rendered as html charts using the "render" command.
+/// </remarks>
+public class InteractiveTableExplorer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
-    private readonly IKustoQueryContextTableLoader _loader;
+    private readonly ITableSerializer _loader;
     private readonly IConsole _outputConsole;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public ReportExplorer(IConsole outputConsole, FolderContext folders, IKustoQueryContextTableLoader loader)
+    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableSerializer loader)
     {
         _outputConsole = outputConsole;
         _loader = loader;
-        _context.AddLazyTableLoader(_loader);
+        _context.SetTableLoader(_loader);
         _folders = folders;
     }
 
-    public ReportExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
+    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
         new StandardFormatAdaptor(folders.OutputFolder))
     {
     }
@@ -232,7 +239,7 @@ public class ReportExplorer
 
     public static class RunScriptCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
             Logger.Info($"Loading '{filename}'..");
@@ -254,7 +261,7 @@ public class ReportExplorer
 
     public static class QueryCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
             Logger.Info($"Fetching query '{filename}'");
@@ -276,7 +283,7 @@ public class ReportExplorer
 
     public static class SaveQueryCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
             Logger.Info($"Saving query to '{filename}'");
@@ -312,7 +319,7 @@ public class ReportExplorer
 
     public static class SaveCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             await exp._loader.SaveResult(exp._prevResult, o.File);
         }
@@ -331,7 +338,7 @@ public class ReportExplorer
 
     public static class ShowCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             exp.ShowResultsToConsole(exp._prevResult, o.Offset, o.NumToShow);
             await Task.CompletedTask;
@@ -350,7 +357,7 @@ public class ReportExplorer
 
     public static class RenderCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
@@ -368,7 +375,7 @@ public class ReportExplorer
 
     public static class MaterializeCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             exp.GetCurrentContext().MaterializeResultAsTable(exp._prevResult, o.As);
             Logger.Info($"Table '{o.As}' now available");
@@ -386,7 +393,7 @@ public class ReportExplorer
 
     public static class AllTablesCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             var context = exp._context;
             var tableNames = context.TableNames
@@ -404,7 +411,7 @@ public class ReportExplorer
 
     public static class LoadCommand
     {
-        internal static async Task RunAsync(ReportExplorer exp, Options o)
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
             await exp._loader.LoadTable(exp._context, o.File, tableName);
@@ -425,7 +432,7 @@ public class ReportExplorer
 
     public static class SynTableCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
 
@@ -445,7 +452,7 @@ public class ReportExplorer
 
     private static class FormatCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             if (o.Max > 0)
                 exp._currentDisplayOptions = exp._currentDisplayOptions with { MaxToDisplay = o.Max };
@@ -463,7 +470,7 @@ public class ReportExplorer
 
     private static class ExitCommand
     {
-        internal static void Run(ReportExplorer exp, Options o)
+        internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             Logger.Info("Exiting...");
             Environment.Exit(0);
