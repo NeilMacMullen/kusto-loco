@@ -49,7 +49,7 @@ public class KustoQueryHelper
         Logger.Info("Create context");
         var context = new KustoQueryContext();
         Logger.Info("Adding table from records");
-        context.AddTableFromRecords(tableName, rows);
+        context.AddTableFromImmutableData(tableName, rows);
         Logger.Info("Running...");
 
         return await context.RunTabularQueryAsync(query);

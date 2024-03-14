@@ -88,28 +88,21 @@ public class KustoQueryContext
         return this;
     }
 
-    public void OldAddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
+    public void AddTableFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records)
     {
-        var table = TableBuilder.OldCreateFromRows(tableName, records);
+        var table = TableBuilder.CreateFromVolatileData(tableName, records);
         AddTable(table);
     }
 
-    public KustoQueryContext AddTableFromRecords<T>(string tableName, ImmutableArray<T> records)
+    public KustoQueryContext AddTableFromImmutableData<T>(string tableName, ImmutableArray<T> records)
     {
-        var table = TableBuilder.CreateFromRows(tableName, records);
+        var table = TableBuilder.CreateFromImmutableData(tableName, records);
         AddTable(table);
         return this;
     }
 
 
-    public KustoQueryContext AddChunkedTableFromRecords<T>(string tableName, IReadOnlyCollection<T> records, int chunkSize)
-    {
-        var table = TableBuilder.OldCreateFromRows(tableName, records);
-        var chunked = ChunkedKustoTable
-            .FromTable(table.ToTableSource(), chunkSize);
-        AddTable(chunked);
-        return this;
-    }
+    
 
     public int BenchmarkQuery(string query)
     {
@@ -161,7 +154,7 @@ public class KustoQueryContext
                     ))
                 .ToImmutableArray();
 
-            var tr = TableBuilder.CreateFromRows("tables", rows)
+            var tr = TableBuilder.CreateFromImmutableData("tables", rows)
                 .ToTableSource() as InMemoryTableSource;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
@@ -172,7 +165,7 @@ public class KustoQueryContext
                     .ToImmutableArray()
                 ;
 
-            var tr = TableBuilder.CreateFromRows("tables", rows)
+            var tr = TableBuilder.CreateFromImmutableData("tables", rows)
                 .ToTableSource() as InMemoryTableSource;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);

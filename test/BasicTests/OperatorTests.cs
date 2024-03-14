@@ -26,7 +26,7 @@ public class OperatorTests
         var context = CreateContext();
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-        context.AddTableFromRecords("data", rows);
+        context.AddTableFromImmutableData("data", rows);
         var result = await context.RunTabularQueryAsync("data | getschema");
         var schema = KustoFormatter.Tabulate(result);
         Console.WriteLine(schema);

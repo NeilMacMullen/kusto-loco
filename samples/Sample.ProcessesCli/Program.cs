@@ -22,7 +22,7 @@ var processes = ProcessReader.GetProcesses();
 var query = args.First();
 
 var result = await new KustoQueryContext()
-    .AddTableFromRecords("processes", processes)
+    .AddTableFromImmutableData("processes", processes)
     .RunTabularQueryAsync(query);
 
 if (result.Error.IsNotBlank())

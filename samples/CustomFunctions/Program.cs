@@ -22,7 +22,7 @@ internal class Program
             .Select(i => new Number(i, string.Empty))
             .ToImmutableArray();
 
-        context.AddTableFromRecords("numbers", numbers);
+        context.AddTableFromImmutableData("numbers", numbers);
 
         //run a query using our custom function
         var query = "numbers | extend FizzBuzz = fizz(N)";

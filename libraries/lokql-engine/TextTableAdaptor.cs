@@ -17,7 +17,7 @@ public class TextTableAdaptor : IFileBasedTableAccess
         var lines = File.ReadAllLines(path)
                         .Select(l => new { Line = l })
                         .ToImmutableArray();
-        var table = TableBuilder.CreateFromRows(name, lines).ToTableSource();
+        var table = TableBuilder.CreateFromImmutableData(name, lines).ToTableSource();
         context.AddTable(table);
         return Task.FromResult(true);
     }

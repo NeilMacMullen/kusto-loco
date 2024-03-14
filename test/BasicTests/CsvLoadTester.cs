@@ -36,7 +36,7 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromRecords("data", rows);
+            context.AddTableFromImmutableData("data", rows);
             var result = (await context.RunTabularQueryAsync("data | count"));
             KustoFormatter.Tabulate(result).Should().Contain("50000");
         }
@@ -48,7 +48,7 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromRecords("data", rows);
+            context.AddTableFromImmutableData("data", rows);
             var result = (await context.RunTabularQueryAsync("data | where Value < 10 | count"));
             KustoFormatter.Tabulate(result).Should().Contain("10");
         }

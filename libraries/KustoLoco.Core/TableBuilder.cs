@@ -76,14 +76,15 @@ public class TableBuilder
         return WithColumn(name, indexColumn);
     }
 
-
-    public static TableBuilder OldCreateFromRows<T>(string name, IReadOnlyCollection<T> rows)
-        => FromRecords(name, rows);
-
-
-    public static TableBuilder CreateFromRows<T>(string name, ImmutableArray<T> rows) => FromWrappedRecords(name, rows);
-
-    private static TableBuilder FromRecords<T>(string tableName, IReadOnlyCollection<T> records)
+  
+    /// <summary>
+    /// Creates a TableBuilder from a collection of records by _copying_ the data into new columns
+    /// </summary>
+    /// <remarks>
+    /// This method is less efficient than <see cref="CreateFromImmutableData{T}"/> since it requires copying the data into new arrays.
+    /// It's a little more flexible though and the overhead is generally not a problem for small collections (a few 1000s) of records.
+    /// </remarks>
+    public static TableBuilder CreateFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records)
     {
         var builder = CreateEmpty(tableName, records.Count);
         foreach (var p in typeof(T).GetProperties())
@@ -96,7 +97,13 @@ public class TableBuilder
         return builder;
     }
 
-    private static TableBuilder FromWrappedRecords<T>(string tableName, ImmutableArray<T> records)
+    /// <summary>
+    /// Creates columns that wrap row properties in a lambda value getter
+    /// </summary>
+    /// <remarks>
+    /// This method allows us to create very efficient columns since the only overhead over the original data is the method call
+    /// </remarks>
+    public  static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records)
     {
         var builder = CreateEmpty(tableName, records.Length);
         foreach (var p in typeof(T).GetProperties())
