@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using KustoLoco.Core.Evaluation;
-using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using NLog;
 using NotNullStrings;
 
@@ -20,13 +20,12 @@ namespace KustoLoco.Core;
 ///     Provides a context for queries across a set of tables
 /// </summary>
 /// <remarks>
-/// Querying is thread-safe, but adding/removing tables is not.  Care must be taken to
-/// ensure that queries are not issued while tables are being added or removed. This needs
-/// particular care when using lazy table loading since one query may cause the loaded table
-/// list to change while another query is in progress.
-///
-/// A Fluent syntax is supported BUT the context is not immutable so operations will return the
-/// original mutated context.
+///     Querying is thread-safe, but adding/removing tables is not.  Care must be taken to
+///     ensure that queries are not issued while tables are being added or removed. This needs
+///     particular care when using lazy table loading since one query may cause the loaded table
+///     list to change while another query is in progress.
+///     A Fluent syntax is supported BUT the context is not immutable so operations will return the
+///     original mutated context.
 /// </remarks>
 public class KustoQueryContext
 {
@@ -48,7 +47,10 @@ public class KustoQueryContext
     }
 
 
-    public void AddTable(TableBuilder builder) => AddTable(builder.ToTableSource());
+    public void AddTable(TableBuilder builder)
+    {
+        AddTable(builder.ToTableSource());
+    }
 
 
     public KustoQueryContext AddTable(ITableSource table)
@@ -101,8 +103,6 @@ public class KustoQueryContext
         return this;
     }
 
-
-    
 
     public int BenchmarkQuery(string query)
     {
@@ -192,10 +192,10 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    /// Sets the table loader for the context
+    ///     Sets the table loader for the context
     /// </summary>
     /// <remarks>
-    /// This allows the context to lazily load tables as required by queries
+    ///     This allows the context to lazily load tables as required by queries
     /// </remarks>
     public KustoQueryContext SetTableLoader(IKustoQueryContextTableLoader loader)
     {
@@ -243,25 +243,33 @@ public class KustoQueryContext
                     tables.Add(e.RawResultType.Name);
             });
         //special case handling for when query is _only_ a table name without any operators
-        if (!tables.Any() && query.Tokenize().Length == 1)
-        {
-            tables.Add(query.Trim());
-        }
+        if (!tables.Any() && query.Tokenize().Length == 1) tables.Add(query.Trim());
 
         return tables.Select(KustoNameEscaping.RemoveFraming).Distinct().ToArray();
     }
 
-    public IEnumerable<ITableSource> Tables() => _tables;
-
-
-    public static KustoQueryContext WithFullDebug()
+    public IEnumerable<ITableSource> Tables()
     {
-        var context = new KustoQueryContext
-        {
-            _fullDebug = true
-        };
-        return context;
+        return _tables;
     }
+
+    private KustoQueryContext AddDebug()
+    {
+        _fullDebug = true;
+        return this;
+    }
+
+    /// <summary>
+    ///     Creates a context that has addition debug information
+    /// </summary>
+    /// <remarks>
+    ///     Primarily used for testing and development
+    /// </remarks>
+    public static KustoQueryContext CreateWithDebug()
+    {
+        return new KustoQueryContext().AddDebug();
+    }
+
 
     /// <summary>
     ///     Makes an existing table available under a different name
@@ -301,4 +309,42 @@ public class KustoQueryContext
         );
         AddTable(mat);
     }
+
+
+    
+    /// <summary>
+    ///     Runs a query against the supplied records.
+    /// </summary>
+    /// <remarks>
+    ///     The query is prefixed with "data | " so only basic queries are supported
+    /// </remarks>
+    public static KustoQueryResult QueryRecords<T>(
+        ImmutableArray<T> rows,
+        string query)
+    {
+        const string tableName = "data";
+        var context = new KustoQueryContext();
+        query = $"{tableName} | {query}";
+        context.AddTableFromImmutableData(tableName, rows);
+        return context.RunTabularQueryWithoutDemandBasedTableLoading(query);
+    }
+
+
+    /// <summary>
+    ///     Runs a query against the supplied records.
+    /// </summary>
+    /// <remarks>
+    ///    This is a convenience method intended to support programmatically generated queries.  It should be used with
+    ///   caution since it's quite possible to change the shape of the data in the query in a way that would make it impossible
+    /// to deserialize the results back into the original type.
+    /// </remarks>
+    public static IReadOnlyCollection<T> FilterRecords<T>(ImmutableArray<T> rows,
+        string query)
+    {
+        var result = QueryRecords(rows, query);
+        return result.DeserialiseTo<T>();
+    }
+
+
+
 }

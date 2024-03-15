@@ -1,8 +1,10 @@
-﻿
-using KustoLoco.FileFormats;
+﻿using System.Reflection;
 using KustoLoco.Core;
+using KustoLoco.FileFormats;
 using NotNullStrings;
+using Spectre.Console;
 
+ShowHelpIfAppropriate();
 var result = await new CsvLoader()
     .LoadTable(args.First(), "data", new ConsoleProgressReporter());
 
@@ -29,4 +31,18 @@ while (true)
         Console.WriteLine(KustoFormatter.Tabulate(res));
         Console.WriteLine($"{res.QueryDuration}ms");
     }
+}
+
+
+void ShowHelpIfAppropriate()
+{
+    if (args.Length != 0) return;
+    var programName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
+    var help = $"""
+                This program demonstrates the use of KQL to query a CSV file specified by the user.
+                Usage:
+                 {programName} c:\temp\mydata.csv
+                """;
+    AnsiConsole.MarkupLineInterpolated($"[yellow]{help}[/]");
+    Environment.Exit(0);
 }

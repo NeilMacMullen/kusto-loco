@@ -17,7 +17,7 @@ public class OperatorTests
 
     private static KustoQueryContext CreateContext()
     {
-        return KustoQueryContext.WithFullDebug();
+        return KustoQueryContext.CreateWithDebug();
     }
 
     [TestMethod]

@@ -94,6 +94,13 @@ public class TableBuilder
         return WithColumn(name, builder.ToColumn());
     }
 
+    /// <summary>
+    /// Add an index column to the table 
+    /// </summary>
+    /// <remarks>
+    /// An index column is a column that contains a single value repeated for the length of the table
+    /// Typically used to provide efficient filtering and summarization operations
+    /// </remarks>
     public TableBuilder WithIndexColumn<T>(string name, T? value)
     {
         var indexColumn = new SingleValueColumn<T>(value, Length);
@@ -198,11 +205,11 @@ public class TableBuilder
 
     public ITableSource ToTableSource()
     {
-        var syms = _columnNames.Zip(_columns)
+        var symbols = _columnNames.Zip(_columns)
             .Select(cs =>
                 new ColumnSymbol(cs.First, cs.Second.Type))
             .ToArray();
-        var ts = new TableSymbol(Name, syms);
+        var ts = new TableSymbol(Name, symbols);
         return new InMemoryTableSource(ts, _columns.ToArray());
     }
 

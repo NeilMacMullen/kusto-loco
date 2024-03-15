@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using KustoLoco.Core;
 using NotNullStrings;
@@ -37,6 +38,7 @@ public class KustoResultRenderer
         => result.Visualization.ChartType.IsNotBlank()
             ? KustoToVegaChartType(result)
             : RenderToTable(result);
+
 
 
     public static string KustoToVegaChartType(KustoQueryResult result)
@@ -113,6 +115,19 @@ public class KustoResultRenderer
         return VegaMaker.MakeHtml(title, b.Serialize());
     }
 
+    /// <summary>
+    /// If the query result has a chart type, render it in the browser by creating a temporary html file
+    /// </summary>
+    public static void RenderChartInBrowser(KustoQueryResult result)
+    {
+        if (result.Visualization.ChartType.IsBlank())
+            return;
+
+        var fileName = Path.ChangeExtension(Path.GetTempFileName(), "html");
+        var text = RenderToHtml(result);
+        File.WriteAllText(fileName, text);
+        Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
+    }
 
     public static void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
     {

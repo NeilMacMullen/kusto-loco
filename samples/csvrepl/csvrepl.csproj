@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" />
+    <PackageReference Include="Spectre.Console" />
   </ItemGroup>
 
   <ItemGroup>

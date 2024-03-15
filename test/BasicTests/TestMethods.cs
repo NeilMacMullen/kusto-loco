@@ -12,7 +12,7 @@ public abstract class TestMethods
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    protected static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
+    protected static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
 
     protected async Task<string> LastLineOfResult(string query)
     {

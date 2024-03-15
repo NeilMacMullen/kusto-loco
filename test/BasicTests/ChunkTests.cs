@@ -14,7 +14,7 @@ public class ChunkTests
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
+    private static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
 
     private void AddChunkedTableFromRecords<T>(KustoQueryContext context,string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {
