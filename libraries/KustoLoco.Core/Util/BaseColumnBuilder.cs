@@ -15,13 +15,13 @@ public abstract class BaseColumnBuilder
 
     public void PadTo(int size)
     {
-
         //pad with nulls 
         while (RowCount < size)
         {
             Add(null);
         }
     }
+
     public void AddAt(object? value, int rowIndex)
     {
         PadTo(rowIndex);

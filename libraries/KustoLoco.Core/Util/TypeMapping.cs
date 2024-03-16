@@ -99,8 +99,30 @@ public static class TypeMapping
 
 public static class TypeNameHelper
 {
-    public static string GetTypeDisplayName<T>(T type)
+    public static string GetTypeDisplayName<T>(T type) => typeof(T).Name;
+
+    public static string TypeName<T>() => typeof(T).FullName!;
+
+    public static Type GetTypeFromName(string name)
     {
-        return typeof(T).Name;
+        return name switch
+        {
+            _ when name == TypeName<string>() => typeof(string),
+            _ when name == TypeName<long>() => typeof(long),
+            _ when name == TypeName<int>() => typeof(int),
+            _ when name == TypeName<bool>() => typeof(bool),
+            _ when name == TypeName<DateTime>() => typeof(DateTime),
+            _ when name == TypeName<Guid>() => typeof(Guid),
+            _ when name == TypeName<decimal>() => typeof(decimal),
+            _ when name == TypeName<TimeSpan>() => typeof(TimeSpan),
+            _ when name == TypeName<JsonNode>() => typeof(JsonNode),
+            _ when name == TypeName<uint>() => typeof(uint),
+            _ when name == TypeName<ushort>() => typeof(ushort),
+            _ when name == TypeName<float>() => typeof(float),
+            _ when name == TypeName<double>() => typeof(double),
+            _ when name == TypeName<short>() => typeof(short),
+            _ when name == TypeName<ulong>() => typeof(ulong),
+            _ => typeof(object)
+        };
     }
 }

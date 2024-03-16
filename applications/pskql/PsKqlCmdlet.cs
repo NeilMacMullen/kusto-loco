@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using KustoLoco.Rendering;
-
 
 namespace pskql;
 
@@ -12,6 +10,9 @@ namespace pskql;
 public class PsKqlCmdlet : Cmdlet
 {
     private const string TableName = "data";
+
+    private readonly Dictionary<string, BaseColumnBuilder> _columnBuilders = [];
+    private readonly List<string> _columnNames = [];
     private readonly List<PSObject> _objects = [];
     private bool _noQueryPrefix;
 
@@ -39,41 +40,66 @@ public class PsKqlCmdlet : Cmdlet
     {
         var builder = TableBuilder.CreateEmpty(TableName, _objects.Count);
 
-        var columnBuilders = new Dictionary<string, BaseColumnBuilder>();
-        var columnNames = new List<string>();
+
         var badProperties = new List<string>();
+        var addedProperties = new List<string>();
         WriteDebug($"Adding {_objects.Count} items");
         var rowIndex = 0;
         foreach (var item in _objects)
         {
             var types = item.TypeNames.ToArray();
             //simple types
-            if (types.First() == "System.String")
-                AddValue("Value", types.First(), () => item.BaseObject, rowIndex);
+            if (types.First() == TypeNameHelper.TypeName<string>())
+                AddValue("Value", types.First(), item.BaseObject, rowIndex);
             else //complex types
+            {
+                // it's possible that not all rows have the same properties, for
+                //example if we've done an 'ls' and have a mix of files and directories
+                //therefore we have to be careful to insert cells at the appropriate row
+                //index and pad with nulls where necessary
                 foreach (var p in item.Properties)
                 {
                     if (badProperties.Contains(p.Name))
                         continue;
-                    WriteDebug($"{rowIndex} Attempting to add property {p.Name} of type {p.TypeNameOfValue}...");
+                    //it's important we check the property type _before_ attempting to access the Value
+                    //since some Values are extremely expensive to access
+                    //TODO we currently assume non-primitive Values are expensive
+                    //but we could be more sophisticated here and attempt to time accesses
+                    if (TypeNameHelper.GetTypeFromName(p.TypeNameOfValue) == typeof(object)
+                        && p.TypeNameOfValue != TypeNameHelper.TypeName<object>())
+                    {
+                        //we deliberately skip complex properties for now
+                        //in the future we might decide to flatten them or import has JsonNodes
+                        WriteDebug($"{rowIndex} Skipping property {p.Name} of unsupported type {p.TypeNameOfValue}...");
+                        badProperties.Add(p.Name);
+                        continue;
+                    }
+
+                    if (!addedProperties.Contains(p.Name))
+                    {
+                        WriteDebug($"{rowIndex} Attempting to add property {p.Name} of type {p.TypeNameOfValue}...");
+                    }
+
                     try
                     {
-                        AddValue(p.Name, p.TypeNameOfValue, () => p.Value, rowIndex);
+                        AddValue(p.Name, p.TypeNameOfValue, p.Value, rowIndex);
+                        addedProperties.Add(p.Name);
                     }
                     catch (Exception e)
                     {
-                        WriteWarning(e.Message);
+                        WriteDebug(e.Message);
                         badProperties.Add(p.Name);
                     }
                 }
+            }
 
             rowIndex++;
         }
 
         WriteDebug("Creating context...");
-        foreach (var name in columnNames)
+        foreach (var name in _columnNames)
         {
-            var cb = columnBuilders[name];
+            var cb = _columnBuilders[name];
             cb.PadTo(rowIndex);
             builder.WithColumn(name, cb.ToColumn());
         }
@@ -105,68 +131,34 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                var html = KustoResultRenderer.RenderToHtml(result);
-                var filename = Path.ChangeExtension(Path.GetTempFileName(), ".html");
-                File.WriteAllText(filename, html);
-                Process.Start(new ProcessStartInfo { FileName = filename, UseShellExecute = true });
+                KustoResultRenderer.RenderChartInBrowser(result);
             }
         }
+    }
 
-        return;
-
-        BaseColumnBuilder GetOrAdd(string name, Type type)
-        {
-            if (columnBuilders!.TryGetValue(name, out var b))
-                return b;
-            b = ColumnHelpers.CreateBuilder(type);
-            columnBuilders[name] = b;
-            columnNames.Add(name);
+    private BaseColumnBuilder GetOrCreateBuilder(string name, string typeName)
+    {
+        var type = TypeNameHelper.GetTypeFromName(typeName);
+        if (_columnBuilders!.TryGetValue(name, out var b))
             return b;
-        }
+        b = ColumnHelpers.CreateBuilder(type);
+        _columnBuilders[name] = b;
+        _columnNames.Add(name);
+        return b;
+    }
 
 
-        void AddValue(string columnName, string typeName, Func<object?> valueGetter, int rowIndex)
+    private void AddValue(string columnName, string typeName, object? value, int rowIndex)
+    {
+        //special-casing for properties of type "object" which we turn into strings for the purpose of querying
+        if (typeName == TypeNameHelper.TypeName<object>())
         {
-            //Uses a getter func because evaluating some complex types can take a very long time
-            switch (typeName)
-            {
-                case "System.String":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(string));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-                case "System.Int32":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(long));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-                case "System.Int64":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(long));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-                case "System.Boolean":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(bool));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-                case "System.DateTime":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(DateTime));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-                case "System.Guid":
-                {
-                    var colBuilder = GetOrAdd(columnName, typeof(Guid));
-                    colBuilder.AddAt(valueGetter(), rowIndex);
-                    break;
-                }
-            }
+            typeName = TypeNameHelper.TypeName<string>();
+            value = value?.ToString() ?? string.Empty;
         }
+
+
+        var colBuilder = GetOrCreateBuilder(columnName, typeName);
+        colBuilder.AddAt(value, rowIndex);
     }
 }
