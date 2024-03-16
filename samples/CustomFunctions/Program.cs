@@ -1,8 +1,7 @@
 ﻿using System.Collections.Immutable;
-using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language.Symbols;
 using KustoLoco.Core;
-
+using KustoLoco.Core.Evaluation.BuiltIns;
 
 namespace CustomFunctions;
 
@@ -28,7 +27,7 @@ internal class Program
         var query = "numbers | extend FizzBuzz = fizz(N)";
         var results = await context.RunTabularQueryAsync(query);
 
-        foreach (var fb in results.DeserialiseTo<Number>())
+        foreach (var fb in results.ToRecords<Number>())
             Console.WriteLine(fb);
     }
 

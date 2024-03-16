@@ -248,10 +248,7 @@ public class KustoQueryContext
         return tables.Select(KustoNameEscaping.RemoveFraming).Distinct().ToArray();
     }
 
-    public IEnumerable<ITableSource> Tables()
-    {
-        return _tables;
-    }
+    public IEnumerable<ITableSource> Tables() => _tables;
 
     private KustoQueryContext AddDebug()
     {
@@ -265,10 +262,7 @@ public class KustoQueryContext
     /// <remarks>
     ///     Primarily used for testing and development
     /// </remarks>
-    public static KustoQueryContext CreateWithDebug()
-    {
-        return new KustoQueryContext().AddDebug();
-    }
+    public static KustoQueryContext CreateWithDebug() => new KustoQueryContext().AddDebug();
 
 
     /// <summary>
@@ -296,7 +290,7 @@ public class KustoQueryContext
         var result = await RunTabularQueryAsync(query);
         if (result.Error.IsNotBlank())
             throw new InvalidOperationException($"{result.Error}");
-        return result.DeserialiseTo<T>();
+        return result.ToRecords<T>();
     }
 
     /// <summary>
@@ -311,7 +305,6 @@ public class KustoQueryContext
     }
 
 
-    
     /// <summary>
     ///     Runs a query against the supplied records.
     /// </summary>
@@ -334,17 +327,15 @@ public class KustoQueryContext
     ///     Runs a query against the supplied records.
     /// </summary>
     /// <remarks>
-    ///    This is a convenience method intended to support programmatically generated queries.  It should be used with
-    ///   caution since it's quite possible to change the shape of the data in the query in a way that would make it impossible
-    /// to deserialize the results back into the original type.
+    ///     This is a convenience method intended to support programmatically generated queries.  It should be used with
+    ///     caution since it's quite possible to change the shape of the data in the query in a way that would make it
+    ///     impossible
+    ///     to deserialize the results back into the original type.
     /// </remarks>
     public static IReadOnlyCollection<T> FilterRecords<T>(ImmutableArray<T> rows,
         string query)
     {
         var result = QueryRecords(rows, query);
-        return result.DeserialiseTo<T>();
+        return result.ToRecords<T>();
     }
-
-
-
 }

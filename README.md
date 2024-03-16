@@ -1,13 +1,63 @@
-# !!! UNDER CONSTRUCTION !!!
-
-This fork is currently undergoing changes and is unstable. See [todo-list](docs/plannedWork.md)
-Please refer back to the original repo for a more stable version
-
 # Kusto-Loco
 
-KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) which has been [extended](docs/additionalFunctions.md) to improve query performance to provide a richer feature-set.
+Kusto-Loco makes it easy to use the Kusto Query Language (KQL) to query data held in your own applications or local files.  You can use it as an engine for your own application or just download the prebuilt tools to explore your existing data.
 
-It provides a simple way to perform complex queries against in-memory tabular data.
+Data can be loaded from CSV, JSON or Parquet files or from sets of POCOs held in memory. Query results can be serialised back to files or objects or rendered to HTML charts.
+
+The engine is extensible to allow you to provide your own custom functions for appropriate for your domain.
+
+The main components are:
+  
+- Nuget Packages
+	- KustoLoco.Core - the core query engine for embedding in your own application
+	- KustoLoco.FileFormats - a set of file readers and writers for standard formats
+	- KustLoco.Rendering - supports rendering to HTML charts using Vega-Lite
+	- KustoLoco.SourceGeneration - used for creating custom functions
+- Applications
+    - Lokql - a scriptable command-line tool for data exploration and manipulation
+	- LokqlDx - a more capable WPF version of Lokql
+	- PSKql - brings the power of KQL to Powershell.  Allows querying/manipulation of piped data.
+
+
+## Quick Start
+
+### Querying in-memory data
+```csharp
+record Temperature(string City,double Temperature,DateTime Date);
+record MaxTempByCity(double  MaxTemp,DateTime Day,string City);
+
+var temperatures = .... // get a set of Temperature records
+
+var query = @"where Date > date(1 jan 2000) 
+              | project Day=bin(Date,1d) 
+			  | summarize MaxTemp=max(Temperature) by Day,City
+			  | order by MaxTemp
+			  | take 10
+			 ";
+
+var result = KustoQueryContext.QueryRecords(processes, query);
+
+//if you know what type the result is you can turn it into a strongly-typed set
+var maxTemperatures = result.ToRecords<MaxTempByCity>();
+
+//if you just want to see the results in a datagrid (for example)
+foreach (var col in result.ColumnNames())   dataTable.Columns.Add(col);
+foreach (var row in result.EnumerateRows()) dataTable.Rows.Add(row);
+
+//if you want to send the results across the wire without knowing
+//their shape..
+var dto = new MyDto{ 
+    IssuedQuery=Result.Query, 
+	Error=Result.Error,
+	Data = result.ToSerializableObject() 
+	 };
+
+
+```
+
+
+## Credits
+
 
 
 ## Lokql
@@ -42,7 +92,9 @@ TODO
 
 
 ## Credits
-Credit for original implementation and all heavy-lifting belongs to [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
+
+
+KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
 
 Since then the engine has been extended and optimised by the [Sensize](https://sensize.net) team including NeilMacMullen, Vartika Gupta and Kosta Demoore.
 
@@ -61,25 +113,3 @@ Since then the engine has been extended and optimised by the [Sensize](https://s
 
 To come... primarily filling out the function/operation set
 
-## Contributing
-
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## Trademarks
-
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.

@@ -13,7 +13,6 @@ using NotNullStrings;
 
 namespace KustoLoco.Core;
 
-
 public class KustoQueryResult
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -113,10 +112,10 @@ public class KustoQueryResult
     /// <summary>
     ///     Deserialises a Dictionary-based result to objects
     /// </summary>
-    public IReadOnlyCollection<T> DeserialiseTo<T>(int max = int.MaxValue)
-        => DeserialiseTo<T>(AsOrderedDictionarySet(max));
+    public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue)
+        => ToRecords<T>(AsOrderedDictionarySet(max));
 
-    public static IReadOnlyCollection<T> DeserialiseTo<T>(IEnumerable<OrderedDictionary> dictionaries)
+    public static IReadOnlyCollection<T> ToRecords<T>(IEnumerable<OrderedDictionary> dictionaries)
     {
         //this is horrible but I don't have time to research how to do it ourselves and the bottom line
         //is that we are expecting results sets to be small to running through the JsonSerializer is
@@ -133,4 +132,14 @@ public class KustoQueryResult
         => Error.IsNotBlank()
             ? [new OrderedDictionary { ["QUERY ERROR"] = Error }]
             : AsOrderedDictionarySet();
+
+
+    /// <summary>
+    ///     Allows a KustoQueryResult to dropped into a DTO or other serializable object
+    /// </summary>
+    /// <remarks>
+    ///     We currently use an OrderedDictionary to represent the rows of the result set.
+    ///     However in future we may return a JsonObject
+    /// </remarks>
+    public object ToSerializableObject() => AsOrderedDictionarySet();
 }
