@@ -33,7 +33,9 @@
                           HorizontalAlignment="Stretch"
                           Background="DarkGray"/>
             <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
-                         Background="Black"/>
+                         Background="Black"
+                         FontSize="20"
+                         />
         </Grid>
 
         <GridSplitter Grid.Column="1"

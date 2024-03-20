@@ -10,10 +10,10 @@
         <TextBox Name="Query" 
                  PreviewKeyDown="Query_OnKeyDown"
                  FontFamily="Consolas"
-                 FontSize="16"
+                 FontSize="20"
                  AcceptsReturn="True" 
                  Background="Black"
-                 Foreground="Blue"
+                 Foreground="GreenYellow"
                  />
     </Grid>
 </UserControl>

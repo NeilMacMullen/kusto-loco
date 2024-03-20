@@ -414,6 +414,9 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
+            //remove table if it already exists
+            if (o.Force)
+                exp._context.RemoveTable(tableName);
             await exp._loader.LoadTable(exp._context, o.File, tableName);
         }
 
@@ -426,6 +429,9 @@ public class InteractiveTableExplorer
 
             [Value(1, HelpText = "Name of table (defaults to name of file)")]
             public string As { get; set; } = string.Empty;
+
+            [Option('f', "force", HelpText = "Force reload")]
+            public bool Force { get; set; }
         }
     }
 
