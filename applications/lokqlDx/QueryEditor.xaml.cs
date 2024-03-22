@@ -67,6 +67,11 @@ namespace lokqlDx
         {
             Query.Text = text;
         }
+
+        public string GetText()
+        {
+           return Query.Text;
+        }
     }
 
     public class QueryEditorRunEventArgs(string query) : EventArgs

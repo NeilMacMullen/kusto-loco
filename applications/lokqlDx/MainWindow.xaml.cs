@@ -1,28 +1,28 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using System.Windows;
+using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Rendering;
-using KustoLoco.Core;
 
 namespace lokqlDx;
 
 public partial class MainWindow : Window
 {
     private readonly WpfConsole _console;
-    private readonly InteractiveTableExplorer explorer;
+    private InteractiveTableExplorer _explorer;
+    private readonly PreferencesManager _preferenceManager = new();
+    private readonly WorkspaceManager _workspaceManager = new();
 
     public MainWindow()
     {
         InitializeComponent();
+        _preferenceManager.Load();
+        _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
 
-        var workin = @"C:\kusto";
-        var context =
-            new InteractiveTableExplorer.FolderContext(
-                workin,
-                workin,
-                workin);
         _console = new WpfConsole(OutputText);
-        explorer = new InteractiveTableExplorer(_console, context);
+        _explorer = new InteractiveTableExplorer(_console, new InteractiveTableExplorer.FolderContext(
+            string.Empty, string.Empty, string.Empty));
     }
 
 
@@ -31,7 +31,7 @@ public partial class MainWindow : Window
         //start capturing console output from the engine
         _console.PrepareForOutput();
         //run the supplied lines of kusto/commands
-        var result = await explorer.RunInput(query, false);
+        var result = await _explorer.RunInput(query, false);
         _console.RenderTextBufferToWpfControl();
 
         //if there are no results leave the previously rendered results in place
@@ -75,23 +75,24 @@ public partial class MainWindow : Window
 
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        Editor.SetText(@"
-# move the cursor over a block of lines and press CTRL-ENTER to run
-# commands prefixed with '.' are special commands.  Use .help  to list
+        var workspace = _workspaceManager.workspace;
+        Editor.SetText(workspace.Text);
+        var context =
+            new InteractiveTableExplorer.FolderContext(
+                workspace.WorkingDirectory,
+                workspace.WorkingDirectory,
+                workspace.WorkingDirectory);
 
-.help 
+        _explorer = new InteractiveTableExplorer(_console, context);
+    }
 
-# loads a CSV file into a table called 'data'
-
-.load c:\data\mydata.csv data
-
-# gets the distribution of values in the 'Name' column
-
-data 
-| summarize count() by Name 
-| render barchart
-
-
-");
+    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    {
+        PreferencesManager.EnsureDefaultFolderExists();
+        var workspace = _workspaceManager.workspace;
+        workspace.Text = Editor.GetText();
+        _workspaceManager.Save(workspace);
+        _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager._path;
+        _preferenceManager.Save();
     }
 }
