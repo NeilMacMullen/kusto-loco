@@ -9,11 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" />
+    <PackageReference Include="Spectre.Console" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CsvSupport\CsvSupport.csproj" />
-    <ProjectReference Include="..\..\src\KustoSupport\KustoSupport.csproj" />
+    <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
   </ItemGroup>
 
 </Project>

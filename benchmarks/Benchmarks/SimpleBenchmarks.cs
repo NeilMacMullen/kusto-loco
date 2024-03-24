@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using CsvSupport;
-using KustoSupport;
+using KustoLoco.FileFormats;
+using KustoLoco.Core;
 
 namespace Benchmarks
 {
@@ -14,7 +14,7 @@ namespace Benchmarks
         public void Setup()
         {
             _context = new KustoQueryContext();
-            CsvLoader.Load(@"C:\temp\locations.csv", _context, "data");
+            CsvLoader.Load(@"C:\temp\locations.csv",  "data");
         }
 
 

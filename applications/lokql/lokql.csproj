@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="CsvHelper" />
+    <PackageReference Include="NLog" />
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
+    <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
+  </ItemGroup>
+
+</Project>

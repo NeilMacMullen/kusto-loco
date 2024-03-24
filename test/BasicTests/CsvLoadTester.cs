@@ -1,14 +1,14 @@
 using System.Collections.Immutable;
-using CsvSupport;
 using FluentAssertions;
-using KustoSupport;
+using KustoLoco.Core;
+using KustoLoco.FileFormats;
 
 namespace BasicTests
 {
     [TestClass]
     public class CsvLoadTester
     {
-        private static KustoQueryContext CreateContext() => KustoQueryContext.WithFullDebug();
+        private static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
 
         [TestMethod]
         public async Task TestMethod1()
@@ -36,7 +36,7 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromRecords("data", rows);
+            context.AddTableFromImmutableData("data", rows);
             var result = (await context.RunTabularQueryAsync("data | count"));
             KustoFormatter.Tabulate(result).Should().Contain("50000");
         }
@@ -48,7 +48,7 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromRecords("data", rows);
+            context.AddTableFromImmutableData("data", rows);
             var result = (await context.RunTabularQueryAsync("data | where Value < 10 | count"));
             KustoFormatter.Tabulate(result).Should().Contain("10");
         }

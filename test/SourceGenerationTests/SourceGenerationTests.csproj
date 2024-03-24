@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SourceGeneration\SourceGeneration.csproj" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" />
   </ItemGroup>
 
 </Project>

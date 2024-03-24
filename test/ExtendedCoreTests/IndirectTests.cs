@@ -1,7 +1,8 @@
 using System.Collections.Immutable;
-using BabyKusto.Core;
-using BabyKusto.Core.Util;
+using KustoLoco.Core;
+using KustoLoco.Core.Util;
 using FluentAssertions;
+using KustoLoco.Core.DataSource.Columns;
 
 namespace ExtendedCoreTests;
 

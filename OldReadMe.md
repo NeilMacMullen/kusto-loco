@@ -53,7 +53,7 @@ BabyKusto is a self-contained execution engine for the [Kusto Query Language](ht
 
 BabyKusto leverages the official [`Microsoft.Azure.Kusto.Language`](https://www.nuget.org/packages/Microsoft.Azure.Kusto.Language/) package for parsing and semantic analysis of KQL queries.
 
-The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](./src/BabyKusto.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](./src/BabyKusto.Core/Evaluation/BabyKustoEvaluator.cs).
+The syntax tree is then translated to BabyKusto's internal representation (see [InternalRepresentation](./src/KustoLoco.Core/InternalRepresentation)), which is evaluated by [BabyKustoEvaluator.cs](./src/KustoLoco.Core/Evaluation/BabyKustoEvaluator.cs).
 
 You can explore the internal representation of a query by setting `dumpIRTree: true` when calling `BabyKustoEngine.Evaluate`.
 Below is an example of the internal representation for the query:
