@@ -1,5 +1,5 @@
 ﻿using System;
-using AdvancedStringFunctionality;
+using KustoLoco.Core.LibraryFunctions;
 
 // ReSharper disable PartialTypeWithSinglePart
 

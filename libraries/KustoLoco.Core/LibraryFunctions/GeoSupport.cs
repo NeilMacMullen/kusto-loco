@@ -1,6 +1,7 @@
-﻿using Geohash;
+﻿using System;
+using Geohash;
 
-namespace Geo;
+namespace KustoLoco.Core.LibraryFunctions;
 
 public static class GeoSupport
 {
@@ -47,9 +48,8 @@ public static class GeoSupport
         return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution!.Value);
     }
 
-    public static (double Latitude,double Longitude) GeoHashCentralPoint(string point)
+    public static (double Latitude, double Longitude) GeoHashCentralPoint(string point)
     {
-
         var geohasher = new Geohasher();
         var d = geohasher.Decode(point);
         return (d.latitude, d.longitude);

@@ -5,9 +5,34 @@
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>KustoLoco Core functionality</Title>
+    <Version>1.0.0</Version>
+    <Authors>Neil MacMullen</Authors>
+    <Description>KQL querying against local data</Description>
+    <Copyright>(C) 2024</Copyright>
+    <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
+    <PackageReleaseNotes>Initial test release</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fastenshtein" />
+    <PackageReference Include="geohash-dotnet" />
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
     <PackageReference Include="NLog" />
     <PackageReference Include="NotNullStrings" />
@@ -17,12 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AdvancedStringFunctionality\AdvancedStringFunctionality.csproj" />
-    <ProjectReference Include="..\Geo\Geo.csproj" />
     <ProjectReference Include="..\..\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj" />
-    <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" 
-					                      OutputItemType="Analyzer" 
-					                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

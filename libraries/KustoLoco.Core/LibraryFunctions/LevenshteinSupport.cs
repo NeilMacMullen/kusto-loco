@@ -1,8 +1,6 @@
 ﻿using Fastenshtein;
 
-#pragma warning disable CS8604 // Possible null reference argument.
-
-namespace AdvancedStringFunctionality;
+namespace KustoLoco.Core.LibraryFunctions;
 
 public static class LevenshteinFunctions
 {

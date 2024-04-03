@@ -1,6 +1,6 @@
-﻿using AdvancedStringFunctionality;
+﻿// ReSharper disable PartialTypeWithSinglePart
 
-// ReSharper disable PartialTypeWithSinglePart
+using KustoLoco.Core.LibraryFunctions;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

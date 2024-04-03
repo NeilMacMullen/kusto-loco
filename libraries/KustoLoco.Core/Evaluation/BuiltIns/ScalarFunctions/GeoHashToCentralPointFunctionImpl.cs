@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Geo;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.LibraryFunctions;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
