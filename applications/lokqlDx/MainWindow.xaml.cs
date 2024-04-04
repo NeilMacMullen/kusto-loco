@@ -53,15 +53,7 @@ public partial class MainWindow : Window
     private void FillInDataGrid(KustoQueryResult result)
     {
         var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed) ? parsed : 100;
-
-        var dt = new DataTable();
-
-        foreach (var col in result.ColumnNames())
-            dt.Columns.Add(col);
-
-        foreach (var row in result.EnumerateRows().Take(maxDataGridRows))
-            dt.Rows.Add(row);
-
+        var dt = result.ToDataTable(maxDataGridRows);
         dataGrid.ItemsSource = dt.DefaultView;
     }
 

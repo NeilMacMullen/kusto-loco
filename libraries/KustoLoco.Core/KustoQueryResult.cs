@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
 using System.Text.Json;
 using KustoLoco.Core.DataSource;
@@ -142,4 +143,20 @@ public class KustoQueryResult
     ///     However in future we may return a JsonObject
     /// </remarks>
     public object ToSerializableObject() => AsOrderedDictionarySet();
+
+    /// <summary>
+    /// Returns the result of a query as a DataTable
+    /// </summary>
+    public DataTable ToDataTable(int maxRows=Int32.MaxValue)
+    {
+        var dt = new DataTable();
+
+        foreach (var col in ColumnNames())
+            dt.Columns.Add(col);
+
+        foreach (var row in EnumerateRows().Take(maxRows))
+            dt.Rows.Add(row);
+        return dt;
+
+    }
 }
