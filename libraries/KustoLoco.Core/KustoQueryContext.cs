@@ -338,4 +338,10 @@ public class KustoQueryContext
         var result = QueryRecords(rows, query);
         return result.ToRecords<T>();
     }
+
+    public bool HasTable(string tableName)
+    {
+        tableName = KustoNameEscaping.RemoveFraming(tableName);
+       return  _tables.Any(t => t.Name == tableName);
+    }
 }

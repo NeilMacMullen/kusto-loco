@@ -60,8 +60,7 @@ public class InteractiveTableExplorer
 
         if (maxToDisplay < result.Height)
         {
-            _outputConsole.SetForegroundColor(ConsoleColor.Red);
-            _outputConsole.WriteLine(
+            Warn(
                 $"Display was truncated to first {maxToDisplay} of {result.Height}.  Use '.display --max' to change this behaviour");
         }
     }
@@ -75,7 +74,7 @@ public class InteractiveTableExplorer
             _outputConsole.SetForegroundColor(ConsoleColor.Green);
             if (result.Height == 0)
             {
-                _outputConsole.WriteLine("No results");
+                Warn("No results");
             }
             else
             {
@@ -89,8 +88,7 @@ public class InteractiveTableExplorer
                 }
             }
 
-            _outputConsole.SetForegroundColor(ConsoleColor.Yellow);
-            _outputConsole.WriteLine($"Query took {result.QueryDuration}ms");
+            Warn($"Query took {result.QueryDuration}ms");
         }
     }
 
@@ -414,9 +412,19 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
-            //remove table if it already exists
-            if (o.Force)
-                exp._context.RemoveTable(tableName);
+            //remove table if it already exist
+            if (exp._context.HasTable(tableName))
+            {
+                if (o.Force)
+                    exp._context.RemoveTable(tableName);
+                else
+                {
+                    exp.Warn($"Table '{tableName}' already exists.  Use '.load -f' to force reload");
+                    return;
+                }
+            }
+           
+           
             await exp._loader.LoadTable(exp._context, o.File, tableName);
         }
 
@@ -433,6 +441,12 @@ public class InteractiveTableExplorer
             [Option('f', "force", HelpText = "Force reload")]
             public bool Force { get; set; }
         }
+    }
+
+    private void Warn(string s)
+    {
+       _outputConsole.SetForegroundColor(ConsoleColor.Red);
+       _outputConsole.WriteLine(s);
     }
 
 

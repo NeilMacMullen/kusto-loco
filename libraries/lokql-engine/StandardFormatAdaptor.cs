@@ -48,7 +48,7 @@ public class StandardFormatAdaptor : ITableSerializer
 
     public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName)
     {
-        var alreadyPresent = context.TableNames.Contains(tableName);
+        var alreadyPresent = context.HasTable(tableName);
         if (alreadyPresent)
             return true;
 
