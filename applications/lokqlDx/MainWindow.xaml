@@ -26,7 +26,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <local:QueryEditor x:Name="Editor" Grid.Row="0" RunEvent="OnQueryEditorRunTextBlock" />
+            <local:QueryEditor x:Name="Editor" Grid.Row="0" 
+                               RunEvent="OnQueryEditorRunTextBlock" />
 
             <GridSplitter Grid.Row="1"
                           VerticalAlignment="Stretch"
@@ -45,7 +46,7 @@
                       HorizontalAlignment="Stretch"
                       Background="DarkGray"/>
 
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="2" Background="Black">
             <Grid.RowDefinitions>
 
                 <RowDefinition Height="*" />
@@ -54,11 +55,23 @@
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" >
                 <DockPanel  DockPanel.Dock="Top">
-                    <Label DockPanel.Dock="Left">Rows to display:</Label>
-                    <TextBox Name="VisibleDataGridRows" VerticalContentAlignment="Center">1000</TextBox>
+                    <Label DockPanel.Dock="Left" Background="DarkGray">Max rows:</Label>
+                    <TextBox Name="VisibleDataGridRows" VerticalContentAlignment="Center"
+                             Background="LightGray">1000</TextBox>
                 </DockPanel>
-               
-                <DataGrid   Name="dataGrid" />
+
+                <DataGrid   Name="dataGrid" Background="Black" RowBackground="Black"
+                            Foreground="GreenYellow"
+                            AlternatingRowBackground="DarkBlue">
+
+                    <DataGrid.Resources>
+                        <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Background" Value="DarkBlue" />
+                        </Style>
+                    </DataGrid.Resources>
+
+
+                </DataGrid>
             </DockPanel>
           
             <GridSplitter Grid.Row="1"

@@ -241,7 +241,8 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
-            Logger.Info($"Loading '{filename}'..");
+            
+            exp.Info($"Loading '{filename}'..");
             var lines = await File.ReadAllLinesAsync(filename);
             foreach (var line in lines)
             {
@@ -258,12 +259,18 @@ public class InteractiveTableExplorer
         }
     }
 
+    private void Info(string s)
+    {
+        _outputConsole.SetForegroundColor(ConsoleColor.Yellow);
+        _outputConsole.WriteLine(s);
+    }
+
     public static class QueryCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
-            Logger.Info($"Fetching query '{filename}'");
+            exp.Info($"Fetching query '{filename}'");
             var query = await File.ReadAllTextAsync(filename);
             await exp.ExecuteAsync($"{o.Prefix}{query}");
         }
@@ -285,7 +292,7 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
-            Logger.Info($"Saving query to '{filename}'");
+            exp.Info($"Saving query to '{filename}'");
             var q = exp._prevResult.Query;
             if (!o.NoSplit)
                 q = q
@@ -377,7 +384,7 @@ public class InteractiveTableExplorer
         internal static void Run(InteractiveTableExplorer exp, Options o)
         {
             exp.GetCurrentContext().MaterializeResultAsTable(exp._prevResult, o.As);
-            Logger.Info($"Table '{o.As}' now available");
+            exp.Info($"Table '{o.As}' now available");
         }
 
         [Verb("materialize", aliases: ["materialise", "mat"],
@@ -455,7 +462,7 @@ public class InteractiveTableExplorer
     {
         internal static void Run(InteractiveTableExplorer exp, Options o)
         {
-            Logger.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
+            exp.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
 
             exp.GetCurrentContext().ShareTable(o.CurrentName, o.As);
         }
@@ -477,7 +484,7 @@ public class InteractiveTableExplorer
         {
             if (o.Max > 0)
                 exp._currentDisplayOptions = exp._currentDisplayOptions with { MaxToDisplay = o.Max };
-            Logger.Info($"Set: {exp._currentDisplayOptions}");
+            exp.Info($"Set: {exp._currentDisplayOptions}");
         }
 
         [Verb("display", aliases: ["d"], HelpText = "change the output format")]
@@ -493,7 +500,7 @@ public class InteractiveTableExplorer
     {
         internal static void Run(InteractiveTableExplorer exp, Options o)
         {
-            Logger.Info("Exiting...");
+            exp.Warn("Exiting...");
             Environment.Exit(0);
         }
 

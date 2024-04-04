@@ -55,8 +55,6 @@ public class KustoQueryContext
 
     public KustoQueryContext AddTable(ITableSource table)
     {
-        if (_tables.Any(t => t.Name == table.Name))
-            throw new ArgumentException($"Context already contains a table named '{table.Name}'");
         RemoveTable(table.Name);
         _tables.Add(table);
         return this;
