@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Data;
 using System.Windows;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
@@ -10,9 +9,9 @@ namespace lokqlDx;
 public partial class MainWindow : Window
 {
     private readonly WpfConsole _console;
-    private InteractiveTableExplorer _explorer;
     private readonly PreferencesManager _preferenceManager = new();
     private readonly WorkspaceManager _workspaceManager = new();
+    private InteractiveTableExplorer _explorer;
 
     public MainWindow()
     {
