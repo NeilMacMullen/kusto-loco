@@ -31,8 +31,7 @@ public partial class MainWindow : Window
         _console.PrepareForOutput();
         //run the supplied lines of kusto/commands
         var result = await _explorer.RunInput(query, false);
-        _console.RenderTextBufferToWpfControl();
-
+       
         //if there are no results leave the previously rendered results in place
         if (result.Height == 0)
             return;

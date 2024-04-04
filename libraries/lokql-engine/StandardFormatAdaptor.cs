@@ -24,7 +24,7 @@ public class StandardFormatAdaptor : ITableSerializer
     {
         foreach (var path in tableNames)
         {
-            if (await LoadTable(context, path, path))
+            if (await LoadTable(context, path, path,new NullProgressReporter()))
                 continue;
             break;
         }
@@ -46,7 +46,7 @@ public class StandardFormatAdaptor : ITableSerializer
         }
     }
 
-    public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName)
+    public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName,IProgress<string> progressReporter)
     {
         var alreadyPresent = context.HasTable(tableName);
         if (alreadyPresent)
@@ -62,7 +62,7 @@ public class StandardFormatAdaptor : ITableSerializer
         {
             if (!Path.Exists(filepath)) break;
 
-            var success = await loader.TryLoad(filepath, context, tableName,new NullProgressReporter());
+            var success = await loader.TryLoad(filepath, context, tableName,progressReporter);
             if (success)
                 break;
         }

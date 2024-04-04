@@ -16,8 +16,7 @@ namespace lokqlDx;
 public class WpfConsole : IConsole
 {
     private readonly RichTextBox _control;
-    private readonly List<ColoredText> _lines = new();
-
+   
     private ConsoleColor _currentColor = ConsoleColor.Red;
 
     public WpfConsole(RichTextBox control) => _control = control;
@@ -40,7 +39,12 @@ public class WpfConsole : IConsole
 
     public void Write(string s)
     {
-        _lines.Add(new ColoredText(_currentColor, s));
+         var line = new ColoredText(_currentColor, s);
+
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            RenderTextBufferToWpfControl(line);
+        });
     }
 
     public void SetForegroundColor(ConsoleColor color)
@@ -58,7 +62,9 @@ public class WpfConsole : IConsole
     /// </summary>
     public void PrepareForOutput()
     {
-        _lines.Clear();
+       
+        _control.Document.Blocks.Clear();
+        _control.Document.LineHeight = 1;
         WindowWidth = Math.Max(10, VisibleColumns);
     }
 
@@ -83,14 +89,12 @@ public class WpfConsole : IConsole
     /// <summary>
     ///     Renders queued text to the RichTextBox that backs up this console
     /// </summary>
-    public void RenderTextBufferToWpfControl()
+    private void RenderTextBufferToWpfControl(ColoredText line)
     {
-        _control.Document.Blocks.Clear();
-        _control.Document.LineHeight = 1;
-        foreach (var line in _lines)
-        {
+      
+     
             AppendText(_control, line.Text, GetColor(line.Color));
-        }
+      
     }
 
     private Brush GetColor(ConsoleColor lineColor)

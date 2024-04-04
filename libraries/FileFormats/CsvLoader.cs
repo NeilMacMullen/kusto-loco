@@ -13,7 +13,7 @@ public class CsvLoader : ITableLoader
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-    private static ITableSource Load(TextReader reader, string tableName)
+    private static ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter)
     {
         var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         csv.Read();
@@ -32,9 +32,10 @@ public class CsvLoader : ITableLoader
 
             rowCount++;
             if (rowCount % 100_000 == 0)
-                Logger.Info($"{rowCount} records read");
+                progressReporter.Report($"{rowCount} records read");
         }
 
+        progressReporter.Report("Inferring column types...");
         var inferredColumns = builders
             .Select(b => ColumnTypeInferrer.AutoInfer(b.ToColumn()))
             .ToArray();
@@ -46,22 +47,23 @@ public class CsvLoader : ITableLoader
         }
 
         var t = table.ToTableSource();
+        progressReporter.Report("Loaded");
         return t;
 
     }
 
 
-    public static ITableSource Load(string filename,string tableName)
+    public static ITableSource Load(string filename,string tableName, IProgress<string> progressReporter)
     {
         using TextReader fileReader = new StreamReader(filename);
-        return Load(fileReader,tableName);
+        return Load(fileReader,tableName,progressReporter);
     }
 
 
     public static void LoadFromString(string csv, string tableName, KustoQueryContext context)
     {
         var reader = new StringReader(csv.Trim());
-        var table =Load(reader, tableName);
+        var table =Load(reader, tableName,new NullProgressReporter());
         context.AddTable(table);
     }
 
@@ -103,7 +105,7 @@ public class CsvLoader : ITableLoader
     {
         try
         {
-            var table = Load(path, tableName);
+            var table = Load(path, tableName,progressReporter);
             return Task.FromResult(new TableLoadResult(table, string.Empty));
         }
         catch (Exception e)

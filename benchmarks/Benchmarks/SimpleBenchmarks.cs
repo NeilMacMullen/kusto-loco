@@ -14,7 +14,7 @@ namespace Benchmarks
         public void Setup()
         {
             _context = new KustoQueryContext();
-            CsvLoader.Load(@"C:\temp\locations.csv",  "data");
+            CsvLoader.Load(@"C:\temp\locations.csv",  "data",new NullProgressReporter());
         }
 
 

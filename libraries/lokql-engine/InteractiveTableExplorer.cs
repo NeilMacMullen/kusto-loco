@@ -4,6 +4,7 @@ using System.Text;
 using KustoLoco.Core.Evaluation;
 using CommandLine;
 using KustoLoco.Core;
+using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using NLog;
 using NotNullStrings;
@@ -424,8 +425,8 @@ public class InteractiveTableExplorer
                 }
             }
            
-           
-            await exp._loader.LoadTable(exp._context, o.File, tableName);
+           var pr = new ConsoleProgressReporter(exp._outputConsole);
+            await exp._loader.LoadTable(exp._context, o.File, tableName,pr);
         }
 
         [Verb("load", aliases: ["ld"],
@@ -501,4 +502,19 @@ public class InteractiveTableExplorer
     }
 
     #endregion
+}
+
+public class ConsoleProgressReporter :IProgress<string>
+{
+    private readonly IConsole _console;
+
+    public ConsoleProgressReporter(IConsole console)
+    {
+        _console = console;
+    }
+
+    public void Report(string value)
+    {
+        _console.WriteLine(value);
+    }
 }
