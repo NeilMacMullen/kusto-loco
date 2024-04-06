@@ -46,13 +46,17 @@ public class KustoQueryContext
         _additionalFunctions = additionalFunctions;
     }
 
-
-    public void AddTable(TableBuilder builder)
+    /// <summary>
+    /// Adds a table to the context from a builder
+    /// </summary>
+    public KustoQueryContext AddTable(TableBuilder builder)
     {
-        AddTable(builder.ToTableSource());
+        return AddTable(builder.ToTableSource());
     }
 
-
+    /// <summary>
+    /// Adds a table to the context
+    /// </summary>
     public KustoQueryContext AddTable(ITableSource table)
     {
         RemoveTable(table.Name);
@@ -84,8 +88,7 @@ public class KustoQueryContext
     public KustoQueryContext RenameTable(string oldName, string newName)
     {
         ShareTable(oldName, newName);
-        RemoveTable(oldName);
-        return this;
+        return RemoveTable(oldName);
     }
 
     /// <summary>
@@ -96,11 +99,9 @@ public class KustoQueryContext
     /// a copy-and-convert operation. For smaller data sets, this is unlikely to be noticeable but
     /// if operating on tables of 100Ks or millions of rows you should consider using the wrapped version.
     /// </remarks>
-    public void CopyDataIntoTable<T>(string tableName, IReadOnlyCollection<T> records)
-    {
-        var table = TableBuilder.CreateFromVolatileData(tableName, records);
-        AddTable(table);
-    }
+    public KustoQueryContext CopyDataIntoTable<T>(string tableName, IReadOnlyCollection<T> records) 
+        => AddTable(TableBuilder.CreateFromVolatileData(tableName, records));
+
     /// <summary>
     /// Adds immutable data to the context 
     /// </summary>
@@ -110,11 +111,7 @@ public class KustoQueryContext
     /// that are directly supported by Kusto.
     /// </remarks>
     public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
-    {
-        var table = TableBuilder.CreateFromImmutableData(tableName, records);
-        AddTable(table);
-        return this;
-    }
+        => AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
 
     /// <summary>
     /// Runs a query and evaluates the result in order to get an accurate benchmark
@@ -159,7 +156,9 @@ public class KustoQueryContext
             return new KustoQueryResult(query, table, vis, TimeSpan.Zero, ex.Message);
         }
     }
-
+    /// <summary>
+    /// Creates the table list for the ".tables" command
+    /// </summary>
     private KustoQueryResult CreateTableList(string query, bool expandColumns)
     {
         if (expandColumns)
@@ -184,11 +183,10 @@ public class KustoQueryContext
         else
         {
             var rows = _tables.Select(table => new { Table = table.Name, Columns = table.Type.Columns.Count })
-                    .ToImmutableArray()
-                ;
+                    .ToImmutableArray();
 
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
-                .ToTableSource() as InMemoryTableSource;
+                .ToTableSource() as InMemoryTableSource ;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }
@@ -228,8 +226,9 @@ public class KustoQueryContext
     /// <summary>
     /// Runs a query against the context, loading tables as required
     /// </summary>
+    /// <remarks>
     /// If the context has a table loader, it will be used to load tables as required by the query
-    /// <returns></returns>
+    /// </remarks>
     public async Task<KustoQueryResult> RunQuery(string query)
     {
         try
@@ -284,7 +283,7 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    ///     Creates a context that has addition debug information
+    ///     Creates a context that has additional debug information
     /// </summary>
     /// <remarks>
     ///     Primarily used for testing and development
@@ -349,7 +348,6 @@ public class KustoQueryContext
         return context.RunQueryWithoutDemandBasedTableLoading(query);
     }
 
-
     /// <summary>
     ///     Runs a query against the supplied records.
     /// </summary>
@@ -366,6 +364,9 @@ public class KustoQueryContext
         return result.ToRecords<T>();
     }
 
+    /// <summary>
+    /// True if the context has a table with the given name
+    /// </summary>
     public bool HasTable(string tableName)
     {
         tableName = KustoNameEscaping.RemoveFraming(tableName);
