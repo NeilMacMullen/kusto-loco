@@ -84,8 +84,9 @@ public class ParquetSerializer : ITableSerializer
     }
 
     public bool RequiresTypeInference { get; } = false;
-    public Task<TableSaveResult> SaveTable(string path,ITableSource source, IProgress<string> progressReporter)
+    public async Task<TableSaveResult> SaveTable(string path,KustoQueryResult result, IProgress<string> progressReporter)
     {
-        throw new NotImplementedException();
+        await Save(path, result);
+       return TableSaveResult.Success();
     }
 }

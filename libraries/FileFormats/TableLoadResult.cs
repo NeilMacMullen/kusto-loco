@@ -14,6 +14,11 @@ public readonly record struct TableLoadResult(ITableSource Table, string Error)
 
 
 
-//TODO
-public readonly record struct TableSaveResult(string Error);
+public readonly record struct TableSaveResult(string Error)
+{
+    public static TableSaveResult Success()
+    {
+        return new TableSaveResult(string.Empty);
+    }
+}
 

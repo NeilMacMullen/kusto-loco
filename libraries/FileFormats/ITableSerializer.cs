@@ -18,7 +18,7 @@ public interface ITableSerializer
     /// </summary>
     public bool RequiresTypeInference { get; }
 
-    Task<TableSaveResult> SaveTable(string path,ITableSource table,  IProgress<string> progressReporter);
+    Task<TableSaveResult> SaveTable(string path,KustoQueryResult result,  IProgress<string> progressReporter);
 }
 
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Text.Json;
 using KustoLoco.Core;
+using KustoLoco.FileFormats;
 using NLog;
 
 /// <summary>
@@ -9,43 +10,19 @@ using NLog;
 public class JsonArrayTableAdaptor : IFileBasedTableAccess
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
+    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
     {
-        var text = File.ReadAllText(path);
-        var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
-        var sdlist = new List<OrderedDictionary>();
-        foreach (var d in dict!)
-        {
-            var s = new OrderedDictionary();
-            foreach (var k in d.Keys)
-            {
 
-                //Logger.Warn($"{k} --> {d[k]!.GetType().Name}");
-                if (d[k] is JsonElement e && e.ValueKind == JsonValueKind.Array)
-                {
-                    s[k] = string.Join(";", e.EnumerateArray().Select(i=>i.ToString()));
-                }
-                else
-                    s[k] = d[k]?.ToString() ?? string.Empty;
-            }
-
-            sdlist.Add(s);
-        }
-
-        var table = TableBuilder
-            .FromOrderedDictionarySet(name,
-                sdlist);
-        context.AddTable(table);
-        return Task.FromResult(true);
+        var res = await new JsonObjectArraySerializer().LoadTable(path, name, progressReporter);
+      
+        context.AddTable(res.Table);
+        return true;
     }
-
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".json"];
 
-    public Task TrySave(string path, KustoQueryResult result)
+    public async Task TrySave(string path, KustoQueryResult result)
     {
-        var json = result.ToJsonString();
-        File.WriteAllText(path, json);
-        return Task.CompletedTask;
+        await new JsonObjectArraySerializer().SaveTable(path, result,new NullProgressReporter());
     }
 }

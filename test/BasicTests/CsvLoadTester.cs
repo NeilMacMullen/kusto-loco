@@ -19,7 +19,7 @@ Name,Count
 acd,100
 def,30
 ";
-            var t =CsvSerializer.LoadFromString(csv, "data");
+            var t =CsvSerializer.Default.LoadFromString(csv, "data");
             t = TableBuilder.AutoInferColumnTypes(t,new NullProgressReporter());
             context.AddTable(t);
             var nameResult = (await context.RunQuery("data | where Name contains 'a'"));

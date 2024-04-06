@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
 using KustoLoco.Core;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Util;
@@ -9,13 +10,30 @@ namespace KustoLoco.FileFormats;
 
 public class CsvSerializer : ITableSerializer
 {
+    private readonly CsvConfiguration _config;
+    
+    public  CsvSerializer(CsvConfiguration config)
+    {
+       _config = config;
+      
+    }
+
+    public static readonly CsvSerializer Default = new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture));
+    public static readonly CsvSerializer Tsv = new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture)
+    {
+        Delimiter = "\t"
+    });
+
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-    private static ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter)
+    private ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter)
     {
-        var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+
+       
+        var csv = new CsvReader(reader, _config);
         csv.Read();
         csv.ReadHeader();
         var keys = csv.Context.Reader.HeaderRecord;
@@ -35,12 +53,6 @@ public class CsvSerializer : ITableSerializer
                 progressReporter.Report($"{rowCount} records read");
         }
 
-        /*
-        progressReporter.Report("Inferring column types...");
-        var inferredColumns = builders
-            .Select(b => ColumnTypeInferrer.AutoInfer(b.ToColumn()))
-            .ToArray();
-        */
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++)
         {
@@ -54,14 +66,14 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public static ITableSource Load(string filename,string tableName, IProgress<string> progressReporter)
+    public  ITableSource Load(string filename,string tableName, IProgress<string> progressReporter)
     {
         using TextReader fileReader = new StreamReader(filename);
         return Load(fileReader,tableName,progressReporter);
     }
 
 
-    public static ITableSource LoadFromString(string csv, string tableName)
+    public  ITableSource LoadFromString(string csv, string tableName)
     {
         var reader = new StringReader(csv.Trim());
         var table =Load(reader, tableName,new NullProgressReporter());
@@ -69,9 +81,9 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public static void WriteToCsvStream(KustoQueryResult result, int max, bool skipHeader, TextWriter writer)
+    public  void WriteToCsvStream(KustoQueryResult result, int max, bool skipHeader, TextWriter writer)
     {
-        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        using var csv = new CsvWriter(writer, _config);
         if (!skipHeader)
         {
             foreach (var heading in result.ColumnNames())
@@ -79,8 +91,6 @@ public class CsvSerializer : ITableSerializer
                 csv.WriteField(heading);
             }
         }
-
-
         csv.NextRecord();
 
         foreach (var r in result.EnumerateRows())
@@ -97,7 +107,7 @@ public class CsvSerializer : ITableSerializer
         }
     }
 
-    public static void WriteToCsv(string path, KustoQueryResult result)
+    private  void WriteToCsv(string path, KustoQueryResult result)
     {
         using var writer = new StreamWriter(path);
         WriteToCsvStream(result, int.MaxValue, false, writer);
@@ -119,8 +129,9 @@ public class CsvSerializer : ITableSerializer
 
     public bool RequiresTypeInference => true;
 
-    public Task<TableSaveResult> SaveTable(string path,ITableSource table, IProgress<string> progressReporter)
+    public Task<TableSaveResult> SaveTable(string path,KustoQueryResult result, IProgress<string> progressReporter)
     {
-        throw new NotImplementedException();
+        WriteToCsv(path,result);
+        return Task.FromResult(TableSaveResult.Success());
     }
 }

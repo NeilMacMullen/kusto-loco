@@ -14,6 +14,7 @@ public class StandardFormatAdaptor : ITableSerializer
         _loaders =
         [
             new CsvTableAdaptor(),
+            new TsvTableAdaptor(),
             new ParquetTableAdaptor(),
             new TextTableAdaptor(),
             new JsonArrayTableAdaptor()

@@ -5,7 +5,7 @@ using NotNullStrings;
 using Spectre.Console;
 
 ShowHelpIfAppropriate();
-var result = await new CsvSerializer()
+var result = await CsvSerializer.Default
     .LoadTable(args.First(), "data", new ConsoleProgressReporter());
 
 if (result.Error.IsNotBlank())

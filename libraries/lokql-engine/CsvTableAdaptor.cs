@@ -6,16 +6,36 @@ public class CsvTableAdaptor : IFileBasedTableAccess
 {
     public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
     {
-        var result = await new CsvSerializer().LoadTable(path, name,progressReporter);
+        var result = await CsvSerializer.Default.LoadTable(path, name,progressReporter);
         context.AddTable(result.Table);
         return true;
     }
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".csv"];
 
-    public Task TrySave(string path, KustoQueryResult result)
+    public async Task TrySave(string path, KustoQueryResult result)
     {
-        CsvSerializer.WriteToCsv(path, result);
-        return Task.CompletedTask;
+        await CsvSerializer.Default.SaveTable(path, result,new NullProgressReporter());
+       
+    }
+}
+
+
+
+public class TsvTableAdaptor : IFileBasedTableAccess
+{
+    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name, IProgress<string> progressReporter)
+    {
+        var result = await CsvSerializer.Tsv.LoadTable(path, name, progressReporter);
+        context.AddTable(result.Table);
+        return true;
+    }
+
+    public IReadOnlyCollection<string> SupportedFileExtensions() => [".tsv"];
+
+    public async Task TrySave(string path, KustoQueryResult result)
+    {
+        await CsvSerializer.Tsv.SaveTable(path, result, new NullProgressReporter());
+
     }
 }

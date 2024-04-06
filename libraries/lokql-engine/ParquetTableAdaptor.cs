@@ -9,7 +9,7 @@ public class ParquetTableAdaptor : IFileBasedTableAccess
 
     public async Task TrySave(string path, KustoQueryResult result)
     {
-        await ParquetSerializer.Save(path, result);
+        await new ParquetSerializer() .SaveTable(path, result,new NullProgressReporter());
     }
 
     public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
