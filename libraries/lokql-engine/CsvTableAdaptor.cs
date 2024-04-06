@@ -19,4 +19,7 @@ public class CsvTableAdaptor : IFileBasedTableAccess
         await CsvSerializer.Default.SaveTable(path, result,new NullProgressReporter());
        
     }
+
+    public TableAdaptorDescription GetDescription()
+        => new("Csv", "Csv Files", SupportedFileExtensions());
 }

@@ -218,7 +218,8 @@ public class InteractiveTableExplorer
                     typeof(SynTableCommand.Options),
                     typeof(AllTablesCommand.Options),
                     typeof(ShowCommand.Options),
-                    typeof(TestCommand.Options)
+                    typeof(TestCommand.Options),
+                    typeof(FileFormatsCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -233,6 +234,7 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
                 .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
                 .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
+            .WithParsedAsync<FileFormatsCommand.Options>(o => FileFormatsCommand.RunAsync(this, o))
             ;
     }
 
@@ -340,6 +342,23 @@ public class InteractiveTableExplorer
         }
     }
 
+    public static class FileFormatsCommand
+    {
+        internal static  Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            var formats = exp._loader.GetSupportedAdaptors()
+                .Select(f => $"{f.Name} ({f.Extensions.JoinString(", ")})")
+                .JoinAsLines();
+            exp.Info(formats);
+            return Task.CompletedTask;
+        }
+
+        [Verb("formats", aliases: ["fmts"], HelpText = "list supported file formats for save/load")]
+        internal class Options
+        {
+          
+        }
+    }
 
     public static class TestCommand
     {

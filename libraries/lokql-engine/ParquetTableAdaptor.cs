@@ -18,4 +18,7 @@ public class ParquetTableAdaptor : IFileBasedTableAccess
         context.AddTable(result.Table);
         return true;
     }
+
+    public TableAdaptorDescription GetDescription()
+        => new("Parquet", "Apache Parquet Files", SupportedFileExtensions());
 }

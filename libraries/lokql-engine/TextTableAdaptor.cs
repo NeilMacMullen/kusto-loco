@@ -24,4 +24,7 @@ public class TextTableAdaptor : IFileBasedTableAccess
         context.AddTable(table);
         return Task.FromResult(true);
     }
+
+    public TableAdaptorDescription GetDescription()
+        => new("Text", "Tabular data text format", SupportedFileExtensions());
 }

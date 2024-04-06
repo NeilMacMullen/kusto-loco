@@ -19,4 +19,7 @@ public class TsvTableAdaptor : IFileBasedTableAccess
         await CsvSerializer.Tsv.SaveTable(path, result, new NullProgressReporter());
 
     }
+
+    public TableAdaptorDescription GetDescription()
+        => new("Tsv", "Tab-separated data", SupportedFileExtensions());
 }

@@ -58,6 +58,11 @@ public class StandardFormatAdaptor : ITableAdaptor
         }
     }
 
+    public IEnumerable<TableAdaptorDescription> GetSupportedAdaptors()
+    {
+       return _loaders.Select(l => l.GetDescription()).ToArray();
+    }
+
     public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName,IProgress<string> progressReporter)
     {
         var alreadyPresent = context.HasTable(tableName);

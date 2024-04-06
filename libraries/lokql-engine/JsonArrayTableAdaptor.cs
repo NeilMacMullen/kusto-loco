@@ -29,4 +29,7 @@ public class JsonArrayTableAdaptor : IFileBasedTableAccess
     {
         await new JsonObjectArraySerializer().SaveTable(path, result, new NullProgressReporter());
     }
+
+    public TableAdaptorDescription GetDescription()
+        => new("JsonObjectArray", "Array of json objects", SupportedFileExtensions());
 }
