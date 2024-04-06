@@ -28,9 +28,9 @@ public class TableBuilder
     public readonly int Length;
     public readonly string Name;
 
-    private ImmutableArray<string> _columnNames = [];
+    private ImmutableArray<string> _columnNames ;
 
-    private ImmutableArray<BaseColumn> _columns = [];
+    private ImmutableArray<BaseColumn> _columns ;
 
     private TableBuilder(string name, IEnumerable<BaseColumn> columns,
         IEnumerable<string> columnNames, int length)
@@ -194,11 +194,13 @@ public class TableBuilder
 
         return builder;
     }
-
-    public static ITableSource FromScalarResult(ScalarResult scalar)
+    /// <summary>
+    /// Produce a single-column, single-row table from a scalar result
+    /// </summary>
+    public static ITableSource FromScalarResult(string tableName,ScalarResult scalar)
     {
         var column = ColumnHelpers.CreateFromScalar(scalar.Value, scalar.Type, 1);
-        return CreateEmpty("result", 1)
+        return CreateEmpty(tableName, 1)
             .WithColumn("value", column)
             .ToTableSource();
     }
@@ -216,7 +218,7 @@ public class TableBuilder
     public static ITableSource FromTable(ITableSource table, string requestedTableName)
     {
         if (table is not InMemoryTableSource ims)
-            throw new NotImplementedException("can currently only shared generated tables");
+            throw new NotImplementedException("can currently only share generated tables");
         return ims.ShareAs(requestedTableName);
     }
 }

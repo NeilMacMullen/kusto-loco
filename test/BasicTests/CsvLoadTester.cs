@@ -20,13 +20,13 @@ acd,100
 def,30
 ";
             CsvLoader.LoadFromString(csv, "data", context);
-            var nameResult = (await context.RunTabularQueryAsync("data | where Name contains 'a'"));
+            var nameResult = (await context.RunQuery("data | where Name contains 'a'"));
             nameResult.Error.Should().BeEmpty();
-            nameResult.Height.Should().Be(1);
+            nameResult.RowCount.Should().Be(1);
 
-            var countResult = await context.RunTabularQueryAsync("data | where Count > 50");
+            var countResult = await context.RunQuery("data | where Count > 50");
             countResult.Error.Should().BeEmpty();
-            countResult.Height.Should().Be(1);
+            countResult.RowCount.Should().Be(1);
         }
 
 
@@ -36,8 +36,8 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromImmutableData("data", rows);
-            var result = (await context.RunTabularQueryAsync("data | count"));
+            context.WrapDataIntoTable("data", rows);
+            var result = (await context.RunQuery("data | count"));
             KustoFormatter.Tabulate(result).Should().Contain("50000");
         }
 
@@ -48,8 +48,8 @@ def,30
             var context = new KustoQueryContext();
             var rows = Enumerable.Range(0, 50000).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-            context.AddTableFromImmutableData("data", rows);
-            var result = (await context.RunTabularQueryAsync("data | where Value < 10 | count"));
+            context.WrapDataIntoTable("data", rows);
+            var result = (await context.RunQuery("data | where Value < 10 | count"));
             KustoFormatter.Tabulate(result).Should().Contain("10");
         }
     }

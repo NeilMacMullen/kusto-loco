@@ -2,6 +2,9 @@
 
 namespace KustoLoco.FileFormats;
 
+/// <summary>
+/// Describes an object that can load a table from a file or other source
+/// </summary>
 public interface ITableLoader
 {
     /// <summary>

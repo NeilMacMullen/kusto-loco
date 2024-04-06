@@ -108,7 +108,7 @@ public class PsKqlCmdlet : Cmdlet
         context.AddTable(builder.ToTableSource());
         WriteDebug("Running query...");
         var query = NoQueryPrefix ? Query : $"data | {Query}";
-        var result = context.RunTabularQueryWithoutDemandBasedTableLoading(query);
+        var result = context.RunQueryWithoutDemandBasedTableLoading(query);
         if (result.Error.Length != 0)
         {
             WriteError(new ErrorRecord(new ArgumentException(result.Error), "QueryError", ErrorCategory.InvalidArgument,

@@ -448,8 +448,8 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
     {
         var query = "range x from 1 to 10 step 0";
         var context = CreateContext();
-        var result = await context.RunTabularQueryAsync(query);
-        result.Height.Should().Be(0);
+        var result = await context.RunQuery(query);
+        result.RowCount.Should().Be(0);
         if (result.Error.Length != 0)
             result.Error.Should().Contain("The expression must not be the value: 0");
     }

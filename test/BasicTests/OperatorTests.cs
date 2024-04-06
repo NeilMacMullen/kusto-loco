@@ -26,8 +26,8 @@ public class OperatorTests
         var context = CreateContext();
         var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToImmutableArray();
 
-        context.AddTableFromImmutableData("data", rows);
-        var result = await context.RunTabularQueryAsync("data | getschema");
+        context.WrapDataIntoTable("data", rows);
+        var result = await context.RunQuery("data | getschema");
         var schema = KustoFormatter.Tabulate(result);
         Console.WriteLine(schema);
         schema.Should().Contain(nameof(Row.Name));
@@ -51,7 +51,7 @@ public class OperatorTests
         table = table
             .WithColumn("lazy", lazy);
         context.AddTable(table);
-        await context.RunTabularQueryAsync("data | where  lazy == 'a' | count");
+        await context.RunQuery("data | where  lazy == 'a' | count");
         invocationCountForIndex.Should().Be(1);
     }
 
@@ -75,35 +75,35 @@ public class OperatorTests
             .WithColumn("c2", c1);
         context.AddTable(builder);
         //add.cs
-        (await context.RunTabularQueryAsync("data | extend p=c1+c2"))
+        (await context.RunQuery("data | extend p=c1+c2"))
             .Error.Should()
             .BeEmpty();
         //subtract.cs
-        (await context.RunTabularQueryAsync("data | extend p=c1-c2"))
+        (await context.RunQuery("data | extend p=c1-c2"))
             .Error.Should()
             .BeEmpty();
 
         //Multiply.cs
-        (await context.RunTabularQueryAsync("data | extend p=c1*c2"))
+        (await context.RunQuery("data | extend p=c1*c2"))
             .Error.Should()
             .BeEmpty();
 
         //Divide.cs
-        (await context.RunTabularQueryAsync("data | extend p=c1/c2"))
+        (await context.RunQuery("data | extend p=c1/c2"))
             .Error.Should()
             .BeEmpty();
 
         //Modulo.cs
-        (await context.RunTabularQueryAsync("data | extend p=c1 % c2"))
+        (await context.RunQuery("data | extend p=c1 % c2"))
             .Error.Should()
             .BeEmpty();
 
         //Binning
-        (await context.RunTabularQueryAsync("data | extend p=bin(c1,c2)"))
+        (await context.RunQuery("data | extend p=bin(c1,c2)"))
             .Error.Should()
             .BeEmpty();
 
-        (await context.RunTabularQueryAsync("data | summarize p=max(c1) by c2 "))
+        (await context.RunQuery("data | summarize p=max(c1) by c2 "))
             .Error.Should()
             .BeEmpty();
     }

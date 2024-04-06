@@ -21,11 +21,11 @@ internal class Program
             .Select(i => new Number(i, string.Empty))
             .ToImmutableArray();
 
-        context.AddTableFromImmutableData("numbers", numbers);
+        context.WrapDataIntoTable("numbers", numbers);
 
         //run a query using our custom function
         var query = "numbers | extend FizzBuzz = fizz(N)";
-        var results = await context.RunTabularQueryAsync(query);
+        var results = await context.RunQuery(query);
 
         foreach (var fb in results.ToRecords<Number>())
             Console.WriteLine(fb);

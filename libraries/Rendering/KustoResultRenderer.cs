@@ -11,7 +11,7 @@ public class KustoResultRenderer
 {
     public static string RenderToTable(KustoQueryResult result)
     {
-        if (result.Height == 0)
+        if (result.RowCount == 0)
             return result.Error;
         var headers = result.ColumnNames();
 
@@ -35,10 +35,13 @@ public class KustoResultRenderer
     }
 
     public static string RenderToHtml(KustoQueryResult result)
-        => result.Visualization.ChartType.IsNotBlank()
-            ? KustoToVegaChartType(result)
-            : RenderToTable(result);
-
+    {
+        return result.Error.IsNotBlank()
+            ? result.Error
+            : result.Visualization.ChartType.IsNotBlank()
+                ? KustoToVegaChartType(result)
+                : RenderToTable(result);
+    }
 
 
     public static string KustoToVegaChartType(KustoQueryResult result)
@@ -74,10 +77,7 @@ public class KustoResultRenderer
 
     private static void MakeLineChart(KustoQueryResult result, VegaChart chart)
     {
-        if (result.ColumnDefinitions().Length > 2)
-        {
-            chart.UseCursorTooltip();
-        }
+        if (result.ColumnDefinitions().Length > 2) chart.UseCursorTooltip();
     }
 
     private static void MakeStackedArea(KustoQueryResult result, VegaChart chart)
@@ -86,7 +86,9 @@ public class KustoResultRenderer
     }
 
     private static string VisualizationKind(KustoQueryResult result)
-        => result.Visualization.PropertyOr(KustoVisualizationProperties.Kind, string.Empty);
+    {
+        return result.Visualization.PropertyOr(KustoVisualizationProperties.Kind, string.Empty);
+    }
 
     private static void MakeBarChart(KustoQueryResult result, VegaChart b)
     {
@@ -108,7 +110,7 @@ public class KustoResultRenderer
     public static string RenderToChart(string title, VegaMark vegaType, KustoQueryResult result,
         Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected)
     {
-        if (result.Height == 0)
+        if (result.RowCount == 0)
             return result.Error;
         var b = RenderToJObjectBuilder(vegaType, result, jmutate, expected);
         b.SetTitle(title);
@@ -116,7 +118,7 @@ public class KustoResultRenderer
     }
 
     /// <summary>
-    /// If the query result has a chart type, render it in the browser by creating a temporary html file
+    ///     If the query result has a chart type, render it in the browser by creating a temporary html file
     /// </summary>
     public static void RenderChartInBrowser(KustoQueryResult result)
     {
@@ -162,17 +164,15 @@ public class KustoResultRenderer
         ImmutableArray<ExpectedColumnSet> expectedColumns)
     {
         bool IsMatch(ExpectedColumnSet ex, ColumnDescription c1, ColumnDescription c2)
-            => ex.X.Contains(c1.VegaAxisType) && ex.Y.Contains(c2.VegaAxisType);
+        {
+            return ex.X.Contains(c1.VegaAxisType) && ex.Y.Contains(c2.VegaAxisType);
+        }
 
 
         foreach (var e in expectedColumns)
-        {
-            foreach (var (x, y, z) in new[] { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) })
-            {
-                if (IsMatch(e, columns[x], columns[y]))
-                    return [columns[x], columns[y], columns[z]];
-            }
-        }
+        foreach (var (x, y, z) in new[] { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) })
+            if (IsMatch(e, columns[x], columns[y]))
+                return [columns[x], columns[y], columns[z]];
 
         return columns;
     }
@@ -205,7 +205,9 @@ public class KustoResultRenderer
             spec.SetSize(1800, 100);
         }
         else
+        {
             spec.FillContainer();
+        }
 
         return spec;
     }
@@ -213,9 +215,7 @@ public class KustoResultRenderer
     private static VegaAxisType InferSuitableAxisType(Type t)
     {
         if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
             return InferSuitableAxisType(Nullable.GetUnderlyingType(t));
-        }
 
         return VegaChart.InferSuitableAxisType(t);
     }

@@ -37,7 +37,7 @@ public partial class MainWindow : Window
             await Task.Run(async () => await _explorer.RunInput(query, false));
 
         //if there are no results leave the previously rendered results in place
-        if (result.Height == 0)
+        if (result.RowCount == 0)
             return;
 
         if (result.Visualization != VisualizationState.Empty)

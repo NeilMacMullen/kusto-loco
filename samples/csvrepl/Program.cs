@@ -21,7 +21,7 @@ while (true)
 {
     Console.Write(">");
     var query = Console.ReadLine().Trim();
-    var res = await context.RunTabularQueryAsync(query);
+    var res = await context.RunQuery(query);
     if (res.Error.IsNotBlank())
     {
         Console.WriteLine(res.Error);

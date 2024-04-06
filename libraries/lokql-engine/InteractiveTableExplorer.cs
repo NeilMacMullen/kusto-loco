@@ -59,10 +59,10 @@ public class InteractiveTableExplorer
         var prefs = new KustoFormatter.DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
         _outputConsole.WriteLine(KustoFormatter.Tabulate(result, prefs));
 
-        if (maxToDisplay < result.Height)
+        if (maxToDisplay < result.RowCount)
         {
             Warn(
-                $"Display was truncated to first {maxToDisplay} of {result.Height}.  Use '.display --max' to change this behaviour");
+                $"Display was truncated to first {maxToDisplay} of {result.RowCount}.  Use '.display --max' to change this behaviour");
         }
     }
 
@@ -73,7 +73,7 @@ public class InteractiveTableExplorer
         else
         {
             _outputConsole.SetForegroundColor(ConsoleColor.Green);
-            if (result.Height == 0)
+            if (result.RowCount == 0)
             {
                 Warn("No results");
             }
@@ -89,7 +89,7 @@ public class InteractiveTableExplorer
                 }
             }
 
-            Warn($"Query took {result.QueryDuration}ms");
+            Warn($"Query took {(int)result.QueryDuration.TotalMilliseconds}ms");
         }
     }
 
@@ -157,7 +157,7 @@ public class InteractiveTableExplorer
             }
 
 
-            var result = await GetCurrentContext().RunTabularQueryAsync(query);
+            var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
                 _prevResult = result;
 

@@ -37,7 +37,7 @@ public static class KustoFormatter
     {
         var table = TableBuilder.FromOrderedDictionarySet(string.Empty, dictionaries);
         var result = new KustoQueryResult(string.Empty, table.ToTableSource() as InMemoryTableSource,
-            VisualizationState.Empty, 0, string.Empty);
+            VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         return Tabulate(result);
     }
 
@@ -46,14 +46,14 @@ public static class KustoFormatter
 
     public static string Tabulate(KustoQueryResult result, DisplayPreferences prefs)
     {
-        if (result.Height == 0)
+        if (result.RowCount == 0)
             return "no results";
         var columns = result.ColumnDefinitions();
         var sb = new StringBuilder();
 
         var max = prefs.Length;
 
-        var displayHeight = Math.Min(max, result.Height);
+        var displayHeight = Math.Min(max, result.RowCount);
         var maxColumnWidth = prefs.ScreenWidth;
         var screenWidth = Math.Max(10, prefs.ScreenWidth);
 

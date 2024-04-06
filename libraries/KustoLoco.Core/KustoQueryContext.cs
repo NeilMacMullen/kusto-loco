@@ -88,20 +88,37 @@ public class KustoQueryContext
         return this;
     }
 
-    public void AddTableFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records)
+    /// <summary>
+    ///    Adds a table to the context from volatile data
+    /// </summary>
+    /// <remarks>
+    /// This method is more convenient than the wrapping version but less efficient since it requires
+    /// a copy-and-convert operation. For smaller data sets, this is unlikely to be noticeable but
+    /// if operating on tables of 100Ks or millions of rows you should consider using the wrapped version.
+    /// </remarks>
+    public void CopyDataIntoTable<T>(string tableName, IReadOnlyCollection<T> records)
     {
         var table = TableBuilder.CreateFromVolatileData(tableName, records);
         AddTable(table);
     }
-
-    public KustoQueryContext AddTableFromImmutableData<T>(string tableName, ImmutableArray<T> records)
+    /// <summary>
+    /// Adds immutable data to the context 
+    /// </summary>
+    /// <remarks>
+    /// This is the preferred way to add data to the context since it avoids additional allocations.
+    /// However, the client must ensure that the data is truly immutable and consists only of types
+    /// that are directly supported by Kusto.
+    /// </remarks>
+    public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
     {
         var table = TableBuilder.CreateFromImmutableData(tableName, records);
         AddTable(table);
         return this;
     }
 
-
+    /// <summary>
+    /// Runs a query and evaluates the result in order to get an accurate benchmark
+    /// </summary>
     public int BenchmarkQuery(string query)
     {
         var engine = new BabyKustoEngine();
@@ -109,7 +126,14 @@ public class KustoQueryContext
         return res.RowCount;
     }
 
-    public KustoQueryResult RunTabularQueryWithoutDemandBasedTableLoading(string query)
+    /// <summary>
+    ///    Runs a query against the context without attempting to load tables mentioned in the query
+    /// </summary>
+    /// <remarks>
+    /// This method skips the initial table presence check and is suitable for simple queries.  However, RunQuery
+    /// is preferred in most contexts since it has very little overhead and 'async' may become a requirement in future
+    /// </remarks>
+    public KustoQueryResult RunQueryWithoutDemandBasedTableLoading(string query)
     {
         var watch = Stopwatch.StartNew();
         var engine = new BabyKustoEngine();
@@ -126,13 +150,13 @@ public class KustoQueryContext
                 );
             var (table, vis) = TableFromEvaluationResult(result);
 
-            return new KustoQueryResult(query, table, vis, (int)watch.ElapsedMilliseconds,
+            return new KustoQueryResult(query, table, vis, watch.Elapsed,
                 string.Empty);
         }
         catch (Exception ex)
         {
             var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
-            return new KustoQueryResult(query, table, vis, 0, ex.Message);
+            return new KustoQueryResult(query, table, vis, TimeSpan.Zero, ex.Message);
         }
     }
 
@@ -155,7 +179,7 @@ public class KustoQueryContext
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
                 .ToTableSource() as InMemoryTableSource;
 
-            return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
+            return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }
         else
         {
@@ -166,27 +190,27 @@ public class KustoQueryContext
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
                 .ToTableSource() as InMemoryTableSource;
 
-            return new KustoQueryResult(query, tr!, VisualizationState.Empty, 0, string.Empty);
+            return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }
     }
 
-    private (InMemoryTableSource, VisualizationState) TableFromEvaluationResult(EvaluationResult results)
+    /// <summary>
+    /// Converts an evaluation result into a table and visualization state so that it can be wrapped into a KustoQueryResult
+    /// </summary>
+    /// <remarks>
+    /// We turn _scalar_ results into a single-value, single column table for consistency.
+    /// </remarks>
+    private static (InMemoryTableSource, VisualizationState) TableFromEvaluationResult(EvaluationResult results)
     {
-        switch (results)
+        return results switch
         {
-            case ScalarResult scalar:
-
-                return (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult(scalar))
-                    , VisualizationState.Empty);
-            case TabularResult tabular:
-
-                return (InMemoryTableSource.FromITableSource(tabular.Value), tabular.VisualizationState);
-
-            default:
-
-                return (new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>()),
-                    VisualizationState.Empty);
-        }
+            ScalarResult scalar 
+                => (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult("result",scalar)), VisualizationState.Empty),
+            TabularResult tabular 
+                => (InMemoryTableSource.FromITableSource(tabular.Value), tabular.VisualizationState),
+            _ 
+                => (new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>()), VisualizationState.Empty)
+        };
     }
 
     /// <summary>
@@ -201,7 +225,12 @@ public class KustoQueryContext
         return this;
     }
 
-    public async Task<KustoQueryResult> RunTabularQueryAsync(string query)
+    /// <summary>
+    /// Runs a query against the context, loading tables as required
+    /// </summary>
+    /// If the context has a table loader, it will be used to load tables as required by the query
+    /// <returns></returns>
+    public async Task<KustoQueryResult> RunQuery(string query)
     {
         try
         {
@@ -211,12 +240,12 @@ public class KustoQueryContext
             // Ensure that tables are loaded into the query context
             await _lazyTableLoader.LoadTablesAsync(this, requiredTables);
 
-            return RunTabularQueryWithoutDemandBasedTableLoading(query);
+            return RunQueryWithoutDemandBasedTableLoading(query);
         }
         catch (Exception ex)
         {
-            var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
-            return new KustoQueryResult(query, table, vis, 0, ex.Message);
+            var (table, visualizationState) = TableFromEvaluationResult(EvaluationResult.Null);
+            return new KustoQueryResult(query, table, visualizationState, TimeSpan.Zero, ex.Message);
         }
     }
 
@@ -283,9 +312,9 @@ public class KustoQueryContext
         }
     }
 
-    public async Task<IReadOnlyCollection<T>> RunTabularQueryToRecordSet<T>(string query)
+    public async Task<IReadOnlyCollection<T>> RunQueryToRecordSet<T>(string query)
     {
-        var result = await RunTabularQueryAsync(query);
+        var result = await RunQuery(query);
         if (result.Error.IsNotBlank())
             throw new InvalidOperationException($"{result.Error}");
         return result.ToRecords<T>();
@@ -316,8 +345,8 @@ public class KustoQueryContext
         const string tableName = "data";
         var context = new KustoQueryContext();
         query = $"{tableName} | {query}";
-        context.AddTableFromImmutableData(tableName, rows);
-        return context.RunTabularQueryWithoutDemandBasedTableLoading(query);
+        context.WrapDataIntoTable(tableName, rows);
+        return context.RunQueryWithoutDemandBasedTableLoading(query);
     }
 
 
