@@ -19,7 +19,9 @@ Name,Count
 acd,100
 def,30
 ";
-            CsvLoader.LoadFromString(csv, "data", context);
+            var t =CsvSerializer.LoadFromString(csv, "data");
+            t = TableBuilder.AutoInferColumnTypes(t,new NullProgressReporter());
+            context.AddTable(t);
             var nameResult = (await context.RunQuery("data | where Name contains 'a'"));
             nameResult.Error.Should().BeEmpty();
             nameResult.RowCount.Should().Be(1);

@@ -14,7 +14,7 @@ public abstract class BaseColumn
     protected ColumnHints hints;
     protected BaseColumn(TypeSymbol type) => Type = type;
     public TypeSymbol Type { get; }
-
+    public string Name =>Type.Name;
     public bool IsSingleValue => hints.HasFlag(ColumnHints.HoldsSingleValue)
                                  | (RowCount == 1);
 

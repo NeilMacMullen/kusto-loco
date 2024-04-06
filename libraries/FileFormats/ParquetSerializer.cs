@@ -7,7 +7,7 @@ using Parquet.Schema;
 
 namespace KustoLoco.FileFormats;
 
-public class ParquetFileOps : ITableLoader
+public class ParquetSerializer : ITableSerializer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -58,7 +58,7 @@ public class ParquetFileOps : ITableLoader
 
     public static async Task<ITableSource> LoadFromFile(string path, string tableName)
     {
-        using var fs = File.OpenRead(path);
+        await using var fs = File.OpenRead(path);
         using var reader = await ParquetReader.CreateAsync(fs);
         var rg = await reader.ReadEntireRowGroupAsync();
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rg.GetLength(0));
@@ -74,15 +74,18 @@ public class ParquetFileOps : ITableLoader
 
             tableBuilder.WithColumn(c.Field.Name, colBuilder.ToColumn());
         }
-
         return tableBuilder.ToTableSource();
     }
 
     public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
     {
         var table = await LoadFromFile(path, tableName);
-        return new TableLoadResult(table,string.Empty);
+        return TableLoadResult.Success(table);
     }
 
     public bool RequiresTypeInference { get; } = false;
+    public Task<TableSaveResult> SaveTable(string path,ITableSource source, IProgress<string> progressReporter)
+    {
+        throw new NotImplementedException();
+    }
 }

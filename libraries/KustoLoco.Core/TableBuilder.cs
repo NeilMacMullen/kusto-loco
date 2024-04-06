@@ -11,6 +11,7 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using KustoLoco.Core.DataSource;
+using System.Data.Common;
 
 namespace KustoLoco.Core;
 
@@ -220,5 +221,42 @@ public class TableBuilder
         if (table is not InMemoryTableSource ims)
             throw new NotImplementedException("can currently only share generated tables");
         return ims.ShareAs(requestedTableName);
+    }
+
+    /// <summary>
+    /// Creates a new table by inferring the types of the columns in the input table
+    /// </summary>
+    public static ITableSource AutoInferColumnTypes(ITableSource other,IProgress<string> progressReporter)
+    {
+        var chunks = other.GetData().ToArray();
+        switch (chunks.Length)
+        {
+            case 0:
+                return other;
+            case > 1:
+                throw new NotImplementedException("can currently only infer types for single chunk tables");
+        }
+
+        var columns = chunks[0].Columns;
+        if (columns.Length == 0)
+            return other;
+
+        var columnNames = other.ColumnNames.ToArray();
+        var inferredColumns = columns.Zip(columnNames, (col, name) =>
+            {
+                progressReporter.Report($"Inferring column type for {name}...");
+                var newC = ColumnTypeInferrer.AutoInfer(col);
+                progressReporter.Report($"{name} -> {newC.Type.Name}");
+                return newC;
+            })
+            .ToArray();
+        var builder = CreateEmpty(other.Name, columns[0].RowCount);
+        for (var i = 0; i < columns.Length; i++)
+        {
+            builder.WithColumn(columnNames[i], inferredColumns[i]);
+        }
+
+        return builder.ToTableSource();
+    
     }
 }

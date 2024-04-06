@@ -7,7 +7,7 @@ using NLog;
 
 namespace KustoLoco.FileFormats;
 
-public class CsvLoader : ITableLoader
+public class CsvSerializer : ITableSerializer
 {
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -35,20 +35,21 @@ public class CsvLoader : ITableLoader
                 progressReporter.Report($"{rowCount} records read");
         }
 
+        /*
         progressReporter.Report("Inferring column types...");
         var inferredColumns = builders
             .Select(b => ColumnTypeInferrer.AutoInfer(b.ToColumn()))
             .ToArray();
-
-        var table = TableBuilder.CreateEmpty(tableName, rowCount);
+        */
+        var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++)
         {
-            table.WithColumn(keys[i], inferredColumns[i]);
+            tableBuilder.WithColumn(keys[i], builders[i].ToColumn());
         }
 
-        var t = table.ToTableSource();
+        var tableSource = tableBuilder.ToTableSource();
         progressReporter.Report("Loaded");
-        return t;
+        return tableSource;
 
     }
 
@@ -60,11 +61,11 @@ public class CsvLoader : ITableLoader
     }
 
 
-    public static void LoadFromString(string csv, string tableName, KustoQueryContext context)
+    public static ITableSource LoadFromString(string csv, string tableName)
     {
         var reader = new StringReader(csv.Trim());
         var table =Load(reader, tableName,new NullProgressReporter());
-        context.AddTable(table);
+        return table;
     }
 
 
@@ -78,6 +79,7 @@ public class CsvLoader : ITableLoader
                 csv.WriteField(heading);
             }
         }
+
 
         csv.NextRecord();
 
@@ -106,13 +108,19 @@ public class CsvLoader : ITableLoader
         try
         {
             var table = Load(path, tableName,progressReporter);
-            return Task.FromResult(new TableLoadResult(table, string.Empty));
+            table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
+            return Task.FromResult(TableLoadResult.Success(table));
         }
         catch (Exception e)
         {
-            return Task.FromResult(new TableLoadResult(NullTableSource.Instance, e.Message));
+            return Task.FromResult(TableLoadResult.Failure(e.Message));
         }
     }
 
-    public bool RequiresTypeInference { get; } = true;
+    public bool RequiresTypeInference => true;
+
+    public Task<TableSaveResult> SaveTable(string path,ITableSource table, IProgress<string> progressReporter)
+    {
+        throw new NotImplementedException();
+    }
 }
