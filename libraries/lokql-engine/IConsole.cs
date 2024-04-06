@@ -1,4 +1,6 @@
-﻿#pragma warning disable CS8618, CS8604
+﻿namespace Lokql.Engine;
+
+
 /// <summary>
 ///     Describes operations required for a basic console type display
 /// </summary>

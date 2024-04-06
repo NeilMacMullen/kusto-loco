@@ -1,4 +1,7 @@
 ﻿using CommandLine;
+
+namespace Lokql.Engine;
+
 public static class StandardParsers
 {
     public static readonly Parser Default = new(settings =>

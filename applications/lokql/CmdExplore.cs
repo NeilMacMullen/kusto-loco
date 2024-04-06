@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Lokql.Engine;
 using NLog;
 using NotNullStrings;
 

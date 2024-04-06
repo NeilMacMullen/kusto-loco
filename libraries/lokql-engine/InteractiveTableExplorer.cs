@@ -1,27 +1,28 @@
 ﻿using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Text;
-using KustoLoco.Core.Evaluation;
 using CommandLine;
 using KustoLoco.Core;
-using KustoLoco.FileFormats;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Rendering;
 using NLog;
 using NotNullStrings;
 
+namespace Lokql.Engine;
+
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local setters are
 // required on Options properties by CommandLineParser library
-
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-
 /// <summary>
-/// A repl for exploring kusto tables
+///     A repl for exploring kusto tables
 /// </summary>
 /// <remarks>
-/// This class is used as the heart of the CLI and UI version of "lokql"  As well as providing demand-based loading of tables,
-/// it also provides a number of commands to interact with the data, such as saving, loading, rendering and materializing tables.
-/// Query results can also be rendered as html charts using the "render" command.
+///     This class is used as the heart of the CLI and UI version of "lokql"  As well as providing demand-based loading of
+///     tables,
+///     it also provides a number of commands to interact with the data, such as saving, loading, rendering and
+///     materializing tables.
+///     Query results can also be rendered as html charts using the "render" command.
 /// </remarks>
 public class InteractiveTableExplorer
 {
@@ -29,14 +30,14 @@ public class InteractiveTableExplorer
     private readonly KustoQueryContext _context = new();
 
     private readonly FolderContext _folders;
-    private readonly ITableSerializer _loader;
+    private readonly ITableAdaptor _loader;
     private readonly IConsole _outputConsole;
     private readonly StringBuilder commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableSerializer loader)
+    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableAdaptor loader)
     {
         _outputConsole = outputConsole;
         _loader = loader;
@@ -49,7 +50,10 @@ public class InteractiveTableExplorer
     {
     }
 
-    private KustoQueryContext GetCurrentContext() => _context;
+    private KustoQueryContext GetCurrentContext()
+    {
+        return _context;
+    }
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
@@ -60,16 +64,16 @@ public class InteractiveTableExplorer
         _outputConsole.WriteLine(KustoFormatter.Tabulate(result, prefs));
 
         if (maxToDisplay < result.RowCount)
-        {
             Warn(
                 $"Display was truncated to first {maxToDisplay} of {result.RowCount}.  Use '.display --max' to change this behaviour");
-        }
     }
 
     private void DisplayResults(KustoQueryResult result, bool autoRender)
     {
         if (result.Error.IsNotBlank())
+        {
             ShowError(result.Error);
+        }
         else
         {
             _outputConsole.SetForegroundColor(ConsoleColor.Green);
@@ -84,9 +88,7 @@ public class InteractiveTableExplorer
                 //auto render
 
                 if (autoRender && result.Visualization != VisualizationState.Empty)
-                {
                     RenderCommand.Run(this, new RenderCommand.Options());
-                }
             }
 
             Warn($"Query took {(int)result.QueryDuration.TotalMilliseconds}ms");
@@ -97,10 +99,7 @@ public class InteractiveTableExplorer
     {
         _outputConsole.WriteLine("Use '.help' to list commands");
 
-        if (initialScript.IsNotBlank())
-        {
-            await RunInput($".run {initialScript}", true);
-        }
+        if (initialScript.IsNotBlank()) await RunInput($".run {initialScript}", true);
 
         while (true)
         {
@@ -233,8 +232,8 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
                 .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
-           .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
-                ;
+                .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
+            ;
     }
 
 
@@ -243,13 +242,10 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
-            
+
             exp.Info($"Loading '{filename}'..");
             var lines = await File.ReadAllLinesAsync(filename);
-            foreach (var line in lines)
-            {
-                await exp.ExecuteAsync(line);
-            }
+            foreach (var line in lines) await exp.ExecuteAsync(line);
         }
 
         [Verb("run", aliases: ["script", "r"],
@@ -354,16 +350,15 @@ public class InteractiveTableExplorer
                 for (var i = 0; i < 100; i++)
                 {
                     exp.Info($"Line {i}");
-                   var t = Stopwatch.StartNew();
-                    while (t.ElapsedMilliseconds < 100) ; 
+                    var t = Stopwatch.StartNew();
+                    while (t.ElapsedMilliseconds < 100) ;
                 }
             });
         }
 
-        [Verb("test",  HelpText = "test")]
+        [Verb("test", HelpText = "test")]
         internal class Options
         {
-          
         }
     }
 
@@ -450,18 +445,20 @@ public class InteractiveTableExplorer
             if (exp._context.HasTable(tableName))
             {
                 if (o.Force)
+                {
                     exp._context.RemoveTable(tableName);
+                }
                 else
                 {
                     exp.Warn($"Table '{tableName}' already exists.  Use '.load -f' to force reload");
                     return;
                 }
             }
-           
-           var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
-           pr.Report("Progress");
-           exp.Info("after progress");
-            await exp._loader.LoadTable(exp._context, o.File, tableName,pr);
+
+            var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
+            pr.Report("Progress");
+            exp.Info("after progress");
+            await exp._loader.LoadTable(exp._context, o.File, tableName, pr);
         }
 
         [Verb("load", aliases: ["ld"],
@@ -481,8 +478,8 @@ public class InteractiveTableExplorer
 
     private void Warn(string s)
     {
-       _outputConsole.SetForegroundColor(ConsoleColor.Red);
-       _outputConsole.WriteLine(s);
+        _outputConsole.SetForegroundColor(ConsoleColor.Red);
+        _outputConsole.WriteLine(s);
     }
 
 

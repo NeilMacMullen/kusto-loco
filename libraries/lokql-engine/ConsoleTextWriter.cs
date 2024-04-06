@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
-#pragma warning disable CS8618, CS8604
+namespace Lokql.Engine;
+
 /// <summary>
 ///     Wraps a TextWriter around an IConsole
 /// </summary>

@@ -1,6 +1,7 @@
 ﻿
 using CommandLine;
 using LogSetup;
+using Lokql.Engine;
 using NLog;
 
 LoggingExtensions.SetupLoggingForConsole(LogLevel.Info);

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core;
 
+
+namespace Lokql.Engine;
+
 public class TextTableAdaptor : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".txt"];

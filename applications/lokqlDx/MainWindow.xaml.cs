@@ -3,6 +3,7 @@ using System.Windows;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Rendering;
+using Lokql.Engine;
 
 namespace lokqlDx;
 

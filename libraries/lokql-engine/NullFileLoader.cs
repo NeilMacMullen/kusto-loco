@@ -1,4 +1,6 @@
 ﻿using KustoLoco.Core;
+namespace Lokql.Engine;
+
 
 public class NullFileLoader : IFileBasedTableAccess
 {

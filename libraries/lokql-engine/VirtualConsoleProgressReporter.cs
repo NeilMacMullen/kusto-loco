@@ -1,4 +1,8 @@
-﻿#pragma warning disable CS8618
+﻿
+
+namespace Lokql.Engine;
+
+
 public class VirtualConsoleProgressReporter(IConsole console) : IProgress<string>
 {
     public void Report(string value)

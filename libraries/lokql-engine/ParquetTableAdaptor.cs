@@ -1,7 +1,7 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.FileFormats;
 
-
+namespace Lokql.Engine;
 
 public class ParquetTableAdaptor : IFileBasedTableAccess
 {
