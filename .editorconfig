@@ -1,0 +1,37 @@
+# top-most EditorConfig file
+root = true
+
+# Windows-style newlines with a newline ending every file
+[*]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# 4 space indentation
+[*.{cs, cshtml, razor}]
+indent_style = space
+indent_size = 4
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none
+
+# 2 space indentation
+
+# UA0013: 'ApiController' does not exist
+dotnet_diagnostic.UA0013.severity = none
+
+[*.csproj]
+indent_style = space
+indent_size = 2
+charset = utf-8-bom
+
+# 2 space indentation
+[*.{xaml, wxs, config, yml}]
+indent_style = space
+indent_size = 2
+
+# Matches the exact files package.json
+[{packages.config}]
+indent_style = space
+indent_size = 2

@@ -439,7 +439,6 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            exp.Info($"Loading '{o.File}'...");
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
             //remove table if it already exists
             if (exp._context.HasTable(tableName))
@@ -456,9 +455,9 @@ public class InteractiveTableExplorer
             }
 
             var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
-            pr.Report("Progress");
-            exp.Info("after progress");
-            await exp._loader.LoadTable(exp._context, o.File, tableName, pr);
+            var success = await exp._loader.LoadTable(exp._context, o.File, tableName, pr);
+            if (!success) exp.Warn($"Unable to load '{o.File}'");
+           
         }
 
         [Verb("load", aliases: ["ld"],

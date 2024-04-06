@@ -1,24 +1,10 @@
-﻿using System.Text;
+﻿namespace Lokql.Engine;
 
-namespace Lokql.Engine;
-
+/// <summary>
+///     implementation of IConsole that uses the actual system console
+/// </summary>
 public class SystemConsole : IConsole
 {
-
-    public class ConsoleWriter : TextWriter
-    {
-        public override Encoding Encoding => Console.OutputEncoding;
-        public override void Write(char c)
-        {
-           Console.Write(c);
-        }
-    }
-    private readonly TextWriter _writer;
-
-    public SystemConsole()
-    {
-        _writer = new ConsoleWriter();
-    }
     public void Write(string s)
     {
         Console.Write(s);
@@ -31,10 +17,9 @@ public class SystemConsole : IConsole
 
     public int WindowWidth => Console.WindowWidth;
 
-    public TextWriter Writer => _writer;
 
     public string ReadLine()
     {
-        return Console.ReadLine()??string.Empty ;
+        return Console.ReadLine() ?? string.Empty;
     }
 }

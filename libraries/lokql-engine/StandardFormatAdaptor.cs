@@ -10,6 +10,9 @@ namespace Lokql.Engine;
 /// This class is used by the interactive shell to choose the appropriate adaptor based on
 /// the file extension.  For example, if the user tries to load a file called "mydata.csv",
 /// the CsvTableAdaptor will be used to load the file.
+///
+/// The adaptor will try to load the file from a list of paths, in order
+/// unless the path is fully qualified.
 /// </remarks>
 public class StandardFormatAdaptor : ITableAdaptor
 {
@@ -73,7 +76,10 @@ public class StandardFormatAdaptor : ITableAdaptor
 
             var success = await loader.TryLoad(filepath, context, tableName,progressReporter);
             if (success)
-                break;
+            {
+                progressReporter.Report($"Loaded table '{tableName}' from {filepath}");
+                return true;
+            }
         }
 
         return false;
