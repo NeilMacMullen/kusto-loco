@@ -11,12 +11,11 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using KustoLoco.Core.DataSource;
-using System.Data.Common;
 
 namespace KustoLoco.Core;
 
 
-#pragma warning disable CS8604, CS8602, CS8603
+
 /// <summary>
 ///     Provides a simple way to create a Kusto ITableSource
 /// </summary>
@@ -175,8 +174,8 @@ public class TableBuilder
             .Select(de => de.Key.ToString())
             .Select(h => new
             {
-                ColumnName = h,
-                Type = firstDictionary[h]?.GetType() ?? typeof(string)
+                ColumnName = h!,
+                Type = firstDictionary[h!]?.GetType() ?? typeof(string)
             })
             .ToArray();
 

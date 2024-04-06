@@ -2,7 +2,6 @@
 
 namespace Lokql.Engine;
 
-#pragma warning disable CS8618, CS8604
 public class SystemConsole : IConsole
 {
 

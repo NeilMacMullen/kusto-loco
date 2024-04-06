@@ -10,7 +10,7 @@ using KustoLoco.Core.Util;
 using NLog;
 using NotNullStrings;
 
-#pragma warning disable CS8603 // Possible null reference return.
+
 
 namespace KustoLoco.Core;
 
@@ -166,7 +166,14 @@ public class KustoQueryResult
         //"good enough" for now...
 
         var json = ToJsonString(dictionaries);
-        return JsonSerializer.Deserialize<T[]>(json);
+        try
+        {
+            return JsonSerializer.Deserialize<T[]>(json)!;
+        }
+        catch 
+        {
+            return [];
+        }
     }
 
     public string ToJsonString() => ToJsonString(AsOrderedDictionarySet());

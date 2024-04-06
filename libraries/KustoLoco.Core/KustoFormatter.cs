@@ -7,25 +7,21 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using NotNullStrings;
 
-#pragma warning disable CS8604 // Possible null reference argument.
-
 namespace KustoLoco.Core;
-
 
 public static class KustoFormatter
 {
     public static string ObjectToKustoString(object? o)
     {
-#pragma warning disable CS8603 // Possible null reference return.
+
         return o switch
         {
             null => string.Empty,
             DateTime d => d.Kind == DateTimeKind.Local
                 ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
                 : d.ToString("u"),
-            _ => o.ToString()
+            _ => o.ToString()!
         };
-#pragma warning restore CS8603 // Possible null reference return.
     }
 
     /// <summary>
@@ -36,32 +32,33 @@ public static class KustoFormatter
     public static string Tabulate(IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
         var table = TableBuilder.FromOrderedDictionarySet(string.Empty, dictionaries);
-        var result = new KustoQueryResult(string.Empty, table.ToTableSource() as InMemoryTableSource,
-            VisualizationState.Empty, TimeSpan.Zero, string.Empty);
+        var source = table.ToTableSource() as InMemoryTableSource 
+                  ?? throw new NotImplementedException("TableBuilder is currently assumed to return an InMemoryTableSource");
+        var result = new KustoQueryResult(string.Empty, source, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         return Tabulate(result);
     }
 
     public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
         => Tabulate(result, new DisplayPreferences(int.MaxValue, 0, max));
 
-    public static string Tabulate(KustoQueryResult result, DisplayPreferences prefs)
+    public static string Tabulate(KustoQueryResult result, DisplayPreferences preferences)
     {
         if (result.RowCount == 0)
             return "no results";
         var columns = result.ColumnDefinitions();
         var sb = new StringBuilder();
 
-        var max = prefs.Length;
+        var max = preferences.Length;
 
         var displayHeight = Math.Min(max, result.RowCount);
-        var maxColumnWidth = prefs.ScreenWidth;
-        var screenWidth = Math.Max(10, prefs.ScreenWidth);
+        var maxColumnWidth = preferences.ScreenWidth;
+        var screenWidth = Math.Max(10, preferences.ScreenWidth);
 
 
         string[] MakeStringColumn(ColumnResult c)
             => new[] { c.Name }
                 .Concat(result.EnumerateColumnData(c)
-                    .Skip(prefs.StartOffset)
+                    .Skip(preferences.StartOffset)
                     .Take(max))
                 .Select(ObjectToKustoString)
                 .ToArray();

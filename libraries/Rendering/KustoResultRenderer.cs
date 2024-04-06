@@ -6,7 +6,7 @@ using NotNullStrings;
 
 namespace KustoLoco.Rendering;
 
-#pragma warning disable CS8618, CS8600, CS8602, CS8604
+
 public class KustoResultRenderer
 {
     public static string RenderToTable(KustoQueryResult result)
@@ -214,10 +214,9 @@ public class KustoResultRenderer
 
     private static VegaAxisType InferSuitableAxisType(Type t)
     {
-        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
-            return InferSuitableAxisType(Nullable.GetUnderlyingType(t));
-
-        return VegaChart.InferSuitableAxisType(t);
+        return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)
+            ? InferSuitableAxisType(Nullable.GetUnderlyingType(t)!)
+            : VegaChart.InferSuitableAxisType(t);
     }
 
     private static VegaMark InferChartTypeFromAxisTypes(VegaAxisType[] axisTypes)

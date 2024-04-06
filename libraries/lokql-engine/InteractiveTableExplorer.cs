@@ -12,7 +12,6 @@ namespace Lokql.Engine;
 
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local setters are
 // required on Options properties by CommandLineParser library
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 /// <summary>
 ///     A repl for exploring kusto tables
@@ -32,7 +31,7 @@ public class InteractiveTableExplorer
     private readonly FolderContext _folders;
     private readonly ITableAdaptor _loader;
     private readonly IConsole _outputConsole;
-    private readonly StringBuilder commandBuffer = new();
+    private readonly StringBuilder _commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
@@ -43,6 +42,7 @@ public class InteractiveTableExplorer
         _loader = loader;
         _context.SetTableLoader(_loader);
         _folders = folders;
+        _prevResult = KustoQueryResult.Empty;
     }
 
     public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
@@ -125,19 +125,19 @@ public class InteractiveTableExplorer
         if (query.StartsWith("#") | query.IsBlank()) return KustoQueryResult.Empty;
         if (query.EndsWith("\\"))
         {
-            commandBuffer.Append(query.Substring(0, query.Length - 1) + " ");
+            _commandBuffer.Append(query.Substring(0, query.Length - 1) + " ");
             return KustoQueryResult.Empty;
         }
 
         if (query.EndsWith("|"))
         {
-            commandBuffer.Append(query);
+            _commandBuffer.Append(query);
             return KustoQueryResult.Empty;
         }
 
-        commandBuffer.Append(query);
-        query = commandBuffer.ToString().Trim();
-        commandBuffer.Clear();
+        _commandBuffer.Append(query);
+        query = _commandBuffer.ToString().Trim();
+        _commandBuffer.Clear();
         try
         {
             if (query.StartsWith("."))
@@ -253,7 +253,7 @@ public class InteractiveTableExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of script", Required = true)]
-            public string File { get; set; }
+            public string File { get; set; } =string.Empty;
         }
     }
 
@@ -311,7 +311,7 @@ public class InteractiveTableExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of queryFile", Required = true)]
-            public string File { get; set; }
+            public string File { get; set; } = string.Empty;
 
             [Option('c', HelpText = "Adds a comment")]
             public string Comment { get; set; } = string.Empty;
@@ -441,7 +441,7 @@ public class InteractiveTableExplorer
         {
             exp.Info($"Loading '{o.File}'...");
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
-            //remove table if it already exist
+            //remove table if it already exists
             if (exp._context.HasTable(tableName))
             {
                 if (o.Force)
@@ -492,7 +492,7 @@ public class InteractiveTableExplorer
             exp.GetCurrentContext().ShareTable(o.CurrentName, o.As);
         }
 
-        [Verb("synomym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]
+        [Verb("synonym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]
         internal class Options
         {
             [Value(0, HelpText = "table name", Required = true)]
