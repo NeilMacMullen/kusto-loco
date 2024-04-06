@@ -59,7 +59,7 @@ namespace lokqlDx
                 sb.AppendLine(Query.GetLineText(i));
                 i++;
             }
-
+           
             return sb.ToString().Trim();
         }
 

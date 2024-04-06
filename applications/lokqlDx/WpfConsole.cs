@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace lokqlDx;
 
@@ -62,10 +63,13 @@ public class WpfConsole : IConsole
     /// </summary>
     public void PrepareForOutput()
     {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            _control.Document.Blocks.Clear();
+            _control.Document.LineHeight = 1;
+            WindowWidth = Math.Max(10, VisibleColumns);
+        });
        
-        _control.Document.Blocks.Clear();
-        _control.Document.LineHeight = 1;
-        WindowWidth = Math.Max(10, VisibleColumns);
     }
 
 
@@ -84,6 +88,7 @@ public class WpfConsole : IConsole
         catch (FormatException)
         {
         }
+        box.ScrollToEnd();
     }
 
     /// <summary>

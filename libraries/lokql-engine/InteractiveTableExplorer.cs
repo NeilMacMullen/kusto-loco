@@ -218,7 +218,8 @@ public class InteractiveTableExplorer
                     typeof(MaterializeCommand.Options),
                     typeof(SynTableCommand.Options),
                     typeof(AllTablesCommand.Options),
-                    typeof(ShowCommand.Options)
+                    typeof(ShowCommand.Options),
+                    typeof(TestCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -232,7 +233,8 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<SaveCommand.Options>(o => SaveCommand.RunAsync(this, o))
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
                 .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
-            ;
+           .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
+                ;
     }
 
 
@@ -342,6 +344,29 @@ public class InteractiveTableExplorer
         }
     }
 
+
+    public static class TestCommand
+    {
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            await Task.Run(() =>
+            {
+                for (var i = 0; i < 100; i++)
+                {
+                    exp.Info($"Line {i}");
+                   var t = Stopwatch.StartNew();
+                    while (t.ElapsedMilliseconds < 100) ; 
+                }
+            });
+        }
+
+        [Verb("test",  HelpText = "test")]
+        internal class Options
+        {
+          
+        }
+    }
+
     public static class ShowCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
@@ -419,6 +444,7 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
+            exp.Info($"Loading '{o.File}'...");
             var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
             //remove table if it already exist
             if (exp._context.HasTable(tableName))
@@ -432,7 +458,9 @@ public class InteractiveTableExplorer
                 }
             }
            
-           var pr = new ConsoleProgressReporter(exp._outputConsole);
+           var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
+           pr.Report("Progress");
+           exp.Info("after progress");
             await exp._loader.LoadTable(exp._context, o.File, tableName,pr);
         }
 
@@ -511,17 +539,10 @@ public class InteractiveTableExplorer
     #endregion
 }
 
-public class ConsoleProgressReporter :IProgress<string>
+public class VirtualConsoleProgressReporter(IConsole console) : IProgress<string>
 {
-    private readonly IConsole _console;
-
-    public ConsoleProgressReporter(IConsole console)
-    {
-        _console = console;
-    }
-
     public void Report(string value)
     {
-        _console.WriteLine(value);
+        console.WriteLine(value);
     }
 }
