@@ -7,9 +7,30 @@ using Parquet.Schema;
 
 namespace KustoLoco.FileFormats;
 
+/// <summary>
+///     Basic support for saving and loading parquet files.
+/// </summary>
+/// <remarks>
+///     Could be extended to support chunks, indices and other parquet features.
+/// </remarks>
 public class ParquetSerializer : ITableSerializer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
+    {
+        var table = await LoadFromFile(path, tableName, progressReporter);
+        return TableLoadResult.Success(table);
+    }
+
+    public bool RequiresTypeInference { get; } = false;
+
+    public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result,
+        IProgress<string> progressReporter)
+    {
+        await Save(path, result);
+        return TableSaveResult.Success();
+    }
 
     public static async Task Save(string path, KustoQueryResult result)
     {
@@ -19,7 +40,7 @@ public class ParquetSerializer : ITableSerializer
 
     private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
     {
-        Logger.Info("using builder");
+        //TODO - it feels like this could be done more efficiently
         var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType);
         foreach (var o in res.EnumerateColumnData(r))
             builder.Add(o);
@@ -28,35 +49,29 @@ public class ParquetSerializer : ITableSerializer
 
     public static async Task SaveToStream(Stream fs, KustoQueryResult result)
     {
-        Logger.Info("writing to stream");
-        var datafields = result.ColumnDefinitions()
+        var dataFields = result.ColumnDefinitions()
             .Select(col =>
                 new DataField(col.Name, col.UnderlyingType, true))
             .ToArray();
-        Logger.Info("created datafields");
-        var schema = new ParquetSchema(datafields.Cast<Field>().ToArray());
-        Logger.Info("Created schema");
-        var columns = result
-            .ColumnDefinitions()
-            .Select(col =>
-                {
-                    Logger.Info($"creating datacol {col.Name} {col.UnderlyingType}");
-                    return new DataColumn(
-                        datafields[col.Index],
-                        CreateArrayFromRawObjects(col, result));
-                }
-            )
-            .ToArray();
+        var schema = new ParquetSchema(dataFields.Cast<Field>().ToArray());
 
 
         using var writer = await ParquetWriter.CreateAsync(schema, fs);
         using var groupWriter = writer.CreateRowGroup();
 
-        foreach (var c in columns)
-            await groupWriter.WriteColumnAsync(c);
+        foreach (var col in result
+                     .ColumnDefinitions())
+        {
+            var dataColumn = new DataColumn(
+                dataFields[col.Index],
+                CreateArrayFromRawObjects(col, result)
+            );
+            await groupWriter.WriteColumnAsync(dataColumn);
+        }
     }
 
-    public static async Task<ITableSource> LoadFromFile(string path, string tableName)
+    public static async Task<ITableSource> LoadFromFile(string path, string tableName,
+        IProgress<string> progressReporter)
     {
         await using var fs = File.OpenRead(path);
         using var reader = await ParquetReader.CreateAsync(fs);
@@ -65,28 +80,15 @@ public class ParquetSerializer : ITableSerializer
         foreach (var c in rg)
         {
             var type = c.Field.ClrType;
-            Logger.Debug($"reading column {c.Field.Name} of type {c.Field.Name}");
+            progressReporter.Report($"reading column {c.Field.Name} of type {c.Field.Name}");
+            //TODO - surely there is a more efficient way to do this by wrapping the original data?
             var colBuilder = ColumnHelpers.CreateBuilder(type);
             foreach (var o in c.Data)
-            {
                 colBuilder.Add(o);
-            }
 
             tableBuilder.WithColumn(c.Field.Name, colBuilder.ToColumn());
         }
+
         return tableBuilder.ToTableSource();
-    }
-
-    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
-    {
-        var table = await LoadFromFile(path, tableName);
-        return TableLoadResult.Success(table);
-    }
-
-    public bool RequiresTypeInference { get; } = false;
-    public async Task<TableSaveResult> SaveTable(string path,KustoQueryResult result, IProgress<string> progressReporter)
-    {
-        await Save(path, result);
-       return TableSaveResult.Success();
     }
 }
