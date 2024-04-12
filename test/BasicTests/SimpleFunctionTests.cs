@@ -510,4 +510,25 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         var result = await LastLineOfResult(query);
         result.Should().Be("6.00:00:00");
     }
+
+
+    [TestMethod]
+    public async Task RepeatedUnion()
+    {
+        var query = @"
+let d=datatable(v1: int,v2: int, v3:int) [
+1,2,3,
+4,5,6
+];
+d | project Type='v1',Val=v1
+| union (d | project Type='v2',Val=v2)
+| union (d | project Type='v3',Val=v3)
+| count ";
+        
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+  
+
 }

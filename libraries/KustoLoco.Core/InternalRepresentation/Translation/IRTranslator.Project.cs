@@ -32,7 +32,7 @@ internal partial class IRTranslator
     {
         Debug.Assert(_rowScope != TableSymbol.Empty);
         var resultTypeMember = node.ResultType.Members;
-
+        //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
         var renamedColumns = new Dictionary<ColumnSymbol, ColumnSymbol>();
         foreach (var element in node.Expressions)
         {
@@ -102,6 +102,7 @@ internal partial class IRTranslator
     {
         Debug.Assert(_rowScope != TableSymbol.Empty);
         var pendingExpressions = new LinkedList<IRExpressionNode>();
+        //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
         var namedExtendedColumns = new Dictionary<ColumnSymbol, LinkedListNode<IRExpressionNode>>();
         foreach (var element in expressions)
         {

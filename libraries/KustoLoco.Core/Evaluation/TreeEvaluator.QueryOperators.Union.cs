@@ -49,6 +49,7 @@ internal partial class TreeEvaluator
 
     private class UnionResultTable : ITableSource
     {
+        //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
         private readonly Dictionary<ColumnSymbol, int> _columnMappings;
         private readonly List<ITableSource> _tables;
 
