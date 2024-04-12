@@ -523,12 +523,10 @@ let d=datatable(v1: int,v2: int, v3:int) [
 d | project Type='v1',Val=v1
 | union (d | project Type='v2',Val=v2)
 | union (d | project Type='v3',Val=v3)
-| count ";
-        
+| where Type == 'v2'
+| count";
+
         var result = await LastLineOfResult(query);
-        result.Should().Be("3");
+        result.Should().Be("2");
     }
-
-  
-
 }

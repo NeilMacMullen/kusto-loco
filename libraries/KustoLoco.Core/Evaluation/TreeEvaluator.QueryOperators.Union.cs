@@ -7,12 +7,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -50,7 +49,7 @@ internal partial class TreeEvaluator
     private class UnionResultTable : ITableSource
     {
         //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
-        private readonly Dictionary<ColumnSymbol, int> _columnMappings;
+        private readonly ColumnSymbolLookup _columnMappings = new();
         private readonly List<ITableSource> _tables;
 
         public UnionResultTable(List<ITableSource> tables, TableSymbol resultType)
@@ -58,7 +57,7 @@ internal partial class TreeEvaluator
             _tables = tables;
             Type = resultType;
 
-            _columnMappings = new Dictionary<ColumnSymbol, int>();
+
             var i = 0;
             foreach (ColumnSymbol columnSymbol in resultType.Members)
             {
