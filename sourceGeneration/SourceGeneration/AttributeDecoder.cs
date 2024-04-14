@@ -1,108 +1,112 @@
 ﻿using System;
-using SourceGeneration;
 
-public class AttributeDecoder
+
+namespace KustoLoco.SourceGeneration
 {
-    public ImplementationType ImplementationType;
-    public bool IsBuiltIn;
 
-    public string SymbolName;
-
-    internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
+    public class AttributeDecoder
     {
-        var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
-        SymbolName = funcSymbol;
+        public ImplementationType ImplementationType;
+        public bool IsBuiltIn;
 
-        if (funcSymbol.Contains("Functions"))
+        public string SymbolName;
+
+        internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
         {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Function;
-        }
-        else if (funcSymbol.Contains("Operators"))
-        {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Operator;
-        }
-        else if (funcSymbol.Contains("Aggregates"))
-        {
-            IsBuiltIn = true;
-            ImplementationType = ImplementationType.Aggregate;
-        }
-        else
-        {
-            var category = attr.GetStringFor(nameof(KustoImplementationAttribute.Category));
-            if (category == string.Empty)
+            var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
+            SymbolName = funcSymbol;
+
+            if (funcSymbol.Contains("Functions"))
+            {
+                IsBuiltIn = true;
                 ImplementationType = ImplementationType.Function;
+            }
+            else if (funcSymbol.Contains("Operators"))
+            {
+                IsBuiltIn = true;
+                ImplementationType = ImplementationType.Operator;
+            }
+            else if (funcSymbol.Contains("Aggregates"))
+            {
+                IsBuiltIn = true;
+                ImplementationType = ImplementationType.Aggregate;
+            }
             else
-                ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
-        }
-    }
-
-    public string SymbolTypeName
-    {
-        get
-        {
-            switch (ImplementationType)
             {
-                case ImplementationType.Function:
-                case ImplementationType.Aggregate:
-                    return "FunctionSymbol";
-                case ImplementationType.Operator:
-                    return "OperatorSymbol";
-                default: return "no symbol";
+                var category = attr.GetStringFor(nameof(KustoImplementationAttribute.Category));
+                if (category == string.Empty)
+                    ImplementationType = ImplementationType.Function;
+                else
+                    ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
             }
         }
-    }
 
-    public bool IsFuncOrOp => ImplementationType == ImplementationType.Function ||
-                              ImplementationType == ImplementationType.Operator;
-
-
-    public string BaseClassName
-    {
-        get
+        public string SymbolTypeName
         {
-            switch (ImplementationType)
+            get
             {
-                case ImplementationType.Function:
-
-                case ImplementationType.Operator:
-                    return "IScalarFunctionImpl";
-                case ImplementationType.Aggregate:
-                    return "IAggregateImpl";
-                default: return "no symbol";
+                switch (ImplementationType)
+                {
+                    case ImplementationType.Function:
+                    case ImplementationType.Aggregate:
+                        return "FunctionSymbol";
+                    case ImplementationType.Operator:
+                        return "OperatorSymbol";
+                    default: return "no symbol";
+                }
             }
         }
-    }
+
+        public bool IsFuncOrOp => ImplementationType == ImplementationType.Function ||
+                                  ImplementationType == ImplementationType.Operator;
 
 
-    public string OverloadName()
-    {
-        switch (ImplementationType)
-
+        public string BaseClassName
         {
-            case ImplementationType.Operator:
-            case ImplementationType.Function:
-                return "ScalarOverloadInfo";
-            case ImplementationType.Aggregate:
-                return "AggregateOverloadInfo";
-            default:
-                return "not yet implemented";
+            get
+            {
+                switch (ImplementationType)
+                {
+                    case ImplementationType.Function:
+
+                    case ImplementationType.Operator:
+                        return "IScalarFunctionImpl";
+                    case ImplementationType.Aggregate:
+                        return "IAggregateImpl";
+                    default: return "no symbol";
+                }
+            }
         }
-    }
 
-    public string OverloadWrapperName()
-    {
-        switch (ImplementationType)
 
+        public string OverloadName()
         {
-            case ImplementationType.Operator:
-            case ImplementationType.Function:
-                return "ScalarFunctionInfo";
-            case ImplementationType.Aggregate:
-                return "AggregateInfo";
-            default:
-                return "not yet implemented";
+            switch (ImplementationType)
+
+            {
+                case ImplementationType.Operator:
+                case ImplementationType.Function:
+                    return "ScalarOverloadInfo";
+                case ImplementationType.Aggregate:
+                    return "AggregateOverloadInfo";
+                default:
+                    return "not yet implemented";
+            }
+        }
+
+        public string OverloadWrapperName()
+        {
+            switch (ImplementationType)
+
+            {
+                case ImplementationType.Operator:
+                case ImplementationType.Function:
+                    return "ScalarFunctionInfo";
+                case ImplementationType.Aggregate:
+                    return "AggregateInfo";
+                default:
+                    return "not yet implemented";
+            }
         }
     }
 }

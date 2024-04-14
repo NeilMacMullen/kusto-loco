@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace SourceGeneration
+namespace KustoLoco.SourceGeneration
 {
     public class ImplementationMethod
     {

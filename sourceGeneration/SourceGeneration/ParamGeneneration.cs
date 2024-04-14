@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace SourceGeneration
+namespace KustoLoco.SourceGeneration
 {
     public static class ParamGeneneration
     {

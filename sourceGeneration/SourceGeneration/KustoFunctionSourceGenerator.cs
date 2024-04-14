@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SourceGeneration
+namespace KustoLoco.SourceGeneration
 {
     [Generator]
     public class KustoFunctionSourceGenerator : ISourceGenerator

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace SourceGeneration
+namespace KustoLoco.SourceGeneration
 {
     public class CodeEmitter
     {

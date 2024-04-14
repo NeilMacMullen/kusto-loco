@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SourceGeneration;
+using KustoLoco.SourceGeneration;
 
 namespace SourceGenerationTests;
 

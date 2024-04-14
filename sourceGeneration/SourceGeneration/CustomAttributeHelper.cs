@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SourceGeneration
+namespace KustoLoco.SourceGeneration
 {
     public class CustomAttributeHelper<T>
         where T : Attribute

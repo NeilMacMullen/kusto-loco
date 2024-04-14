@@ -1,4 +1,4 @@
-﻿namespace SourceGeneration
+﻿namespace KustoLoco.SourceGeneration
 {
     public class Param
     {
