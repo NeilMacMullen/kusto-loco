@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
     <PackageReleaseNotes>Initial test release</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyName>KustoLoco.Rendering</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

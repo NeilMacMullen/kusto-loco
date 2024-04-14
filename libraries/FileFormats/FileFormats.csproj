@@ -17,6 +17,7 @@
     <PackageReleaseNotes>Initial test release</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
+    <AssemblyName>KustoLoco.FileFormats</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
