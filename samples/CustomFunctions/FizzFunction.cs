@@ -1,5 +1,7 @@
 ﻿// ReSharper disable PartialTypeWithSinglePart
 
+using KustoLoco.SourceGeneration.Attributes;
+
 namespace CustomFunctions;
 
 [KustoImplementation(Keyword = "fizz")]

@@ -46,4 +46,8 @@
     <ProjectReference Include="..\..\sourceGeneration\SourceGeneration\SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="KustoLoco.SourceGeneration.Attributes"/>
+  </ItemGroup>
+
 </Project>

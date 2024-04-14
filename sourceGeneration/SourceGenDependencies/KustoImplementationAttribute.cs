@@ -1,7 +1,10 @@
 ﻿using System;
 
-public class KustoImplementationAttribute : Attribute
+namespace KustoLoco.SourceGeneration.Attributes
 {
-    public string Keyword { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
+    public class KustoImplementationAttribute : Attribute
+    {
+        public string Keyword { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+    }
 }
