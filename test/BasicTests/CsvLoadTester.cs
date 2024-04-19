@@ -19,7 +19,8 @@ Name,Count
 acd,100
 def,30
 ";
-            var t =CsvSerializer.Default.LoadFromString(csv, "data");
+            var settings = new KustoSettings();
+            var t =CsvSerializer.Default.LoadFromString(csv, "data",settings);
             t = TableBuilder.AutoInferColumnTypes(t,new NullProgressReporter());
             context.AddTable(t);
             var nameResult = (await context.RunQuery("data | where Name contains 'a'"));

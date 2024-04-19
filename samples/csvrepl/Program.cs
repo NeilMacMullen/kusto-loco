@@ -5,8 +5,9 @@ using NotNullStrings;
 using Spectre.Console;
 
 ShowHelpIfAppropriate();
+var settings = new KustoSettings();
 var result = await CsvSerializer.Default
-    .LoadTable(args.First(), "data", new ConsoleProgressReporter());
+    .LoadTable(args.First(), "data", new ConsoleProgressReporter(),settings);
 
 if (result.Error.IsNotBlank())
 {

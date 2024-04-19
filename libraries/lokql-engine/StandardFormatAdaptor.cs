@@ -18,10 +18,12 @@ public class StandardFormatAdaptor : ITableAdaptor
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly string[] _paths;
+    private readonly KustoSettings _settings;
 
-    public StandardFormatAdaptor(params string[] paths)
+    public StandardFormatAdaptor(KustoSettings settings,params string[] paths)
     {
         _paths = paths;
+        _settings = settings;
         _loaders =
         [
             new CsvTableAdaptor(),
@@ -79,7 +81,7 @@ public class StandardFormatAdaptor : ITableAdaptor
         {
             if (!Path.Exists(filepath)) break;
 
-            var success = await loader.TryLoad(filepath, context, tableName,progressReporter);
+            var success = await loader.TryLoad(filepath, context, tableName,progressReporter,_settings);
             if (success)
             {
                 progressReporter.Report($"Loaded table '{tableName}' from {filepath}");

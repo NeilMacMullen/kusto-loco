@@ -5,9 +5,9 @@ namespace Lokql.Engine;
 
 public class TsvTableAdaptor : IFileBasedTableAccess
 {
-    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name, IProgress<string> progressReporter)
+    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name, IProgress<string> progressReporter,KustoSettings settings)
     {
-        var result = await CsvSerializer.Tsv.LoadTable(path, name, progressReporter);
+        var result = await CsvSerializer.Tsv.LoadTable(path, name, progressReporter,settings);
         context.AddTable(result.Table);
         return true;
     }

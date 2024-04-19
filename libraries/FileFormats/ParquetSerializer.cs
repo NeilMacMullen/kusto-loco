@@ -17,7 +17,7 @@ public class ParquetSerializer : ITableSerializer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
+    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter, KustoSettings settings)
     {
         var table = await LoadFromFile(path, tableName, progressReporter);
         return TableLoadResult.Success(table);

@@ -14,7 +14,8 @@ namespace Benchmarks
         public void Setup()
         {
             _context = new KustoQueryContext();
-            CsvSerializer.Default.Load(@"C:\temp\locations.csv",  "data",new NullProgressReporter());
+            var settings = new KustoSettings();
+            CsvSerializer.Default.Load(@"C:\temp\locations.csv",  "data",new NullProgressReporter(),settings);
         }
 
 

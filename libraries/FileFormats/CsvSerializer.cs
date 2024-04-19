@@ -28,11 +28,8 @@ public class CsvSerializer : ITableSerializer
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-    private ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter)
+    private ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter,KustoSettings settings)
     {
-
-
-       
         var csv = new CsvReader(reader, _config);
         csv.Read();
         csv.ReadHeader();
@@ -45,7 +42,7 @@ public class CsvSerializer : ITableSerializer
         {
             for (var i = 0; i < keys.Length; i++)
             {
-                builders[i].Add(csv.GetField<string>(i));
+                builders[i].Add(csv.GetField<string>(i).Trim());
             }
 
             rowCount++;
@@ -66,17 +63,17 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public  ITableSource Load(string filename,string tableName, IProgress<string> progressReporter)
+    public  ITableSource Load(string filename,string tableName, IProgress<string> progressReporter,KustoSettings settings)
     {
         using TextReader fileReader = new StreamReader(filename);
-        return Load(fileReader,tableName,progressReporter);
+        return Load(fileReader,tableName,progressReporter,settings);
     }
 
 
-    public  ITableSource LoadFromString(string csv, string tableName)
+    public  ITableSource LoadFromString(string csv, string tableName,KustoSettings settings)
     {
         var reader = new StringReader(csv.Trim());
-        var table =Load(reader, tableName,new NullProgressReporter());
+        var table =Load(reader, tableName,new NullProgressReporter(),settings);
         return table;
     }
 
@@ -113,11 +110,11 @@ public class CsvSerializer : ITableSerializer
         WriteToCsvStream(result, int.MaxValue, false, writer);
     }
 
-    public Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter)
+    public Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter, KustoSettings settings)
     {
         try
         {
-            var table = Load(path, tableName,progressReporter);
+            var table = Load(path, tableName,progressReporter, settings);
             table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
             return Task.FromResult(TableLoadResult.Success(table));
         }

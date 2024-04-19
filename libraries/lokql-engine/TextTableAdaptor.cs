@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core;
+using KustoLoco.FileFormats;
 
 
 namespace Lokql.Engine;
@@ -15,7 +16,7 @@ public class TextTableAdaptor : IFileBasedTableAccess
         return Task.CompletedTask;
     }
 
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter)
+    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter,KustoSettings settings)
     {
         var lines = File.ReadAllLines(path)
                         .Select(l => new { Line = l })

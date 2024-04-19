@@ -4,6 +4,7 @@ using System.Text;
 using CommandLine;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using NLog;
 using NotNullStrings;
@@ -46,7 +47,7 @@ public class InteractiveTableExplorer
     }
 
     public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
-        new StandardFormatAdaptor(folders.OutputFolder))
+        new StandardFormatAdaptor(new KustoSettings(),folders.OutputFolder))
     {
     }
 

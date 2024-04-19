@@ -1,4 +1,6 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.FileFormats;
+
 namespace Lokql.Engine;
 
 /// <summary>
@@ -12,7 +14,7 @@ namespace Lokql.Engine;
 /// </remarks>
 public interface IFileBasedTableAccess
 {
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter);
+    public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter,KustoSettings settings);
     public IReadOnlyCollection<string> SupportedFileExtensions();
     public Task TrySave(string path, KustoQueryResult result);
     TableAdaptorDescription GetDescription();

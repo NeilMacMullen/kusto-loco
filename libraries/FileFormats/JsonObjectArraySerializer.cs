@@ -18,7 +18,7 @@ public class JsonObjectArraySerializer : ITableSerializer
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
    
-    public Task<TableLoadResult> LoadTable(string path,string name, IProgress<string> progressReporter)
+    public Task<TableLoadResult> LoadTable(string path,string name, IProgress<string> progressReporter, KustoSettings settings)
     {
         var text = File.ReadAllText(path);
         var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);

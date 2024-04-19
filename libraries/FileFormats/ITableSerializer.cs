@@ -12,7 +12,7 @@ public interface ITableSerializer
     /// <summary>
     /// Attempts to load a table from a path
     /// </summary>
-    Task<TableLoadResult> LoadTable(string path,string tableName,IProgress<string> progressReporter);
+    Task<TableLoadResult> LoadTable(string path,string tableName,IProgress<string> progressReporter,KustoSettings settings);
     /// <summary>
     /// Indicates that the serialization is insufficient to represent type information and that type inference is required
     /// </summary>

@@ -12,9 +12,9 @@ public class JsonArrayTableAdaptor : IFileBasedTableAccess
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,
-        IProgress<string> progressReporter)
+        IProgress<string> progressReporter,KustoSettings settings)
     {
-        var res = await new JsonObjectArraySerializer().LoadTable(path, name, progressReporter);
+        var res = await new JsonObjectArraySerializer().LoadTable(path, name, progressReporter,settings);
 
         context.AddTable(res.Table);
         return true;
