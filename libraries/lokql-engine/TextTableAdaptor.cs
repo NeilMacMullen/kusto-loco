@@ -9,11 +9,18 @@ public class TextTableAdaptor : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".txt"];
 
-    public Task TrySave(string path, KustoQueryResult result)
+    public Task<bool> TrySave(string path, KustoQueryResult result)
     {
-        var text = KustoFormatter.Tabulate(result);
-        File.WriteAllText(path, text);
-        return Task.CompletedTask;
+        try
+        {
+            var text = KustoFormatter.Tabulate(result);
+            File.WriteAllText(path, text);
+            return Task.FromResult(true);
+        }
+        catch 
+        {
+            return Task.FromResult(false);
+        }
     }
 
     public Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter,KustoSettings settings)

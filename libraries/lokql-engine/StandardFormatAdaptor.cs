@@ -1,6 +1,7 @@
 ﻿
 using KustoLoco.FileFormats;
 using KustoLoco.Core;
+using Parquet.Schema;
 namespace Lokql.Engine;
 
 /// <summary>
@@ -44,8 +45,14 @@ public class StandardFormatAdaptor : ITableAdaptor
         }
     }
 
-    public async Task SaveResult(KustoQueryResult result, string path)
+    public async Task<bool> SaveResult(KustoQueryResult result, string path, IProgress<string> progressReporter)
     {
+        if (result.RowCount == 0)
+        {
+            progressReporter.Report("No rows to save");
+            return false;
+        }
+
         var loader = GetFileLoaderForExtension(path);
 
 
@@ -54,10 +61,16 @@ public class StandardFormatAdaptor : ITableAdaptor
             : _paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
-            await loader.TrySave(filepath, result);
+            var success = await loader.TrySave(filepath, result);
             //todo -here -  quick hack to ensure we only save to one place!
-            break;
+            if (success)
+            {
+                progressReporter.Report($"Saved {result.RowCount} rows x {result.ColumnCount} columns to {filepath}");
+                return success;
+            }
         }
+        progressReporter.Report($"Unable to save result to {path}");
+        return false;
     }
 
     public IEnumerable<TableAdaptorDescription> GetSupportedAdaptors()
@@ -88,7 +101,7 @@ public class StandardFormatAdaptor : ITableAdaptor
                 return true;
             }
         }
-
+        progressReporter.Report($"Unable to load table '{tableName}' from {path}");
         return false;
     }
 

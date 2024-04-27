@@ -1,6 +1,7 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.FileFormats;
 using NLog;
+using NotNullStrings;
 
 namespace Lokql.Engine;
 
@@ -25,9 +26,9 @@ public class JsonArrayTableAdaptor : IFileBasedTableAccess
         return [".json"];
     }
 
-    public async Task TrySave(string path, KustoQueryResult result)
+    public async Task<bool> TrySave(string path, KustoQueryResult result)
     {
-        await new JsonObjectArraySerializer().SaveTable(path, result, new NullProgressReporter());
+        return (await new JsonObjectArraySerializer().SaveTable(path, result, new NullProgressReporter())).Error.IsBlank();
     }
 
     public TableAdaptorDescription GetDescription()

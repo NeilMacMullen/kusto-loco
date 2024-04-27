@@ -11,7 +11,7 @@ public class NullFileLoader : IFileBasedTableAccess
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [];
 
-    public Task TrySave(string path, KustoQueryResult result) => Task.CompletedTask;
+    public Task<bool> TrySave(string path, KustoQueryResult result) => Task.FromResult(false);
 
     public TableAdaptorDescription GetDescription()
         => new("None", "Not supported", SupportedFileExtensions());

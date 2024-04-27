@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,7 @@
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="NLog" />
     <PackageReference Include="System.CommandLine" />
+  
   </ItemGroup>
 
   <ItemGroup>

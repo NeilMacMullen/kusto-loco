@@ -1,6 +1,8 @@
 ﻿
 using KustoLoco.FileFormats;
 using KustoLoco.Core;
+using NotNullStrings;
+
 namespace Lokql.Engine;
 
 public class CsvTableAdaptor : IFileBasedTableAccess
@@ -14,9 +16,9 @@ public class CsvTableAdaptor : IFileBasedTableAccess
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".csv"];
 
-    public async Task TrySave(string path, KustoQueryResult result)
+    public async Task<bool> TrySave(string path, KustoQueryResult result)
     {
-        await CsvSerializer.Default.SaveTable(path, result,new NullProgressReporter());
+        return (await CsvSerializer.Default.SaveTable(path, result,new NullProgressReporter())).Error.IsBlank();
        
     }
 

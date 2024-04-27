@@ -328,7 +328,8 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            await exp._loader.SaveResult(exp._prevResult, o.File);
+            var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
+            await exp._loader.SaveResult(exp._prevResult, o.File,pr);
         }
 
         [Verb("save", aliases: ["sv"], HelpText = "save last results to file")]

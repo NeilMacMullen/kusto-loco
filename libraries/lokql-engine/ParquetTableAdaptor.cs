@@ -1,5 +1,6 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.FileFormats;
+using NotNullStrings;
 
 namespace Lokql.Engine;
 
@@ -7,9 +8,9 @@ public class ParquetTableAdaptor : IFileBasedTableAccess
 {
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".parquet"];
 
-    public async Task TrySave(string path, KustoQueryResult result)
+    public async Task<bool> TrySave(string path, KustoQueryResult result)
     {
-        await new ParquetSerializer() .SaveTable(path, result,new NullProgressReporter());
+       return (await new ParquetSerializer() .SaveTable(path, result,new NullProgressReporter())).Error.IsNotBlank();
     }
 
     public async Task<bool> TryLoad(string path, KustoQueryContext context, string name,IProgress<string> progressReporter,KustoSettings settings)

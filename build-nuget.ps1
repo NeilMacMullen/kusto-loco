@@ -22,11 +22,25 @@ if (-not $skipBuild) {
 
     dotnet build -c Release
     Get-ChildItem -r *.nupkg | Remove-Item -r
-
+    
+    #make nuget packages
     dotnet pack   -p:PackageVersion=$version .\libraries\KustoLoco.Core\KustoLoco.Core.csproj
     dotnet pack   -p:PackageVersion=$version .\libraries\FileFormats\FileFormats.csproj
     dotnet pack   -p:PackageVersion=$version .\libraries\Rendering\Rendering.csproj
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
+
+    #build application exes
+
+    dotnet publish  .\applications\lokql\lokql.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql -c:Release
+    dotnet publish  .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx
+    dotnet publish  .\applications\pskql\pskql.csproj -r win-x64 --self-contained false --output .\publish\pskql
+    
+    #remove pdbs
+    get-ChildItem -recurse -path .\publish\ -include *.pdb | remove-item
+
+    #clean up pskql....
+     get-ChildItem -recurse -path .\publish\pskql -include Microsoft.*.dll | remove-item
+ get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
 
 }
 
