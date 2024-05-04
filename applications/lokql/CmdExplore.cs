@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using KustoLoco.FileFormats;
 using Lokql.Engine;
 using NLog;
 using NotNullStrings;
@@ -19,7 +20,9 @@ internal class CmdExplore
                 options.WorkIn.OrWhenBlank(options.Scripts),
                 options.WorkIn.OrWhenBlank(options.Queries));
         var console = new SystemConsole();
-        var explorer = new InteractiveTableExplorer(console, context);
+        var settings = new KustoSettings();
+        var loader = new StandardFormatAdaptor(settings, options.Results);
+        var explorer = new InteractiveTableExplorer(console, context,loader,settings);
 
         await explorer.RunInteractive(options.Run);
     }

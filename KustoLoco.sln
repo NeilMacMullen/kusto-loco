@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "processes", "samples\proces
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "editkql", "applications\editkql\editkql.csproj", "{79DF329C-95E6-43C9-9179-6BD828AD807E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SettingsTests", "test\SettingsTests\SettingsTests.csproj", "{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,10 @@ Global
 		{79DF329C-95E6-43C9-9179-6BD828AD807E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79DF329C-95E6-43C9-9179-6BD828AD807E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79DF329C-95E6-43C9-9179-6BD828AD807E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +182,7 @@ Global
 		{3895CE55-9D19-4815-AFDA-0D3F0F6A9EED} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{8F48A377-57EC-4A30-88F5-7E3261B23DB6} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{79DF329C-95E6-43C9-9179-6BD828AD807E} = {B891952E-5D41-45F7-ABB2-B512A8200656}
+		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71} = {932C804C-F6B7-4361-8360-E5238938E464}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}

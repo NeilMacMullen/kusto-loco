@@ -7,7 +7,6 @@ namespace KustoLoco.FileFormats;
 
 public class JsonObjectArraySerializer : ITableSerializer
 {
-    public bool RequiresTypeInference => true;
     public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result, IProgress<string> progressReporter)
     {
         var json = result.ToJsonString();

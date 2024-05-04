@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using Lokql.Engine;
+using Microsoft.Win32;
 
 namespace lokqlDx;
 
@@ -21,8 +24,11 @@ public partial class MainWindow : Window
         _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
 
         _console = new WpfConsole(OutputText);
-        _explorer = new InteractiveTableExplorer(_console, new InteractiveTableExplorer.FolderContext(
-            string.Empty, string.Empty, string.Empty));
+        var settings = new KustoSettings();
+        var loader = new StandardFormatAdaptor(settings, @"C:\kusto");
+        _explorer = new InteractiveTableExplorer(_console,
+            new InteractiveTableExplorer.FolderContext(string.Empty, string.Empty, string.Empty),
+            loader,settings);
     }
 
 
@@ -77,17 +83,56 @@ public partial class MainWindow : Window
                 workspace.WorkingDirectory,
                 workspace.WorkingDirectory,
                 workspace.WorkingDirectory);
-
-        _explorer = new InteractiveTableExplorer(_console, context);
+        var settings = new KustoSettings();
+        var loader = new StandardFormatAdaptor(settings, workspace.WorkingDirectory);
+        _explorer = new InteractiveTableExplorer(_console, context, loader, settings);
     }
 
-    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    private void SaveWorkspace(string path)
     {
         PreferencesManager.EnsureDefaultFolderExists();
         var workspace = _workspaceManager.workspace;
         workspace.Text = Editor.GetText();
-        _workspaceManager.Save(workspace);
+        _workspaceManager.Save(workspace,path);
         _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager._path;
         _preferenceManager.Save();
+
+    }
+
+    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    {
+      
+    }
+
+    private void OpenWorkSpace(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void EditPreferences(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SaveWorkspace(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SaveWorkspaceAs(object sender, RoutedEventArgs e)
+    {
+        var folder = Path.GetDirectoryName(_workspaceManager._path);
+        var dialog = new SaveFileDialog
+        {
+            InitialDirectory = folder,
+            Filter = "Lokql Workspace|*.lokql",
+            FileName = Path.GetFileName(_workspaceManager._path)
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            _workspaceManager.Save(_workspaceManager.workspace,_workspaceManager._path);
+            _preferenceManager.Preferences.LastWorkspacePath = dialog.FileName;
+            _preferenceManager.Save();
+        }
     }
 }

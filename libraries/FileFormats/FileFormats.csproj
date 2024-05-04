@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
+    <PackageReference Include="NotNullStrings" />
     <PackageReference Include="Parquet.Net" />
   </ItemGroup>
 

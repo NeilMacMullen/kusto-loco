@@ -31,25 +31,24 @@ public class InteractiveTableExplorer
 
     private readonly FolderContext _folders;
     private readonly ITableAdaptor _loader;
+    private readonly KustoSettings _settings;
     private readonly IConsole _outputConsole;
     private readonly StringBuilder _commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableAdaptor loader)
+    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableAdaptor loader,KustoSettings settings)
     {
         _outputConsole = outputConsole;
         _loader = loader;
+        _settings = settings;
         _context.SetTableLoader(_loader);
         _folders = folders;
         _prevResult = KustoQueryResult.Empty;
     }
 
-    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders) : this(outputConsole, folders,
-        new StandardFormatAdaptor(new KustoSettings(),folders.OutputFolder))
-    {
-    }
+   
 
     private KustoQueryContext GetCurrentContext()
     {
@@ -193,7 +192,7 @@ public class InteractiveTableExplorer
     }
 
     public readonly record struct FolderContext(
-        string OutputFolder,
+        string DataFolder,
         string ScriptFolder,
         string QueryFolder);
 
@@ -220,7 +219,9 @@ public class InteractiveTableExplorer
                     typeof(AllTablesCommand.Options),
                     typeof(ShowCommand.Options),
                     typeof(TestCommand.Options),
-                    typeof(FileFormatsCommand.Options)
+                    typeof(FileFormatsCommand.Options),
+                    typeof(SetCommand.Options),
+                    typeof(ListSettingsCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -236,6 +237,8 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
                 .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
             .WithParsedAsync<FileFormatsCommand.Options>(o => FileFormatsCommand.RunAsync(this, o))
+                .WithParsedAsync<SetCommand.Options>(o => SetCommand.RunAsync(this, o))
+                .WithParsedAsync<ListSettingsCommand.Options>(o => ListSettingsCommand.RunAsync(this, o))
             ;
     }
 
@@ -495,6 +498,54 @@ public class InteractiveTableExplorer
             public bool Force { get; set; }
         }
     }
+
+    public static class SetCommand
+    {
+        internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            
+            exp._settings.Set(o.Name, o.Value);
+            exp.Info($"Set {o.Name} to {o.Value}");
+            return Task.CompletedTask;
+
+        }
+
+        [Verb("set", HelpText = "sets a setting value")]
+        internal class Options
+        {
+            [Value(0, HelpText = "setting name", Required = true)]
+            public string Name { get; set; } = string.Empty;
+
+            [Value(1, HelpText = "Value of setting (omit to remove)")]
+            public string Value { get; set; } = string.Empty;
+
+        }
+    }
+
+    public static class ListSettingsCommand
+    {
+        internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            foreach (var (k, v) in exp._settings.Enumerate())
+            {
+                if(!k.Contains(o.Match))
+                    continue;
+                exp.Info($"{k} -> {v}");
+            }
+            return Task.CompletedTask;
+        }
+
+        [Verb("settings", HelpText = "lists all settings")]
+        internal class Options
+        {
+            [Value(0, HelpText = "match substring", Required = false)]
+            public string Match { get; set; } = string.Empty;
+
+            
+
+        }
+    }
+
 
     private void Warn(string s)
     {

@@ -23,7 +23,6 @@ public class ParquetSerializer : ITableSerializer
         return TableLoadResult.Success(table);
     }
 
-    public bool RequiresTypeInference { get; } = false;
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result,
         IProgress<string> progressReporter)
