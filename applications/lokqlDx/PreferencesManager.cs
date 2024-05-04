@@ -49,6 +49,8 @@ public class PreferencesManager
         {
             var json = File.ReadAllText(PreferencesPath());
             Preferences = JsonSerializer.Deserialize<Preferences>(json)!;
+            if (Preferences.FontSize==0)
+                Preferences.FontSize = 12;
         }
         catch (Exception e)
         {

@@ -63,6 +63,10 @@ namespace lokqlDx
             return sb.ToString().Trim();
         }
 
+        public void SetFontSize(double newSize)
+        {
+            Query.FontSize = newSize;
+        }
         public void SetText(string text)
         {
             Query.Text = text;

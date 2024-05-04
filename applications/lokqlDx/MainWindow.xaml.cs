@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.FileFormats;
@@ -75,6 +77,7 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
+        UpdateFontSize();
     }
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -177,6 +180,86 @@ public partial class MainWindow : Window
         {
             _workspaceManager.Load(currentPath);
             UpdateUIFromWorkspace();
+        }
+    }
+    
+    private void IncreaseFontSize(object sender, RoutedEventArgs e)
+    {
+        _preferenceManager.Preferences.FontSize =  Math.Min(40, _preferenceManager.Preferences.FontSize + 2);
+        UpdateFontSize();
+    }
+    private void DecreaseFontSize(object sender, RoutedEventArgs e)
+    {
+        _preferenceManager.Preferences.FontSize = Math.Max(8, _preferenceManager.Preferences.FontSize - 2);
+        UpdateFontSize();
+    }
+
+    private void UpdateFontSize()
+    {
+        Editor.SetFontSize(_preferenceManager.Preferences.FontSize);
+        OutputText.FontSize= _preferenceManager.Preferences.FontSize;
+        dataGrid.FontSize= _preferenceManager.Preferences.FontSize;
+
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        // here I suppose the window's menu is named "MainMenu"
+        MainMenu.RaiseMenuItemClickOnKeyGesture(e);
+    }
+
+  
+}
+
+
+public static class MenuExtensions
+{
+    public static void RaiseMenuItemClickOnKeyGesture(this ItemsControl? control, KeyEventArgs args) => RaiseMenuItemClickOnKeyGesture(control, args, false);
+    public static void RaiseMenuItemClickOnKeyGesture(this ItemsControl? control, KeyEventArgs args, bool throwOnError)
+    {
+        if (args == null)
+            throw new ArgumentNullException(nameof(args));
+
+        if (control == null)
+            return;
+
+        var kgc = new KeyGestureConverter();
+        foreach (var item in control.Items.OfType<MenuItem>())
+        {
+            if (!string.IsNullOrWhiteSpace(item.InputGestureText))
+            {
+                KeyGesture? gesture = null;
+                if (throwOnError)
+                {
+                    gesture = kgc.ConvertFrom(item.InputGestureText) as KeyGesture;
+                }
+                else
+                {
+                    try
+                    {
+                        gesture = kgc.ConvertFrom(item.InputGestureText) as KeyGesture;
+                    }
+                    catch
+                    {
+                    }
+                }
+
+          
+                    if (gesture != null && gesture.Matches(null, args)
+                       )
+                    {
+                        item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+                        args.Handled = true;
+                        return;
+                    }
+           
+            }
+
+            RaiseMenuItemClickOnKeyGesture(item, args, throwOnError);
+            if (args.Handled)
+                return;
         }
     }
 }

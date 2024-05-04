@@ -28,11 +28,8 @@ public class WorkspaceManager
         if (!UserText.IsBlank()) return;
         UserText=@"
 # move the cursor over a block of lines and press CTRL-ENTER to run
-# commands prefixed with '.' are special commands.  Use .help  to list
 
-.help 
-
-# loads a CSV file into a table called 'data'
+# load a CSV file into a table called 'data'
 
 .load c:\data\mydata.csv data
 
@@ -42,6 +39,8 @@ data
 | summarize count() by Name 
 | render barchart
 
+#save the results to a parquet file
+.save namecount.parqet
 
 ";
     }

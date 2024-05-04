@@ -11,15 +11,19 @@
         Closing="MainWindow_OnClosing"
         >
   <DockPanel>
-    <Menu DockPanel.Dock="Top">
+    <Menu DockPanel.Dock="Top" Name="MainMenu">
       <MenuItem Header="_File">
         <MenuItem Header="_New Workspace" Click="NewWorkspace"/>
         <MenuItem Header="_Open Workspace" Click="OpenWorkSpace"/>
         <MenuItem Header="_Save" Click="SaveWorkspace"/>
         <MenuItem Header="Save _As" Click="SaveWorkspaceAs"/>
-        <MenuItem Header="_Preferences" Click="EditPreferences"/>
       </MenuItem>
-    </Menu>
+      <MenuItem Header="_Preferences">
+        <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
+        <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
+
+      </MenuItem>
+      </Menu>
   <Grid>
         <Grid.ColumnDefinitions>
 
