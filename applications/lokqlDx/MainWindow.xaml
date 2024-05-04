@@ -13,6 +13,7 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File">
+        <MenuItem Header="_New Workspace" Click="NewWorkspace"/>
         <MenuItem Header="_Open Workspace" Click="OpenWorkSpace"/>
         <MenuItem Header="_Save" Click="SaveWorkspace"/>
         <MenuItem Header="Save _As" Click="SaveWorkspaceAs"/>

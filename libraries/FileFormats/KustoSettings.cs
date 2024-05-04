@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using NotNullStrings;
 
 namespace KustoLoco.FileFormats;
 
@@ -75,4 +76,17 @@ public class KustoSettings
     }
 
     public IEnumerable<RawKustoSetting> Enumerate() => _settings.Values;
+
+    public string[] GetPathList(string name, IReadOnlyCollection<string> fallback)
+    {
+        var k = Get(name, fallback.JoinString(";"));
+        return k.Tokenize(";");
+    }
+}
+
+//TODO - this is a bit of a hack to get the settings names in one place
+//needs to be partitioned and ideally generated from source generation
+public static class KustoSettingNames
+{
+    public const string KustoDataPath = "kusto.datapath";
 }

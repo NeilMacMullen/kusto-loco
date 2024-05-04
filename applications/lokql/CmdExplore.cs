@@ -14,15 +14,12 @@ internal class CmdExplore
 
     public static async Task RunAsync(Options options)
     {
-        var context =
-            new InteractiveTableExplorer.FolderContext(
-                options.WorkIn.OrWhenBlank(options.Results),
-                options.WorkIn.OrWhenBlank(options.Scripts),
-                options.WorkIn.OrWhenBlank(options.Queries));
+      
         var console = new SystemConsole();
         var settings = new KustoSettings();
-        var loader = new StandardFormatAdaptor(settings, options.Results);
-        var explorer = new InteractiveTableExplorer(console, context,loader,settings);
+        settings.Set(KustoSettingNames.KustoDataPath, options.Data);
+        var loader = new StandardFormatAdaptor(settings);
+        var explorer = new InteractiveTableExplorer(console,  loader, settings);
 
         await explorer.RunInteractive(options.Run);
     }
@@ -36,10 +33,10 @@ internal class CmdExplore
         [Option(HelpText = "Folder containing '.csl' scripts")]
         public string Queries { get; set; } = string.Empty;
 
-        [Option(HelpText = "Default folder to save results to")]
-        public string Results { get; set; } = string.Empty;
+        [Option(HelpText = "Default folder to load/save data/results to")]
+        public string Data { get; set; } = string.Empty;
 
-        [Option(HelpText = "Default folder for Scripts,Queries, Results if those aren't specified")]
+        [Option(HelpText = "Default folder for Scripts,Queries, Data if those aren't specified")]
         public string WorkIn { get; set; } = string.Empty;
 
 

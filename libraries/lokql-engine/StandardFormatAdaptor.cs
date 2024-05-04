@@ -21,9 +21,9 @@ public class StandardFormatAdaptor : ITableAdaptor
     private readonly string[] _paths;
     private readonly KustoSettings _settings;
 
-    public StandardFormatAdaptor(KustoSettings settings,params string[] paths)
+    public StandardFormatAdaptor(KustoSettings settings)
     {
-        _paths = paths;
+        _paths = settings.GetPathList(KustoSettingNames.KustoDataPath, [@"c:\kusto"]);
         _settings = settings;
         _loaders =
         [

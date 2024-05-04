@@ -10,10 +10,10 @@ namespace SettingsTests
         public void BoolCanBeRead()
         {
             var settings = new KustoSettings();
-             
+
             // true/false
             settings.Set("bool", "true");
-            settings.Get("bool",false).Should().BeTrue();
+            settings.Get("bool", false).Should().BeTrue();
 
             settings.Set("bool", "false");
             settings.Get("bool", true).Should().BeFalse();
@@ -33,6 +33,14 @@ namespace SettingsTests
             settings.Get("bool", true).Should().BeFalse();
 
 
+        }
+
+        [TestMethod]
+        public void PathCanBeRead()
+        {
+            var settings = new KustoSettings();
+            settings.Set("path", @"c:\kusto ; c:\work\test");
+            settings.GetPathList("path", []).Should().BeEquivalentTo(new[] { @"c:\kusto", @"c:\work\test" });
         }
     }
 }

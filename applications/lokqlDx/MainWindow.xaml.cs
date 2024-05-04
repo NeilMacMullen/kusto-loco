@@ -20,15 +20,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        _preferenceManager.Load();
-        _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
-
         _console = new WpfConsole(OutputText);
         var settings = new KustoSettings();
-        var loader = new StandardFormatAdaptor(settings, @"C:\kusto");
-        _explorer = new InteractiveTableExplorer(_console,
-            new InteractiveTableExplorer.FolderContext(string.Empty, string.Empty, string.Empty),
-            loader,settings);
+        var loader = new StandardFormatAdaptor(settings);
+        _explorer = new InteractiveTableExplorer(_console, loader, settings);
     }
 
 
@@ -74,65 +69,114 @@ public partial class MainWindow : Window
         await RunQuery(eventArgs.Query);
     }
 
+    private void UpdateUIFromWorkspace()
+    {
+        Editor.SetText(_workspaceManager.UserText);
+        var settings = _workspaceManager.Settings;
+        var loader = new StandardFormatAdaptor(settings);
+        _explorer = new InteractiveTableExplorer(_console, loader, settings);
+    }
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        var workspace = _workspaceManager.workspace;
-        Editor.SetText(workspace.Text);
-        var context =
-            new InteractiveTableExplorer.FolderContext(
-                workspace.WorkingDirectory,
-                workspace.WorkingDirectory,
-                workspace.WorkingDirectory);
-        var settings = new KustoSettings();
-        var loader = new StandardFormatAdaptor(settings, workspace.WorkingDirectory);
-        _explorer = new InteractiveTableExplorer(_console, context, loader, settings);
+        _preferenceManager.Load();
+        _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
+      UpdateUIFromWorkspace();
     }
 
     private void SaveWorkspace(string path)
     {
         PreferencesManager.EnsureDefaultFolderExists();
-        var workspace = _workspaceManager.workspace;
-        workspace.Text = Editor.GetText();
-        _workspaceManager.Save(workspace,path);
+        _workspaceManager.Save(path, Editor.GetText(), _explorer._settings);
         _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager._path;
         _preferenceManager.Save();
-
     }
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
-      
+        Save();
     }
 
     private void OpenWorkSpace(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        var folder = _workspaceManager.ContainingFolder();
+        var dialog = new OpenFileDialog()
+        {
+            InitialDirectory = folder,
+            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
+            FileName = Path.GetFileName(_workspaceManager._path)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            _workspaceManager.Load(dialog.FileName);
+            UpdateUIFromWorkspace();
+        }
     }
 
     private void EditPreferences(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+       
     }
 
     private void SaveWorkspace(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        Save();
     }
 
-    private void SaveWorkspaceAs(object sender, RoutedEventArgs e)
+    private void Save()
     {
-        var folder = Path.GetDirectoryName(_workspaceManager._path);
+        SaveWorkspace(_workspaceManager._path);
+    }
+
+    private bool SaveAs()
+    {
+        var folder = _workspaceManager.ContainingFolder();
         var dialog = new SaveFileDialog
         {
             InitialDirectory = folder,
-            Filter = "Lokql Workspace|*.lokql",
+            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
             FileName = Path.GetFileName(_workspaceManager._path)
         };
         if (dialog.ShowDialog() == true)
         {
-            _workspaceManager.Save(_workspaceManager.workspace,_workspaceManager._path);
-            _preferenceManager.Preferences.LastWorkspacePath = dialog.FileName;
-            _preferenceManager.Save();
+            SaveWorkspace(dialog.FileName);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SaveWorkspaceAs(object sender, RoutedEventArgs e)
+    {
+        SaveAs();
+    }
+
+    private void NewWorkspace(object sender, RoutedEventArgs e)
+    {
+        //save current
+        Save();
+        var currentPath = _workspaceManager._path;
+        _workspaceManager.CreateNewPathInCurrentFolder();
+        if (SaveAs())
+        {
+
+            Editor.SetText(string.Empty);
+            dataGrid.ItemsSource = null;
+
+            //create new
+            var settings = new KustoSettings();
+          
+            var loader = new StandardFormatAdaptor(settings);
+            _explorer = new InteractiveTableExplorer(_console, loader, settings);
+           
+            settings.Set(KustoSettingNames.KustoDataPath, _workspaceManager.ContainingFolder());
+            _console.PrepareForOutput();
+            _console.Write($"{KustoSettingNames.KustoDataPath} set to '{_workspaceManager.ContainingFolder()}' for new project");
+        }
+        else
+        {
+            _workspaceManager.Load(currentPath);
+            UpdateUIFromWorkspace();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
+using KustoLoco.FileFormats;
 using NotNullStrings;
 
 namespace lokqlDx;
@@ -13,15 +14,19 @@ namespace lokqlDx;
 /// </remarks>
 public class WorkspaceManager
 {
-    public string _path =string.Empty;
-    public Workspace workspace = new();
 
+    public const string Extension = "lokql";
+    public static string GlobPattern=> $"*.{Extension}";
+    public string _path =string.Empty;
+   
+    public string UserText { get; private set; } = string.Empty;
+
+    public KustoSettings Settings{ get;private set;} = new KustoSettings();
 
     private void EnsureWorkspacePopulated()
     {
-        if (!workspace.WorkingDirectory.IsBlank()) return;
-        workspace.WorkingDirectory = @"C:\kustoloco";
-        workspace.Text=@"
+        if (!UserText.IsBlank()) return;
+        UserText=@"
 # move the cursor over a block of lines and press CTRL-ENTER to run
 # commands prefixed with '.' are special commands.  Use .help  to list
 
@@ -46,8 +51,13 @@ data
     {
     }
 
-    public void Save(Workspace workspace,string path)
+    public void Save(string path,string userText,KustoSettings settings)
     {
+        var workspace = new Workspace
+        {
+            Text = userText,
+            Settings = settings.Enumerate().ToDictionary(kv=>kv.Name,kv=>kv.Value)
+        };
         _path = path;
         try
         {
@@ -66,7 +76,13 @@ data
         try
         {
             var json = File.ReadAllText(_path);
-            workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+            var workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+            UserText = workspace.Text;
+            Settings = new KustoSettings();
+            foreach (var kv in workspace.Settings)
+            {
+                Settings.Set(kv.Key, kv.Value);
+            }
         }
         catch (Exception e)
         {
@@ -74,4 +90,12 @@ data
         }
         EnsureWorkspacePopulated();
     }
+
+    public void CreateNewPathInCurrentFolder()
+    {
+       _path = Path.Combine(ContainingFolder(),
+           Path.ChangeExtension("new",Extension));
+    }
+
+    public string ContainingFolder() =>Path.GetDirectoryName(_path).NullToEmpty();
 }

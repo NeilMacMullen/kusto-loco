@@ -29,22 +29,20 @@ public class InteractiveTableExplorer
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly KustoQueryContext _context = new();
 
-    private readonly FolderContext _folders;
     private readonly ITableAdaptor _loader;
-    private readonly KustoSettings _settings;
+    public readonly KustoSettings _settings;
     private readonly IConsole _outputConsole;
     private readonly StringBuilder _commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IConsole outputConsole, FolderContext folders, ITableAdaptor loader,KustoSettings settings)
+    public InteractiveTableExplorer(IConsole outputConsole, ITableAdaptor loader,KustoSettings settings)
     {
         _outputConsole = outputConsole;
         _loader = loader;
         _settings = settings;
         _context.SetTableLoader(_loader);
-        _folders = folders;
         _prevResult = KustoQueryResult.Empty;
     }
 
@@ -191,11 +189,6 @@ public class InteractiveTableExplorer
         return path;
     }
 
-    public readonly record struct FolderContext(
-        string DataFolder,
-        string ScriptFolder,
-        string QueryFolder);
-
 
     internal readonly record struct DisplayOptions(int MaxToDisplay);
 
@@ -246,12 +239,14 @@ public class InteractiveTableExplorer
     public static class RunScriptCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
-        {
+        {/*
             var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
 
             exp.Info($"Loading '{filename}'..");
             var lines = await File.ReadAllLinesAsync(filename);
             foreach (var line in lines) await exp.ExecuteAsync(line);
+            */
+            await Task.CompletedTask;
         }
 
         [Verb("run", aliases: ["script", "r"],
@@ -273,10 +268,13 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
+            /*
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
             exp.Info($"Fetching query '{filename}'");
             var query = await File.ReadAllTextAsync(filename);
             await exp.ExecuteAsync($"{o.Prefix}{query}");
+            */
+            await Task.CompletedTask;
         }
 
         [Verb("query", aliases: ["q"],
@@ -294,7 +292,7 @@ public class InteractiveTableExplorer
     public static class SaveQueryCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
-        {
+        {/*
             var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
             exp.Info($"Saving query to '{filename}'");
             var q = exp._prevResult.Query;
@@ -310,6 +308,8 @@ public class InteractiveTableExplorer
 {q}
 ";
             await File.WriteAllTextAsync(filename, text);
+            */
+            await Task.CompletedTask;
         }
 
         [Verb("savequery", aliases: ["sq"],
