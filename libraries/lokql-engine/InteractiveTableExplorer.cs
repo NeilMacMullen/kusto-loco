@@ -341,9 +341,6 @@ public class InteractiveTableExplorer
             [Value(0, HelpText = "Name of file", Required = true)]
             public string File { get; set; } = string.Empty;
 
-
-            [Option('b', "bare", HelpText = "Skips header for csv (useful when generating id lists)")]
-            public bool SkipHeader { get; set; }
         }
     }
 

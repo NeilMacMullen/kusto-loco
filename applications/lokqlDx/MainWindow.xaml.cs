@@ -83,6 +83,14 @@ public partial class MainWindow : Window
     {
         _preferenceManager.Load();
         _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
+        if (this.Width >100 && this.Height > 100 && this.Left > 0 && this.Top > 0)
+        {
+            this.Width = _preferenceManager.Preferences.WindowWidth;
+            this.Height = _preferenceManager.Preferences.WindowHeight;
+            this.Left = _preferenceManager.Preferences.WindowLeft;
+            this.Top = _preferenceManager.Preferences.WindowTop;
+        }
+
       UpdateUIFromWorkspace();
     }
 
@@ -91,6 +99,11 @@ public partial class MainWindow : Window
         PreferencesManager.EnsureDefaultFolderExists();
         _workspaceManager.Save(path, Editor.GetText(), _explorer._settings);
         _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager._path;
+        _preferenceManager.Preferences.WindowLeft=this.Left;
+        _preferenceManager.Preferences.WindowTop = this.Top;
+        _preferenceManager.Preferences.WindowWidth = this.Width;
+        _preferenceManager.Preferences.WindowHeight = this.Height;
+
         _preferenceManager.Save();
     }
 
@@ -185,12 +198,12 @@ public partial class MainWindow : Window
     
     private void IncreaseFontSize(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.FontSize =  Math.Min(40, _preferenceManager.Preferences.FontSize + 2);
+        _preferenceManager.Preferences.FontSize =  Math.Min(40, _preferenceManager.Preferences.FontSize + 1);
         UpdateFontSize();
     }
     private void DecreaseFontSize(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.FontSize = Math.Max(8, _preferenceManager.Preferences.FontSize - 2);
+        _preferenceManager.Preferences.FontSize = Math.Max(6, _preferenceManager.Preferences.FontSize - 1);
         UpdateFontSize();
     }
 
