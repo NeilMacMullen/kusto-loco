@@ -29,11 +29,11 @@ if (-not $skipBuild) {
     dotnet pack   -p:PackageVersion=$version .\libraries\Rendering\Rendering.csproj
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
 
-    #build application exes
+    #build application exes-p:PackageVersion=$version
 
-    dotnet publish  .\applications\lokql\lokql.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql -c:Release
-    dotnet publish  .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx
-    dotnet publish  .\applications\pskql\pskql.csproj -r win-x64 --self-contained false --output .\publish\pskql
+    dotnet publish   /p:Version="$version" /p:InformationalVersion="$version"  .\applications\lokql\lokql.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql -c:Release -p:PackageVersion=$version
+    dotnet publish   /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx  -p:PackageVersion=$version
+    dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\pskql\pskql.csproj -r win-x64 --self-contained false --output .\publish\pskql  -p:PackageVersion=$version
     
     #remove pdbs
     get-ChildItem -recurse -path .\publish\ -include *.pdb | remove-item
