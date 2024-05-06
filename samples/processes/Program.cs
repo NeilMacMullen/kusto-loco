@@ -12,7 +12,9 @@ ShowHelpIfAppropriate();
 
 var processes = ProcessReader.GetProcesses();
 var query = args.First();
-var result = KustoQueryContext.QueryRecords(processes, query);
+var context = new KustoQueryContext();
+context.WrapDataIntoTable("processes", processes);
+var result = await context.RunQuery(query);
 
 DisplayQueryResult(result);
 

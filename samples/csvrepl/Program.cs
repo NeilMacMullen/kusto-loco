@@ -15,8 +15,8 @@ if (result.Error.IsNotBlank())
     return;
 }
 
-var context = new KustoQueryContext();
-context.AddTable(result.Table);
+var context = new KustoQueryContext()
+     .AddTable(result.Table);
 
 while (true)
 {
