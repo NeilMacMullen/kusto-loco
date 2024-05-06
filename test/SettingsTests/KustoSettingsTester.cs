@@ -25,6 +25,14 @@ namespace SettingsTests
             settings.Set("bool", "no");
             settings.Get("bool", true).Should().BeFalse();
 
+
+            //on/off
+            settings.Set("bool", "on");
+            settings.Get("bool", false).Should().BeTrue();
+
+            settings.Set("bool", "off");
+            settings.Get("bool", true).Should().BeFalse();
+
             // numeric
             settings.Set("bool", "1");
             settings.Get("bool", false).Should().BeTrue();

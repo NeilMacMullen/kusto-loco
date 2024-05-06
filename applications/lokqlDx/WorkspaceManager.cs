@@ -90,8 +90,10 @@ data
         EnsureWorkspacePopulated();
     }
 
-    public void CreateNewPathInCurrentFolder()
+    public void CreateNewInCurrentFolder()
     {
+        UserText=string.Empty;
+        Settings = new KustoSettings();
        _path = Path.Combine(ContainingFolder(),
            Path.ChangeExtension("new",Extension));
     }

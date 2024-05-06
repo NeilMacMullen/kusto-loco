@@ -544,7 +544,7 @@ public class InteractiveTableExplorer
     }
 
 
-    private void Warn(string s)
+    public void Warn(string s)
     {
         _outputConsole.SetForegroundColor(ConsoleColor.Red);
         _outputConsole.WriteLine(s);

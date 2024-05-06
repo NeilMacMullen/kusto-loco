@@ -50,7 +50,14 @@ public partial class MainWindow : Window
             await webview.EnsureCoreWebView2Async();
             //generate the html and display it
             var html = KustoResultRenderer.RenderToHtml(result);
-            webview.NavigateToString(html);
+            try
+            {
+                webview.NavigateToString(html);
+            }
+            catch
+            {
+                _explorer.Warn("Unable to render results in webview");
+            }
         }
 
         FillInDataGrid(result);
@@ -78,12 +85,14 @@ public partial class MainWindow : Window
         var loader = new StandardFormatAdaptor(settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
         UpdateFontSize();
+        Title = $"LokqlDX - {_workspaceManager._path}";
     }
-    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+
+    private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.Load();
         _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
-        if (this.Width >100 && this.Height > 100 && this.Left > 0 && this.Top > 0)
+        if (this.Width > 100 && this.Height > 100 && this.Left > 0 && this.Top > 0)
         {
             this.Width = _preferenceManager.Preferences.WindowWidth;
             this.Height = _preferenceManager.Preferences.WindowHeight;
@@ -91,7 +100,8 @@ public partial class MainWindow : Window
             this.Top = _preferenceManager.Preferences.WindowTop;
         }
 
-      UpdateUIFromWorkspace();
+        UpdateUIFromWorkspace();
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX") ;
     }
 
     private void SaveWorkspace(string path)
@@ -167,31 +177,22 @@ public partial class MainWindow : Window
         SaveAs();
     }
 
-    private void NewWorkspace(object sender, RoutedEventArgs e)
+    private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
         //save current
         Save();
-        var currentPath = _workspaceManager._path;
-        _workspaceManager.CreateNewPathInCurrentFolder();
+        var prevPath = _workspaceManager._path;
+        _workspaceManager.CreateNewInCurrentFolder();
         if (SaveAs())
         {
 
-            Editor.SetText(string.Empty);
-            dataGrid.ItemsSource = null;
-
-            //create new
-            var settings = new KustoSettings();
-          
-            var loader = new StandardFormatAdaptor(settings);
-            _explorer = new InteractiveTableExplorer(_console, loader, settings);
-           
-            settings.Set(KustoSettingNames.KustoDataPath, _workspaceManager.ContainingFolder());
-            _console.PrepareForOutput();
-            _console.Write($"{KustoSettingNames.KustoDataPath} set to '{_workspaceManager.ContainingFolder()}' for new project");
+            UpdateUIFromWorkspace();
+         
+            await _explorer.RunInput($".set {KustoSettingNames.KustoDataPath} \"{_workspaceManager.ContainingFolder()}\"",false);
         }
         else
         {
-            _workspaceManager.Load(currentPath);
+            _workspaceManager.Load(prevPath);
             UpdateUIFromWorkspace();
         }
     }
@@ -223,7 +224,26 @@ public partial class MainWindow : Window
         MainMenu.RaiseMenuItemClickOnKeyGesture(e);
     }
 
-  
+    private async Task Navigate(string url)
+    {
+        await webview.EnsureCoreWebView2Async();
+        webview.Source = new Uri(url);
+    }
+    private async void NavigateToGettingStarted(object sender, RoutedEventArgs e)
+    {
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+    }
+
+    private async void NavigateToProjectPage(object sender, RoutedEventArgs e)
+    {
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco");
+    }
+
+    private async void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
+    {
+        await Navigate(
+            "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
+    }
 }
 
 

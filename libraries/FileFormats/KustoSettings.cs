@@ -3,12 +3,11 @@ using NotNullStrings;
 
 namespace KustoLoco.FileFormats;
 
-
-
 public record RawKustoSetting(string Name, string Value)
 {
     public string Key => Name.ToLowerInvariant();
 }
+
 /// <summary>
 ///     Provides a flexible way of passing settings around the various KustoLoco layers
 /// </summary>
@@ -45,7 +44,7 @@ public class KustoSettings
     public string Get(string setting, string fallbackValue)
     {
         var fb = new RawKustoSetting(setting, fallbackValue);
-       return _settings.GetValueOrDefault(setting.ToLowerInvariant(), fb).Value;
+        return _settings.GetValueOrDefault(setting.ToLowerInvariant(), fb).Value;
     }
 
 
@@ -63,19 +62,18 @@ public class KustoSettings
     /// </remarks>
     public bool Get(string setting, bool fallbackValue)
     {
-        var s = Get(setting, string.Empty);
-        if (bool.TryParse(s, out var b))
-            return b;
-        if (s.Equals("yes", StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (s.Equals("no", StringComparison.OrdinalIgnoreCase))
-            return false;
-        if (int.TryParse(s, out var v))
-            return v > 0;
+        var trueValues = new[] { "true", "yes", "on", "1" };
+        var falseValues = new[] { "false", "no", "off", "0" };
+        var s = Get(setting, string.Empty).ToLowerInvariant();
+        if (trueValues.Contains(s)) return true;
+        if (falseValues.Contains(s)) return false;
         return fallbackValue;
     }
 
-    public IEnumerable<RawKustoSetting> Enumerate() => _settings.Values;
+    public IEnumerable<RawKustoSetting> Enumerate()
+    {
+        return _settings.Values;
+    }
 
     public string[] GetPathList(string name, IReadOnlyCollection<string> fallback)
     {
