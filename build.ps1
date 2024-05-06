@@ -5,13 +5,13 @@ param(
 
     [Parameter(Mandatory = $true, HelpMessage = "version for package")]
     [string] $version,
-    [Parameter(HelpMessage = "api key (if publising)")]
+    [Parameter(HelpMessage = "api key (if publising nuget packages)")]
     [string] $api,
 
     [Parameter(HelpMessage = "test only")]
     [switch] $skipBuild,
-    [Parameter(HelpMessage = "create upload zip")]
-    [switch] $zip
+    [Parameter(HelpMessage = "do not create upload zip")]
+    [switch] $skipZip
 
 )
 
@@ -29,10 +29,10 @@ if (-not $skipBuild) {
     dotnet pack   -p:PackageVersion=$version .\libraries\Rendering\Rendering.csproj
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
 
-    #build application exes-p:PackageVersion=$version
+    #build application exes
 
-    dotnet publish   /p:Version="$version" /p:InformationalVersion="$version"  .\applications\lokql\lokql.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql -c:Release -p:PackageVersion=$version
-    dotnet publish   /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx  -p:PackageVersion=$version
+    dotnet publish  /p:Version="$version" /p:InformationalVersion="$version"  .\applications\lokql\lokql.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql -c:Release -p:PackageVersion=$version
+    dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx  -p:PackageVersion=$version
     dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\pskql\pskql.csproj -r win-x64 --self-contained false --output .\publish\pskql  -p:PackageVersion=$version
     
     #remove pdbs
@@ -40,11 +40,9 @@ if (-not $skipBuild) {
 
     #clean up pskql....
      get-ChildItem -recurse -path .\publish\pskql -include Microsoft.*.dll | remove-item
- get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
+     get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
 
 }
-
-
 
 if (-not ($api -like '') ) {
     dotnet nuget push libraries\KustoLoco.Core\bin\Release\KustoLoco.Core.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
@@ -55,7 +53,7 @@ if (-not ($api -like '') ) {
 
 get-ChildItem -r *.nupkg | % FullName
 
-if ($zip)
+if (-not $skipZip)
 {
     $v=$version.replace('.','-')
     $compress = @{
