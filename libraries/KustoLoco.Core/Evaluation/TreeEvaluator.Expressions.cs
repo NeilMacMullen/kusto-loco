@@ -22,8 +22,10 @@ internal partial class TreeEvaluator
 
         var (symbol, value) = lookup.Value;
         if (symbol != node.ReferencedSymbol)
-            Console.WriteLine(
-                $"Name '{node.ReferencedSymbol.Name}' mismatched, but that's expected for now in function calls.");
+        {
+            //TODO - do we care ?
+            //Console.WriteLine($"Name '{node.ReferencedSymbol.Name}' mismatched, but that's expected for now in function calls.");
+        }
 
         return value;
     }
