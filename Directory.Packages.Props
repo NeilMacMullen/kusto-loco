@@ -26,7 +26,7 @@
     <PackageVersion Include="xunit" Version="2.8.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.5.2" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.5.3" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Text.Json" Version="8.0.3" />
     <PackageVersion Include="CsvHelper" Version="32.0.1" />

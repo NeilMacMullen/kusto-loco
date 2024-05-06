@@ -1,115 +1,54 @@
 # Kusto-Loco
 
-Kusto-Loco makes it easy to use the Kusto Query Language (KQL) to query data held in your own applications or local files.  You can use it as an engine for your own application or just download the prebuilt tools to explore your existing data.
+Kusto-Loco is a set of libraries and applications based around the [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/).  KQL is normally used against data held in [Azure Data Explorer](https://learn.microsoft.com/en-us/azure/data-explorer/) but Kusto-Loco allows you to query in-memory data held in your own applications.
 
-Data can be loaded from CSV, JSON or Parquet files or from sets of POCOs held in memory. Query results can be serialised back to files or objects or rendered to HTML charts.
+Data can be loaded from CSV, JSON or Parquet files or from sets of POCOs held in memory. Query results can be serialised back to files or objects or rendered to HTML charts using the [Vega-Lite](https://vega.github.io/vega-lite/examples/) charting library.
 
-The engine is extensible to allow you to provide your own custom functions for appropriate for your domain.
+Loading data, running a query and rendering the results to a chart can be done in a few lines of code after referencing the appropriate [Nuget Packages](https://github.com/NeilMacMullen/kusto-loco/wiki/Applications-and-Nuget-Packages).
 
-The main components are:
-  
-- Nuget Packages
-	- KustoLoco.Core - the core query engine for embedding in your own application
-	- KustoLoco.FileFormats - a set of file readers and writers for standard formats
-	- KustLoco.Rendering - supports rendering to HTML charts using Vega-Lite
-	- KustoLoco.SourceGeneration - used for creating custom functions
-- Applications
-    - Lokql - a scriptable command-line tool for data exploration and manipulation
-	- LokqlDx - a more capable WPF version of Lokql
-	- PSKql - brings the power of KQL to Powershell.  Allows querying/manipulation of piped data.
-
-
-## Quick Start
-
-### Querying in-memory data
 ```csharp
-record Temperature(string City,double Temperature,DateTime Date);
-record MaxTempByCity(double  MaxTemp,DateTime Day,string City);
+var context = new KustoQueryContext()
+                  .CopyDataIntoTable("products", productRows); // load data from a set of POCOs
+var result = await context.RunQuery("products | summarize count() by Category | render piechart");
 
-var temperatures = .... // get a set of Temperature records
-
-var query = @"where Date > date(1 jan 2000) 
-              | project Day=bin(Date,1d) 
-			  | summarize MaxTemp=max(Temperature) by Day,City
-			  | order by MaxTemp
-			  | take 10
-			 ";
-
-var result = KustoQueryContext.QueryRecords(processes, query);
-
-//if you know what type the result is you can turn it into a strongly-typed set
-var maxTemperatures = result.ToRecords<MaxTempByCity>();
-
-//if you just want to see the results in a datagrid (for example)
-foreach (var col in result.ColumnNames())   dataTable.Columns.Add(col);
-foreach (var row in result.EnumerateRows()) dataTable.Rows.Add(row);
-
-//if you want to send the results across the wire without knowing
-//their shape..
-var dto = new MyDto{ 
-    IssuedQuery=Result.Query, 
-	Error=Result.Error,
-	Data = result.ToSerializableObject() 
-	 };
-
-
+var datatable = result.ToDataTable(); // create a datatable to dump into a datagrid
+webview.NavigateToString(KustoResultRenderer.RenderToHtml(result)); //render chart
 ```
 
+If you just want to get started playing around with KQL on your own file-based data you can use the supplied [LokqlDX](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX) application. 
+![image](https://github.com/NeilMacMullen/kusto-loco/assets/9131337/ef8fd072-db8c-4ba0-8e44-aaca8157d918)
 
-## Credits
+Kusto-Loco even comes with a Powershell module that allows you use KQL queries in a  Powershell pipeline.
 
+![image](https://github.com/NeilMacMullen/kusto-loco/assets/9131337/2522d3f0-9b57-4009-a270-8f6fc13d91a1)
 
+## Quick Starts
 
-## Lokql
-Lokql is a a simple command-line based data explorer that allows you to load data from files, issue KQL queries, and render the results to charts or tables.
-
-TODO:Example here
-
-## Project Goals
-
-| Goal | Non-Goal|
-|------|----------|
-|Provide a *useful* implementation of a significant subset of the standard Kusto Query Language and built-in functions. | Provide "bit-exact" results vs ADX |
-|Easy import/export of local file-based and in-memory data | Distributed/cluster-based processing |
-|"Good enough" performance for single-user interaction | Low-latency, "web-scale" query serving |
-| Allow engine extensibility for custom functionality |Fork Kusto Language |
-| Basic query optimisation | Complex query planner |
-
-## Changes relative to original BabyKusto
-- Much more efficient filtering
-- CSV/POCO adaptation layer
-- Tabulation of results
-- Additional functions and operations
-
-## Known differences to ADX/Kusto
-- Regex operations use C# regex format
-- GeoHash limited to precision of 12 
-- No clustering
-- Rendering is translated via vega-lite
-- row_number method is non-compliant
-
-TODO 
+- [For application developers who want to consume the libraries](https://github.com/NeilMacMullen/kusto-loco/wiki/Using-the-query-engine)
+- [LokqlDX - a simple data explorer for local files](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX)
+- [Powershell integration](https://github.com/NeilMacMullen/kusto-loco/wiki/Powershell-Integration)
 
 
-## Credits
+## Status
 
+The current version is 1.0.1.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
+
+## Credits and Contributors
 
 KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
 
-Since then the engine has been extended and optimised by the [Sensize](https://sensize.net) team including NeilMacMullen, Vartika Gupta and Kosta Demoore.
+Since then the engine has been heavily extended and optimised by [NeilMacMullen](https://github.com/NeilMacMullen) with additional contributions from [Vartika Gupta](https://github.com/vartika-jain-gupta) and [Kosta Demoore](https://github.com/konvolution).
 
-## WIP
-- Use index-based colums for Join
-- Port Sensize extensions
-- Port "explore" application
-- Parquet serialization
-
-## Other resources 
-- wiki (todo) 
-- [ADX playpen](https://dataexplorer.azure.com/clusters/help/databases/Samples)
-- 
-
-## Help Wanted
-
-To come... primarily filling out the function/operation set
+The project leans heavily on a number of open source libraries including:
+- [Benchmark.Net](https://github.com/dotnet/BenchmarkDotNet) used for performance testing
+- [CommandLineParser](https://github.com/commandlineparser/commandline) used for command parsing within LokqlDX
+- [CsvHelper](https://joshclose.github.io/CsvHelper/) used for CSV serialisation
+- [Fashenstein](https://github.com/DanHarltey/Fastenshtein) use for fuzzy string matching
+- [FluentAssertions](https://fluentassertions.com/) used for testing
+- [geohash-dotnet](https://github.com/postlagerkarte/geohash-dotnet) for geohash encoding
+- [NotNullStrings](https://github.com/NeilMacMullen/NotNullStrings) for basic string extensions
+- [Parquet.Net](https://github.com/aloneguid/parquet-dotnet) for Parquet serialisation
+- [Spectre.Console](https://github.com/spectreconsole/spectre.console) for nice table rendering
+- [T-Digest.net](https://github.com/ASolomatin/T-Digest.NET) is used internally for some aggregation functions
+- [VegaGenerator](https://github.com/NeilMacMullen/VegaGenerator) is used to simplify rendering of charts
 

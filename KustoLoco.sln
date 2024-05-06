@@ -24,8 +24,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A5579A8E-4
 		docs\additionalFunctions.md = docs\additionalFunctions.md
 		docs\addUserDefinedFunction.md = docs\addUserDefinedFunction.md
 		docs\internal-representation.png = docs\internal-representation.png
-		OldReadMe.md = OldReadMe.md
+		LICENSE = LICENSE
 		docs\plannedWork.md = docs\plannedWork.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{44F51B35-D6EE-402F-93C7-3C43B1FD62B2}"
