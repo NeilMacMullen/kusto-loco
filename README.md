@@ -2,7 +2,21 @@
 
 Kusto-Loco is a set of libraries and applications based around the [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/).  KQL is normally used against data held in [Azure Data Explorer](https://learn.microsoft.com/en-us/azure/data-explorer/) but Kusto-Loco allows you to query in-memory data held in your own applications.
 
-Data can be loaded from CSV, JSON or Parquet files or from sets of POCOs held in memory. Query results can be serialised back to files or objects or rendered to HTML charts using the [Vega-Lite](https://vega.github.io/vega-lite/examples/) charting library.
+
+For a super-quick introduction to KQL see [this wiki page](https://github.com/NeilMacMullen/kusto-loco/wiki/Basic-introduction-to-KQL) but to give you a flavour here's a simple query that calculates the average rating of all PCs in a product table and renders the results as a chart.
+
+```kql
+products 
+| where Category=='PC' 
+| join reviews on ProductId 
+| summarize Rating=avg(Score) by ProductId,ProductName 
+| order by Rating
+| project ProductName, Rating
+| render columnchart
+```
+
+
+Kusto-Loco makes it easy to load data from CSV, JSON or Parquet files or from sets of POCOs held in memory. Query results can be serialised back to files or objects or rendered to HTML charts using the [Vega-Lite](https://vega.github.io/vega-lite/examples/) charting library.
 
 Loading data, running a query and rendering the results to a chart can be done in a few lines of code after referencing the appropriate [Nuget Packages](https://github.com/NeilMacMullen/kusto-loco/wiki/Applications-and-Nuget-Packages).
 
@@ -52,3 +66,6 @@ The project leans heavily on a number of open source libraries including:
 - [T-Digest.net](https://github.com/ASolomatin/T-Digest.NET) is used internally for some aggregation functions
 - [VegaGenerator](https://github.com/NeilMacMullen/VegaGenerator) is used to simplify rendering of charts
 
+## Contibuting
+
+If you'd like to help with the project please see the [Contributing](https://github.com/NeilMacMullen/kusto-loco/wiki/Contributing) page.
