@@ -18,7 +18,8 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitNameReference(IRNameReferenceNode node, EvaluationContext context)
     {
         var lookup = context.Scope.Lookup(node.ReferencedSymbol.Name);
-        if (lookup == null) throw new InvalidOperationException($"Name {node.ReferencedSymbol.Name} is not in scope.");
+        if (lookup == null)
+            throw new InvalidOperationException($"Name {node.ReferencedSymbol.Name} is not in scope.");
 
         var (symbol, value) = lookup.Value;
         if (symbol != node.ReferencedSymbol)

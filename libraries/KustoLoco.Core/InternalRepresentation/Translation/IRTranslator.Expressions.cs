@@ -46,6 +46,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
     public override IRNode VisitSimpleNamedExpression(SimpleNamedExpression node) => node.Expression.Accept(this);
 
+    //TODO - this is a nightmare.... there's an assumption that elementary Kusto types are reference equatable but it simply
+    //isn't true (or else we can't trust it to be so).  Really we want to compare only the important properties.
     public override IRNode VisitNameReference(NameReference node)
     {
         if (_rowScope != TableSymbol.Empty)
@@ -55,6 +57,16 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
             {
                 return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, index);
             }
+
+
+
+            //try column lookup ...
+            var m = _rowScope.Members.FirstIndex(t =>  t is ColumnSymbol cs &&  cs.Name == node.ReferencedSymbol.Name && cs.Type==node.ResultType);
+            if (m >= 0)
+            {
+                return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, m);
+            }
+
             //if the node referenced symbol has type unknown because it may have come
             //from an expression that failed to be evaluated (possibly bug in parser) then 
             //try a more relaxed fit..
