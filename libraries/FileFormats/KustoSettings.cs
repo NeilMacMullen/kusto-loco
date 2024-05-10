@@ -16,7 +16,7 @@ public record RawKustoSetting(string Name, string Value)
 ///     The benefit of loose typing here is that it's easy to add new settings
 ///     without changing the interface and it fits well with the idea of allowing the user
 ///     to change behaviour by typing in values dynamically.  For example, a user in lokqldx could
-///     type in "set csv.inferColumnTypes false" to disable automatic type inference.
+///     type in "set csv.skipTypeInference yes" to disable automatic type inference.
 ///     Settings are _mutable_ because we don't want to pass them in for every operation.
 ///     However. it would be good to find a way to get back to immutability.
 /// </remarks>

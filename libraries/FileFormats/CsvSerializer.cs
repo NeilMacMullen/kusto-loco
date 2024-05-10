@@ -31,7 +31,7 @@ public class CsvSerializer : ITableSerializer
         try
         {
             var table = Load(path, tableName, progressReporter, settings);
-            if (settings.Get(CsvSerializerSettings.InferColumnTypes,true))
+            if (!settings.Get(CsvSerializerSettings.SkipTypeInference,false))
                 table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
 
             return Task.FromResult(TableLoadResult.Success(table));
@@ -130,7 +130,7 @@ public class CsvSerializer : ITableSerializer
         //self-describing settings  
         private const string prefix = "csv";
         private static string Setting(string setting) => $"{prefix}.{setting}";
-        public static  string InferColumnTypes => Setting("inferColumnTypes");
+        public static  string SkipTypeInference => Setting("skipTypeInference");
         public static string TrimCells => Setting("TrimCells");
     }
 }

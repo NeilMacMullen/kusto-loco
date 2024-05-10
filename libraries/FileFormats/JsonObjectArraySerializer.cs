@@ -41,8 +41,24 @@ public class JsonObjectArraySerializer : ITableSerializer
             .FromOrderedDictionarySet(name,
                 sdlist)
             .ToTableSource();
+
+        if (!settings.Get(JsonSerializerSettings.SkipTypeInference, false))
+                table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
+
+       
         return Task.FromResult(TableLoadResult.Success(table));
     }
 
+private static class JsonSerializerSettings
+{
+    //TODO - source generation would allow much more flexibility for
+    //self-describing settings  
+    private const string prefix = "json";
+    private static string Setting(string setting) => $"{prefix}.{setting}";
+    public static string SkipTypeInference => Setting("skipTypeInference");
+    public static string TrimCells => Setting("TrimCells");
+}
 
 }
+
+
