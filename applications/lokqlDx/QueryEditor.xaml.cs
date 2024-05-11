@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.Web.WebView2.Core.Raw;
 
 namespace lokqlDx
 {
@@ -76,10 +77,16 @@ namespace lokqlDx
         {
            return Query.Text;
         }
+
+        public void SetBusy(bool isBusy)
+        {
+            BusyStatus.Content = isBusy ? "Busy" : "Ready";
+        }
     }
 
     public class QueryEditorRunEventArgs(string query) : EventArgs
     {
         public string Query { get; private set; } = query;
     }
+
 }

@@ -28,9 +28,13 @@ public partial class MainWindow : Window
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
     }
 
-
+    private bool isBusy;
     private async Task RunQuery(string query)
     {
+        if (isBusy)
+            return;
+        isBusy = true;
+        Editor.SetBusy(true);
         //start capturing console output from the engine
         _console.PrepareForOutput();
         //run the supplied lines of kusto/commands
@@ -41,26 +45,30 @@ public partial class MainWindow : Window
             await Task.Run(async () => await _explorer.RunInput(query, false));
 
         //if there are no results leave the previously rendered results in place
-        if (result.RowCount == 0)
-            return;
-
-        if (result.Visualization != VisualizationState.Empty)
+        if (result.RowCount != 0)
         {
-            //annoying we have to do this, but it's the only way to get the webview to render
-            await webview.EnsureCoreWebView2Async();
-            //generate the html and display it
-            var html = KustoResultRenderer.RenderToHtml(result);
-            try
+
+            if (result.Visualization != VisualizationState.Empty)
             {
-                webview.NavigateToString(html);
+                //annoying we have to do this, but it's the only way to get the webview to render
+                await webview.EnsureCoreWebView2Async();
+                //generate the html and display it
+                var html = KustoResultRenderer.RenderToHtml(result);
+                try
+                {
+                    webview.NavigateToString(html);
+                }
+                catch
+                {
+                    _explorer.Warn("Unable to render results in webview");
+                }
             }
-            catch
-            {
-                _explorer.Warn("Unable to render results in webview");
-            }
+
+            FillInDataGrid(result);
         }
 
-        FillInDataGrid(result);
+        Editor.SetBusy(false);
+        isBusy = false;
     }
 
     private void FillInDataGrid(KustoQueryResult result)
