@@ -70,6 +70,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "processes", "samples\proces
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsTests", "test\SettingsTests\SettingsTests.csproj", "{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessesWpf", "samples\ProcessesWpf\ProcessesWpf.csproj", "{71B23959-1E4C-4C67-B6CD-554F697C58DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71B23959-1E4C-4C67-B6CD-554F697C58DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71B23959-1E4C-4C67-B6CD-554F697C58DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71B23959-1E4C-4C67-B6CD-554F697C58DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71B23959-1E4C-4C67-B6CD-554F697C58DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,6 +183,7 @@ Global
 		{3895CE55-9D19-4815-AFDA-0D3F0F6A9EED} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{8F48A377-57EC-4A30-88F5-7E3261B23DB6} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{1EFE0E94-DB11-4BFA-96CB-28CB54DB9B71} = {932C804C-F6B7-4361-8360-E5238938E464}
+		{71B23959-1E4C-4C67-B6CD-554F697C58DC} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
