@@ -208,4 +208,22 @@ public class KustoQueryResult
             dt.Rows.Add(row);
         return dt;
     }
+
+    ///<summary>
+    /// Returns the result of a query as a DataTable, suitable for use in a DataGridView or similar
+    /// </summary>
+    /// <remarks>
+    /// If the result has an error, returns a single cell DataTable that contains the error text
+    /// </remarks>
+    public DataTable ToDataTableOrError(int maxRows = Int32.MaxValue)
+    {
+        if (Error.IsNotBlank())
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("ERROR");
+            dt.Rows.Add(Error);
+            return dt;
+        }
+        return ToDataTable(maxRows);
+    }
 }
