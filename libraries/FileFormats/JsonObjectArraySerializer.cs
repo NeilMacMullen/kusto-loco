@@ -62,8 +62,10 @@ public class JsonObjectArraySerializer : ITableSerializer
         //self-describing settings  
         private const string prefix = "json";
 
-        public static readonly KustoSettingDefinition SkipTypeInference = new(Setting("skipTypeInference"),
-            "skips type inference", "false", nameof(Boolean));
+        public static readonly KustoSettingDefinition SkipTypeInference = new(
+            Setting("skipTypeInference"), "prevents conversion of string columns to types",
+            "off",
+            nameof(Boolean));
 
         private static string Setting(string setting)
         {

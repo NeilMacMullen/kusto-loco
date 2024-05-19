@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
-using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
+using KustoLoco.Core.Settings;
 using NLog;
 using NotNullStrings;
 
@@ -31,12 +32,12 @@ public class KustoQueryContext
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
-
-    private bool _fullDebug;
+    private IKustoConsole _debugConsole = new SystemConsole();
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
 
     private List<ITableSource> _tables = [];
+    private KustoSettingsProvider _settings=new KustoSettingsProvider();
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 
@@ -47,7 +48,7 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    /// Adds a table to the context from a builder
+    ///     Adds a table to the context from a builder
     /// </summary>
     public KustoQueryContext AddTable(TableBuilder builder)
     {
@@ -55,7 +56,7 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    /// Adds a table to the context
+    ///     Adds a table to the context
     /// </summary>
     public KustoQueryContext AddTable(ITableSource table)
     {
@@ -92,48 +93,52 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    ///    Adds a table to the context from volatile data
+    ///     Adds a table to the context from volatile data
     /// </summary>
     /// <remarks>
-    /// This method is more convenient than the wrapping version but less efficient since it requires
-    /// a copy-and-convert operation. For smaller data sets, this is unlikely to be noticeable but
-    /// if operating on tables of 100Ks or millions of rows you should consider using the wrapped version.
+    ///     This method is more convenient than the wrapping version but less efficient since it requires
+    ///     a copy-and-convert operation. For smaller data sets, this is unlikely to be noticeable but
+    ///     if operating on tables of 100Ks or millions of rows you should consider using the wrapped version.
     /// </remarks>
-    public KustoQueryContext CopyDataIntoTable<T>(string tableName, IReadOnlyCollection<T> records) 
-        => AddTable(TableBuilder.CreateFromVolatileData(tableName, records));
+    public KustoQueryContext CopyDataIntoTable<T>(string tableName, IReadOnlyCollection<T> records)
+    {
+        return AddTable(TableBuilder.CreateFromVolatileData(tableName, records));
+    }
 
     /// <summary>
-    /// Adds immutable data to the context 
+    ///     Adds immutable data to the context
     /// </summary>
     /// <remarks>
-    /// This is the preferred way to add data to the context since it avoids additional allocations.
-    /// However, the client must ensure that the data is truly immutable and consists only of types
-    /// that are directly supported by Kusto.
+    ///     This is the preferred way to add data to the context since it avoids additional allocations.
+    ///     However, the client must ensure that the data is truly immutable and consists only of types
+    ///     that are directly supported by Kusto.
     /// </remarks>
     public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
-        => AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
+    {
+        return AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
+    }
 
     /// <summary>
-    /// Runs a query and evaluates the result in order to get an accurate benchmark
+    ///     Runs a query and evaluates the result in order to get an accurate benchmark
     /// </summary>
     public int BenchmarkQuery(string query)
     {
-        var engine = new BabyKustoEngine();
-        var res = engine.Evaluate(_tables, query, _fullDebug, _fullDebug);
+        var engine = new BabyKustoEngine(new SystemConsole(),_settings);
+        var res = engine.Evaluate(_tables, query);
         return res.RowCount;
     }
 
     /// <summary>
-    ///    Runs a query against the context without attempting to load tables mentioned in the query
+    ///     Runs a query against the context without attempting to load tables mentioned in the query
     /// </summary>
     /// <remarks>
-    /// This method skips the initial table presence check and is suitable for simple queries.  However, RunQuery
-    /// is preferred in most contexts since it has very little overhead and 'async' may become a requirement in future
+    ///     This method skips the initial table presence check and is suitable for simple queries.  However, RunQuery
+    ///     is preferred in most contexts since it has very little overhead and 'async' may become a requirement in future
     /// </remarks>
     public KustoQueryResult RunQueryWithoutDemandBasedTableLoading(string query)
     {
         var watch = Stopwatch.StartNew();
-        var engine = new BabyKustoEngine();
+        var engine = new BabyKustoEngine(_debugConsole,_settings);
         engine.AddAdditionalFunctions(_additionalFunctions);
         //handling for "special" commands
         if (query.Trim() == ".tables")
@@ -142,9 +147,7 @@ public class KustoQueryContext
         try
         {
             var result =
-                engine.Evaluate(_tables, query,
-                    _fullDebug, _fullDebug
-                );
+                engine.Evaluate(_tables, query);
             var (table, vis) = TableFromEvaluationResult(result);
 
             return new KustoQueryResult(query, table, vis, watch.Elapsed,
@@ -156,8 +159,9 @@ public class KustoQueryContext
             return new KustoQueryResult(query, table, vis, TimeSpan.Zero, ex.Message);
         }
     }
+
     /// <summary>
-    /// Creates the table list for the ".tables" command
+    ///     Creates the table list for the ".tables" command
     /// </summary>
     private KustoQueryResult CreateTableList(string query, bool expandColumns)
     {
@@ -183,31 +187,33 @@ public class KustoQueryContext
         else
         {
             var rows = _tables.Select(table => new { Table = table.Name, Columns = table.Type.Columns.Count })
-                    .ToImmutableArray();
+                .ToImmutableArray();
 
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
-                .ToTableSource() as InMemoryTableSource ;
+                .ToTableSource() as InMemoryTableSource;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }
     }
 
     /// <summary>
-    /// Converts an evaluation result into a table and visualization state so that it can be wrapped into a KustoQueryResult
+    ///     Converts an evaluation result into a table and visualization state so that it can be wrapped into a
+    ///     KustoQueryResult
     /// </summary>
     /// <remarks>
-    /// We turn _scalar_ results into a single-value, single column table for consistency.
+    ///     We turn _scalar_ results into a single-value, single column table for consistency.
     /// </remarks>
     private static (InMemoryTableSource, VisualizationState) TableFromEvaluationResult(EvaluationResult results)
     {
         return results switch
         {
-            ScalarResult scalar 
-                => (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult("result",scalar)), VisualizationState.Empty),
-            TabularResult tabular 
+            ScalarResult scalar
+                => (InMemoryTableSource.FromITableSource(TableBuilder.FromScalarResult("result", scalar)),
+                    VisualizationState.Empty),
+            TabularResult tabular
                 => (InMemoryTableSource.FromITableSource(tabular.Value), tabular.VisualizationState),
-            _ 
-                => (new InMemoryTableSource(TableSymbol.Empty, Array.Empty<BaseColumn>()), VisualizationState.Empty)
+            _
+                => (new InMemoryTableSource(TableSymbol.Empty, []), VisualizationState.Empty)
         };
     }
 
@@ -224,10 +230,12 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    /// Runs a query against the context, loading tables as required
+    ///     Runs a query against the context, loading tables as required
     /// </summary>
     /// <remarks>
-    /// If the context has a table loader, it will be used to load tables as required by the query
+    ///     If the context has a table loader, it will be used to load tables as required by the query
+    ///     IMPORTANT - this call does not use ConfigureAwait(false) so use Task.Run() if you are calling
+    ///     this from a UI thread
     /// </remarks>
     public async Task<KustoQueryResult> RunQuery(string query)
     {
@@ -274,11 +282,15 @@ public class KustoQueryContext
         return tables.Select(KustoNameEscaping.RemoveFraming).Distinct().ToArray();
     }
 
-    public IEnumerable<ITableSource> Tables() => _tables;
-
-    private KustoQueryContext AddDebug()
+    public IEnumerable<ITableSource> Tables()
     {
-        _fullDebug = true;
+        return _tables;
+    }
+
+    private KustoQueryContext AddDebug(IKustoConsole console,KustoSettingsProvider settings)
+    {
+        _settings = settings;
+        _debugConsole = console;
         return this;
     }
 
@@ -288,7 +300,11 @@ public class KustoQueryContext
     /// <remarks>
     ///     Primarily used for testing and development
     /// </remarks>
-    public static KustoQueryContext CreateWithDebug() => new KustoQueryContext().AddDebug();
+    public static KustoQueryContext CreateWithDebug(IKustoConsole console,KustoSettingsProvider settings)
+    {
+        return new KustoQueryContext()
+            .AddDebug(console,settings);
+    }
 
 
     /// <summary>
@@ -365,11 +381,19 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    /// True if the context has a table with the given name
+    ///     True if the context has a table with the given name
     /// </summary>
     public bool HasTable(string tableName)
     {
         tableName = KustoNameEscaping.RemoveFraming(tableName);
-       return  _tables.Any(t => t.Name == tableName);
+        return _tables.Any(t => t.Name == tableName);
+    }
+
+    public static KustoQueryContext CreateForTest()
+    {
+       return new KustoQueryContext()
+           .AddDebug(new SystemConsole(),
+           BabyKustoEngine.GetSettingsWithFullDebug()
+               );
     }
 }

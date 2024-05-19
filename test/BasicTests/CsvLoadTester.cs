@@ -10,7 +10,8 @@ namespace BasicTests
     [TestClass]
     public class CsvLoadTester
     {
-        private static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
+        private static KustoQueryContext CreateContext()
+            => KustoQueryContext.CreateForTest();
 
         [TestMethod]
         public async Task TestMethod1()

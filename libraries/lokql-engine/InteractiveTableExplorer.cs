@@ -29,7 +29,7 @@ public class InteractiveTableExplorer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly StringBuilder _commandBuffer = new();
-    private readonly KustoQueryContext _context = new();
+    private readonly KustoQueryContext _context;
 
     private readonly ITableAdaptor _loader;
     private readonly IKustoConsole _outputConsole;
@@ -43,6 +43,7 @@ public class InteractiveTableExplorer
         _outputConsole = outputConsole;
         _loader = loader;
         _settings = settings;
+        _context = KustoQueryContext.CreateWithDebug(outputConsole,settings);
         _context.SetTableLoader(_loader);
         _prevResult = KustoQueryResult.Empty;
     }
