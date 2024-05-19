@@ -8,6 +8,7 @@ using System.Text.Json;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using KustoLoco.Core.DataSource;
@@ -225,7 +226,7 @@ public class TableBuilder
     /// <summary>
     /// Creates a new table by inferring the types of the columns in the input table
     /// </summary>
-    public static ITableSource AutoInferColumnTypes(ITableSource other,IProgress<string> progressReporter)
+    public static ITableSource AutoInferColumnTypes(ITableSource other,IKustoConsole console)
     {
         var chunks = other.GetData().ToArray();
         switch (chunks.Length)
@@ -243,9 +244,8 @@ public class TableBuilder
         var columnNames = other.ColumnNames.ToArray();
         var inferredColumns = columns.Zip(columnNames, (col, name) =>
             {
-                progressReporter.Report($"Inferring column type for {name}...");
                 var newC = ColumnTypeInferrer.AutoInfer(col);
-                progressReporter.Report($"{name} -> {newC.Type.Name}");
+                console.ShowProgress($"Column {name} -> {newC.Type.Name}");
                 return newC;
             })
             .ToArray();
@@ -254,7 +254,7 @@ public class TableBuilder
         {
             builder.WithColumn(columnNames[i], inferredColumns[i]);
         }
-
+        console.CompleteProgress("");
         return builder.ToTableSource();
     
     }

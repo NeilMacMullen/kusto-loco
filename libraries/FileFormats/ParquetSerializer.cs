@@ -1,4 +1,6 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
 using Parquet;
@@ -15,23 +17,30 @@ namespace KustoLoco.FileFormats;
 /// </remarks>
 public class ParquetSerializer : ITableSerializer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    public async Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter, KustoSettings settings)
+    public ParquetSerializer(KustoSettingsProvider settings, IKustoConsole console)
     {
-        var table = await LoadFromFile(path, tableName, progressReporter);
+        _settings = settings;
+        _console = console;
+    }
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private readonly KustoSettingsProvider _settings;
+    private readonly IKustoConsole _console;
+
+    public async Task<TableLoadResult> LoadTable(string path, string tableName)
+    {
+        var table = await LoadFromFile(path, tableName);
         return TableLoadResult.Success(table);
     }
 
 
-    public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result,
-        IProgress<string> progressReporter)
+    public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
         await Save(path, result);
         return TableSaveResult.Success();
     }
 
-    public static async Task Save(string path, KustoQueryResult result)
+    public async Task Save(string path, KustoQueryResult result)
     {
         await using Stream fs = File.OpenWrite(path);
         await SaveToStream(fs, result);
@@ -46,7 +55,7 @@ public class ParquetSerializer : ITableSerializer
         return builder.GetDataAsArray();
     }
 
-    public static async Task SaveToStream(Stream fs, KustoQueryResult result)
+    public async Task SaveToStream(Stream fs, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
             .Select(col =>
@@ -61,16 +70,17 @@ public class ParquetSerializer : ITableSerializer
         foreach (var col in result
                      .ColumnDefinitions())
         {
+            _console.ShowProgress($"Writing column {col.Name}...");
             var dataColumn = new DataColumn(
                 dataFields[col.Index],
                 CreateArrayFromRawObjects(col, result)
             );
             await groupWriter.WriteColumnAsync(dataColumn);
         }
+        _console.CompleteProgress("");
     }
 
-    public static async Task<ITableSource> LoadFromFile(string path, string tableName,
-        IProgress<string> progressReporter)
+    private async Task<ITableSource> LoadFromFile(string path, string tableName)
     {
         await using var fs = File.OpenRead(path);
         using var reader = await ParquetReader.CreateAsync(fs);
@@ -79,7 +89,7 @@ public class ParquetSerializer : ITableSerializer
         foreach (var c in rg)
         {
             var type = c.Field.ClrType;
-            progressReporter.Report($"reading column {c.Field.Name} of type {c.Field.Name}");
+            _console.ShowProgress($"Reading column {c.Field.Name} of type {c.Field.Name}");
             //TODO - surely there is a more efficient way to do this by wrapping the original data?
             var colBuilder = ColumnHelpers.CreateBuilder(type);
             foreach (var o in c.Data)
@@ -87,7 +97,7 @@ public class ParquetSerializer : ITableSerializer
 
             tableBuilder.WithColumn(c.Field.Name, colBuilder.ToColumn());
         }
-
+        _console.CompleteProgress("");
         return tableBuilder.ToTableSource();
     }
 }

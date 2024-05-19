@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using Lokql.Engine;
@@ -16,15 +17,16 @@ public partial class MainWindow : Window
 {
     private readonly WpfConsole _console;
     private readonly PreferencesManager _preferenceManager = new();
-    private readonly WorkspaceManager _workspaceManager = new();
+    private readonly WorkspaceManager _workspaceManager;
     private InteractiveTableExplorer _explorer;
 
     public MainWindow()
     {
         InitializeComponent();
         _console = new WpfConsole(OutputText);
-        var settings = new KustoSettings();
-        var loader = new StandardFormatAdaptor(settings);
+        var settings = new KustoSettingsProvider();
+        _workspaceManager = new WorkspaceManager(settings);
+        var loader = new StandardFormatAdaptor(settings,_console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
     }
 
@@ -90,10 +92,10 @@ public partial class MainWindow : Window
     {
         Editor.SetText(_workspaceManager.UserText);
         var settings = _workspaceManager.Settings;
-        var loader = new StandardFormatAdaptor(settings);
+        var loader = new StandardFormatAdaptor(settings,_console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
         UpdateFontSize();
-        Title = $"LokqlDX - {_workspaceManager._path}";
+        Title = $"LokqlDX - {_workspaceManager.Path}";
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -115,8 +117,8 @@ public partial class MainWindow : Window
     private void SaveWorkspace(string path)
     {
         PreferencesManager.EnsureDefaultFolderExists();
-        _workspaceManager.Save(path, Editor.GetText(), _explorer._settings);
-        _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager._path;
+        _workspaceManager.Save(path, Editor.GetText());
+        _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager.Path;
         _preferenceManager.Preferences.WindowLeft=this.Left;
         _preferenceManager.Preferences.WindowTop = this.Top;
         _preferenceManager.Preferences.WindowWidth = this.Width;
@@ -137,7 +139,7 @@ public partial class MainWindow : Window
         {
             InitialDirectory = folder,
             Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager._path)
+            FileName = Path.GetFileName(_workspaceManager.Path)
         };
 
         if (dialog.ShowDialog() == true)
@@ -159,7 +161,7 @@ public partial class MainWindow : Window
 
     private void Save()
     {
-        SaveWorkspace(_workspaceManager._path);
+        SaveWorkspace(_workspaceManager.Path);
     }
 
     private bool SaveAs()
@@ -169,7 +171,7 @@ public partial class MainWindow : Window
         {
             InitialDirectory = folder,
             Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager._path)
+            FileName = Path.GetFileName(_workspaceManager.Path)
         };
         if (dialog.ShowDialog() == true)
         {
@@ -185,18 +187,16 @@ public partial class MainWindow : Window
         SaveAs();
     }
 
-    private async void NewWorkspace(object sender, RoutedEventArgs e)
+    private void NewWorkspace(object sender, RoutedEventArgs e)
     {
         //save current
         Save();
-        var prevPath = _workspaceManager._path;
+        var prevPath = _workspaceManager.Path;
         _workspaceManager.CreateNewInCurrentFolder();
         if (SaveAs())
         {
-
             UpdateUIFromWorkspace();
-         
-            await _explorer.RunInput($".set {KustoSettingNames.KustoDataPath} \"{_workspaceManager.ContainingFolder()}\"",false);
+            _explorer.SetWorkingPaths(_workspaceManager.ContainingFolder());
         }
         else
         {

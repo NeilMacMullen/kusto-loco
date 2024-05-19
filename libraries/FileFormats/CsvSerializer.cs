@@ -2,6 +2,8 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
 
@@ -9,30 +11,25 @@ namespace KustoLoco.FileFormats;
 
 public class CsvSerializer : ITableSerializer
 {
-    public static readonly CsvSerializer Default = new(new CsvConfiguration(CultureInfo.InvariantCulture));
-
-    public static readonly CsvSerializer Tsv = new(new CsvConfiguration(CultureInfo.InvariantCulture)
-    {
-        Delimiter = "\t"
-    });
-
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly CsvConfiguration _config;
+    private readonly IKustoConsole _console;
+    private readonly KustoSettingsProvider _settings;
 
-    public CsvSerializer(CsvConfiguration config)
+    public CsvSerializer(CsvConfiguration config, KustoSettingsProvider settings, IKustoConsole console)
     {
         _config = config;
+        _settings = settings;
+        _console = console;
+        settings.Register(CsvSerializerSettings.SkipTypeInference, CsvSerializerSettings.TrimCells);
     }
 
-    public Task<TableLoadResult> LoadTable(string path, string tableName, IProgress<string> progressReporter,
-        KustoSettings settings)
+    public Task<TableLoadResult> LoadTable(string path, string tableName)
     {
         try
         {
-            var table = Load(path, tableName, progressReporter, settings);
-            if (!settings.Get(CsvSerializerSettings.SkipTypeInference,false))
-                table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
+            var table = Load(path, tableName);
+            if (!_settings.GetBool(CsvSerializerSettings.SkipTypeInference))
+                table = TableBuilder.AutoInferColumnTypes(table, _console);
 
             return Task.FromResult(TableLoadResult.Success(table));
         }
@@ -42,15 +39,28 @@ public class CsvSerializer : ITableSerializer
         }
     }
 
-    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result, IProgress<string> progressReporter)
+    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
         WriteToCsv(path, result);
         return Task.FromResult(TableSaveResult.Success());
     }
 
 
-    private ITableSource Load(TextReader reader, string tableName, IProgress<string> progressReporter,
-        KustoSettings settings)
+    public static CsvSerializer Default(KustoSettingsProvider settings, IKustoConsole console)
+    {
+        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture), settings, console);
+    }
+
+    public static CsvSerializer Tsv(KustoSettingsProvider settings, IKustoConsole console)
+    {
+        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = "\t"
+            }
+            , settings, console);
+    }
+
+    private ITableSource Load(TextReader reader, string tableName)
     {
         var csv = new CsvReader(reader, _config);
         csv.Read();
@@ -62,50 +72,57 @@ public class CsvSerializer : ITableSerializer
         var rowCount = 0;
         while (csv.Read())
         {
-            var IsTrimRequired = settings.Get(CsvSerializerSettings.TrimCells, true);
-            string TrimIfRequired(string s) => IsTrimRequired ? s.Trim() : s;    
+            var isTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
+
+            string TrimIfRequired(string s)
+            {
+                return isTrimRequired ? s.Trim() : s;
+            }
+
             for (var i = 0; i < keys.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
 
             rowCount++;
             if (rowCount % 100_000 == 0)
-                progressReporter.Report($"{rowCount} records read");
+                _console.ShowProgress($"loaded {rowCount} records");
         }
-
+       
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++) tableBuilder.WithColumn(keys[i], builders[i].ToColumn());
 
         var tableSource = tableBuilder.ToTableSource();
-        progressReporter.Report("Loaded");
+        _console.CompleteProgress($"loaded {rowCount} records");
         return tableSource;
     }
 
 
-    public ITableSource Load(string filename, string tableName, IProgress<string> progressReporter,
-        KustoSettings settings)
+    public ITableSource Load(string filename, string tableName)
     {
         using TextReader fileReader = new StreamReader(filename);
-        return Load(fileReader, tableName, progressReporter, settings);
+        return Load(fileReader, tableName);
     }
 
 
-    public ITableSource LoadFromString(string csv, string tableName, KustoSettings settings)
+    public ITableSource LoadFromString(string csv, string tableName)
     {
         var reader = new StringReader(csv.Trim());
-        var table = Load(reader, tableName, new NullProgressReporter(), settings);
+        var table = Load(reader, tableName);
         return table;
     }
 
 
-    public void WriteToCsvStream(KustoQueryResult result, int max, bool skipHeader, TextWriter writer)
+    public void WriteToCsvStream(KustoQueryResult result, bool skipHeader, TextWriter writer)
     {
         using var csv = new CsvWriter(writer, _config);
         if (!skipHeader)
             foreach (var heading in result.ColumnNames())
                 csv.WriteField(heading);
         csv.NextRecord();
-
+        var rowCount = 0;
         foreach (var r in result.EnumerateRows())
         {
+            rowCount++;
+            if (rowCount % 100_000 == 0)
+                _console.ShowProgress($"wrote {rowCount} records");
             foreach (var cell in r)
             {
                 var toPrint = cell is DateTime dt
@@ -116,24 +133,30 @@ public class CsvSerializer : ITableSerializer
 
             csv.NextRecord();
         }
+        _console.CompleteProgress($"wrote {rowCount} records");
     }
 
     private void WriteToCsv(string path, KustoQueryResult result)
     {
         using var writer = new StreamWriter(path);
-        WriteToCsvStream(result, int.MaxValue, false, writer);
+        WriteToCsvStream(result, false, writer);
     }
 
     private static class CsvSerializerSettings
     {
-        //TODO - source generation would allow much more flexibility for
-        //self-describing settings  
         private const string prefix = "csv";
-        private static string Setting(string setting) => $"{prefix}.{setting}";
-        public static  string SkipTypeInference => Setting("skipTypeInference");
-        public static string TrimCells => Setting("TrimCells");
+
+        public static readonly KustoSettingDefinition SkipTypeInference = new(
+            Setting("skipTypeInference"), "prevents conversion of string columns to types",
+            "off",
+            nameof(String));
+
+        public static readonly KustoSettingDefinition TrimCells = new(Setting("TrimCells"),
+            "Removes leading and trailing whitespace from string values", "true", nameof(Boolean));
+
+        private static string Setting(string setting)
+        {
+            return $"{prefix}.{setting}";
+        }
     }
 }
-
-
-

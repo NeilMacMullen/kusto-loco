@@ -1,12 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using NotNullStrings;
 
-namespace KustoLoco.FileFormats;
-
-public record RawKustoSetting(string Name, string Value)
-{
-    public string Key => Name.ToLowerInvariant();
-}
+namespace KustoLoco.Core.Settings;
 
 /// <summary>
 ///     Provides a flexible way of passing settings around the various KustoLoco layers
@@ -20,9 +17,23 @@ public record RawKustoSetting(string Name, string Value)
 ///     Settings are _mutable_ because we don't want to pass them in for every operation.
 ///     However. it would be good to find a way to get back to immutability.
 /// </remarks>
-public class KustoSettings
+public class KustoSettingsProvider
 {
+    private ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
+        ImmutableHashSet<KustoSettingDefinition>.Empty;
+
     private ImmutableDictionary<string, RawKustoSetting> _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+
+    public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions()
+    {
+        return _registeredSettings;
+    }
+
+    public void Register(params KustoSettingDefinition[] settings)
+    {
+        foreach (var setting in settings)
+            _registeredSettings = _registeredSettings.Add(setting);
+    }
 
     public void Set(string setting, string value)
     {
@@ -41,17 +52,18 @@ public class KustoSettings
     }
 
 
-    public string Get(string setting, string fallbackValue)
+    public string Get(KustoSettingDefinition setting)
     {
-        var fb = new RawKustoSetting(setting, fallbackValue);
-        return _settings.GetValueOrDefault(setting.ToLowerInvariant(), fb).Value;
+        var settingName = setting.Name;
+        var fb = new RawKustoSetting(settingName, setting.DefaultValue);
+        return _settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
 
-    public int Get(string setting, int fallbackValue)
+    public int GetInt(KustoSettingDefinition setting)
     {
-        var s = Get(setting, string.Empty);
-        return int.TryParse(s, out var v) ? v : fallbackValue;
+        var s = Get(setting);
+        return int.TryParse(s, out var v) ? v : 0;
     }
 
     /// <summary>
@@ -60,14 +72,14 @@ public class KustoSettings
     /// <remarks>
     ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true
     /// </remarks>
-    public bool Get(string setting, bool fallbackValue)
+    public bool GetBool(KustoSettingDefinition setting)
     {
         var trueValues = new[] { "true", "yes", "on", "1" };
         var falseValues = new[] { "false", "no", "off", "0" };
-        var s = Get(setting, string.Empty).ToLowerInvariant();
+        var s = Get(setting).ToLowerInvariant();
         if (trueValues.Contains(s)) return true;
         if (falseValues.Contains(s)) return false;
-        return fallbackValue;
+        return false;
     }
 
     public IEnumerable<RawKustoSetting> Enumerate()
@@ -75,16 +87,24 @@ public class KustoSettings
         return _settings.Values;
     }
 
-    public string[] GetPathList(string name, IReadOnlyCollection<string> fallback)
+    /// <summary>
+    ///     Obtain an array of strings from a setting that is a list of paths
+    /// </summary>
+    /// <remarks>
+    ///     Path-lists use the ';' separator and elements are trimmed so it's not possible
+    ///     to use paths that start or end with spaces.
+    /// </remarks>
+    public string[] GetPathList(KustoSettingDefinition name)
     {
-        var k = Get(name, fallback.JoinString(";"));
+        var k = Get(name);
         return k.Tokenize(";");
     }
-}
 
-//TODO - this is a bit of a hack to get the settings names in one place
-//needs to be partitioned and ideally generated from source generation
-public static class KustoSettingNames
-{
-    public const string KustoDataPath = "kusto.datapath";
+    /// <summary>
+    ///     Reset all settings to their default values
+    /// </summary>
+    public void Reset()
+    {
+        _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+    }
 }

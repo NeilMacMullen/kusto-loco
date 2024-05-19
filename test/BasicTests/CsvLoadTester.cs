@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using FluentAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
 namespace BasicTests
@@ -13,15 +15,16 @@ namespace BasicTests
         [TestMethod]
         public async Task TestMethod1()
         {
+            var console = new SystemConsole();
             var context = CreateContext();
             var csv = @"
 Name,Count
 acd,100
 def,30
 ";
-            var settings = new KustoSettings();
-            var t =CsvSerializer.Default.LoadFromString(csv, "data",settings);
-            t = TableBuilder.AutoInferColumnTypes(t,new NullProgressReporter());
+            var t =CsvSerializer.Default(new KustoSettingsProvider(),console)
+                .LoadFromString(csv, "data");
+            t = TableBuilder.AutoInferColumnTypes(t,console);
             context.AddTable(t);
             var nameResult = (await context.RunQuery("data | where Name contains 'a'"));
             nameResult.Error.Should().BeEmpty();
