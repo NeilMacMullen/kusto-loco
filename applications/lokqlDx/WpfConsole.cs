@@ -3,25 +3,22 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Shapes;
-using Lokql.Engine;
+using KustoLoco.Core.Console;
 
 namespace lokqlDx;
 
 /// <summary>
-///     Simple IConsole implementation that allows a RichTextBox to emulate a console for output text
+///     Simple IKustoConsole implementation that allows a RichTextBox to emulate a console for output text
 /// </summary>
-/// <remarks>
-///     Rather than mess around with different dispatcher contexts, we just mandate that the client
-///     app needs to render the buffered text at the end of the operation.
-/// </remarks>
-public class WpfConsole : IConsole
+public class WpfConsole : IKustoConsole
 {
     private readonly RichTextBox _control;
-   
-    private ConsoleColor _currentColor = ConsoleColor.Red;
 
-    public WpfConsole(RichTextBox control) => _control = control;
+
+    public WpfConsole(RichTextBox control)
+    {
+        _control = control;
+    }
 
     //calculate the number of visible columns in the RichTextBox
     public int VisibleColumns
@@ -41,23 +38,21 @@ public class WpfConsole : IConsole
 
     public void Write(string s)
     {
-         var line = new ColoredText(_currentColor, s);
+        var line = new ColoredText(ForegroundColor, s);
 
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            RenderTextBufferToWpfControl(line);
-        });
+        Application.Current.Dispatcher.Invoke(() => { RenderTextBufferToWpfControl(line); });
     }
 
-    public void SetForegroundColor(ConsoleColor color)
-    {
-        _currentColor = color;
-    }
+    public ConsoleColor ForegroundColor { get; set; }
+
 
     public int WindowWidth { get; private set; }
 
 
-    public string ReadLine() => string.Empty;
+    public string ReadLine()
+    {
+        return string.Empty;
+    }
 
     /// <summary>
     ///     Prepare for new text output and calculate the width of the console window
@@ -69,14 +64,15 @@ public class WpfConsole : IConsole
             _control.Document.Blocks.Clear();
             _control.Document.LineHeight = 1;
             WindowWidth = Math.Max(10, VisibleColumns);
+            //TODO - works around some weirdness in the RichTextBox control
+            //that causes it to not render a newline after the first line of text
+            AppendText(_control,"\r\n",Brushes.Black);
         });
-       
     }
 
 
     private static void AppendText(RichTextBox box, string text, Brush color)
     {
-        text = text.Replace("\r", "");
         var tr = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd)
         {
             Text = text
@@ -89,6 +85,7 @@ public class WpfConsole : IConsole
         catch (FormatException)
         {
         }
+
         box.ScrollToEnd();
     }
 
@@ -97,10 +94,7 @@ public class WpfConsole : IConsole
     /// </summary>
     private void RenderTextBufferToWpfControl(ColoredText line)
     {
-      
-     
-            AppendText(_control, line.Text, GetColor(line.Color));
-      
+        AppendText(_control, line.Text, GetColor(line.Color));
     }
 
     private Brush GetColor(ConsoleColor lineColor)
@@ -145,4 +139,5 @@ public class WpfConsole : IConsole
     }
 
     private readonly record struct ColoredText(ConsoleColor Color, string Text);
+   
 }

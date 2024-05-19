@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
@@ -9,12 +10,12 @@ namespace Lokql.Engine;
 public class TextTableAdaptor : IFileBasedTableAccess
 {
     private readonly KustoSettingsProvider _settings;
-    private readonly IProgress<string> _progressReporter;
+    private readonly IKustoConsole _console;
 
-    public TextTableAdaptor(KustoSettingsProvider settings,IProgress<string> progressReporter)
+    public TextTableAdaptor(KustoSettingsProvider settings,IKustoConsole console)
     {
         _settings = settings;
-        _progressReporter = progressReporter;
+        _console = console;
     }
     public IReadOnlyCollection<string> SupportedFileExtensions() => [".txt"];
 

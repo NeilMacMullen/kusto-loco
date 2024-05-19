@@ -26,8 +26,7 @@ public partial class MainWindow : Window
         _console = new WpfConsole(OutputText);
         var settings = new KustoSettingsProvider();
         _workspaceManager = new WorkspaceManager(settings);
-        var pr = new VirtualConsoleProgressReporter(_console);
-        var loader = new StandardFormatAdaptor(settings,pr);
+        var loader = new StandardFormatAdaptor(settings,_console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
     }
 
@@ -93,8 +92,7 @@ public partial class MainWindow : Window
     {
         Editor.SetText(_workspaceManager.UserText);
         var settings = _workspaceManager.Settings;
-        var pr = new VirtualConsoleProgressReporter(_console);
-        var loader = new StandardFormatAdaptor(settings,pr);
+        var loader = new StandardFormatAdaptor(settings,_console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
         UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path}";

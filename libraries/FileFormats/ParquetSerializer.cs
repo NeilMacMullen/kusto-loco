@@ -1,4 +1,5 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
@@ -17,14 +18,14 @@ namespace KustoLoco.FileFormats;
 public class ParquetSerializer : ITableSerializer
 {
 
-    public ParquetSerializer(KustoSettingsProvider settings, IProgress<string> progressReporter)
+    public ParquetSerializer(KustoSettingsProvider settings, IKustoConsole console)
     {
         _settings = settings;
-        _progressReporter = progressReporter;
+        _console = console;
     }
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly KustoSettingsProvider _settings;
-    private readonly IProgress<string> _progressReporter;
+    private readonly IKustoConsole _console;
 
     public async Task<TableLoadResult> LoadTable(string path, string tableName)
     {
@@ -86,7 +87,7 @@ public class ParquetSerializer : ITableSerializer
         foreach (var c in rg)
         {
             var type = c.Field.ClrType;
-            _progressReporter.Report($"reading column {c.Field.Name} of type {c.Field.Name}");
+            _console.ShowProgress($"Reading column {c.Field.Name} of type {c.Field.Name}");
             //TODO - surely there is a more efficient way to do this by wrapping the original data?
             var colBuilder = ColumnHelpers.CreateBuilder(type);
             foreach (var o in c.Data)
@@ -94,7 +95,7 @@ public class ParquetSerializer : ITableSerializer
 
             tableBuilder.WithColumn(c.Field.Name, colBuilder.ToColumn());
         }
-
+        _console.CompleteProgress("");
         return tableBuilder.ToTableSource();
     }
 }

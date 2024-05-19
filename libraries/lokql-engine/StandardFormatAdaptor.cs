@@ -1,4 +1,5 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
@@ -18,19 +19,19 @@ public class StandardFormatAdaptor : ITableAdaptor
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly KustoSettingsProvider _settings;
-    private readonly IProgress<string> _progressReporter;
+    private readonly IKustoConsole _console;
 
-    public StandardFormatAdaptor(KustoSettingsProvider settings,IProgress<string> progressReporter)
+    public StandardFormatAdaptor(KustoSettingsProvider settings,IKustoConsole console)
     {
         _settings = settings;
-        _progressReporter = progressReporter;
+        _console = console;
         _loaders =
         [
-            new CsvTableAdaptor(settings,progressReporter),
-            new TsvTableAdaptor(settings,progressReporter),
-            new ParquetTableAdaptor(settings,progressReporter),
-            new TextTableAdaptor(settings,progressReporter),
-            new JsonArrayTableAdaptor(settings,progressReporter)
+            new CsvTableAdaptor(settings,console),
+            new TsvTableAdaptor(settings,console),
+            new ParquetTableAdaptor(settings,console),
+            new TextTableAdaptor(settings,console),
+            new JsonArrayTableAdaptor(settings,console)
         ];
         _settings.Register(Settings.KustoDataPath);
 
@@ -53,7 +54,7 @@ public class StandardFormatAdaptor : ITableAdaptor
     {
         if (result.RowCount == 0)
         {
-            _progressReporter.Report("No rows to save");
+            _console.Warn("No rows to save");
             return false;
         }
 
@@ -69,12 +70,12 @@ public class StandardFormatAdaptor : ITableAdaptor
             //todo -here -  quick hack to ensure we only save to one place!
             if (success)
             {
-                _progressReporter.Report($"Saved {result.RowCount} rows x {result.ColumnCount} columns to {filepath}");
+                _console.Info($"Saved {result.RowCount} rows x {result.ColumnCount} columns to {filepath}");
                 return success;
             }
         }
 
-        _progressReporter.Report($"Unable to save result to {path}");
+        _console.Info($"Unable to save result to {path}");
         return false;
     }
 
@@ -107,12 +108,12 @@ public class StandardFormatAdaptor : ITableAdaptor
             var success = await loader.TryLoad(filepath, context, tableName);
             if (success)
             {
-                _progressReporter.Report($"Loaded table '{tableName}' from {filepath}");
+                _console.Info($"Loaded table '{tableName}' from {filepath}");
                 return true;
             }
         }
 
-        _progressReporter.Report($"Unable to load table '{tableName}' from {path}");
+        _console.Warn($"Unable to load table '{tableName}' from {path}");
         return false;
     }
 

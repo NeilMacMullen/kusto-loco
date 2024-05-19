@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Text.Json;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using NLog;
 
@@ -9,13 +10,13 @@ namespace KustoLoco.FileFormats;
 public class JsonObjectArraySerializer : ITableSerializer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private readonly IProgress<string> _progressReporter;
+    private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
 
-    public JsonObjectArraySerializer(KustoSettingsProvider settings, IProgress<string> progressReporter)
+    public JsonObjectArraySerializer(KustoSettingsProvider settings, IKustoConsole console)
     {
         _settings = settings;
-        _progressReporter = progressReporter;
+        _console = console;
         _settings.Register(JsonSerializerSettings.SkipTypeInference);
     }
 
@@ -49,7 +50,7 @@ public class JsonObjectArraySerializer : ITableSerializer
             .ToTableSource();
 
         if (!_settings.GetBool(JsonSerializerSettings.SkipTypeInference))
-            table = TableBuilder.AutoInferColumnTypes(table, _progressReporter);
+            table = TableBuilder.AutoInferColumnTypes(table, _console);
 
 
         return Task.FromResult(TableLoadResult.Success(table));

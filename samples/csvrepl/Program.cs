@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using NotNullStrings;
@@ -7,7 +8,7 @@ using Spectre.Console;
 
 ShowHelpIfAppropriate();
 var settings = new KustoSettingsProvider();
-var result = await CsvSerializer.Default(settings,new ConsoleProgressReporter())
+var result = await CsvSerializer.Default(settings,new SystemConsole())
     .LoadTable(args.First(), "data");
 
 if (result.Error.IsNotBlank())

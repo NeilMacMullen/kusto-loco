@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using CommandLine;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
@@ -32,13 +33,13 @@ public class InteractiveTableExplorer
 
     private readonly ITableAdaptor _loader;
     public readonly KustoSettingsProvider _settings;
-    private readonly IConsole _outputConsole;
+    private readonly IKustoConsole _outputConsole;
     private readonly StringBuilder _commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IConsole outputConsole, ITableAdaptor loader,KustoSettingsProvider settings)
+    public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader,KustoSettingsProvider settings)
     {
         _outputConsole = outputConsole;
         _loader = loader;
@@ -56,7 +57,7 @@ public class InteractiveTableExplorer
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
-        _outputConsole.SetForegroundColor(ConsoleColor.Green);
+        _outputConsole.ForegroundColor = ConsoleColor.Green;
 
 
         var prefs = new KustoFormatter.DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
@@ -75,7 +76,7 @@ public class InteractiveTableExplorer
         }
         else
         {
-            _outputConsole.SetForegroundColor(ConsoleColor.Green);
+            _outputConsole.ForegroundColor=ConsoleColor.Green;
             if (result.RowCount == 0)
             {
                 Warn("No results");
@@ -102,7 +103,7 @@ public class InteractiveTableExplorer
 
         while (true)
         {
-            _outputConsole.SetForegroundColor(ConsoleColor.Blue);
+            _outputConsole.ForegroundColor = ConsoleColor.Blue;
             _outputConsole.Write("KQL> ");
             var query = _outputConsole.ReadLine();
             await RunInput(query, true);
@@ -111,7 +112,7 @@ public class InteractiveTableExplorer
 
     private async Task ExecuteAsync(string line)
     {
-        _outputConsole.SetForegroundColor(ConsoleColor.Blue);
+        _outputConsole.ForegroundColor=ConsoleColor.Blue;
 
         _outputConsole.WriteLine($"KQL> {line}");
         await RunInput(line, true);
@@ -174,7 +175,7 @@ public class InteractiveTableExplorer
 
     private void ShowError(string message)
     {
-        _outputConsole.SetForegroundColor(ConsoleColor.DarkRed);
+        _outputConsole.ForegroundColor =ConsoleColor.DarkRed;
         _outputConsole.WriteLine("Error:");
         _outputConsole.WriteLine(message);
     }
@@ -263,7 +264,7 @@ public class InteractiveTableExplorer
 
     private void Info(string s)
     {
-        _outputConsole.SetForegroundColor(ConsoleColor.Yellow);
+        _outputConsole.ForegroundColor= ConsoleColor.Yellow;
         _outputConsole.WriteLine(s);
     }
 
@@ -565,11 +566,7 @@ public class InteractiveTableExplorer
         }
     }
 
-    public void Warn(string s)
-    {
-        _outputConsole.SetForegroundColor(ConsoleColor.Red);
-        _outputConsole.WriteLine(s);
-    }
+    public void Warn(string s) => _outputConsole.Warn(s);
 
 
     public static class SynTableCommand

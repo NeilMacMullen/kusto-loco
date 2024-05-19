@@ -2,6 +2,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
@@ -10,16 +11,15 @@ namespace KustoLoco.FileFormats;
 
 public class CsvSerializer : ITableSerializer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly CsvConfiguration _config;
-    private readonly IProgress<string> _progressReporter;
+    private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
 
-    public CsvSerializer(CsvConfiguration config, KustoSettingsProvider settings, IProgress<string> progressReporter)
+    public CsvSerializer(CsvConfiguration config, KustoSettingsProvider settings, IKustoConsole console)
     {
         _config = config;
         _settings = settings;
-        _progressReporter = progressReporter;
+        _console = console;
         settings.Register(CsvSerializerSettings.SkipTypeInference, CsvSerializerSettings.TrimCells);
     }
 
@@ -29,7 +29,7 @@ public class CsvSerializer : ITableSerializer
         {
             var table = Load(path, tableName);
             if (!_settings.GetBool(CsvSerializerSettings.SkipTypeInference))
-                table = TableBuilder.AutoInferColumnTypes(table, _progressReporter);
+                table = TableBuilder.AutoInferColumnTypes(table, _console);
 
             return Task.FromResult(TableLoadResult.Success(table));
         }
@@ -46,18 +46,18 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public static CsvSerializer Default(KustoSettingsProvider settings, IProgress<string> progressReporter)
+    public static CsvSerializer Default(KustoSettingsProvider settings, IKustoConsole console)
     {
-        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture), settings, progressReporter);
+        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture), settings, console);
     }
 
-    public static CsvSerializer Tsv(KustoSettingsProvider settings, IProgress<string> progressReporter)
+    public static CsvSerializer Tsv(KustoSettingsProvider settings, IKustoConsole console)
     {
         return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = "\t"
             }
-            , settings, progressReporter);
+            , settings, console);
     }
 
     private ITableSource Load(TextReader reader, string tableName)
@@ -83,14 +83,14 @@ public class CsvSerializer : ITableSerializer
 
             rowCount++;
             if (rowCount % 100_000 == 0)
-                _progressReporter.Report($"{rowCount} records read");
+                _console.ShowProgress($"loaded {rowCount} records");
         }
-
+       
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++) tableBuilder.WithColumn(keys[i], builders[i].ToColumn());
 
         var tableSource = tableBuilder.ToTableSource();
-        _progressReporter.Report("Loaded");
+        _console.CompleteProgress($"loaded {rowCount} records");
         return tableSource;
     }
 
