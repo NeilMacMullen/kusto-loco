@@ -203,10 +203,10 @@ public class InteractiveTableExplorer
 
     #region internal commands
 
-    private Task RunInternalCommand(string[] args)
+    private async Task RunInternalCommand(string[] args)
     {
-        var textWriter = new ConsoleTextWriter(_outputConsole);
-        return StandardParsers.CreateWithHelpWriter(textWriter)
+        var textWriter = new StringWriter();
+        await StandardParsers.CreateWithHelpWriter(textWriter)
                 .ParseArguments(args,
                     typeof(ExitCommand.Options),
                     typeof(SaveCommand.Options),
@@ -245,6 +245,7 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<ListSettingDefinitionsCommand.Options>(o =>
                     ListSettingDefinitionsCommand.RunAsync(this, o))
             ;
+        _outputConsole.Info(textWriter.ToString());
     }
 
 
