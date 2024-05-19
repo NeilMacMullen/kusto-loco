@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using NotNullStrings;
 
@@ -14,14 +15,12 @@ namespace lokqlDx;
 /// </remarks>
 public class WorkspaceManager
 {
-
     public const string Extension = "lokql";
     public static string GlobPattern=> $"*.{Extension}";
-    public string _path =string.Empty;
+    public string Path =string.Empty;
    
     public string UserText { get; private set; } = string.Empty;
-
-    public KustoSettings Settings{ get;private set;} = new KustoSettings();
+    public KustoSettingsProvider Settings { get; }
 
     private void EnsureWorkspacePopulated()
     {
@@ -46,22 +45,23 @@ data
     }
 
 
-    public WorkspaceManager()
+    public WorkspaceManager(KustoSettingsProvider settings)
     {
+        Settings = settings;
     }
 
-    public void Save(string path,string userText,KustoSettings settings)
+    public void Save(string path,string userText)
     {
         var workspace = new Workspace
         {
             Text = userText,
-            Settings = settings.Enumerate().ToDictionary(kv=>kv.Name,kv=>kv.Value)
+            Settings = Settings.Enumerate().ToDictionary(kv=>kv.Name,kv=>kv.Value)
         };
-        _path = path;
+        Path = path;
         try
         {
             var json = JsonSerializer.Serialize(workspace);
-            File.WriteAllText(_path, json);
+            File.WriteAllText(Path, json);
         }
         catch (Exception e)
         {
@@ -71,13 +71,13 @@ data
 
     public void Load(string path)
     {
-        _path = path;
+        Path = path;
         try
         {
-            var json = File.ReadAllText(_path);
+            var json = File.ReadAllText(Path);
             var workspace = JsonSerializer.Deserialize<Workspace>(json)!;
             UserText = workspace.Text;
-            Settings = new KustoSettings();
+            Settings.Reset();
             foreach (var kv in workspace.Settings)
             {
                 Settings.Set(kv.Key, kv.Value);
@@ -93,10 +93,10 @@ data
     public void CreateNewInCurrentFolder()
     {
         UserText=string.Empty;
-        Settings = new KustoSettings();
-       _path = Path.Combine(ContainingFolder(),
-           Path.ChangeExtension("new",Extension));
+        Settings.Reset();
+       Path = System.IO.Path.Combine(ContainingFolder(),
+           System.IO.Path.ChangeExtension("new",Extension));
     }
 
-    public string ContainingFolder() =>Path.GetDirectoryName(_path).NullToEmpty();
+    public string ContainingFolder() =>System.IO.Path.GetDirectoryName(Path).NullToEmpty();
 }

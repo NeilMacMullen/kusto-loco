@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Running;
 using KustoLoco.FileFormats;
 using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 
 namespace Benchmarks
 {
@@ -14,8 +15,10 @@ namespace Benchmarks
         public void Setup()
         {
             _context = new KustoQueryContext();
-            var settings = new KustoSettings();
-            CsvSerializer.Default.Load(@"C:\temp\locations.csv",  "data",new NullProgressReporter(),settings);
+            var settings = new KustoSettingsProvider();
+            CsvSerializer.Default(settings,new NullProgressReporter())
+
+                .Load(@"C:\temp\locations.csv", "data");
         }
 
 

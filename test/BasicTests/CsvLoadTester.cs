@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using FluentAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
 namespace BasicTests
@@ -19,8 +20,8 @@ Name,Count
 acd,100
 def,30
 ";
-            var settings = new KustoSettings();
-            var t =CsvSerializer.Default.LoadFromString(csv, "data",settings);
+            var t =CsvSerializer.Default(new KustoSettingsProvider(),new NullProgressReporter())
+                .LoadFromString(csv, "data");
             t = TableBuilder.AutoInferColumnTypes(t,new NullProgressReporter());
             context.AddTable(t);
             var nameResult = (await context.RunQuery("data | where Name contains 'a'"));

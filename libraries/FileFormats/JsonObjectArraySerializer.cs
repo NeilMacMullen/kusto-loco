@@ -1,23 +1,33 @@
-﻿using KustoLoco.Core;
-using NLog;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Text.Json;
+using KustoLoco.Core;
+using KustoLoco.Core.Settings;
+using NLog;
 
 namespace KustoLoco.FileFormats;
 
 public class JsonObjectArraySerializer : ITableSerializer
 {
-    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result, IProgress<string> progressReporter)
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private readonly IProgress<string> _progressReporter;
+    private readonly KustoSettingsProvider _settings;
+
+    public JsonObjectArraySerializer(KustoSettingsProvider settings, IProgress<string> progressReporter)
+    {
+        _settings = settings;
+        _progressReporter = progressReporter;
+        _settings.Register(JsonSerializerSettings.SkipTypeInference);
+    }
+
+    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
         var json = result.ToJsonString();
         File.WriteAllText(path, json);
         return Task.FromResult(TableSaveResult.Success());
     }
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-   
-    public Task<TableLoadResult> LoadTable(string path,string name, IProgress<string> progressReporter, KustoSettings settings)
+    public Task<TableLoadResult> LoadTable(string path, string name)
     {
         var text = File.ReadAllText(path);
         var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
@@ -26,14 +36,10 @@ public class JsonObjectArraySerializer : ITableSerializer
         {
             var s = new OrderedDictionary();
             foreach (var k in d.Keys)
-            {
                 if (d[k] is JsonElement e && e.ValueKind == JsonValueKind.Array)
-                {
                     s[k] = string.Join(";", e.EnumerateArray().Select(i => i.ToString()));
-                }
                 else
                     s[k] = d[k]?.ToString() ?? string.Empty;
-            }
             sdlist.Add(s);
         }
 
@@ -42,23 +48,25 @@ public class JsonObjectArraySerializer : ITableSerializer
                 sdlist)
             .ToTableSource();
 
-        if (!settings.Get(JsonSerializerSettings.SkipTypeInference, false))
-                table = TableBuilder.AutoInferColumnTypes(table, progressReporter);
+        if (!_settings.GetBool(JsonSerializerSettings.SkipTypeInference))
+            table = TableBuilder.AutoInferColumnTypes(table, _progressReporter);
 
-       
+
         return Task.FromResult(TableLoadResult.Success(table));
     }
 
-private static class JsonSerializerSettings
-{
-    //TODO - source generation would allow much more flexibility for
-    //self-describing settings  
-    private const string prefix = "json";
-    private static string Setting(string setting) => $"{prefix}.{setting}";
-    public static string SkipTypeInference => Setting("skipTypeInference");
-    public static string TrimCells => Setting("TrimCells");
+    private static class JsonSerializerSettings
+    {
+        //TODO - source generation would allow much more flexibility for
+        //self-describing settings  
+        private const string prefix = "json";
+
+        public static readonly KustoSettingDefinition SkipTypeInference = new(Setting("skipTypeInference"),
+            "skips type inference", "false", nameof(Boolean));
+
+        private static string Setting(string setting)
+        {
+            return $"{prefix}.{setting}";
+        }
+    }
 }
-
-}
-
-

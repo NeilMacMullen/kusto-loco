@@ -4,6 +4,7 @@ using System.Text;
 using CommandLine;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using NLog;
@@ -30,14 +31,14 @@ public class InteractiveTableExplorer
     private readonly KustoQueryContext _context = new();
 
     private readonly ITableAdaptor _loader;
-    public readonly KustoSettings _settings;
+    public readonly KustoSettingsProvider _settings;
     private readonly IConsole _outputConsole;
     private readonly StringBuilder _commandBuffer = new();
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IConsole outputConsole, ITableAdaptor loader,KustoSettings settings)
+    public InteractiveTableExplorer(IConsole outputConsole, ITableAdaptor loader,KustoSettingsProvider settings)
     {
         _outputConsole = outputConsole;
         _loader = loader;
@@ -214,7 +215,8 @@ public class InteractiveTableExplorer
                     typeof(TestCommand.Options),
                     typeof(FileFormatsCommand.Options),
                     typeof(SetCommand.Options),
-                    typeof(ListSettingsCommand.Options)
+                    typeof(ListSettingsCommand.Options),
+                    typeof(ListSettingDefinitionsCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -232,6 +234,7 @@ public class InteractiveTableExplorer
             .WithParsedAsync<FileFormatsCommand.Options>(o => FileFormatsCommand.RunAsync(this, o))
                 .WithParsedAsync<SetCommand.Options>(o => SetCommand.RunAsync(this, o))
                 .WithParsedAsync<ListSettingsCommand.Options>(o => ListSettingsCommand.RunAsync(this, o))
+                .WithParsedAsync<ListSettingDefinitionsCommand.Options>(o=>ListSettingDefinitionsCommand.RunAsync(this,o))
             ;
     }
 
@@ -331,8 +334,8 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
-            await exp._loader.SaveResult(exp._prevResult, o.File,pr);
+            
+            await exp._loader.SaveResult(exp._prevResult, o.File);
         }
 
         [Verb("save", aliases: ["sv"], HelpText = "save last results to file")]
@@ -475,8 +478,8 @@ public class InteractiveTableExplorer
                 }
             }
 
-            var pr = new VirtualConsoleProgressReporter(exp._outputConsole);
-            var success = await exp._loader.LoadTable(exp._context, o.File, tableName, pr);
+          
+            var success = await exp._loader.LoadTable(exp._context, o.File, tableName);
             if (!success) exp.Warn($"Unable to load '{o.File}'");
            
         }
@@ -537,12 +540,30 @@ public class InteractiveTableExplorer
         {
             [Value(0, HelpText = "match substring", Required = false)]
             public string Match { get; set; } = string.Empty;
-
-            
-
         }
     }
 
+
+    public static class ListSettingDefinitionsCommand
+    {
+        internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            foreach (var def in exp._settings.GetDefinitions().OrderBy(d=>d.Name))
+            {
+                if (!def.Name.Contains(o.Match))
+                    continue;
+                exp.Info($"{def}");
+            }
+            return Task.CompletedTask;
+        }
+
+        [Verb("defs", HelpText = "lists all setting definitions")]
+        internal class Options
+        {
+            [Value(0, HelpText = "match substring", Required = false)]
+            public string Match { get; set; } = string.Empty;
+        }
+    }
 
     public void Warn(string s)
     {
@@ -602,4 +623,9 @@ public class InteractiveTableExplorer
     }
 
     #endregion
+
+    public void SetWorkingPaths(string containingFolder)
+    {
+        _loader.SetDataPaths(containingFolder);
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
 namespace Lokql.Engine;
@@ -16,38 +17,43 @@ namespace Lokql.Engine;
 public class StandardFormatAdaptor : ITableAdaptor
 {
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
-    private readonly KustoSettings _settings;
+    private readonly KustoSettingsProvider _settings;
+    private readonly IProgress<string> _progressReporter;
 
-    public StandardFormatAdaptor(KustoSettings settings)
+    public StandardFormatAdaptor(KustoSettingsProvider settings,IProgress<string> progressReporter)
     {
         _settings = settings;
+        _progressReporter = progressReporter;
         _loaders =
         [
-            new CsvTableAdaptor(),
-            new TsvTableAdaptor(),
-            new ParquetTableAdaptor(),
-            new TextTableAdaptor(),
-            new JsonArrayTableAdaptor()
+            new CsvTableAdaptor(settings,progressReporter),
+            new TsvTableAdaptor(settings,progressReporter),
+            new ParquetTableAdaptor(settings,progressReporter),
+            new TextTableAdaptor(settings,progressReporter),
+            new JsonArrayTableAdaptor(settings,progressReporter)
         ];
-    }
+        _settings.Register(Settings.KustoDataPath);
 
-    private IReadOnlyCollection<string> Paths => _settings.GetPathList(KustoSettingNames.KustoDataPath, [@"c:\kusto"]);
+
+}
+
+    private IReadOnlyCollection<string> Paths => _settings.GetPathList(Settings.KustoDataPath);
 
     public async Task LoadTablesAsync(KustoQueryContext context, IReadOnlyCollection<string> tableNames)
     {
         foreach (var path in tableNames)
         {
-            if (await LoadTable(context, path, path, new NullProgressReporter()))
+            if (await LoadTable(context, path, path))
                 continue;
             break;
         }
     }
 
-    public async Task<bool> SaveResult(KustoQueryResult result, string path, IProgress<string> progressReporter)
+    public async Task<bool> SaveResult(KustoQueryResult result, string path)
     {
         if (result.RowCount == 0)
         {
-            progressReporter.Report("No rows to save");
+            _progressReporter.Report("No rows to save");
             return false;
         }
 
@@ -63,12 +69,12 @@ public class StandardFormatAdaptor : ITableAdaptor
             //todo -here -  quick hack to ensure we only save to one place!
             if (success)
             {
-                progressReporter.Report($"Saved {result.RowCount} rows x {result.ColumnCount} columns to {filepath}");
+                _progressReporter.Report($"Saved {result.RowCount} rows x {result.ColumnCount} columns to {filepath}");
                 return success;
             }
         }
 
-        progressReporter.Report($"Unable to save result to {path}");
+        _progressReporter.Report($"Unable to save result to {path}");
         return false;
     }
 
@@ -77,8 +83,12 @@ public class StandardFormatAdaptor : ITableAdaptor
         return _loaders.Select(l => l.GetDescription()).ToArray();
     }
 
-    public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName,
-        IProgress<string> progressReporter)
+    public void SetDataPaths(string path)
+    {
+        _settings.Set(Settings.KustoDataPath.Name, path);
+    }
+
+    public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName)
     {
         var alreadyPresent = context.HasTable(tableName);
         if (alreadyPresent)
@@ -94,15 +104,15 @@ public class StandardFormatAdaptor : ITableAdaptor
         {
             if (!Path.Exists(filepath)) break;
 
-            var success = await loader.TryLoad(filepath, context, tableName, progressReporter, _settings);
+            var success = await loader.TryLoad(filepath, context, tableName);
             if (success)
             {
-                progressReporter.Report($"Loaded table '{tableName}' from {filepath}");
+                _progressReporter.Report($"Loaded table '{tableName}' from {filepath}");
                 return true;
             }
         }
 
-        progressReporter.Report($"Unable to load table '{tableName}' from {path}");
+        _progressReporter.Report($"Unable to load table '{tableName}' from {path}");
         return false;
     }
 
@@ -115,4 +125,10 @@ public class StandardFormatAdaptor : ITableAdaptor
 
         return new NullFileLoader();
     }
+    public static class Settings
+    {
+        public static readonly KustoSettingDefinition KustoDataPath = new("kusto.datapath",
+            "Search path for kusto data files", @"C:\kusto", nameof(String));
+    }
+
 }
