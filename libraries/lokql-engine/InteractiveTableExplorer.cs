@@ -6,7 +6,6 @@ using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
-using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using NLog;
 using NotNullStrings;
@@ -29,17 +28,17 @@ namespace Lokql.Engine;
 public class InteractiveTableExplorer
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    private readonly StringBuilder _commandBuffer = new();
     private readonly KustoQueryContext _context = new();
 
     private readonly ITableAdaptor _loader;
-    public readonly KustoSettingsProvider _settings;
     private readonly IKustoConsole _outputConsole;
-    private readonly StringBuilder _commandBuffer = new();
+    public readonly KustoSettingsProvider _settings;
 
     private DisplayOptions _currentDisplayOptions = new(10);
     private KustoQueryResult _prevResult;
 
-    public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader,KustoSettingsProvider settings)
+    public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings)
     {
         _outputConsole = outputConsole;
         _loader = loader;
@@ -48,7 +47,6 @@ public class InteractiveTableExplorer
         _prevResult = KustoQueryResult.Empty;
     }
 
-   
 
     private KustoQueryContext GetCurrentContext()
     {
@@ -65,7 +63,7 @@ public class InteractiveTableExplorer
 
         if (maxToDisplay < result.RowCount)
             Warn(
-                $"Display was truncated to first {maxToDisplay} of {result.RowCount}.  Use '.display --max' to change this behaviour");
+                $"Display was truncated to first {maxToDisplay} of {result.RowCount}.  Use '.display -m <n>' to change this behaviour");
     }
 
     private void DisplayResults(KustoQueryResult result, bool autoRender)
@@ -76,7 +74,7 @@ public class InteractiveTableExplorer
         }
         else
         {
-            _outputConsole.ForegroundColor=ConsoleColor.Green;
+            _outputConsole.ForegroundColor = ConsoleColor.Green;
             if (result.RowCount == 0)
             {
                 Warn("No results");
@@ -112,7 +110,7 @@ public class InteractiveTableExplorer
 
     private async Task ExecuteAsync(string line)
     {
-        _outputConsole.ForegroundColor=ConsoleColor.Blue;
+        _outputConsole.ForegroundColor = ConsoleColor.Blue;
 
         _outputConsole.WriteLine($"KQL> {line}");
         await RunInput(line, true);
@@ -175,7 +173,7 @@ public class InteractiveTableExplorer
 
     private void ShowError(string message)
     {
-        _outputConsole.ForegroundColor =ConsoleColor.DarkRed;
+        _outputConsole.ForegroundColor = ConsoleColor.DarkRed;
         _outputConsole.WriteLine("Error:");
         _outputConsole.WriteLine(message);
     }
@@ -189,6 +187,11 @@ public class InteractiveTableExplorer
         if (!Path.HasExtension(path))
             path = Path.ChangeExtension(path, extension);
         return path;
+    }
+
+    public void SetWorkingPaths(string containingFolder)
+    {
+        _loader.SetDataPaths(containingFolder);
     }
 
 
@@ -232,10 +235,11 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<QueryCommand.Options>(o => QueryCommand.RunAsync(this, o))
                 .WithParsedAsync<ShowCommand.Options>(o => ShowCommand.RunAsync(this, o))
                 .WithParsedAsync<TestCommand.Options>(o => TestCommand.RunAsync(this, o))
-            .WithParsedAsync<FileFormatsCommand.Options>(o => FileFormatsCommand.RunAsync(this, o))
+                .WithParsedAsync<FileFormatsCommand.Options>(o => FileFormatsCommand.RunAsync(this, o))
                 .WithParsedAsync<SetCommand.Options>(o => SetCommand.RunAsync(this, o))
                 .WithParsedAsync<ListSettingsCommand.Options>(o => ListSettingsCommand.RunAsync(this, o))
-                .WithParsedAsync<ListSettingDefinitionsCommand.Options>(o=>ListSettingDefinitionsCommand.RunAsync(this,o))
+                .WithParsedAsync<ListSettingDefinitionsCommand.Options>(o =>
+                    ListSettingDefinitionsCommand.RunAsync(this, o))
             ;
     }
 
@@ -243,13 +247,14 @@ public class InteractiveTableExplorer
     public static class RunScriptCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
-        {/*
-            var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
+        {
+            /*
+                var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
 
-            exp.Info($"Loading '{filename}'..");
-            var lines = await File.ReadAllLinesAsync(filename);
-            foreach (var line in lines) await exp.ExecuteAsync(line);
-            */
+                exp.Info($"Loading '{filename}'..");
+                var lines = await File.ReadAllLinesAsync(filename);
+                foreach (var line in lines) await exp.ExecuteAsync(line);
+                */
             await Task.CompletedTask;
         }
 
@@ -258,13 +263,13 @@ public class InteractiveTableExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of script", Required = true)]
-            public string File { get; set; } =string.Empty;
+            public string File { get; set; } = string.Empty;
         }
     }
 
     private void Info(string s)
     {
-        _outputConsole.ForegroundColor= ConsoleColor.Yellow;
+        _outputConsole.ForegroundColor = ConsoleColor.Yellow;
         _outputConsole.WriteLine(s);
     }
 
@@ -296,23 +301,24 @@ public class InteractiveTableExplorer
     public static class SaveQueryCommand
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
-        {/*
-            var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
-            exp.Info($"Saving query to '{filename}'");
-            var q = exp._prevResult.Query;
-            if (!o.NoSplit)
-                q = q
-                        .Tokenize("|")
-                        .JoinString($"{Environment.NewLine}| ")
-                        .Tokenize(";")
-                        .JoinString($";{Environment.NewLine}")
-                    ;
+        {
+            /*
+                var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
+                exp.Info($"Saving query to '{filename}'");
+                var q = exp._prevResult.Query;
+                if (!o.NoSplit)
+                    q = q
+                            .Tokenize("|")
+                            .JoinString($"{Environment.NewLine}| ")
+                            .Tokenize(";")
+                            .JoinString($";{Environment.NewLine}")
+                        ;
 
-            var text = $@"//{o.Comment}
-{q}
-";
-            await File.WriteAllTextAsync(filename, text);
-            */
+                var text = $@"//{o.Comment}
+    {q}
+    ";
+                await File.WriteAllTextAsync(filename, text);
+                */
             await Task.CompletedTask;
         }
 
@@ -335,7 +341,6 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            
             await exp._loader.SaveResult(exp._prevResult, o.File);
         }
 
@@ -344,13 +349,12 @@ public class InteractiveTableExplorer
         {
             [Value(0, HelpText = "Name of file", Required = true)]
             public string File { get; set; } = string.Empty;
-
         }
     }
 
     public static class FileFormatsCommand
     {
-        internal static  Task RunAsync(InteractiveTableExplorer exp, Options o)
+        internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var formats = exp._loader.GetSupportedAdaptors()
                 .Select(f => $"{f.Name} ({f.Extensions.JoinString(", ")})")
@@ -362,7 +366,6 @@ public class InteractiveTableExplorer
         [Verb("formats", aliases: ["fmts"], HelpText = "list supported file formats for save/load")]
         internal class Options
         {
-          
         }
     }
 
@@ -479,10 +482,9 @@ public class InteractiveTableExplorer
                 }
             }
 
-          
+
             var success = await exp._loader.LoadTable(exp._context, o.File, tableName);
             if (!success) exp.Warn($"Unable to load '{o.File}'");
-           
         }
 
         [Verb("load", aliases: ["ld"],
@@ -504,11 +506,9 @@ public class InteractiveTableExplorer
     {
         internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            
             exp._settings.Set(o.Name, o.Value);
             exp.Info($"Set {o.Name} to {o.Value}");
             return Task.CompletedTask;
-
         }
 
         [Verb("set", HelpText = "sets a setting value")]
@@ -519,7 +519,6 @@ public class InteractiveTableExplorer
 
             [Value(1, HelpText = "Value of setting (omit to remove)")]
             public string Value { get; set; } = string.Empty;
-
         }
     }
 
@@ -527,12 +526,12 @@ public class InteractiveTableExplorer
     {
         internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            foreach (var (k, v) in exp._settings.Enumerate())
-            {
-                if(!k.Contains(o.Match))
-                    continue;
-                exp.Info($"{k} -> {v}");
-            }
+            var settings = exp._settings.Enumerate()
+                .Where(s => s.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
+                .OrderBy(s => s.Name);
+
+            var str = Tabulator.Tabulate(settings, "Name|Value",s => s.Name, s => s.Value);
+            exp.Info(str);
             return Task.CompletedTask;
         }
 
@@ -549,16 +548,16 @@ public class InteractiveTableExplorer
     {
         internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            foreach (var def in exp._settings.GetDefinitions().OrderBy(d=>d.Name))
-            {
-                if (!def.Name.Contains(o.Match))
-                    continue;
-                exp.Info($"{def}");
-            }
+            var defs = exp._settings.GetDefinitions()
+                .Where(d => d.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
+                .OrderBy(d => d.Name);
+
+            var str = Tabulator.Tabulate(defs, "Name|Description|Default",d => d.Name, d => d.Description, d => d.DefaultValue);
+            exp.Info(str);
             return Task.CompletedTask;
         }
 
-        [Verb("defs", HelpText = "lists all setting definitions")]
+        [Verb("settingdefinitions", HelpText = "lists all setting definitions")]
         internal class Options
         {
             [Value(0, HelpText = "match substring", Required = false)]
@@ -566,7 +565,10 @@ public class InteractiveTableExplorer
         }
     }
 
-    public void Warn(string s) => _outputConsole.Warn(s);
+    public void Warn(string s)
+    {
+        _outputConsole.Warn(s);
+    }
 
 
     public static class SynTableCommand
@@ -620,9 +622,4 @@ public class InteractiveTableExplorer
     }
 
     #endregion
-
-    public void SetWorkingPaths(string containingFolder)
-    {
-        _loader.SetDataPaths(containingFolder);
-    }
 }

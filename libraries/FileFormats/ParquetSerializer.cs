@@ -40,7 +40,7 @@ public class ParquetSerializer : ITableSerializer
         return TableSaveResult.Success();
     }
 
-    public static async Task Save(string path, KustoQueryResult result)
+    public async Task Save(string path, KustoQueryResult result)
     {
         await using Stream fs = File.OpenWrite(path);
         await SaveToStream(fs, result);
@@ -55,7 +55,7 @@ public class ParquetSerializer : ITableSerializer
         return builder.GetDataAsArray();
     }
 
-    public static async Task SaveToStream(Stream fs, KustoQueryResult result)
+    public async Task SaveToStream(Stream fs, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
             .Select(col =>
@@ -70,12 +70,14 @@ public class ParquetSerializer : ITableSerializer
         foreach (var col in result
                      .ColumnDefinitions())
         {
+            _console.ShowProgress($"Writing column {col.Name}...");
             var dataColumn = new DataColumn(
                 dataFields[col.Index],
                 CreateArrayFromRawObjects(col, result)
             );
             await groupWriter.WriteColumnAsync(dataColumn);
         }
+        _console.CompleteProgress("");
     }
 
     private async Task<ITableSource> LoadFromFile(string path, string tableName)

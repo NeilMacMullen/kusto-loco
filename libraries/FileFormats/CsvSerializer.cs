@@ -72,11 +72,11 @@ public class CsvSerializer : ITableSerializer
         var rowCount = 0;
         while (csv.Read())
         {
-            var IsTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
+            var isTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
 
             string TrimIfRequired(string s)
             {
-                return IsTrimRequired ? s.Trim() : s;
+                return isTrimRequired ? s.Trim() : s;
             }
 
             for (var i = 0; i < keys.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
@@ -110,16 +110,19 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public void WriteToCsvStream(KustoQueryResult result, int max, bool skipHeader, TextWriter writer)
+    public void WriteToCsvStream(KustoQueryResult result, bool skipHeader, TextWriter writer)
     {
         using var csv = new CsvWriter(writer, _config);
         if (!skipHeader)
             foreach (var heading in result.ColumnNames())
                 csv.WriteField(heading);
         csv.NextRecord();
-
+        var rowCount = 0;
         foreach (var r in result.EnumerateRows())
         {
+            rowCount++;
+            if (rowCount % 100_000 == 0)
+                _console.ShowProgress($"wrote {rowCount} records");
             foreach (var cell in r)
             {
                 var toPrint = cell is DateTime dt
@@ -130,12 +133,13 @@ public class CsvSerializer : ITableSerializer
 
             csv.NextRecord();
         }
+        _console.CompleteProgress($"wrote {rowCount} records");
     }
 
     private void WriteToCsv(string path, KustoQueryResult result)
     {
         using var writer = new StreamWriter(path);
-        WriteToCsvStream(result, int.MaxValue, false, writer);
+        WriteToCsvStream(result, false, writer);
     }
 
     private static class CsvSerializerSettings
