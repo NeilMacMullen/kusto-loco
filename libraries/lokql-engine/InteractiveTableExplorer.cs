@@ -43,9 +43,10 @@ public class InteractiveTableExplorer
         _outputConsole = outputConsole;
         _loader = loader;
         _settings = settings;
-        _context = KustoQueryContext.CreateWithDebug(outputConsole,settings);
+        _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.SetTableLoader(_loader);
         _prevResult = KustoQueryResult.Empty;
+        LokqlSettings.Register(_settings);
     }
 
 
@@ -193,6 +194,8 @@ public class InteractiveTableExplorer
     public void SetWorkingPaths(string containingFolder)
     {
         _loader.SetDataPaths(containingFolder);
+        _settings.Set(LokqlSettings.ScriptPath.Name, containingFolder);
+        _settings.Set(LokqlSettings.QueryPath.Name, containingFolder);
     }
 
 
@@ -249,14 +252,14 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            /*
-                var filename = ToFullPath(o.File, exp._folders.ScriptFolder, ".dfr");
+            var scriptFolder = exp._settings.Get(LokqlSettings.ScriptPath);
 
-                exp.Info($"Loading '{filename}'..");
-                var lines = await File.ReadAllLinesAsync(filename);
-                foreach (var line in lines) await exp.ExecuteAsync(line);
-                */
-            await Task.CompletedTask;
+            var filename = ToFullPath(o.File, scriptFolder, ".dfr");
+
+            exp.Info($"Loading script '{filename}'..");
+            var lines = await File.ReadAllLinesAsync(filename);
+            foreach (var line in lines)
+                await exp.ExecuteAsync(line);
         }
 
         [Verb("run", aliases: ["script", "r"],
@@ -278,13 +281,11 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            /*
-            var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
+            var queryFolder = exp._settings.Get(LokqlSettings.QueryPath);
+            var filename = ToFullPath(o.File, queryFolder, ".csl");
             exp.Info($"Fetching query '{filename}'");
             var query = await File.ReadAllTextAsync(filename);
             await exp.ExecuteAsync($"{o.Prefix}{query}");
-            */
-            await Task.CompletedTask;
         }
 
         [Verb("query", aliases: ["q"],
@@ -303,28 +304,26 @@ public class InteractiveTableExplorer
     {
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
-            /*
-                var filename = ToFullPath(o.File, exp._folders.QueryFolder, ".csl");
-                exp.Info($"Saving query to '{filename}'");
-                var q = exp._prevResult.Query;
-                if (!o.NoSplit)
-                    q = q
-                            .Tokenize("|")
-                            .JoinString($"{Environment.NewLine}| ")
-                            .Tokenize(";")
-                            .JoinString($";{Environment.NewLine}")
-                        ;
+            var queryFolder = exp._settings.Get(LokqlSettings.QueryPath);
+            var filename = ToFullPath(o.File, queryFolder, ".csl");
+            exp.Info($"Saving query as '{filename}'");
+            var q = exp._prevResult.Query;
+            if (!o.NoSplit)
+                q = q
+                        .Tokenize("|")
+                        .JoinString($"{Environment.NewLine}| ")
+                        .Tokenize(";")
+                        .JoinString($";{Environment.NewLine}")
+                    ;
 
-                var text = $@"//{o.Comment}
+            var text = $@"//{o.Comment}
     {q}
     ";
-                await File.WriteAllTextAsync(filename, text);
-                */
-            await Task.CompletedTask;
+            await File.WriteAllTextAsync(filename, text);
         }
 
         [Verb("savequery", aliases: ["sq"],
-            HelpText = "save a query to a file so you can use it again")]
+            HelpText = "save the previous query to a file so you can reuse it")]
         internal class Options
         {
             [Value(0, HelpText = "Name of queryFile", Required = true)]
@@ -418,13 +417,17 @@ public class InteractiveTableExplorer
             var result = exp._prevResult;
             var text = KustoResultRenderer.RenderToHtml(result);
             File.WriteAllText(fileName, text);
-            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
+            exp.Info($"Saved chart as {fileName}");
+            if(!o.SaveOnly)
+                Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
 
-        [Verb("render", aliases: ["ren"], HelpText = "render last results as html")]
+        [Verb("render", aliases: ["ren"], HelpText = "render last results as html and opens with browser")]
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
+            [Option("saveOnly", HelpText = "just save the file without opening in the browser")]
+            public bool SaveOnly { get; set; }
         }
     }
 
@@ -531,7 +534,7 @@ public class InteractiveTableExplorer
                 .Where(s => s.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(s => s.Name);
 
-            var str = Tabulator.Tabulate(settings, "Name|Value",s => s.Name, s => s.Value);
+            var str = Tabulator.Tabulate(settings, "Name|Value", s => s.Name, s => s.Value);
             exp.Info(str);
             return Task.CompletedTask;
         }
@@ -553,7 +556,8 @@ public class InteractiveTableExplorer
                 .Where(d => d.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(d => d.Name);
 
-            var str = Tabulator.Tabulate(defs, "Name|Description|Default",d => d.Name, d => d.Description, d => d.DefaultValue);
+            var str = Tabulator.Tabulate(defs, "Name|Description|Default", d => d.Name, d => d.Description,
+                d => d.DefaultValue);
             exp.Info(str);
             return Task.CompletedTask;
         }
@@ -623,4 +627,19 @@ public class InteractiveTableExplorer
     }
 
     #endregion
+}
+
+public static class LokqlSettings
+{
+    public static readonly KustoSettingDefinition ScriptPath = new("lokql.scriptpath",
+        "location of script files", @"C:\kusto", nameof(String));
+
+    public static readonly KustoSettingDefinition QueryPath = new("lokql.querypath",
+        "location of query files", @"C:\kusto", nameof(String));
+
+    public static void Register(KustoSettingsProvider settings)
+    {
+        settings.Register(ScriptPath);
+        settings.Register(QueryPath);
+    }
 }
