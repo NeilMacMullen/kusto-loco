@@ -3,6 +3,7 @@ using System.Diagnostics;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
 using FluentAssertions;
+using KustoLoco.Core.Console;
 using Xunit;
 
 namespace KustoLoco.Core.Tests;
@@ -87,7 +88,7 @@ iso:string
 
     private static void Test(string query, string expectedOutput)
     {
-        var engine = new BabyKustoEngine();
+        var engine = BabyKustoEngine.CreateForTest();
         var result = (TabularResult?)engine.Evaluate(
             Array.Empty<ITableSource>(),
             query);

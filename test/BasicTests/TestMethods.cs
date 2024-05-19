@@ -1,4 +1,5 @@
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using LogSetup;
 using NLog;
 using NotNullStrings;
@@ -12,7 +13,8 @@ public abstract class TestMethods
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    protected static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
+    protected static KustoQueryContext CreateContext()
+        => KustoQueryContext.CreateForTest();
 
     protected async Task<string> LastLineOfResult(string query)
     {

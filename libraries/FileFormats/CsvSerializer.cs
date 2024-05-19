@@ -145,11 +145,11 @@ public class CsvSerializer : ITableSerializer
     private static class CsvSerializerSettings
     {
         private const string prefix = "csv";
-
-        public static readonly KustoSettingDefinition SkipTypeInference = new(
+  public static readonly KustoSettingDefinition SkipTypeInference = new(
             Setting("skipTypeInference"), "prevents conversion of string columns to types",
             "off",
-            nameof(String));
+            nameof(Boolean));
+      
 
         public static readonly KustoSettingDefinition TrimCells = new(Setting("TrimCells"),
             "Removes leading and trailing whitespace from string values", "true", nameof(Boolean));

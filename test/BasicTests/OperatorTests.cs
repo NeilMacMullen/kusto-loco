@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using FluentAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource.Columns;
 using LogSetup;
 using LogLevel = NLog.LogLevel;
@@ -17,7 +18,7 @@ public class OperatorTests
 
     private static KustoQueryContext CreateContext()
     {
-        return KustoQueryContext.CreateWithDebug();
+        return KustoQueryContext.CreateForTest();
     }
 
     [TestMethod]

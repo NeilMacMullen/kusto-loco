@@ -1,5 +1,6 @@
 using FluentAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
 using LogSetup;
 using NLog;
@@ -14,7 +15,8 @@ public class ChunkTests
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }
 
-    private static KustoQueryContext CreateContext() => KustoQueryContext.CreateWithDebug();
+    private static KustoQueryContext CreateContext()
+        => KustoQueryContext.CreateForTest();
 
     private void AddChunkedTableFromRecords<T>(KustoQueryContext context,string tableName, IReadOnlyCollection<T> records, int chunkSize)
     {

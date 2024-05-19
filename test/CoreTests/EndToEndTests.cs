@@ -7,6 +7,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
 using FluentAssertions;
+using KustoLoco.Core.Console;
 using LogSetup;
 using NLog;
 using Xunit;
@@ -3799,9 +3800,9 @@ aaathis is a test";
 
     private static void Test(string query, string expectedOutput)
     {
-        var engine = new BabyKustoEngine();
+        var engine = BabyKustoEngine.CreateForTest();
         var result = (TabularResult)engine.Evaluate(
-            Array.Empty<ITableSource>(), query, true, true);
+            Array.Empty<ITableSource>(), query);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
@@ -4018,9 +4019,9 @@ aaathis is a test";
     [Fact]
     public void RenderTest()
     {
-        var engine = new BabyKustoEngine();
+        var engine = BabyKustoEngine.CreateForTest();
         var query = "print X=1 | render barchart with (legend=visible,ymax=100)";
-        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query, true, true);
+        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query);
         var vis = result.VisualizationState;
         vis.ChartType.Should().Be("barchart");
         vis.Items["legend"].Should().Be("visible");
@@ -4030,9 +4031,9 @@ aaathis is a test";
     [Fact]
     public void WhenNoRenderSpecifiedVisualisationShouldBeEmpty()
     {
-        var engine = new BabyKustoEngine();
+        var engine = BabyKustoEngine.CreateForTest();
         var query = "print X=1";
-        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query, true, true);
+        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query);
         var vis = result.VisualizationState;
         vis.Should().Be(VisualizationState.Empty);
     }

@@ -12,10 +12,8 @@ using NotNullStrings;
 
 namespace KustoLoco.Core.Diagnostics;
 
-internal class IrNodeVisualizer
+internal class IrNodeVisualizer(IKustoConsole console)
 {
-    private readonly IKustoConsole _console = new SystemConsole();
-
     public void DumpKustoTree(KustoCode code,bool show)
     {
         if (!show)
@@ -36,7 +34,7 @@ internal class IrNodeVisualizer
         sb.AppendLine();
         sb.AppendLine();
         var s=sb.ToString();
-        _console.WriteLine(s);
+        console.WriteLine(s);
     }
 
     public void DumpIRTree(IRNode node,bool show)
@@ -45,19 +43,19 @@ internal class IrNodeVisualizer
             return ;
         DumpTreeInternal(node, "");
 
-        _console.WriteLine();
-        _console.WriteLine();
+        console.WriteLine();
+        console.WriteLine();
     }
 
     private void DumpTreeInternal(IRNode node, string indent, bool isLast = true)
     {
-        var oldColor = _console.ForegroundColor;
+        var oldColor = console.ForegroundColor;
         try
         {
-            _console.ForegroundColor = ConsoleColor.DarkGray;
+            console.ForegroundColor = ConsoleColor.DarkGray;
 
-            _console.Write(indent);
-            _console.Write(isLast ? " └─" : " ├─");
+            console.Write(indent);
+            console.Write(isLast ? " └─" : " ├─");
 
             var c = node switch
             {
@@ -69,12 +67,12 @@ internal class IrNodeVisualizer
                 IRExpressionNode => ConsoleColor.Cyan,
                 _ => ConsoleColor.Gray
             };
-            _console.ForegroundColor = c;
-            _console.WriteLine(node?.ToString().NullToEmpty()!);
+            console.ForegroundColor = c;
+            console.WriteLine(node?.ToString().NullToEmpty()!);
         }
         finally
         {
-            _console.ForegroundColor = oldColor;
+            console.ForegroundColor = oldColor;
         }
 
         indent += isLast ? "   " : " | ";

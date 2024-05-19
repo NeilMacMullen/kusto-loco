@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;
@@ -11,6 +12,7 @@ using KustoLoco.Core.Diagnostics;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
+using KustoLoco.Core.Settings;
 using NLog;
 
 namespace KustoLoco.Core;
@@ -22,6 +24,29 @@ public class BabyKustoEngine
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
+    private readonly IKustoConsole _console;
+    private readonly KustoSettingsProvider _settings;
+
+    public BabyKustoEngine(IKustoConsole console,KustoSettingsProvider settings)
+    {
+        _settings = settings;
+        _console = console;
+        _settings.Register(CoreSettings.DumpIr,CoreSettings.DumpParseTree);
+    }
+
+    public static BabyKustoEngine CreateForTest()
+    {
+        var settings = GetSettingsWithFullDebug();
+        return new BabyKustoEngine(new SystemConsole(), settings);
+    }
+
+    public static KustoSettingsProvider GetSettingsWithFullDebug()
+    {
+        var settings = new KustoSettingsProvider();
+        settings.Set(CoreSettings.DumpIr.Name, "true");
+        settings.Set(CoreSettings.DumpParseTree.Name, "true");
+        return settings;
+    }
 
     public void AddAdditionalFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> funcs)
     {
@@ -43,8 +68,11 @@ public class BabyKustoEngine
 
     public EvaluationResult Evaluate(
         IReadOnlyCollection<ITableSource> tables,
-        string query, bool dumpKustoTree = false, bool dumpIRTree = false)
+        string query)
     {
+        var dumpKustoTree = _settings.GetBool(CoreSettings.DumpParseTree);
+        var dumpIRTree = _settings.GetBool(CoreSettings.DumpIr);
+
         Logger.Trace("Evaluate called");
         //combine all available functions
         var allFuncs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
@@ -64,7 +92,7 @@ public class BabyKustoEngine
 
         var code = KustoCode.ParseAndAnalyze(query, globals);
 
-        var visualizer = new IrNodeVisualizer();
+        var visualizer = new IrNodeVisualizer(_console);
         visualizer.DumpKustoTree(code, dumpKustoTree);
 
         var diagnostics = code.GetDiagnostics();
@@ -91,5 +119,23 @@ public class BabyKustoEngine
         Logger.Trace("Evaluating in scope...");
         var result = BabyKustoEvaluator.Evaluate(ir, scope);
         return result;
+    }
+
+    private static class CoreSettings
+    {
+        private const string prefix = "core";
+
+        public static readonly KustoSettingDefinition DumpIr = new(
+            Setting("dumpir"), "dumps the internal representation",
+            "false",
+            nameof(Boolean));
+
+        public static readonly KustoSettingDefinition DumpParseTree = new(Setting("dumpkl"),
+            "dumps the internal kusto parse tree", "false", nameof(Boolean));
+
+        private static string Setting(string setting)
+        {
+            return $"{prefix}.{setting}";
+        }
     }
 }
