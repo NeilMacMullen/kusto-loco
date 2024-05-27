@@ -1,0 +1,6 @@
+@WebApp_HostAddress = http://localhost:7273
+
+GET https://localhost:7273/kql/
+Accept: application/json
+
+###

@@ -1,11 +1,11 @@
 ﻿using System.Globalization;
+using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
-using NLog;
 
 namespace KustoLoco.FileFormats;
 
@@ -14,6 +14,7 @@ public class CsvSerializer : ITableSerializer
     private readonly CsvConfiguration _config;
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
+    private readonly bool _skipHeader = false;
 
     public CsvSerializer(CsvConfiguration config, KustoSettingsProvider settings, IKustoConsole console)
     {
@@ -23,45 +24,16 @@ public class CsvSerializer : ITableSerializer
         settings.Register(CsvSerializerSettings.SkipTypeInference, CsvSerializerSettings.TrimCells);
     }
 
-    public Task<TableLoadResult> LoadTable(string path, string tableName)
+    public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
-        try
-        {
-            var table = Load(path, tableName);
-            if (!_settings.GetBool(CsvSerializerSettings.SkipTypeInference))
-                table = TableBuilder.AutoInferColumnTypes(table, _console);
-
-            return Task.FromResult(TableLoadResult.Success(table));
-        }
-        catch (Exception e)
-        {
-            return Task.FromResult(TableLoadResult.Failure(e.Message));
-        }
-    }
-
-    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
-    {
-        WriteToCsv(path, result);
-        return Task.FromResult(TableSaveResult.Success());
+        await using var stream = File.OpenWrite(path);
+        return await SaveTable(stream, result);
     }
 
 
-    public static CsvSerializer Default(KustoSettingsProvider settings, IKustoConsole console)
+    public Task<TableLoadResult> LoadTable(Stream stream, string tableName)
     {
-        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture), settings, console);
-    }
-
-    public static CsvSerializer Tsv(KustoSettingsProvider settings, IKustoConsole console)
-    {
-        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = "\t"
-            }
-            , settings, console);
-    }
-
-    private ITableSource Load(TextReader reader, string tableName)
-    {
+        using var reader = new StreamReader(stream);
         var csv = new CsvReader(reader, _config);
         csv.Read();
         csv.ReadHeader();
@@ -85,38 +57,48 @@ public class CsvSerializer : ITableSerializer
             if (rowCount % 100_000 == 0)
                 _console.ShowProgress($"loaded {rowCount} records");
         }
-       
+
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
         for (var i = 0; i < keys.Length; i++) tableBuilder.WithColumn(keys[i], builders[i].ToColumn());
 
         var tableSource = tableBuilder.ToTableSource();
         _console.CompleteProgress($"loaded {rowCount} records");
-        return tableSource;
+
+        if (!_settings.GetBool(CsvSerializerSettings.SkipTypeInference))
+            tableSource = TableBuilder.AutoInferColumnTypes(tableSource, _console);
+        return Task.FromResult(TableLoadResult.Success(tableSource));
     }
 
 
-    public ITableSource Load(string filename, string tableName)
+    public async Task<TableLoadResult> LoadTable(string filename, string tableName)
     {
-        using TextReader fileReader = new StreamReader(filename);
-        return Load(fileReader, tableName);
+        try
+        {
+            await using var fileReader = File.OpenRead(filename);
+            return await LoadTable(fileReader, tableName);
+        }
+        catch (Exception e)
+        {
+            return TableLoadResult.Failure(e.Message);
+        }
     }
 
 
-    public ITableSource LoadFromString(string csv, string tableName)
+    public Task<TableSaveResult> SaveTable(Stream stream, KustoQueryResult result)
     {
-        var reader = new StringReader(csv.Trim());
-        var table = Load(reader, tableName);
-        return table;
-    }
+        if (result.ColumnCount == 0)
+        {
+            _console.Warn("No columns in result - empty file/stream written");
+            return Task.FromResult(TableSaveResult.Success());
+        }
 
-
-    public void WriteToCsvStream(KustoQueryResult result, bool skipHeader, TextWriter writer)
-    {
+        using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, _config);
-        if (!skipHeader)
+        if (!_skipHeader)
             foreach (var heading in result.ColumnNames())
                 csv.WriteField(heading);
         csv.NextRecord();
+
         var rowCount = 0;
         foreach (var r in result.EnumerateRows())
         {
@@ -133,30 +115,51 @@ public class CsvSerializer : ITableSerializer
 
             csv.NextRecord();
         }
+
         _console.CompleteProgress($"wrote {rowCount} records");
+        return Task.FromResult(TableSaveResult.Success());
     }
 
-    private void WriteToCsv(string path, KustoQueryResult result)
+
+    public static CsvSerializer Default(KustoSettingsProvider settings, IKustoConsole console)
     {
-        using var writer = new StreamWriter(path);
-        WriteToCsvStream(result, false, writer);
+        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture), settings, console);
     }
+
+    public static CsvSerializer Tsv(KustoSettingsProvider settings, IKustoConsole console)
+    {
+        return new CsvSerializer(new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = "\t"
+            }
+            , settings, console);
+    }
+
+
+    public ITableSource LoadFromString(string csv, string tableName)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv.Trim()));
+        var result = LoadTable(stream, tableName).Result;
+        return result.Table;
+    }
+
 
     private static class CsvSerializerSettings
     {
-        private const string prefix = "csv";
-  public static readonly KustoSettingDefinition SkipTypeInference = new(
+        private const string Prefix = "csv";
+
+        public static readonly KustoSettingDefinition SkipTypeInference = new(
             Setting("skipTypeInference"), "prevents conversion of string columns to types",
             "off",
             nameof(Boolean));
-      
+
 
         public static readonly KustoSettingDefinition TrimCells = new(Setting("TrimCells"),
             "Removes leading and trailing whitespace from string values", "true", nameof(Boolean));
 
         private static string Setting(string setting)
         {
-            return $"{prefix}.{setting}";
+            return $"{Prefix}.{setting}";
         }
     }
 }

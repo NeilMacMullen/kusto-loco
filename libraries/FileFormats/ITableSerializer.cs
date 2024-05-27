@@ -19,8 +19,13 @@ public interface ITableSerializer
     /// </summary>
     Task<TableLoadResult> LoadTable(string path,string tableName);
 
+    Task<TableLoadResult> LoadTable(Stream stream, string tableName);
+
+
+    /// <summary>
+    /// Attempts to save a table to a patch
+    /// </summary>
     Task<TableSaveResult> SaveTable(string path,KustoQueryResult result);
+
+    Task<TableSaveResult> SaveTable(Stream stream, KustoQueryResult result);
 }
-
-
-
