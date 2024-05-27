@@ -1,0 +1,40 @@
+﻿@page "/"
+@inject HttpClient _client
+@using KustoLoco.Core
+@using KustoLoco.Rendering
+<div style="display: flex; flex-direction: column; height: 90vh;">
+    <div style="flex-shrink: 0;">
+        <PageTitle>KQl</PageTitle>
+        <div style="display: flex; align-items: stretch;">
+            <textarea @bind="query" class="form-control" rows="3" style="flex-grow: 1;"></textarea>
+            <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">
+                &#x1F50D;
+            </button>
+        </div>
+        <p>
+            @summary
+        </p>
+    </div>
+    <div style="flex-grow: 1; overflow: auto;">
+        <iframe style="width: 100%; height: 90%;" srcdoc="@table"></iframe>
+    </div>
+</div>
+
+@code {
+    private string query = "let T = datatable(A:int)[1,2,3,4,5,6,7,8,9]; T | project X=A,Y=A*A | render linechart";
+    private MarkupString table;
+    private string summary = "summary";
+
+    async Task<string> GetXDSFile()
+    {
+        return await _client.GetStringAsync("sample-data/weather.json");
+    }
+
+    private async Task RunQuery()
+    {
+        var client = new KustoQueryContext();
+        var result = await client.RunQuery(query);
+        table = new MarkupString(KustoResultRenderer.RenderToHtml(result));
+        summary = $"{result.ColumnCount}x{result.RowCount} {result.QueryDuration}ms";
+    }
+}

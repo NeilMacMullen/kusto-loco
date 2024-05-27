@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Text;
 using System.Text.Json;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
@@ -20,18 +21,30 @@ public class JsonObjectArraySerializer : ITableSerializer
         _settings.Register(JsonSerializerSettings.SkipTypeInference);
     }
 
-    public Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
+  
+    public async  Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
+    {
+        await using var stream = File.OpenWrite(path);
+        return await SaveTable(stream, result);    
+    }
+
+    public async Task<TableSaveResult> SaveTable(Stream stream, KustoQueryResult result)
     {
         var json = result.ToJsonString();
-        File.WriteAllText(path, json);
-        return Task.FromResult(TableSaveResult.Success());
+        await stream.WriteAsync(Encoding.UTF8.GetBytes(json));
+        return TableSaveResult.Success();
+    }
+    public async Task<TableLoadResult> LoadTable(string path, string tableName)
+    {
+        await using var stream = File.OpenRead(path);
+        return await LoadTable(stream, tableName);  
     }
 
 
-    public Task<TableLoadResult> LoadTable(string path, string name)
+    public Task<TableLoadResult> LoadTable(Stream stream, string name)
     {
-        var text = File.ReadAllText(path);
-        var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(text);
+
+        var dict = JsonSerializer.Deserialize<OrderedDictionary[]>(stream);
         var sdlist = new List<OrderedDictionary>();
         foreach (var d in dict!)
         {

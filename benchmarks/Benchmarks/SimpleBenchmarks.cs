@@ -13,14 +13,14 @@ namespace Benchmarks
         private KustoQueryContext _context ;
 
         [GlobalSetup]
-        public void Setup()
+        public async Task Setup()
         {
             var console = new SystemConsole();
             _context = new KustoQueryContext();
             var settings = new KustoSettingsProvider();
-            CsvSerializer.Default(settings,console)
-
-                .Load(@"C:\temp\locations.csv", "data");
+            var tableResult =await CsvSerializer.Default(settings,console)
+                .LoadTable(@"C:\temp\locations.csv", "data");
+            _context.AddTable(tableResult.Table);
         }
 
 

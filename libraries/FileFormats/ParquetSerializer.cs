@@ -1,5 +1,6 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
@@ -23,27 +24,17 @@ public class ParquetSerializer : ITableSerializer
         _settings = settings;
         _console = console;
     }
+    public static ParquetSerializer Default => new(new KustoSettingsProvider(), new NullConsole());
+
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly KustoSettingsProvider _settings;
     private readonly IKustoConsole _console;
 
-    public async Task<TableLoadResult> LoadTable(string path, string tableName)
-    {
-        var table = await LoadFromFile(path, tableName);
-        return TableLoadResult.Success(table);
-    }
-
-
+ 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
-        await Save(path, result);
-        return TableSaveResult.Success();
-    }
-
-    public async Task Save(string path, KustoQueryResult result)
-    {
         await using Stream fs = File.OpenWrite(path);
-        await SaveToStream(fs, result);
+        return await SaveTable(fs, result);
     }
 
     private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
@@ -55,12 +46,17 @@ public class ParquetSerializer : ITableSerializer
         return builder.GetDataAsArray();
     }
 
-    public async Task SaveToStream(Stream fs, KustoQueryResult result)
+    public async Task<TableSaveResult> SaveTable(Stream fs, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
             .Select(col =>
                 new DataField(col.Name, col.UnderlyingType, true))
             .ToArray();
+        if (!dataFields.Any())
+        {
+            _console.Warn("No columns in result - empty file/stream written");
+            return TableSaveResult.Success();
+        }
         var schema = new ParquetSchema(dataFields.Cast<Field>().ToArray());
 
 
@@ -78,18 +74,21 @@ public class ParquetSerializer : ITableSerializer
             await groupWriter.WriteColumnAsync(dataColumn);
         }
         _console.CompleteProgress("");
+        return TableSaveResult.Success();
     }
 
-    private async Task<ITableSource> LoadFromFile(string path, string tableName)
+
+    public async Task<TableLoadResult> LoadTable(Stream fs, string tableName)
     {
-        await using var fs = File.OpenRead(path);
+        if (fs.Length == 0)
+            return TableLoadResult.Success(InMemoryTableSource.Empty);
         using var reader = await ParquetReader.CreateAsync(fs);
         var rg = await reader.ReadEntireRowGroupAsync();
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rg.GetLength(0));
         foreach (var c in rg)
         {
             var type = c.Field.ClrType;
-            _console.ShowProgress($"Reading column {c.Field.Name} of type {c.Field.Name}");
+            _console.ShowProgress($"Reading column {c.Field.Name} of type {type.Name}");
             //TODO - surely there is a more efficient way to do this by wrapping the original data?
             var colBuilder = ColumnHelpers.CreateBuilder(type);
             foreach (var o in c.Data)
@@ -98,6 +97,13 @@ public class ParquetSerializer : ITableSerializer
             tableBuilder.WithColumn(c.Field.Name, colBuilder.ToColumn());
         }
         _console.CompleteProgress("");
-        return tableBuilder.ToTableSource();
+        return TableLoadResult.Success(tableBuilder.ToTableSource());
+    }
+
+    public async Task<TableLoadResult> LoadTable(string path, string tableName)
+    {
+        await using var fs = File.OpenRead(path);
+        return await LoadTable(fs, tableName);
+
     }
 }
