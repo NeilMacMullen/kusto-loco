@@ -69,6 +69,6 @@ The project leans heavily on a number of open source libraries including:
 - [T-Digest.net](https://github.com/ASolomatin/T-Digest.NET) is used internally for some aggregation functions
 - [VegaGenerator](https://github.com/NeilMacMullen/VegaGenerator) is used to simplify rendering of charts
 
-## Contibuting
+## Contributing
 
 If you'd like to help with the project please see the [Contributing](https://github.com/NeilMacMullen/kusto-loco/wiki/Contributing) page.
