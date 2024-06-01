@@ -9,16 +9,16 @@
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Fastenshtein" Version="1.0.0.9" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.5" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.6" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.6" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.4.2" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.2535.41" />
     <PackageVersion Include="NLog" Version="5.3.2" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.3.1" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.3.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.4.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.4.3" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="Parquet.Net" Version="4.23.5" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
@@ -27,16 +27,16 @@
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
     <PackageVersion Include="VegaGenerator" Version="1.0.0" />
-    <PackageVersion Include="xunit" Version="2.8.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageVersion Include="xunit" Version="2.8.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.5.4" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.5.5" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Text.Json" Version="8.0.3" />
     <PackageVersion Include="CsvHelper" Version="32.0.3" />
     <PackageVersion Include="geohash-dotnet" Version="2.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 </Project>
