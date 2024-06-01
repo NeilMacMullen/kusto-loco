@@ -20,6 +20,8 @@ public class KustoQueryResult
 
     public static readonly KustoQueryResult Empty = new(string.Empty,
         InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
+    public static KustoQueryResult FromError(string query, string error)
+        => new(query, InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, error);
 
     /// <summary>
     ///     Provides the results of a Kusto query as a collection of dictionaries

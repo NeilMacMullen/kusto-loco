@@ -54,6 +54,29 @@ public static class TypeMapping
         throw new NotImplementedException($"No TypeSymbol equivalent for .Net type {type.Name}");
     }
 
+
+    public static Type TypeFromName(string name)
+    {
+        return name switch
+        {
+            "string" => typeof(string),
+            "long" => typeof(long),
+            "int" => typeof(int),
+            "bool" => typeof(bool),
+            "datetime" => typeof(DateTime),
+            "guid" => typeof(Guid),
+            "decimal" => typeof(decimal),
+            "timespan" => typeof(TimeSpan),
+            "dynamic" => typeof(JsonNode),
+            "uint" => typeof(uint),
+            "ushort" => typeof(ushort),
+            "float" => typeof(float),
+            "double" => typeof(double),
+            "short" => typeof(short),
+            "ulong" => typeof(ulong),
+            _ => throw new NotImplementedException($"No .Net type equivalent for Kusto type {name}")
+        };
+    }
     /// <summary>
     ///     Gets the "core" .Net type associated with the TypeSymbol
     /// </summary>

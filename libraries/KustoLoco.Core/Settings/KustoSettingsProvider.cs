@@ -59,7 +59,25 @@ public class KustoSettingsProvider
         return _settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
+    /// <summary>
+    /// Tries to interpret a string as a setting name 
+    /// </summary>
+    /// <remarks>
+    /// There are a number of places in application code where it's convenient to see if the
+    /// supplied string might actually be interpreted as a setting name.  For example
+    /// .set abc xyz
+    /// .command abc
+    /// --> could transform to .command xyz
+    /// </remarks>
+    public string TrySubstitute(string name)
+    {
+        var fb = new RawKustoSetting(name, name);
+        return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
+    }
 
+    /// <summary>
+    /// Try to fetch a setting and interpret it as a number (int)
+    /// </summary>
     public int GetInt(KustoSettingDefinition setting)
     {
         var s = Get(setting);

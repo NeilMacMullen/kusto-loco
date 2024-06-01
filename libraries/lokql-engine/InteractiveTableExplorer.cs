@@ -1,13 +1,16 @@
 ﻿using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Text;
+using AppInsightsSupport;
 using CommandLine;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using NLog;
+using NLog.LayoutRenderers.Wrappers;
 using NotNullStrings;
 
 namespace Lokql.Engine;
@@ -36,7 +39,6 @@ public class InteractiveTableExplorer
     public readonly KustoSettingsProvider _settings;
 
     private DisplayOptions _currentDisplayOptions = new(10);
-    private KustoQueryResult _prevResult;
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings)
     {
@@ -49,11 +51,10 @@ public class InteractiveTableExplorer
         LokqlSettings.Register(_settings);
     }
 
+    public KustoQueryResult _prevResult { get; private set; }
 
-    private KustoQueryContext GetCurrentContext()
-    {
-        return _context;
-    }
+
+    private KustoQueryContext GetCurrentContext() => _context;
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
@@ -151,7 +152,7 @@ public class InteractiveTableExplorer
                         break;
                     default:
                         await RunInternalCommand(tokens);
-                        return KustoQueryResult.Empty;
+                        return _prevResult;
                 }
             }
 
@@ -224,7 +225,8 @@ public class InteractiveTableExplorer
                     typeof(FileFormatsCommand.Options),
                     typeof(SetCommand.Options),
                     typeof(ListSettingsCommand.Options),
-                    typeof(ListSettingDefinitionsCommand.Options)
+                    typeof(ListSettingDefinitionsCommand.Options),
+                    typeof(AppInsightsCommand.Options)
                 )
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
@@ -244,6 +246,7 @@ public class InteractiveTableExplorer
                 .WithParsedAsync<ListSettingsCommand.Options>(o => ListSettingsCommand.RunAsync(this, o))
                 .WithParsedAsync<ListSettingDefinitionsCommand.Options>(o =>
                     ListSettingDefinitionsCommand.RunAsync(this, o))
+                .WithParsedAsync<AppInsightsCommand.Options>(o => AppInsightsCommand.RunAsync(this, o))
             ;
         _outputConsole.Info(textWriter.ToString());
     }
@@ -504,6 +507,28 @@ public class InteractiveTableExplorer
 
             [Option('f', "force", HelpText = "Force reload")]
             public bool Force { get; set; }
+        }
+    }
+
+    public static class AppInsightsCommand
+    {
+        internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+        {
+            var ai = new ApplicationInsightsLogLoader(exp._settings, exp._outputConsole);
+            var result =await ai.LoadTable(o.Rid, o.Query, TimeSpan.FromDays(7));
+            exp._prevResult = result;
+        }
+
+        [Verb("appinsights",aliases: ["ai"], 
+        HelpText = "Runs a query against an application insights log-set")]
+        internal class Options
+        {
+            [Value(0, HelpText = "resourceId", Required = true)]
+            public string Rid { get; set; } = string.Empty;
+
+            [Value(1, HelpText = "query")]
+            public string Query { get; set; } = string.Empty;
+         
         }
     }
 
