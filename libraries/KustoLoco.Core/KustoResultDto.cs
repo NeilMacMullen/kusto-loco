@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Core;
+﻿using System.Collections.Generic;
+
+namespace KustoLoco.Core;
 
 /// <summary>
 /// A Dto that represents a *serialized* QueryResult
@@ -19,5 +21,6 @@ public class KustoResultDto
     public string StreamFormat { get; set; } = string.Empty;
     public string ResultStream { get; set; } = string.Empty;
     public string VisualizationChartType { get; set; } = string.Empty;
+    public Dictionary<string, string> VisualizationProperties { get; set; } = new Dictionary<string, string>();
     public string Error { get; set; } = string.Empty;
 }

@@ -30,6 +30,7 @@ public class KustoResultSerializer(ITableSerializer serializer,string format)
             StreamFormat = format,
             ResultStream = str,
             VisualizationChartType = result.Visualization.ChartType,
+            VisualizationProperties = result.Visualization.Properties.ToDictionary(),
             Duration = result.QueryDuration.TotalMilliseconds,
             Error = result.Error
         };
@@ -43,7 +44,8 @@ public class KustoResultSerializer(ITableSerializer serializer,string format)
         var text = Convert.FromBase64String(dto.ResultStream);
         //TODO could keep this in a stream by using CryptoStream
         var table = await GetTable(text);
-        var vis = new VisualizationState(dto.VisualizationChartType, ImmutableDictionary<string, object>.Empty);
+        var visualizationProperties = dto.VisualizationProperties.ToImmutableDictionary();
+        var vis = new VisualizationState(dto.VisualizationChartType, visualizationProperties);
         var duration = TimeSpan.FromMilliseconds(dto.Duration);
         return new KustoQueryResult(dto.Query, table, vis, duration, dto.Error);
     }
