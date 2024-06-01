@@ -2,20 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>Lokql.Engine</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" />
-    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Azure.Monitor.Query" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
-    <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>
 
 </Project>
