@@ -4024,8 +4024,8 @@ aaathis is a test";
         var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query);
         var vis = result.VisualizationState;
         vis.ChartType.Should().Be("barchart");
-        vis.Items["legend"].Should().Be("visible");
-        vis.Items["ymax"].Should().Be(100);
+        vis.Properties["legend"].Should().Be("visible");
+        vis.Properties["ymax"].Should().Be("100");
     }
 
     [Fact]

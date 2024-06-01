@@ -9,7 +9,7 @@ namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators
 
 internal class IRRenderOperatorNode : IRQueryOperatorNode
 {
-    public IRRenderOperatorNode(string chartType, ImmutableDictionary<string, object> items, TypeSymbol resultType)
+    public IRRenderOperatorNode(string chartType, ImmutableDictionary<string, string> items, TypeSymbol resultType)
         : base(resultType)
     {
         ChartType = chartType;
@@ -17,7 +17,7 @@ internal class IRRenderOperatorNode : IRQueryOperatorNode
     }
 
     public string ChartType { get; }
-    public ImmutableDictionary<string, object> Items { get; }
+    public ImmutableDictionary<string, string> Items { get; }
 
     public override int ChildCount => 0;
     public override IRNode GetChild(int index) => throw new ArgumentOutOfRangeException(nameof(index));
