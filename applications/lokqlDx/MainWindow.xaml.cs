@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shell;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
@@ -10,6 +11,8 @@ using KustoLoco.FileFormats;
 using KustoLoco.Rendering;
 using Lokql.Engine;
 using Microsoft.Win32;
+using NotNullStrings;
+using ZstdSharp.Unsafe;
 
 namespace lokqlDx;
 
@@ -20,17 +23,24 @@ public partial class MainWindow : Window
     private readonly WorkspaceManager _workspaceManager;
     private InteractiveTableExplorer _explorer;
 
-    public MainWindow()
+
+    public MainWindow(
+        string [] args
+        )
     {
+        _args = args.ToArray();
         InitializeComponent();
         _console = new WpfConsole(OutputText);
         var settings = new KustoSettingsProvider();
         _workspaceManager = new WorkspaceManager(settings);
         var loader = new StandardFormatAdaptor(settings,_console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings);
+        
     }
 
     private bool isBusy;
+    private readonly string[] _args;
+
     private async Task RunQuery(string query)
     {
         if (isBusy)
@@ -101,7 +111,8 @@ public partial class MainWindow : Window
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.Load();
-        _workspaceManager.Load(_preferenceManager.Preferences.LastWorkspacePath);
+        var pathToLoad=_args.Any() ? _args[0] : _preferenceManager.Preferences.LastWorkspacePath;
+        _workspaceManager.Load(pathToLoad);
         if (this.Width > 100 && this.Height > 100 && this.Left > 0 && this.Top > 0)
         {
             this.Width = _preferenceManager.Preferences.WindowWidth;
@@ -161,6 +172,7 @@ public partial class MainWindow : Window
 
     private void Save()
     {
+        JumpList.AddToRecentCategory(_workspaceManager.Path);
         SaveWorkspace(_workspaceManager.Path);
     }
 
@@ -251,6 +263,11 @@ public partial class MainWindow : Window
     {
         await Navigate(
             "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
+    }
+
+    private void EnableJumpList(object sender, RoutedEventArgs e)
+    {
+      RegistryOperations.AssociateFileType();
     }
 }
 
