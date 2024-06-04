@@ -10,6 +10,7 @@
         Loaded="MainWindow_OnLoaded"
         Closing="MainWindow_OnClosing"
         >
+ 
   <DockPanel>
     <Menu DockPanel.Dock="Top" Name="MainMenu">
       <MenuItem Header="_File">
@@ -22,6 +23,9 @@
         <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
         <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
 
+      </MenuItem>
+      <MenuItem Header="Misc">
+        <MenuItem Header="Register file association" Click="EnableJumpList"/>
       </MenuItem>
       <MenuItem Header="Help">
 
