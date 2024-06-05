@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject HttpClient _client
 @using KustoLoco.Core
+@using KustoLoco.Core.Settings
 @using KustoLoco.Rendering
 <div style="display: flex; flex-direction: column; height: 90vh;">
     <div style="flex-shrink: 0;">
@@ -34,7 +35,8 @@
     {
         var client = new KustoQueryContext();
         var result = await client.RunQuery(query);
-        table = new MarkupString(KustoResultRenderer.RenderToHtml(result));
+        var renderer = new KustoResultRenderer(new KustoSettingsProvider());
+        table = new MarkupString(renderer.RenderToHtml(result));
         summary = $"{result.ColumnCount}x{result.RowCount} {result.QueryDuration}ms";
     }
 }

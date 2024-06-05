@@ -1,16 +1,15 @@
-﻿using System.CommandLine.Parsing;
+﻿using System.Collections.Specialized;
+using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Text;
 using AppInsightsSupport;
 using CommandLine;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
-using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using NLog;
-using NLog.LayoutRenderers.Wrappers;
 using NotNullStrings;
 
 namespace Lokql.Engine;
@@ -54,7 +53,10 @@ public class InteractiveTableExplorer
     public KustoQueryResult _prevResult { get; private set; }
 
 
-    private KustoQueryContext GetCurrentContext() => _context;
+    private KustoQueryContext GetCurrentContext()
+    {
+        return _context;
+    }
 
     private void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
@@ -226,8 +228,10 @@ public class InteractiveTableExplorer
                     typeof(SetCommand.Options),
                     typeof(ListSettingsCommand.Options),
                     typeof(ListSettingDefinitionsCommand.Options),
-                    typeof(AppInsightsCommand.Options)
+                    typeof(AppInsightsCommand.Options),
+                    typeof(PivotCommand.Options)
                 )
+                .WithParsed<PivotCommand.Options>(o => PivotCommand.Run(this, o))
                 .WithParsed<MaterializeCommand.Options>(o => MaterializeCommand.Run(this, o))
                 .WithParsed<RenderCommand.Options>(o => RenderCommand.Run(this, o))
                 .WithParsed<AllTablesCommand.Options>(o => AllTablesCommand.Run(this, o))
@@ -419,10 +423,11 @@ public class InteractiveTableExplorer
         {
             var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
             var result = exp._prevResult;
-            var text = KustoResultRenderer.RenderToHtml(result);
+            var renderer = new KustoResultRenderer(exp._settings);
+            var text = renderer.RenderToHtml(result);
             File.WriteAllText(fileName, text);
             exp.Info($"Saved chart as {fileName}");
-            if(!o.SaveOnly)
+            if (!o.SaveOnly)
                 Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
 
@@ -430,8 +435,44 @@ public class InteractiveTableExplorer
         internal class Options
         {
             [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
+
             [Option("saveOnly", HelpText = "just save the file without opening in the browser")]
             public bool SaveOnly { get; set; }
+        }
+    }
+
+    public static class PivotCommand
+    {
+        internal static void Run(InteractiveTableExplorer exp, Options o)
+        {
+            var result = exp._prevResult;
+            var ods = new List<OrderedDictionary>();
+            var columns = result.ColumnDefinitions();
+            foreach (var row in result.EnumerateRows())
+                for (var i = o.Keep; i < row.Length; i++)
+                {
+                    var od = new OrderedDictionary();
+
+                    for (var k = 0; k < o.Keep; k++)
+                        od[columns[k].Name] = row[k];
+
+                    od["Column"] = columns[i].Name;
+                    od["Data"] = row[i];
+                    ods.Add(od);
+                }
+
+            var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods);
+            exp.GetCurrentContext().AddTable(builder);
+        }
+
+        [Verb("pivot", HelpText = "pivots columns into rows")]
+        internal class Options
+        {
+            [Value(0, Required = true, HelpText = "Name of table")]
+            public string As { get; set; } = string.Empty;
+
+            [Option(HelpText = "Columns before first pivoted column")]
+            public int Keep { get; set; } = 1;
         }
     }
 
@@ -515,20 +556,18 @@ public class InteractiveTableExplorer
         internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
         {
             var ai = new ApplicationInsightsLogLoader(exp._settings, exp._outputConsole);
-            var result =await ai.LoadTable(o.Rid, o.Query, TimeSpan.FromDays(7));
+            var result = await ai.LoadTable(o.Rid, o.Query, TimeSpan.FromDays(7));
             exp._prevResult = result;
         }
 
-        [Verb("appinsights",aliases: ["ai"], 
-        HelpText = "Runs a query against an application insights log-set")]
+        [Verb("appinsights", aliases: ["ai"],
+            HelpText = "Runs a query against an application insights log-set")]
         internal class Options
         {
             [Value(0, HelpText = "resourceId", Required = true)]
             public string Rid { get; set; } = string.Empty;
 
-            [Value(1, HelpText = "query")]
-            public string Query { get; set; } = string.Empty;
-         
+            [Value(1, HelpText = "query")] public string Query { get; set; } = string.Empty;
         }
     }
 

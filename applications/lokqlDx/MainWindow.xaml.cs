@@ -65,7 +65,8 @@ public partial class MainWindow : Window
                 //annoying we have to do this, but it's the only way to get the webview to render
                 await webview.EnsureCoreWebView2Async();
                 //generate the html and display it
-                var html = KustoResultRenderer.RenderToHtml(result);
+                var renderer = new KustoResultRenderer(_explorer._settings);
+                var html = renderer.RenderToHtml(result);
                 try
                 {
                     webview.NavigateToString(html);

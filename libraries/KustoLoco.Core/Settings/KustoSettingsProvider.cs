@@ -75,6 +75,11 @@ public class KustoSettingsProvider
         return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
+    public string GetOr(string setting,string fallback)
+    {
+        var fb = new KustoSettingDefinition(setting, string.Empty,fallback,string.Empty);
+        return Get(fb);
+    }
     /// <summary>
     /// Try to fetch a setting and interpret it as a number (int)
     /// </summary>
