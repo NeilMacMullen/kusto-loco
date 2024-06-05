@@ -2,13 +2,21 @@
 using System.Diagnostics;
 using System.Text;
 using KustoLoco.Core;
+using KustoLoco.Core.Settings;
+using Microsoft.VisualBasic.CompilerServices;
 using NotNullStrings;
 
 namespace KustoLoco.Rendering;
 
-
 public class KustoResultRenderer
 {
+    private readonly KustoSettingsProvider _settings;
+
+    public KustoResultRenderer(KustoSettingsProvider settings)
+    {
+        _settings = settings;
+    }
+
     public static string RenderToTable(KustoQueryResult result)
     {
         if (result.RowCount == 0)
@@ -34,7 +42,7 @@ public class KustoResultRenderer
         return sb.ToString();
     }
 
-    public static string RenderToHtml(KustoQueryResult result)
+    public string RenderToHtml(KustoQueryResult result)
     {
         return result.Error.IsNotBlank()
             ? result.Error
@@ -44,7 +52,7 @@ public class KustoResultRenderer
     }
 
 
-    public static string KustoToVegaChartType(KustoQueryResult result)
+    public string KustoToVegaChartType(KustoQueryResult result)
     {
         var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
         var state = result.Visualization;
@@ -66,7 +74,7 @@ public class KustoResultRenderer
 
             KustoChartTypes.Ladder => RenderToChart(title, VegaMark.Bar, result, MakeTimeLineChart,
                 AllowedColumnTypes.LadderChart),
-            KustoChartTypes.Scatter => RenderToChart(title, VegaMark.Point, result, NoOp,
+            KustoChartTypes.Scatter => RenderToChart(title, VegaMark.Point, result, MakeScatterChart,
                 AllowedColumnTypes.Unrestricted),
 
 
@@ -75,52 +83,59 @@ public class KustoResultRenderer
         };
     }
 
-    private static void MakeLineChart(KustoQueryResult result, VegaChart chart)
+    private void MakeLineChart(KustoQueryResult result, VegaChart chart)
     {
         if (result.ColumnDefinitions().Length > 2) chart.UseCursorTooltip();
     }
 
-    private static void MakeStackedArea(KustoQueryResult result, VegaChart chart)
+    private void MakeStackedArea(KustoQueryResult result, VegaChart chart)
     {
         chart.StackAxis(VegaAxisName.Y);
     }
 
-    private static string VisualizationKind(KustoQueryResult result)
+    private string VisualizationKind(KustoQueryResult result)
     {
         return result.Visualization.PropertyOr(KustoVisualizationProperties.Kind, string.Empty);
     }
 
-    private static void MakeBarChart(KustoQueryResult result, VegaChart b)
+    private void MakeBarChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == KustoVisualizationProperties.Stacked)
             b.StackAxis(VegaAxisName.X);
     }
 
-    private static void MakeColumnChart(KustoQueryResult result, VegaChart b)
+    private void MakeColumnChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == KustoVisualizationProperties.Stacked)
             b.StackAxis(VegaAxisName.Y);
     }
 
-    public static void NoOp(KustoQueryResult result, VegaChart o)
+    public void NoOp(KustoQueryResult result, VegaChart o)
     {
     }
 
 
-    public static string RenderToChart(string title, VegaMark vegaType, KustoQueryResult result,
+    public string RenderToChart(string title, VegaMark vegaType, KustoQueryResult result,
         Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected)
     {
         if (result.RowCount == 0)
             return result.Error;
         var b = RenderToJObjectBuilder(vegaType, result, jmutate, expected);
         b.SetTitle(title);
-        return VegaMaker.MakeHtml(title, b.Serialize());
+        var theme = _settings.GetOr("vega.theme", "dark");
+        return VegaMaker.MakeHtml(title, b.Serialize(),theme);
+    }
+
+
+    public static void RenderChartInBrowser(KustoQueryResult result)
+    {
+        new KustoResultRenderer(new KustoSettingsProvider()).RenderInBrowser(result);
     }
 
     /// <summary>
     ///     If the query result has a chart type, render it in the browser by creating a temporary html file
     /// </summary>
-    public static void RenderChartInBrowser(KustoQueryResult result)
+    public void RenderInBrowser(KustoQueryResult result)
     {
         if (result.Visualization.ChartType.IsBlank())
             return;
@@ -131,13 +146,24 @@ public class KustoResultRenderer
         Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
     }
 
-    public static void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
+    public  void MakeTimeLineChart(KustoQueryResult result, VegaChart chart)
     {
         chart.ConvertToTimeline();
     }
 
 
-    public static VegaMark InferChartTypeFromResult(KustoQueryResult result)
+    public  void MakeScatterChart(KustoQueryResult result, VegaChart chart)
+    {
+        foreach (var c in "size shape angle".Tokenize())
+        {
+            var markSize = _settings.GetOr($"vega.point.{c}", string.Empty);
+            if (markSize.IsNotBlank())
+                chart._builder.Set($"mark.{c}", markSize);
+        }
+    }
+
+
+    public  VegaMark InferChartTypeFromResult(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
         var types = headers.Select(h => h.UnderlyingType).ToArray();
@@ -179,7 +205,8 @@ public class KustoResultRenderer
 
     public static VegaChart RenderToJObjectBuilder(VegaMark chartType,
         KustoQueryResult result,
-        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expectedColumns)
+        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expectedColumns
+    )
     {
         var columns = GetColumns(result);
 
