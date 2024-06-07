@@ -2,6 +2,7 @@
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using AppInsightsSupport;
 using CommandLine;
 using KustoLoco.Core;
@@ -121,9 +122,22 @@ public class InteractiveTableExplorer
         await RunInput(line, true);
     }
 
+
+    public string Interpolate(string query)
+    {
+        string rep(Match m)
+        {
+            var term = m.Groups[1].Value;
+            return _settings.TrySubstitute(term);
+        }
+        return Regex.Replace(query, @"\$(\w+)",rep);
+
+    }
+
     public async Task<KustoQueryResult> RunInput(string query, bool autoRender)
     {
-        query = query.Trim();
+        query = Interpolate(query)
+            .Trim();
         //support comments
         if (query.StartsWith("#") | query.IsBlank()) return KustoQueryResult.Empty;
         if (query.EndsWith("\\"))
