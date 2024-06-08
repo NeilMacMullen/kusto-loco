@@ -51,13 +51,18 @@ namespace lokqlDx
         /// </remarks>
         public string GetTextAroundCursor()
         {
+            if (Query.SelectionLength > 0)
+            {
+                return Query.SelectedText.Trim();
+            }
+
             var i = Query.GetLineIndexFromCharacterIndex(Query.CaretIndex);
             var sb = new StringBuilder();
             while (i >= 1 && Query.GetLineText(i - 1).Trim().Length > 0)
                 i--;
             while (i < Query.LineCount && Query.GetLineText(i).Trim().Length > 0)
             {
-                sb.AppendLine(Query.GetLineText(i));
+                sb.Append(Query.GetLineText(i));
                 i++;
             }
            

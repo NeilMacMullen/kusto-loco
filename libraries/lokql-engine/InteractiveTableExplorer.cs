@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
-using System.Text;
+using System.Text.RegularExpressions;
 using AppInsightsSupport;
 using CommandLine;
 using KustoLoco.Core;
@@ -29,8 +29,6 @@ namespace Lokql.Engine;
 /// </remarks>
 public class InteractiveTableExplorer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    private readonly StringBuilder _commandBuffer = new();
     private readonly KustoQueryContext _context;
 
     private readonly ITableAdaptor _loader;
@@ -121,26 +119,34 @@ public class InteractiveTableExplorer
         await RunInput(line, true);
     }
 
-    public async Task<KustoQueryResult> RunInput(string query, bool autoRender)
+
+    public string Interpolate(string query)
     {
-        query = query.Trim();
+        string rep(Match m)
+        {
+            var term = m.Groups[1].Value;
+            return _settings.TrySubstitute(term);
+        }
+
+        return Regex.Replace(query, @"\$(\w+)", rep);
+    }
+
+    public async Task RunInput(string query, bool autoRender)
+    {
+        var breaker = new BlockBreaker(query);
+        var sequence = new BlockSequence(breaker.Blocks);
+
+        while (!sequence.Complete) await RunInput(sequence, autoRender);
+    }
+
+    public async Task RunInput(BlockSequence blocks, bool autoRender)
+    {
+        var query = blocks.Next();
+        query = Interpolate(query)
+            .Trim();
         //support comments
-        if (query.StartsWith("#") | query.IsBlank()) return KustoQueryResult.Empty;
-        if (query.EndsWith("\\"))
-        {
-            _commandBuffer.Append(query.Substring(0, query.Length - 1) + " ");
-            return KustoQueryResult.Empty;
-        }
+        if (query.StartsWith("#") | query.IsBlank()) return;
 
-        if (query.EndsWith("|"))
-        {
-            _commandBuffer.Append(query);
-            return KustoQueryResult.Empty;
-        }
-
-        _commandBuffer.Append(query);
-        query = _commandBuffer.ToString().Trim();
-        _commandBuffer.Clear();
         try
         {
             if (query.StartsWith("."))
@@ -154,7 +160,7 @@ public class InteractiveTableExplorer
                         break;
                     default:
                         await RunInternalCommand(tokens);
-                        return _prevResult;
+                        return;
                 }
             }
 
@@ -164,15 +170,12 @@ public class InteractiveTableExplorer
                 _prevResult = result;
 
             DisplayResults(result, autoRender);
-            return result;
+            return;
         }
         catch (Exception ex)
         {
             ShowError(ex.Message);
         }
-
-
-        return KustoQueryResult.Empty;
     }
 
 
@@ -265,9 +268,8 @@ public class InteractiveTableExplorer
             var filename = ToFullPath(o.File, scriptFolder, ".dfr");
 
             exp.Info($"Loading script '{filename}'..");
-            var lines = await File.ReadAllLinesAsync(filename);
-            foreach (var line in lines)
-                await exp.ExecuteAsync(line);
+            var text = await File.ReadAllTextAsync(filename);
+            await exp.RunInput(text, false);
         }
 
         [Verb("run", aliases: ["script", "r"],
