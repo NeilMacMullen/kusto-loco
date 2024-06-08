@@ -62,7 +62,7 @@ namespace lokqlDx
                 i--;
             while (i < Query.LineCount && Query.GetLineText(i).Trim().Length > 0)
             {
-                sb.AppendLine(Query.GetLineText(i));
+                sb.Append(Query.GetLineText(i));
                 i++;
             }
            

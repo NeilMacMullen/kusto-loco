@@ -74,6 +74,7 @@ public static class TypeMapping
             "double" => typeof(double),
             "short" => typeof(short),
             "ulong" => typeof(ulong),
+            "real" => typeof(double), //promote to double
             _ => throw new NotImplementedException($"No .Net type equivalent for Kusto type {name}")
         };
     }
