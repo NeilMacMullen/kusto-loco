@@ -1,0 +1,25 @@
+﻿using CommandLine;
+
+namespace Lokql.Engine.Commands;
+
+public static class RunScriptCommand
+{
+    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+    {
+        var scriptFolder = exp.Settings.Get(LokqlSettings.ScriptPath);
+
+        var filename = InteractiveTableExplorer.ToFullPath(o.File, scriptFolder, ".dfr");
+
+        exp.Info($"Loading script '{filename}'..");
+        var text = await File.ReadAllTextAsync(filename);
+        await exp.RunInput(text);
+    }
+
+    [Verb("run", aliases: ["script", "r"],
+        HelpText = "run a script")]
+    internal class Options
+    {
+        [Value(0, HelpText = "Name of script", Required = true)]
+        public string File { get; set; } = string.Empty;
+    }
+}

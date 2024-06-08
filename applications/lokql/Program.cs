@@ -3,6 +3,7 @@ using CommandLine;
 using LogSetup;
 using Lokql.Engine;
 using NLog;
+using NotNullStrings;
 
 LoggingExtensions.SetupLoggingForConsole(LogLevel.Info);
 await StandardParsers.Default
@@ -11,4 +12,4 @@ await StandardParsers.Default
     .WithParsedAsync<CmdExplore.Options>(CmdExplore.RunAsync);
 
 
-    
+
