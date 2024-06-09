@@ -35,6 +35,8 @@ public class CommandProcessor
                 .WithAdditionalCommand<ListSettingsCommand.Options>(ListSettingsCommand.RunAsync)
                 .WithAdditionalCommand<ListSettingDefinitionsCommand.Options>(ListSettingDefinitionsCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
+                .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
+                .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
             ;
     }
 

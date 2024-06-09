@@ -1,12 +1,11 @@
 ﻿using System.Text;
-using NetTopologySuite.Algorithm;
 using NotNullStrings;
 
 namespace Lokql.Engine;
 
 public class BlockBreaker
 {
-    public  string[] Blocks =[];
+    public string[] Blocks = [];
 
     public BlockBreaker(string block)
     {
@@ -17,14 +16,14 @@ public class BlockBreaker
             .ToArray();
 
 
-        var sb=new StringBuilder();
+        var sb = new StringBuilder();
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
             //A blank line between blocks indicates we should complete the previous one
             if (trimmedLine.IsBlank())
             {
-               CompleteBlock();
+                CompleteBlock();
                 continue;
             }
 
@@ -41,10 +40,7 @@ public class BlockBreaker
             }
 
 
-
             sb.AppendLine(line);
-
-
         }
 
         Blocks = blocks.ToArray();
@@ -59,23 +55,10 @@ public class BlockBreaker
         }
     }
 
-    private static bool IsSingleLineCommand(string trimmedLine) =>
-        trimmedLine.StartsWith(".") ||
-        trimmedLine.StartsWith("#") ||
-        trimmedLine.StartsWith("//");
-}
-
-
-public class BlockSequence
-{
-    public BlockSequence(string [] blocks)
+    private static bool IsSingleLineCommand(string trimmedLine)
     {
-        Blocks =blocks.ToArray();
+        return trimmedLine.StartsWith(".") ||
+               trimmedLine.StartsWith("#") ||
+               trimmedLine.StartsWith("//");
     }
-
-    public int Index { get; private set; }=0;
-    private string[] Blocks { get; }
-    public bool Complete => Index >= Blocks.Length;
-
-    public string Next() => Index < Blocks.Length ? Blocks[Index++] : string.Empty;
 }

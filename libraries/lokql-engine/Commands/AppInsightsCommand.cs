@@ -21,6 +21,8 @@ public static class AppInsightsCommand
             return;
 
         var query = blocks.Next();
+        //make sure we pick up any variable interpolation in case we are inside a function
+        query = exp._interpolator.Interpolate(query);
 
         var result = await ai.LoadTable(o.Rid, query, t, DateTime.UtcNow);
         exp.InjectResult(result);
