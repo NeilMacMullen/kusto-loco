@@ -34,4 +34,15 @@ public static class ParserExtensions
 
         return result;
     }
+
+    public static async Task TryAsync(this ParserResult<object> result,Type optionsType,
+        Func<object, Task> action)
+    {
+        if (result is Parsed<object> parsed && parsed.Value.GetType() == optionsType)
+        {
+            await action(parsed.Value);
+        }
+       
+    }
+
 }

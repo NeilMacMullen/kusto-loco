@@ -203,11 +203,12 @@ public class KustoQueryResult
     {
         var dt = new DataTable();
 
-        foreach (var col in ColumnNames())
-            dt.Columns.Add(col);
+        foreach (var col in ColumnDefinitions())
+            dt.Columns.Add(col.Name,col.UnderlyingType);
 
         foreach (var row in EnumerateRows().Take(maxRows))
             dt.Rows.Add(row);
+
         return dt;
     }
 

@@ -21,9 +21,9 @@ internal class CmdExplore
         var settings = new KustoSettingsProvider();
         var loader = new StandardFormatAdaptor(settings,console);
         loader.SetDataPaths(options.Data);
-        var explorer = new InteractiveTableExplorer(console,  loader, settings);
-
-        await explorer.RunInteractive(options.Run);
+        var processor = CommandProcessorProvider.GetCommandProcessor();
+        var explorer = new InteractiveTableExplorer(console,  loader, settings,processor);
+        await RunInteractive(console, explorer);
     }
 
     [Verb("explore")]
@@ -45,4 +45,22 @@ internal class CmdExplore
         [Option(HelpText = "Runs a script at startup")]
         public string Run { get; set; } = string.Empty;
     }
+
+
+
+    public static async Task RunInteractive(IKustoConsole _outputConsole,InteractiveTableExplorer exp)
+    {
+        exp.Warn("Use '.help' to list commands");
+
+        while (true)
+        {
+            _outputConsole.ForegroundColor = ConsoleColor.Blue;
+            _outputConsole.Write("KQL> ");
+            var query = _outputConsole.ReadLine();
+            await exp.RunInput(query);
+        }
+    }
+
+ 
+
 }

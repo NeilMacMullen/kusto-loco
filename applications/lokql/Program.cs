@@ -1,5 +1,4 @@
-﻿
-using CommandLine;
+﻿using CommandLine;
 using LogSetup;
 using Lokql.Engine;
 using NLog;
@@ -9,6 +8,3 @@ await StandardParsers.Default
     .ParseArguments(args,
         typeof(CmdExplore.Options))
     .WithParsedAsync<CmdExplore.Options>(CmdExplore.RunAsync);
-
-
-    

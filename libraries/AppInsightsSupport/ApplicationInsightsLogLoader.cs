@@ -27,7 +27,7 @@ public class ApplicationInsightsLogLoader
     }
     public async Task<KustoQueryResult> LoadTable(string resourcePath,
         string query,
-        TimeSpan history
+        DateTime start,DateTime end
     )
     {
         var client = new LogsQueryClient(new DefaultAzureCredential());
@@ -38,7 +38,7 @@ public class ApplicationInsightsLogLoader
         var results = await client.QueryResourceAsync(
             new ResourceIdentifier(resourcePath),
             query,
-            new QueryTimeRange(history),
+            new QueryTimeRange(start,end),
             new LogsQueryOptions
             {
                 IncludeVisualization = true,
