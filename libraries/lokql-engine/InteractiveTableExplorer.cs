@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
@@ -24,8 +23,10 @@ public class InteractiveTableExplorer
 {
     private readonly CommandProcessor _commandProcessor;
     private readonly KustoQueryContext _context;
+    public readonly BlockInterpolator _interpolator;
 
     public readonly ITableAdaptor _loader;
+    private readonly MacroRegistry _macros = new();
     public readonly IKustoConsole _outputConsole;
     public readonly KustoSettingsProvider Settings;
 
@@ -37,6 +38,7 @@ public class InteractiveTableExplorer
         _outputConsole = outputConsole;
         _loader = loader;
         Settings = settings;
+        _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.SetTableLoader(_loader);
@@ -46,6 +48,11 @@ public class InteractiveTableExplorer
 
     public KustoQueryResult _prevResult { get; set; }
 
+
+    public void AddMacro(MacroDefinition macro)
+    {
+        _macros.AddMacro(macro);
+    }
 
     public KustoQueryContext GetCurrentContext()
     {
@@ -88,32 +95,28 @@ public class InteractiveTableExplorer
         }
     }
 
-    public string Interpolate(string query)
-    {
-        string rep(Match m)
-        {
-            var term = m.Groups[1].Value;
-            return Settings.TrySubstitute(term);
-        }
-
-        return Regex.Replace(query, @"\$(\w+)", rep);
-    }
 
     public async Task RunInput(string query)
     {
         var breaker = new BlockBreaker(query);
         var sequence = new BlockSequence(breaker.Blocks);
-
-        while (!sequence.Complete) await RunInput(sequence);
+        await RunSequence(sequence);
     }
 
-    public async Task RunInput(BlockSequence blocks)
+    public async Task RunSequence(BlockSequence sequence)
+    {
+        while (!sequence.Complete)
+            await RunNextBlock(sequence);
+    }
+
+    public async Task RunNextBlock(BlockSequence blocks)
     {
         var query = blocks.Next();
-        query = Interpolate(query)
+        query = _interpolator.Interpolate(query)
             .Trim();
+
         //support comments
-        if (query.StartsWith("#") | query.IsBlank()) return;
+        if (query.StartsWith("#") || query.StartsWith("//") || query.IsBlank()) return;
 
         try
         {
@@ -179,6 +182,30 @@ public class InteractiveTableExplorer
     }
 
     #endregion
+
+    /// <summary>
+    ///     Adds a layer of settings to the setting interpolation stack
+    /// </summary>
+    /// <remarks>
+    ///     Primarily used by the Macro mechanism to avoid name-clashes for parameters
+    /// </remarks>
+    public void PushSettingLayer(KustoSettingsProvider settings)
+    {
+        _interpolator.PushSettings(settings);
+    }
+
+    /// <summary>
+    ///     Pops the top layer of settings from the setting interpolation stack
+    /// </summary>
+    public void PopSettingLayer()
+    {
+        _interpolator.PopSettings();
+    }
+
+    public MacroDefinition GetMacro(string oName)
+    {
+        return _macros.GetMacro(oName);
+    }
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
 }
