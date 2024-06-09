@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shell;
 using KustoLoco.Core;
@@ -35,7 +34,7 @@ public partial class MainWindow : Window
         var settings = new KustoSettingsProvider();
         _workspaceManager = new WorkspaceManager(settings);
         var loader = new StandardFormatAdaptor(settings, _console);
-        var cp = CommandProcessor.Default();
+        var cp = CommandProcessorProvider.GetCommandProcessor();
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp);
     }
 
@@ -101,7 +100,7 @@ public partial class MainWindow : Window
         Editor.SetText(_workspaceManager.UserText);
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
-        _explorer = new InteractiveTableExplorer(_console, loader, settings, CommandProcessor.Default());
+        _explorer = new InteractiveTableExplorer(_console, loader, settings, CommandProcessorProvider.GetCommandProcessor());
         UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path}";
     }
@@ -266,54 +265,5 @@ public partial class MainWindow : Window
     private void EnableJumpList(object sender, RoutedEventArgs e)
     {
         RegistryOperations.AssociateFileType();
-    }
-}
-
-public static class MenuExtensions
-{
-    public static void RaiseMenuItemClickOnKeyGesture(this ItemsControl? control, KeyEventArgs args)
-    {
-        RaiseMenuItemClickOnKeyGesture(control, args, false);
-    }
-
-    public static void RaiseMenuItemClickOnKeyGesture(this ItemsControl? control, KeyEventArgs args, bool throwOnError)
-    {
-        if (args == null)
-            throw new ArgumentNullException(nameof(args));
-
-        if (control == null)
-            return;
-
-        var kgc = new KeyGestureConverter();
-        foreach (var item in control.Items.OfType<MenuItem>())
-        {
-            if (!string.IsNullOrWhiteSpace(item.InputGestureText))
-            {
-                KeyGesture? gesture = null;
-                if (throwOnError)
-                    gesture = kgc.ConvertFrom(item.InputGestureText) as KeyGesture;
-                else
-                    try
-                    {
-                        gesture = kgc.ConvertFrom(item.InputGestureText) as KeyGesture;
-                    }
-                    catch
-                    {
-                    }
-
-
-                if (gesture != null && gesture.Matches(null, args)
-                   )
-                {
-                    item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-                    args.Handled = true;
-                    return;
-                }
-            }
-
-            RaiseMenuItemClickOnKeyGesture(item, args, throwOnError);
-            if (args.Handled)
-                return;
-        }
     }
 }
