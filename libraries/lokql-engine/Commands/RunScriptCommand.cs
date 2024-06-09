@@ -4,8 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class RunScriptCommand
 {
-    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         var scriptFolder = exp.Settings.Get(LokqlSettings.ScriptPath);
 
         var filename = InteractiveTableExplorer.ToFullPath(o.File, scriptFolder, ".dfr");

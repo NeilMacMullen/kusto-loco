@@ -4,8 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class SaveCommand
 {
-    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp= econtext.Explorer;
         await exp._loader.SaveResult(exp._prevResult, o.File);
     }
 

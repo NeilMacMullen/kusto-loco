@@ -5,9 +5,10 @@ namespace Lokql.Engine.Commands;
 
 public static class AllTablesCommand
 {
-    internal static Task Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(CommandProcessorContext econtext, Options o)
     {
-        var context = exp.GetCurrentContext();
+        var exp = econtext.Explorer;
+        var context = exp .GetCurrentContext();
         var tableNames = context.TableNames
             .Select(t => $"['{t}']")
             .JoinAsLines();

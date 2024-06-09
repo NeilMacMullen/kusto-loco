@@ -6,8 +6,9 @@ namespace Lokql.Engine.Commands;
 
 public static class PivotCommand
 {
-    internal static void Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         var result = exp._prevResult;
         var ods = new List<OrderedDictionary>();
         var columns = result.ColumnDefinitions();
@@ -26,6 +27,7 @@ public static class PivotCommand
 
         var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods);
         exp.GetCurrentContext().AddTable(builder);
+        return Task.CompletedTask;
     }
 
     [Verb("pivot", HelpText = "pivots columns into rows")]

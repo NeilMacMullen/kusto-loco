@@ -4,10 +4,12 @@ namespace Lokql.Engine.Commands;
 
 public static class MaterializeCommand
 {
-    internal static void Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         exp.GetCurrentContext().MaterializeResultAsTable(exp._prevResult, o.As);
         exp.Info($"Table '{o.As}' now available");
+        return Task.CompletedTask;
     }
 
     [Verb("materialize", aliases: ["materialise", "mat"],

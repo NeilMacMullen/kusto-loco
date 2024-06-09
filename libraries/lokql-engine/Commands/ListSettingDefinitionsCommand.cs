@@ -4,8 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class ListSettingDefinitionsCommand
 {
-    internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         var defs = exp.Settings.GetDefinitions()
             .Where(d => d.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
             .OrderBy(d => d.Name);

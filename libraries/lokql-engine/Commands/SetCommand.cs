@@ -4,8 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class SetCommand
 {
-    internal static Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         exp.Settings.Set(o.Name, o.Value);
         exp.Info($"Set {o.Name} to {o.Value}");
         return Task.CompletedTask;

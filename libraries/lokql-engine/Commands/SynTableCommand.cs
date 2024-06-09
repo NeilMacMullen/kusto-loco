@@ -4,11 +4,13 @@ namespace Lokql.Engine.Commands;
 
 public static class SynTableCommand
 {
-    internal static void Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         exp.Info($"Creating synonym for table {o.CurrentName} as {o.As} ...");
 
         exp.GetCurrentContext().ShareTable(o.CurrentName, o.As);
+        return Task.CompletedTask;
     }
 
     [Verb("synonym", aliases: ["syn", "alias"], HelpText = "provides a synonym for a table")]

@@ -5,8 +5,9 @@ namespace Lokql.Engine.Commands;
 
 public static class SaveQueryCommand
 {
-    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         var queryFolder = exp.Settings.Get(LokqlSettings.QueryPath);
         var filename = InteractiveTableExplorer.ToFullPath(o.File, queryFolder, ".csl");
         exp.Info($"Saving query as '{filename}'");

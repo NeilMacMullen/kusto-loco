@@ -4,8 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class ShowCommand
 {
-    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         exp.ShowResultsToConsole(exp._prevResult, o.Offset, o.NumToShow);
         await Task.CompletedTask;
     }

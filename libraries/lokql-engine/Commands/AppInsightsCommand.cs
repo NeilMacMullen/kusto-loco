@@ -5,8 +5,10 @@ namespace Lokql.Engine.Commands;
 
 public static class AppInsightsCommand
 {
-    internal static async Task RunAsync(InteractiveTableExplorer exp, Options o, BlockSequence blocks)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
+        var blocks = econtext.Sequence;
         var ai = new ApplicationInsightsLogLoader(exp.Settings, exp._outputConsole);
 
         var timespan = o.Timespan;

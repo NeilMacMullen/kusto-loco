@@ -7,8 +7,9 @@ namespace Lokql.Engine.Commands;
 
 public static class RenderCommand
 {
-    internal static void Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(CommandProcessorContext econtext, Options o)
     {
+        var exp = econtext.Explorer;
         var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
         var result = exp._prevResult;
         var renderer = new KustoResultRenderer(exp.Settings);
@@ -17,6 +18,7 @@ public static class RenderCommand
         exp.Info($"Saved chart as {fileName}");
         if (!o.SaveOnly)
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
+        return Task.CompletedTask;
     }
 
     [Verb("render", aliases: ["ren"], HelpText = "render last results as html and opens with browser")]
