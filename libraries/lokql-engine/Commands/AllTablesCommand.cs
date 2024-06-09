@@ -5,13 +5,14 @@ namespace Lokql.Engine.Commands;
 
 public static class AllTablesCommand
 {
-    internal static void Run(InteractiveTableExplorer exp, Options o)
+    internal static Task Run(InteractiveTableExplorer exp, Options o)
     {
         var context = exp.GetCurrentContext();
         var tableNames = context.TableNames
             .Select(t => $"['{t}']")
             .JoinAsLines();
         exp._outputConsole.WriteLine(tableNames);
+        return Task.CompletedTask;
     }
 
     [Verb("listtables", aliases: ["ls", "alltables", "at"],

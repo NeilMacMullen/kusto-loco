@@ -22,7 +22,7 @@ internal class CmdExplore
         var settings = new KustoSettingsProvider();
         var loader = new StandardFormatAdaptor(settings,console);
         loader.SetDataPaths(options.Data);
-        var processor = new CommandProcessor();
+        var processor = CommandProcessor.Default();
         var explorer = new InteractiveTableExplorer(console,  loader, settings,processor);
         await RunInteractive(console, explorer);
     }
