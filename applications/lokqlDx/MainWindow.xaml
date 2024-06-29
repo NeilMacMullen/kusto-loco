@@ -50,10 +50,40 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <local:QueryEditor x:Name="Editor" Grid.Row="0" 
+        <TabControl Grid.Row="0" >
+          <TabItem Header="Edit">
+            <local:QueryEditor x:Name="Editor" 
                                RunEvent="OnQueryEditorRunTextBlock" />
+          </TabItem>
+          <TabItem Header="Copilot">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <RichTextBox Grid.Row="0" Name="ChatHistory" FontFamily="Consolas"
+                           Background="DarkBlue"
+                           FontSize="10"/>
+              <GridSplitter Grid.Row="1"
+                            VerticalAlignment="Stretch"
+                            Height="5"
+                            HorizontalAlignment="Stretch"
+                            Background="DarkGray"/>
+              <DockPanel Grid.Row="2">
+                <Button Name="SubmitButton" DockPanel.Dock="Bottom" Margin="5" Width="100" HorizontalAlignment="Right" Click="SubmitToCopilot">Submit</Button>
+                <TextBox  Name="UserChat" FontFamily="Consolas"
+                              Background="LightBlue"
+                              FontSize="10"
+                              AcceptsReturn="True"/>
 
-            <GridSplitter Grid.Row="1"
+              </DockPanel>
+
+            </Grid>
+
+          </TabItem>
+        </TabControl>
+        <GridSplitter Grid.Row="1"
                           VerticalAlignment="Stretch"
                           Height="5"
                           HorizontalAlignment="Stretch"
