@@ -147,7 +147,7 @@ internal static class BuiltInScalarFunctions
         EndOfMonthFunction.Register(functions);
         StartOfYearFunction.Register(functions);
         EndOfYearFunction.Register(functions);
-
+        DatetimeDiffFunction.Register(functions);
         functions.Add(Functions.DatetimeUtcToLocal,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(),
                 ScalarTypes.DateTime,
