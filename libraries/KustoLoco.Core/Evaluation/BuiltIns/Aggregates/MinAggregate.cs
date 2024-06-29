@@ -47,7 +47,7 @@ internal partial class MinAggregate
     internal static TimeSpan? TsImplFinish(NumericAggregate context)
         => context.Count == 0 ? null : new TimeSpan((long)context.Total);
 
-    internal static DateTime DtImpl(NumericAggregate context, TimeSpan n)
+    internal static DateTime DtImpl(NumericAggregate context, DateTime n)
     {
         context.Total = context.Count == 0 ? n.Ticks : Math.Min(context.Total, n.Ticks);
         context.Count++;
