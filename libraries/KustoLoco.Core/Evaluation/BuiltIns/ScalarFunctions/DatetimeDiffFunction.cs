@@ -9,7 +9,7 @@ internal partial class DatetimeDiffFunction
     //It's unclear from the documentation whether things like "day" should be rounded or truncated
     private static long Impl(string period, DateTime a, DateTime b)
     {
-        return period switch
+        return period.ToLowerInvariant() switch
         {
             "year" => a.Year - b.Year,
             "month" => (a.Year - b.Year) * 12 + a.Month - b.Month,
