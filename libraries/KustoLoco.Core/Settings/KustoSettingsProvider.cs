@@ -75,6 +75,9 @@ public class KustoSettingsProvider
         return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
+    public bool HasSetting(string name)
+        => _settings.ContainsKey(name.ToLowerInvariant());
+
     public string GetOr(string setting,string fallback)
     {
         var fb = new KustoSettingDefinition(setting, string.Empty,fallback,string.Empty);

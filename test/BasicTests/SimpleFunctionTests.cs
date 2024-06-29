@@ -529,4 +529,17 @@ d | project Type='v1',Val=v1
         var result = await LastLineOfResult(query);
         result.Should().Be("2");
     }
+
+    [TestMethod]
+    public async Task QuoteSlash()
+    {
+        var query = """ 
+datatable(T:string) ['abcd','"def']
+| where T contains "\"def"
+| count
+""";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("1");
+    }
+
 }
