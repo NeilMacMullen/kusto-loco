@@ -6,6 +6,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
+#pragma warning disable CS8604 // Possible null reference argument.
 
 namespace KustoLoco.FileFormats;
 
@@ -14,14 +15,15 @@ public class CsvSerializer : ITableSerializer
     private readonly CsvConfiguration _config;
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
-    private readonly bool _skipHeader = false;
 
     public CsvSerializer(CsvConfiguration config, KustoSettingsProvider settings, IKustoConsole console)
     {
         _config = config;
         _settings = settings;
         _console = console;
-        settings.Register(CsvSerializerSettings.SkipTypeInference, CsvSerializerSettings.TrimCells);
+        settings.Register(CsvSerializerSettings.SkipTypeInference,
+            CsvSerializerSettings.TrimCells,
+            CsvSerializerSettings.SkipHeaderOnSave);
     }
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
@@ -37,7 +39,10 @@ public class CsvSerializer : ITableSerializer
         var csv = new CsvReader(reader, _config);
         csv.Read();
         csv.ReadHeader();
-        var keys = csv.Context.Reader.HeaderRecord;
+
+        var keys = csv.Context.Reader?.HeaderRecord;
+
+
         var builders = keys
             .Select(_ => new ColumnBuilder<string>())
             .ToArray();
@@ -94,10 +99,12 @@ public class CsvSerializer : ITableSerializer
 
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, _config);
-        if (!_skipHeader)
+        if (!_settings.GetBool(CsvSerializerSettings.SkipHeaderOnSave))
+        {
             foreach (var heading in result.ColumnNames())
                 csv.WriteField(heading);
-        csv.NextRecord();
+            csv.NextRecord();
+        }
 
         var rowCount = 0;
         foreach (var r in result.EnumerateRows())
@@ -156,6 +163,9 @@ public class CsvSerializer : ITableSerializer
 
         public static readonly KustoSettingDefinition TrimCells = new(Setting("TrimCells"),
             "Removes leading and trailing whitespace from string values", "true", nameof(Boolean));
+
+        public static readonly KustoSettingDefinition SkipHeaderOnSave = new(Setting("SkipHeaderOnSave"),
+            "Don't write header row when saving CSV files", "false", nameof(Boolean));
 
         private static string Setting(string setting)
         {
