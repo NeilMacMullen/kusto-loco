@@ -86,7 +86,11 @@
 
                 <DataGrid   Name="dataGrid" Background="Black" RowBackground="Black"
                             Foreground="GreenYellow"
-                            AlternatingRowBackground="DarkBlue">
+                            AlternatingRowBackground="DarkBlue"
+                            IsReadOnly="True"
+                            ClipboardCopyMode="ExcludeHeader"
+                            SelectionUnit="Cell"
+                            >
 
                     <DataGrid.Resources>
                         <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">

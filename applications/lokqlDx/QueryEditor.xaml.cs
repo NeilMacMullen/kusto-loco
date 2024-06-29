@@ -31,7 +31,7 @@ namespace lokqlDx
         {
             if (e.Key == Key.Enter)
             {
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.LeftShift))
                 {
                     e.Handled = true;
                     var query = GetTextAroundCursor();
