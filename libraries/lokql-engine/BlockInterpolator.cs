@@ -26,17 +26,18 @@ public class BlockInterpolator
     {
         string rep(Match m)
         {
+            var fullMatch =m.Value;
+            if(fullMatch.StartsWith("$$"))
+                return fullMatch.Substring(1);
             var term = m.Groups[1].Value;
             foreach(var settings in _settingsStack.ToArray().Reverse())
             {
-              
-                var result = settings.TrySubstitute(term);
-                if (!string.Equals(result, term, StringComparison.InvariantCultureIgnoreCase))
-                    return result;
+                if(settings.HasSetting(term))
+                    return settings.TrySubstitute(term);
             }
-            return term;
+            return fullMatch;
         }
 
-        return Regex.Replace(query, @"\$(\w+)", rep);
+        return Regex.Replace(query, @"\$?\$\(?(\w+)\)?", rep);
     }
 }
