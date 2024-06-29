@@ -59,6 +59,10 @@ public class PsKqlCmdlet : Cmdlet
                 //index and pad with nulls where necessary
                 foreach (var p in item.Properties)
                 {
+                    if (p is PSScriptProperty scr)
+                    {
+
+                    }
                     if (badProperties.Contains(p.Name))
                         continue;
                     //it's important we check the property type _before_ attempting to access the Value
@@ -153,11 +157,28 @@ public class PsKqlCmdlet : Cmdlet
         //special-casing for properties of type "object" which we turn into strings for the purpose of querying
         if (typeName == TypeNameHelper.TypeName<object>())
         {
-            typeName = TypeNameHelper.TypeName<string>();
-            value = value?.ToString() ?? string.Empty;
+            if (value != null)
+            {
+                WriteDebug($"property '{columnName}'  is object so trying to derive type from value");
+                typeName = value.GetType().ToString();
+                WriteDebug($"prop {columnName} typeof '{value}' is {typeName}");
+                if (value is PSObject ps)
+                {
+                    WriteDebug($"property '{columnName}'  is PSObject so trying to derive type from BaseObject");
+                    typeName = ps.BaseObject.GetType().ToString();
+                    WriteDebug($"prop {columnName} baseobj typeof '{ps.BaseObject}' is {typeName}");
+                    value = ps.BaseObject;
+                }
+            }
+            else
+            {
+                typeName = TypeNameHelper.TypeName<string>();
+                value = value?.ToString() ?? string.Empty;
+            }
+
+           
         }
-
-
+        WriteDebug($"Getting builder for {columnName}");
         var colBuilder = GetOrCreateBuilder(columnName, typeName);
         colBuilder.AddAt(value, rowIndex);
     }
