@@ -71,6 +71,18 @@ data
 
     public void Load(string path)
     {
+        if (!File.Exists(path))
+        {
+            var rootSettingFolderPath =
+                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                       "kustoloco");
+            if (!Directory.Exists(rootSettingFolderPath))
+                Directory.CreateDirectory(rootSettingFolderPath);
+
+            path = System.IO.Path.Combine(rootSettingFolderPath, "settings");
+            File.WriteAllText(path, JsonSerializer.Serialize(new Workspace()));
+        }
+
         Path = path;
         try
         {

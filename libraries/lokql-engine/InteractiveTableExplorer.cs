@@ -31,6 +31,7 @@ public class InteractiveTableExplorer
     public readonly KustoSettingsProvider Settings;
 
     public DisplayOptions _currentDisplayOptions = new(10);
+    public KustoQueryResult _prevResultIncludingError =KustoQueryResult.Empty;
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
         CommandProcessor commandProcessor)
@@ -129,6 +130,7 @@ public class InteractiveTableExplorer
             var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
                 _prevResult = result;
+            _prevResultIncludingError = result;
 
             DisplayResults(result);
         }
