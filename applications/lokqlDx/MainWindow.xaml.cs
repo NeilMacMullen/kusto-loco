@@ -18,6 +18,7 @@ public partial class MainWindow : Window
 {
     private readonly string[] _args;
     private readonly WpfConsole _console;
+    private readonly Size _minWindowSize = new(600, 400);
     private readonly PreferencesManager _preferenceManager = new();
     private readonly WorkspaceManager _workspaceManager;
 
@@ -111,12 +112,18 @@ public partial class MainWindow : Window
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.Load();
-        var pathToLoad = _args.Any() ? _args[0] : _preferenceManager.Preferences.LastWorkspacePath;
+        var pathToLoad = _args.Any()
+                             ? _args[0]
+                             : _preferenceManager.Preferences.LastWorkspacePath;
         _workspaceManager.Load(pathToLoad);
         if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
         {
-            Width = _preferenceManager.Preferences.WindowWidth;
-            Height = _preferenceManager.Preferences.WindowHeight;
+            Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
+                        ? _minWindowSize.Width
+                        : _preferenceManager.Preferences.WindowWidth;
+            Height = _preferenceManager.Preferences.WindowHeight < _minWindowSize.Height
+                         ? _minWindowSize.Height
+                         : _preferenceManager.Preferences.WindowHeight;
             Left = _preferenceManager.Preferences.WindowLeft;
             Top = _preferenceManager.Preferences.WindowTop;
         }
