@@ -9,8 +9,6 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using Lokql.Engine;
-using Lokql.Engine.Commands;
-using Microsoft.Identity.Client;
 using Microsoft.Win32;
 using NotNullStrings;
 
@@ -22,9 +20,9 @@ public partial class MainWindow : Window
     private readonly WpfConsole _console;
     private readonly PreferencesManager _preferenceManager = new();
     private readonly WorkspaceManager _workspaceManager;
-    private InteractiveTableExplorer _explorer;
 
-    private Copilot _copilot=new Copilot(string.Empty);
+    private Copilot _copilot = new(string.Empty);
+    private InteractiveTableExplorer _explorer;
     private bool isBusy;
 
 
@@ -104,7 +102,8 @@ public partial class MainWindow : Window
         Editor.SetText(_workspaceManager.UserText);
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
-        _explorer = new InteractiveTableExplorer(_console, loader, settings, CommandProcessorProvider.GetCommandProcessor());
+        _explorer = new InteractiveTableExplorer(_console, loader, settings,
+            CommandProcessorProvider.GetCommandProcessor());
         UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path}";
     }
@@ -278,31 +277,27 @@ public partial class MainWindow : Window
         SubmitButton.IsEnabled = false;
         if (!_copilot.Initialised)
         {
-            _copilot= new Copilot(_explorer.Settings.GetOr("copilot",string.Empty));
+            _copilot = new Copilot(_explorer.Settings.GetOr("copilot", string.Empty));
             foreach (var table in _explorer.GetCurrentContext().Tables())
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"The table named '{table.Name}' has the following columns");
                 var cols = table.ColumnNames.Zip(table.Type.Columns)
                     .Select(z => $"  {z.First} is of type {z.Second.Type.Name}").ToArray();
-                foreach (var column in cols)
-                {
-                    sb.AppendLine(column);
-                }
+                foreach (var column in cols) sb.AppendLine(column);
                 _copilot.AddSystemInstructions(sb.ToString());
             }
         }
+
         var userchat = UserChat.Text;
         UserChat.Text = string.Empty;
         const int maxResubmissions = 3;
-        for (var i = 0; i < maxResubmissions; i ++)
+        for (var i = 0; i < maxResubmissions; i++)
         {
             var response = await _copilot.Issue(userchat);
 
 
             var console = new WpfConsole(ChatHistory);
-            console.PrepareForOutput();
-            _copilot.RenderResponses(console);
 
             //now try to extract kql...
             var lines = response.Split('\n');
@@ -310,12 +305,13 @@ public partial class MainWindow : Window
             var getting = false;
             foreach (var line in lines)
             {
-                if (line.StartsWith("```kql"))
+                if (line.StartsWith("```kql") || line.StartsWith("```kusto"))
                 {
                     kql.Clear();
                     getting = true;
                     continue;
                 }
+
                 if (line.StartsWith("```"))
                 {
                     getting = false;
@@ -326,6 +322,13 @@ public partial class MainWindow : Window
                     kql.AppendLine(line.Trim());
             }
 
+            _copilot.AddResponse(kql.ToString());
+            console.PrepareForOutput();
+            var options = new List<string> { Copilot.Roles.System, Copilot.Roles.User, Copilot.Roles.Kql };
+            if (TerseMode.IsChecked != true)
+                options.Add(Copilot.Roles.Assistant);
+            _copilot.RenderResponses(console, options.ToArray());
+
             if (kql.ToString().IsBlank())
                 break;
             await RunQuery(kql.ToString());
@@ -335,10 +338,14 @@ public partial class MainWindow : Window
                 break;
             userchat = $"That query gave an error: {lastResult.Error}";
         }
-       
-     
+
 
         SubmitButton.IsEnabled = true;
+    }
 
+    private void ResetCopilot(object sender, RoutedEventArgs e)
+    {
+        _copilot = new Copilot(string.Empty);
+        ChatHistory.Document.Blocks.Clear();
     }
 }

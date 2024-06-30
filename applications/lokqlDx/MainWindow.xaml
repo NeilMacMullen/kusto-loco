@@ -56,7 +56,11 @@
                                RunEvent="OnQueryEditorRunTextBlock" />
           </TabItem>
           <TabItem Header="Copilot">
-            <Grid>
+            <DockPanel>
+              <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <CheckBox Name ="TerseMode" VerticalAlignment="Center">Terse</CheckBox>
+               </StackPanel>
+              <Grid>
               <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -71,7 +75,11 @@
                             HorizontalAlignment="Stretch"
                             Background="DarkGray"/>
               <DockPanel Grid.Row="2">
-                <Button Name="SubmitButton" DockPanel.Dock="Bottom" Margin="5" Width="100" HorizontalAlignment="Right" Click="SubmitToCopilot">Submit</Button>
+                <DockPanel DockPanel.Dock="Bottom" Margin="5" >
+                  <Button Name="SubmitButton" DockPanel.Dock="Right"  Width="100" HorizontalAlignment="Right" Click="SubmitToCopilot">Submit</Button>
+                  <Button Name="ClearChatButton" DockPanel.Dock="Left"  Width="100" HorizontalAlignment="Left" Click="ResetCopilot">Restart</Button>
+                </DockPanel>
+               
                 <TextBox  Name="UserChat" FontFamily="Consolas"
                               Background="LightBlue"
                               FontSize="10"
@@ -80,6 +88,8 @@
               </DockPanel>
 
             </Grid>
+
+            </DockPanel>
 
           </TabItem>
         </TabControl>

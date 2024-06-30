@@ -10,16 +10,27 @@ namespace lokqlDx;
 
 public class Copilot
 {
-
-    public void RenderResponses(IKustoConsole console)
+    public static class Roles
+    {
+        public const string User = "user";
+        public const string Assistant = "assistant";
+        public const string System = "system";
+        public const string Kql = "kql";
+    }
+    public void RenderResponses(IKustoConsole console,params string [] roles)
     {
         foreach(var message in context)
         {
+            if (roles.Length > 0 && !roles.Contains(message.role))
+            {
+                continue;
+            }
             var color = message.role switch
             {
-                "user" => ConsoleColor.Green,
-                "assistant" => ConsoleColor.Yellow,
-                "system" => ConsoleColor.Cyan,
+                Roles.User => ConsoleColor.Green,
+                Roles.Assistant => ConsoleColor.White,
+                Roles.System => ConsoleColor.Red,
+                Roles.Kql => ConsoleColor.Yellow,
                 _ => ConsoleColor.White
             };
             console.ForegroundColor = color;
@@ -80,7 +91,9 @@ I will now give some some information about the schema of the tables that you wi
         var requestData = new
         {
             model = "gpt-4",
-            messages = context.Select(x => new { x.role, x.content }).ToArray()
+            messages = context
+                .Where(m=> m.role!= Roles.Kql)
+                .Select(x => new { x.role, x.content }).ToArray()
         };
 
         var requestContent = new StringContent(JsonSerializer.Serialize(requestData), Encoding.UTF8,
@@ -96,10 +109,10 @@ I will now give some some information about the schema of the tables that you wi
 
     private void AddMessage(string role, string content) => context.Add(new ChatMessage(role, content));
 
-    private void AddUserMessage(string content) => AddMessage("user", content);
+    private void AddUserMessage(string content) => AddMessage(Roles.User, content);
 
-    private void AddCopilotResponse(string content) => AddMessage("assistant", content);
-    public void AddSystemInstructions(string content) => AddMessage("system", content);
+    private void AddCopilotResponse(string content) => AddMessage(Roles.Assistant, content);
+    public void AddSystemInstructions(string content) => AddMessage(Roles.System, content);
 
 
     public readonly record struct ChatMessage(string role, string content);
@@ -115,4 +128,9 @@ I will now give some some information about the schema of the tables that you wi
     }
 
     public bool Initialised { get; private set; }
+
+    public void AddResponse(string response)
+    {
+       AddMessage(Roles.Kql,response);
+    }
 }
