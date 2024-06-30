@@ -3,7 +3,7 @@
 public class Preferences
 {
     public string LastWorkspacePath { get; set; } = string.Empty;
-    public double FontSize { get; set; }
+    public double FontSize { get; set; } = 20;
     public string FontFamily { get; set; } = string.Empty;
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
