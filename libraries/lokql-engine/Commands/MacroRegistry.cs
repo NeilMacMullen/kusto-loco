@@ -1,21 +1,23 @@
-﻿namespace Lokql.Engine.Commands;
+﻿using System.Collections.Immutable;
+
+namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Holds a set of macro definitions that can be applied in the current explorer context
+///     Holds a set of macro definitions that can be applied in the current explorer context
 /// </summary>
 public class MacroRegistry
 {
-    private readonly List<MacroDefinition> _macros = [];
+    private ImmutableDictionary<string, MacroDefinition> _macros = ImmutableDictionary<string, MacroDefinition>.Empty;
 
     public void AddMacro(MacroDefinition macro)
     {
-        _macros.Add(macro);
+        _macros = _macros.SetItem(macro.Name, macro);
     }
 
     public MacroDefinition GetMacro(string name)
     {
-        return _macros.Where(f => f.Name == name)
-            .Append(new MacroDefinition(string.Empty, [], []))
-            .First();
+        return _macros.TryGetValue(name, out var m)
+            ? m
+            : new MacroDefinition(string.Empty, [], []);
     }
 }

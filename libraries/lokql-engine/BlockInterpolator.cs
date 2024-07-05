@@ -29,15 +29,21 @@ public class BlockInterpolator
             var fullMatch =m.Value;
             if(fullMatch.StartsWith("$$"))
                 return fullMatch.Substring(1);
-            var term = m.Groups[1].Value;
+            var term = m.Groups[2].Value;
             foreach(var settings in _settingsStack.ToArray().Reverse())
             {
+                //cope with unbalance brackets such as bin($abcd) where we want to prevent the
+                //losing bracket being lost.
+                var variableHasLeadingBracket = m.Groups[1].Value == "(";
                 if(settings.HasSetting(term))
-                    return settings.TrySubstitute(term);
+                    return
+                        variableHasLeadingBracket
+                            ? settings.TrySubstitute(term)
+                            : settings.TrySubstitute(term) + m.Groups[3].Value;
             }
             return fullMatch;
         }
 
-        return Regex.Replace(query, @"\$?\$\(?(\w+)\)?", rep);
+        return Regex.Replace(query, @"\$?\$(\(?)(\w+)(\)?)", rep);
     }
 }
