@@ -6,8 +6,8 @@ namespace Lokql.Engine;
 
 public class NullFileLoader : IFileBasedTableAccess
 {
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
-        => Task.FromResult(false);
+    public Task<TableLoadResult> TryLoad(string path,  string name)
+        => Task.FromResult(TableLoadResult.Failure("no tables available in Null File Loader"));
 
     public IReadOnlyCollection<string> SupportedFileExtensions() => [];
 

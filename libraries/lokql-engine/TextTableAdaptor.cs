@@ -33,14 +33,14 @@ public class TextTableAdaptor : IFileBasedTableAccess
         }
     }
 
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name)
+    public Task<TableLoadResult> TryLoad(string path, string name)
     {
         var lines = File.ReadAllLines(path)
                         .Select(l => new { Line = l })
                         .ToImmutableArray();
         var table = TableBuilder.CreateFromImmutableData(name, lines).ToTableSource();
-        context.AddTable(table);
-        return Task.FromResult(true);
+       
+        return Task.FromResult(TableLoadResult.Success(table));
     }
 
     public TableAdaptorDescription GetDescription()

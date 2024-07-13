@@ -2,6 +2,7 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
+using NotNullStrings;
 
 namespace Lokql.Engine;
 
@@ -103,14 +104,18 @@ public class StandardFormatAdaptor : ITableAdaptor
             : Paths.Select(p => Path.Combine(p, path));
         foreach (var filepath in filePaths)
         {
-            if (!Path.Exists(filepath)) break;
+            if (!Path.Exists(filepath))
+                break;
 
-            var success = await loader.TryLoad(filepath, context, tableName);
-            if (success)
+            var result = await loader.TryLoad(filepath,  tableName);
+            if (result.Error.IsBlank())
             {
+                context.AddTable(result.Table);
                 _console.Info($"Loaded table '{tableName}' from {filepath}");
                 return true;
             }
+            _console.Warn($"Unable to load table '{tableName}' from {filepath}");
+            _console.Warn($"Error:{result.Error}");
         }
 
         _console.Warn($"Unable to load table '{tableName}' from {path}");

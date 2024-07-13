@@ -7,11 +7,10 @@ namespace Lokql.Engine;
 public abstract class TableAdaptorBase(ITableSerializer serializer,string name,string description,string extensions)
     : IFileBasedTableAccess
 {
-    public async Task<bool> TryLoad(string path, KustoQueryContext context, string name)
+    public async Task<TableLoadResult> TryLoad(string path,string name)
     {
         var result = await serializer.LoadTable(path, name);
-        context.AddTable(result.Table);
-        return true;
+        return result;
     }
 
     public async Task<bool> TrySave(string path, KustoQueryResult result)

@@ -14,7 +14,7 @@ namespace Lokql.Engine;
 /// </remarks>
 public interface IFileBasedTableAccess
 {
-    public Task<bool> TryLoad(string path, KustoQueryContext context, string name);
+    public Task<TableLoadResult> TryLoad(string path,string name);
     public IReadOnlyCollection<string> SupportedFileExtensions();
     public Task<bool> TrySave(string path, KustoQueryResult result);
     TableAdaptorDescription GetDescription();

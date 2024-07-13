@@ -45,4 +45,14 @@ public class BlockInterpolationTests
         var expr = "xxx $xyz  def";
         blockInterpolator.Interpolate(expr).Should().Be(expr);
     }
+
+    [TestMethod]
+    public void CheckThatClosingBracketsWithoutOpeningOnesAreLeft()
+    {
+        var settings = new KustoSettingsProvider();
+        settings.Set("abc", "123");
+        var blockInterpolator = new BlockInterpolator(settings);
+        var expr = "xxx($abc)yyy";
+        blockInterpolator.Interpolate(expr).Should().Be("xxx(123)yyy");
+    }
 }
