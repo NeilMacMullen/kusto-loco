@@ -28,7 +28,7 @@ public class CsvSerializer : ITableSerializer
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
-        await using var stream = File.OpenWrite(path);
+        await using var stream = File.Create(path);
         return await SaveTable(stream, result);
     }
 
@@ -84,7 +84,11 @@ public class CsvSerializer : ITableSerializer
         }
         catch (Exception e)
         {
-            return TableLoadResult.Failure(e.Message);
+            var message = e.Message;
+            //add helpful hint fo common error
+            if (message.Contains("because it is being used by another process"))
+                message += " Is the file open in Excel or another program?";
+            return TableLoadResult.Failure(message);
         }
     }
 

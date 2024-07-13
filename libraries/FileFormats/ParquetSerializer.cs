@@ -33,7 +33,7 @@ public class ParquetSerializer : ITableSerializer
  
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
-        await using Stream fs = File.OpenWrite(path);
+        await using Stream fs = File.Create(path);
         return await SaveTable(fs, result);
     }
 

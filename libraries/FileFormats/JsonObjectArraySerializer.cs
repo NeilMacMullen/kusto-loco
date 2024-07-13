@@ -24,7 +24,7 @@ public class JsonObjectArraySerializer : ITableSerializer
   
     public async  Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
     {
-        await using var stream = File.OpenWrite(path);
+        await using var stream = File.Create(path);
         return await SaveTable(stream, result);    
     }
 
