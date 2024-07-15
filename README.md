@@ -44,11 +44,13 @@ Kusto-Loco even comes with a Powershell module that allows you use KQL queries i
 - [For application developers who want to consume the libraries](https://github.com/NeilMacMullen/kusto-loco/wiki/Using-the-query-engine)
 - [LokqlDX - a simple data explorer for local files](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX)
 - [Powershell integration](https://github.com/NeilMacMullen/kusto-loco/wiki/Powershell-Integration)
+- [ChatGpt Copilot](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX#chatgpt-copilot)
+
 
 
 ## Status
 
-The current version is 1.0.1.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
+The current version is 1.0.5.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
 
 ## Credits and Contributors
 
