@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System.Diagnostics;
+using System.Management.Automation;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
@@ -14,7 +15,9 @@ public class PsKqlCmdlet : Cmdlet
     private readonly Dictionary<string, BaseColumnBuilder> _columnBuilders = [];
     private readonly List<string> _columnNames = [];
     private readonly List<PSObject> _objects = [];
-    private bool _noQueryPrefix;
+    private readonly List<string> addedProperties = [];
+
+    private readonly List<string> badProperties = [];
 
     // Declare the parameters for the cmdlet.
     [Parameter(ValueFromPipeline = true)] public PSObject Item { get; set; } = new(string.Empty);
@@ -22,81 +25,116 @@ public class PsKqlCmdlet : Cmdlet
     [Parameter(Position = 0, HelpMessage = "KQL query string fragment. Default value is 'getschema'")]
     public string Query { get; set; } = "getschema";
 
+    [Parameter(HelpMessage = "Evaluate PSScriptProperty members (may cause slow operation)")]
+    public SwitchParameter EvaluateScriptProperties { get; set; }
+
     [Parameter(HelpMessage =
         "Queries are usually implicitly prefixed with 'data |' but this can be disabled with this switch"
     )]
-    public SwitchParameter NoQueryPrefix
-    {
-        get => _noQueryPrefix;
-        set => _noQueryPrefix = value;
-    }
+    public SwitchParameter NoQueryPrefix { get; set; }
 
     protected override void ProcessRecord()
     {
         _objects.Add(Item);
     }
 
+
+    private void AddPropertyInfo(string prefix, PSPropertyInfo p, int rowIndex)
+    {
+        var timer = Stopwatch.StartNew();
+        var pName = prefix + p.Name;
+        WriteDebug($"AddPropertyInfo {pName}");
+
+
+        if (badProperties.Contains(pName))
+            return;
+        try
+        {
+            /*  if (p is PSScriptProperty)
+              {
+                  WriteDebug("Returning because script");
+                  return;
+              }
+            */
+            switch (p)
+            {
+                case PSProperty psProperty:
+                    break;
+                case PSAliasProperty psAlias:
+                    break;
+                case PSCodeProperty psCode:
+                    break;
+                case PSScriptProperty psScript:
+                    if (!EvaluateScriptProperties)
+                        return;
+                    break;
+                case PSNoteProperty psNote:
+                    break;
+
+                default:
+                    //we deliberately skip complex properties for now
+                    //in the future we might decide to flatten them or import has JsonNodes
+                    WriteDebug(
+                        $"{rowIndex} Skipping property {pName} of unsupported type {p.TypeNameOfValue} {p.GetType().Name}...");
+                    badProperties.Add(pName);
+                    return;
+            }
+
+            var pTypeNameOfValue = p.TypeNameOfValue;
+            var pValue = p.Value;
+            //it's important we check the property type _before_ attempting to access the Value
+            //since some Values are extremely expensive to access
+            //TODO we currently assume non-primitive Values are expensive
+            //but we could be more sophisticated here and attempt to time accesses
+            WriteDebug(
+                $"name:{rowIndex} {pName} valueTypeName:{pTypeNameOfValue} pType:{p.GetType().Name} valType:{pValue?.GetType()?.Name ?? "null"}");
+            // it's possible that not all rows have the same properties, for
+            //example if we've done an 'ls' and have a mix of files and directories
+            //therefore we have to be careful to insert cells at the appropriate row
+            //index and pad with nulls where necessary
+            if (!addedProperties.Contains(pName))
+                WriteDebug($"{rowIndex} Attempting to add property {pName} of type {pTypeNameOfValue}...");
+
+
+            AddValue(pName, pTypeNameOfValue, pValue, rowIndex);
+            addedProperties.Add(pName);
+        }
+        catch (Exception e)
+        {
+            WriteDebug($"Unable to get property {pName}");
+            WriteDebug(e.Message);
+            badProperties.Add(pName);
+        }
+        finally
+        {
+            WriteDebug($"AddPropertyInfo {pName} time {timer.Elapsed}");
+        }
+    }
+
+    //complex types
+    private void AddObject(PSObject item, int rowIndex)
+    {
+        foreach (var p in item.Properties) AddPropertyInfo(string.Empty, p, rowIndex);
+    }
+
+    private static bool IsSimpleType(string typeName)
+    {
+        return TypeNameHelper.GetTypeFromName(typeName) != typeof(object);
+    }
+
     protected override void EndProcessing()
     {
         var builder = TableBuilder.CreateEmpty(TableName, _objects.Count);
 
-
-        var badProperties = new List<string>();
-        var addedProperties = new List<string>();
         WriteDebug($"Adding {_objects.Count} items");
         var rowIndex = 0;
         foreach (var item in _objects)
         {
             var types = item.TypeNames.ToArray();
             //simple types
-            if (types.First() == TypeNameHelper.TypeName<string>())
+            if (IsSimpleType(types.First()))
                 AddValue("Value", types.First(), item.BaseObject, rowIndex);
-            else //complex types
-            {
-                // it's possible that not all rows have the same properties, for
-                //example if we've done an 'ls' and have a mix of files and directories
-                //therefore we have to be careful to insert cells at the appropriate row
-                //index and pad with nulls where necessary
-                foreach (var p in item.Properties)
-                {
-                    if (p is PSScriptProperty scr)
-                    {
-
-                    }
-                    if (badProperties.Contains(p.Name))
-                        continue;
-                    //it's important we check the property type _before_ attempting to access the Value
-                    //since some Values are extremely expensive to access
-                    //TODO we currently assume non-primitive Values are expensive
-                    //but we could be more sophisticated here and attempt to time accesses
-                    if (TypeNameHelper.GetTypeFromName(p.TypeNameOfValue) == typeof(object)
-                        && p.TypeNameOfValue != TypeNameHelper.TypeName<object>())
-                    {
-                        //we deliberately skip complex properties for now
-                        //in the future we might decide to flatten them or import has JsonNodes
-                        WriteDebug($"{rowIndex} Skipping property {p.Name} of unsupported type {p.TypeNameOfValue}...");
-                        badProperties.Add(p.Name);
-                        continue;
-                    }
-
-                    if (!addedProperties.Contains(p.Name))
-                    {
-                        WriteDebug($"{rowIndex} Attempting to add property {p.Name} of type {p.TypeNameOfValue}...");
-                    }
-
-                    try
-                    {
-                        AddValue(p.Name, p.TypeNameOfValue, p.Value, rowIndex);
-                        addedProperties.Add(p.Name);
-                    }
-                    catch (Exception e)
-                    {
-                        WriteDebug(e.Message);
-                        badProperties.Add(p.Name);
-                    }
-                }
-            }
-
+            else AddObject(item, rowIndex);
             rowIndex++;
         }
 
@@ -154,7 +192,6 @@ public class PsKqlCmdlet : Cmdlet
 
     private void AddValue(string columnName, string typeName, object? value, int rowIndex)
     {
-        //special-casing for properties of type "object" which we turn into strings for the purpose of querying
         if (typeName == TypeNameHelper.TypeName<object>())
         {
             if (value != null)
@@ -162,12 +199,23 @@ public class PsKqlCmdlet : Cmdlet
                 WriteDebug($"property '{columnName}'  is object so trying to derive type from value");
                 typeName = value.GetType().ToString();
                 WriteDebug($"prop {columnName} typeof '{value}' is {typeName}");
+
+
                 if (value is PSObject ps)
                 {
-                    WriteDebug($"property '{columnName}'  is PSObject so trying to derive type from BaseObject");
-                    typeName = ps.BaseObject.GetType().ToString();
-                    WriteDebug($"prop {columnName} baseobj typeof '{ps.BaseObject}' is {typeName}");
-                    value = ps.BaseObject;
+                    typeName = ps.BaseObject?.GetType()?.ToString() ?? "null";
+                    if (IsSimpleType(typeName))
+                    {
+                        value = ps.BaseObject;
+                    }
+                    else
+                    {
+                        WriteDebug($"prop {columnName} baseobj typeof '{ps.BaseObject}' is {typeName}");
+                        WriteDebug($"property '{columnName}'  is PSObject with properties so trying to add props");
+                        foreach (var info in ps.Properties)
+                            AddPropertyInfo(columnName + "_", info, rowIndex);
+                        return;
+                    }
                 }
             }
             else
@@ -175,10 +223,16 @@ public class PsKqlCmdlet : Cmdlet
                 typeName = TypeNameHelper.TypeName<string>();
                 value = value?.ToString() ?? string.Empty;
             }
-
-           
         }
-        WriteDebug($"Getting builder for {columnName}");
+
+        if (!IsSimpleType(typeName))
+        {
+            WriteDebug($"{columnName} has type {typeName} val {value} .. enumerating properties");
+            typeName = TypeNameHelper.TypeName<string>();
+            value = value?.ToString() ?? string.Empty;
+        }
+
+        //WriteDebug($"Getting builder for {columnName}");
         var colBuilder = GetOrCreateBuilder(columnName, typeName);
         colBuilder.AddAt(value, rowIndex);
     }
