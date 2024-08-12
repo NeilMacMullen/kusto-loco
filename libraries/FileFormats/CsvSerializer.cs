@@ -25,7 +25,8 @@ public class CsvSerializer : ITableSerializer
         settings.Register(CsvSerializerSettings.SkipTypeInference,
             CsvSerializerSettings.TrimCells,
             CsvSerializerSettings.SkipHeaderOnSave,
-            CsvSerializerSettings.InferColumnNames);
+            CsvSerializerSettings.InferColumnNames,
+            CsvSerializerSettings.Separator);
     }
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
@@ -42,6 +43,12 @@ public class CsvSerializer : ITableSerializer
         var inferColumnNames = _settings.GetBool(CsvSerializerSettings.InferColumnNames);
         using var reader = new StreamReader(stream);
         var config = _config with { HasHeaderRecord = !inferColumnNames };
+        var separator = (_settings.Get(CsvSerializerSettings.Separator));
+        if (separator.Length>=1)
+        {
+            config= config with { Delimiter = separator};
+        }
+       
         var csv = new CsvReader(reader, config);
        
         if (!inferColumnNames)
@@ -191,6 +198,9 @@ public class CsvSerializer : ITableSerializer
 
         public static readonly KustoSettingDefinition InferColumnNames = new(Setting("InferColumnNames"),
             "Infer column names", "false", nameof(Boolean));
+
+        public static readonly KustoSettingDefinition Separator = new(Setting("Separator"),
+            "Character that separates columns", string.Empty, nameof(String));
 
         private static string Setting(string setting)
         {
