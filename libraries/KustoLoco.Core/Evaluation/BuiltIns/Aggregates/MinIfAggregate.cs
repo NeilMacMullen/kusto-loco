@@ -65,5 +65,5 @@ internal partial class MinIfAggregate
     }
 
     internal static DateTime? DtImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new DateTime((long)context.Total);
+        => context.Count == 0 ? null : new DateTime((long)context.Total, DateTimeKind.Utc);
 }
