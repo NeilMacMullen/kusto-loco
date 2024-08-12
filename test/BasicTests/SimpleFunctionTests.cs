@@ -542,4 +542,62 @@ datatable(T:string) ['abcd','"def']
         result.Should().Contain("1");
     }
 
+
+    [TestMethod]
+    public async Task RoundDouble()
+    {
+        var query = "print round(3.14,1)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.1");
+    }
+
+  
+
+    [TestMethod]
+    public async Task LogDouble()
+    {
+        var query = "print log(4)";
+        var result = await LastLineOfResult(query);
+        result.Should().StartWith("1.3");
+    }
+
+    [TestMethod]
+    public async Task SignInt()
+    {
+        var query = "print sign(-4)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("-1");
+    }
+
+    [TestMethod]
+    public async Task ToLongHex()
+    {
+        var query = "print parsehex('a0')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("160");
+    }
+
+    [TestMethod]
+    public async Task ToLongHexWithPrefix()
+    {
+        var query = "print parsehex('0xa0')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("160");
+    }
+
+    [TestMethod]
+    public async Task ToHex()
+    {
+        var query = "print tohex(160)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("a0");
+    }
+
+    [TestMethod]
+    public async Task ToLong2()
+    {
+        var query = "print tolong('0xa0')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("160");
+    }
 }

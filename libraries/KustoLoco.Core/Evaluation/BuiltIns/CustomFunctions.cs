@@ -28,5 +28,6 @@ internal static class CustomFunctions
         DateTimeToIso.Register(functions);
         TrimWsFunction.Register(functions);
         ToDateTimeFmtFunction.Register(functions);
+        ParseHexFunction.Register(functions);
     }
 }
