@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -23,7 +24,9 @@ public class CsvSerializer : ITableSerializer
         _console = console;
         settings.Register(CsvSerializerSettings.SkipTypeInference,
             CsvSerializerSettings.TrimCells,
-            CsvSerializerSettings.SkipHeaderOnSave);
+            CsvSerializerSettings.SkipHeaderOnSave,
+            CsvSerializerSettings.InferColumnNames,
+            CsvSerializerSettings.Separator);
     }
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
@@ -35,28 +38,48 @@ public class CsvSerializer : ITableSerializer
 
     public Task<TableLoadResult> LoadTable(Stream stream, string tableName)
     {
+        var keys = Array.Empty<string>();
+        var builders = Array.Empty<ColumnBuilder<string>>();
+        var inferColumnNames = _settings.GetBool(CsvSerializerSettings.InferColumnNames);
         using var reader = new StreamReader(stream);
-        var csv = new CsvReader(reader, _config);
-        csv.Read();
-        csv.ReadHeader();
+        var config = _config with { HasHeaderRecord = !inferColumnNames };
+        var separator = (_settings.Get(CsvSerializerSettings.Separator));
+        if (separator.Length>=1)
+        {
+            config= config with { Delimiter = separator};
+        }
+       
+        var csv = new CsvReader(reader, config);
+       
+        if (!inferColumnNames)
+        {
+            csv.Read();
+            csv.ReadHeader();
+            keys = csv.Context.Reader?.HeaderRecord;
+            builders= keys
+                .Select(_ => new ColumnBuilder<string>())
+                .ToArray();
+        }
 
-        var keys = csv.Context.Reader?.HeaderRecord;
-
-
-        var builders = keys
-            .Select(_ => new ColumnBuilder<string>())
-            .ToArray();
         var rowCount = 0;
         while (csv.Read())
         {
+            if (!builders.Any())
+            {
+                keys = Enumerable.Range(0, csv.ColumnCount).Select(c => $"Column{c}").ToArray();
+                builders = keys
+                    .Select(_ => new ColumnBuilder<string>())
+                    .ToArray();
+            }
+
             var isTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
 
             string TrimIfRequired(string s)
             {
                 return isTrimRequired ? s.Trim() : s;
             }
-
-            for (var i = 0; i < keys.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
+           
+            for (var i = 0; i < builders.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
 
             rowCount++;
             if (rowCount % 100_000 == 0)
@@ -160,7 +183,7 @@ public class CsvSerializer : ITableSerializer
         private const string Prefix = "csv";
 
         public static readonly KustoSettingDefinition SkipTypeInference = new(
-            Setting("skipTypeInference"), "prevents conversion of string columns to types",
+            Setting("SkipTypeInference"), "prevents conversion of string columns to types",
             "off",
             nameof(Boolean));
 
@@ -170,6 +193,14 @@ public class CsvSerializer : ITableSerializer
 
         public static readonly KustoSettingDefinition SkipHeaderOnSave = new(Setting("SkipHeaderOnSave"),
             "Don't write header row when saving CSV files", "false", nameof(Boolean));
+
+
+
+        public static readonly KustoSettingDefinition InferColumnNames = new(Setting("InferColumnNames"),
+            "Infer column names", "false", nameof(Boolean));
+
+        public static readonly KustoSettingDefinition Separator = new(Setting("Separator"),
+            "Character that separates columns", string.Empty, nameof(String));
 
         private static string Setting(string setting)
         {

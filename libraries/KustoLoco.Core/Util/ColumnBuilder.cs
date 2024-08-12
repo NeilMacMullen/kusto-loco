@@ -37,6 +37,14 @@ public class ColumnBuilder<T> : BaseColumnBuilder
         if (typeof(T) == typeof(JsonNode))
             _data.Add((T?)value);
         else
+        if (value is DateTime dt)
+        {
+            if (dt.Kind == DateTimeKind.Unspecified)
+                dt=DateTime.SpecifyKind(dt,DateTimeKind.Utc);
+            if (dt.Kind == DateTimeKind.Local) dt = dt.ToUniversalTime();
+            _data.Add(TypeMapping.CastOrConvertToNullable<T>(dt));
+        }
+        else
             _data.Add(TypeMapping.CastOrConvertToNullable<T>(value));
     }
 

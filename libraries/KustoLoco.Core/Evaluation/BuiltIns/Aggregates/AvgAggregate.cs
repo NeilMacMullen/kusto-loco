@@ -60,5 +60,5 @@ internal partial class AvgAggregate
 
     internal static DateTime? DtImplFinish(NumericAggregate context) => context.Count == 0
         ? null
-        : new DateTime((long)context.Total / context.Count);
+        : new DateTime((long)context.Total / context.Count,DateTimeKind.Utc);
 }

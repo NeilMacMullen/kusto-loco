@@ -123,6 +123,7 @@ internal static class BuiltInScalarFunctions
         TanFunction.Register(functions);
         SignFunction.Register(functions);
         RoundFunction.Register(functions);
+        ToHexFunction.Register(functions);
         RadiansFunction.Register(functions);
         DegreesFunction.Register(functions);
         LogFunction.Register(functions);
