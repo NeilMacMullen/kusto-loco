@@ -21,11 +21,10 @@ public static class ColumnTypeInferrer
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private static readonly TypeTrier [] TypeTriers =
     [
-
         //don't bother with int .... Kusto is natively "long"
         //so this would just lead to excessive casts
         new TypeTrier(typeof(long), s => (long.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
-        new TypeTrier(typeof(double), s => (double.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new TypeTrier(typeof(double), s => s.Length <=17 && double.TryParse(s, CultureInfo.InvariantCulture, out var i) ? (true,i) :(false,0)),
         new TypeTrier(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
         new TypeTrier(typeof(Guid), s => (Guid.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
         new TypeTrier(typeof(TimeSpan), s => (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),

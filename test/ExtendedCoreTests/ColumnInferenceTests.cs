@@ -28,6 +28,15 @@ public class ColumnInferenceTests
     }
 
     [TestMethod]
+    public void NumericString()
+    {
+        //we want to ensure that long strings of digits are not turned into doubles (ala Excel)
+        //so we should infer as string
+        var src = Create("89457300000022721768");
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.String);
+    }
+
+    [TestMethod]
     public void SingleInt()
     {
         var src = Create("5");
