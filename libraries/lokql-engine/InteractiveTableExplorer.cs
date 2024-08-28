@@ -33,6 +33,8 @@ public class InteractiveTableExplorer
     public DisplayOptions _currentDisplayOptions = new(10);
     public KustoQueryResult _prevResultIncludingError =KustoQueryResult.Empty;
 
+    public Report ActiveReport { get; private set; } = new Report(string.Empty);
+
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
         CommandProcessor commandProcessor)
     {
@@ -210,4 +212,25 @@ public class InteractiveTableExplorer
     }
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
+
+    public void StartNewReport(string title)
+    {
+        ActiveReport = new Report(title);
+    }
+}
+
+
+public class Report
+{
+    public VegaComposer Composer { get; set; }
+
+    public Report(string title)
+    {
+        Composer = new VegaComposer(title,"dark");
+    }
+
+    public string? Render()
+    {
+        return Composer.Render();
+    }
 }

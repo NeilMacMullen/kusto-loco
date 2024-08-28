@@ -37,6 +37,9 @@ public class CommandProcessor
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
                 .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
                 .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
+                .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.Run)
+                .WithAdditionalCommand<RenderToReportCommand.Options>(RenderToReportCommand.Run)
+                .WithAdditionalCommand<EndReportCommand.Options>(EndReportCommand.Run)
             ;
     }
 
