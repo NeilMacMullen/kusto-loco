@@ -600,4 +600,13 @@ datatable(T:string) ['abcd','"def']
         var result = await LastLineOfResult(query);
         result.Should().Be("160");
     }
+
+    [TestMethod]
+    public async Task MultiStringCat()
+    {
+        var query = "print strcat('1','2','3','4','5','6','7','8','9','0','1','2','3','4','5')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("123456789012345");
+    }
+
 }
