@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using Kusto.Language;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 
@@ -69,10 +69,7 @@ internal static class BuiltInScalarFunctions
                 for (var numArgs = 2; numArgs <= 4; numArgs++)
                 {
                     var argTypes = new ScalarSymbol[numArgs];
-                    for (var i = 0; i < numArgs; i++)
-                    {
-                        argTypes[i] = type;
-                    }
+                    for (var i = 0; i < numArgs; i++) argTypes[i] = type;
 
                     overloads.Add(new ScalarOverloadInfo(impl, type, argTypes));
                 }
@@ -83,26 +80,17 @@ internal static class BuiltInScalarFunctions
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         AgoFunction.Register(functions);
         FormatDateTime.Register(functions);
-        // TODO: Support N-ary functions properly
-        functions.Add(
-            Functions.Strcat,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String,
-                    ScalarTypes.String),
-                new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String,
+
+        //add multiple overloads for strcat
+        var overrides = Enumerable.Range(1, 20)
+            .Select(n =>
+                new ScalarOverloadInfo(new StrcatFunctionImpl(),
                     ScalarTypes.String,
-                    ScalarTypes.String),
-                new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String, ScalarTypes.String),
-                new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String, ScalarTypes.String,
-                    ScalarTypes.String),
-                new ScalarOverloadInfo(new StrcatFunctionImpl(), ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String, ScalarTypes.String,
-                    ScalarTypes.String, ScalarTypes.String)));
+                    Enumerable.Range(0, n).Select(_ => (TypeSymbol)ScalarTypes.String).ToArray()))
+            .ToArray();
+        functions.Add(Functions.Strcat,
+            new ScalarFunctionInfo(overrides));
+
 
         StrlenFunction.Register(functions);
         ToLowerFunction.Register(functions);
@@ -260,12 +248,12 @@ internal static class BuiltInScalarFunctions
 
         functions.Add(Functions.ArraySortAsc, new ScalarFunctionInfo(
             new
-                ScalarOverloadInfo(new ArraySortFunctionImpl(ascending: true),
+                ScalarOverloadInfo(new ArraySortFunctionImpl(true),
                     ScalarTypes.Dynamic,
                     ScalarTypes.Dynamic)));
         functions.Add(Functions.ArraySortDesc, new ScalarFunctionInfo(
             new
-                ScalarOverloadInfo(new ArraySortFunctionImpl(ascending: false),
+                ScalarOverloadInfo(new ArraySortFunctionImpl(false),
                     ScalarTypes.Dynamic,
                     ScalarTypes.Dynamic)));
 
@@ -339,7 +327,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String)));
 
         ScalarOverloadInfo[] BuildOverloads(IScalarFunctionImpl func, TypeSymbol t)
-            => Enumerable.Range(1, 10)
+        {
+            return Enumerable.Range(1, 10)
                 .Select(i =>
                 {
                     var pairs = Enumerable.Range(0, i)
@@ -352,6 +341,7 @@ internal static class BuiltInScalarFunctions
                     return overload;
                 })
                 .ToArray();
+        }
 
         functions.Add(
             Functions.Case,

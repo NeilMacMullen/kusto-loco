@@ -93,9 +93,12 @@ public class ApplicationInsightsLogLoader
         using var vizDoc = JsonDocument.Parse(viz);
         var queryViz = vizDoc.RootElement.GetProperty("visualization");
         var visState = queryViz.GetString().NullToEmpty();
-
+        var props = vizDoc.RootElement.EnumerateObject().ToImmutableDictionary(
+            el => el.Name,
+            el => el.Value.ToString().NullToEmpty()
+        );
         //TODO - accept other properties
-        return new VisualizationState(visState, ImmutableDictionary<string, string>.Empty);
+        return new VisualizationState(visState, props);
     }
 
 }
