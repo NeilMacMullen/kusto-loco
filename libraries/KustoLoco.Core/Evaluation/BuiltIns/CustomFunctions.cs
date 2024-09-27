@@ -27,6 +27,8 @@ internal static class CustomFunctions
         StringSimilarity.Register(functions);
         DateTimeToIso.Register(functions);
         TrimWsFunction.Register(functions);
+        PadLeftFunction.Register(functions);
+        PadRightFunction.Register(functions);
         ToDateTimeFmtFunction.Register(functions);
         ParseHexFunction.Register(functions);
     }

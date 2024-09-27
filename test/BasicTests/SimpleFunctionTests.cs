@@ -133,11 +133,72 @@ datatable(Size:int) [50]
     }
 
     [TestMethod]
+    public async Task SubStringSingleParameter()
+    {
+        var query = "print c=substring('ABCdef',2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("Cdef");
+    }
+
+
+    [TestMethod]
     public async Task Trimws()
     {
         var query = "print c=trimws('   abc   ')";
         var result = await LastLineOfResult(query);
         result.Should().Be("abc");
+    }
+
+
+    
+    [TestMethod]
+    public async Task PadLeft()
+    {
+        var query = "print c=padleft('abc',6)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("   abc");
+    }
+
+    [TestMethod]
+    public async Task PadLeftWithChar()
+    {
+        var query = "print c=padleft('abc',6,'A')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("AAAabc");
+    }
+
+
+    [TestMethod]
+    public async Task PadLeftWithBlankChar()
+    {
+        var query = "print c=padleft('abc',6,'')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("   abc");
+    }
+
+    [TestMethod]
+    public async Task PadRight()
+    {
+        var query = "print c=padright('abc',6)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("abc   ");
+    }
+
+    [TestMethod]
+    public async Task PadRightWithChar()
+    {
+        var query = "print c=padright('abc',6,'A')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("abcAAA");
+    }
+
+
+    [TestMethod]
+    public async Task PadRightWithBlankChar()
+    {
+        var query = "print c=padright('abc',6,'')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("abc   ");
     }
 
     [TestMethod]
