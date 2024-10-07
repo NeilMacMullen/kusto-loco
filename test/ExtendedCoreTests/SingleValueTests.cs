@@ -1,4 +1,3 @@
-using KustoLoco.Core;
 using FluentAssertions;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
