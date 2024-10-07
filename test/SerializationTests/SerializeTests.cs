@@ -1,11 +1,7 @@
-using System.Collections.Immutable;
-using System.Security.Cryptography;
 using System.Text;
 using FluentAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
-using KustoLoco.Core.DataSource;
-using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 
@@ -60,7 +56,7 @@ public class SerializeTests
         var result = await CreateSimpleResult();
         var dto = await _kustoResultSerializer.Serialize(result);
         var roundTripped = await _kustoResultSerializer.Deserialize(dto);
-      CheckResultEquivalency(roundTripped,result);
+        CheckResultEquivalency(roundTripped, result);
     }
 
 
@@ -74,7 +70,6 @@ public class SerializeTests
     }
 
 
-
     [TestMethod]
     public async Task SerialiseChart()
     {
@@ -86,13 +81,13 @@ public class SerializeTests
     }
 
 
-    private void CheckResultEquivalency(KustoQueryResult roundTripped, KustoQueryResult expected )
+    private void CheckResultEquivalency(KustoQueryResult roundTripped, KustoQueryResult expected)
     {
         roundTripped.ColumnCount.Should().Be(expected.ColumnCount);
         roundTripped.RowCount.Should().Be(expected.RowCount);
         roundTripped.Query.Should().Be(expected.Query);
         roundTripped.Error.Should().Be(expected.Error);
-        roundTripped.QueryDuration.Should().BeCloseTo(expected.QueryDuration,TimeSpan.FromMilliseconds(1));
+        roundTripped.QueryDuration.Should().BeCloseTo(expected.QueryDuration, TimeSpan.FromMilliseconds(1));
         roundTripped.Visualization.Should().Be(expected.Visualization);
         roundTripped.ColumnDefinitions().Should().BeEquivalentTo(expected.ColumnDefinitions());
     }

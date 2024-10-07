@@ -1,23 +1,21 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core;
-using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
-using KustoLoco.Core.Settings;
 
 namespace KustoLoco.FileFormats;
 
 /// <summary>
-/// Allows a KustoQueryResult to be serialized for transfer across the wire
+///     Allows a KustoQueryResult to be serialized for transfer across the wire
 /// </summary>
 /// <remarks>
-/// Although the base class is capable of using any ITableSerializer implementation,
-/// it's strongly recommended to use a ParquetSerializer
+///     Although the base class is capable of using any ITableSerializer implementation,
+///     it's strongly recommended to use a ParquetSerializer
 /// </remarks>
-public class KustoResultSerializer(ITableSerializer serializer,string format)
+public class KustoResultSerializer(ITableSerializer serializer, string format)
 {
     /// <summary>
-    /// Serialize a result to a KustoResultDto
+    ///     Serialize a result to a KustoResultDto
     /// </summary>
     public async Task<KustoResultDto> Serialize(KustoQueryResult result)
     {
@@ -37,7 +35,7 @@ public class KustoResultSerializer(ITableSerializer serializer,string format)
     }
 
     /// <summary>
-    /// Deserialize a KustoResultDto to a KustoQueryResult
+    ///     Deserialize a KustoResultDto to a KustoQueryResult
     /// </summary>
     public async Task<KustoQueryResult> Deserialize(KustoResultDto dto)
     {
@@ -73,16 +71,16 @@ public class KustoResultSerializer(ITableSerializer serializer,string format)
     }
 }
 
-
 /// <summary>
-/// A serializer for KustoQueryResults that uses Parquet to encode the result stream   
+///     A serializer for KustoQueryResults that uses Parquet to encode the result stream
 /// </summary>
 /// <remarks>
-/// This is the recommended serializer for KustoQueryResults as it is both efficient and contains sufficient type information
-/// to avoid ambiguity when deserializing
+///     This is the recommended serializer for KustoQueryResults as it is both efficient and contains sufficient type
+///     information
+///     to avoid ambiguity when deserializing
 /// </remarks>
 public class ParquetResultSerializer(ITableSerializer serializer) : KustoResultSerializer(serializer, Format)
 {
     public const string Format = "uuparquet";
-    public static  ParquetResultSerializer Default => new(ParquetSerializer.Default);
+    public static ParquetResultSerializer Default => new(ParquetSerializer.Default);
 }
