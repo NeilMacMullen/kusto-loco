@@ -27,13 +27,16 @@ public class ColumnInferenceTests
         ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.Real);
     }
 
+
     [TestMethod]
     public void NumericString()
     {
         //we want to ensure that long strings of digits are not turned into doubles (ala Excel)
         //so we should infer as string
         var src = Create("89457300000022721768");
+        src.GetRawDataValue(0)!.ToString().Should().Be("89457300000022721768");
         ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.String);
+        src.GetRawDataValue(0)!.ToString().Should().Be("89457300000022721768");
     }
 
     [TestMethod]
@@ -55,5 +58,14 @@ public class ColumnInferenceTests
     {
         var src = Create("5", "6", "abc");
         ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.String);
+    }
+
+    [TestMethod]
+    public void DoubleIsAllowedToTruncate()
+    {
+        //
+        var src = Create("12.34567890123456789012");
+        ColumnTypeInferrer.AutoInfer(src).Type.Should().Be(ScalarTypes.Real);
+        src.GetRawDataValue(0)!.ToString().Should().Be("12.34567890123456789012");
     }
 }
