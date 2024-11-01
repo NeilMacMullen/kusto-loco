@@ -56,28 +56,24 @@ public partial class MainWindow : Window
 
         await Task.Run(async () => await _explorer.RunInput(query));
         var result = _explorer._prevResult;
-        //if there are no results leave the previously rendered results in place
-        if (result.RowCount != 0)
-        {
-            if (result.Visualization != VisualizationState.Empty)
-            {
-                //annoying we have to do this, but it's the only way to get the webview to render
-                await webview.EnsureCoreWebView2Async();
-                //generate the html and display it
-                var renderer = new KustoResultRenderer(_explorer.Settings);
-                var html = renderer.RenderToHtml(result);
-                try
-                {
-                    webview.NavigateToString(html);
-                }
-                catch
-                {
-                    _explorer.Warn("Unable to render results in webview");
-                }
-            }
 
-            FillInDataGrid(result);
+        var renderer = new KustoResultRenderer(_explorer.Settings);
+        var html = renderer.RenderToHtml(result);
+
+        //annoying we have to do this, but it's the only way to get the webview to render
+        await webview.EnsureCoreWebView2Async();
+        //generate the html and display it
+        try
+        {
+            webview.NavigateToString(html);
         }
+        catch
+        {
+            _explorer.Warn("Unable to render results in webview");
+        }
+
+
+        FillInDataGrid(result);
 
         Editor.SetBusy(false);
         isBusy = false;
@@ -85,7 +81,14 @@ public partial class MainWindow : Window
 
     private void FillInDataGrid(KustoQueryResult result)
     {
-        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed) ? parsed : 100;
+        //ensure that if have not results we clear the data grid
+        if (result.RowCount == 0)
+        {
+            dataGrid.ItemsSource = null;
+            return;
+        }
+
+        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed) ? parsed : 10000;
         var dt = result.ToDataTable(maxDataGridRows);
         dataGrid.ItemsSource = dt.DefaultView;
     }
@@ -113,17 +116,17 @@ public partial class MainWindow : Window
     {
         _preferenceManager.Load();
         var pathToLoad = _args.Any()
-                             ? _args[0]
-                             : _preferenceManager.Preferences.LastWorkspacePath;
+            ? _args[0]
+            : _preferenceManager.Preferences.LastWorkspacePath;
         _workspaceManager.Load(pathToLoad);
         if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
         {
             Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
-                        ? _minWindowSize.Width
-                        : _preferenceManager.Preferences.WindowWidth;
+                ? _minWindowSize.Width
+                : _preferenceManager.Preferences.WindowWidth;
             Height = _preferenceManager.Preferences.WindowHeight < _minWindowSize.Height
-                         ? _minWindowSize.Height
-                         : _preferenceManager.Preferences.WindowHeight;
+                ? _minWindowSize.Height
+                : _preferenceManager.Preferences.WindowHeight;
             Left = _preferenceManager.Preferences.WindowLeft;
             Top = _preferenceManager.Preferences.WindowTop;
         }

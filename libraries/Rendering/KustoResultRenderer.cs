@@ -44,12 +44,18 @@ public class KustoResultRenderer
     public string RenderToHtml(KustoQueryResult result)
     {
         return result.Error.IsNotBlank()
-            ? result.Error
-            : result.Visualization.ChartType.IsNotBlank()
-                ? KustoToVegaChartType(result)
-                : RenderToTable(result);
+            ? RenderStringAsHtml(result.Error)
+            : result.RowCount == 0
+                ? RenderStringAsHtml("No results")
+                : result.Visualization.ChartType.IsNotBlank()
+                    ? KustoToVegaChartType(result)
+                    : RenderStringAsHtml("No visualization");
     }
 
+    public string RenderStringAsHtml(string x)
+    {
+        return "<HTML><BODY><font color=\"green\">" + x + "</font></BODY></HTML>";
+    }
 
     public void RenderToComposer(KustoQueryResult result, VegaComposer composer)
     {
@@ -75,7 +81,7 @@ public class KustoResultRenderer
         switch (state.ChartType)
         {
             case KustoChartTypes.Column:
-                RenderToChart(VegaMark.Bar, result, MakeColumnChart, AllowedColumnTypes.ColumnChart,composer);
+                RenderToChart(VegaMark.Bar, result, MakeColumnChart, AllowedColumnTypes.ColumnChart, composer);
                 break;
             case KustoChartTypes.Bar:
                 RenderToChart(VegaMark.Bar, result, MakeBarChart,
@@ -145,12 +151,12 @@ public class KustoResultRenderer
 
 
     public void RenderToChart(VegaMark vegaType, KustoQueryResult result,
-        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected,VegaComposer composer)
+        Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected, VegaComposer composer)
     {
         if (result.RowCount == 0)
         {
             composer.AddRawHtml("<p>No results</p>");
-            return ;
+            return;
         }
 
         var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
@@ -297,22 +303,22 @@ public static class AllowedColumnTypes
     public static ImmutableArray<ExpectedColumnSet> Unrestricted = [];
 
     public static ImmutableArray<ExpectedColumnSet> LineChart =
-        [new ExpectedColumnSet([VegaAxisType.Quantitative, VegaAxisType.Temporal], [VegaAxisType.Quantitative])];
+        [new([VegaAxisType.Quantitative, VegaAxisType.Temporal], [VegaAxisType.Quantitative])];
 
     public static ImmutableArray<ExpectedColumnSet> BarChart =
     [
-        new ExpectedColumnSet([VegaAxisType.Quantitative, VegaAxisType.Temporal],
+        new([VegaAxisType.Quantitative, VegaAxisType.Temporal],
             [VegaAxisType.Nominal, VegaAxisType.Ordinal])
     ];
 
     public static ImmutableArray<ExpectedColumnSet> ColumnChart =
     [
-        new ExpectedColumnSet([VegaAxisType.Temporal, VegaAxisType.Ordinal],
+        new([VegaAxisType.Temporal, VegaAxisType.Ordinal],
             [VegaAxisType.Quantitative, VegaAxisType.Temporal])
     ];
 
     public static ImmutableArray<ExpectedColumnSet> LadderChart =
-        [new ExpectedColumnSet([VegaAxisType.Temporal], [VegaAxisType.Temporal])];
+        [new([VegaAxisType.Temporal], [VegaAxisType.Temporal])];
 }
 
 public static class KustoChartTypes
