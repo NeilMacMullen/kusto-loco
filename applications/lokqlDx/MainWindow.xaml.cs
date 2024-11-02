@@ -197,6 +197,7 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             SaveWorkspace(dialog.FileName);
+            UpdateUIFromWorkspace();
             return true;
         }
 
