@@ -17,6 +17,7 @@ public static class RegistryOperations
 
     public static void AssociateFileType()
     {
+        //taken from https://stackoverflow.com/questions/1387769/create-registry-entry-to-associate-file-extension-with-application-in-c
 
         if (!IsAdmin())
         {
@@ -24,25 +25,13 @@ public static class RegistryOperations
             return;
         }
         const string progId = "kustoloco.lokqldx";
+        var exe = System.Diagnostics.Process.GetCurrentProcess()?.MainModule?.FileName ?? string.Empty;
 
-        // Check if we have write access to the registry
-        var key = Registry.CurrentUser.OpenSubKey("Software", true);
-        if (key == null)
-        {
-            // We don't have access
-            return;
-        }
+        Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\{progId}\shell\open\command",
+            null,
+            "\""+exe + "\" \"%1\"");
 
-        // Create a value for this key that points to the ProgId
-        key = key.CreateSubKey($".{WorkspaceManager.Extension}");
-        if (key != null) key.SetValue("", progId);
-
-        // Create a new key for the ProgId
-        key = Registry.ClassesRoot.CreateSubKey(progId);
-        if (key == null) return;
-
-        // Set the default value of this key to the application path
-        key.SetValue("", System.Diagnostics.Process.GetCurrentProcess()?.MainModule?.FileName ??string.Empty);
+        Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\.{WorkspaceManager.Extension}", null, progId);
         MessageBox.Show($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
     }
 
