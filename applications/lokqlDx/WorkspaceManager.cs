@@ -18,10 +18,7 @@ public class WorkspaceManager
     public string Path = string.Empty;
 
 
-    public WorkspaceManager(KustoSettingsProvider settings)
-    {
-        Settings = settings;
-    }
+    public WorkspaceManager(KustoSettingsProvider settings) => Settings = settings;
 
     public static string GlobPattern => $"*.{Extension}";
 
@@ -55,11 +52,11 @@ data
         UserText = userText;
         Path = path;
         var workspace = new Workspace
-        {
-            Text = UserText,
-            Settings = Settings.Enumerate().ToDictionary(kv => kv.Name, kv => kv.Value)
-        };
-       
+                        {
+                            Text = UserText,
+                            Settings = Settings.Enumerate().ToDictionary(kv => kv.Name, kv => kv.Value)
+                        };
+
         try
         {
             var json = JsonSerializer.Serialize(workspace);
@@ -73,31 +70,29 @@ data
 
     public void Load(string path)
     {
-        if (!File.Exists(path))
-        {
-            var rootSettingFolderPath =
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "kustoloco");
-            if (!Directory.Exists(rootSettingFolderPath))
-                Directory.CreateDirectory(rootSettingFolderPath);
+        var rootSettingFolderPath =
+            System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                   "kustoloco");
 
-            path = System.IO.Path.Combine(rootSettingFolderPath, "settings");
-            File.WriteAllText(path, JsonSerializer.Serialize(new Workspace()));
-        }
+        if (!Directory.Exists(rootSettingFolderPath))
+            Directory.CreateDirectory(rootSettingFolderPath);
 
+        UserText = string.Empty;
+        Settings.Reset();
         Path = path;
-        try
-        {
-            var json = File.ReadAllText(Path);
-            var workspace = JsonSerializer.Deserialize<Workspace>(json)!;
-            UserText = workspace.Text;
-            Settings.Reset();
-            foreach (var kv in workspace.Settings) Settings.Set(kv.Key, kv.Value);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error loading workspace: {e.Message}");
-        }
+
+        if (path.IsNotBlank())
+            try
+            {
+                var json = File.ReadAllText(Path);
+                var workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+                UserText = workspace.Text;
+                foreach (var kv in workspace.Settings) Settings.Set(kv.Key, kv.Value);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error loading workspace: {e.Message}");
+            }
 
         EnsureWorkspacePopulated();
     }
@@ -107,11 +102,8 @@ data
         UserText = string.Empty;
         Settings.Reset();
         Path = System.IO.Path.Combine(ContainingFolder(),
-            System.IO.Path.ChangeExtension("new", Extension));
+                                      System.IO.Path.ChangeExtension("new", Extension));
     }
 
-    public string ContainingFolder()
-    {
-        return System.IO.Path.GetDirectoryName(Path).NullToEmpty();
-    }
+    public string ContainingFolder() => System.IO.Path.GetDirectoryName(Path).NullToEmpty();
 }

@@ -16,8 +16,8 @@
       <MenuItem Header="_File">
         <MenuItem Header="_New Workspace" Click="NewWorkspace"/>
         <MenuItem Header="_Open Workspace" Click="OpenWorkSpace"/>
-        <MenuItem Header="_Save" Click="SaveWorkspace"/>
-        <MenuItem Header="Save _As" Click="SaveWorkspaceAs"/>
+        <MenuItem Header="_Save" Click="SaveWorkspaceEvent"/>
+        <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent"/>
       </MenuItem>
       <MenuItem Header="_Preferences">
         <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>

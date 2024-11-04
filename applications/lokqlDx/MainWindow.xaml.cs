@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shell;
 using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using Lokql.Engine;
@@ -88,7 +87,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed) ? parsed : 10000;
+        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed)
+                                  ? parsed
+                                  : 10000;
         var dt = result.ToDataTable(maxDataGridRows);
         dataGrid.ItemsSource = dt.DefaultView;
     }
@@ -107,7 +108,7 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings,
-            CommandProcessorProvider.GetCommandProcessor());
+                                                 CommandProcessorProvider.GetCommandProcessor());
         UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path}";
     }
@@ -116,17 +117,17 @@ public partial class MainWindow : Window
     {
         _preferenceManager.Load();
         var pathToLoad = _args.Any()
-            ? _args[0]
-            : _preferenceManager.Preferences.LastWorkspacePath;
+                             ? _args[0]
+                             : string.Empty;
         _workspaceManager.Load(pathToLoad);
         if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
         {
             Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
-                ? _minWindowSize.Width
-                : _preferenceManager.Preferences.WindowWidth;
+                        ? _minWindowSize.Width
+                        : _preferenceManager.Preferences.WindowWidth;
             Height = _preferenceManager.Preferences.WindowHeight < _minWindowSize.Height
-                ? _minWindowSize.Height
-                : _preferenceManager.Preferences.WindowHeight;
+                         ? _minWindowSize.Height
+                         : _preferenceManager.Preferences.WindowHeight;
             Left = _preferenceManager.Preferences.WindowLeft;
             Top = _preferenceManager.Preferences.WindowTop;
         }
@@ -157,11 +158,11 @@ public partial class MainWindow : Window
     {
         var folder = _workspaceManager.ContainingFolder();
         var dialog = new OpenFileDialog
-        {
-            InitialDirectory = folder,
-            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager.Path)
-        };
+                     {
+                         InitialDirectory = folder,
+                         Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
+                         FileName = Path.GetFileName(_workspaceManager.Path)
+                     };
 
         if (dialog.ShowDialog() == true)
         {
@@ -174,13 +175,19 @@ public partial class MainWindow : Window
     {
     }
 
-    private void SaveWorkspace(object sender, RoutedEventArgs e)
+    private void SaveWorkspaceEvent(object sender, RoutedEventArgs e)
     {
         Save();
     }
 
     private void Save()
     {
+        if (_workspaceManager.Path.IsBlank())
+        {
+            SaveAs();
+            return;
+        }
+
         JumpList.AddToRecentCategory(_workspaceManager.Path);
         SaveWorkspace(_workspaceManager.Path);
     }
@@ -189,11 +196,11 @@ public partial class MainWindow : Window
     {
         var folder = _workspaceManager.ContainingFolder();
         var dialog = new SaveFileDialog
-        {
-            InitialDirectory = folder,
-            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager.Path)
-        };
+                     {
+                         InitialDirectory = folder,
+                         Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
+                         FileName = Path.GetFileName(_workspaceManager.Path)
+                     };
         if (dialog.ShowDialog() == true)
         {
             SaveWorkspace(dialog.FileName);
@@ -204,7 +211,7 @@ public partial class MainWindow : Window
         return false;
     }
 
-    private void SaveWorkspaceAs(object sender, RoutedEventArgs e)
+    private void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
     {
         SaveAs();
     }
@@ -275,7 +282,7 @@ public partial class MainWindow : Window
     private async void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
     {
         await Navigate(
-            "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
+                       "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
     }
 
     private void EnableJumpList(object sender, RoutedEventArgs e)
@@ -294,7 +301,8 @@ public partial class MainWindow : Window
                 var sb = new StringBuilder();
                 sb.AppendLine($"The table named '{table.Name}' has the following columns");
                 var cols = table.ColumnNames.Zip(table.Type.Columns)
-                    .Select(z => $"  {z.First} is of type {z.Second.Type.Name}").ToArray();
+                                .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
+                                .ToArray();
                 foreach (var column in cols) sb.AppendLine(column);
                 _copilot.AddSystemInstructions(sb.ToString());
             }
