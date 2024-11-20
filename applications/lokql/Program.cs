@@ -6,5 +6,10 @@ using NLog;
 LoggingExtensions.SetupLoggingForConsole(LogLevel.Info);
 await StandardParsers.Default
     .ParseArguments(args,
-        typeof(CmdExplore.Options))
-    .WithParsedAsync<CmdExplore.Options>(CmdExplore.RunAsync);
+        typeof(CmdExplore.Options),
+        typeof(CmdRun.Options))
+
+    .WithParsedAsync<CmdExplore.Options>(CmdExplore.RunAsync)
+    .WithParsedAsync<CmdRun.Options>(CmdRun.RunAsync)
+
+    ;

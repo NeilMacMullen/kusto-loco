@@ -9,4 +9,5 @@ public class Preferences
     public double WindowHeight { get; set; }
     public double WindowTop { get; set; }
     public double WindowLeft { get; set; }
+    public string StartupScript { get; set; }= string.Empty;
 }
