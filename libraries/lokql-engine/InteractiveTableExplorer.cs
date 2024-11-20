@@ -149,7 +149,7 @@ public class InteractiveTableExplorer
 
     private void ShowError(string message)
     {
-        _outputConsole.ForegroundColor = ConsoleColor.DarkRed;
+        _outputConsole.ForegroundColor = ConsoleColor.Red;
         _outputConsole.WriteLine("Error:");
         _outputConsole.WriteLine(message);
     }
