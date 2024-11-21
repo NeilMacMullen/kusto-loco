@@ -39,6 +39,8 @@ public class CommandProcessor
                 .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
                 .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.Run)
                 .WithAdditionalCommand<RenderToReportCommand.Options>(RenderToReportCommand.Run)
+                .WithAdditionalCommand<RenderTableToReportCommand.Options>(RenderTableToReportCommand.Run)
+
                 .WithAdditionalCommand<EndReportCommand.Options>(EndReportCommand.Run)
             ;
     }

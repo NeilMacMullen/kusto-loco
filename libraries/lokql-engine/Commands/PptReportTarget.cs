@@ -19,6 +19,11 @@ public class PptReportTarget : IReportTarget
         UpdateOrAddImage(name, bytes);
     }
 
+    private ISlide AddSlide()
+    {
+        _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
+        return _pres.Slides.Last();
+    }
     public void UpdateOrAddImage(string name, byte[] data)
     {
         var matchingPictures = name.IsBlank()
@@ -32,13 +37,37 @@ public class PptReportTarget : IReportTarget
         }
         else
         {
-            _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
-            var slide = _pres.Slides.Last();
+            var slide = AddSlide();
 
             slide.Shapes.AddPicture(new MemoryStream(data));
         }
     }
 
+    public void UpdateOrAddTable(string name,InteractiveTableExplorer explorer)
+    {
+        var slide = AddSlide();
+        var shapeCollection=slide.Shapes;
+        var res = explorer._prevResult;
+        shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount+1);
+        var addedTable = (ITable)shapeCollection.Last();
+        var col = 0;
+        foreach (var header in res.ColumnNames())
+        {
+            var cell = addedTable[0, col];
+            cell.TextBox.Text =header;
+            col++;
+        }
+
+        for (var c = 0; c < res.ColumnCount; c++)
+        {
+            for (var r = 0; r < res.RowCount; r++)
+            {
+                var cell = addedTable[r + 1, c];
+                cell.TextBox.Text = res.Get(c,r)?.ToString() ?? "<null>";
+            }
+        }
+        
+    }
     public void UpdateOrAddText(string name, string text)
     {
         throw new NotImplementedException();

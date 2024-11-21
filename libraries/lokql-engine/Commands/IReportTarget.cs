@@ -7,4 +7,5 @@ public interface IReportTarget
     //void UpdateOrAddTable(string name, KustoQueryResult);
     void UpdateOrAddText(string name, string text);
     void SaveAs(string name);
+    public void UpdateOrAddTable(string name, InteractiveTableExplorer explorer);
 }

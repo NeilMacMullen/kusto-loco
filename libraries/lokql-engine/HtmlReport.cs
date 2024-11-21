@@ -40,4 +40,9 @@ public class HtmlReport:IReportTarget
         File.WriteAllText(name, text);
         
     }
+
+    public void UpdateOrAddTable(string name, InteractiveTableExplorer explorer)
+    {
+        throw new NotImplementedException();
+    }
 }
