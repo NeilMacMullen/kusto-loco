@@ -9,6 +9,7 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using Lokql.Engine;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using NotNullStrings;
 
@@ -66,6 +67,7 @@ public partial class MainWindow : Window
         try
         {
             webview.NavigateToString(html);
+            await Render();
         }
         catch
         {
@@ -99,6 +101,13 @@ public partial class MainWindow : Window
     private async void OnQueryEditorRunTextBlock(object? sender, QueryEditorRunEventArgs eventArgs)
     {
         await RunQuery(eventArgs.Query);
+    }
+
+    private async Task Render()
+    {
+        var strm = new MemoryStream();
+        await webview.CoreWebView2.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, strm);
+        _explorer.SetImage( strm.GetBuffer());
     }
 
     private void UpdateUIFromWorkspace()

@@ -9,14 +9,14 @@ public static class RenderToReportCommand
     {
         var exp = econtext.Explorer;
 
-        var result = exp._prevResult;
-        var renderer = new KustoResultRenderer(exp.Settings);
-        renderer.RenderToComposer(result, exp.ActiveReport.Composer);
+        exp.ActiveReport.UpdateOrAddImage(o.Name,exp);
+       
         return Task.CompletedTask;
     }
 
     [Verb("renderToReport", HelpText = "render last results as html and save in active report")]
     internal class Options
     {
+        [Option] public string Name { get; set; } = string.Empty;
     }
 }

@@ -1,24 +1,34 @@
-﻿using ShapeCrawler;
+﻿using NotNullStrings;
+using ShapeCrawler;
 
 namespace Lokql.Engine.Commands;
+
 // see https://github.com/MicrosoftEdge/WebView2Feedback/issues/3453
 public class PptReportTarget : IReportTarget
 {
     private readonly Presentation _pres;
 
+    private PptReportTarget(Presentation pres)
+    {
+        _pres = pres;
+    }
+
+    public void UpdateOrAddImage(string name, InteractiveTableExplorer explorer)
+    {
+        var bytes = explorer.GetImageBytes();
+        UpdateOrAddImage(name, bytes);
+    }
+
     public void UpdateOrAddImage(string name, byte[] data)
     {
-
-        var matchingPictures = _pres.Slides.SelectMany(s => s.Shapes.OfType<IPicture>())
-            .Where(p => p.Name == name)
-            .ToArray();
+        var matchingPictures = name.IsBlank()
+            ? []
+            : _pres.Slides.SelectMany(s => s.Shapes.OfType<IPicture>())
+                .Where(p => p.Name == name)
+                .ToArray();
         if (matchingPictures.Any())
         {
-            foreach (var p in matchingPictures)
-            {
-                p.Image.Update(data);
-
-            }
+            foreach (var p in matchingPictures) p.Image!.Update(data);
         }
         else
         {
@@ -41,11 +51,9 @@ public class PptReportTarget : IReportTarget
 
     public static PptReportTarget Create(string filename)
     {
-        var pres = new Presentation(filename);
+        var pres = filename.IsBlank()
+            ? new Presentation()
+            : new Presentation(filename);
         return new PptReportTarget(pres);
-    }
-    private PptReportTarget(Presentation pres)
-    {
-        this._pres = pres;
     }
 }

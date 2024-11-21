@@ -33,7 +33,7 @@ public class InteractiveTableExplorer
     public DisplayOptions _currentDisplayOptions = new(10);
     public KustoQueryResult _prevResultIncludingError =KustoQueryResult.Empty;
 
-    public Report ActiveReport { get; private set; } = new Report(string.Empty);
+    public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
         CommandProcessor commandProcessor)
@@ -213,24 +213,21 @@ public class InteractiveTableExplorer
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
 
-    public void StartNewReport(string title)
+    public void StartNewReport(IReportTarget report)
     {
-        ActiveReport = new Report(title);
+        ActiveReport = report;
     }
-}
-
-
-public class Report
-{
-    public VegaComposer Composer { get; set; }
-
-    public Report(string title)
+    #region image support
+    //Ugh this is horrible - figure out a better way
+    private byte[] _image = [];
+    public byte[] GetImageBytes()
     {
-        Composer = new VegaComposer(title,"dark");
+        return _image;
     }
 
-    public string? Render()
+    public void SetImage(byte[] getBuffer)
     {
-        return Composer.Render();
+        _image = getBuffer;
     }
+    #endregion
 }
