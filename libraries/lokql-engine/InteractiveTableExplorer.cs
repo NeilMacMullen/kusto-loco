@@ -35,6 +35,8 @@ public class InteractiveTableExplorer
 
     public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
+
+    public Func<KustoQueryResult, Task> GetRenderCallback = result => Task.CompletedTask; 
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
         CommandProcessor commandProcessor)
     {
@@ -131,7 +133,12 @@ public class InteractiveTableExplorer
 
             var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
+            {
                 _prevResult = result;
+                var renderTask = GetRenderCallback(result);
+                await renderTask;
+            }
+
             _prevResultIncludingError = result;
 
             DisplayResults(result);

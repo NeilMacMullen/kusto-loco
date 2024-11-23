@@ -1,4 +1,6 @@
-﻿using NotNullStrings;
+﻿using System.Diagnostics.CodeAnalysis;
+using DocumentFormat.OpenXml.Drawing;
+using NotNullStrings;
 using ShapeCrawler;
 
 namespace Lokql.Engine.Commands;
@@ -24,13 +26,17 @@ public class PptReportTarget : IReportTarget
         _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
         return _pres.Slides.Last();
     }
-    public void UpdateOrAddImage(string name, byte[] data)
-    {
-        var matchingPictures = name.IsBlank()
+
+    private T[] FindMatches<T>(string name) where T:IShape =>
+        name.IsBlank()
             ? []
-            : _pres.Slides.SelectMany(s => s.Shapes.OfType<IPicture>())
+            : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
                 .Where(p => p.Name == name)
                 .ToArray();
+
+    public void UpdateOrAddImage(string name, byte[] data)
+    {
+        var matchingPictures = FindMatches<IPicture>(name);
         if (matchingPictures.Any())
         {
             foreach (var p in matchingPictures) p.Image!.Update(data);
@@ -43,35 +49,73 @@ public class PptReportTarget : IReportTarget
         }
     }
 
-    public void UpdateOrAddTable(string name,InteractiveTableExplorer explorer)
-    {
-        var slide = AddSlide();
-        var shapeCollection=slide.Shapes;
-        var res = explorer._prevResult;
-        shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount+1);
-        var addedTable = (ITable)shapeCollection.Last();
-        var col = 0;
-        foreach (var header in res.ColumnNames())
-        {
-            var cell = addedTable[0, col];
-            cell.TextBox.Text =header;
-            col++;
-        }
-
-        for (var c = 0; c < res.ColumnCount; c++)
-        {
-            for (var r = 0; r < res.RowCount; r++)
-            {
-                var cell = addedTable[r + 1, c];
-                cell.TextBox.Text = res.Get(c,r)?.ToString() ?? "<null>";
-            }
-        }
-        
-    }
     public void UpdateOrAddText(string name, string text)
     {
-        throw new NotImplementedException();
+        var matches = FindMatches<IShape>(name);
+        if (matches.Any())
+        {
+            foreach (var p in matches) p.Text = text;
+        }
+        else
+        {
+            
+        }
     }
+
+    public void UpdateOrAddTable(string name,InteractiveTableExplorer explorer)
+    {
+        var res = explorer._prevResult;
+        var matchingTables = FindMatches<ITable>(name);
+        
+        if (matchingTables.Any())
+        {
+            var requiredRows = res.RowCount+1;//add 1 for header
+            var requiredColumns =res.ColumnCount;
+            foreach (var existingTable in matchingTables)
+            {
+                while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
+                while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
+                while (existingTable.Columns.Count > requiredColumns) existingTable.RemoveColumnAt(0);
+                //while (existingTable.Columns.Count> requiredColumns) .../*what goes here? */ ;
+                FillTable(existingTable);
+
+            }
+        }
+        else
+        {
+            var slide = AddSlide();
+            var shapeCollection = slide.Shapes;
+           
+            shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount + 1);
+            var newTable = (ITable)shapeCollection.Last();
+            FillTable(newTable);
+        }
+
+        return;
+
+        void FillTable(ITable addedTable)
+        {
+            var col = 0;
+            var maxColumns = Math.Min(res.ColumnCount, addedTable.Columns.Count);
+            foreach (var header in res.ColumnNames().Take(maxColumns))
+            {
+                var cell = addedTable[0, col];
+                cell.TextBox.Text = header;
+                col++;
+            }
+
+           
+            for (var c = 0; c < maxColumns; c++)
+            {
+                for (var r = 0; r < res.RowCount; r++)
+                {
+                    var cell = addedTable[r + 1, c];
+                    cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
+                }
+            }
+        }
+    }
+   
 
     public void SaveAs(string name)
     {
