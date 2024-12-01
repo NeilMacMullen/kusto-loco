@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using DocumentFormat.OpenXml.Drawing;
+﻿using KustoLoco.Core;
 using NotNullStrings;
 using ShapeCrawler;
 
@@ -21,19 +20,6 @@ public class PptReportTarget : IReportTarget
         UpdateOrAddImage(name, bytes);
     }
 
-    private ISlide AddSlide()
-    {
-        _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
-        return _pres.Slides.Last();
-    }
-
-    private T[] FindMatches<T>(string name) where T:IShape =>
-        name.IsBlank()
-            ? []
-            : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
-                .Where(p => p.Name == name)
-                .ToArray();
-
     public void UpdateOrAddImage(string name, byte[] data)
     {
         var matchingPictures = FindMatches<IPicture>(name);
@@ -53,39 +39,36 @@ public class PptReportTarget : IReportTarget
     {
         var matches = FindMatches<IShape>(name);
         if (matches.Any())
-        {
-            foreach (var p in matches) p.Text = text;
-        }
-        else
-        {
-            
-        }
+            foreach (var p in matches)
+                p.Text = text;
     }
 
-    public void UpdateOrAddTable(string name,InteractiveTableExplorer explorer)
+    public void UpdateOrAddTable(string name, KustoQueryResult res)
     {
-        var res = explorer._prevResult;
+       
         var matchingTables = FindMatches<ITable>(name);
-        
+
         if (matchingTables.Any())
         {
-            var requiredRows = res.RowCount+1;//add 1 for header
-            var requiredColumns =res.ColumnCount;
+            var requiredRows = res.RowCount + 1; //add 1 for header
+            var requiredColumns = res.ColumnCount;
             foreach (var existingTable in matchingTables)
             {
                 while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
                 while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
                 while (existingTable.Columns.Count > requiredColumns) existingTable.RemoveColumnAt(0);
-                //while (existingTable.Columns.Count> requiredColumns) .../*what goes here? */ ;
+                //TODO - fix this up when next shapecrawler release
+                while (existingTable.Columns.Count < requiredColumns)
+                    existingTable.InsertColumnAfter(existingTable.Columns.Count);
+                //existingTable.AddColumn();
                 FillTable(existingTable);
-
             }
         }
         else
         {
             var slide = AddSlide();
             var shapeCollection = slide.Shapes;
-           
+
             shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount + 1);
             var newTable = (ITable)shapeCollection.Last();
             FillTable(newTable);
@@ -104,22 +87,35 @@ public class PptReportTarget : IReportTarget
                 col++;
             }
 
-           
+
             for (var c = 0; c < maxColumns; c++)
+            for (var r = 0; r < res.RowCount; r++)
             {
-                for (var r = 0; r < res.RowCount; r++)
-                {
-                    var cell = addedTable[r + 1, c];
-                    cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
-                }
+                var cell = addedTable[r + 1, c];
+                cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
             }
         }
     }
-   
+
 
     public void SaveAs(string name)
     {
         _pres.SaveAs(name);
+    }
+
+    private ISlide AddSlide()
+    {
+        _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
+        return _pres.Slides.Last();
+    }
+
+    private T[] FindMatches<T>(string name) where T : IShape
+    {
+        return name.IsBlank()
+            ? []
+            : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
+                .Where(p => p.Name == name)
+                .ToArray();
     }
 
     public static PptReportTarget Create(string filename)
@@ -129,4 +125,10 @@ public class PptReportTarget : IReportTarget
             : new Presentation(filename);
         return new PptReportTarget(pres);
     }
+}
+
+
+public interface IResultRenderingSurface
+{
+    
 }

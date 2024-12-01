@@ -1,4 +1,6 @@
-﻿namespace Lokql.Engine.Commands;
+﻿using KustoLoco.Core;
+
+namespace Lokql.Engine.Commands;
 
 public interface IReportTarget
 {
@@ -7,5 +9,5 @@ public interface IReportTarget
     //void UpdateOrAddTable(string name, KustoQueryResult);
     void UpdateOrAddText(string name, string text);
     void SaveAs(string name);
-    public void UpdateOrAddTable(string name, InteractiveTableExplorer explorer);
+    public void UpdateOrAddTable(string name,KustoQueryResult result);
 }

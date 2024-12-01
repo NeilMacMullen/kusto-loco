@@ -57,7 +57,7 @@ public partial class MainWindow : Window
         //the engine
         _explorer.GetRenderCallback = RenderCallback;
         await Task.Run(async () => await _explorer.RunInput(query));
-        var result = _explorer._prevResult;
+        var result = _explorer.GetPreviousResult();
         //await RenderResult(result);
        
 
@@ -386,7 +386,7 @@ private void FillInDataGrid(KustoQueryResult result)
             if (kql.ToString().IsBlank())
                 break;
             await RunQuery(kql.ToString());
-            var lastResult = _explorer._prevResultIncludingError;
+            var lastResult = _explorer.GetPreviousResult();
 
             if (lastResult.Error.IsBlank())
                 break;

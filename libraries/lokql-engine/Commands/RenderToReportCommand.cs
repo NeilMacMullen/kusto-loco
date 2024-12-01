@@ -43,7 +43,7 @@ public static class RenderTableToReportCommand
     {
         var exp = econtext.Explorer;
        
-            exp.ActiveReport.UpdateOrAddTable(o.Name, exp);
+            exp.ActiveReport.UpdateOrAddTable(o.Name, exp.GetPreviousResult());
         
 
         return Task.CompletedTask;
@@ -61,7 +61,7 @@ public static class RenderTableToText
     internal static Task Run(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-            var text = (exp._prevResult.RowCount > 0) ? exp._prevResult.Get(0, 0)?.ToString()??"<null>" : "no data";
+            var text = (exp.GetPreviousResult().RowCount > 0) ? exp.GetPreviousResult().Get(0, 0)?.ToString()??"<null>" : "no data";
                 
             exp.ActiveReport.UpdateOrAddText(o.Name, text);
 

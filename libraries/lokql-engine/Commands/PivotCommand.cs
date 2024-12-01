@@ -9,7 +9,7 @@ public static class PivotCommand
     internal static Task Run(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-        var result = exp._prevResult;
+        var result = exp.GetPreviousResult();
         var ods = new List<OrderedDictionary>();
         var columns = result.ColumnDefinitions();
         foreach (var row in result.EnumerateRows())

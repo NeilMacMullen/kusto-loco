@@ -31,8 +31,7 @@ public class InteractiveTableExplorer
     public readonly KustoSettingsProvider Settings;
 
     public DisplayOptions _currentDisplayOptions = new(10);
-    public KustoQueryResult _prevResultIncludingError =KustoQueryResult.Empty;
-
+  
     public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
 
@@ -47,11 +46,10 @@ public class InteractiveTableExplorer
         _commandProcessor = commandProcessor;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.SetTableLoader(_loader);
-        _prevResult = KustoQueryResult.Empty;
-        LokqlSettings.Register(Settings);
+      LokqlSettings.Register(Settings);
     }
 
-    public KustoQueryResult _prevResult { get; set; }
+    public ResultHistory _resultHistory = new ResultHistory();
 
 
     public void AddMacro(MacroDefinition macro)
@@ -134,12 +132,11 @@ public class InteractiveTableExplorer
             var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
             {
-                _prevResult = result;
                 var renderTask = GetRenderCallback(result);
                 await renderTask;
             }
 
-            _prevResultIncludingError = result;
+           _resultHistory.Push(result);
 
             DisplayResults(result);
         }
@@ -151,7 +148,7 @@ public class InteractiveTableExplorer
 
     public void InjectResult(KustoQueryResult result)
     {
-        _prevResult = result;
+        _resultHistory.Push(result);
     }
 
     private void ShowError(string message)
@@ -237,4 +234,34 @@ public class InteractiveTableExplorer
         _image = getBuffer;
     }
     #endregion
+
+    public KustoQueryResult GetPreviousResult()
+    {
+        return _resultHistory.MostRecent;
+    }
+}
+
+
+public class ResultHistory
+{
+    private Dictionary<string,KustoQueryResult> _results= new ();
+    public KustoQueryResult _mostRecent = KustoQueryResult.Empty;
+
+    public void Push(KustoQueryResult result)
+    {
+        _mostRecent=result;
+    }
+
+    public void Save(string name)
+    {
+        _results[name] = _mostRecent;
+    }
+
+    public KustoQueryResult Fetch(string name) =>
+        _results.TryGetValue(name, out var found)
+        ? found
+        : KustoQueryResult.Empty;
+
+    public KustoQueryResult MostRecent => _mostRecent;
+
 }

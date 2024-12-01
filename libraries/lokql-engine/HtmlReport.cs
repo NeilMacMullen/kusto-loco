@@ -1,4 +1,5 @@
-﻿using KustoLoco.Rendering;
+﻿using KustoLoco.Core;
+using KustoLoco.Rendering;
 using Lokql.Engine.Commands;
 
 namespace Lokql.Engine;
@@ -19,7 +20,7 @@ public class HtmlReport:IReportTarget
 
     public void UpdateOrAddImage(string name, InteractiveTableExplorer exp)
     {
-        var result = exp._prevResult;
+        var result = exp.GetPreviousResult();
         var renderer = new KustoResultRenderer(exp.Settings);
         renderer.RenderToComposer(result, Composer);
     }
@@ -38,10 +39,9 @@ public class HtmlReport:IReportTarget
     {
         var text = Render();
         File.WriteAllText(name, text);
-        
     }
 
-    public void UpdateOrAddTable(string name, InteractiveTableExplorer explorer)
+    public void UpdateOrAddTable(string name, KustoQueryResult result)
     {
         throw new NotImplementedException();
     }

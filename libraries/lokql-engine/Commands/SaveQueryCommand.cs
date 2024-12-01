@@ -11,7 +11,7 @@ public static class SaveQueryCommand
         var queryFolder = exp.Settings.Get(LokqlSettings.QueryPath);
         var filename = InteractiveTableExplorer.ToFullPath(o.File, queryFolder, ".csl");
         exp.Info($"Saving query as '{filename}'");
-        var q = exp._prevResult.Query;
+        var q = exp.GetPreviousResult().Query;
         if (!o.NoSplit)
             q = q
                     .Tokenize("|")

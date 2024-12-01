@@ -11,7 +11,7 @@ public static class RenderCommand
     {
         var exp = econtext.Explorer;
         var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
-        var result = exp._prevResult;
+        var result = exp.GetPreviousResult();
         var renderer = new KustoResultRenderer(exp.Settings);
         var text = renderer.RenderToHtml(result);
         File.WriteAllText(fileName, text);
