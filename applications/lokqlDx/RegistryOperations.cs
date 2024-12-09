@@ -30,7 +30,7 @@ public static class RegistryOperations
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\.{WorkspaceManager.Extension}", null, progId);
             MessageBox.Show($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
         }
-        catch (Exception ex)
+        catch 
         {
             MessageBox.Show("Unable to register file association - you may need to run the application as admin");
         }
