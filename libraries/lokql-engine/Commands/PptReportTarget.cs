@@ -25,7 +25,10 @@ public class PptReportTarget : IReportTarget
         var matchingPictures = FindMatches<IPicture>(name);
         if (matchingPictures.Any())
         {
-            foreach (var p in matchingPictures) p.Image!.Update(data);
+            foreach (var p in matchingPictures)
+            {
+                p.Image!.Update(data);
+            }
         }
         else
         {
