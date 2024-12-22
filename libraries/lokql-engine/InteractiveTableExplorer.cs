@@ -3,6 +3,7 @@ using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
 using NotNullStrings;
+using System.IO;
 
 namespace Lokql.Engine;
 
@@ -165,12 +166,7 @@ public class InteractiveTableExplorer
         return path;
     }
 
-    public void SetWorkingPaths(string containingFolder)
-    {
-        _loader.SetDataPaths(containingFolder);
-        Settings.Set(LokqlSettings.ScriptPath.Name, containingFolder);
-        Settings.Set(LokqlSettings.QueryPath.Name, containingFolder);
-    }
+   
 
     public void Info(string s)
     {

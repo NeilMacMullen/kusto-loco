@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using System.Text.Json;
 using KustoLoco.Core.Settings;
+using Lokql.Engine;
 using NotNullStrings;
+using ZstdSharp.Unsafe;
 
 namespace lokqlDx;
 
@@ -16,20 +18,20 @@ public class WorkspaceManager
 {
     public const string Extension = "lokql";
     public string Path = string.Empty;
-
-
-    public WorkspaceManager(KustoSettingsProvider settings) => Settings = settings;
+    private Workspace _workspace=new Workspace();
+    public Workspace Workspace => _workspace;
 
     public static string GlobPattern => $"*.{Extension}";
 
-    public string UserText { get; private set; } = string.Empty;
-    public KustoSettingsProvider Settings { get; }
+  
+    public KustoSettingsProvider Settings { get; } = new KustoSettingsProvider();
 
     private void EnsureWorkspacePopulated()
     {
+        var UserText = _workspace.Text;
         if (!UserText.IsBlank()) return;
         UserText = @"
-# move the cursor over a block of lines and press CTRL-ENTER to run
+# move the cursor over a block of lines and press SHIFT-ENTER to run
 
 # load a CSV file into a table called 'data'
 
@@ -47,16 +49,10 @@ data
 ";
     }
 
-    public void Save(string path, string userText)
+    public void Save(string path,Workspace workspace)
     {
-        UserText = userText;
+       
         Path = path;
-        var workspace = new Workspace
-                        {
-                            Text = UserText,
-                            Settings = Settings.Enumerate().ToDictionary(kv => kv.Name, kv => kv.Value)
-                        };
-
         try
         {
             var json = JsonSerializer.Serialize(workspace);
@@ -70,6 +66,12 @@ data
 
     public void Load(string path)
     {
+        if (path.IsBlank())
+        {
+            CreateNew();
+            return;
+        }
+
         var rootSettingFolderPath =
             System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                    "kustoloco");
@@ -77,17 +79,16 @@ data
         if (!Directory.Exists(rootSettingFolderPath))
             Directory.CreateDirectory(rootSettingFolderPath);
 
-        UserText = string.Empty;
+       _workspace=new Workspace();
         Settings.Reset();
         Path = path;
-
+        SetWorkingPaths();
         if (path.IsNotBlank())
             try
             {
                 var json = File.ReadAllText(Path);
-                var workspace = JsonSerializer.Deserialize<Workspace>(json)!;
-                UserText = workspace.Text;
-                foreach (var kv in workspace.Settings) Settings.Set(kv.Key, kv.Value);
+                _workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+              
             }
             catch (Exception e)
             {
@@ -97,13 +98,24 @@ data
         EnsureWorkspacePopulated();
     }
 
-    public void CreateNewInCurrentFolder()
+    public void CreateNew()
     {
-        UserText = string.Empty;
+        _workspace= new Workspace();
         Settings.Reset();
-        Path = System.IO.Path.Combine(ContainingFolder(),
-                                      System.IO.Path.ChangeExtension("new", Extension));
+        Path = string.Empty;
     }
 
+    public bool IsDirty(Workspace wkspc) => wkspc!=_workspace;
     public string ContainingFolder() => System.IO.Path.GetDirectoryName(Path).NullToEmpty();
+
+    public void SetWorkingPaths()
+    {
+        if(Path.IsBlank())
+            return;
+        var containingFolder = ContainingFolder();
+        Settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, containingFolder);
+        Settings.Set(LokqlSettings.ScriptPath.Name, containingFolder);
+        Settings.Set(LokqlSettings.QueryPath.Name, containingFolder);
+    }
+
 }

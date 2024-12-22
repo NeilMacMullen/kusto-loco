@@ -1,0 +1,23 @@
+﻿<Window x:Class="lokqlDx.WorkspaceOptions"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lokqlDx"
+        mc:Ignorable="d"
+        Title="WorkspaceOptions" Height="450" Width="800"
+
+Loaded="WorkspaceOptions_OnLoaded"
+        >
+  <DockPanel>
+    <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+      <Button IsCancel="True">Cancel</Button>
+      <Button Click="OnOk">Ok</Button>
+    </StackPanel>
+    <DockPanel>
+      <Label Content="Pre-script (run on workspace load)" DockPanel.Dock="Top"></Label>
+      <TextBox Name="StartupScript" AcceptsReturn="True" Background="Black" Foreground="White"></TextBox>
+    </DockPanel>
+
+  </DockPanel>
+</Window>

@@ -10,4 +10,5 @@ public class Preferences
     public double WindowTop { get; set; }
     public double WindowLeft { get; set; }
     public string StartupScript { get; set; }= string.Empty;
+    public string[] RecentProjects { get; set; } = [];
 }

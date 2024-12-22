@@ -15,7 +15,7 @@ public static class RegistryOperations
         return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 
-    public static void AssociateFileType()
+    public static void AssociateFileType(bool quiet)
     {
         //taken from https://stackoverflow.com/questions/1387769/create-registry-entry-to-associate-file-extension-with-application-in-c
         try
@@ -24,15 +24,17 @@ public static class RegistryOperations
             var exe = Process.GetCurrentProcess()?.MainModule?.FileName ?? string.Empty;
 
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\{progId}\shell\open\command",
-                              null,
-                              "\"" + exe + "\" \"%1\"");
+                null,
+                "\"" + exe + "\" \"%1\"");
 
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\.{WorkspaceManager.Extension}", null, progId);
-            MessageBox.Show($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
+            if (!quiet)
+                MessageBox.Show($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
         }
-        catch 
+        catch
         {
-            MessageBox.Show("Unable to register file association - you may need to run the application as admin");
+            if (!quiet)
+                MessageBox.Show("Unable to register file association - you may need to run the application as admin");
         }
     }
 }

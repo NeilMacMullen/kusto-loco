@@ -10,7 +10,7 @@ namespace lokqlDx;
 ///     Simple text editor for running queries
 /// </summary>
 /// <remarks>
-///     The key thing this provides is an event based on CTRL-ENTER that
+///     The key thing this provides is an event based on SHIFT-ENTER that
 ///     selects text around the cursor and sends it to the RunEvent
 ///     In future it would be nice to replace this with a more capable editor
 ///     that supports syntax highlighting and other features
@@ -33,7 +33,7 @@ public partial class QueryEditor : UserControl
     private void Query_OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.LeftShift))
+            if (Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftShift))
             {
                 e.Handled = true;
                 var query = GetTextAroundCursor();

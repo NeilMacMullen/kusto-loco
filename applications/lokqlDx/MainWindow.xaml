@@ -16,12 +16,17 @@
       <MenuItem Header="_File">
         <MenuItem Header="_New Workspace" Click="NewWorkspace"/>
         <MenuItem Header="_Open Workspace" Click="OpenWorkSpace"/>
+        <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"/>
+
         <MenuItem Header="_Save" Click="SaveWorkspaceEvent"/>
         <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent"/>
       </MenuItem>
       <MenuItem Header="_Preferences">
         <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
         <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
+        <MenuItem Header="Options"  Click="OpenOptionsDialog"/>
+        <MenuItem Header="WorkspaceOptions"  Click="OpenWorkspaceOptions"/>
+
 
       </MenuItem>
       <MenuItem Header="Misc">
