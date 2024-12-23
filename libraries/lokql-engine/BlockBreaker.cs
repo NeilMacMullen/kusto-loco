@@ -3,6 +3,13 @@ using NotNullStrings;
 
 namespace Lokql.Engine;
 
+/// <summary>
+/// A class to break a block of text into individual executable blocks
+/// </summary>
+/// <remarks>
+/// A block is a set of lines that can be executed as a single unit.
+/// A block is terminated by a blank line or command
+/// </remarks>
 public class BlockBreaker
 {
     public string[] Blocks = [];
