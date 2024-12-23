@@ -25,7 +25,7 @@ public static class AppInsightsCommand
         query = exp._interpolator.Interpolate(query);
 
         var result = await ai.LoadTable(o.Rid, query, t, DateTime.UtcNow);
-        exp.InjectResult(result);
+        await exp.InjectResult(result);
     }
 
     [Verb("appinsights", aliases: ["ai"],

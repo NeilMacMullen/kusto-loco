@@ -1,4 +1,5 @@
-﻿using KustoLoco.Core;
+﻿using DocumentFormat.OpenXml.Linq;
+using KustoLoco.Core;
 using NotNullStrings;
 using ShapeCrawler;
 
@@ -14,27 +15,30 @@ public class PptReportTarget : IReportTarget
         _pres = pres;
     }
 
-    public void UpdateOrAddImage(string name, InteractiveTableExplorer explorer)
+    public  async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer)
     {
-        var bytes = explorer.GetImageBytes();
-        UpdateOrAddImage(name, bytes);
+        var surface = explorer.GetRenderingSurface();
+        await UpdateOrAddImage(name, surface);
     }
 
-    public void UpdateOrAddImage(string name, byte[] data)
+    public async Task UpdateOrAddImage(string name, IResultRenderingSurface surface)
     {
+        
         var matchingPictures = FindMatches<IPicture>(name);
         if (matchingPictures.Any())
         {
             foreach (var p in matchingPictures)
             {
+                var data = await surface.GetImage((double)p.Width,(double)p.Height);
                 p.Image!.Update(data);
             }
         }
         else
         {
             var slide = AddSlide();
-
+            var data = await surface.GetImage(800,600);
             slide.Shapes.AddPicture(new MemoryStream(data));
+            File.WriteAllBytes(@"C:\temp\debug.png",data);
         }
     }
 
@@ -128,10 +132,4 @@ public class PptReportTarget : IReportTarget
             : new Presentation(filename);
         return new PptReportTarget(pres);
     }
-}
-
-
-public interface IResultRenderingSurface
-{
-    
 }

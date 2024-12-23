@@ -12,7 +12,7 @@ public static class EndReportCommand
         var exp = econtext.Explorer;
         var report = exp.ActiveReport;
          report.SaveAs(o.File);
-         exp.Info($"Saved chart as {o.File}");
+         exp.Info($"Closed report {o.File}");
         // if (!o.SaveOnly)
         //     Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         return Task.CompletedTask;

@@ -27,7 +27,7 @@ public static class StartReportCommand
             exp.StartNewReport(html);
            
         }
-        else econtext.Explorer.Warn("Unrecognised report type 'type'");
+        else econtext.Explorer.Warn($"Unrecognised report type '{type}'");
 
         return Task.CompletedTask;
     }

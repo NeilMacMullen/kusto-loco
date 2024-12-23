@@ -18,17 +18,15 @@ public class HtmlReport:IReportTarget
         return Composer.Render();
     }
 
-    public void UpdateOrAddImage(string name, InteractiveTableExplorer exp)
+    public Task UpdateOrAddImage(string name, InteractiveTableExplorer exp)
     {
         var result = exp.GetPreviousResult();
         var renderer = new KustoResultRenderer(exp.Settings);
         renderer.RenderToComposer(result, Composer);
+        return Task.CompletedTask;
     }
 
-    public void UpdateOrAddImage(string name, byte[] data)
-    {
-        throw new NotImplementedException();
-    }
+   
 
     public void UpdateOrAddText(string name, string text)
     {

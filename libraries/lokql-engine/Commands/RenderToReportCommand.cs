@@ -20,13 +20,11 @@ public static class SleepCommand
 
 public static class RenderToReportCommand
 {
-    internal static Task Run(CommandProcessorContext econtext, Options o)
+    internal static async Task Run(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
       
-        exp.ActiveReport.UpdateOrAddImage(o.Name,exp);
-       
-        return Task.CompletedTask;
+        await exp.ActiveReport.UpdateOrAddImage(o.Name,exp);
     }
 
     [Verb("renderToReport", HelpText = "render last results as html and save in active report")]

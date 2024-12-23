@@ -4,6 +4,8 @@ using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 using System.IO;
+using KustoLoco.Rendering;
+using ZstdSharp.Unsafe;
 
 namespace Lokql.Engine;
 
@@ -23,6 +25,7 @@ namespace Lokql.Engine;
 public class InteractiveTableExplorer
 {
     private readonly CommandProcessor _commandProcessor;
+    private readonly IResultRenderingSurface _renderingSurface;
     private readonly KustoQueryContext _context;
     public readonly BlockInterpolator _interpolator;
 
@@ -35,16 +38,19 @@ public class InteractiveTableExplorer
   
     public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
-
-    public Func<KustoQueryResult, Task> GetRenderCallback = result => Task.CompletedTask; 
+    public IResultRenderingSurface GetRenderingSurface()
+    {
+        return _renderingSurface;
+    }
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
-        CommandProcessor commandProcessor)
+        CommandProcessor commandProcessor,IResultRenderingSurface renderingSurface)
     {
         _outputConsole = outputConsole;
         _loader = loader;
         Settings = settings;
         _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
+        _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.SetTableLoader(_loader);
       LokqlSettings.Register(Settings);
@@ -133,8 +139,7 @@ public class InteractiveTableExplorer
             var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
             {
-                var renderTask = GetRenderCallback(result);
-                await renderTask;
+                await _renderingSurface.RenderToSurface(result);
             }
 
            _resultHistory.Push(result);
@@ -147,9 +152,14 @@ public class InteractiveTableExplorer
         }
     }
 
-    public void InjectResult(KustoQueryResult result)
+    public async Task InjectResult(KustoQueryResult result)
     {
         _resultHistory.Push(result);
+        if (result.Error.Length == 0)
+        {
+            await _renderingSurface.RenderToSurface(result);
+        }
+        DisplayResults(result);
     }
 
     private void ShowError(string message)
@@ -217,47 +227,10 @@ public class InteractiveTableExplorer
     {
         ActiveReport = report;
     }
-    #region image support
-    //Ugh this is horrible - figure out a better way
-    private byte[] _image = [];
-    public byte[] GetImageBytes()
-    {
-        return _image;
-    }
-
-    public void SetImage(byte[] getBuffer)
-    {
-        _image = getBuffer;
-    }
-    #endregion
+   
 
     public KustoQueryResult GetPreviousResult()
     {
         return _resultHistory.MostRecent;
     }
-}
-
-
-public class ResultHistory
-{
-    private Dictionary<string,KustoQueryResult> _results= new ();
-    public KustoQueryResult _mostRecent = KustoQueryResult.Empty;
-
-    public void Push(KustoQueryResult result)
-    {
-        _mostRecent=result;
-    }
-
-    public void Save(string name)
-    {
-        _results[name] = _mostRecent;
-    }
-
-    public KustoQueryResult Fetch(string name) =>
-        _results.TryGetValue(name, out var found)
-        ? found
-        : KustoQueryResult.Empty;
-
-    public KustoQueryResult MostRecent => _mostRecent;
-
 }
