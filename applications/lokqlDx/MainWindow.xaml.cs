@@ -445,7 +445,7 @@ public partial class MainWindow : Window
 
     private void OpenApplicationOptionsDialog(object sender, RoutedEventArgs e)
     {
-        var dialog = new PreferencesWindow(_preferenceManager.Preferences)
+        var dialog = new ApplicationPreferencesWindow(_preferenceManager.Preferences)
         {
             Owner = this
         };
@@ -459,7 +459,7 @@ public partial class MainWindow : Window
     private void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
     {
        UpdateCurrentWorkspaceFromUI();
-        var dialog = new WorkspaceOptions(currentWorkspace)
+        var dialog = new WorkspacePreferencesWindow(currentWorkspace)
         {
             Owner = this
         };

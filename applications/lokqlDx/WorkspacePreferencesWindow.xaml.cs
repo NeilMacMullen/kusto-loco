@@ -3,13 +3,13 @@
 namespace lokqlDx;
 
 /// <summary>
-///     Interaction logic for WorkspaceOptions.xaml
+///     Interaction logic for WorkspacePreferencesWindow.xaml
 /// </summary>
-public partial class WorkspaceOptions : Window
+public partial class WorkspacePreferencesWindow : Window
 {
     public  Workspace _workspace;
 
-    public WorkspaceOptions(Workspace workspace)
+    public WorkspacePreferencesWindow(Workspace workspace)
     {
         _workspace = workspace;
         InitializeComponent();
@@ -21,7 +21,7 @@ public partial class WorkspaceOptions : Window
         DialogResult = true;
     }
 
-    private void WorkspaceOptions_OnLoaded(object sender, RoutedEventArgs e)
+    private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
     {
         StartupScript.Text = _workspace.StartupScript;
     }

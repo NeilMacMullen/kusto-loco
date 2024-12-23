@@ -1,4 +1,4 @@
-﻿<Window x:Class="lokqlDx.WorkspaceOptions"
+﻿<Window x:Class="lokqlDx.WorkspacePreferencesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Workspace Options" Height="450" Width="800"
 
-Loaded="WorkspaceOptions_OnLoaded"
+Loaded="Dialog_OnLoaded"
         >
   <DockPanel>
     <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
