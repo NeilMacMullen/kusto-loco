@@ -22,11 +22,12 @@
         <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent"/>
       </MenuItem>
       <MenuItem Header="_Preferences">
+        <MenuItem Header="Application Options"  Click="OpenApplicationOptionsDialog"/>
+        <MenuItem Header="Workspace Options"  Click="OpenWorkspaceOptionsDialog"/>
+        <Separator></Separator>
         <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
         <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
-        <MenuItem Header="Options"  Click="OpenOptionsDialog"/>
-        <MenuItem Header="WorkspaceOptions"  Click="OpenWorkspaceOptions"/>
-
+        <MenuItem Header="Toggle Word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap"/>
 
       </MenuItem>
       <MenuItem Header="Misc">
@@ -123,11 +124,14 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <DockPanel Grid.Row="0" >
-                <DockPanel  DockPanel.Dock="Top">
+              <StackPanel DockPanel.Dock="Top">
+              <DockPanel>
                     <Label DockPanel.Dock="Left" Background="DarkGray">Max rows:</Label>
                     <TextBox Name="VisibleDataGridRows" VerticalContentAlignment="Center"
-                             Background="LightGray">1000</TextBox>
+                             Background="LightGray">10000</TextBox>
                 </DockPanel>
+                <Label Visibility="Collapsed"  Name="DatagridOverflowWarning" Foreground="Red" Content="Not all rows shown in grid!"></Label>
+              </StackPanel>
 
                 <DataGrid   Name="dataGrid" Background="Black" RowBackground="Black"
                             Foreground="GreenYellow"

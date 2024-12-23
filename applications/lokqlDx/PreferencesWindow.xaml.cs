@@ -31,11 +31,17 @@ namespace lokqlDx
         private void PreferencesWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
            StartupScript.Text= _preferences.StartupScript;
+           var fontFamilies = Fonts.SystemFontFamilies;
+           FontSelector.ItemsSource =fontFamilies ;
+           var current = fontFamilies.Where(f => f.Source == _preferences.FontFamily).ToArray();
+           if (current.Any())
+               FontSelector.SelectedItem = current.First();
         }
 
         private void OnOk(object sender, RoutedEventArgs e)
         {
             _preferences.StartupScript = StartupScript.Text;
+            _preferences.FontFamily = ((FontFamily)FontSelector.SelectedItem).Source;
             DialogResult = true;
         }
     }

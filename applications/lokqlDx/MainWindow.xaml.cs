@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shell;
 using KustoLoco.Core;
 using KustoLoco.Rendering;
@@ -81,6 +82,14 @@ public partial class MainWindow : Window
         isBusy = false;
     }
 
+    private int TryGetMaxVisibleDatagridRows()
+    {
+        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed)
+            ? parsed
+            : 10000;
+        return maxDataGridRows;
+    }
+
     private void FillInDataGrid(KustoQueryResult result)
     {
         //ensure that if have not results we clear the data grid
@@ -90,9 +99,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        var maxDataGridRows = int.TryParse(VisibleDataGridRows.Text, out var parsed)
-            ? parsed
-            : 10000;
+        var maxDataGridRows = TryGetMaxVisibleDatagridRows();
+
+        DatagridOverflowWarning.Visibility = result.RowCount > maxDataGridRows ? Visibility.Visible : Visibility.Collapsed;
         var dt = result.ToDataTable(maxDataGridRows);
         dataGrid.ItemsSource = dt.DefaultView;
     }
@@ -143,16 +152,26 @@ public partial class MainWindow : Window
         RebuildRecentFilesList();
     }
 
+    private void UpdateDynamicUiFromPreferences(Preferences preferences)
+    {
+        Editor.SetFont(preferences.FontFamily);
+        Editor.SetWordWrap(_preferenceManager.Preferences.WordWrap);
+        OutputText.FontFamily = new FontFamily(preferences.FontFamily);
+        VisibleDataGridRows.Text =preferences.MaxDataGridRows.ToString();
+       
+    }
+
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         RegistryOperations.AssociateFileType(true);
+        PreferencesManager.EnsureDefaultFolderExists();
+
         _preferenceManager.Load();
-        _mruList = MruList.LoadFromArray(_preferenceManager.Preferences.RecentProjects);
-        RebuildRecentFilesList();
-        var pathToLoad = _args.Any()
-            ? _args[0]
-            : string.Empty;
-      
+       
+      UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+      _mruList = MruList.LoadFromArray(_preferenceManager.Preferences.RecentProjects);
+      RebuildRecentFilesList();
+
         if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
         {
             Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
@@ -164,6 +183,9 @@ public partial class MainWindow : Window
             Left = _preferenceManager.Preferences.WindowLeft;
             Top = _preferenceManager.Preferences.WindowTop;
         }
+        var pathToLoad = _args.Any()
+            ? _args[0]
+            : string.Empty;
         await LoadWorkspace(pathToLoad);
         await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
     }
@@ -176,11 +198,10 @@ public partial class MainWindow : Window
 
     private Workspace currentWorkspace = new Workspace();
 
-    private void SaveWorkspace(string path)
+    private void SaveApplicationPreferences()
     {
         PreferencesManager.EnsureDefaultFolderExists();
-        UpdateCurrentWorkspaceFromUI();
-        _workspaceManager.Save(path,currentWorkspace);
+
         _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager.Path;
         _preferenceManager.Preferences.WindowLeft = Left;
         _preferenceManager.Preferences.WindowTop = Top;
@@ -188,13 +209,22 @@ public partial class MainWindow : Window
         _preferenceManager.Preferences.WindowHeight = Height;
 
         _preferenceManager.Preferences.RecentProjects = _mruList.GetItems().Select(i => i.Path).ToArray();
+        _preferenceManager.Preferences.MaxDataGridRows = TryGetMaxVisibleDatagridRows();
         _preferenceManager.Save();
         UpdateMostRecentlyUsed(_workspaceManager.Path);
+    }
+    private void SaveWorkspace(string path)
+    {
+        UpdateCurrentWorkspaceFromUI();
+        _workspaceManager.Save(path,currentWorkspace);
+
+      SaveApplicationPreferences();
     }
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
         Save();
+        SaveApplicationPreferences();
     }
 
     private async Task LoadWorkspace(string path)
@@ -413,16 +443,20 @@ public partial class MainWindow : Window
         ChatHistory.Document.Blocks.Clear();
     }
 
-    private void OpenOptionsDialog(object sender, RoutedEventArgs e)
+    private void OpenApplicationOptionsDialog(object sender, RoutedEventArgs e)
     {
         var dialog = new PreferencesWindow(_preferenceManager.Preferences)
         {
             Owner = this
         };
-        if (dialog.ShowDialog() == true) _preferenceManager.Save();
+        if (dialog.ShowDialog() == true)
+        {
+            _preferenceManager.Save();
+            UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+        }
     }
 
-    private void OpenWorkspaceOptions(object sender, RoutedEventArgs e)
+    private void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
     {
        UpdateCurrentWorkspaceFromUI();
         var dialog = new WorkspaceOptions(currentWorkspace)
@@ -434,5 +468,12 @@ public partial class MainWindow : Window
             currentWorkspace=dialog._workspace ;
             Save();
         }
+    }
+
+    private void ToggleWordWrap(object sender, RoutedEventArgs e)
+    {
+        _preferenceManager.Preferences.WordWrap = !_preferenceManager.Preferences.WordWrap;
+        UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+       
     }
 }

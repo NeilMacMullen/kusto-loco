@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using NotNullStrings;
 
 namespace lokqlDx;
@@ -73,7 +74,10 @@ public partial class QueryEditor : UserControl
     {
         Query.Text = text;
     }
-
+    public void SetFont(string font)
+    {
+        Query.FontFamily = new FontFamily(font);
+    }
     public string GetText()
     {
         return Query.Text;
@@ -137,6 +141,11 @@ public partial class QueryEditor : UserControl
         {
             drgevent.Effects = DragDropEffects.None;
         }
+    }
+
+    public void SetWordWrap(bool wordWrap)
+    {
+        Query.TextWrapping = wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap;
     }
 }
 
