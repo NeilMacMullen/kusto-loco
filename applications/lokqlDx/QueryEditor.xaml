@@ -21,6 +21,7 @@
           PreviewDragOver="TextBox_PreviewDragOver"
           Drop="TextBox_Drop"
           PreviewDragEnter="Query_OnPreviewDragEnter"
+          TextWrapping="Wrap"
         />
     </DockPanel>
 </UserControl>

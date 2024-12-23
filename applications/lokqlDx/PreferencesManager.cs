@@ -57,6 +57,8 @@ public class PreferencesManager
             Console.WriteLine($"Error loading preferences: {e.Message}");
         }
 
+        if (Preferences.FontFamily.IsBlank())
+            Preferences.FontFamily = "Consolas";
         if (Preferences.LastWorkspacePath.IsBlank()) Preferences.LastWorkspacePath = DefaultWorkspacePath();
     }
 }
