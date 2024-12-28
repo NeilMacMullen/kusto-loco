@@ -49,16 +49,15 @@ public class WebviewRenderer : IResultRenderingSurface
         return await Application.Current.Dispatcher.Invoke(async () =>
         {
 
-            //var runtimePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"WebView2");
-            var runtimePath = AppDomain.CurrentDomain.BaseDirectory;
-            runtimePath =
-                @"C:\work\open-source\kusto-loco\applications\lokqlDx\bin\Debug\net8.0-windows\lokqlDx.exe.WebView2";
-            //var environment = await CoreWebView2Environment.CreateAsync(runtimePath);
             var environment=await CoreWebView2Environment.CreateAsync();
             var browserController = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
-            browserController.Bounds = new Rectangle(0, 0, (int)pWidth, (int)pHeight);
-            await NavigateToStringAsync(browserController.CoreWebView2, _lastContent);
-            browserController.Close();
+            var bounds = new Rectangle(0, 0, (int)pWidth, (int)pHeight);
+            browserController.Bounds = bounds;
+            //browserController.SetBoundsAndZoomFactor(bounds,1);
+             await NavigateToStringAsync(browserController.CoreWebView2, _lastContent);
+          
+             browserController.Close();
+            File.WriteAllBytes(@$"C:\temp\debug_{(int)pWidth}x{(int)pHeight}.png",_image);
             return _image;
         });
         
@@ -83,13 +82,13 @@ public class WebviewRenderer : IResultRenderingSurface
         await tcs.Task;
 
         var strm = new MemoryStream();
-        await _webview.CoreWebView2.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, strm);
+        await webview.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, strm);
         _image = strm.GetBuffer();
-
+      
 
     }
 
-
+ 
 
     private void FillInDataGrid(KustoQueryResult result)
     {
