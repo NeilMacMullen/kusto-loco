@@ -4,6 +4,8 @@ using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 using System.IO;
+using KustoLoco.Rendering;
+using ZstdSharp.Unsafe;
 
 namespace Lokql.Engine;
 
@@ -23,6 +25,7 @@ namespace Lokql.Engine;
 public class InteractiveTableExplorer
 {
     private readonly CommandProcessor _commandProcessor;
+    private readonly IResultRenderingSurface _renderingSurface;
     private readonly KustoQueryContext _context;
     public readonly BlockInterpolator _interpolator;
 
@@ -32,25 +35,28 @@ public class InteractiveTableExplorer
     public readonly KustoSettingsProvider Settings;
 
     public DisplayOptions _currentDisplayOptions = new(10);
-    public KustoQueryResult _prevResultIncludingError =KustoQueryResult.Empty;
+  
+    public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
-    public Report ActiveReport { get; private set; } = new Report(string.Empty);
-
+    public IResultRenderingSurface GetRenderingSurface()
+    {
+        return _renderingSurface;
+    }
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
-        CommandProcessor commandProcessor)
+        CommandProcessor commandProcessor,IResultRenderingSurface renderingSurface)
     {
         _outputConsole = outputConsole;
         _loader = loader;
         Settings = settings;
         _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
+        _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.SetTableLoader(_loader);
-        _prevResult = KustoQueryResult.Empty;
-        LokqlSettings.Register(Settings);
+      LokqlSettings.Register(Settings);
     }
 
-    public KustoQueryResult _prevResult { get; set; }
+    public ResultHistory _resultHistory = new ResultHistory();
 
 
     public void AddMacro(MacroDefinition macro)
@@ -132,8 +138,11 @@ public class InteractiveTableExplorer
 
             var result = await GetCurrentContext().RunQuery(query);
             if (result.Error.Length == 0)
-                _prevResult = result;
-            _prevResultIncludingError = result;
+            {
+                await _renderingSurface.RenderToDisplay(result);
+            }
+
+           _resultHistory.Push(result);
 
             DisplayResults(result);
         }
@@ -143,14 +152,19 @@ public class InteractiveTableExplorer
         }
     }
 
-    public void InjectResult(KustoQueryResult result)
+    public async Task InjectResult(KustoQueryResult result)
     {
-        _prevResult = result;
+        _resultHistory.Push(result);
+        if (result.Error.Length == 0)
+        {
+            await _renderingSurface.RenderToDisplay(result);
+        }
+        DisplayResults(result);
     }
 
     private void ShowError(string message)
     {
-        _outputConsole.ForegroundColor = ConsoleColor.DarkRed;
+        _outputConsole.ForegroundColor = ConsoleColor.Red;
         _outputConsole.WriteLine("Error:");
         _outputConsole.WriteLine(message);
     }
@@ -209,24 +223,14 @@ public class InteractiveTableExplorer
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
 
-    public void StartNewReport(string title)
+    public void StartNewReport(IReportTarget report)
     {
-        ActiveReport = new Report(title);
+        ActiveReport = report;
     }
-}
+   
 
-
-public class Report
-{
-    public VegaComposer Composer { get; set; }
-
-    public Report(string title)
+    public KustoQueryResult GetPreviousResult()
     {
-        Composer = new VegaComposer(title,"dark");
-    }
-
-    public string? Render()
-    {
-        return Composer.Render();
+        return _resultHistory.MostRecent;
     }
 }

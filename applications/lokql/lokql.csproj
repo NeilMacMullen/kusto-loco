@@ -13,6 +13,7 @@
     <PackageReference Include="CommandLineParser" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="NLog" />
+    <PackageReference Include="ShapeCrawler" />
     <PackageReference Include="System.CommandLine" />
   
   </ItemGroup>

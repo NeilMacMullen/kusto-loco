@@ -2,6 +2,7 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
+using Lokql.Engine.Commands;
 using NLog;
 
 /// <summary>
@@ -19,7 +20,8 @@ internal class CmdExplore
         var loader = new StandardFormatAdaptor(settings, console);
         loader.SetDataPaths(options.Data);
         var processor = CommandProcessorProvider.GetCommandProcessor();
-        var explorer = new InteractiveTableExplorer(console, loader, settings, processor);
+        var renderer = new NullResultRenderingSurface();
+        var explorer = new InteractiveTableExplorer(console, loader, settings, processor, renderer);
         await RunInteractive(console, explorer);
     }
 

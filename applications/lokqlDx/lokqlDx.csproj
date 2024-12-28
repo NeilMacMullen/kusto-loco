@@ -25,6 +25,7 @@
   <ItemGroup>
     <PackageReference Include="AvalonEdit" />
     <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="ShapeCrawler" />
    
   </ItemGroup>
 

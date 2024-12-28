@@ -7,7 +7,7 @@ public static class ShowCommand
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-        exp.ShowResultsToConsole(exp._prevResult, o.Offset, o.NumToShow);
+        exp.ShowResultsToConsole(exp.GetPreviousResult(), o.Offset, o.NumToShow);
         await Task.CompletedTask;
     }
 

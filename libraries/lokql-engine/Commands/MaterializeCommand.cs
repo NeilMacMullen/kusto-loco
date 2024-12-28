@@ -7,7 +7,7 @@ public static class MaterializeCommand
     internal static Task Run(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-        exp.GetCurrentContext().MaterializeResultAsTable(exp._prevResult, o.As);
+        exp.GetCurrentContext().MaterializeResultAsTable(exp.GetPreviousResult(), o.As);
         exp.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
     }
