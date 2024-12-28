@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -8,15 +9,35 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace KustoLoco.SourceGeneration
 {
     [Generator]
-    public class KustoFunctionSourceGenerator : ISourceGenerator
+    public class KustoFunctionSourceGenerator : IIncrementalGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+#if DEBUG
+            if (!Debugger.IsAttached)
+            {
+                //Debugger.Launch();
+            }
+#endif
+            var classDeclarations = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    (s, _) => IsSyntaxTargetForGeneration(s),
+                    (ctx, _) => GetSemanticTargetForGeneration(ctx))
+                .Where(m => m != null);
+
+            IncrementalValueProvider<(Compilation, ImmutableArray<ClassDeclarationSyntax>)> compilationAndClasses
+                = context.CompilationProvider.Combine(classDeclarations.Collect());
+
+            context.RegisterSourceOutput(compilationAndClasses,
+                (spc, source) => Execute(source.Item1, source.Item2, spc));
+        }
+
+        public void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes,
+            SourceProductionContext context)
         {
             try
             {
-                var syntaxReceiver = (AttributedClassReceiver)context.SyntaxReceiver;
-                Console.WriteLine("Code generator running...");
-                foreach (var classDeclaration in syntaxReceiver.found)
+                foreach (var classDeclaration in classes.Distinct())
                 {
                     var wrapperClassName = classDeclaration.Identifier.ValueText;
 
@@ -99,16 +120,14 @@ namespace KustoLoco.SourceGeneration
             }
         }
 
-
-        public void Initialize(GeneratorInitializationContext context)
+        private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
         {
-#if DEBUG
-            if (!Debugger.IsAttached)
-            {
-                //Debugger.Launch();
-            }
-#endif
-            context.RegisterForSyntaxNotifications(() => new AttributedClassReceiver());
+            return node is ClassDeclarationSyntax m && m.AttributeLists.Count > 0;
+        }
+
+        private static ClassDeclarationSyntax GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+        {
+            return context.Node as ClassDeclarationSyntax;
         }
 
         private void EmitHeader(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
@@ -131,10 +150,7 @@ namespace KustoLoco.SourceGeneration
             code.AppendStatement("using System.Diagnostics");
             code.AppendStatement("using System.Collections.Generic");
 
-            foreach (var u in GetUsingList(classDeclaration))
-            {
-                code.AppendLine(u);
-            }
+            foreach (var u in GetUsingList(classDeclaration)) code.AppendLine(u);
         }
 
         private static CustomAttributeHelper<T> AttributeAsHelper<T>(ClassDeclarationSyntax classDeclaration)
@@ -147,12 +163,10 @@ namespace KustoLoco.SourceGeneration
                 .ToArray();
 
             if (!attributes.Any())
-            {
                 return new CustomAttributeHelper<T>(new Dictionary<string, string>
                 {
                     ["error"] = "no attributes"
                 });
-            }
 
             var dict = new Dictionary<string, string>
             {
@@ -245,10 +259,7 @@ namespace KustoLoco.SourceGeneration
             while (true)
             {
                 if (s == null) return usings.ToArray();
-                if (s is CompilationUnitSyntax cu)
-                {
-                    usings.AddRange(cu.Usings.Select(c => c.ToString()));
-                }
+                if (s is CompilationUnitSyntax cu) usings.AddRange(cu.Usings.Select(c => c.ToString()));
 
                 s = s.Parent;
             }
