@@ -1,27 +1,27 @@
 ﻿<UserControl x:Class="lokqlDx.QueryEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:lokqlDx"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel Background="Black" >
-      <Label Name="BusyStatus" DockPanel.Dock="Bottom" Content="Ready" Foreground="White"/>
-      <TextBox 
-          DockPanel.Dock="Top" 
-          Padding="3" Name="Query" 
-                 PreviewKeyDown="Query_OnKeyDown"
-                 FontFamily="Consolas"
-                 FontSize="20"
-                 AcceptsReturn="True" 
-                 Background="Black"
-                 Foreground="GreenYellow"
-          AllowDrop="True"
-          PreviewDragOver="TextBox_PreviewDragOver"
-          Drop="TextBox_Drop"
-          PreviewDragEnter="Query_OnPreviewDragEnter"
-          TextWrapping="Wrap"
-        />
-    </DockPanel>
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="QueryEditor_OnLoaded">
+  <DockPanel Background="Black">
+    <Label Name="BusyStatus" DockPanel.Dock="Bottom" Content="Ready" Foreground="White" />
+    <avalonEdit:TextEditor
+      DockPanel.Dock="Top"
+      Padding="3"
+      Name="Query"
+      FontFamily="Consolas"
+      Background="Black"
+      Foreground="White"
+      ShowLineNumbers="True"
+      PreviewKeyDown="InternalEditor_OnKeyDown"
+      FontSize="20"
+      AllowDrop="True"
+      PreviewDragOver="TextBox_PreviewDragOver"
+      Drop="TextBox_Drop"
+      PreviewDragEnter="Query_OnPreviewDragEnter" />
+  </DockPanel>
 </UserControl>

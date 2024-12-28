@@ -27,7 +27,8 @@
         <Separator></Separator>
         <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
         <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
-        <MenuItem Header="Toggle Word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap"/>
+        <MenuItem Header="Toggle word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap"/>
+        <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers"/>
 
       </MenuItem>
       <MenuItem Header="Misc">

@@ -11,10 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SyntaxHighlighting.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Properties\kql.ico" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="SyntaxHighlighting.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" />
     <PackageReference Include="Microsoft.Web.WebView2" />
    
   </ItemGroup>
