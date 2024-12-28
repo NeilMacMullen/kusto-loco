@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SyntaxDefinition name="KQL"
+                  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<Color name="Comment" foreground="#b6ea8b" />
+	<Color name="String" foreground="#ce9178" />
+	<Color name="ScriptComment" foreground="Blue" />
+	<Color name="InternalCommand" foreground="#a935c6" />
+
+	<!-- This is the main ruleset. -->
+	<RuleSet>
+		<Span color="Comment" begin="//" />
+		<Span color="ScriptComment" begin="#" />
+		<Span color="InternalCommand" begin="\." />
+
+		<Span color="String">
+			<Begin>"</Begin>
+			<End>"</End>
+
+		</Span>
+
+		<Span color="String">
+			<Begin>'</Begin>
+			<End>'</End>
+
+		</Span>
+
+
+		<Keywords  foreground="#6dabff">
+			<Word>where</Word>
+			<Word>count</Word>
+			<Word>by</Word>
+			<Word>and</Word>
+			<Word>or</Word>
+			<Word>case</Word>
+			<Word>iff</Word>
+			<Word>project</Word>
+			<Word>project-away</Word>
+			<Word>project-keep</Word>
+			<Word>extend</Word>
+			<Word>summarize</Word>
+			<Word>render</Word>
+			<Word>contains</Word>
+
+		</Keywords>
+
+		<!-- Digits -->
+		<Rule foreground="#31d793">
+			\b0[xX][0-9a-fA-F]+  # hex number
+			|    \b
+			(    \d+(\.[0-9]+)?   #number with optional floating point
+			|    \.[0-9]+         #or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)? # optional exponent
+		</Rule>
+
+	</RuleSet>
+</SyntaxDefinition>

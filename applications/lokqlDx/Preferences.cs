@@ -13,4 +13,5 @@ public class Preferences
     public string[] RecentProjects { get; set; } = [];
     public int MaxDataGridRows { get; set; } = 10000;
     public bool WordWrap { get; set; } = false;
+    public bool ShowLineNumbers { get; set; } = false;
 }
