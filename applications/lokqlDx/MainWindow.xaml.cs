@@ -114,6 +114,7 @@ public partial class MainWindow : Window
     {
         Editor.SetFont(preferences.FontFamily);
         Editor.SetWordWrap(_preferenceManager.Preferences.WordWrap);
+        Editor.ShowLineNumbers(_preferenceManager.Preferences.ShowLineNumbers);
         OutputText.FontFamily = new FontFamily(preferences.FontFamily);
 
         _renderingSurface.SetMaxVisibleDatagridRows(preferences.MaxDataGridRows);
@@ -433,5 +434,12 @@ public partial class MainWindow : Window
     {
         _preferenceManager.Preferences.WordWrap = !_preferenceManager.Preferences.WordWrap;
         UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+    }
+
+    private void ToggleLineNumbers(object sender, RoutedEventArgs e)
+    {
+        _preferenceManager.Preferences.ShowLineNumbers = !_preferenceManager.Preferences.ShowLineNumbers;
+        UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+
     }
 }

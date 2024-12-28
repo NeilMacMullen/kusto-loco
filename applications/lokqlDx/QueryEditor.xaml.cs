@@ -1,8 +1,13 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using NotNullStrings;
 
 namespace lokqlDx;
@@ -13,8 +18,6 @@ namespace lokqlDx;
 /// <remarks>
 ///     The key thing this provides is an event based on SHIFT-ENTER that
 ///     selects text around the cursor and sends it to the RunEvent
-///     In future it would be nice to replace this with a more capable editor
-///     that supports syntax highlighting and other features
 /// </remarks>
 public partial class QueryEditor : UserControl
 {
@@ -31,16 +34,6 @@ public partial class QueryEditor : UserControl
 
     #endregion
 
-    private void Query_OnKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter)
-            if (Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                e.Handled = true;
-                var query = GetTextAroundCursor();
-                if (query.Length > 0) RunEvent?.Invoke(this, new QueryEditorRunEventArgs(query));
-            }
-    }
 
     /// <summary>
     ///     searches for lines around the cursor that contain text
@@ -48,17 +41,30 @@ public partial class QueryEditor : UserControl
     /// <remarks>
     ///     This allows us to easily run multi-line queries
     /// </remarks>
-    public string GetTextAroundCursor()
+    private string GetTextAroundCursor()
     {
         if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
 
-        var i = Query.GetLineIndexFromCharacterIndex(Query.CaretIndex);
-        var sb = new StringBuilder();
-        while (i >= 1 && Query.GetLineText(i - 1).Trim().Length > 0)
-            i--;
-        while (i < Query.LineCount && Query.GetLineText(i).Trim().Length > 0)
+        var i = Query
+            .Document.GetLineByOffset(Query.CaretOffset).LineNumber;
+
+        string GetLineForDocumentLine(DocumentLine line)
         {
-            sb.Append(Query.GetLineText(i));
+            return Query.Document.GetText(line.Offset, line.Length);
+        }
+
+        string GetLineForLine(int line)
+        {
+            return GetLineForDocumentLine(Query.Document.GetLineByNumber(line));
+        }
+
+        var sb = new StringBuilder();
+
+        while (i > 1 && GetLineForLine(i - 1).Trim().Length > 0)
+            i--;
+        while (i <= Query.LineCount && GetLineForLine(i).Trim().Length > 0)
+        {
+            sb.AppendLine(GetLineForLine(i));
             i++;
         }
 
@@ -74,10 +80,12 @@ public partial class QueryEditor : UserControl
     {
         Query.Text = text;
     }
+
     public void SetFont(string font)
     {
         Query.FontFamily = new FontFamily(font);
     }
+
     public string GetText()
     {
         return Query.Text;
@@ -101,10 +109,10 @@ public partial class QueryEditor : UserControl
             e.Handled = true;
     }
 
-    private void InsertAtCursor(string newString)
+    private void InsertAtCursor(string text)
     {
-        Query.Text = Query.Text.Insert(Query.CaretIndex, newString);
-        Query.CaretIndex += newString.Length;
+        Query.Document.Insert(Query.CaretOffset, text);
+      
     }
 
     private void TextBox_Drop(object sender, DragEventArgs e)
@@ -118,7 +126,11 @@ public partial class QueryEditor : UserControl
         }
 
         e.Handled = true;
-        string VerbFromExtension(string f) => f.EndsWith(".csl") ? "run" : "load";
+
+        string VerbFromExtension(string f)
+        {
+            return f.EndsWith(".csl") ? "run" : "load";
+        }
     }
 
     private void Query_OnPreviewDragEnter(object sender, DragEventArgs drgevent)
@@ -132,7 +144,7 @@ public partial class QueryEditor : UserControl
             // Get an array with the filenames of the files being dragged
             var files = (string[])drgevent.Data.GetData(DataFormats.FileDrop);
 
-            if (files.Length >0)
+            if (files.Length > 0)
                 drgevent.Effects = DragDropEffects.Move;
             else
                 drgevent.Effects = DragDropEffects.None;
@@ -145,7 +157,31 @@ public partial class QueryEditor : UserControl
 
     public void SetWordWrap(bool wordWrap)
     {
-        Query.TextWrapping = wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        Query.WordWrap = wordWrap;
+    }
+
+    public void ShowLineNumbers(bool show)
+    {
+        Query.ShowLineNumbers = show;
+    }
+
+    private void InternalEditor_OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+            if (Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                e.Handled = true;
+                var query = GetTextAroundCursor();
+                if (query.Length > 0) RunEvent?.Invoke(this, new QueryEditorRunEventArgs(query));
+            }
+    }
+
+    private void QueryEditor_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var s = assembly.GetManifestResourceStream("lokqlDx.SyntaxHighlighting.xml");
+        using var reader = new XmlTextReader(s!);
+        Query.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 }
 
