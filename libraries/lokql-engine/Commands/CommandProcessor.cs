@@ -17,6 +17,7 @@ public class CommandProcessor
     public static CommandProcessor Default()
     {
         return new CommandProcessor()
+            .WithAdditionalCommand<QuickCsvCommand.Options>(QuickCsvCommand.RunAsync)
             .WithAdditionalCommand<AllTablesCommand.Options>(AllTablesCommand.Run)
             .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
             .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.Run)
