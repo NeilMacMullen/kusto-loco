@@ -18,9 +18,8 @@ public class HtmlReport:IReportTarget
         return Composer.Render();
     }
 
-    public Task UpdateOrAddImage(string name, InteractiveTableExplorer exp)
+    public Task UpdateOrAddImage(string name, InteractiveTableExplorer exp, KustoQueryResult result)
     {
-        var result = exp.GetPreviousResult();
         var renderer = new KustoResultRenderer(exp.Settings);
         renderer.RenderToComposer(result, Composer);
         return Task.CompletedTask;

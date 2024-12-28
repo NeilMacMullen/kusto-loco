@@ -107,6 +107,7 @@
             <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
                          Background="Black"
                          FontSize="20"
+                         VerticalScrollBarVisibility="Auto"
                          />
         </Grid>
 

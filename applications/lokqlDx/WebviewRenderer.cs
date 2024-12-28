@@ -1,94 +1,81 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
 using Lokql.Engine.Commands;
-using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 
 namespace lokqlDx;
 
-public class WebviewRenderer : IResultRenderingSurface
+public class WebViewRenderer : IResultRenderingSurface
 {
-    private readonly WebView2 _webview;
     private readonly DataGrid _dataGrid;
+    private readonly TextBox _visibleDataGridRows;
+    private readonly Label _datagridSizeWarning;
     private readonly KustoSettingsProvider _settings;
-    private string _lastContent=string.Empty;
-    private byte[] _image=[];
+    private readonly WebView2 _webView;
 
-    public WebviewRenderer(WebView2 webview,DataGrid datagrid, KustoSettingsProvider settings)
+    public WebViewRenderer(WebView2 webView, DataGrid dataGrid,
+        TextBox visibleDataGridRows,
+        Label datagridSizeWarning,
+        KustoSettingsProvider settings)
     {
-        _webview = webview;
-        _dataGrid = datagrid;
+        _webView = webView;
+        _dataGrid = dataGrid;
+        _visibleDataGridRows = visibleDataGridRows;
+        _datagridSizeWarning = datagridSizeWarning;
         _settings = settings;
     }
 
-    public async Task RenderResult(KustoQueryResult result)
+    public void SetMaxVisibleDatagridRows(int n)
+    {
+        if (n < 1) n = 10000;
+        _visibleDataGridRows.Text = n.ToString();
+    }
+    public int TryGetMaxVisibleDatagridRows()
+    {
+        var maxDataGridRows = int.TryParse(_visibleDataGridRows.Text, out var parsed)
+            ? parsed
+            : 10000;
+        return maxDataGridRows;
+    }
+
+    public async Task RenderToDisplay(KustoQueryResult result)
+    {
+        await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
+    }
+
+    /// <summary>
+    ///     Renders the result to an image using a headless webview
+    /// </summary>
+    public async Task<byte[]> RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
+    {
+        var html = GetHtmlFromResult(result);
+        return await SafeInvoke(async () => { return await WebViewExtensions.RenderToImage(html, pWidth, pHeight); });
+    }
+
+    private string GetHtmlFromResult(KustoQueryResult result)
     {
         var renderer = new KustoResultRenderer(_settings);
-        var html = renderer.RenderToHtml(result);
+        return renderer.RenderToHtml(result);
+    }
+
+    public async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)
+    {
+        var html = GetHtmlFromResult(result);
         //annoying we have to do this, but it's the only way to get the webview to render
-        await _webview.EnsureCoreWebView2Async();
-        await NavigateToStringAsync(_webview.CoreWebView2,html);
+        await _webView.EnsureCoreWebView2Async();
+        await WebViewExtensions.NavigateToStringAsync(_webView.CoreWebView2, html);
         FillInDataGrid(result);
+        return true;
     }
 
-    public async Task RenderToSurface(KustoQueryResult result)
+    public async Task<T> SafeInvoke<T>(Func<Task<T>> func)
     {
-        await Application.Current.Dispatcher.Invoke(async () => { await RenderResult(result); });
-    }
-    static readonly IntPtr HWND_MESSAGE = new IntPtr( -3 );
-
-    public async Task<byte[]> GetImage(double pWidth, double pHeight)
-    {
-      
-       
-        return await Application.Current.Dispatcher.Invoke(async () =>
-        {
-
-            var environment=await CoreWebView2Environment.CreateAsync();
-            var browserController = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
-            var bounds = new Rectangle(0, 0, (int)pWidth, (int)pHeight);
-            browserController.Bounds = bounds;
-            //browserController.SetBoundsAndZoomFactor(bounds,1);
-             await NavigateToStringAsync(browserController.CoreWebView2, _lastContent);
-          
-             browserController.Close();
-            File.WriteAllBytes(@$"C:\temp\debug_{(int)pWidth}x{(int)pHeight}.png",_image);
-            return _image;
-        });
-        
-
-
+        return await Application.Current.Dispatcher.Invoke(func);
     }
 
-    public async Task NavigateToStringAsync(CoreWebView2 webview, string htmlContent)
-    {
-        _lastContent = htmlContent;
-        var tcs = new TaskCompletionSource<bool>();
-
-        void NavigationCompletedHandler(object sender, CoreWebView2NavigationCompletedEventArgs e)
-        {
-            webview.NavigationCompleted -= NavigationCompletedHandler!;
-            tcs.SetResult(true);
-        }
-
-        webview.NavigationCompleted += NavigationCompletedHandler!;
-        webview.NavigateToString(htmlContent);
-
-        await tcs.Task;
-
-        var strm = new MemoryStream();
-        await webview.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, strm);
-        _image = strm.GetBuffer();
-      
-
-    }
-
- 
 
     private void FillInDataGrid(KustoQueryResult result)
     {
@@ -99,7 +86,12 @@ public class WebviewRenderer : IResultRenderingSurface
             return;
         }
 
-        var dt = result.ToDataTable(10000);
+        var maxDataGridRows = TryGetMaxVisibleDatagridRows();
+
+        _datagridSizeWarning.Visibility =
+            result.RowCount > maxDataGridRows ? Visibility.Visible : Visibility.Collapsed;
+        var dt = result.ToDataTable(maxDataGridRows);
         _dataGrid.ItemsSource = dt.DefaultView;
     }
+
 }

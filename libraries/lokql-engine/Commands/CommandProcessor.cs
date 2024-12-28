@@ -42,8 +42,9 @@ public class CommandProcessor
             .WithAdditionalCommand<RenderTableToReportCommand.Options>(RenderTableToReportCommand.Run)
             .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.Run)
             .WithAdditionalCommand<EndReportCommand.Options>(EndReportCommand.Run)
-            .WithAdditionalCommand<RenderTableToText.Options>(RenderTableToText.Run);
-
+            .WithAdditionalCommand<RenderTableToText.Options>(RenderTableToText.Run)
+            .WithAdditionalCommand<PushCommand.Options>(PushCommand.RunAsync)
+            .WithAdditionalCommand<PullCommand.Options>(PullCommand.RunAsync);
     }
 
     public CommandProcessor WithAdditionalCommand<T>(Func<CommandProcessorContext, T, Task> registration)

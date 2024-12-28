@@ -1,11 +1,9 @@
-﻿using DocumentFormat.OpenXml.Linq;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using NotNullStrings;
 using ShapeCrawler;
 
 namespace Lokql.Engine.Commands;
 
-// see https://github.com/MicrosoftEdge/WebView2Feedback/issues/3453
 public class PptReportTarget : IReportTarget
 {
     private readonly Presentation _pres;
@@ -15,31 +13,10 @@ public class PptReportTarget : IReportTarget
         _pres = pres;
     }
 
-    public  async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer)
+    public async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
     {
         var surface = explorer.GetRenderingSurface();
-        await UpdateOrAddImage(name, surface);
-    }
-
-    public async Task UpdateOrAddImage(string name, IResultRenderingSurface surface)
-    {
-        
-        var matchingPictures = FindMatches<IPicture>(name);
-        if (matchingPictures.Any())
-        {
-            foreach (var p in matchingPictures)
-            {
-                var data = await surface.GetImage((double)p.Width,(double)p.Height);
-                p.Image!.Update(data);
-            }
-        }
-        else
-        {
-            var slide = AddSlide();
-            var data = await surface.GetImage(800,600);
-            slide.Shapes.AddPicture(new MemoryStream(data));
-            File.WriteAllBytes(@"C:\temp\debug.png",data);
-        }
+        await UpdateOrAddImage(name, surface, result);
     }
 
     public void UpdateOrAddText(string name, string text)
@@ -52,22 +29,20 @@ public class PptReportTarget : IReportTarget
 
     public void UpdateOrAddTable(string name, KustoQueryResult res)
     {
-       
         var matchingTables = FindMatches<ITable>(name);
 
         if (matchingTables.Any())
         {
-            var requiredRows = res.RowCount + 1; //add 1 for header
-            var requiredColumns = res.ColumnCount;
+            var requiredRows = AllowableRowCount(res.RowCount + 1); //add 1 for header
+            var requiredColumns = AllowableColumnCount(res.ColumnCount);
             foreach (var existingTable in matchingTables)
             {
                 while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
                 while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
                 while (existingTable.Columns.Count > requiredColumns) existingTable.RemoveColumnAt(0);
-                //TODO - fix this up when next shapecrawler release
                 while (existingTable.Columns.Count < requiredColumns)
-                    existingTable.InsertColumnAfter(existingTable.Columns.Count);
-                //existingTable.AddColumn();
+              //      existingTable.InsertColumnAfter(existingTable.Columns.Count);
+                existingTable.AddColumn();
                 FillTable(existingTable);
             }
         }
@@ -86,7 +61,7 @@ public class PptReportTarget : IReportTarget
         void FillTable(ITable addedTable)
         {
             var col = 0;
-            var maxColumns = Math.Min(res.ColumnCount, addedTable.Columns.Count);
+            var maxColumns = AllowableColumnCount(Math.Min(res.ColumnCount, addedTable.Columns.Count));
             foreach (var header in res.ColumnNames().Take(maxColumns))
             {
                 var cell = addedTable[0, col];
@@ -96,7 +71,7 @@ public class PptReportTarget : IReportTarget
 
 
             for (var c = 0; c < maxColumns; c++)
-            for (var r = 0; r < res.RowCount; r++)
+            for (var r = 0; r < AllowableRowCount(res.RowCount); r++)
             {
                 var cell = addedTable[r + 1, c];
                 cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
@@ -108,6 +83,35 @@ public class PptReportTarget : IReportTarget
     public void SaveAs(string name)
     {
         _pres.SaveAs(name);
+    }
+
+    private async Task UpdateOrAddImage(string name, IResultRenderingSurface surface, KustoQueryResult result)
+    {
+        var matchingPictures = FindMatches<IPicture>(name);
+        if (matchingPictures.Any())
+        {
+            foreach (var p in matchingPictures)
+            {
+                var data = await surface.RenderToImage(result, (double)p.Width, (double)p.Height);
+                p.Image!.Update(data);
+            }
+        }
+        else
+        {
+            var slide = AddSlide();
+            var data = await surface.RenderToImage(result, 800, 600);
+            slide.Shapes.AddPicture(new MemoryStream(data));
+        }
+    }
+
+    private int AllowableColumnCount(int wanted)
+    {
+        return Math.Min(wanted, 100);
+    }
+
+    private int AllowableRowCount(int wanted)
+    {
+        return Math.Min(wanted, 100);
     }
 
     private ISlide AddSlide()

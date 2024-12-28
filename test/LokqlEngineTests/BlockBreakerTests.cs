@@ -82,17 +82,29 @@ public class BlockBreakerTests
     {
         var block1 = " # this is a query";
         var block2 = @"table
-| where a>5";
-        var block3 = " // this is also comment";
-        var block4 = ".set xyz def";
+| where a>5
+// this is a kusto comment
+| where A > 3";
+        var block3 = ".set xyz def";
         var query = $@"{block1}
 {block2}
-{block3}
-{block4}";
+{block3}";
         var blockBreaker = new BlockBreaker(query);
-        blockBreaker.Blocks.Length.Should().Be(4);
-        CheckSimilar(blockBreaker.Blocks, [block1, block2, block3,block4]);
+        blockBreaker.Blocks.Length.Should().Be(3);
+        CheckSimilar(blockBreaker.Blocks, [block1, block2, block3]);
     }
 
-
+    [TestMethod]
+    public void BlockIsNotBrokenAtKustoComments()
+    {
+        var block1 = @"table
+| where a>5";
+        var block2 = " // this is also comment";
+        var block3 = "| where a > 3";
+        var query = $@"{block1}
+{block2}
+{block3}";
+        var blockBreaker = new BlockBreaker(query);
+        blockBreaker.Blocks.Length.Should().Be(1);
+    }
 }

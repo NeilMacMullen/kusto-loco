@@ -65,7 +65,6 @@ public class BlockBreaker
     private static bool IsSingleLineCommand(string trimmedLine)
     {
         return trimmedLine.StartsWith(".") ||
-               trimmedLine.StartsWith("#") ||
-               trimmedLine.StartsWith("//");
+               trimmedLine.StartsWith("#");
     }
 }

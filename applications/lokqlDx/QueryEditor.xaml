@@ -22,6 +22,7 @@
           Drop="TextBox_Drop"
           PreviewDragEnter="Query_OnPreviewDragEnter"
           TextWrapping="Wrap"
+          VerticalScrollBarVisibility="Auto"
         />
     </DockPanel>
 </UserControl>

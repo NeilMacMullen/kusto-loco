@@ -24,7 +24,7 @@ public static class PushCommand
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-       // var res =await exp.PushResult(o.Name,exp.GetPreviousResult());
+        exp._resultHistory.Save(o.Name);
        await Task.CompletedTask;
     }
 
@@ -42,10 +42,8 @@ public static class PullCommand
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-       // var res = await exp.PopResult(o.Name);
-        //todo - need some cue to rerender
-   //     exp.InjectResult(res);
-   await Task.CompletedTask;
+        var res = exp._resultHistory.Fetch(o.Name);
+        await exp.InjectResult(res);
     }
 
     [Verb("pop", aliases: ["sv"], HelpText = "keeps a result in memory ")]

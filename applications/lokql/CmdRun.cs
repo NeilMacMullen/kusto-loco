@@ -2,6 +2,7 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
+using Lokql.Engine.Commands;
 using NLog;
 
 /// <summary>
@@ -19,10 +20,10 @@ internal class CmdRun
         var loader = new StandardFormatAdaptor(settings, console);
         loader.SetDataPaths(options.Data);
         var processor = CommandProcessorProvider.GetCommandProcessor();
-        var explorer = new InteractiveTableExplorer(console, loader, settings, processor);
+        var renderer = new NullResultRenderingSurface();
+        var explorer = new InteractiveTableExplorer(console, loader, settings, processor,renderer);
         var block = File.ReadAllText(options.Run);
         await explorer.RunInput(block);
-       
     }
 
 
@@ -42,10 +43,8 @@ internal class CmdRun
     [Verb("run", HelpText = "runs a lokqldx workspace in its entirety")]
     public class Options
     {
-      
         [Option(HelpText = "Default folder to load/save data/results to")]
         public string Data { get; set; } = string.Empty;
-
 
 
         [Option(HelpText = "Runs a script at startup")]
