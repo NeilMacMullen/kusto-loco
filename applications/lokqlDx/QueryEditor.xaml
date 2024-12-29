@@ -22,6 +22,7 @@
       AllowDrop="True"
       PreviewDragOver="TextBox_PreviewDragOver"
       Drop="TextBox_Drop"
-      PreviewDragEnter="Query_OnPreviewDragEnter" />
+      PreviewDragEnter="Query_OnPreviewDragEnter"
+      />
   </DockPanel>
 </UserControl>

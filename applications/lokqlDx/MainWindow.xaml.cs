@@ -122,6 +122,8 @@ public partial class MainWindow : Window
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
+        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs().Select(v=>
+            new IntellisenseEntry(v.Key,v.Value,string.Empty)).ToArray());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
 

@@ -1,5 +1,9 @@
 ﻿using System.Collections.Immutable;
+using System.CommandLine.Help;
 using System.CommandLine.Parsing;
+using System.Reflection;
+using CommandLine;
+using CommandLine.Text;
 
 namespace Lokql.Engine.Commands;
 
@@ -67,16 +71,28 @@ public class CommandProcessor
 
         var table = _registrations.Keys.ToArray();
 
-        var result = StandardParsers.CreateWithHelpWriter(textWriter)
+          var result = StandardParsers.CreateWithHelpWriter(textWriter)
             .ParseArguments(tokens, table);
 
         var context = new CommandProcessorContext(exp, sequence);
         foreach (var registration in _registrations)
         {
-            Func<object, Task> func = async o => { await registration.Value(context, o); };
-            await result.TryAsync(registration.Key, func);
+            async Task Func(object o)
+            {
+                await registration.Value(context, o);
+            }
+
+            await result.TryAsync(registration.Key, Func);
         }
 
         exp.Info(textWriter.ToString());
+    }
+
+    public Dictionary<string, string> GetVerbs()
+    {
+        return _registrations.Keys
+            .SelectMany(t => t.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
+            .OfType<VerbAttribute>()
+            .ToDictionary(a => a.Name, a => a.HelpText);
     }
 }

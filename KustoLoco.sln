@@ -84,6 +84,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppInsightsSupport", "libra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LokqlEngineTests", "test\LokqlEngineTests\LokqlEngineTests.csproj", "{16A14511-618F-44F4-B09C-4C68BAF932CC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectUtilities", "ProjectUtilities", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntellisenseHelper", "utilities\IntellisenseHelper\IntellisenseHelper.csproj", "{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -194,6 +198,10 @@ Global
 		{16A14511-618F-44F4-B09C-4C68BAF932CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16A14511-618F-44F4-B09C-4C68BAF932CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16A14511-618F-44F4-B09C-4C68BAF932CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -226,6 +234,7 @@ Global
 		{32E26ABF-C631-405E-8EFB-1AD08A30CF5E} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{F01F2BDA-7EA1-4658-BE44-CAD85B306D1D} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{16A14511-618F-44F4-B09C-4C68BAF932CC} = {932C804C-F6B7-4361-8360-E5238938E464}
+		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
