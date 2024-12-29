@@ -69,6 +69,15 @@ public class InteractiveTableExplorer
         return _context;
     }
 
+    public string [] GetColumnNames()
+    {
+       return  _context.Tables().SelectMany(t=>t.ColumnNames)
+          .Distinct().ToArray();
+    }
+    public string[] GetTableNames()
+    {
+        return _context.TableNames.ToArray();
+    }
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
         _outputConsole.ForegroundColor = ConsoleColor.Green;

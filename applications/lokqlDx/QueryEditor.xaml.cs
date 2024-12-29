@@ -26,8 +26,10 @@ namespace lokqlDx;
 public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper editorHelper;
+    private IntellisenseEntry[] _columnNames = [];
     private IntellisenseEntry[] _internalCommands = [];
     private bool _isBusy;
+    private IntellisenseEntry[] _tableNames = [];
     private CompletionWindow? completionWindow;
     private IntellisenseEntry[] KqlFunctionEntries = [];
 
@@ -190,12 +192,12 @@ public partial class QueryEditor : UserControl
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
     }
 
-    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions,string prefix)
+    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
     {
         completionWindow = new CompletionWindow(Query.TextArea);
         IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
         foreach (var k in completions.OrderBy(k => k.Name))
-            data.Add(new MyCompletionData(k,prefix));
+            data.Add(new MyCompletionData(k, prefix, rewind));
         completionWindow.Show();
         completionWindow.Closed += delegate { completionWindow = null; };
     }
@@ -207,25 +209,32 @@ public partial class QueryEditor : UserControl
             //only show completions if we are at the start of a line
             var textToLeft = editorHelper.TextToLeftOfCaret();
             if (textToLeft.TrimStart() == ".")
-                ShowCompletions(_internalCommands,string.Empty);
+                ShowCompletions(_internalCommands, string.Empty, 0);
             return;
         }
 
-        if (e.Text == "|")
-        {
-            ShowCompletions(KqlOperatorEntries," ");
-            return;
-        }
         if (e.Text == " ")
         {
             var textToLeft = editorHelper.TextToLeftOfCaret();
-            if (textToLeft.Contains('|'))
+
+            if (textToLeft.Trim().EndsWith('|'))
             {
-                ShowCompletions(KqlFunctionEntries,string.Empty);
+                ShowCompletions(KqlOperatorEntries, " ", 0);
+                return;
             }
+
+            if (textToLeft.Trim().Contains('|')) ShowCompletions(KqlFunctionEntries, string.Empty, 0);
 
             return;
         }
+
+        if (e.Text == "@")
+        {
+            ShowCompletions(_columnNames, string.Empty, 1);
+            return;
+        }
+
+        if (e.Text == "[") ShowCompletions(_tableNames, string.Empty, 1);
     }
 
     public void AddInternalCommands(IntellisenseEntry[] verbs)
@@ -243,6 +252,18 @@ public partial class QueryEditor : UserControl
         // Do not set e.Handled=true.
         // We still want to insert the character that was typed.
     }
+
+    public void SetColumnNames(string[] getTablesAndSchemas)
+    {
+        _columnNames = getTablesAndSchemas.Select(t => new IntellisenseEntry(t, "Column", t))
+            .ToArray();
+    }
+
+    public void SetTableNames(string[] getTablesAndSchemas)
+    {
+        _tableNames = getTablesAndSchemas.Select(t => new IntellisenseEntry(t, "Table", t))
+            .ToArray();
+    }
 }
 
 public class QueryEditorRunEventArgs(string query) : EventArgs
@@ -252,7 +273,7 @@ public class QueryEditorRunEventArgs(string query) : EventArgs
 
 /// Implements AvalonEdit ICompletionData interface to provide the entries in the
 /// completion drop down.
-public class MyCompletionData(IntellisenseEntry entry,string prefix) : ICompletionData
+public class MyCompletionData(IntellisenseEntry entry, string prefix, int rewind) : ICompletionData
 {
     public ImageSource? Image => null;
 
@@ -270,7 +291,10 @@ Usage: {entry.Syntax}";
     public void Complete(TextArea textArea, ISegment completionSegment,
         EventArgs insertionRequestEventArgs)
     {
-        textArea.Document.Replace(completionSegment, prefix+ Text);
+        var seg = new TextSegment();
+        seg.StartOffset = completionSegment.Offset - rewind;
+        seg.Length = completionSegment.Length + rewind;
+        textArea.Document.Replace(seg, prefix + Text);
     }
 }
 
