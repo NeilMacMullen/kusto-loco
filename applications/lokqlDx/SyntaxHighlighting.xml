@@ -4,7 +4,7 @@
 	<Color name="Comment" foreground="#b6ea8b" />
 	<Color name="String" foreground="#ce9178" />
 	<Color name="ScriptComment" foreground="Blue" />
-	<Color name="InternalCommand" foreground="#a935c6" />
+	<Color name="InternalCommand" foreground="#b65fff" />
 
 	<!-- This is the main ruleset. -->
 	<RuleSet>
@@ -36,10 +36,12 @@
 			<Word>project</Word>
 			<Word>project-away</Word>
 			<Word>project-keep</Word>
+			<Word>project-rename</Word>
 			<Word>extend</Word>
 			<Word>summarize</Word>
 			<Word>render</Word>
 			<Word>contains</Word>
+			<Word>join</Word>
 
 		</Keywords>
 

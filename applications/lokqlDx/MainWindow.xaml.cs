@@ -42,8 +42,8 @@ public partial class MainWindow : Window
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
         _renderingSurface = new WebViewRenderer(webview, dataGrid,
-            VisibleDataGridRows, DatagridOverflowWarning,
-            settings);
+                                                VisibleDataGridRows, DatagridOverflowWarning,
+                                                settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
     }
 
@@ -62,6 +62,7 @@ public partial class MainWindow : Window
         await Task.Run(async () => await _explorer.RunInput(query));
         Editor.SetColumnNames(_explorer.GetColumnNames());
         Editor.SetTableNames(_explorer.GetTableNames());
+        Editor.AddSettingsForIntellisense(_explorer.Settings);
         Editor.SetBusy(false);
         isBusy = false;
     }
@@ -82,7 +83,7 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings,
-            CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+                                                 CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
         UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path.OrWhenBlank("new workspace")}";
     }
@@ -93,10 +94,10 @@ public partial class MainWindow : Window
         foreach (var mruItem in _mruList.GetItems())
         {
             var menuitem = new MenuItem
-            {
-                Header = mruItem.Description,
-                DataContext = mruItem
-            };
+                           {
+                               Header = mruItem.Description,
+                               DataContext = mruItem
+                           };
             menuitem.Click += RecentlyUsedFileClicked;
             RecentlyUsed.Items.Add(menuitem);
         }
@@ -124,8 +125,10 @@ public partial class MainWindow : Window
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs().Select(v=>
-            new IntellisenseEntry(v.Key,v.Value,string.Empty)).ToArray());
+        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
+                                            .Select(v =>
+                                                        new IntellisenseEntry(v.Key, v.Value, string.Empty))
+                                            .ToArray());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
 
@@ -138,18 +141,18 @@ public partial class MainWindow : Window
         if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
         {
             Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
-                ? _minWindowSize.Width
-                : _preferenceManager.Preferences.WindowWidth;
+                        ? _minWindowSize.Width
+                        : _preferenceManager.Preferences.WindowWidth;
             Height = _preferenceManager.Preferences.WindowHeight < _minWindowSize.Height
-                ? _minWindowSize.Height
-                : _preferenceManager.Preferences.WindowHeight;
+                         ? _minWindowSize.Height
+                         : _preferenceManager.Preferences.WindowHeight;
             Left = _preferenceManager.Preferences.WindowLeft;
             Top = _preferenceManager.Preferences.WindowTop;
         }
 
         var pathToLoad = _args.Any()
-            ? _args[0]
-            : string.Empty;
+                             ? _args[0]
+                             : string.Empty;
         await LoadWorkspace(pathToLoad);
         await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
     }
@@ -209,11 +212,11 @@ public partial class MainWindow : Window
     {
         var folder = _workspaceManager.ContainingFolder();
         var dialog = new OpenFileDialog
-        {
-            InitialDirectory = folder,
-            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager.Path)
-        };
+                     {
+                         InitialDirectory = folder,
+                         Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
+                         FileName = Path.GetFileName(_workspaceManager.Path)
+                     };
 
         if (dialog.ShowDialog() == true)
             await LoadWorkspace(dialog.FileName);
@@ -247,10 +250,10 @@ public partial class MainWindow : Window
     private bool SaveAs()
     {
         var dialog = new SaveFileDialog
-        {
-            Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
-            FileName = Path.GetFileName(_workspaceManager.Path)
-        };
+                     {
+                         Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
+                         FileName = Path.GetFileName(_workspaceManager.Path)
+                     };
         if (dialog.ShowDialog() == true)
         {
             SaveWorkspace(dialog.FileName);
@@ -321,7 +324,7 @@ public partial class MainWindow : Window
     private async void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
     {
         await Navigate(
-            "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
+                       "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
     }
 
     private void EnableJumpList(object sender, RoutedEventArgs e)
@@ -340,8 +343,8 @@ public partial class MainWindow : Window
                 var sb = new StringBuilder();
                 sb.AppendLine($"The table named '{table.Name}' has the following columns");
                 var cols = table.ColumnNames.Zip(table.Type.Columns)
-                    .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
-                    .ToArray();
+                                .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
+                                .ToArray();
                 foreach (var column in cols) sb.AppendLine(column);
                 _copilot.AddSystemInstructions(sb.ToString());
             }
@@ -410,9 +413,9 @@ public partial class MainWindow : Window
     private void OpenApplicationOptionsDialog(object sender, RoutedEventArgs e)
     {
         var dialog = new ApplicationPreferencesWindow(_preferenceManager.Preferences)
-        {
-            Owner = this
-        };
+                     {
+                         Owner = this
+                     };
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save();
@@ -424,9 +427,9 @@ public partial class MainWindow : Window
     {
         UpdateCurrentWorkspaceFromUI();
         var dialog = new WorkspacePreferencesWindow(currentWorkspace)
-        {
-            Owner = this
-        };
+                     {
+                         Owner = this
+                     };
         if (dialog.ShowDialog() == true)
         {
             currentWorkspace = dialog._workspace;
@@ -444,6 +447,5 @@ public partial class MainWindow : Window
     {
         _preferenceManager.Preferences.ShowLineNumbers = !_preferenceManager.Preferences.ShowLineNumbers;
         UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
-
     }
 }

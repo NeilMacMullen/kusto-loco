@@ -358,5 +358,35 @@
     "Name": "url_encode_component",
     "Description": "The function converts characters of the input URL into a format that can be transmitted over the internet. Differs from [url_encode](./urlencodefunction.md) by encoding spaces as \u0027%20\u0027 and not as \u0027\u002B\u0027.\r\n\r\nFor more information about URL encoding and decoding, see [Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding).",
     "Syntax": "\u0060url_encode_component(\u0060*url*\u0060)\u0060"
+  },
+  {
+    "Name": "contains_cs",
+    "Description": "Filters a record set for data containing a case-sensitive string. \u0060contains_cs\u0060 searches for arbitrary sub-strings rather than [terms](datatypes-string-operators.md#what-is-a-term).\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060has_cs\u0060 for faster results."
+  },
+  {
+    "Name": "contains",
+    "Description": "Filters a record set for data containing a case-insensitive string. \u0060contains\u0060 searches for arbitrary sub-strings rather than [terms](datatypes-string-operators.md#what-is-a-term).\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nWhen possible, use [contains_cs](contains-cs-operator.md) - a case-sensitive version of the operator.\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060has\u0060 for faster results."
+  },
+  {
+    "Name": "!contains_cs",
+    "Description": "Filters a record set for data that doesn\u0027t include a case-sensitive string. \u0060!contains_cs\u0060 searches for characters rather than [terms](datatypes-string-operators.md#what-is-a-term) of three or more characters. The query scans the values in the column, which is slower than looking up a term in a term index.\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060!has_cs\u0060 for faster results."
+  },
+  {
+    "Name": "!contains",
+    "Description": "Filters a record set for data that doesn\u0027t include a case-sensitive string. \u0060!contains\u0060 searches for characters rather than [terms](datatypes-string-operators.md#what-is-a-term) of three or more characters. The query scans the values in the column, which is slower than looking up a term in a term index.\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nWhen possible, use the case-sensitive [!contains_cs](not-contains-cs-operator.md).\r\n\r\nUse \u0060!has\u0060 if you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term)."
+  },
+  {
+    "Name": "between",
+    "Description": "Filters a record set for data matching the values in an inclusive range.\r\n\r\n\u0060between\u0060 can operate on any numeric, datetime, or timespan expression.",
+    "Syntax": "*T* \u0060|\u0060 \u0060where\u0060 *expr* \u0060between\u0060 \u0060(\u0060*leftRange*\u0060 .. \u0060*rightRange*\u0060)\u0060"
+  },
+  {
+    "Name": "!between",
+    "Description": "Matches the input that is outside of the inclusive range.\r\n\r\n\u0060!between\u0060 can operate on any numeric, datetime, or timespan expression.",
+    "Syntax": "*T* \u0060|\u0060 \u0060where\u0060 *expr* \u0060!between\u0060 \u0060(\u0060*leftRange*\u0060 .. \u0060*rightRange*\u0060)\u0060"
   }
 ]

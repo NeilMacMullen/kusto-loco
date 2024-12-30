@@ -15,10 +15,7 @@ public class WpfConsole : IKustoConsole
     private readonly RichTextBox _control;
 
 
-    public WpfConsole(RichTextBox control)
-    {
-        _control = control;
-    }
+    public WpfConsole(RichTextBox control) => _control = control;
 
     //calculate the number of visible columns in the RichTextBox
     public int VisibleColumns
@@ -26,12 +23,12 @@ public class WpfConsole : IKustoConsole
         get
         {
             var typeface = new Typeface(_control.FontFamily, _control.FontStyle, _control.FontWeight,
-                _control.FontStretch);
+                                        _control.FontStretch);
             var n = 50;
-            var formattedText = new FormattedText("".PadRight(n, 'w'), CultureInfo.InvariantCulture,
-                FlowDirection.LeftToRight,
-                typeface, _control.FontSize, Brushes.Black,
-                VisualTreeHelper.GetDpi(_control).PixelsPerDip);
+            var formattedText = new FormattedText(string.Empty.PadRight(n, 'w'), CultureInfo.InvariantCulture,
+                                                  FlowDirection.LeftToRight,
+                                                  typeface, _control.FontSize, Brushes.Black,
+                                                  VisualTreeHelper.GetDpi(_control).PixelsPerDip);
             return (int)(_control.ActualWidth * n * 0.9 / formattedText.WidthIncludingTrailingWhitespace);
         }
     }
@@ -49,10 +46,7 @@ public class WpfConsole : IKustoConsole
     public int WindowWidth { get; private set; }
 
 
-    public string ReadLine()
-    {
-        return string.Empty;
-    }
+    public string ReadLine() => string.Empty;
 
     /// <summary>
     ///     Prepare for new text output and calculate the width of the console window
@@ -60,27 +54,27 @@ public class WpfConsole : IKustoConsole
     public void PrepareForOutput()
     {
         Application.Current.Dispatcher.Invoke(() =>
-        {
-            _control.Document.Blocks.Clear();
-            _control.Document.LineHeight = 1;
-            WindowWidth = Math.Max(10, VisibleColumns);
-            //TODO - works around some weirdness in the RichTextBox control
-            //that causes it to not render a newline after the first line of text
-            AppendText(_control,"\r\n",Brushes.Black);
-        });
+                                              {
+                                                  _control.Document.Blocks.Clear();
+                                                  _control.Document.LineHeight = 1;
+                                                  WindowWidth = Math.Max(10, VisibleColumns);
+                                                  //TODO - works around some weirdness in the RichTextBox control
+                                                  //that causes it to not render a newline after the first line of text
+                                                  AppendText(_control, "\r\n", Brushes.Black);
+                                              });
     }
 
 
     private static void AppendText(RichTextBox box, string text, Brush color)
     {
         var tr = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd)
-        {
-            Text = text
-        };
+                 {
+                     Text = text
+                 };
         try
         {
             tr.ApplyPropertyValue(TextElement.ForegroundProperty,
-                color);
+                                  color);
         }
         catch (FormatException)
         {
@@ -139,5 +133,4 @@ public class WpfConsole : IKustoConsole
     }
 
     private readonly record struct ColoredText(ConsoleColor Color, string Text);
-   
 }
