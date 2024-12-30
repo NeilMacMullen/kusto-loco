@@ -72,12 +72,19 @@ public class InteractiveTableExplorer
     public string [] GetColumnNames()
     {
        return  _context.Tables().SelectMany(t=>t.ColumnNames)
-          .Distinct().ToArray();
+
+           .Distinct()
+           .Select(EnsureEscaped)
+          .ToArray();
     }
-    public string[] GetTableNames()
-    {
-        return _context.TableNames.ToArray();
-    }
+
+    private string EnsureEscaped(string name) =>
+        (name.Any(c=>!char.IsLetterOrDigit(c)))
+            ? KustoNameEscaping.EnsureFraming(name)
+            :name;
+
+    public string[] GetTableNames() => _context.TableNames.Select(EnsureEscaped).ToArray();
+
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
         _outputConsole.ForegroundColor = ConsoleColor.Green;
