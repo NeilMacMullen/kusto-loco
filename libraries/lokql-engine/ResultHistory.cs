@@ -1,25 +1,33 @@
-﻿using KustoLoco.Core;
+﻿using System.Collections.Immutable;
+using KustoLoco.Core;
 using NotNullStrings;
 
 namespace Lokql.Engine;
 
 public class ResultHistory
 {
-    public KustoQueryResult _mostRecent = KustoQueryResult.Empty;
-    private readonly Dictionary<string, KustoQueryResult> _results = new();
+    private ImmutableList<StoredResult> _results = [];
 
 
-    public KustoQueryResult MostRecent => _mostRecent;
+    public KustoQueryResult MostRecent { get; private set; } = KustoQueryResult.Empty;
+
 
     public void Push(KustoQueryResult result)
     {
-        _mostRecent = result;
+        MostRecent = result;
     }
 
     public void Save(string name)
     {
-        _results[name] = _mostRecent;
+        _results = _results
+            .Where(r=>! r.Name.Equals(name,StringComparison.InvariantCultureIgnoreCase))
+            .Append(new StoredResult(name, DateTime.Now, MostRecent))
+            .ToImmutableList();
+        
     }
+    private readonly StoredResult _nullStoredResult = new(string.Empty,
+    DateTime.MinValue, KustoQueryResult.Empty);
+
     /// <summary>
     /// Get a stored result by name
     /// </summary>
@@ -30,8 +38,16 @@ public class ResultHistory
     {
         return name.IsBlank()
             ? MostRecent
-            : _results.TryGetValue(name, out var found)
-                ? found
-                : KustoQueryResult.Empty;
+            : _results.Where(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                .Append(_nullStoredResult)
+                .First(_ => true).Result;
+
     }
+
+    public ImmutableList<StoredResult> List()
+    {
+        return _results;
+    }
+
+    public readonly record struct StoredResult(string Name, DateTime Timestamp, KustoQueryResult Result);
 }

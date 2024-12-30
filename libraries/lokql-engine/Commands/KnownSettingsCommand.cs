@@ -20,7 +20,10 @@ public static class KnownSettingsCommand
         return Task.CompletedTask;
     }
 
-    [Verb("knownsettings", HelpText = "lists all setting definitions known to the engine")]
+    [Verb("knownsettings", HelpText = @"lists all setting definitions known to the engine
+Examples:
+  .knownsettings         #show all known settings
+  .knownsettings csv     #show known settings that related to csv processing")]
     internal class Options
     {
         [Value(0, HelpText = "match substring", Required = false)]
