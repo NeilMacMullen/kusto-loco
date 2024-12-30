@@ -9,8 +9,8 @@ public readonly record struct CommandProcessorContext(InteractiveTableExplorer E
 
 public class CommandProcessor
 {
-    private ImmutableDictionary<Type, Func<CommandProcessorContext, object, Task>> _registrations
-        = ImmutableDictionary<Type, Func<CommandProcessorContext, object, Task>>.Empty;
+    private ImmutableList<RegisteredCommand>  _registrations
+        = [];
 
     private CommandProcessor()
     {
@@ -52,7 +52,8 @@ public class CommandProcessor
 
     public CommandProcessor WithAdditionalCommand<T>(Func<CommandProcessorContext, T, Task> registration)
     {
-        _registrations = _registrations.Add(typeof(T), (exp, o) => registration(exp, (T)o));
+        _registrations = _registrations.Add(
+            new RegisteredCommand(typeof(T), (exp, o) => registration(exp, (T)o)));
         return this;
     }
 
@@ -67,20 +68,21 @@ public class CommandProcessor
 
         var textWriter = new StringWriter();
 
-        var table = _registrations.Keys.ToArray();
+        var typeTable = _registrations.Select(r=>r.OptionType).ToArray();
 
-        var result = StandardParsers.CreateWithHelpWriter(textWriter)
-            .ParseArguments(tokens, table);
+        var parserResult = StandardParsers
+            .CreateWithHelpWriter(textWriter)
+            .ParseArguments(tokens, typeTable);
 
         var context = new CommandProcessorContext(exp, sequence);
         foreach (var registration in _registrations)
         {
             async Task Func(object o)
             {
-                await registration.Value(context, o);
+                await registration.TaskGeneratingFunction(context, o);
             }
 
-            await result.TryAsync(registration.Key, Func);
+            await parserResult.TryAsync(registration.OptionType, Func);
         }
 
         exp.Info(textWriter.ToString());
@@ -88,9 +90,17 @@ public class CommandProcessor
 
     public Dictionary<string, string> GetVerbs()
     {
-        return _registrations.Keys
-            .SelectMany(t => t.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
+        var verbs= _registrations
+            .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
             .OfType<VerbAttribute>()
             .ToDictionary(a => a.Name, a => a.HelpText);
+        verbs["help"]= @"Shows a list of available commands or help for a specific command
+.help            for a summary of all commands
+.help *command*  for details of a specific command";
+        return verbs;
     }
+
+    private readonly record struct RegisteredCommand(
+        Type OptionType,
+        Func<CommandProcessorContext, object, Task> TaskGeneratingFunction);
 }
