@@ -24,7 +24,6 @@
 
 		</Span>
 
-
 		<Keywords  foreground="#6dabff">
 			<Word>where</Word>
 			<Word>count</Word>
@@ -42,6 +41,8 @@
 			<Word>render</Word>
 			<Word>contains</Word>
 			<Word>join</Word>
+			<Word>distinct</Word>
+
 
 		</Keywords>
 
