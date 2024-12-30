@@ -1,0 +1,392 @@
+[
+  {
+    "Name": "abs",
+    "Description": "Calculates the absolute value of the input.",
+    "Syntax": "\u0060abs(\u0060*x*\u0060)\u0060"
+  },
+  {
+    "Name": "ago",
+    "Description": "Subtracts the given [timespan](scalar-data-types/timespan.md) from the current UTC time.\r\n\r\nLike \u0060now()\u0060, if you use \u0060ago()\u0060 multiple times in a single query statement, the current UTC time\r\nbeing referenced will be the same across all uses.",
+    "Syntax": "\u0060ago(\u0060*timespan*\u0060)\u0060"
+  },
+  {
+    "Name": "array_length",
+    "Description": "Calculates the number of elements in a dynamic array.\r\n\r\n\u003E **Deprecated aliases:** arraylength()",
+    "Syntax": "\u0060array_length(\u0060*array*\u0060)\u0060"
+  },
+  {
+    "Name": "array_sort_asc",
+    "Description": "Receives one or more arrays. Sorts the first array in ascending order. Orders the remaining arrays to match the reordered first array.",
+    "Syntax": "\u0060array_sort_asc(\u0060*array1*[, ..., *argumentN*]\u0060)\u0060\r\n\r\n\u0060array_sort_asc(\u0060*array1*[, ..., *argumentN*]\u0060,\u0060*nulls_last*\u0060)\u0060\r\n\r\nIf *nulls_last* isn\u0027t provided, a default value of \u0060true\u0060 is used."
+  },
+  {
+    "Name": "array_sort_desc",
+    "Description": "Receives one or more arrays. Sorts the first array in descending order. Orders the remaining arrays to match the reordered first array.",
+    "Syntax": "\u0060array_sort_desc(\u0060*array1*[, ..., *argumentN*]\u0060)\u0060\r\n\r\n\u0060array_sort_desc(\u0060*array1*[, ..., *argumentN*]\u0060,\u0060*nulls_last*\u0060)\u0060\r\n\r\nIf *nulls_last* isn\u0027t provided, a default value of \u0060true\u0060 is used."
+  },
+  {
+    "Name": "bin",
+    "Description": "Rounds values down to an integer multiple of a given bin size.\r\n\r\nUsed frequently in combination with [\u0060summarize by ...\u0060](./summarizeoperator.md).\r\nIf you have a scattered set of values, they\u0027ll be grouped into a smaller set of specific values.\r\n\r\n\u003E The \u0060bin()\u0060 and \u0060floor()\u0060 functions are equivalent",
+    "Syntax": "\u0060bin(\u0060*value*\u0060,\u0060*roundTo*\u0060)\u0060"
+  },
+  {
+    "Name": "case",
+    "Description": "Evaluates a list of predicates and returns the first result expression whose predicate is satisfied.\r\n\r\nIf none of the predicates return \u0060true\u0060, the result of the \u0060else\u0060 expression is returned.\r\nAll \u0060predicate\u0060 arguments must be expressions that evaluate to a  \u0060boolean\u0060 value.\r\nAll \u0060then\u0060 arguments and the \u0060else\u0060 argument must be of the same type.",
+    "Syntax": "\u0060case(\u0060*predicate_1*, *then_1*,\r\n       [*predicate_2*, *then_2*, ...]\r\n       *else*\u0060)\u0060"
+  },
+  {
+    "Name": "coalesce",
+    "Description": "Evaluates a list of expressions and returns the first non-null (or non-empty for string) expression.",
+    "Syntax": "\u0060coalesce(\u0060*arg*\u0060,\u0060*arg_2*\u0060,[\u0060*arg_3*\u0060,...])\u0060"
+  },
+  {
+    "Name": "cos",
+    "Description": "Returns the cosine function value of the specified angle. The angle is specified in radians.",
+    "Syntax": "\u0060cos(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "datetime_diff",
+    "Description": "Calculates the number of the specified periods between two [datetime](./scalar-data-types/datetime.md) values.",
+    "Syntax": "\u0060datetime_diff(\u0060*period*\u0060,\u0060*datetime1*\u0060,\u0060*datetime2*\u0060)\u0060"
+  },
+  {
+    "Name": "datetime_part",
+    "Description": "Extracts the requested date part as an integer value.\r\n\r\n\u003E **Deprecated aliases:** datepart()",
+    "Syntax": "\u0060datetime_part(\u0060*part*\u0060,\u0060*datetime*\u0060)\u0060"
+  },
+  {
+    "Name": "datetime_utc_to_local",
+    "Description": "Converts UTC [datetime](./scalar-data-types/datetime.md) to local datetime using a [time-zone specification](timezone.md).",
+    "Syntax": "\u0060datetime_utc_to_local(\u0060*from*\u0060,\u0060*timezone*\u0060)\u0060"
+  },
+  {
+    "Name": "dayofmonth",
+    "Description": "Returns an integer representing the day number of the given datetime.",
+    "Syntax": "\u0060dayofmonth(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "dayofweek",
+    "Description": "Returns the integer number of days since the preceding Sunday, as a \u0060timespan\u0060.",
+    "Syntax": "\u0060dayofweek(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "dayofyear",
+    "Description": "Returns the integer number represents the day number of the given year.",
+    "Syntax": "\u0060dayofyear(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "degrees",
+    "Description": "Converts angle value in radians into value in degrees, using the formula \u0060degrees = (180 / PI ) * angle_in_radians\u0060.",
+    "Syntax": "\u0060degrees(\u0060*radians*\u0060)\u0060"
+  },
+  {
+    "Name": "endofday",
+    "Description": "Returns the end of the day containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060endofday(\u0060*date* [, *offset*]\u0060)\u0060"
+  },
+  {
+    "Name": "endofmonth",
+    "Description": "Returns the end of the month containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060endofmonth(\u0060*date* [, *offset*]\u0060)\u0060"
+  },
+  {
+    "Name": "endofweek",
+    "Description": "Returns the end of the week containing the date, shifted by an offset, if provided.\r\n\r\nLast day of the week is considered to be a Saturday.",
+    "Syntax": "\u0060endofweek(\u0060*date* [, *offset*]\u0060)\u0060"
+  },
+  {
+    "Name": "endofyear",
+    "Description": "Returns the end of the year containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060endofyear(\u0060*date* [, *offset*]\u0060)\u0060"
+  },
+  {
+    "Name": "exp",
+    "Description": "The base-e exponential function of x, which is e raised to the power x: e^x.",
+    "Syntax": "\u0060exp(\u0060*x*\u0060)\u0060"
+  },
+  {
+    "Name": "extract",
+    "Description": "Get a match for a [regular expression](./re2.md) from a source string.\r\n\r\nOptionally, convert the extracted substring to the indicated type.",
+    "Syntax": "\u0060extract(\u0060*regex*\u0060,\u0060 *captureGroup*\u0060,\u0060 *source* [\u0060,\u0060 *typeLiteral*]\u0060)\u0060"
+  },
+  {
+    "Name": "format_datetime",
+    "Description": "Formats a datetime according to the provided format.",
+    "Syntax": "\u0060format_datetime(\u0060*date* \u0060,\u0060 *format*\u0060)\u0060"
+  },
+  {
+    "Name": "geo_distance_2points",
+    "Description": "Calculates the shortest distance in meters between two geospatial coordinates on Earth.",
+    "Syntax": "\u0060geo_distance_2points(\u0060*p1_longitude*\u0060,\u0060*p1_latitude*\u0060,\u0060*p2_longitude*\u0060,\u0060*p2_latitude*\u0060)\u0060"
+  },
+  {
+    "Name": "geo_geohash_to_central_point",
+    "Description": "Calculates the geospatial coordinates that represent the center of a geohash rectangular area.\r\n\r\nRead more about [\u0060geohash\u0060](https://en.wikipedia.org/wiki/Geohash).",
+    "Syntax": "\u0060geo_geohash_to_central_point(\u0060*geohash*\u0060)\u0060"
+  },
+  {
+    "Name": "geo_point_to_geohash",
+    "Description": "Calculates the geohash string value of a geographic location.\r\n\r\nRead more about [geohash](https://en.wikipedia.org/wiki/Geohash).",
+    "Syntax": "\u0060geo_point_to_geohash(\u0060*longitude*\u0060,\u0060 *latitude*\u0060,\u0060[ *accuracy* ]\u0060)\u0060"
+  },
+  {
+    "Name": "getyear",
+    "Description": "Returns the year part of the \u0060datetime\u0060 argument.",
+    "Syntax": "\u0060getyear(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "hourofday",
+    "Description": "Returns the integer number representing the hour number of the given date.",
+    "Syntax": "\u0060hourofday(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "iff",
+    "Description": "Returns the value of *then* if *if* evaluates to \u0060true\u0060,\r\nor the value of *else* otherwise.\r\n\r\n\u003E The \u0060iff()\u0060 and \u0060iif()\u0060 functions are equivalent",
+    "Syntax": "\u0060iff(\u0060*if*\u0060,\u0060 *then*\u0060,\u0060 *else*\u0060)\u0060"
+  },
+  {
+    "Name": "iif",
+    "Description": "Returns the value of *then* if *if* evaluates to \u0060true\u0060,\r\nor the value of *else* otherwise.\r\n\r\nAn alias for [\u0060iff()\u0060](ifffunction.md).",
+    "Syntax": "\u0060iif(\u0060*if*\u0060,\u0060 *then*\u0060,\u0060 *else*\u0060)\u0060"
+  },
+  {
+    "Name": "isempty",
+    "Description": "Returns \u0060true\u0060 if the argument is an empty string or is null.",
+    "Syntax": "\u0060isempty(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "isnull",
+    "Description": "Evaluates its sole argument and returns a \u0060bool\u0060 value indicating if the argument evaluates to a null value.\r\n\r\n\u003E [!NOTE]\r\n\u003E String values can\u0027t be null. Use [isempty](./isemptyfunction.md) to determine if a value of type \u0060string\u0060 is empty or not.",
+    "Syntax": "\u0060isnull(\u0060*Expr*\u0060)\u0060"
+  },
+  {
+    "Name": "log",
+    "Description": "The natural logarithm is the base-e logarithm: the inverse of the natural exponential function (exp).",
+    "Syntax": "\u0060log(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "log10",
+    "Description": "\u0060log10()\u0060 returns the common (base-10) logarithm of the input.",
+    "Syntax": "\u0060log10(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "log2",
+    "Description": "The logarithm is the base-2 logarithm: the inverse of the exponential function (exp) with base 2.",
+    "Syntax": "\u0060log2(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "min_of",
+    "Description": "Returns the minimum value of several evaluated scalar expressions.",
+    "Syntax": "\u0060min_of\u0060 \u0060(\u0060*arg*\u0060,\u0060 *arg_2*\u0060,\u0060 [ *arg_3*, ... ]\u0060)\u0060"
+  },
+  {
+    "Name": "monthofyear",
+    "Description": "Returns the integer number from 1-12 representing the month number of the given year.\r\n\r\n\u003E The \u0060monthofyear()\u0060 and \u0060getmonth()\u0060 functions are equivalent",
+    "Syntax": "\u0060monthofyear(\u0060*date*\u0060)\u0060"
+  },
+  {
+    "Name": "not",
+    "Description": "Reverses the value of its \u0060bool\u0060 argument.",
+    "Syntax": "\u0060not(\u0060*expr*\u0060)\u0060"
+  },
+  {
+    "Name": "now",
+    "Description": "Returns the current UTC time, optionally offset by a given [timespan](scalar-data-types/timespan.md).\r\n\r\nThe current UTC time will stay the same across all uses of \u0060now()\u0060 in a single query statement, even if there\u0027s technically a small time difference between when each \u0060now()\u0060 runs.",
+    "Syntax": "\u0060now(\u0060[ *offset* ]\u0060)\u0060"
+  },
+  {
+    "Name": "parse_json",
+    "Description": "Interprets a \u0060string\u0060 as a JSON value and returns the value as \u0060dynamic\u0060. If possible, the value is converted into relevant [data types](scalar-data-types/index.md).  For strict parsing with no data type conversion, use [extract()](extractfunction.md) or [extract_json()](extractjsonfunction.md) functions.\r\n\r\nIt\u0027s better to use the parse_json() function over the [extract_json()](./extractjsonfunction.md) function when you need to extract more than one element of a JSON compound object. Use [dynamic()](./scalar-data-types/dynamic.md) when possible.\r\n\r\n\u003E **Deprecated aliases:** parsejson(), toobject(), todynamic()",
+    "Syntax": "\u0060parse_json(\u0060*json*\u0060)\u0060"
+  },
+  {
+    "Name": "pow",
+    "Description": "Returns a result of raising to power",
+    "Syntax": "\u0060pow(\u0060*base*\u0060,\u0060 *exponent* \u0060)\u0060"
+  },
+  {
+    "Name": "radians",
+    "Description": "Converts angle value in degrees into value in radians, using formula \u0060radians = (PI / 180 ) * angle_in_degrees\u0060",
+    "Syntax": "\u0060radians(\u0060*degrees*\u0060)\u0060"
+  },
+  {
+    "Name": "replace_string",
+    "Description": "Replaces all string matches with a specified string.\r\n\r\n\u003E **Deprecated aliases:** replace()\r\n\r\nTo replace multiple strings, see [replace_strings()](replace-strings-function.md).",
+    "Syntax": "\u0060replace_string(\u0060*text*\u0060,\u0060 *lookup*\u0060,\u0060 *rewrite*\u0060)\u0060"
+  },
+  {
+    "Name": "round",
+    "Description": "Returns the rounded number to the specified precision.",
+    "Syntax": "\u0060round(\u0060*number* [\u0060,\u0060 *precision*]\u0060)\u0060"
+  },
+  {
+    "Name": "row_number",
+    "Description": "Returns the current row\u0027s index in a [serialized row set](./windowsfunctions.md#serialized-row-set).\r\n\r\nThe row index starts by default at \u00601\u0060 for the first row, and is incremented by \u00601\u0060 for each additional row.\r\nOptionally, the row index can start at a different value than \u00601\u0060.\r\nAdditionally, the row index may be reset according to some provided predicate.",
+    "Syntax": "\u0060row_number(\u0060 [*StartingIndex* [\u0060,\u0060 *Restart*]] \u0060)\u0060\r\n\r\n| Name | Type | Required | Description |\r\n|--|--|--|--|\r\n| *StartingIndex*| long | | The value of the row index to start at or restart to. The default value is 1.|\r\n| *restart*| bool | | Indicates when the numbering is to be restarted to the *StartingIndex* value. The default is \u0060false\u0060.|"
+  },
+  {
+    "Name": "sign",
+    "Description": "Returns the sign of the numeric expression.",
+    "Syntax": "\u0060sign(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "sin",
+    "Description": "Returns the sine function value of the specified angle. The angle is specified in radians.",
+    "Syntax": "\u0060sin(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "split",
+    "Description": "The \u0060split()\u0060 function takes a string and splits it into substrings based on a specified delimiter, returning the substrings in an array. Optionally, you can retrieve a specific substring by specifying its index.",
+    "Syntax": "\u0060split(\u0060*source*\u0060,\u0060 *delimiter* [\u0060,\u0060 *requestedIndex*]\u0060)\u0060"
+  },
+  {
+    "Name": "sqrt",
+    "Description": "Returns the square root of the input.",
+    "Syntax": "\u0060sqrt(\u0060*number*\u0060)\u0060"
+  },
+  {
+    "Name": "startofday",
+    "Description": "Returns the start of the day containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060startofday(\u0060*date* [\u0060,\u0060 *offset* ]\u0060)\u0060"
+  },
+  {
+    "Name": "startofmonth",
+    "Description": "Returns the start of the month containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060startofmonth(\u0060*date* [\u0060,\u0060 *offset* ]\u0060)\u0060"
+  },
+  {
+    "Name": "startofweek",
+    "Description": "Returns the start of the week containing the date, shifted by an offset, if provided.\r\n\r\nStart of the week is considered to be a Sunday.",
+    "Syntax": "\u0060startofweek(\u0060*date* [\u0060,\u0060 *offset* ]\u0060)\u0060"
+  },
+  {
+    "Name": "startofyear",
+    "Description": "Returns the start of the year containing the date, shifted by an offset, if provided.",
+    "Syntax": "\u0060startofyear(\u0060*date* [\u0060,\u0060 *offset* ]\u0060)\u0060"
+  },
+  {
+    "Name": "strcat",
+    "Description": "Concatenates between 1 and 64 arguments.",
+    "Syntax": "\u0060strcat(\u0060*argument1*\u0060,\u0060 *argument2* [\u0060,\u0060 *argument3* ... ]\u0060)\u0060"
+  },
+  {
+    "Name": "strlen",
+    "Description": "Returns the length, in characters, of the input string.\r\n\r\n\u003E [!NOTE]\r\n\u003E This function counts Unicode [code points](https://en.wikipedia.org/wiki/Code_point).",
+    "Syntax": "\u0060strlen(\u0060*source*\u0060)\u0060"
+  },
+  {
+    "Name": "substring",
+    "Description": "Extracts a substring from the source string starting from some index to the end of the string.\r\n\r\nOptionally, the length of the requested substring can be specified.",
+    "Syntax": "\u0060substring(\u0060*source*\u0060,\u0060 *startingIndex* [\u0060,\u0060 *length*]\u0060)\u0060"
+  },
+  {
+    "Name": "tan",
+    "Description": "Returns the tangent value of the specified number.",
+    "Syntax": "\u0060tan(\u0060*x*\u0060)\u0060"
+  },
+  {
+    "Name": "tobool",
+    "Description": "Convert inputs to boolean (signed 8-bit) representation.\r\n\r\n\u003E The \u0060tobool()\u0060 and \u0060toboolean()\u0060 functions are equivalent",
+    "Syntax": "\u0060tobool(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "todatetime",
+    "Description": "Converts the input to a [datetime](./scalar-data-types/datetime.md) scalar value.\r\n\r\n\u003E [!NOTE]\r\n\u003E Prefer using [datetime()](./scalar-data-types/datetime.md) when possible.",
+    "Syntax": "\u0060todatetime(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "todouble",
+    "Description": "Converts the input expression to a value of type \u0060real\u0060.\r\n\r\n\u003E The \u0060todouble()\u0060 and \u0060toreal()\u0060 functions are equivalent",
+    "Syntax": "\u0060todouble(\u0060*Expr*\u0060)\u0060"
+  },
+  {
+    "Name": "tohex",
+    "Description": "Converts input to a hexadecimal string.",
+    "Syntax": "\u0060tohex(\u0060*value*\u0060,\u0060 [\u0060,\u0060 *minLength* ]\u0060)\u0060"
+  },
+  {
+    "Name": "toint",
+    "Description": "Converts the input to an integer value (signed 32-bit) number representation.\r\n\r\n\u003E [!NOTE]\r\n\u003E Prefer using [int()](./scalar-data-types/int.md) when possible.",
+    "Syntax": "\u0060toint(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "tolong",
+    "Description": "Converts the input value to a long (signed 64-bit) number representation.\r\n\r\n\u003E [!NOTE]\r\n\u003E Prefer using [long()](./scalar-data-types/long.md) when possible.",
+    "Syntax": "\u0060tolong(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "tolower",
+    "Description": "Converts the input string to lower case.",
+    "Syntax": "\u0060tolower(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "tostring",
+    "Description": "Converts the input to a string representation.",
+    "Syntax": "\u0060tostring(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "totimespan",
+    "Description": "Converts the input to a [timespan](./scalar-data-types/timespan.md) scalar value.\r\n\r\n\u003E **Deprecated aliases:** totime()",
+    "Syntax": "\u0060totimespan(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "toupper",
+    "Description": "Converts a string to upper case.",
+    "Syntax": "\u0060toupper(\u0060*value*\u0060)\u0060"
+  },
+  {
+    "Name": "trim_end",
+    "Description": "Removes trailing match of the specified regular expression.",
+    "Syntax": "\u0060trim_end(\u0060*regex*\u0060,\u0060 *source*\u0060)\u0060"
+  },
+  {
+    "Name": "trim",
+    "Description": "Removes all leading and trailing matches of the specified regular expression.",
+    "Syntax": "\u0060trim(\u0060*regex*\u0060,\u0060 *source*\u0060)\u0060"
+  },
+  {
+    "Name": "trim_start",
+    "Description": "Removes leading match of the specified regular expression.",
+    "Syntax": "\u0060trim_start(\u0060*regex*\u0060,\u0060 *source*\u0060)\u0060"
+  },
+  {
+    "Name": "url_decode",
+    "Description": "The function converts an encoded URL into a regular URL representation.\r\n\r\nFor more information about URL encoding and decoding, see [Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding).",
+    "Syntax": "\u0060url_decode(\u0060*encoded_url*\u0060)\u0060"
+  },
+  {
+    "Name": "url_encode_component",
+    "Description": "The function converts characters of the input URL into a format that can be transmitted over the internet. Differs from [url_encode](./urlencodefunction.md) by encoding spaces as \u0027%20\u0027 and not as \u0027\u002B\u0027.\r\n\r\nFor more information about URL encoding and decoding, see [Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding).",
+    "Syntax": "\u0060url_encode_component(\u0060*url*\u0060)\u0060"
+  },
+  {
+    "Name": "contains_cs",
+    "Description": "Filters a record set for data containing a case-sensitive string. \u0060contains_cs\u0060 searches for arbitrary sub-strings rather than [terms](datatypes-string-operators.md#what-is-a-term).\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060has_cs\u0060 for faster results."
+  },
+  {
+    "Name": "contains",
+    "Description": "Filters a record set for data containing a case-insensitive string. \u0060contains\u0060 searches for arbitrary sub-strings rather than [terms](datatypes-string-operators.md#what-is-a-term).\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nWhen possible, use [contains_cs](contains-cs-operator.md) - a case-sensitive version of the operator.\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060has\u0060 for faster results."
+  },
+  {
+    "Name": "!contains_cs",
+    "Description": "Filters a record set for data that doesn\u0027t include a case-sensitive string. \u0060!contains_cs\u0060 searches for characters rather than [terms](datatypes-string-operators.md#what-is-a-term) of three or more characters. The query scans the values in the column, which is slower than looking up a term in a term index.\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nIf you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term), use \u0060!has_cs\u0060 for faster results."
+  },
+  {
+    "Name": "!contains",
+    "Description": "Filters a record set for data that doesn\u0027t include a case-sensitive string. \u0060!contains\u0060 searches for characters rather than [terms](datatypes-string-operators.md#what-is-a-term) of three or more characters. The query scans the values in the column, which is slower than looking up a term in a term index.\r\n\r\n[!INCLUDE [contains-operator-comparison](../../includes/contains-operator-comparison.md)]",
+    "Syntax": "[!INCLUDE [performance-tip-note](../../includes/performance-tip-note.md)]\r\n\r\nWhen possible, use the case-sensitive [!contains_cs](not-contains-cs-operator.md).\r\n\r\nUse \u0060!has\u0060 if you\u0027re looking for a [term](datatypes-string-operators.md#what-is-a-term)."
+  },
+  {
+    "Name": "between",
+    "Description": "Filters a record set for data matching the values in an inclusive range.\r\n\r\n\u0060between\u0060 can operate on any numeric, datetime, or timespan expression.",
+    "Syntax": "*T* \u0060|\u0060 \u0060where\u0060 *expr* \u0060between\u0060 \u0060(\u0060*leftRange*\u0060 .. \u0060*rightRange*\u0060)\u0060"
+  },
+  {
+    "Name": "!between",
+    "Description": "Matches the input that is outside of the inclusive range.\r\n\r\n\u0060!between\u0060 can operate on any numeric, datetime, or timespan expression.",
+    "Syntax": "*T* \u0060|\u0060 \u0060where\u0060 *expr* \u0060!between\u0060 \u0060(\u0060*leftRange*\u0060 .. \u0060*rightRange*\u0060)\u0060"
+  }
+]

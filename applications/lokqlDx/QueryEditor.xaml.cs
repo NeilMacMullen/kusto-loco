@@ -1,13 +1,18 @@
 ﻿using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using KustoLoco.Core.Settings;
 using NotNullStrings;
 
 namespace lokqlDx;
@@ -21,11 +26,23 @@ namespace lokqlDx;
 /// </remarks>
 public partial class QueryEditor : UserControl
 {
+    private readonly EditorHelper editorHelper;
+    private IntellisenseEntry[] _columnNames = [];
+    private IntellisenseEntry[] _internalCommands = [];
     private bool _isBusy;
+    private IntellisenseEntry[] _settingNames = [];
+    private IntellisenseEntry[] _tableNames = [];
+    private CompletionWindow? completionWindow;
+    private IntellisenseEntry[] KqlFunctionEntries = [];
+
+    public IntellisenseEntry[] KqlOperatorEntries = [];
 
     public QueryEditor()
     {
         InitializeComponent();
+        Query.TextArea.TextEntering += textEditor_TextArea_TextEntering;
+        Query.TextArea.TextEntered += textEditor_TextArea_TextEntered;
+        editorHelper = new EditorHelper(Query);
     }
 
     #region public interface
@@ -45,26 +62,15 @@ public partial class QueryEditor : UserControl
     {
         if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
 
-        var i = Query
-            .Document.GetLineByOffset(Query.CaretOffset).LineNumber;
-
-        string GetLineForDocumentLine(DocumentLine line)
-        {
-            return Query.Document.GetText(line.Offset, line.Length);
-        }
-
-        string GetLineForLine(int line)
-        {
-            return GetLineForDocumentLine(Query.Document.GetLineByNumber(line));
-        }
+        var i = editorHelper.LineAtCaret().LineNumber;
 
         var sb = new StringBuilder();
 
-        while (i > 1 && GetLineForLine(i - 1).Trim().Length > 0)
+        while (i > 1 && editorHelper.TextInLine(i - 1).Trim().Length > 0)
             i--;
-        while (i <= Query.LineCount && GetLineForLine(i).Trim().Length > 0)
+        while (i <= Query.LineCount && editorHelper.TextInLine(i).Trim().Length > 0)
         {
-            sb.AppendLine(GetLineForLine(i));
+            sb.AppendLine(editorHelper.TextInLine(i));
             i++;
         }
 
@@ -86,15 +92,14 @@ public partial class QueryEditor : UserControl
         Query.FontFamily = new FontFamily(font);
     }
 
-    public string GetText()
-    {
-        return Query.Text;
-    }
+    public string GetText() => Query.Text;
 
     public void SetBusy(bool isBusy)
     {
         _isBusy = isBusy;
-        BusyStatus.Content = isBusy ? "Busy" : "Ready";
+        BusyStatus.Content = isBusy
+                                 ? "Busy"
+                                 : "Ready";
     }
 
     private void TextBox_PreviewDragOver(object sender, DragEventArgs e)
@@ -112,7 +117,6 @@ public partial class QueryEditor : UserControl
     private void InsertAtCursor(string text)
     {
         Query.Document.Insert(Query.CaretOffset, text);
-      
     }
 
     private void TextBox_Drop(object sender, DragEventArgs e)
@@ -128,9 +132,9 @@ public partial class QueryEditor : UserControl
         e.Handled = true;
 
         string VerbFromExtension(string f)
-        {
-            return f.EndsWith(".csl") ? "run" : "load";
-        }
+            => f.EndsWith(".csl")
+                   ? "run"
+                   : "load";
     }
 
     private void Query_OnPreviewDragEnter(object sender, DragEventArgs drgevent)
@@ -182,6 +186,113 @@ public partial class QueryEditor : UserControl
         using var s = assembly.GetManifestResourceStream("lokqlDx.SyntaxHighlighting.xml");
         using var reader = new XmlTextReader(s!);
         Query.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+
+        using var functions = assembly.GetManifestResourceStream("lokqlDx.IntellisenseFunctions.json");
+        KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions!)!;
+        using var ops = assembly.GetManifestResourceStream("lokqlDx.IntellisenseOperators.json");
+        KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
+    }
+
+    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
+    {
+        completionWindow = new CompletionWindow(Query.TextArea);
+        completionWindow.CloseWhenCaretAtBeginning = true;
+        IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+        foreach (var k in completions.OrderBy(k => k.Name))
+            data.Add(new MyCompletionData(k, prefix, rewind));
+        completionWindow.Show();
+        completionWindow.Closed += delegate { completionWindow = null; };
+    }
+
+    private void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+    {
+        if (completionWindow != null && !completionWindow.CompletionList.ListBox.HasItems)
+        {
+            completionWindow.Close();
+            return;
+        }
+
+        if (e.Text == ".")
+        {
+            //only show completions if we are at the start of a line
+            var textToLeft = editorHelper.TextToLeftOfCaret();
+            if (textToLeft.TrimStart() == ".")
+            {
+                ShowCompletions(_internalCommands, string.Empty, 0);
+            }
+
+
+            return;
+        }
+
+        if (e.Text == "|")
+        {
+            ShowCompletions(KqlOperatorEntries, " ", 0);
+            return;
+        }
+
+        if (e.Text == "@")
+        {
+            ShowCompletions(_columnNames, string.Empty, 1);
+            return;
+        }
+
+        if (e.Text == "[")
+        {
+            ShowCompletions(_tableNames, string.Empty, 1);
+            return;
+        }
+
+        if (e.Text == "$")
+        {
+            ShowCompletions(_settingNames, string.Empty, 0);
+            return;
+        }
+
+        if (e.Text == "?")
+        {
+            ShowCompletions(KqlFunctionEntries, string.Empty, 1);
+        }
+    }
+
+    public void AddInternalCommands(IntellisenseEntry[] verbs)
+    {
+        _internalCommands = verbs;
+    }
+
+    private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+    {
+        if (e.Text.Length > 0 && completionWindow != null)
+        {
+            if (!char.IsLetterOrDigit(e.Text[0]))
+            {
+                // Whenever a non-letter is typed while the completion window is open,
+                // insert the currently selected element.
+                completionWindow.CompletionList.RequestInsertion(e);
+
+                // Do not set e.Handled=true.
+                // We still want to insert the character that was typed.
+            }
+        }
+    }
+
+    public void SetColumnNames(string[] getTablesAndSchemas)
+    {
+        _columnNames = getTablesAndSchemas.Select(t => new IntellisenseEntry(t, "Column", t))
+                                          .ToArray();
+    }
+
+    public void SetTableNames(string[] getTablesAndSchemas)
+    {
+        _tableNames = getTablesAndSchemas.Select(t => new IntellisenseEntry(t, "Table", t))
+                                         .ToArray();
+    }
+
+    public void AddSettingsForIntellisense(KustoSettingsProvider settings)
+    {
+        _settingNames = settings.Enumerate()
+                                .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
+                                .ToArray();
     }
 }
 
@@ -189,3 +300,53 @@ public class QueryEditorRunEventArgs(string query) : EventArgs
 {
     public string Query { get; private set; } = query;
 }
+
+/// Implements AvalonEdit ICompletionData interface to provide the entries in the
+/// completion drop down.
+public class MyCompletionData(IntellisenseEntry entry, string prefix, int rewind) : ICompletionData
+{
+    public ImageSource? Image => null;
+
+    public string Text => entry.Name;
+
+    // Use this property if you want to show a fancy UIElement in the list.
+    public object? Content => Text;
+
+    public object? Description
+        => $@"{entry.Description}
+Usage: {entry.Syntax}";
+
+
+    public double Priority => 1.0;
+
+    public void Complete(TextArea textArea, ISegment completionSegment,
+        EventArgs insertionRequestEventArgs)
+    {
+        var seg = new TextSegment();
+        seg.StartOffset = completionSegment.Offset - rewind;
+        seg.Length = completionSegment.Length + rewind;
+        textArea.Document.Replace(seg, prefix + Text);
+    }
+}
+
+public class EditorHelper
+{
+    public EditorHelper(TextEditor query) => Query = query;
+
+    public TextEditor Query { get; set; }
+
+
+    public string GetText(DocumentLine line) => Query.Document.GetText(line.Offset, line.Length);
+
+    public string TextInLine(int line) => GetText(Query.Document.GetLineByNumber(line));
+
+    public DocumentLine LineAtCaret() => Query.Document.GetLineByOffset(Query.CaretOffset);
+
+    public string TextToLeftOfCaret()
+    {
+        var line = LineAtCaret();
+        return Query.Document.GetText(line.Offset, Query.CaretOffset - line.Offset);
+    }
+}
+
+public readonly record struct IntellisenseEntry(string Name, string Description, string Syntax);

@@ -24,7 +24,7 @@ namespace Lokql.Engine;
 /// </remarks>
 public class InteractiveTableExplorer
 {
-    private readonly CommandProcessor _commandProcessor;
+    public readonly CommandProcessor _commandProcessor;
     private readonly IResultRenderingSurface _renderingSurface;
     private readonly KustoQueryContext _context;
     public readonly BlockInterpolator _interpolator;
@@ -69,6 +69,15 @@ public class InteractiveTableExplorer
         return _context;
     }
 
+    public string [] GetColumnNames()
+    {
+       return  _context.Tables().SelectMany(t=>t.ColumnNames)
+          .Distinct().ToArray();
+    }
+    public string[] GetTableNames()
+    {
+        return _context.TableNames.ToArray();
+    }
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
         _outputConsole.ForegroundColor = ConsoleColor.Green;

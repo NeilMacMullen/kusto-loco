@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="IntellisenseFunctions.json" />
+    <None Remove="IntellisenseOperators.json" />
     <None Remove="SyntaxHighlighting.xml" />
   </ItemGroup>
 
@@ -19,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="IntellisenseFunctions.json" />
+    <EmbeddedResource Include="IntellisenseOperators.json" />
     <EmbeddedResource Include="SyntaxHighlighting.xml" />
   </ItemGroup>
 
