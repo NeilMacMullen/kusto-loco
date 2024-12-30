@@ -19,9 +19,15 @@ public class CommandProcessor
     public static CommandProcessor Default()
     {
         return new CommandProcessor()
+            .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
+            .WithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
+            .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
+            .WithAdditionalCommand<SettingsCommand.Options>(SettingsCommand.RunAsync)
+            .WithAdditionalCommand<KnownSettingsCommand.Options>(KnownSettingsCommand.RunAsync)
+
+
             .WithAdditionalCommand<QuickCsvCommand.Options>(QuickCsvCommand.RunAsync)
             .WithAdditionalCommand<AllTablesCommand.Options>(AllTablesCommand.Run)
-            .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
             .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.Run)
             .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.Run)
             .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.Run)
@@ -30,13 +36,10 @@ public class CommandProcessor
             .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.Run)
             .WithAdditionalCommand<RunScriptCommand.Options>(RunScriptCommand.RunAsync)
             .WithAdditionalCommand<SaveQueryCommand.Options>(SaveQueryCommand.RunAsync)
-            .WithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
+          
             .WithAdditionalCommand<QueryCommand.Options>(QueryCommand.RunAsync)
             .WithAdditionalCommand<ShowCommand.Options>(ShowCommand.RunAsync)
             .WithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
-            .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
-            .WithAdditionalCommand<ListSettingsCommand.Options>(ListSettingsCommand.RunAsync)
-            .WithAdditionalCommand<ListSettingDefinitionsCommand.Options>(ListSettingDefinitionsCommand.RunAsync)
             .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
             .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
             .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)

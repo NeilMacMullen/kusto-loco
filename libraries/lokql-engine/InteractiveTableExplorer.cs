@@ -67,20 +67,13 @@ public class InteractiveTableExplorer
     {
         return _context.Tables().SelectMany(t => t.ColumnNames)
             .Distinct()
-            .Select(EnsureEscaped)
+            .Select(NameEscaper.EscapeIfNecessary)
             .ToArray();
-    }
-
-    private string EnsureEscaped(string name)
-    {
-        return name.Any(c => !char.IsLetterOrDigit(c))
-            ? KustoNameEscaping.EnsureFraming(name)
-            : name;
     }
 
     public string[] GetTableNames()
     {
-        return _context.TableNames.Select(EnsureEscaped).ToArray();
+        return _context.TableNames.Select(NameEscaper.EscapeIfNecessary).ToArray();
     }
 
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
@@ -234,6 +227,13 @@ public class InteractiveTableExplorer
     {
         return _resultHistory.MostRecent;
     }
+
+    public KustoQueryResult GetResult(string name)
+    {
+        return _resultHistory.Fetch(name);
+    }
+
+
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
 }

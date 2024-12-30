@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Core;
+﻿using System.Linq;
+
+namespace KustoLoco.Core;
 
 
 /// <summary>
@@ -35,4 +37,16 @@ public static class KustoNameEscaping
     ///     remove the framing first
     /// </remarks>
     public static string EnsureFraming(string tableName) => $"['{RemoveFraming(tableName)}']";
+
+    /// <summary>
+    ///    Escape a name if it contains any characters that are not letters or digits
+    /// </summary>
+    public static string EscapeIfNecessary(string name)
+    {
+        name = RemoveFraming(name);
+        return name
+            .Any(c => !char.IsLetterOrDigit(c))
+            ? EnsureFraming(name)
+            : name;
+    }
 }
