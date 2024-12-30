@@ -1,5 +1,4 @@
-﻿using AppInsightsSupport;
-using CommandLine;
+﻿using CommandLine;
 using KustoLoco.FileFormats;
 using NotNullStrings;
 
@@ -7,7 +6,7 @@ namespace Lokql.Engine.Commands;
 
 public static class QuickCsvCommand
 {
-    internal static  Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var blocks = econtext.Sequence;
@@ -44,7 +43,7 @@ public static class QuickCsvCommand
         try
         {
             var serializer = CsvSerializer.Default(exp.Settings, exp._outputConsole);
-            var source =serializer.LoadFromString(csvData, tableName);
+            var source = serializer.LoadFromString(csvData, tableName);
             exp.GetCurrentContext().AddTable(source);
             exp.Info($"Loaded {tableName}");
         }
@@ -54,14 +53,12 @@ public static class QuickCsvCommand
         }
 
         return Task.CompletedTask;
-
     }
 
-    [Verb("csvdata", 
-        HelpText = "loads data from csv-formatted inline data")]
+    [Verb("csvdata",
+        HelpText = @"loads data from csv-formatted inline data")]
     internal class Options
     {
-        
         [Value(0, HelpText = "Name of table ")]
         public string As { get; set; } = string.Empty;
 

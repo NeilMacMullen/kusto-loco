@@ -1,9 +1,7 @@
 ﻿using System.Collections.Immutable;
-using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Reflection;
 using CommandLine;
-using CommandLine.Text;
 
 namespace Lokql.Engine.Commands;
 
@@ -71,7 +69,7 @@ public class CommandProcessor
 
         var table = _registrations.Keys.ToArray();
 
-          var result = StandardParsers.CreateWithHelpWriter(textWriter)
+        var result = StandardParsers.CreateWithHelpWriter(textWriter)
             .ParseArguments(tokens, table);
 
         var context = new CommandProcessorContext(exp, sequence);

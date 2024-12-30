@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using Microsoft.Identity.Client;
 
 namespace Lokql.Engine.Commands;
 
@@ -7,7 +6,7 @@ public static class SaveCommand
 {
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
-        var exp= econtext.Explorer;
+        var exp = econtext.Explorer;
         await exp._loader.SaveResult(exp.GetPreviousResult(), o.File);
     }
 
@@ -25,7 +24,7 @@ public static class PushCommand
     {
         var exp = econtext.Explorer;
         exp._resultHistory.Save(o.Name);
-       await Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     [Verb("push", aliases: ["sv"], HelpText = "keeps a result in memory ")]
@@ -35,7 +34,6 @@ public static class PushCommand
         public string Name { get; set; } = string.Empty;
     }
 }
-
 
 public static class PullCommand
 {

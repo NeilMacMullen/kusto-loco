@@ -1,7 +1,4 @@
-﻿
-
-
-using System.Reflection;
+﻿using System.Reflection;
 using KustoLoco.Core;
 using KustoLoco.Rendering;
 using NotNullStrings;
@@ -23,27 +20,26 @@ DisplayQueryResult(result);
 
 void DisplayQueryResult(KustoQueryResult queryResult)
 {
-
     // if we got an error display it and skip rendering an empty table
     if (queryResult.Error.IsNotBlank())
     {
         AnsiConsole.MarkupLineInterpolated($"[red]{queryResult.Error}[/]");
         return;
     }
-    
+
     //display the results as a pretty Spectre.Console table
     var table = new Table();
 
     // Add columns with header names
     foreach (var column in queryResult.ColumnDefinitions()) table.AddColumn(column.Name);
-    
+
     // Add rows.  Note that cells could contain nulls in the general case
     foreach (var row in queryResult.EnumerateRows())
     {
         var rowCells = row.Select(CellToString).ToArray();
         table.AddRow(rowCells);
     }
-    
+
     AnsiConsole.Write(table);
 
     //render the results as a chart if we were asked to do that
@@ -51,14 +47,17 @@ void DisplayQueryResult(KustoQueryResult queryResult)
 
     return;
 
-    string CellToString(object? cell) => cell?.ToString() ?? "<null>";
+    string CellToString(object? cell)
+    {
+        return cell?.ToString() ?? "<null>";
+    }
 }
 
 
 void ShowHelpIfAppropriate()
 {
     if (args.Length != 0) return;
-    
+
     var programName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
     var help = $"""
                 This program demonstrates the use of KQL to query the current process list.

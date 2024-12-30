@@ -3,7 +3,6 @@ using System.Text.Json;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
-using ZstdSharp.Unsafe;
 
 namespace lokqlDx;
 
@@ -17,14 +16,14 @@ namespace lokqlDx;
 public class WorkspaceManager
 {
     public const string Extension = "lokql";
+    private Workspace _workspace = new();
     public string Path = string.Empty;
-    private Workspace _workspace=new Workspace();
     public Workspace Workspace => _workspace;
 
     public static string GlobPattern => $"*.{Extension}";
 
-  
-    public KustoSettingsProvider Settings { get; } = new KustoSettingsProvider();
+
+    public KustoSettingsProvider Settings { get; } = new();
 
     private void EnsureWorkspacePopulated()
     {
@@ -49,9 +48,8 @@ data
 ";
     }
 
-    public void Save(string path,Workspace workspace)
+    public void Save(string path, Workspace workspace)
     {
-       
         Path = path;
         try
         {
@@ -74,12 +72,12 @@ data
 
         var rootSettingFolderPath =
             System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                                   "kustoloco");
+                "kustoloco");
 
         if (!Directory.Exists(rootSettingFolderPath))
             Directory.CreateDirectory(rootSettingFolderPath);
 
-       _workspace=new Workspace();
+        _workspace = new Workspace();
         Settings.Reset();
         Path = path;
         SetWorkingPaths();
@@ -88,7 +86,6 @@ data
             {
                 var json = File.ReadAllText(Path);
                 _workspace = JsonSerializer.Deserialize<Workspace>(json)!;
-              
             }
             catch (Exception e)
             {
@@ -100,22 +97,28 @@ data
 
     public void CreateNew()
     {
-        _workspace= new Workspace();
+        _workspace = new Workspace();
         Settings.Reset();
         Path = string.Empty;
     }
 
-    public bool IsDirty(Workspace wkspc) => wkspc!=_workspace;
-    public string ContainingFolder() => System.IO.Path.GetDirectoryName(Path).NullToEmpty();
+    public bool IsDirty(Workspace wkspc)
+    {
+        return wkspc != _workspace;
+    }
+
+    public string ContainingFolder()
+    {
+        return System.IO.Path.GetDirectoryName(Path).NullToEmpty();
+    }
 
     public void SetWorkingPaths()
     {
-        if(Path.IsBlank())
+        if (Path.IsBlank())
             return;
         var containingFolder = ContainingFolder();
         Settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, containingFolder);
         Settings.Set(LokqlSettings.ScriptPath.Name, containingFolder);
         Settings.Set(LokqlSettings.QueryPath.Name, containingFolder);
     }
-
 }

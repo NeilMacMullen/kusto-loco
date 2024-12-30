@@ -1,7 +1,6 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
-using KustoLoco.FileFormats;
 using NotNullStrings;
 
 namespace Lokql.Engine;
@@ -18,26 +17,24 @@ namespace Lokql.Engine;
 /// </remarks>
 public class StandardFormatAdaptor : ITableAdaptor
 {
+    private readonly IKustoConsole _console;
     private readonly IReadOnlyCollection<IFileBasedTableAccess> _loaders;
     private readonly KustoSettingsProvider _settings;
-    private readonly IKustoConsole _console;
 
-    public StandardFormatAdaptor(KustoSettingsProvider settings,IKustoConsole console)
+    public StandardFormatAdaptor(KustoSettingsProvider settings, IKustoConsole console)
     {
         _settings = settings;
         _console = console;
         _loaders =
         [
-            new CsvTableAdaptor(settings,console),
-            new TsvTableAdaptor(settings,console),
-            new ParquetTableAdaptor(settings,console),
-            new TextTableAdaptor(settings,console),
-            new JsonArrayTableAdaptor(settings,console)
+            new CsvTableAdaptor(settings, console),
+            new TsvTableAdaptor(settings, console),
+            new ParquetTableAdaptor(settings, console),
+            new TextTableAdaptor(settings, console),
+            new JsonArrayTableAdaptor(settings, console)
         ];
         _settings.Register(Settings.KustoDataPath);
-
-
-}
+    }
 
     private IReadOnlyCollection<string> Paths => _settings.GetPathList(Settings.KustoDataPath);
 
@@ -107,13 +104,14 @@ public class StandardFormatAdaptor : ITableAdaptor
             if (!Path.Exists(filepath))
                 break;
 
-            var result = await loader.TryLoad(filepath,  tableName);
+            var result = await loader.TryLoad(filepath, tableName);
             if (result.Error.IsBlank())
             {
                 context.AddTable(result.Table);
                 _console.Info($"Loaded table '{tableName}' from {filepath}");
                 return true;
             }
+
             _console.Warn($"Unable to load table '{tableName}' from {filepath}");
             _console.Warn($"Error:{result.Error}");
         }
@@ -131,10 +129,10 @@ public class StandardFormatAdaptor : ITableAdaptor
 
         return new NullFileLoader();
     }
+
     public static class Settings
     {
         public static readonly KustoSettingDefinition KustoDataPath = new("kusto.datapath",
             "Search path for kusto data files", @"C:\kusto", nameof(String));
     }
-
 }
