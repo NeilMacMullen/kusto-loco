@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -7,6 +6,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
+
 #pragma warning disable CS8604 // Possible null reference argument.
 
 namespace KustoLoco.FileFormats;
@@ -43,20 +43,17 @@ public class CsvSerializer : ITableSerializer
         var inferColumnNames = _settings.GetBool(CsvSerializerSettings.InferColumnNames);
         using var reader = new StreamReader(stream);
         var config = _config with { HasHeaderRecord = !inferColumnNames };
-        var separator = (_settings.Get(CsvSerializerSettings.Separator));
-        if (separator.Length>=1)
-        {
-            config= config with { Delimiter = separator};
-        }
-       
+        var separator = _settings.Get(CsvSerializerSettings.Separator);
+        if (separator.Length >= 1) config = config with { Delimiter = separator };
+
         var csv = new CsvReader(reader, config);
-       
+
         if (!inferColumnNames)
         {
             csv.Read();
             csv.ReadHeader();
             keys = csv.Context.Reader?.HeaderRecord;
-            builders= keys
+            builders = keys
                 .Select(_ => new ColumnBuilder<string>())
                 .ToArray();
         }
@@ -78,7 +75,7 @@ public class CsvSerializer : ITableSerializer
             {
                 return isTrimRequired ? s.Trim() : s;
             }
-           
+
             for (var i = 0; i < builders.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
 
             rowCount++;
@@ -193,7 +190,6 @@ public class CsvSerializer : ITableSerializer
 
         public static readonly KustoSettingDefinition SkipHeaderOnSave = new(Setting("SkipHeaderOnSave"),
             "Don't write header row when saving CSV files", "false", nameof(Boolean));
-
 
 
         public static readonly KustoSettingDefinition InferColumnNames = new(Setting("InferColumnNames"),

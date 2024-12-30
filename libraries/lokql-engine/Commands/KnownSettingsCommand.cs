@@ -2,7 +2,10 @@
 
 namespace Lokql.Engine.Commands;
 
-public static class ListSettingDefinitionsCommand
+/// <summary>
+/// Lists all the registered settings
+/// </summary>
+public static class KnownSettingsCommand
 {
     internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
@@ -17,7 +20,10 @@ public static class ListSettingDefinitionsCommand
         return Task.CompletedTask;
     }
 
-    [Verb("settingdefinitions", HelpText = "lists all setting definitions")]
+    [Verb("knownsettings", HelpText = @"lists all setting definitions known to the engine
+Examples:
+  .knownsettings         #show all known settings
+  .knownsettings csv     #show known settings that related to csv processing")]
     internal class Options
     {
         [Value(0, HelpText = "match substring", Required = false)]

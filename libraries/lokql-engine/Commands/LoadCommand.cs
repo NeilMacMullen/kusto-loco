@@ -3,6 +3,9 @@ using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
+/// <summary>
+/// Load a data file
+/// </summary>
 public static class LoadCommand
 {
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
@@ -25,11 +28,20 @@ public static class LoadCommand
 
 
         var success = await exp._loader.LoadTable(exp.GetCurrentContext(), o.File, tableName);
-        if (!success) exp.Warn($"Unable to load '{o.File}'");
+        if (!success)
+            exp.Warn($"Unable to load '{o.File}'");
+        else exp.Info($"Table {NameEscaper.EscapeIfNecessary(tableName)} now available");
     }
 
     [Verb("load", aliases: ["ld"],
-        HelpText = "loads a data file")]
+        HelpText = @"loads a data file.  Supported formats are csv, tsv, json, parquet and text.
+The table name defaults to the file name.
+If the path is not rooted, the file is searched for in path set by kusto.datapath
+If the table already exists, it will not be reloaded unless the -f option is used.
+When loading text files, a single column named 'Line' is created.
+Examples:
+ .load c:\temp\data.csv        
+ .load d.parquet data2 ")]
     internal class Options
     {
         [Value(0, HelpText = "Name of file", Required = true)]

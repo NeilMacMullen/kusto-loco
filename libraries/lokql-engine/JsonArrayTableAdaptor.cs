@@ -1,9 +1,6 @@
-﻿using KustoLoco.Core;
-using KustoLoco.Core.Console;
+﻿using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
-using NLog;
-using NotNullStrings;
 
 namespace Lokql.Engine;
 
