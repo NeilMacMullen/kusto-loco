@@ -3,7 +3,7 @@
 namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Saves last result as named result
+///     Saves last result as named result
 /// </summary>
 public static class PushCommand
 {
@@ -11,6 +11,7 @@ public static class PushCommand
     {
         var exp = econtext.Explorer;
         exp._resultHistory.Save(o.Name);
+        exp.Info($"result stored as '{o.Name}'");
         await Task.CompletedTask;
     }
 

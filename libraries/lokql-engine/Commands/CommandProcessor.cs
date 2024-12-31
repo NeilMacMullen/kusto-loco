@@ -28,29 +28,29 @@ public class CommandProcessor
                 .WithAdditionalCommand<PullCommand.Options>(PullCommand.RunAsync)
                 .WithAdditionalCommand<ResultsCommand.Options>(ResultsCommand.RunAsync)
                 .WithAdditionalCommand<CsvDataCommand.Options>(CsvDataCommand.RunAsync)
-                .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.Run)
-                .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.Run)
-                .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.Run)
+                .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
+                .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
+                .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
                 .WithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
+                .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.RunAsync)
+                .WithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
+                .WithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
+                .WithAdditionalCommand<EchoCommand.Options>(EchoCommand.RunAsync)
 
-
-                .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.Run)
+                .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.RunAsync)
                
-                .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.Run)
-                .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.Run)
-                .WithAdditionalCommand<FormatCommand.Options>(FormatCommand.Run)
+                .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)
+                .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
+                .WithAdditionalCommand<FormatCommand.Options>(FormatCommand.RunAsync)
                 .WithAdditionalCommand<RunScriptCommand.Options>(RunScriptCommand.RunAsync)
                 .WithAdditionalCommand<SaveQueryCommand.Options>(SaveQueryCommand.RunAsync)
                 .WithAdditionalCommand<QueryCommand.Options>(QueryCommand.RunAsync)
                 .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
                 .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
-                .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.Run)
-                .WithAdditionalCommand<RenderToReportCommand.Options>(RenderToReportCommand.Run)
-                .WithAdditionalCommand<RenderTableToReportCommand.Options>(RenderTableToReportCommand.Run)
-                .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.Run)
-                .WithAdditionalCommand<EndReportCommand.Options>(EndReportCommand.Run)
-                .WithAdditionalCommand<RenderTableToText.Options>(RenderTableToText.Run)
+               
+                .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.RunAsync)
+               
             ;
 
     }

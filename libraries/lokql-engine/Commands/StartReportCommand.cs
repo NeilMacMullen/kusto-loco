@@ -5,7 +5,7 @@ namespace Lokql.Engine.Commands;
 
 public static class StartReportCommand
 {
-    internal static Task Run(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var type = o.Type.ToLowerInvariant();
@@ -13,6 +13,7 @@ public static class StartReportCommand
         {
             exp.StartNewReport(PptReportTarget.Create(o.Template));
         }
+        /*
         else
         if (type == "html")
         {
@@ -27,24 +28,27 @@ public static class StartReportCommand
             exp.StartNewReport(html);
            
         }
-        else econtext.Explorer.Warn($"Unrecognised report type '{type}'");
+        */
+        else econtext.Explorer.Warn($"Unrecognised/unsupported report type '{type}'");
 
         return Task.CompletedTask;
     }
 
-    [Verb("startreport", HelpText = "start a report")]
+    [Verb("startreport", HelpText = @"starts building a report
+Currently only the pptx format is supported
+The template argument must point to a valid pptx file which will be used as a template
+Examples:
+  .startreport pptx c:\reports\weeklytemplate.pptx
+  .addtoreport text *name-of-title-element* ""my report""
+  .addtoreport image *name-of-image-element* storedresult1
+  .finishreport c:\reports\thisweek.pptx
+")]
     internal class Options
     {
-
-        [Value(0, HelpText = "path including ext")]
+        [Value(0, HelpText = "Type (must be 'pptx')",Required = true)]
         public string Type { get; set; } = string.Empty;
-        [Value(1, HelpText = "Title")] public string Title { get; set; } = string.Empty;
-        [Option("paneHeight", HelpText = "paneHeight for default style")]
-        public string PaneHeight { get; set; } = string.Empty;
-
-        [Option("template", HelpText = "paneHeight for default style")]
+      
+        [Value(1,HelpText = "Template file",Required = true)]
         public string Template { get; set; } = string.Empty;
-
-
     }
 }
