@@ -4,7 +4,7 @@ using CommandLine;
 namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Issues a query against an application insights server
+///     Issues a query against an application insights server
 /// </summary>
 public static class AppInsightsCommand
 {
@@ -20,13 +20,14 @@ public static class AppInsightsCommand
             exp.Warn($"Unable to parse timespan '{timespan}'");
             return;
         }
+
         if (blocks.Complete)
             return;
 
         var query = blocks.Next();
         //make sure we pick up any variable interpolation in case we are inside a function
         query = exp._interpolator.Interpolate(query);
-
+        exp.Info("Running application insights query.  This may take a while....");
         var result = await ai.LoadTable(o.Rid, query, t, DateTime.UtcNow);
         await exp.InjectResult(result);
     }
@@ -52,7 +53,7 @@ Examples:
     {
         [Value(0, HelpText = "resourceId", Required = true)]
         public string Rid { get; set; } = string.Empty;
-        [Value(1, HelpText = "timespan ")]
-        public string Timespan { get; set; } = "1d";
+
+        [Value(1, HelpText = "timespan ")] public string Timespan { get; set; } = "1d";
     }
 }

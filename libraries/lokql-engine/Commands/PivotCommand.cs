@@ -6,7 +6,7 @@ namespace Lokql.Engine.Commands;
 
 public static class PivotCommand
 {
-    internal static Task Run(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var result = exp.GetPreviousResult();

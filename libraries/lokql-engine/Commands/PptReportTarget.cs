@@ -101,6 +101,7 @@ public class PptReportTarget : IReportTarget
             var slide = AddSlide();
             var data = await surface.RenderToImage(result, 800, 600);
             slide.Shapes.AddPicture(new MemoryStream(data));
+            slide.Shapes.Last().Name = name;
         }
     }
 

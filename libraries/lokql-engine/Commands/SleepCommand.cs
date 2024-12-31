@@ -4,7 +4,7 @@ namespace Lokql.Engine.Commands;
 
 public static class SleepCommand
 {
-    internal static async Task Run(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         econtext.Explorer.Info("Sleeping...");
         await Task.Delay(TimeSpan.FromSeconds(o.Seconds));
