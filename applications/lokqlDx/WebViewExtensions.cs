@@ -34,19 +34,28 @@ public static class WebViewExtensions
     /// <summary>
     ///     Navigates to a string in the specified webView and waits for the navigation to complete.
     /// </summary>
-    public static async Task NavigateToStringAsync(CoreWebView2 webView, string htmlContent)
+    public static async Task NavigateToStringAsync(CoreWebView2 webView, string htmlContent, bool retry = false)
     {
-        var tcs = new TaskCompletionSource<bool>();
-
-        void NavigationCompletedHandler(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        try
         {
-            webView.NavigationCompleted -= NavigationCompletedHandler!;
-            tcs.SetResult(true);
+            var tcs = new TaskCompletionSource<bool>();
+
+            void NavigationCompletedHandler(object sender, CoreWebView2NavigationCompletedEventArgs e)
+            {
+                webView.NavigationCompleted -= NavigationCompletedHandler!;
+                tcs.SetResult(true);
+            }
+
+            webView.NavigationCompleted += NavigationCompletedHandler!;
+            webView.NavigateToString(htmlContent);
+
+            await tcs.Task;
         }
-
-        webView.NavigationCompleted += NavigationCompletedHandler!;
-        webView.NavigateToString(htmlContent);
-
-        await tcs.Task;
+        catch
+        {
+            //sometimes we can't render content, for example if it's way too large, if so attempt to provide a warning
+            if (!retry)
+                await NavigateToStringAsync(webView, "<html><body><font color=\"red\">Unable to render content</font></body></html>", true);
+        }
     }
 }
