@@ -16,19 +16,52 @@ public class KustoResultRenderer
         _settings = settings;
     }
 
-    public static string RenderToTable(KustoQueryResult result)
+    public string RenderToTable(KustoQueryResult result)
     {
         if (result.RowCount == 0)
             return result.Error;
         var headers = result.ColumnNames();
-
+        var maxRows = 100;
 
         var sb = new StringBuilder();
+
+
+        if (result.RowCount > maxRows)
+            sb.AppendLine($"<p><font color=\"red\">Only first {maxRows} of {result.RowCount} displayed</p>");
+        sb.AppendLine(
+            @"<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th
+{
+  text-align: left;
+  padding: 8px;
+   background-color: #00D000;
+}
+
+td {
+  text-align: left;
+  padding: 8px;
+  
+}
+
+tr:nth-child(even) {
+  background-color: #D6EEEE;
+}
+
+tr:nth-child(odd) {
+  background-color: #D0D0D0;
+}
+</style>
+");
         sb.AppendLine("<table>");
         sb.AppendLine("<tr>");
         foreach (var h in headers)
             sb.AppendLine($"<th>{h}</th>");
-        foreach (var r in result.EnumerateRows())
+        foreach (var r in result.EnumerateRows().Take(maxRows))
         {
             sb.AppendLine("<tr>");
             var line = string.Concat(r.Select(item => $"<td>{item}</td>"));
@@ -49,7 +82,7 @@ public class KustoResultRenderer
                 ? RenderStringAsHtml("No results")
                 : result.Visualization.ChartType.IsNotBlank()
                     ? KustoToVegaChartType(result)
-                    : RenderStringAsHtml("No visualization");
+                    : RenderToTable(result);
     }
 
     public string RenderStringAsHtml(string x)
