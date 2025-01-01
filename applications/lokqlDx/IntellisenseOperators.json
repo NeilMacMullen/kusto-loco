@@ -63,6 +63,16 @@
     "Name": "join",
     "Description": "Merge the rows of two tables to form a new table by matching values of the specified columns from each table.\r\n\r\nKusto Query Language (KQL) offers many kinds of joins that each affect the schema and rows in the resultant table in different ways. For example, if you use an \u0060inner\u0060 join, the table has the same columns as the left table, plus the columns from the right table. For best performance, if one table is always smaller than the other, use it as the left side of the \u0060join\u0060 operator. The following image provides a visual representation of the operation performed by each join.\r\n\r\n:::image type=\u0022content\u0022 source=\u0022images/joinoperator/join-kinds.png\u0022 alt-text=\u0022Diagram showing query join kinds.\u0022:::",
     "Syntax": "*LeftTable* \u0060|\u0060 \u0060join\u0060 [ \u0060kind\u0060 \u0060=\u0060 *JoinFlavor* ] [ *Hints* ] \u0060(\u0060*RightTable*\u0060)\u0060 \u0060on\u0060 *Conditions*"
+  },
+  {
+    "Name": "union",
+    "Description": "Takes two or more tables and returns the rows of all of them.",
+    "Syntax": "[ *T* \u0060|\u0060 ] \u0060union\u0060 [ *UnionParameters* ] [\u0060kind=\u0060 \u0060inner\u0060|\u0060outer\u0060] [\u0060withsource=\u0060 *ColumnName*] [\u0060isfuzzy=\u0060 \u0060true\u0060|\u0060false\u0060] *Tables*\r\n\r\n\u003E [!NOTE]\r\n\u003E The operation of the \u0060union\u0060 operator can be altered by setting the \u0060best_effort\u0060 request property to \u0060true\u0060, using either a [set statement](./setstatement.md) or through [client request properties](../api/netfx/request-properties.md). When this property is set to \u0060true\u0060, the \u0060union\u0060 operator will disregard fuzzy resolution and connectivity failures to execute any of the sub-expressions being \u201Cunioned\u201D and yield a warning in the query status results."
+  },
+  {
+    "Name": "getschema",
+    "Description": "Produce a table that represents a tabular schema of the input.",
+    "Syntax": "*T* \u0060|\u0060 \u0060getschema\u0060"
   }
 
 ]
