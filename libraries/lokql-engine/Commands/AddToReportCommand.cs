@@ -1,24 +1,26 @@
 ﻿using CommandLine;
-
+using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
-
 
 public static class AddToReportCommand
 {
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-        var result = exp._resultHistory.Fetch(o.ResultName);
+        var resultName = o.ResultName.IsBlank() ? o.Element : o.ResultName;
+
+        var result = exp._resultHistory.Fetch(resultName);
 
         var type = o.Type.Trim().ToLowerInvariant();
+        
         switch (type)
         {
             case "image":
                 await exp.ActiveReport.UpdateOrAddImage(o.Element, exp, result);
                 break;
             case "table":
-                exp.ActiveReport.UpdateOrAddTable(o.Element, exp._resultHistory.Fetch(o.ResultName));
+                exp.ActiveReport.UpdateOrAddTable(o.Element, result);
                 break;
             case "text":
                 var text = (result.RowCount > 0) ? result.Get(0, 0)?.ToString()??"<null>" : "no data";
@@ -37,7 +39,8 @@ public static class AddToReportCommand
 - Type must be one of image,table, text, or literal
 - Element must be the name of an element in the template file.  If the element
   is not found, a new element may be added at the end of the report
-- ResultName is the name of a stored result or the most recent result if left blank.
+- ResultName is the name of a stored result, '_' to indicate the most recent result, or
+  left blank to use a result of the same name as the template element.
 - For elements of type 'text', only cell (0,0) is used to generate the text.   
 - Type 'literal' is the same as 'text' except that the ResultName is treated as a literal string.
 Examples:

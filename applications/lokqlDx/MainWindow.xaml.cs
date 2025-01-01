@@ -486,4 +486,9 @@ public partial class MainWindow : Window
             Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
         }
     }
+
+    private async void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
+    {
+       await  Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
+    }
 }

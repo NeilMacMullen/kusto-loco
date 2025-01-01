@@ -34,11 +34,12 @@
         <MenuItem Header="Register file association" Click="EnableJumpList" />
       </MenuItem>
       <MenuItem Header="Help">
-
         <MenuItem Header="Getting started" Click="NavigateToGettingStarted" />
         <MenuItem Header="Project Page" Click="NavigateToProjectPage" />
         <Separator />
         <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage" />
+        <Separator/>
+        <MenuItem Header="Github Discussion Forum" Click="NavigateToDiscussionForum" />
       </MenuItem>
     </Menu>
     <Grid>
