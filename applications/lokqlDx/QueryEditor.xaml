@@ -8,9 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="QueryEditor_OnLoaded">
   <DockPanel Background="Black">
-    <Label Name="BusyStatus" DockPanel.Dock="Bottom" Content="Ready" Foreground="White" />
+    <Grid DockPanel.Dock="Top">
+
+ 
     <avalonEdit:TextEditor
-      DockPanel.Dock="Top"
+     
       Padding="3"
       Name="Query"
       FontFamily="Consolas"
@@ -24,5 +26,12 @@
       Drop="TextBox_Drop"
       PreviewDragEnter="Query_OnPreviewDragEnter"
       />
+    <ProgressBar Name="BusyStatus" IsIndeterminate="true" Height="8"
+                 Margin="30" VerticalAlignment="Bottom"
+                 HorizontalAlignment="Stretch"
+                 Visibility="Hidden"
+                 
+                 ></ProgressBar>
+    </Grid>
   </DockPanel>
 </UserControl>
