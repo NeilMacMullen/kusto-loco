@@ -11,7 +11,7 @@ public static class WebViewExtensions
     /// <summary>
     ///     Captures the image currently displayed in the webview.
     /// </summary>
-    private static async Task<byte[]> CaptureImage(CoreWebView2 webview)
+    public static async Task<byte[]> CaptureImage(CoreWebView2 webview)
     {
         var stream = new MemoryStream();
         await webview.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, stream);

@@ -11,7 +11,6 @@ public class Preferences
     public double WindowLeft { get; set; }
     public string StartupScript { get; set; }= string.Empty;
     public string[] RecentProjects { get; set; } = [];
-    public int MaxDataGridRows { get; set; } = 10000;
     public bool WordWrap { get; set; } = false;
     public bool ShowLineNumbers { get; set; } = false;
 }

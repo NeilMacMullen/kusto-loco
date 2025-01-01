@@ -12,4 +12,9 @@ public class NullResultRenderingSurface : IResultRenderingSurface
     {
         return Task.FromResult(Array.Empty<byte>());
     }
+
+    public Task NavigateToUrl(Uri url)
+    {
+        return Task.CompletedTask;
+    }
 }

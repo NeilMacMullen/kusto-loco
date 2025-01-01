@@ -86,10 +86,11 @@ public class KustoSettingsProvider
     /// <summary>
     /// Try to fetch a setting and interpret it as a number (int)
     /// </summary>
-    public int GetInt(KustoSettingDefinition setting)
+    /// <remarks> return the fallback value if the number can't be parsed</remarks>
+    public int GetIntOr(string setting,int fallback)
     {
-        var s = Get(setting);
-        return int.TryParse(s, out var v) ? v : 0;
+        var s = GetOr(setting,fallback.ToString());
+        return int.TryParse(s, out var v) ? v : fallback;
     }
 
     /// <summary>
