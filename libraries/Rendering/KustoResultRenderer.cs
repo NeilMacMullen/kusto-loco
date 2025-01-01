@@ -22,16 +22,15 @@ public class KustoResultRenderer
             return result.Error;
         var headers = result.ColumnNames();
         var defaultMax = 100;
-        var max = _settings.GetOr("html.maxtablerows", $"{defaultMax}");
-
-        var maxRows = int.TryParse(max,out var m) ? m : defaultMax;
-
+        var settingName = "html.maxtablerows";
+        var maxRows = _settings.GetIntOr(settingName, defaultMax);
+     
         var sb = new StringBuilder();
 
 
         if (result.RowCount > maxRows)
             sb.AppendLine($@"<p><font color=""red"">Only first {maxRows} of {result.RowCount} displayed.  " +
-                                                  "Set html.maxtablerows to see more.</p>");
+                                                  $"Set {settingName} to see more.</p>");
         sb.AppendLine(
             @"<style>
 table {

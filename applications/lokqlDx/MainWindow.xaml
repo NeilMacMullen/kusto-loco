@@ -6,165 +6,164 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:lokqlDx"
         mc:Ignorable="d"
-        Title="lokqlDx"  Width="1280" Height="800"
+        Title="lokqlDx" Width="1280" Height="800"
         Loaded="MainWindow_OnLoaded"
-        Closing="MainWindow_OnClosing"
-        >
- 
+        Closing="MainWindow_OnClosing">
+
   <DockPanel>
     <Menu DockPanel.Dock="Top" Name="MainMenu">
       <MenuItem Header="_File">
-        <MenuItem Header="_New Workspace" Click="NewWorkspace"/>
-        <MenuItem Header="_Open Workspace" Click="OpenWorkSpace"/>
-        <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"/>
+        <MenuItem Header="_New Workspace" Click="NewWorkspace" />
+        <MenuItem Header="_Open Workspace" Click="OpenWorkSpace" />
+        <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
 
-        <MenuItem Header="_Save" Click="SaveWorkspaceEvent"/>
-        <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent"/>
+        <MenuItem Header="_Save" Click="SaveWorkspaceEvent" />
+        <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent" />
       </MenuItem>
       <MenuItem Header="_Preferences">
-        <MenuItem Header="Application Options"  Click="OpenApplicationOptionsDialog"/>
-        <MenuItem Header="Workspace Options"  Click="OpenWorkspaceOptionsDialog"/>
-        <Separator></Separator>
-        <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize"/>
-        <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize"/>
-        <MenuItem Header="Toggle word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap"/>
-        <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers"/>
+        <MenuItem Header="Application Options" Click="OpenApplicationOptionsDialog" />
+        <MenuItem Header="Workspace Options" Click="OpenWorkspaceOptionsDialog" />
+        <Separator />
+        <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize" />
+        <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize" />
+        <MenuItem Header="Toggle word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap" />
+        <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers" />
 
       </MenuItem>
       <MenuItem Header="Misc">
-        <MenuItem Header="Register file association" Click="EnableJumpList"/>
+        <MenuItem Header="Register file association" Click="EnableJumpList" />
       </MenuItem>
       <MenuItem Header="Help">
 
-        <MenuItem Header="Getting started" Click="NavigateToGettingStarted"/>
-        <MenuItem Header="Project Page" Click="NavigateToProjectPage"/>
-        <Separator/>
-        <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage"/>
+        <MenuItem Header="Getting started" Click="NavigateToGettingStarted" />
+        <MenuItem Header="Project Page" Click="NavigateToProjectPage" />
+        <Separator />
+        <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage" />
       </MenuItem>
-      </Menu>
-  <Grid>
-        <Grid.ColumnDefinitions>
+    </Menu>
+    <Grid>
+      <Grid.ColumnDefinitions>
 
-            <ColumnDefinition Width="400" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <ColumnDefinition Width="400" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
+      <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
 
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-        <TabControl Grid.Row="0" >
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
           <TabItem Header="Edit">
-            <local:QueryEditor x:Name="Editor" 
+            <local:QueryEditor x:Name="Editor"
                                RunEvent="OnQueryEditorRunTextBlock" />
           </TabItem>
           <TabItem Header="Copilot">
             <DockPanel>
               <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <CheckBox Name ="TerseMode" VerticalAlignment="Center">Terse</CheckBox>
-               </StackPanel>
+                <CheckBox Name="TerseMode" VerticalAlignment="Center">Terse</CheckBox>
+              </StackPanel>
               <Grid>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-              </Grid.RowDefinitions>
-              <RichTextBox Grid.Row="0" Name="ChatHistory" FontFamily="Consolas"
-                           Background="DarkBlue"
-                           FontSize="10"/>
-              <GridSplitter Grid.Row="1"
-                            VerticalAlignment="Stretch"
-                            Height="5"
-                            HorizontalAlignment="Stretch"
-                            Background="DarkGray"/>
-              <DockPanel Grid.Row="2">
-                <DockPanel DockPanel.Dock="Bottom" Margin="5" >
-                  <Button Name="SubmitButton" DockPanel.Dock="Right"  Width="100" HorizontalAlignment="Right" Click="SubmitToCopilot">Submit</Button>
-                  <Button Name="ClearChatButton" DockPanel.Dock="Left"  Width="100" HorizontalAlignment="Left" Click="ResetCopilot">Restart</Button>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <RichTextBox Grid.Row="0" Name="ChatHistory" FontFamily="Consolas"
+                             Background="DarkBlue"
+                             FontSize="10" />
+                <GridSplitter Grid.Row="1"
+                              VerticalAlignment="Stretch"
+                              Height="5"
+                              HorizontalAlignment="Stretch"
+                              Background="DarkGray" />
+                <DockPanel Grid.Row="2">
+                  <DockPanel DockPanel.Dock="Bottom" Margin="5">
+                    <Button Name="SubmitButton" DockPanel.Dock="Right" Width="100" HorizontalAlignment="Right"
+                            Click="SubmitToCopilot">
+                      Submit
+                    </Button>
+                    <Button Name="ClearChatButton" DockPanel.Dock="Left" Width="100" HorizontalAlignment="Left"
+                            Click="ResetCopilot">
+                      Restart
+                    </Button>
+                  </DockPanel>
+
+                  <TextBox Name="UserChat" FontFamily="Consolas"
+                           Background="LightBlue"
+                           FontSize="10"
+                           AcceptsReturn="True" />
+
                 </DockPanel>
-               
-                <TextBox  Name="UserChat" FontFamily="Consolas"
-                              Background="LightBlue"
-                              FontSize="10"
-                              AcceptsReturn="True"/>
 
-              </DockPanel>
-
-            </Grid>
+              </Grid>
 
             </DockPanel>
 
           </TabItem>
         </TabControl>
         <GridSplitter Grid.Row="1"
-                          VerticalAlignment="Stretch"
-                          Height="5"
-                          HorizontalAlignment="Stretch"
-                          Background="DarkGray"/>
-            <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
-                         Background="Black"
-                         FontSize="20"
-                         VerticalScrollBarVisibility="Auto"
-                         />
-        </Grid>
-
-        <GridSplitter Grid.Column="1"
                       VerticalAlignment="Stretch"
-                      Width="5"
+                      Height="5"
                       HorizontalAlignment="Stretch"
-                      Background="DarkGray"/>
+                      Background="DarkGray" />
+        <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
+                     Background="Black"
+                     FontSize="20"
+                     VerticalScrollBarVisibility="Auto" />
+      </Grid>
 
-        <Grid Grid.Column="2" Background="Black">
-            <Grid.RowDefinitions>
+      <GridSplitter Grid.Column="1"
+                    VerticalAlignment="Stretch"
+                    Width="5"
+                    HorizontalAlignment="Stretch"
+                    Background="DarkGray" />
 
-                <RowDefinition Height="100" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <DockPanel Grid.Row="0" >
-              <StackPanel DockPanel.Dock="Top">
-              <DockPanel>
-                    <Label DockPanel.Dock="Left" Background="DarkGray">Max rows:</Label>
-                    <TextBox Name="VisibleDataGridRows" VerticalContentAlignment="Center"
-                             Background="LightGray">10000</TextBox>
-                </DockPanel>
-                <Label Visibility="Collapsed"  Name="DatagridOverflowWarning" Foreground="Red" Content="Not all rows shown in grid!"></Label>
-              </StackPanel>
+      <TabControl Name="RenderingSurface" Grid.Column="2" Background="Black">
+        <TabItem Header="Data">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+              <Label Visibility="Collapsed" Name="DatagridOverflowWarning" Foreground="Red" />
+            </StackPanel>
 
-                <DataGrid   Name="dataGrid" Background="Black" RowBackground="Black"
-                            Foreground="GreenYellow"
-                            AlternatingRowBackground="DarkBlue"
-                            IsReadOnly="True"
-                            ClipboardCopyMode="ExcludeHeader"
-                            SelectionUnit="Cell"
-                            >
+            <DataGrid Name="dataGrid" Background="Black" RowBackground="Black"
+                      Foreground="GreenYellow"
+                      AlternatingRowBackground="DarkBlue"
+                      IsReadOnly="True"
+                      ClipboardCopyMode="ExcludeHeader"
+                      SelectionUnit="Cell">
 
-                    <DataGrid.Resources>
-                        <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
-                            <Setter Property="Background" Value="DarkBlue" />
-                            <Setter Property="Padding" Value="2,0,5,0"/>
-                        </Style>
-                    </DataGrid.Resources>
+              <DataGrid.Resources>
+                <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"
+                       TargetType="{x:Type DataGridColumnHeader}">
+                  <Setter Property="Background" Value="DarkBlue" />
+                  <Setter Property="Padding" Value="2,0,5,0" />
+                </Style>
+              </DataGrid.Resources>
+            </DataGrid>
+          </DockPanel>
+        </TabItem>
+        <TabItem Header="Chart" IsSelected="True">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right"
+                        Margin="4">
+              <Button Content="&#x1F4CB;" ToolTip="Copy image to clipboard"
+                      Click="OnCopyImageToClipboard" />
 
+              <Button Content="&#x1F310;" ToolTip="Open in browser"
+                      Click="onOpenInBrowser" />
 
-                </DataGrid>
-            </DockPanel>
-          
-            <GridSplitter Grid.Row="1"
-                          VerticalAlignment="Stretch"
-                          Height="5"
-                          HorizontalAlignment="Stretch" 
-                          Background="DarkGray"/>
+            </StackPanel>
+            <wv2:WebView2 DockPanel.Dock="Bottom" Name="webview" DefaultBackgroundColor="Black" />
 
-            <wv2:WebView2  Grid.Row="2"  Name="webview" DefaultBackgroundColor="Black"/>
+          </DockPanel>
 
+        </TabItem>
 
-
-        </Grid>
+      </TabControl>
     </Grid>
   </DockPanel>
 </Window>

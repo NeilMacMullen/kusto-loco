@@ -6,4 +6,5 @@ public interface IResultRenderingSurface
 {
     Task RenderToDisplay(KustoQueryResult result);
     Task<byte[]> RenderToImage(KustoQueryResult result,double pWidth, double pHeight);
+    Task NavigateToUrl(Uri url);
 }
