@@ -108,9 +108,8 @@ public partial class QueryEditor : UserControl
     public void SetBusy(bool isBusy)
     {
         _isBusy = isBusy;
-        BusyStatus.Content = isBusy
-            ? "Busy"
-            : "Ready";
+        BusyStatus.Visibility = isBusy ? Visibility.Visible : Visibility.Hidden;
+        Query.IsReadOnly = isBusy;
     }
 
     private void TextBox_PreviewDragOver(object sender, DragEventArgs e)
