@@ -42,6 +42,9 @@
 			<Word>contains</Word>
 			<Word>join</Word>
 			<Word>distinct</Word>
+			<Word>union</Word>
+			<Word>getschema</Word>
+
 
 
 		</Keywords>

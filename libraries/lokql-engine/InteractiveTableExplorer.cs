@@ -63,17 +63,14 @@ public class InteractiveTableExplorer
         return _context;
     }
 
-    public string[] GetColumnNames()
+    public SchemaLine[] GetSchema()
     {
-        return _context.Tables().SelectMany(t => t.ColumnNames)
-            .Distinct()
-            .Select(NameEscaper.EscapeIfNecessary)
+        return _context
+            .Tables()
+            .SelectMany(t => t.ColumnNames.Select(c=>
+                new SchemaLine(string.Empty,NameEscaper.EscapeIfNecessary(t.Name),
+                    NameEscaper.EscapeIfNecessary(c))))
             .ToArray();
-    }
-
-    public string[] GetTableNames()
-    {
-        return _context.TableNames.Select(NameEscaper.EscapeIfNecessary).ToArray();
     }
 
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
@@ -237,3 +234,4 @@ public class InteractiveTableExplorer
 
     public readonly record struct DisplayOptions(int MaxToDisplay);
 }
+public readonly record struct SchemaLine(string Command, string Table, string Column);
