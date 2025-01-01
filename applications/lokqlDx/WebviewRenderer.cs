@@ -41,6 +41,7 @@ public class WebViewRenderer(
             LastRendered = new UriOrHtml(url.ToString(), string.Empty);
             await webView.EnsureCoreWebView2Async();
             webView.CoreWebView2.Navigate(url.ToString());
+            tabControl.SelectedIndex =1;
             return true;
         });
     }

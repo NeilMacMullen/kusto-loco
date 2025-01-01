@@ -40,9 +40,7 @@ public class PptReportTarget : IReportTarget
                 while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
                 while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
                 while (existingTable.Columns.Count > requiredColumns) existingTable.RemoveColumnAt(0);
-                while (existingTable.Columns.Count < requiredColumns)
-              //      existingTable.InsertColumnAfter(existingTable.Columns.Count);
-                existingTable.AddColumn();
+                while (existingTable.Columns.Count < requiredColumns) existingTable.AddColumn();
                 FillTable(existingTable);
             }
         }
@@ -53,6 +51,7 @@ public class PptReportTarget : IReportTarget
 
             shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount + 1);
             var newTable = (ITable)shapeCollection.Last();
+            newTable.Name = name;
             FillTable(newTable);
         }
 

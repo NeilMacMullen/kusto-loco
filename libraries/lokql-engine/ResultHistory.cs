@@ -32,11 +32,11 @@ public class ResultHistory
     /// Get a stored result by name
     /// </summary>
     /// <remarks>
-    /// If the name is empty, return the most recent result
+    /// If the name is empty or '_', return the most recent result
     /// </remarks>
     public KustoQueryResult Fetch(string name)
     {
-        return name.IsBlank()
+        return name.IsBlank() || name == "_"
             ? MostRecent
             : _results.Where(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                 .Append(_nullStoredResult)
