@@ -63,7 +63,7 @@ public partial class MainWindow : Window
         //the engine
         await Task.Run(async () => await _explorer.RunInput(query));
        
-        Editor.SetDynamicSchema(_explorer.GetSchema());
+        Editor.SetSchema(_explorer.GetSchema());
         Editor.AddSettingsForIntellisense(_explorer.Settings);
         Editor.SetBusy(false);
         isBusy = false;

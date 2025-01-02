@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appinsight_schema.csv" />
     <None Remove="IntellisenseFunctions.json" />
     <None Remove="IntellisenseOperators.json" />
     <None Remove="SyntaxHighlighting.xml" />
@@ -22,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="appinsight_schema.csv" />
     <EmbeddedResource Include="IntellisenseFunctions.json" />
     <EmbeddedResource Include="IntellisenseOperators.json" />
     <EmbeddedResource Include="SyntaxHighlighting.xml" />
