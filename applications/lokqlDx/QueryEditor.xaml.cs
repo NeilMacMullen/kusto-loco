@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -8,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
-using CsvHelper;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
@@ -31,17 +29,17 @@ namespace lokqlDx;
 /// </remarks>
 public partial class QueryEditor : UserControl
 {
-    private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly EditorHelper _editorHelper;
+    private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
+
+    private CompletionWindow? _completionWindow;
 
     private IntellisenseEntry[] _internalCommands = [];
     private bool _isBusy;
+    private IntellisenseEntry[] _kqlFunctionEntries = [];
 
 
     private IntellisenseEntry[] _settingNames = [];
-
-    private CompletionWindow? _completionWindow;
-    private IntellisenseEntry[] _kqlFunctionEntries = [];
 
     public IntellisenseEntry[] KqlOperatorEntries = [];
 
@@ -190,20 +188,20 @@ public partial class QueryEditor : UserControl
     }
 
     /// <summary>
-    /// Gets a resource name independent of namespace
+    ///     Gets a resource name independent of namespace
     /// </summary>
     /// <remarks>
-    /// For some reason dotnet publish decides to lower-case the
-    /// namespace in the resource name. In any case, we really don't want to trust
-    /// that the namespace won't change so do a match against the filename
+    ///     For some reason dotnet publish decides to lower-case the
+    ///     namespace in the resource name. In any case, we really don't want to trust
+    ///     that the namespace won't change so do a match against the filename
     /// </remarks>
     private Stream SafeGetResourceStream(string substring)
     {
         var assembly = Assembly.GetExecutingAssembly();
         var availableResources = assembly.GetManifestResourceNames();
-        var wanted = availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
+        var wanted =
+            availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
         return assembly.GetManifestResourceStream(wanted)!;
-
     }
 
     private void QueryEditor_OnLoaded(object sender, RoutedEventArgs e)
@@ -375,15 +373,14 @@ public readonly record struct IntellisenseEntry(string Name, string Description,
 
 public class SchemaIntellisenseProvider
 {
+    private readonly SchemaLine[] _dynamicSchema = [];
     private SchemaLine[] _schemaLines = [];
-    private SchemaLine[] _dynamicSchema = [];
 
     private IEnumerable<SchemaLine> AllSchemaLines()
     {
         return _schemaLines.Concat(_dynamicSchema);
     }
 
-   
 
     private string[] TablesForCommand(string command)
     {
@@ -399,7 +396,7 @@ public class SchemaIntellisenseProvider
         //are matched first since the "dynamic" command have an empty string
         //as the command
         return AllSchemaLines().Select(s => s.Command).Distinct()
-            .OrderByDescending(s=>s.Length)
+            .OrderByDescending(s => s.Length)
             .ToArray();
     }
 
@@ -430,6 +427,7 @@ public class SchemaIntellisenseProvider
                     .ToArray();
                 return columns;
             }
+
         //no command found so return empty
         return [];
     }
