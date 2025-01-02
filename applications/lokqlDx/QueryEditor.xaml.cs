@@ -189,21 +189,32 @@ public partial class QueryEditor : UserControl
             }
     }
 
-    private void QueryEditor_OnLoaded(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Gets a resource name independent of namespace
+    /// </summary>
+    /// <remarks>
+    /// For some reason dotnet publish decides to lower-case the
+    /// namespace in the resource name. In any case, we really don't want to trust
+    /// that the namespace won't change so do a match against the filename
+    /// </remarks>
+    private Stream SafeGetResourceStream(string substring)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using var s = assembly.GetManifestResourceStream("lokqlDx.SyntaxHighlighting.xml");
-        using var reader = new XmlTextReader(s!);
+        var availableResources = assembly.GetManifestResourceNames();
+        var wanted = availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
+        return assembly.GetManifestResourceStream(wanted)!;
+
+    }
+
+    private void QueryEditor_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        using var s = SafeGetResourceStream("SyntaxHighlighting.xml");
+        using var reader = new XmlTextReader(s);
         Query.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-
-        using var functions = assembly.GetManifestResourceStream("lokqlDx.IntellisenseFunctions.json");
+        using var functions = SafeGetResourceStream("IntellisenseFunctions.json");
         _kqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions!)!;
-        using var ops = assembly.GetManifestResourceStream("lokqlDx.IntellisenseOperators.json");
+        using var ops = SafeGetResourceStream("IntellisenseOperators.json");
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
-
-        using var ai = assembly.GetManifestResourceStream("lokqlDx.appinsight_schema.csv");
-        //using var csvReader = new StreamReader(ai!);
-        //using var csv = new CsvReader(csvReader, CultureInfo.InvariantCulture);
     }
 
     private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
