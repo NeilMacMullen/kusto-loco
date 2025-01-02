@@ -1,0 +1,39 @@
+﻿<Window x:Class="lokqlDx.MissingWebviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lokqlDx"
+        mc:Ignorable="d"
+        Title="Missing WebView2 installation" SizeToContent="WidthAndHeight">
+  <StackPanel Margin="10">
+
+    <TextBlock>
+      <Run FontWeight="Bold" >
+      This application requires the Microsoft Edge WebView2</Run >
+      <LineBreak/>
+      <Run FontWeight="Bold">component to be installed on your system.
+      </Run>
+        <LineBreak/>
+          <LineBreak/>
+
+        Download the "Evergreen Bootstrapper from:
+          <LineBreak/>
+          <LineBreak/>
+        <Run Text="     "></Run> <Hyperlink NavigateUri="https://developer.microsoft.com/en-us/microsoft-edge/webview2"
+                                            RequestNavigate="Hyperlink_OnRequestNavigate">WebView2 download site</Hyperlink>
+          <LineBreak/>
+          <LineBreak/>
+        More information and detailed instructions:
+          <LineBreak/>
+          <LineBreak/>
+          <Run Text="     "></Run>
+        <Hyperlink NavigateUri="https://github.com/NeilMacMullen/kusto-loco/wiki/WebView2-Requirement"
+                   RequestNavigate="Hyperlink_OnRequestNavigate"
+                   >lokqldx webview requirements</Hyperlink>
+    </TextBlock>
+<Button HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="5" Padding="5" MinWidth="50"
+        IsCancel="True"
+        >Ok</Button>
+  </StackPanel>
+</Window>

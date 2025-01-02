@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using Lokql.Engine;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using NotNullStrings;
 
@@ -31,6 +32,8 @@ public partial class MainWindow : Window
     private Workspace currentWorkspace = new();
     private bool isBusy;
 
+
+    
     public MainWindow(
         string[] args
     )
@@ -47,6 +50,8 @@ public partial class MainWindow : Window
            DatagridOverflowWarning,
             settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
+
+  
     }
 
     private async Task RunQuery(string query)
@@ -127,6 +132,7 @@ public partial class MainWindow : Window
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
+        
         Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
             .Select(v =>
                 new IntellisenseEntry(v.Key, v.Value, string.Empty))
