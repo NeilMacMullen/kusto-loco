@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:lokqlDx"
         mc:Ignorable="d"
         Title="Missing WebView2 installation" SizeToContent="WidthAndHeight">
   <StackPanel Margin="10">
@@ -17,11 +16,11 @@
         <LineBreak/>
           <LineBreak/>
 
-        Download the "Evergreen Bootstrapper from:
+        Download:
           <LineBreak/>
           <LineBreak/>
-        <Run Text="     "></Run> <Hyperlink NavigateUri="https://developer.microsoft.com/en-us/microsoft-edge/webview2"
-                                            RequestNavigate="Hyperlink_OnRequestNavigate">WebView2 download site</Hyperlink>
+        <Run Text="     "></Run> <Hyperlink NavigateUri="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+                                            RequestNavigate="Hyperlink_OnRequestNavigate">WebView2 installer</Hyperlink>
           <LineBreak/>
           <LineBreak/>
         More information and detailed instructions:
