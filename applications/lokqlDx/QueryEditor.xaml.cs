@@ -202,9 +202,8 @@ public partial class QueryEditor : UserControl
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
 
         using var ai = assembly.GetManifestResourceStream("lokqlDx.appinsight_schema.csv");
-        using var csvReader = new StreamReader(ai!);
-        using var csv = new CsvReader(csvReader, CultureInfo.InvariantCulture);
-        _schemaIntellisenseProvider.AddPredefinedSchemaLines(csv.GetRecords<SchemaLine>().ToArray());
+        //using var csvReader = new StreamReader(ai!);
+        //using var csv = new CsvReader(csvReader, CultureInfo.InvariantCulture);
     }
 
     private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
@@ -293,9 +292,9 @@ public partial class QueryEditor : UserControl
             .ToArray();
     }
 
-    public void SetDynamicSchema(SchemaLine[] getSchema)
+    public void SetSchema(SchemaLine[] getSchema)
     {
-        _schemaIntellisenseProvider.AddDynamicSchema(getSchema);
+        _schemaIntellisenseProvider.SetSchema(getSchema);
     }
 }
 
@@ -365,7 +364,7 @@ public readonly record struct IntellisenseEntry(string Name, string Description,
 
 public class SchemaIntellisenseProvider
 {
-    private readonly List<SchemaLine> _schemaLines = [];
+    private SchemaLine[] _schemaLines = [];
     private SchemaLine[] _dynamicSchema = [];
 
     private IEnumerable<SchemaLine> AllSchemaLines()
@@ -373,10 +372,7 @@ public class SchemaIntellisenseProvider
         return _schemaLines.Concat(_dynamicSchema);
     }
 
-    public void AddPredefinedSchemaLines(IEnumerable<SchemaLine> schema)
-    {
-        _schemaLines.AddRange(schema);
-    }
+   
 
     private string[] TablesForCommand(string command)
     {
@@ -423,13 +419,12 @@ public class SchemaIntellisenseProvider
                     .ToArray();
                 return columns;
             }
-
         //no command found so return empty
         return [];
     }
 
-    public void AddDynamicSchema(SchemaLine[] getSchema)
+    public void SetSchema(SchemaLine[] schema)
     {
-        _dynamicSchema = getSchema;
+        _schemaLines = schema;
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.CommandLine.Parsing;
+using System.Globalization;
 using System.Reflection;
 using CommandLine;
+using CsvHelper;
 
 namespace Lokql.Engine.Commands;
 
@@ -18,7 +20,7 @@ public class CommandProcessor
 
     public static CommandProcessor Default()
     {
-        return new CommandProcessor()
+        var cp= new CommandProcessor()
                 .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
                 .WithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
                 .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
@@ -48,13 +50,23 @@ public class CommandProcessor
                 .WithAdditionalCommand<QueryCommand.Options>(QueryCommand.RunAsync)
                 .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
                 .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
-               
                 .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.RunAsync)
-               
             ;
 
+        cp.AddAdditionalCommandSchema(AppInsightsCommand.SchemaCsv);
+        return cp;
     }
 
+    public void AddAdditionalCommandSchema(string schemaCsv)
+    {
+            var stream = new StringReader(schemaCsv);
+            using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
+            var schema= csv.GetRecords<SchemaLine>().ToArray();
+            _registeredSchema = _registeredSchema.Concat(schema).ToArray();
+    }
+
+
+    private SchemaLine[] _registeredSchema = [];
     public CommandProcessor WithAdditionalCommand<T>(Func<CommandProcessorContext, T, Task> registration)
     {
         _registrations = _registrations.Add(
@@ -62,6 +74,12 @@ public class CommandProcessor
         return this;
     }
 
+    public SchemaLine [] GetRegisteredSchema()
+    {
+        return _registeredSchema;
+    }
+
+  
     public async Task RunInternalCommand(InteractiveTableExplorer exp, string currentLine, BlockSequence sequence)
     {
         var splitter = CommandLineStringSplitter.Instance;

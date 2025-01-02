@@ -65,12 +65,15 @@ public class InteractiveTableExplorer
 
     public SchemaLine[] GetSchema()
     {
-        return _context
+        var commandSchema = _commandProcessor.GetRegisteredSchema();
+        
+        var dynamicSchema= _context
             .Tables()
             .SelectMany(t => t.ColumnNames.Select(c=>
                 new SchemaLine(string.Empty,NameEscaper.EscapeIfNecessary(t.Name),
-                    NameEscaper.EscapeIfNecessary(c))))
-            .ToArray();
+                    NameEscaper.EscapeIfNecessary(c))));
+
+        return commandSchema.Concat(dynamicSchema).ToArray();
     }
 
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
