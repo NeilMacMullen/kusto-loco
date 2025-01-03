@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace KustoLoco.Core;
 
@@ -43,9 +44,11 @@ public static class KustoNameEscaping
     /// </summary>
     public static string EscapeIfNecessary(string name)
     {
+        bool IsAllowableChar(char c)
+            => Char.IsLetterOrDigit(c) || c == '_';
         name = RemoveFraming(name);
         return name
-            .Any(c => !char.IsLetterOrDigit(c))
+            .Any(c => !IsAllowableChar(c))
             ? EnsureFraming(name)
             : name;
     }
