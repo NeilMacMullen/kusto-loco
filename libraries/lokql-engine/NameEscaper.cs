@@ -7,10 +7,6 @@ public static class NameEscaper
 {
     public static string EscapeIfNecessary(string name)
     {
-        name = KustoNameEscaping.RemoveFraming(name);
-        return name
-            .Any(c => !char.IsLetterOrDigit(c))
-            ? KustoNameEscaping.EnsureFraming(name)
-            : name;
+       return  KustoNameEscaping.EscapeIfNecessary(name);
     }
 }
