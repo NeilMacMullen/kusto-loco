@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
   </ItemGroup>
 
