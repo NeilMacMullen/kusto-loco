@@ -108,6 +108,8 @@ data
             if (v is null) continue;
             Settings.Set($"env.{e.Key}",v);
         }
+        if (Path.IsNotBlank())
+            Settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, System.IO.Path.GetDirectoryName(Path)!);
     }
     public void CreateNew()
     {

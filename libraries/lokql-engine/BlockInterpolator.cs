@@ -44,6 +44,6 @@ public class BlockInterpolator
             return fullMatch;
         }
 
-        return Regex.Replace(query, @"\$?\$(\(?)(\w+)(\)?)", rep);
+        return Regex.Replace(query, @"\$?\$(\(?)([a-zA-Z0-9_\.]+)(\)?)", rep);
     }
 }
