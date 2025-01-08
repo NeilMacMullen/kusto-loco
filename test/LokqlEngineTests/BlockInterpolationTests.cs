@@ -55,4 +55,29 @@ public class BlockInterpolationTests
         var expr = "xxx($abc)yyy";
         blockInterpolator.Interpolate(expr).Should().Be("xxx(123)yyy");
     }
+
+
+    [TestMethod]
+    public void DotsAreCorrectlyInterpolated()
+    {
+        var settings = new KustoSettingsProvider();
+        settings.Set("abc.def", "123");
+        settings.Set("abc", "456");
+        var blockInterpolator = new BlockInterpolator(settings);
+        blockInterpolator.Interpolate("xxx $abc.def yyy").Should().Be("xxx 123 yyy");
+        blockInterpolator.Interpolate("xxx $(abc.def) yyy").Should().Be("xxx 123 yyy");
+        blockInterpolator.Interpolate("xxx $(abc).def yyy").Should().Be("xxx 456.def yyy");
+    }
+
+    [TestMethod]
+    public void UnderscoresAreCorrectlyInterpolated()
+    {
+        var settings = new KustoSettingsProvider();
+        settings.Set("abc_def", "123");
+        settings.Set("abc", "456");
+        var blockInterpolator = new BlockInterpolator(settings);
+        blockInterpolator.Interpolate("xxx $abc_def yyy").Should().Be("xxx 123 yyy");
+        blockInterpolator.Interpolate("xxx $(abc_def) yyy").Should().Be("xxx 123 yyy");
+        blockInterpolator.Interpolate("xxx $(abc)_def yyy").Should().Be("xxx 456_def yyy");
+    }
 }

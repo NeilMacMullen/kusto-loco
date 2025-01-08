@@ -1,20 +1,20 @@
 ﻿@page "/"
-@inject HttpClient _client
 @using KustoLoco.Core
+@using KustoLoco.Core.Console
 @using KustoLoco.Core.Settings
+@using KustoLoco.FileFormats
 @using KustoLoco.Rendering
 <div style="display: flex; flex-direction: column; height: 90vh;">
     <div style="flex-shrink: 0;">
         <PageTitle>KQl</PageTitle>
+        <InputFile OnChange="LoadFiles"  accept=".csv"/>
         <div style="display: flex; align-items: stretch;">
-            <textarea @bind="query" class="form-control" rows="3" style="flex-grow: 1;"></textarea>
-            <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">
-                &#x1F50D;
-            </button>
+            <textarea @bind="query" class="form-control" rows="3" style="flex-grow: 1;" placeholder="Loading a CSV file will automatically generate
+a query to show the breakdown of items in the first column
+but you can change this and rerun the query"></textarea>
+            <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">&#x1F50D;</button>
         </div>
-        <p>
-            @summary
-        </p>
+        <p>@summary</p>
     </div>
     <div style="flex-grow: 1; overflow: auto;">
         <iframe style="width: 100%; height: 90%;" srcdoc="@table"></iframe>
@@ -22,21 +22,37 @@
 </div>
 
 @code {
-    private string query = "let T = datatable(A:int)[1,2,3,4,5,6,7,8,9]; T | project X=A,Y=A*A | render linechart";
+    private string query = "";
     private MarkupString table;
-    private string summary = "summary";
+    private string summary = "";
+    private readonly KustoQueryContext kustoContext = new();
 
-    async Task<string> GetXDSFile()
+    private async Task LoadFiles(InputFileChangeEventArgs e)
     {
-        return await _client.GetStringAsync("sample-data/weather.json");
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var tableName = Path.GetFileNameWithoutExtension(file.Name);
+            await using MemoryStream memoryStream = new();
+            await file.OpenReadStream(20_000_000).CopyToAsync(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var csvLoader = CsvSerializer.Default(new KustoSettingsProvider(), new NullConsole());
+            var loadResult = await csvLoader.LoadTable(memoryStream, tableName);
+            kustoContext.AddTable(loadResult.Table);
+            var columnName = loadResult.Table.ColumnNames.First();
+            query = $@"{tableName}
+| summarize count() by {columnName}
+| order by count_ | take 10 | render piechart";
+        }
+
+        await RunQuery();
     }
 
     private async Task RunQuery()
     {
-        var client = new KustoQueryContext();
-        var result = await client.RunQuery(query);
+        var result = await kustoContext.RunQuery(query);
         var renderer = new KustoResultRenderer(new KustoSettingsProvider());
         table = new MarkupString(renderer.RenderToHtml(result));
-        summary = $"{result.ColumnCount}x{result.RowCount} {result.QueryDuration}ms";
+      
     }
+
 }

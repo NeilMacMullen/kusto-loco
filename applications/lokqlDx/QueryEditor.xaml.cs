@@ -285,11 +285,14 @@ public partial class QueryEditor : UserControl
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
     {
+        bool CharContinuesAutoComplete(char c) => (char.IsLetterOrDigit(c) || c == '_' || c == '.');
         if (e.Text.Length > 0 && _completionWindow != null)
-            if (!char.IsLetterOrDigit(e.Text[0]))
-                // Whenever a non-letter is typed while the completion window is open,
-                // insert the currently selected element.
+        {
+            // Whenever a non-letter is typed while the completion window is open,
+            // insert the currently selected element.
+            if (!CharContinuesAutoComplete(e.Text[0]))
                 _completionWindow.CompletionList.RequestInsertion(e);
+        }
         // Do not set e.Handled=true.
         // We still want to insert the character that was typed.
     }
@@ -324,7 +327,9 @@ public class MyCompletionData(IntellisenseEntry entry, string prefix, int rewind
     public object Content => Text;
 
     public object Description
-        => $@"{entry.Description}
+        => entry.Syntax.IsBlank()
+            ? entry.Description
+            : $@"{entry.Description}
 Usage: {entry.Syntax}";
 
 

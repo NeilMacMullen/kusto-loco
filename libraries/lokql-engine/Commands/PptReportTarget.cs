@@ -92,7 +92,7 @@ public class PptReportTarget : IReportTarget
             foreach (var p in matchingPictures)
             {
                 var data = await surface.RenderToImage(result, (double)p.Width, (double)p.Height);
-                p.Image!.Update(data);
+                p.Image!.Update(new MemoryStream(data));
             }
         }
         else
