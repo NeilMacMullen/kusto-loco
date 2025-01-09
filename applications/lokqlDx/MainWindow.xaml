@@ -14,10 +14,10 @@
     <Menu DockPanel.Dock="Top" Name="MainMenu">
       <MenuItem Header="_File">
         <MenuItem Header="_New Workspace" Click="NewWorkspace" />
-        <MenuItem Header="_Open Workspace" Click="OpenWorkSpace" />
+        <MenuItem Header="_Open Workspace" Click="OnOpenWorkSpace" />
         <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
 
-        <MenuItem Header="_Save" Click="SaveWorkspaceEvent" />
+        <MenuItem Header="_Save" Click="OnSaveWorkspace" />
         <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent" />
       </MenuItem>
       <MenuItem Header="_Preferences">
@@ -42,7 +42,7 @@
         <MenuItem Header="Github Discussion Forum" Click="NavigateToDiscussionForum" />
       </MenuItem>
     </Menu>
-    <Grid>
+    <Grid Name="MainGrid">
       <Grid.ColumnDefinitions>
 
         <ColumnDefinition Width="400" />
@@ -50,7 +50,7 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <Grid Grid.Column="0">
+      <Grid Grid.Column="0" Name="EditorConsoleGrid">
         <Grid.RowDefinitions>
 
           <RowDefinition Height="*" />

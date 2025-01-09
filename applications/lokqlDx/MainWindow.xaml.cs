@@ -26,8 +26,6 @@ public partial class MainWindow : Window
     private Copilot _copilot = new(string.Empty);
     private InteractiveTableExplorer _explorer;
 
-    private MruList _mruList = MruList.LoadFromArray([]);
-
     private Workspace currentWorkspace = new();
     private bool isBusy;
 
@@ -52,6 +50,8 @@ public partial class MainWindow : Window
 
     private async Task RunQuery(string query)
     {
+        if (query.IsBlank())
+            return;
         if (isBusy)
             return;
         isBusy = true;
@@ -80,26 +80,32 @@ public partial class MainWindow : Window
     }
 
 
-    private void UpdateUIFromWorkspace()
+    private async Task UpdateUIFromWorkspace()
     {
         Editor.SetText(currentWorkspace.Text);
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         _explorer = new InteractiveTableExplorer(_console, loader, settings,
             CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
-        UpdateFontSize();
         Title = $"LokqlDX - {_workspaceManager.Path.OrWhenBlank("new workspace")}";
+        dataGrid.ItemsSource = null;
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
     }
 
     private void RebuildRecentFilesList()
     {
+        string GetHeaderForPath(string s)
+        {
+            return $"{Path.GetFileName(s)} ({Path.GetDirectoryName(s)})";
+        }
+
         RecentlyUsed.Items.Clear();
-        foreach (var mruItem in _mruList.GetItems())
+        foreach (var path in _preferenceManager.GetMruItems().Take(10))
         {
             var menuitem = new MenuItem
             {
-                Header = mruItem.Description,
-                DataContext = mruItem
+                Header = GetHeaderForPath(path),
+                DataContext = path
             };
             menuitem.Click += RecentlyUsedFileClicked;
             RecentlyUsed.Items.Add(menuitem);
@@ -110,47 +116,45 @@ public partial class MainWindow : Window
     {
         if (path.IsBlank())
             return;
-        _mruList.BringToTop(path);
+        _preferenceManager.BringToTopOfMruList(path);
+
         JumpList.AddToRecentCategory(path);
 
         RebuildRecentFilesList();
     }
 
-    private void UpdateDynamicUiFromPreferences(Preferences preferences)
+    private void UpdateDynamicUiFromPreferences()
     {
+        var preferences = _preferenceManager.UIPreferences;
         Editor.SetFont(preferences.FontFamily);
-        Editor.SetWordWrap(_preferenceManager.Preferences.WordWrap);
-        Editor.ShowLineNumbers(_preferenceManager.Preferences.ShowLineNumbers);
+        Editor.SetWordWrap(preferences.WordWrap);
+        Editor.ShowLineNumbers(preferences.ShowLineNumbers);
         OutputText.FontFamily = new FontFamily(preferences.FontFamily);
+        Editor.SetFontSize(preferences.FontSize);
+        OutputText.FontSize = preferences.FontSize;
+        dataGrid.FontSize = preferences.FontSize;
+        UserChat.FontSize = preferences.FontSize;
+        ChatHistory.FontSize = preferences.FontSize;
+        if (preferences.EditorGridHeight > 10)
+            EditorConsoleGrid.RowDefinitions[0].Height =
+            new GridLength(preferences.EditorGridHeight  ,GridUnitType.Pixel);
+        if (preferences.EditorGridWidth > 10)
+            MainGrid.ColumnDefinitions[0].Width =
+                new GridLength(preferences.EditorGridWidth, GridUnitType.Pixel);
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
+        _preferenceManager.RetrieveUiPreferencesFromDisk();
         Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
             .Select(v =>
                 new IntellisenseEntry(v.Key, v.Value, string.Empty))
             .ToArray());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
-
-        _preferenceManager.Load();
-
-        UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
-        _mruList = MruList.LoadFromArray(_preferenceManager.Preferences.RecentProjects);
+        UpdateDynamicUiFromPreferences();
         RebuildRecentFilesList();
-
-        if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
-        {
-            Width = _preferenceManager.Preferences.WindowWidth < _minWindowSize.Width
-                ? _minWindowSize.Width
-                : _preferenceManager.Preferences.WindowWidth;
-            Height = _preferenceManager.Preferences.WindowHeight < _minWindowSize.Height
-                ? _minWindowSize.Height
-                : _preferenceManager.Preferences.WindowHeight;
-            Left = _preferenceManager.Preferences.WindowLeft;
-            Top = _preferenceManager.Preferences.WindowTop;
-        }
-
+        ResizeWindowAccordingToStoredPreferences();
         var pathToLoad = _args.Any()
             ? _args[0]
             : string.Empty;
@@ -158,68 +162,97 @@ public partial class MainWindow : Window
         await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
     }
 
-    private async void RecentlyUsedFileClicked(object sender, RoutedEventArgs e)
+
+    private void ResizeWindowAccordingToStoredPreferences()
     {
-        if (sender is MenuItem { DataContext: MruList.MruItem mruItem })
-            await LoadWorkspace(mruItem.Path);
+        var ui = _preferenceManager.UIPreferences;
+        if (Width > 100 && Height > 100 && Left > 0 && Top > 0)
+        {
+            Width = ui.WindowWidth < _minWindowSize.Width
+                ? _minWindowSize.Width
+                : ui.WindowWidth;
+            Height = ui.WindowHeight < _minWindowSize.Height
+                ? _minWindowSize.Height
+                : ui.WindowHeight;
+            Left = ui.WindowLeft;
+            Top = ui.WindowTop;
+        }
     }
 
-    private void SaveApplicationPreferences()
+    private async void RecentlyUsedFileClicked(object sender, RoutedEventArgs e)
     {
-        PreferencesManager.EnsureDefaultFolderExists();
+        if (sender is MenuItem { DataContext: string mruItem }) await LoadWorkspace(mruItem);
+    }
 
-        _preferenceManager.Preferences.LastWorkspacePath = _workspaceManager.Path;
-        _preferenceManager.Preferences.WindowLeft = Left;
-        _preferenceManager.Preferences.WindowTop = Top;
-        _preferenceManager.Preferences.WindowWidth = Width;
-        _preferenceManager.Preferences.WindowHeight = Height;
-
-        _preferenceManager.Preferences.RecentProjects = _mruList.GetItems().Select(i => i.Path).ToArray();
-        _preferenceManager.Save();
-        UpdateMostRecentlyUsed(_workspaceManager.Path);
+    private void PersistUiPreferencesToDisk()
+    {
+        var ui = _preferenceManager.UIPreferences;
+        ui.WindowLeft = Left;
+        ui.WindowTop = Top;
+        ui.WindowWidth = Width;
+        ui.WindowHeight = Height;
+        ui.EditorGridHeight = EditorConsoleGrid.RowDefinitions[0].Height.Value;
+        ui.EditorGridWidth= MainGrid.ColumnDefinitions[0].Width.Value;
+        _preferenceManager.SaveUiPrefs();
     }
 
     private void SaveWorkspace(string path)
     {
         UpdateCurrentWorkspaceFromUI();
         _workspaceManager.Save(path, currentWorkspace);
-
-        SaveApplicationPreferences();
+        _preferenceManager.BringToTopOfMruList(path);
     }
 
-    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    /// <summary>
+    ///     Allow the user to save any pending changes
+    /// </summary>
+    /// <returns>
+    ///     true if the user wants to cancel the operation
+    /// </returns>
+    private async Task<bool> OfferSaveOfCurrentWorkspace()
     {
         if (CheckIfWorkspaceDirty())
         {
-            var result = MessageBox.Show("You have have unsaved changes. Do you really want to quit without saving them?",
+            var result = MessageBox.Show(
+                "You have have unsaved changes. Do you want to save them?",
                 "Warning", MessageBoxButton.YesNoCancel);
-            if (result != MessageBoxResult.Yes)
-            {
-                e.Cancel = true;
-                return;
-            }
-           // Save();
-            SaveApplicationPreferences();
+            if (result == MessageBoxResult.Cancel) return true;
+
+            if (result == MessageBoxResult.Yes)
+                await Save();
         }
-        
+
+        return false;
+    }
+
+    private async void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    {
+        if (await OfferSaveOfCurrentWorkspace())
+        {
+            e.Cancel = true;
+            return;
+        }
+
+
+        //save the window size and position, font size etc regardless
+        PersistUiPreferencesToDisk();
     }
 
     private async Task LoadWorkspace(string path)
     {
+        if (await OfferSaveOfCurrentWorkspace()) return;
+
+        //make sure we have the most recent global preferences
+        var appPrefs = _preferenceManager.FetchApplicationPreferencesFromDisk();
         _workspaceManager.Load(path);
         currentWorkspace = _workspaceManager.Workspace;
-
-        var startupscript = _preferenceManager.Preferences.StartupScript;
-        if (!startupscript.IsBlank())
-            await RunQuery(startupscript);
-        var wkspcStartup = _workspaceManager.Workspace.StartupScript;
-        if (!wkspcStartup.IsBlank())
-            await RunQuery(wkspcStartup);
+        await RunQuery(appPrefs.StartupScript);
+        await RunQuery(_workspaceManager.Workspace.StartupScript);
         UpdateMostRecentlyUsed(path);
-        UpdateUIFromWorkspace();
+        await UpdateUIFromWorkspace();
     }
 
-    private async void OpenWorkSpace(object sender, RoutedEventArgs e)
+    private async void OnOpenWorkSpace(object sender, RoutedEventArgs e)
     {
         var folder = _workspaceManager.ContainingFolder();
         var dialog = new OpenFileDialog
@@ -234,9 +267,9 @@ public partial class MainWindow : Window
     }
 
 
-    private void SaveWorkspaceEvent(object sender, RoutedEventArgs e)
+    private async void OnSaveWorkspace(object sender, RoutedEventArgs e)
     {
-        Save();
+        await Save();
     }
 
     private void UpdateCurrentWorkspaceFromUI()
@@ -248,22 +281,22 @@ public partial class MainWindow : Window
     {
         UpdateCurrentWorkspaceFromUI();
         return _workspaceManager.IsDirty(currentWorkspace);
-
     }
-    private void Save()
+
+    private async Task Save()
     {
         if (!CheckIfWorkspaceDirty())
             return;
         if (_workspaceManager.Path.IsBlank())
         {
-            SaveAs();
+            await SaveAs();
             return;
         }
 
         SaveWorkspace(_workspaceManager.Path);
     }
 
-    private bool SaveAs()
+    private async Task<bool> SaveAs()
     {
         var dialog = new SaveFileDialog
         {
@@ -273,45 +306,38 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             SaveWorkspace(dialog.FileName);
-            UpdateUIFromWorkspace();
+            //make sure we update title bar
+            await UpdateUIFromWorkspace();
             return true;
         }
 
         return false;
     }
 
-    private void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
+    private async void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
     {
-        SaveAs();
+        await SaveAs();
     }
 
     private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
         //save current
-        Save();
+        await Save();
         await LoadWorkspace(string.Empty);
     }
 
     private void IncreaseFontSize(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.FontSize = Math.Min(40, _preferenceManager.Preferences.FontSize + 1);
-        UpdateFontSize();
+        _preferenceManager.UIPreferences.FontSize = Math.Min(40, _preferenceManager.UIPreferences.FontSize + 1);
+        UpdateDynamicUiFromPreferences();
     }
 
     private void DecreaseFontSize(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.FontSize = Math.Max(6, _preferenceManager.Preferences.FontSize - 1);
-        UpdateFontSize();
+        _preferenceManager.UIPreferences.FontSize = Math.Max(6, _preferenceManager.UIPreferences.FontSize - 1);
+        UpdateDynamicUiFromPreferences();
     }
 
-    private void UpdateFontSize()
-    {
-        Editor.SetFontSize(_preferenceManager.Preferences.FontSize);
-        OutputText.FontSize = _preferenceManager.Preferences.FontSize;
-        dataGrid.FontSize = _preferenceManager.Preferences.FontSize;
-        UserChat.FontSize = _preferenceManager.Preferences.FontSize;
-        ChatHistory.FontSize = _preferenceManager.Preferences.FontSize;
-    }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
@@ -428,42 +454,48 @@ public partial class MainWindow : Window
     private void OpenApplicationOptionsDialog(object sender, RoutedEventArgs e)
     {
         //make sure we have the latest preferences
-        _preferenceManager.Load();
-        var dialog = new ApplicationPreferencesWindow(_preferenceManager.Preferences)
+        var appPreferences = _preferenceManager.FetchApplicationPreferencesFromDisk();
+        var dialog = new ApplicationPreferencesWindow(appPreferences,
+            _preferenceManager.UIPreferences)
         {
             Owner = this
         };
+        //TODO - this is a bit of a hack based on the fact we've put the
+        //font in this dialog
+        var oldFont = _preferenceManager.UIPreferences.FontFamily;
         if (dialog.ShowDialog() == true)
         {
-            _preferenceManager.Save();
-            UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+            _preferenceManager.Save(appPreferences);
+           
+            UpdateDynamicUiFromPreferences();
         }
+        else _preferenceManager.UIPreferences.FontFamily = oldFont;
     }
 
-    private void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
+    private async void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
     {
         UpdateCurrentWorkspaceFromUI();
-        var dialog = new WorkspacePreferencesWindow(currentWorkspace)
+        var dialog = new WorkspacePreferencesWindow(currentWorkspace, _preferenceManager.UIPreferences)
         {
             Owner = this
         };
         if (dialog.ShowDialog() == true)
         {
             currentWorkspace = dialog._workspace;
-            Save();
+            await Save();
         }
     }
 
     private void ToggleWordWrap(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.WordWrap = !_preferenceManager.Preferences.WordWrap;
-        UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+        _preferenceManager.UIPreferences.WordWrap = !_preferenceManager.UIPreferences.WordWrap;
+        UpdateDynamicUiFromPreferences();
     }
 
     private void ToggleLineNumbers(object sender, RoutedEventArgs e)
     {
-        _preferenceManager.Preferences.ShowLineNumbers = !_preferenceManager.Preferences.ShowLineNumbers;
-        UpdateDynamicUiFromPreferences(_preferenceManager.Preferences);
+        _preferenceManager.UIPreferences.ShowLineNumbers = !_preferenceManager.UIPreferences.ShowLineNumbers;
+        UpdateDynamicUiFromPreferences();
     }
 
     private async void OnCopyImageToClipboard(object sender, RoutedEventArgs e)

@@ -56,6 +56,7 @@ data
         {
             var json = JsonSerializer.Serialize(workspace);
             File.WriteAllText(Path, json);
+            _workspace = workspace;
         }
         catch (Exception e)
         {

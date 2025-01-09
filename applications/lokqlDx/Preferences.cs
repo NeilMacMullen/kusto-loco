@@ -1,16 +1,47 @@
 ﻿namespace lokqlDx;
 
-public class Preferences
+/// <summary>
+/// Global Preferences that are applied for every workspace
+/// </summary>
+public class ApplicationPreferences
 {
-    public string LastWorkspacePath { get; set; } = string.Empty;
+    public string StartupScript { get; set; }= string.Empty;
+}
+
+public class MruEntry
+{
+    public string Path { get; set; } = string.Empty;
+    public DateTime LastAccessed { get; set; } = DateTime.MinValue;
+}
+/// <summary>
+/// The list of recently used files/projects
+/// </summary>
+/// <remarks>
+/// This may be quite contended if the user has multiple copies of the application
+/// open
+/// </remarks>
+public class PersistedMruList
+{
+    public MruEntry [] RecentProjects { get; set; } = [];
+}
+
+/// <summary>
+/// User preferences that affect the UI
+/// </summary>
+/// <remarks>
+/// These are persisted to disk on application close and loaded at startup
+/// </remarks>
+public class UIPreferences
+{
     public double FontSize { get; set; } = 20;
     public string FontFamily { get; set; } = "Consolas";
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
     public double WindowTop { get; set; }
     public double WindowLeft { get; set; }
-    public string StartupScript { get; set; }= string.Empty;
-    public string[] RecentProjects { get; set; } = [];
     public bool WordWrap { get; set; } = false;
     public bool ShowLineNumbers { get; set; } = false;
+    public double EditorGridHeight { get; set; }
+    public double EditorGridWidth { get; set; }
 }
+
