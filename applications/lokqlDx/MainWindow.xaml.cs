@@ -189,8 +189,19 @@ public partial class MainWindow : Window
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
-        Save();
-        SaveApplicationPreferences();
+        if (CheckIfWorkspaceDirty())
+        {
+            var result = MessageBox.Show("You have have unsaved changes. Do you really want to quit without saving them?",
+                "Warning", MessageBoxButton.YesNoCancel);
+            if (result != MessageBoxResult.Yes)
+            {
+                e.Cancel = true;
+                return;
+            }
+           // Save();
+            SaveApplicationPreferences();
+        }
+        
     }
 
     private async Task LoadWorkspace(string path)
@@ -233,10 +244,15 @@ public partial class MainWindow : Window
         currentWorkspace = currentWorkspace with { Text = Editor.GetText() };
     }
 
-    private void Save()
+    private bool CheckIfWorkspaceDirty()
     {
         UpdateCurrentWorkspaceFromUI();
-        if (!_workspaceManager.IsDirty(currentWorkspace))
+        return _workspaceManager.IsDirty(currentWorkspace);
+
+    }
+    private void Save()
+    {
+        if (!CheckIfWorkspaceDirty())
             return;
         if (_workspaceManager.Path.IsBlank())
         {
@@ -411,6 +427,8 @@ public partial class MainWindow : Window
 
     private void OpenApplicationOptionsDialog(object sender, RoutedEventArgs e)
     {
+        //make sure we have the latest preferences
+        _preferenceManager.Load();
         var dialog = new ApplicationPreferencesWindow(_preferenceManager.Preferences)
         {
             Owner = this
