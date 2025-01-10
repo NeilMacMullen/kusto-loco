@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace lokqlDx;
 
@@ -8,10 +9,14 @@ namespace lokqlDx;
 public partial class WorkspacePreferencesWindow : Window
 {
     public  Workspace _workspace;
+    private readonly UIPreferences _uiPreferences;
+   
 
-    public WorkspacePreferencesWindow(Workspace workspace)
+    public WorkspacePreferencesWindow(Workspace workspace,UIPreferences uiPreferences)
     {
         _workspace = workspace;
+        _uiPreferences = uiPreferences;
+
         InitializeComponent();
     }
 
@@ -24,5 +29,7 @@ public partial class WorkspacePreferencesWindow : Window
     private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
     {
         StartupScript.Text = _workspace.StartupScript;
+        StartupScript.FontSize = _uiPreferences.FontSize;
+        StartupScript.FontFamily = new FontFamily(_uiPreferences.FontFamily);
     }
 }

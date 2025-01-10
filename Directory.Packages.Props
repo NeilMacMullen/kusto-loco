@@ -10,8 +10,8 @@
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Fastenshtein" Version="1.0.10" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.4.6" />
@@ -29,7 +29,7 @@
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
-    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.3" />
     <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.7.3" />
