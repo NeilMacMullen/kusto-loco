@@ -88,6 +88,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectUtilities", "Project
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntellisenseHelper", "utilities\IntellisenseHelper\IntellisenseHelper.csproj", "{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor-Server", "samples\Blazor-Server\Blazor-Server.csproj", "{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -202,6 +204,10 @@ Global
 		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -235,6 +241,7 @@ Global
 		{F01F2BDA-7EA1-4658-BE44-CAD85B306D1D} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{16A14511-618F-44F4-B09C-4C68BAF932CC} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
