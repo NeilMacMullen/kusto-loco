@@ -79,17 +79,29 @@ public partial class MainWindow : Window
         await RunQuery(eventArgs.Query);
     }
 
-
-    private async Task UpdateUIFromWorkspace()
+    /// <summary>
+    /// Update the UI because a new workspace has been loaded
+    /// </summary>
+    /// <remarks>
+    /// The clearWorkingContext flags indicates whether we should clear all working context
+    /// We don't always want to do this, for example if we are doing a save-as in which case it's
+    /// a bit disconcerting for the user if all their charts/tables disappear
+    /// </remarks>
+    private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
     {
-        Editor.SetText(currentWorkspace.Text);
-        var settings = _workspaceManager.Settings;
-        var loader = new StandardFormatAdaptor(settings, _console);
-        _explorer = new InteractiveTableExplorer(_console, loader, settings,
-            CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+      
+     
         Title = $"LokqlDX - {_workspaceManager.Path.OrWhenBlank("new workspace")}";
-        dataGrid.ItemsSource = null;
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+        if (clearWorkingContext)
+        {
+            Editor.SetText(currentWorkspace.Text);
+            var settings = _workspaceManager.Settings;
+            var loader = new StandardFormatAdaptor(settings, _console);
+            _explorer = new InteractiveTableExplorer(_console, loader, settings,
+                CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+            dataGrid.ItemsSource = null;
+            await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+        }
     }
 
     private void RebuildRecentFilesList()
@@ -249,7 +261,7 @@ public partial class MainWindow : Window
         await RunQuery(appPrefs.StartupScript);
         await RunQuery(_workspaceManager.Workspace.StartupScript);
         UpdateMostRecentlyUsed(path);
-        await UpdateUIFromWorkspace();
+        await UpdateUIFromWorkspace(true);
     }
 
     private async void OnOpenWorkSpace(object sender, RoutedEventArgs e)
@@ -307,7 +319,7 @@ public partial class MainWindow : Window
         {
             SaveWorkspace(dialog.FileName);
             //make sure we update title bar
-            await UpdateUIFromWorkspace();
+            await UpdateUIFromWorkspace(false);
             return true;
         }
 
