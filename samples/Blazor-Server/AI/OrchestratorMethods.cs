@@ -47,7 +47,7 @@ namespace KustoLoco.AI
                 options.NetworkTimeout = TimeSpan.FromSeconds(520);
 
                 return new OpenAIClient(
-                    apiKeyCredential)
+                    apiKeyCredential, options)
                     .AsChatClient(AIModel);
             }
             else // Azure OpenAI
@@ -57,7 +57,7 @@ namespace KustoLoco.AI
 
                 return new AzureOpenAIClient(
                     new Uri(Endpoint),
-                    apiKeyCredential)
+                    apiKeyCredential, options)
                     .AsChatClient(AIModel);
             }
         }
