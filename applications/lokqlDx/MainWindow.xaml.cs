@@ -54,6 +54,7 @@ public partial class MainWindow : Window
             return;
         if (isBusy)
             return;
+      
         isBusy = true;
         Editor.SetBusy(true);
         //start capturing console output from the engine
@@ -76,6 +77,12 @@ public partial class MainWindow : Window
     /// </summary>
     private async void OnQueryEditorRunTextBlock(object? sender, QueryEditorRunEventArgs eventArgs)
     {
+        //auto-save if we are configured to do so and this is not a new project
+        //(we don't do it for new projects because that is just annoying)
+        if (!_workspaceManager.IsNewWorkspace &&
+            _preferenceManager.FetchCachedApplicationSettings().AutoSave)
+            await Save();
+
         await RunQuery(eventArgs.Query);
     }
 
@@ -89,8 +96,6 @@ public partial class MainWindow : Window
     /// </remarks>
     private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
     {
-      
-     
         Title = $"LokqlDX - {_workspaceManager.Path.OrWhenBlank("new workspace")}";
         if (clearWorkingContext)
         {
@@ -212,34 +217,43 @@ public partial class MainWindow : Window
     {
         UpdateCurrentWorkspaceFromUI();
         _workspaceManager.Save(path, currentWorkspace);
-        _preferenceManager.BringToTopOfMruList(path);
+        UpdateMostRecentlyUsed(path);
     }
 
     /// <summary>
     ///     Allow the user to save any pending changes
     /// </summary>
     /// <returns>
-    ///     true if the user wants to cancel the operation
+    ///     true if the user did the save or didn't need to
     /// </returns>
-    private async Task<bool> OfferSaveOfCurrentWorkspace()
+    private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
-        if (CheckIfWorkspaceDirty())
+        if (!CheckIfWorkspaceDirty())
+            return YesNoCancel.Yes;
+
+        var shouldSave = _preferenceManager.FetchCachedApplicationSettings().AutoSave;
+        //always show the dialog if this is a new workspace
+        //because otherwise it's a little disconcerting to click close
+        //and immediately find yourself in the save-as dialog
+        if (!shouldSave || _workspaceManager.IsNewWorkspace)
         {
             var result = MessageBox.Show(
                 "You have have unsaved changes. Do you want to save them?",
                 "Warning", MessageBoxButton.YesNoCancel);
-            if (result == MessageBoxResult.Cancel) return true;
+            if (result == MessageBoxResult.Cancel)
+                return YesNoCancel.Cancel;
 
-            if (result == MessageBoxResult.Yes)
-                await Save();
+            shouldSave = (result == MessageBoxResult.Yes);
         }
+        if (shouldSave)
+            return await Save();
 
-        return false;
+        return YesNoCancel.No;
     }
 
     private async void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
-        if (await OfferSaveOfCurrentWorkspace())
+        if ( await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
         {
             e.Cancel = true;
             return;
@@ -252,7 +266,8 @@ public partial class MainWindow : Window
 
     private async Task LoadWorkspace(string path)
     {
-        if (await OfferSaveOfCurrentWorkspace()) return;
+        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
+            return;
 
         //make sure we have the most recent global preferences
         var appPrefs = _preferenceManager.FetchApplicationPreferencesFromDisk();
@@ -295,23 +310,32 @@ public partial class MainWindow : Window
         return _workspaceManager.IsDirty(currentWorkspace);
     }
 
-    private async Task Save()
+    /// <summary>
+    /// Save the current workspace to the current file
+    /// </summary>
+    private async Task<YesNoCancel> Save()
     {
         if (!CheckIfWorkspaceDirty())
-            return;
-        if (_workspaceManager.Path.IsBlank())
+            return YesNoCancel.Yes;
+        if (_workspaceManager.IsNewWorkspace)
         {
-            await SaveAs();
-            return;
+            return await SaveAs();
         }
 
         SaveWorkspace(_workspaceManager.Path);
+        return YesNoCancel.Yes;
     }
 
-    private async Task<bool> SaveAs()
+    /// <summary>
+    /// Save the current workspace to a new file
+    /// </summary>
+    /// <returns>true if the user went ahead with the save
+    /// </returns>
+    private async Task<YesNoCancel> SaveAs()
     {
         var dialog = new SaveFileDialog
         {
+            Title = "Save Workspace as...",
             Filter = $"Lokql Workspace ({WorkspaceManager.GlobPattern})|{WorkspaceManager.GlobPattern}",
             FileName = Path.GetFileName(_workspaceManager.Path)
         };
@@ -320,10 +344,10 @@ public partial class MainWindow : Window
             SaveWorkspace(dialog.FileName);
             //make sure we update title bar
             await UpdateUIFromWorkspace(false);
-            return true;
+            return YesNoCancel.Yes;
         }
-
-        return false;
+        //not saving the file counts as a cancel rather than "won't do anything"
+        return YesNoCancel.Cancel;
     }
 
     private async void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
@@ -333,8 +357,10 @@ public partial class MainWindow : Window
 
     private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
-        //save current
-        await Save();
+        if (await OfferSaveOfCurrentWorkspace()== YesNoCancel.Cancel)
+        {
+            return;
+        }
         await LoadWorkspace(string.Empty);
     }
 
@@ -552,4 +578,11 @@ public partial class MainWindow : Window
     {
         await Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
     }
+}
+
+public enum YesNoCancel
+{
+    Yes,
+    No,
+    Cancel
 }
