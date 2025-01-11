@@ -1,22 +1,31 @@
 ﻿@page "/"
+@using KustoLoco.AI
 @using KustoLoco.Core
 @using KustoLoco.Core.Console
 @using KustoLoco.Core.Settings
 @using KustoLoco.FileFormats
 @using KustoLoco.Rendering
+@using KustoLoco.Services
+@inherits OwningComponentBase
+@inject SettingsService SettingsService
+@inject IJSRuntime JSRuntime
 <!-- Include 7.css in your project if not already included -->
 <link rel="stylesheet" href="https://unpkg.com/7.css">
 <PageTitle>Home</PageTitle>
 
 <div style="display: flex; flex-direction: column; height: 90vh;">
     <div style="flex-shrink: 0;">
-        <InputFile OnChange="LoadFiles" accept=".csv" /><br /><br />
+        <button type="button"
+        @onclick="CallCoPilot"
+        style="margin-bottom: 10px; width: 10px">
+            CoPilot
+        </button>&nbsp;&nbsp;<InputFile OnChange="LoadFiles" accept=".csv" /><br /><br />
         <div style="display: flex; align-items: stretch;">
             <textarea @bind="query"
-                class="form-control"
-                rows="3"
-                style="flex-grow: 1;"
-                placeholder="Loading a CSV file will automatically generate
+            class="form-control"
+            rows="3"
+            style="flex-grow: 1;"
+            placeholder="Loading a CSV file will automatically generate
 a query to show the breakdown of items in the first column
 but you can change this and rerun the query"></textarea>
             <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">&#x1F50D;</button>
@@ -27,12 +36,65 @@ but you can change this and rerun the query"></textarea>
         <iframe style="width: 100%; height: 90%;" srcdoc="@table"></iframe>
     </div>
 </div>
+@if (Message != "")
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
+                <div class="window glass active">
+                    <div class="title-bar">
+                        <div class="title-bar-text">Alert!</div>
+                        <div class="title-bar-controls">
+                            <button aria-label="Close" @onclick="CloseMessagePopup"></button>
+                        </div>
+                    </div>
+                    <div class="window-body has-space">
+                        <div class="has-scrollbar" style="width: 100%; height: 100px; overflow: auto">
+                            @Message
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 @code {
+    OrchestratorMethods OrchestratorMethods;
+    private bool isFirstRender = true;
+    private bool IsSettingsEntered = false;
+    private string ApiKey = "";
+    private string Message = "";
+
     private string query = "";
     private MarkupString table;
     private string summary = "";
     private readonly KustoQueryContext kustoContext = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && isFirstRender)
+        {
+            isFirstRender = false;
+            await SettingsService.InitializeAsync();
+
+            OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods));
+
+            ApiKey = SettingsService.ApiKey ?? "";
+
+            if (ApiKey.Length > 1)
+            {
+                IsSettingsEntered = true;
+            }
+            else
+            {
+                IsSettingsEntered = false;
+            }
+
+            StateHasChanged();
+        }
+    }
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
@@ -59,7 +121,28 @@ but you can change this and rerun the query"></textarea>
         var result = await kustoContext.RunQuery(query);
         var renderer = new KustoResultRenderer(new KustoSettingsProvider());
         table = new MarkupString(renderer.RenderToHtml(result));
-
     }
 
+    private void CloseMessagePopup()
+    {
+        Message = "";
+    }
+
+    private Task CallCoPilot()
+    {
+        if (!IsSettingsEntered)
+        {
+            Message = "Please enter your API key in the settings page";
+            return Task.CompletedTask;
+        }
+
+        if (table.Value == null)
+        {
+            Message = "Must load a file first";
+            return Task.CompletedTask;
+        }
+
+        Message = "CoPilot is not yet available";
+        return Task.CompletedTask;
+    }
 }
