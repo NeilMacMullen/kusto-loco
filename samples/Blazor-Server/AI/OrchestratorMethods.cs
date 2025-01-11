@@ -39,19 +39,22 @@ namespace KustoLoco.AI
             string AIEmbeddingModel = objSettings.AIEmbeddingModel;
             string AIModel = objSettings.AIModel;
 
-            OpenAIClientOptions options = new OpenAIClientOptions();
-            options.NetworkTimeout = TimeSpan.FromSeconds(520);
-
             ApiKeyCredential apiKeyCredential = new ApiKeyCredential(ApiKey);
 
             if (objSettings.AIType == "OpenAI")
             {
+                OpenAIClientOptions options = new OpenAIClientOptions();
+                options.NetworkTimeout = TimeSpan.FromSeconds(520);
+
                 return new OpenAIClient(
                     apiKeyCredential)
                     .AsChatClient(AIModel);
             }
             else // Azure OpenAI
             {
+                AzureOpenAIClientOptions options = new AzureOpenAIClientOptions();
+                options.NetworkTimeout = TimeSpan.FromSeconds(520);
+
                 return new AzureOpenAIClient(
                     new Uri(Endpoint),
                     apiKeyCredential)
