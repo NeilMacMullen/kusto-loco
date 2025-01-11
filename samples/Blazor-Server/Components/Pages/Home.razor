@@ -1,0 +1,232 @@
+﻿@page "/"
+@using KustoLoco.AI
+@using KustoLoco.Core
+@using KustoLoco.Core.Console
+@using KustoLoco.Core.Settings
+@using KustoLoco.FileFormats
+@using KustoLoco.Rendering
+@using KustoLoco.Services
+@using System.Text
+@inherits OwningComponentBase
+@inject SettingsService SettingsService
+@inject IJSRuntime JSRuntime
+<!-- Include 7.css in your project if not already included -->
+<link rel="stylesheet" href="https://unpkg.com/7.css">
+<PageTitle>Home</PageTitle>
+
+<div style="display: flex; flex-direction: column; height: 90vh;">
+    <div style="flex-shrink: 0;">
+        <button type="button"
+        @onclick="CallCoPilot"
+        style="margin-bottom: 10px; width: 10px">
+            CoPilot
+        </button>&nbsp;&nbsp;<InputFile OnChange="LoadFiles" accept=".csv" /><br /><br />
+        <div style="display: flex; align-items: stretch;">
+            <textarea @bind="query"
+            class="form-control"
+            rows="3"
+            style="flex-grow: 1;"
+            placeholder="Loading a CSV file will automatically generate
+a query to show the breakdown of items in the first column
+but you can change this and rerun the query or use the CoPilot button for assistance"></textarea>
+            <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">&#x1F50D;</button>
+        </div><br />
+        <p>@summary</p>
+    </div>
+    <div style="flex-grow: 1; overflow: auto;">
+        <iframe style="width: 100%; height: 90%;" srcdoc="@table"></iframe>
+    </div>
+</div>
+@if (ShowAI)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="window glass active">
+                    <div class="title-bar">
+                        <div class="title-bar-text">AI Prompt</div>
+                        <div class="title-bar-controls">
+                            <button aria-label="Close" @onclick="CloseAIPopup"></button>
+                        </div>
+                    </div>
+                    <div class="window-body has-space">
+                        <div class="has-scrollbar" style="width: 100%; height: 200px; overflow: auto">
+                            <textarea @bind="AIMessage" maxlength="1000"
+                                      style="width: 100%; height: 190px; overflow: auto; resize: vertical;">
+                                      </textarea>
+                        </div>
+                        <br />
+                        <button @onclick="AIbtn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+@if (Message != "")
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="window glass active">
+                    <div class="title-bar">
+                        <div class="title-bar-text">Alert!</div>
+                        <div class="title-bar-controls">
+                            <button aria-label="Close" @onclick="CloseMessagePopup"></button>
+                        </div>
+                    </div>
+                    <div class="window-body has-space">
+                        <div class="has-scrollbar" style="width: 100%; height: 100px; overflow: auto">
+                            @Message
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+@code {
+    OrchestratorMethods OrchestratorMethods;
+    private bool isFirstRender = true;
+    private bool IsSettingsEntered = false;
+    private string ApiKey = "";
+    private bool ShowAI = false;
+    private string AIMessage = "";
+    private string Message = "";
+
+    private string query = "";
+    private MarkupString table;
+    private string summary = "";
+    private readonly KustoQueryContext kustoContext = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && isFirstRender)
+        {
+            isFirstRender = false;
+            await SettingsService.InitializeAsync();
+
+            OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods));
+
+            ApiKey = SettingsService.ApiKey ?? "";
+
+            if (ApiKey.Length > 1)
+            {
+                IsSettingsEntered = true;
+            }
+            else
+            {
+                IsSettingsEntered = false;
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var tableName = Path.GetFileNameWithoutExtension(file.Name);
+            await using MemoryStream memoryStream = new();
+            await file.OpenReadStream(20_000_000).CopyToAsync(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var csvLoader = CsvSerializer.Default(new KustoSettingsProvider(), new NullConsole());
+            var loadResult = await csvLoader.LoadTable(memoryStream, tableName);
+            kustoContext.AddTable(loadResult.Table);
+            var columnName = loadResult.Table.ColumnNames.First();
+            query = $@"{tableName}
+| summarize count() by {columnName}
+| order by count_ | take 10 | render piechart";
+        }
+
+        await RunQuery();
+    }
+
+    private async Task RunQuery()
+    {
+        var result = await kustoContext.RunQuery(query);
+        var renderer = new KustoResultRenderer(new KustoSettingsProvider());
+        table = new MarkupString(renderer.RenderToHtml(result));
+    }
+
+    private void CloseAIPopup()
+    {
+        ShowAI = false;
+    }
+
+    private void CloseMessagePopup()
+    {
+        Message = "";
+    }
+
+    private void CallCoPilot()
+    {
+        if (!IsSettingsEntered)
+        {
+            Message = "Please enter your API key in the CoPilot settings page";
+            return;
+        }
+
+        if (table.Value == null)
+        {
+            Message = "Must load a file first";
+            return;
+        }
+
+        ShowAI = true;
+    }
+
+    private async Task AIbtn()
+    {
+        if (AIMessage.Length > 0)
+        {
+            // Load template from Templates\AITemplate.txt
+            var AIQuery = OrchestratorMethods.GetTemplate();
+
+            // Get Table Schema
+            string schema = "";
+            var sb = new StringBuilder();
+
+            foreach (var table in kustoContext.Tables())
+            {
+                sb.AppendLine($"The table named '{table.Name}' has the following columns");
+
+                var cols = table.ColumnNames.Zip(table.Type.Columns)
+                    .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
+                    .ToArray();
+
+                foreach (var column in cols)
+                {
+                    sb.AppendLine(column);
+                }
+
+                schema = sb.ToString();
+            }
+
+            // Replace ## CURRENT SCHEMA ##, ## CURRENT CODE ##, ## CURRENT REQUEST ##
+            // with the current schema, code and request
+            AIQuery = AIQuery.Replace("## CURRENT SCHEMA ##", schema);
+            AIQuery = AIQuery.Replace("## CURRENT CODE ##", query);
+            AIQuery = AIQuery.Replace("## CURRENT REQUEST ##", AIMessage);
+
+            AIResponse result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
+
+            if (result.Error != "")
+            {
+                Message = result.Error;
+            }
+            else
+            {
+                query = result.Code;
+                await RunQuery();
+            }
+        }
+
+        ShowAI = false;
+    }
+}
