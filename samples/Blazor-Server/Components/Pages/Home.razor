@@ -128,24 +128,33 @@ but you can change this and rerun the query or use the CoPilot button for assist
         Message = "";
     }
 
-    private Task CallCoPilot()
+    private async Task CallCoPilot()
     {
         if (!IsSettingsEntered)
         {
             Message = "Please enter your API key in the CoPilot settings page";
-            return Task.CompletedTask;
+            return;
         }
 
         if (table.Value == null)
         {
             Message = "Must load a file first";
-            return Task.CompletedTask;
+            return;
         }
 
         // Load template from Templates\AITemplate.txt
         var template = OrchestratorMethods.GetTemplate();
 
-        Message = "CoPilot is not yet available";
-        return Task.CompletedTask;
+        string AIQuery = "Tellme a joke";
+
+        string result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
+
+        if (result == null)
+        {
+            Message = "Failed to retrieve a valid response from the AI.";
+            return;
+        }
+
+        Message = result;
     }
 }

@@ -11,6 +11,12 @@ using Azure;
 
 namespace KustoLoco.AI
 {
+    public class AIResponse
+    {
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
     public partial class OrchestratorMethods
     {
         // Constructor
@@ -19,7 +25,7 @@ namespace KustoLoco.AI
 
         }
 
-        // Utility Methods
+        // Methods
 
         #region public IChatClient CreateAIChatClient(SettingsService objSettings)
         public IChatClient CreateAIChatClient(SettingsService objSettings)
@@ -74,7 +80,66 @@ namespace KustoLoco.AI
             // Load template from Templates\AITemplate.txt
             string Template = File.ReadAllText("Templates\\AITemplate.txt");
             return Template;
-        } 
+        }
+        #endregion
+
+        /// <summary>
+        /// Sends a system message to the AI chat client and returns the JSON response.
+        /// </summary>
+        /// <param name="objSettings">The settings containing LLM configuration details.</param>
+        /// <param name="AIQuery">The query to use to call the LLM</param>
+        /// <returns>A JSON string containing the response message, or null if no response is received.</returns>
+        #region public async Task<string> CallOpenAI(SettingsService objSettings, string AIQuery)
+        public async Task<string> CallOpenAI(SettingsService objSettings, string AIQuery)         
+        {
+            try
+            {
+                // Create the AI chat client using the provided settings
+                var chatClient = CreateAIChatClient(objSettings);
+
+                // Send the system message to the AI chat client
+                var response = await chatClient.CompleteAsync(AIQuery);
+
+                // Check if the response contains any choices
+                if (response.Choices == null || response.Choices.Count == 0)
+                {
+                    // Optionally, log the absence of choices or handle it as needed
+                    Console.Error.WriteLine("No choices returned in the AI response.");
+                    return null;
+                }
+
+                // Extract the text from the first choice
+                string jsonResponse = response.Choices[0].Text.Trim();
+
+                // Optionally, parse the JSON to ensure it's in the expected format
+                // This step is optional and depends on whether you need to work with the parsed data
+                try
+                {
+                    var parsedResponse = JsonConvert.DeserializeObject<AIResponse>(jsonResponse);
+                    if (parsedResponse != null && !string.IsNullOrEmpty(parsedResponse.Message))
+                    {
+                        return JsonConvert.SerializeObject(parsedResponse, Formatting.Indented);
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine("Parsed response is null or missing the 'message' field.");
+                        return null;
+                    }
+                }
+                catch (JsonException jsonEx)
+                {
+                    // Handle JSON parsing errors
+                    Console.Error.WriteLine($"Error parsing JSON response: {jsonEx.Message}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected exceptions
+                Console.Error.WriteLine($"An error occurred while testing access: {ex.Message}");
+                return null;
+            }
+        }
         #endregion
     }
 }
