@@ -1,13 +1,5 @@
 ﻿namespace lokqlDx;
 
-/// <summary>
-/// Global Preferences that are applied for every workspace
-/// </summary>
-public class ApplicationPreferences
-{
-    public string StartupScript { get; set; }= string.Empty;
-}
-
 public class MruEntry
 {
     public string Path { get; set; } = string.Empty;

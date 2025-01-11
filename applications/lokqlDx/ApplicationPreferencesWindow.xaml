@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:lokqlDx"
         mc:Ignorable="d"
         Title="Application Preferences" Height="450" Width="800"
         Loaded="Dialog_OnLoaded">
@@ -13,20 +12,25 @@
       <Button Margin="3" Click="OnOk">Ok</Button>
     </StackPanel>
     <DockPanel>
-      <StackPanel Margin="5" DockPanel.Dock="Top" Orientation="Horizontal">
-<Label>Font</Label>
-        <ComboBox MinWidth="200" Name="FontSelector"></ComboBox>
-      </StackPanel>
+      <StackPanel Margin="5" DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal">
+        <Label>Font</Label>
+        <ComboBox MinWidth="200" Name="FontSelector" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+         <CheckBox Name="Autosave">Automatically save workspace before running query</CheckBox>
+        </StackPanel>
+        </StackPanel>
       <DockPanel>
-      <Label Content="Application pre-script (run every time a workspace is loaded)" DockPanel.Dock="Top"/>
-      <Border Margin="5">
-      <TextBox  Name="StartupScript" AcceptsReturn="True" Background="Black" Foreground="White"
-                VerticalScrollBarVisibility="Auto"/>
-      </Border>
-    </DockPanel>
+        <Label Content="Application pre-script (run every time a workspace is loaded)" DockPanel.Dock="Top" />
+        <Border Margin="5">
+          <TextBox Name="StartupScript" AcceptsReturn="True" Background="Black" Foreground="White"
+                   VerticalScrollBarVisibility="Auto" />
+        </Border>
+      </DockPanel>
 
     </DockPanel>
 
-    </DockPanel>
+  </DockPanel>
 
 </Window>

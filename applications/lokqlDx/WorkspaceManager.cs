@@ -23,9 +23,9 @@ public class WorkspaceManager
 
     public static string GlobPattern => $"*.{Extension}";
 
-
+    public bool IsNewWorkspace => Path.IsBlank();
     public KustoSettingsProvider Settings { get; } = new();
-
+    private JsonSerializerOptions _options = new() { WriteIndented = true };
     private void EnsureWorkspacePopulated()
     {
         var UserText = _workspace.Text;
@@ -54,7 +54,7 @@ data
         Path = path;
         try
         {
-            var json = JsonSerializer.Serialize(workspace);
+            var json = JsonSerializer.Serialize(workspace,_options);
             File.WriteAllText(Path, json);
             _workspace = workspace;
         }

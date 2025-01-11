@@ -27,6 +27,7 @@ public partial class ApplicationPreferencesWindow : Window
         StartupScript.FontFamily = new FontFamily(_uiPreferences.FontFamily);
         var fontFamilies = Fonts.SystemFontFamilies;
         FontSelector.ItemsSource = fontFamilies;
+        Autosave.IsChecked = _preferences.AutoSave;
         var current = fontFamilies.Where(f => f.Source == _uiPreferences.FontFamily).ToArray();
         if (current.Any())
             FontSelector.SelectedItem = current.First();
@@ -36,6 +37,7 @@ public partial class ApplicationPreferencesWindow : Window
     {
         _preferences.StartupScript = StartupScript.Text;
         _uiPreferences.FontFamily = ((FontFamily)FontSelector.SelectedItem).Source;
+        _preferences.AutoSave = Autosave.IsChecked==true;
         DialogResult = true;
     }
 }
