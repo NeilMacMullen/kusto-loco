@@ -13,8 +13,10 @@ namespace KustoLoco.AI
 {
     public class AIResponse
     {
-        [JsonProperty("message")]
-        public string Message { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+        [JsonProperty("error")]
+        public string Error { get; set; }
     }
 
     public partial class OrchestratorMethods
@@ -89,8 +91,8 @@ namespace KustoLoco.AI
         /// <param name="objSettings">The settings containing LLM configuration details.</param>
         /// <param name="AIQuery">The query to use to call the LLM</param>
         /// <returns>A JSON string containing the response message, or null if no response is received.</returns>
-        #region public async Task<string> CallOpenAI(SettingsService objSettings, string AIQuery)
-        public async Task<string> CallOpenAI(SettingsService objSettings, string AIQuery)         
+        #region public async Task<AIResponse> CallOpenAI(SettingsService objSettings, string AIQuery)
+        public async Task<AIResponse> CallOpenAI(SettingsService objSettings, string AIQuery)         
         {
             try
             {
@@ -104,40 +106,38 @@ namespace KustoLoco.AI
                 if (response.Choices == null || response.Choices.Count == 0)
                 {
                     // Optionally, log the absence of choices or handle it as needed
-                    Console.Error.WriteLine("No choices returned in the AI response.");
-                    return null;
+                    return new AIResponse() { Code = "", Error = "No choices returned in the AI response." };
                 }
 
                 // Extract the text from the first choice
                 string jsonResponse = response.Choices[0].Text.Trim();
 
-                // Optionally, parse the JSON to ensure it's in the expected format
-                // This step is optional and depends on whether you need to work with the parsed data
+                // Remove ```json    and ```
+                jsonResponse = jsonResponse.Replace("```json", "").Replace("```", "");
+
                 try
                 {
                     var parsedResponse = JsonConvert.DeserializeObject<AIResponse>(jsonResponse);
-                    if (parsedResponse != null && !string.IsNullOrEmpty(parsedResponse.Message))
+
+                    if (parsedResponse != null && !string.IsNullOrEmpty(parsedResponse.Code))
                     {
-                        return JsonConvert.SerializeObject(parsedResponse, Formatting.Indented);
+                        return parsedResponse;
                     }
                     else
                     {
-                        Console.Error.WriteLine("Parsed response is null or missing the 'message' field.");
-                        return null;
+                        return new AIResponse() { Code = "", Error = "Parsed response is null or missing the 'Code' field." };
                     }
                 }
                 catch (JsonException jsonEx)
                 {
                     // Handle JSON parsing errors
-                    Console.Error.WriteLine($"Error parsing JSON response: {jsonEx.Message}");
-                    return null;
+                    return new AIResponse() { Code = "", Error = $"Error parsing JSON response: {jsonEx.Message}" };
                 }
             }
             catch (Exception ex)
             {
                 // Handle unexpected exceptions
-                Console.Error.WriteLine($"An error occurred while testing access: {ex.Message}");
-                return null;
+                return new AIResponse() { Code = "", Error = $"An error occurred while testing access: {ex.Message}" };
             }
         }
         #endregion

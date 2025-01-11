@@ -6,6 +6,7 @@
 @using KustoLoco.FileFormats
 @using KustoLoco.Rendering
 @using KustoLoco.Services
+@using System.Text
 @inherits OwningComponentBase
 @inject SettingsService SettingsService
 @inject IJSRuntime JSRuntime
@@ -143,18 +144,44 @@ but you can change this and rerun the query or use the CoPilot button for assist
         }
 
         // Load template from Templates\AITemplate.txt
-        var template = OrchestratorMethods.GetTemplate();
+        var AIQuery = OrchestratorMethods.GetTemplate();
 
-        string AIQuery = "Tellme a joke";
+        // Get Table Schema
+        string schema = "";
+        var sb = new StringBuilder();
 
-        string result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
+        foreach (var table in kustoContext.Tables())
+        {      
+            sb.AppendLine($"The table named '{table.Name}' has the following columns");
 
-        if (result == null)
-        {
-            Message = "Failed to retrieve a valid response from the AI.";
-            return;
+            var cols = table.ColumnNames.Zip(table.Type.Columns)
+                .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
+                .ToArray();
+
+            foreach (var column in cols)
+            {
+                sb.AppendLine(column);
+            }
+
+            schema = sb.ToString();
         }
 
-        Message = result;
+        // Replace ## CURRENT SCHEMA ##, ## CURRENT CODE ##, ## CURRENT REQUEST ##
+        // with the current schema, code and request
+        AIQuery = AIQuery.Replace("## CURRENT SCHEMA ##", schema);
+        AIQuery = AIQuery.Replace("## CURRENT CODE ##", query);
+        AIQuery = AIQuery.Replace("## CURRENT REQUEST ##", "Create a pie chart");
+
+        AIResponse result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
+
+        if (result.Error != "")
+        {
+            Message = result.Error;
+        }
+        else
+        {
+            query = result.Code;
+            await RunQuery();
+        }
     }
 }
