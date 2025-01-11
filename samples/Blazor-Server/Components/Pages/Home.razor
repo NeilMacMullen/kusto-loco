@@ -27,7 +27,7 @@
             style="flex-grow: 1;"
             placeholder="Loading a CSV file will automatically generate
 a query to show the breakdown of items in the first column
-but you can change this and rerun the query"></textarea>
+but you can change this and rerun the query or use the CoPilot button for assistance"></textarea>
             <button class="btn btn-primary" @onclick="RunQuery" style="margin-left: 10px; height: 100%;">&#x1F50D;</button>
         </div><br />
         <p>@summary</p>
@@ -132,7 +132,7 @@ but you can change this and rerun the query"></textarea>
     {
         if (!IsSettingsEntered)
         {
-            Message = "Please enter your API key in the settings page";
+            Message = "Please enter your API key in the CoPilot settings page";
             return Task.CompletedTask;
         }
 
@@ -141,6 +141,9 @@ but you can change this and rerun the query"></textarea>
             Message = "Must load a file first";
             return Task.CompletedTask;
         }
+
+        // Load template from Templates\AITemplate.txt
+        var template = OrchestratorMethods.GetTemplate();
 
         Message = "CoPilot is not yet available";
         return Task.CompletedTask;

@@ -1,0 +1,52 @@
+### Description ###
+Please create a JSON response containing code for generating a Kusto Query Language (KQL) query based on the specified requirements.
+Follow the structure and include inline code comments to make it understandable.
+
+---
+
+### SPECIFICATIONS ###
+
+1. **Query Requirements**:
+   - Clearly define the purpose and functionality of the KQL query.
+   - Specify any particular operations such as filtering, joining, aggregating, or projecting data.
+
+2. **Table Loading**:
+   - Tables need to be referenced using their respective names in the Kusto database.
+   - Example of referencing a table:
+     ```kql
+     TableName
+     ```
+
+3. **Current Table Schema Information for All Existing Tables**:
+   - ## CURRENT SCHEMA ##
+
+4. **Current Code**:
+   - ## CURRENT CODE ##
+
+5. **Current Request**:
+   - ## CURRENT REQUEST ##
+
+6. **Response Format**:
+   - JSON format with two fields: `Code` and `Error`.
+   - Example:
+     ```json
+     {
+       "Code": "",
+       "Error": ""
+     }
+     ```
+
+---
+
+### RESPONSE EXAMPLES ###
+
+#### Example 1: ####
+
+**Prompt:** Create a KQL query to retrieve the top 10 most active users based on the number of logins in the last 30 days.
+
+**Result:**
+```json
+{
+  "Code": "// KQL Query to retrieve the top 10 most active users based on the number of logins in the last 30 days\n\nLoginData\n| where LoginDate >= ago(30d) // Filter logins from the last 30 days\n| summarize LoginCount = count() by UserId // Count logins per user\n| top 10 by LoginCount desc // Select top 10 users with the highest login counts\n| project UserId, LoginCount // Select the UserId and LoginCount columns",
+  "Error": ""
+}

@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Templates\AITemplate.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\AITemplate.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.AI.OpenAI" />
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Blazored.LocalStorage" />

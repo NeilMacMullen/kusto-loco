@@ -51,5 +51,30 @@ namespace KustoLoco.AI
             }
         }
         #endregion
+
+        #region public async Task<bool> TestAccess(SettingsService objSettings, string GPTModel)
+        public async Task<bool> TestAccess(SettingsService objSettings, string GPTModel)
+        {
+            var chatClient = CreateAIChatClient(objSettings);
+            string SystemMessage = "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
+            var response = await chatClient.CompleteAsync(SystemMessage);
+
+            if (response.Choices.Count == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region public string GetTemplate()
+        public string GetTemplate()
+        {
+            // Load template from Templates\AITemplate.txt
+            string Template = File.ReadAllText("Templates\\AITemplate.txt");
+            return Template;
+        } 
+        #endregion
     }
 }
