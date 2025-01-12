@@ -29,12 +29,12 @@ the last one is the series name.
 In general, prefer to place any time-based column as the x-axis and quantity-based columns as the y-axis but this is not a strict requirement.
 
 Here are some common mistakes I want you to avoid:
-- Using the top operator
-- Using the arg_min operator
-- Using the dynamic property types
-- Joining on more than a single column
-- Using the render operator in the middle of the query
-- using 'm' or 'mon' to specify months in a timespan.  Remember that 'm' is minutes and that 'mon' is not a valid timespan.  Instead you need to convert months to a number of days.
+- Do not use the `top` operator
+- Do not use the `arg_min` operator
+- Do not use dynamic property types
+- Do not try to join tables on more than a single column
+- Do not use the `render` operator in the middle of the query
+- Do not use 'm' or 'mon' to specify months in a timespan.  Remember that 'm' is minutes and that 'mon' is not a valid timespan.  Instead you need to convert months to a number of days.
 
 I will now give some some information about the schema of the tables that you will be asked to query.
 
