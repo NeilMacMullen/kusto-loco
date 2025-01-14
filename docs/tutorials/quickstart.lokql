@@ -1,0 +1,4 @@
+{
+  "Text": "\r\nprint \u0022hello KQL\u0022\r\n\r\n# load a csv into a table\r\n.load \u0022traffic.csv\u0022\r\n\r\n# display the table schema \r\ntraffic | getschema\r\n\r\n# show the data\r\ntraffic \r\n\r\n# plot distance covered by vehicle type\r\ntraffic\r\n| summarize TotalDistance = sum(Distance)\r\n  by Year,Vehicle\r\n| project Year,TotalDistance,Vehicle\r\n| render linechart\r\n\r\n.save c:\\temp\\distance_by_vehicle_type.csv",
+  "StartupScript": ""
+}

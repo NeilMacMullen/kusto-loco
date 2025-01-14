@@ -105,7 +105,7 @@ public partial class MainWindow : Window
             _explorer = new InteractiveTableExplorer(_console, loader, settings,
                 CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
             dataGrid.ItemsSource = null;
-            await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+            await NavigateToLanding();
         }
     }
 
@@ -176,10 +176,14 @@ public partial class MainWindow : Window
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+        await NavigateToLanding();
+
     }
 
-
+    async Task NavigateToLanding()
+    {
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
+    }
     private void ResizeWindowAccordingToStoredPreferences()
     {
         var ui = _preferenceManager.UIPreferences;
@@ -392,7 +396,7 @@ public partial class MainWindow : Window
 
     private async void NavigateToGettingStarted(object sender, RoutedEventArgs e)
     {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX");
+        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
     }
 
     private async void NavigateToProjectPage(object sender, RoutedEventArgs e)
@@ -577,6 +581,11 @@ public partial class MainWindow : Window
     private async void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
     {
         await Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
+    }
+
+    private async void NavigateToLandingPage(object sender, RoutedEventArgs e)
+    {
+        await NavigateToLanding();
     }
 }
 
