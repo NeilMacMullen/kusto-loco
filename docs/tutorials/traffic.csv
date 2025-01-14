@@ -1,0 +1,2388 @@
+Year,Region,Vehicle,Distance
+1993,South West,pedal_cycles,228
+1993,South West,two_wheeled_motor_vehicles,289.9
+1993,South West,cars_and_taxis,19674.3
+1993,South West,buses_and_coaches,245
+1993,South West,LGVs,2351.7
+1993,South West,all_HGVs,1295.6
+1993,South West,all_motor_vehicles,23856.6
+1993,East Midlands,pedal_cycles,199.7
+1993,East Midlands,two_wheeled_motor_vehicles,172.8
+1993,East Midlands,cars_and_taxis,16200.2
+1993,East Midlands,buses_and_coaches,190.1
+1993,East Midlands,LGVs,2082.2
+1993,East Midlands,all_HGVs,1647.1
+1993,East Midlands,all_motor_vehicles,20292.4
+1993,Scotland,pedal_cycles,147.3
+1993,Scotland,two_wheeled_motor_vehicles,126.4
+1993,Scotland,cars_and_taxis,17677.6
+1993,Scotland,buses_and_coaches,334.3
+1993,Scotland,LGVs,2231
+1993,Scotland,all_HGVs,1339.9
+1993,Scotland,all_motor_vehicles,21709.3
+1993,Wales,pedal_cycles,81.7
+1993,Wales,two_wheeled_motor_vehicles,104.6
+1993,Wales,cars_and_taxis,11278.8
+1993,Wales,buses_and_coaches,156.3
+1993,Wales,LGVs,1452.7
+1993,Wales,all_HGVs,735.2
+1993,Wales,all_motor_vehicles,13727.6
+1993,North West,pedal_cycles,251.4
+1993,North West,two_wheeled_motor_vehicles,199.2
+1993,North West,cars_and_taxis,23730
+1993,North West,buses_and_coaches,339.8
+1993,North West,LGVs,2801.8
+1993,North West,all_HGVs,1834.4
+1993,North West,all_motor_vehicles,28905.2
+1993,London,pedal_cycles,272.1
+1993,London,two_wheeled_motor_vehicles,358.2
+1993,London,cars_and_taxis,15882.5
+1993,London,buses_and_coaches,273.4
+1993,London,LGVs,1928.6
+1993,London,all_HGVs,640.9
+1993,London,all_motor_vehicles,19083.5
+1993,East of England,pedal_cycles,365.6
+1993,East of England,two_wheeled_motor_vehicles,270.1
+1993,East of England,cars_and_taxis,22996.1
+1993,East of England,buses_and_coaches,254.8
+1993,East of England,LGVs,2976.4
+1993,East of England,all_HGVs,1741.1
+1993,East of England,all_motor_vehicles,28238.4
+1993,Yorkshire and the Humber,pedal_cycles,231.4
+1993,Yorkshire and the Humber,two_wheeled_motor_vehicles,171.2
+1993,Yorkshire and the Humber,cars_and_taxis,16876
+1993,Yorkshire and the Humber,buses_and_coaches,235.9
+1993,Yorkshire and the Humber,LGVs,2204.3
+1993,Yorkshire and the Humber,all_HGVs,1624.3
+1993,Yorkshire and the Humber,all_motor_vehicles,21111.7
+1993,South East,pedal_cycles,431.7
+1993,South East,two_wheeled_motor_vehicles,415.2
+1993,South East,cars_and_taxis,36748.3
+1993,South East,buses_and_coaches,368.7
+1993,South East,LGVs,4267.1
+1993,South East,all_HGVs,2035.3
+1993,South East,all_motor_vehicles,43834.6
+1993,West Midlands,pedal_cycles,195.7
+1993,West Midlands,two_wheeled_motor_vehicles,177.4
+1993,West Midlands,cars_and_taxis,20484.2
+1993,West Midlands,buses_and_coaches,298.6
+1993,West Midlands,LGVs,2528.7
+1993,West Midlands,all_HGVs,1703.3
+1993,West Midlands,all_motor_vehicles,25192.3
+1993,North East,pedal_cycles,85.5
+1993,North East,two_wheeled_motor_vehicles,55.1
+1993,North East,cars_and_taxis,8536.9
+1993,North East,buses_and_coaches,174.1
+1993,North East,LGVs,1021.9
+1993,North East,all_HGVs,474.3
+1993,North East,all_motor_vehicles,10262.3
+1994,South West,pedal_cycles,227.3
+1994,South West,two_wheeled_motor_vehicles,293.2
+1994,South West,cars_and_taxis,20182.1
+1994,South West,buses_and_coaches,244.2
+1994,South West,LGVs,2458.5
+1994,South West,all_HGVs,1325.6
+1994,South West,all_motor_vehicles,24503.5
+1994,East Midlands,pedal_cycles,199.5
+1994,East Midlands,two_wheeled_motor_vehicles,173
+1994,East Midlands,cars_and_taxis,16544.6
+1994,East Midlands,buses_and_coaches,189.7
+1994,East Midlands,LGVs,2165
+1994,East Midlands,all_HGVs,1694.3
+1994,East Midlands,all_motor_vehicles,20766.6
+1994,Scotland,pedal_cycles,146.1
+1994,Scotland,two_wheeled_motor_vehicles,126.8
+1994,Scotland,cars_and_taxis,18070.7
+1994,Scotland,buses_and_coaches,332.5
+1994,Scotland,LGVs,2327.6
+1994,Scotland,all_HGVs,1365.8
+1994,Scotland,all_motor_vehicles,22223.3
+1994,Wales,pedal_cycles,81.2
+1994,Wales,two_wheeled_motor_vehicles,105
+1994,Wales,cars_and_taxis,11529.1
+1994,Wales,buses_and_coaches,155.3
+1994,Wales,LGVs,1517.7
+1994,Wales,all_HGVs,747.4
+1994,Wales,all_motor_vehicles,14054.4
+1994,North West,pedal_cycles,251.5
+1994,North West,two_wheeled_motor_vehicles,195.8
+1994,North West,cars_and_taxis,24124.4
+1994,North West,buses_and_coaches,340.6
+1994,North West,LGVs,2908
+1994,North West,all_HGVs,1868.7
+1994,North West,all_motor_vehicles,29437.6
+1994,London,pedal_cycles,278.4
+1994,London,two_wheeled_motor_vehicles,369.4
+1994,London,cars_and_taxis,16062.8
+1994,London,buses_and_coaches,281.8
+1994,London,LGVs,2010.9
+1994,London,all_HGVs,623.7
+1994,London,all_motor_vehicles,19348.5
+1994,East of England,pedal_cycles,366.1
+1994,East of England,two_wheeled_motor_vehicles,268.7
+1994,East of England,cars_and_taxis,23537.3
+1994,East of England,buses_and_coaches,254.4
+1994,East of England,LGVs,3109.4
+1994,East of England,all_HGVs,1790.3
+1994,East of England,all_motor_vehicles,28960.1
+1994,Yorkshire and the Humber,pedal_cycles,231.6
+1994,Yorkshire and the Humber,two_wheeled_motor_vehicles,169.9
+1994,Yorkshire and the Humber,cars_and_taxis,17218.4
+1994,Yorkshire and the Humber,buses_and_coaches,235.8
+1994,Yorkshire and the Humber,LGVs,2294.3
+1994,Yorkshire and the Humber,all_HGVs,1657.8
+1994,Yorkshire and the Humber,all_motor_vehicles,21576.3
+1994,South East,pedal_cycles,432.1
+1994,South East,two_wheeled_motor_vehicles,414
+1994,South East,cars_and_taxis,37566.6
+1994,South East,buses_and_coaches,369.8
+1994,South East,LGVs,4446
+1994,South East,all_HGVs,2088.5
+1994,South East,all_motor_vehicles,44885
+1994,West Midlands,pedal_cycles,195.9
+1994,West Midlands,two_wheeled_motor_vehicles,175.5
+1994,West Midlands,cars_and_taxis,20876.8
+1994,West Midlands,buses_and_coaches,299.3
+1994,West Midlands,LGVs,2627.8
+1994,West Midlands,all_HGVs,1750
+1994,West Midlands,all_motor_vehicles,25729.3
+1994,North East,pedal_cycles,85.9
+1994,North East,two_wheeled_motor_vehicles,54.7
+1994,North East,cars_and_taxis,8675.8
+1994,North East,buses_and_coaches,173
+1994,North East,LGVs,1062.2
+1994,North East,all_HGVs,482.4
+1994,North East,all_motor_vehicles,10448.2
+1995,South West,pedal_cycles,233.9
+1995,South West,two_wheeled_motor_vehicles,294.1
+1995,South West,cars_and_taxis,20585.3
+1995,South West,buses_and_coaches,257.9
+1995,South West,LGVs,2532.7
+1995,South West,all_HGVs,1360.4
+1995,South West,all_motor_vehicles,25030.5
+1995,East Midlands,pedal_cycles,205.9
+1995,East Midlands,two_wheeled_motor_vehicles,172
+1995,East Midlands,cars_and_taxis,16857.4
+1995,East Midlands,buses_and_coaches,200.8
+1995,East Midlands,LGVs,2217.9
+1995,East Midlands,all_HGVs,1750.9
+1995,East Midlands,all_motor_vehicles,21198.9
+1995,Scotland,pedal_cycles,149.2
+1995,Scotland,two_wheeled_motor_vehicles,126.3
+1995,Scotland,cars_and_taxis,18421.1
+1995,Scotland,buses_and_coaches,350.9
+1995,Scotland,LGVs,2380.9
+1995,Scotland,all_HGVs,1398.1
+1995,Scotland,all_motor_vehicles,22677.4
+1995,Wales,pedal_cycles,83.1
+1995,Wales,two_wheeled_motor_vehicles,104.7
+1995,Wales,cars_and_taxis,11739.5
+1995,Wales,buses_and_coaches,164.3
+1995,Wales,LGVs,1556.3
+1995,Wales,all_HGVs,763.9
+1995,Wales,all_motor_vehicles,14328.6
+1995,North West,pedal_cycles,260.6
+1995,North West,two_wheeled_motor_vehicles,195.8
+1995,North West,cars_and_taxis,24607.3
+1995,North West,buses_and_coaches,358.1
+1995,North West,LGVs,2988.6
+1995,North West,all_HGVs,1916.7
+1995,North West,all_motor_vehicles,30066.6
+1995,London,pedal_cycles,283.3
+1995,London,two_wheeled_motor_vehicles,359.9
+1995,London,cars_and_taxis,16003.1
+1995,London,buses_and_coaches,303.7
+1995,London,LGVs,2087
+1995,London,all_HGVs,608.7
+1995,London,all_motor_vehicles,19362.5
+1995,East of England,pedal_cycles,378.7
+1995,East of England,two_wheeled_motor_vehicles,267.5
+1995,East of England,cars_and_taxis,23980.9
+1995,East of England,buses_and_coaches,268.5
+1995,East of England,LGVs,3196.3
+1995,East of England,all_HGVs,1847.9
+1995,East of England,all_motor_vehicles,29561
+1995,Yorkshire and the Humber,pedal_cycles,239.5
+1995,Yorkshire and the Humber,two_wheeled_motor_vehicles,170.9
+1995,Yorkshire and the Humber,cars_and_taxis,17548.3
+1995,Yorkshire and the Humber,buses_and_coaches,249.4
+1995,Yorkshire and the Humber,LGVs,2356.7
+1995,Yorkshire and the Humber,all_HGVs,1716.2
+1995,Yorkshire and the Humber,all_motor_vehicles,22041.5
+1995,South East,pedal_cycles,447.4
+1995,South East,two_wheeled_motor_vehicles,409.4
+1995,South East,cars_and_taxis,38347.7
+1995,South East,buses_and_coaches,388.6
+1995,South East,LGVs,4562.1
+1995,South East,all_HGVs,2152.5
+1995,South East,all_motor_vehicles,45860.2
+1995,West Midlands,pedal_cycles,202.4
+1995,West Midlands,two_wheeled_motor_vehicles,174.7
+1995,West Midlands,cars_and_taxis,21274.3
+1995,West Midlands,buses_and_coaches,317.8
+1995,West Midlands,LGVs,2698
+1995,West Midlands,all_HGVs,1800.3
+1995,West Midlands,all_motor_vehicles,26265
+1995,North East,pedal_cycles,89.6
+1995,North East,two_wheeled_motor_vehicles,54.5
+1995,North East,cars_and_taxis,8810.9
+1995,North East,buses_and_coaches,183.8
+1995,North East,LGVs,1080.9
+1995,North East,all_HGVs,494.5
+1995,North East,all_motor_vehicles,10624.6
+1996,South West,pedal_cycles,228.4
+1996,South West,two_wheeled_motor_vehicles,292.4
+1996,South West,cars_and_taxis,21073.9
+1996,South West,buses_and_coaches,264.9
+1996,South West,LGVs,2645.2
+1996,South West,all_HGVs,1399.9
+1996,South West,all_motor_vehicles,25676.4
+1996,East Midlands,pedal_cycles,201.6
+1996,East Midlands,two_wheeled_motor_vehicles,169.5
+1996,East Midlands,cars_and_taxis,17360.2
+1996,East Midlands,buses_and_coaches,204.9
+1996,East Midlands,LGVs,2324.8
+1996,East Midlands,all_HGVs,1809.9
+1996,East Midlands,all_motor_vehicles,21869.3
+1996,Scotland,pedal_cycles,146.4
+1996,Scotland,two_wheeled_motor_vehicles,125.6
+1996,Scotland,cars_and_taxis,18907.6
+1996,Scotland,buses_and_coaches,361
+1996,Scotland,LGVs,2499
+1996,Scotland,all_HGVs,1434.1
+1996,Scotland,all_motor_vehicles,23327.2
+1996,Wales,pedal_cycles,81.2
+1996,Wales,two_wheeled_motor_vehicles,103.8
+1996,Wales,cars_and_taxis,12008.1
+1996,Wales,buses_and_coaches,168.5
+1996,Wales,LGVs,1604.3
+1996,Wales,all_HGVs,803.2
+1996,Wales,all_motor_vehicles,14687.8
+1996,North West,pedal_cycles,254.9
+1996,North West,two_wheeled_motor_vehicles,191.8
+1996,North West,cars_and_taxis,25176.7
+1996,North West,buses_and_coaches,365.4
+1996,North West,LGVs,3101.8
+1996,North West,all_HGVs,1985
+1996,North West,all_motor_vehicles,30820.8
+1996,London,pedal_cycles,290.1
+1996,London,two_wheeled_motor_vehicles,375
+1996,London,cars_and_taxis,16161.5
+1996,London,buses_and_coaches,309.6
+1996,London,LGVs,2055.5
+1996,London,all_HGVs,647.2
+1996,London,all_motor_vehicles,19548.9
+1996,East of England,pedal_cycles,370.7
+1996,East of England,two_wheeled_motor_vehicles,266.6
+1996,East of England,cars_and_taxis,24592.2
+1996,East of England,buses_and_coaches,272.9
+1996,East of England,LGVs,3346.4
+1996,East of England,all_HGVs,1886.2
+1996,East of England,all_motor_vehicles,30364.3
+1996,Yorkshire and the Humber,pedal_cycles,234.9
+1996,Yorkshire and the Humber,two_wheeled_motor_vehicles,168.5
+1996,Yorkshire and the Humber,cars_and_taxis,18047.1
+1996,Yorkshire and the Humber,buses_and_coaches,254.8
+1996,Yorkshire and the Humber,LGVs,2435
+1996,Yorkshire and the Humber,all_HGVs,1775.1
+1996,Yorkshire and the Humber,all_motor_vehicles,22680.6
+1996,South East,pedal_cycles,438.1
+1996,South East,two_wheeled_motor_vehicles,414.6
+1996,South East,cars_and_taxis,39510.5
+1996,South East,buses_and_coaches,404.1
+1996,South East,LGVs,4778
+1996,South East,all_HGVs,2220.3
+1996,South East,all_motor_vehicles,47327.5
+1996,West Midlands,pedal_cycles,197.7
+1996,West Midlands,two_wheeled_motor_vehicles,173.2
+1996,West Midlands,cars_and_taxis,21808.6
+1996,West Midlands,buses_and_coaches,321.9
+1996,West Midlands,LGVs,2808.9
+1996,West Midlands,all_HGVs,1845.7
+1996,West Midlands,all_motor_vehicles,26958.4
+1996,North East,pedal_cycles,87.8
+1996,North East,two_wheeled_motor_vehicles,55.1
+1996,North East,cars_and_taxis,8999.2
+1996,North East,buses_and_coaches,186
+1996,North East,LGVs,1104.9
+1996,North East,all_HGVs,494.8
+1996,North East,all_motor_vehicles,10840
+1997,South West,pedal_cycles,229.1
+1997,South West,two_wheeled_motor_vehicles,304.9
+1997,South West,cars_and_taxis,21353
+1997,South West,buses_and_coaches,273.4
+1997,South West,LGVs,2769.6
+1997,South West,all_HGVs,1448.2
+1997,South West,all_motor_vehicles,26149
+1997,East Midlands,pedal_cycles,203.5
+1997,East Midlands,two_wheeled_motor_vehicles,178.3
+1997,East Midlands,cars_and_taxis,17674.4
+1997,East Midlands,buses_and_coaches,210.6
+1997,East Midlands,LGVs,2445.5
+1997,East Midlands,all_HGVs,1846.7
+1997,East Midlands,all_motor_vehicles,22355.6
+1997,Scotland,pedal_cycles,145.9
+1997,Scotland,two_wheeled_motor_vehicles,130.2
+1997,Scotland,cars_and_taxis,19200.4
+1997,Scotland,buses_and_coaches,370.7
+1997,Scotland,LGVs,2662
+1997,Scotland,all_HGVs,1464.3
+1997,Scotland,all_motor_vehicles,23827.6
+1997,Wales,pedal_cycles,81.2
+1997,Wales,two_wheeled_motor_vehicles,110.4
+1997,Wales,cars_and_taxis,12227.9
+1997,Wales,buses_and_coaches,174.7
+1997,Wales,LGVs,1693.6
+1997,Wales,all_HGVs,817.3
+1997,Wales,all_motor_vehicles,15023.8
+1997,North West,pedal_cycles,255.8
+1997,North West,two_wheeled_motor_vehicles,203.9
+1997,North West,cars_and_taxis,25620.9
+1997,North West,buses_and_coaches,374
+1997,North West,LGVs,3223
+1997,North West,all_HGVs,2068.2
+1997,North West,all_motor_vehicles,31490
+1997,London,pedal_cycles,289.1
+1997,London,two_wheeled_motor_vehicles,398.6
+1997,London,cars_and_taxis,16229.4
+1997,London,buses_and_coaches,315
+1997,London,LGVs,2105.3
+1997,London,all_HGVs,646.1
+1997,London,all_motor_vehicles,19694.3
+1997,East of England,pedal_cycles,370.9
+1997,East of England,two_wheeled_motor_vehicles,280.6
+1997,East of England,cars_and_taxis,25046.5
+1997,East of England,buses_and_coaches,282
+1997,East of England,LGVs,3545.3
+1997,East of England,all_HGVs,1918
+1997,East of England,all_motor_vehicles,31072.4
+1997,Yorkshire and the Humber,pedal_cycles,235.8
+1997,Yorkshire and the Humber,two_wheeled_motor_vehicles,174.4
+1997,Yorkshire and the Humber,cars_and_taxis,18303
+1997,Yorkshire and the Humber,buses_and_coaches,258.7
+1997,Yorkshire and the Humber,LGVs,2552.8
+1997,Yorkshire and the Humber,all_HGVs,1813.3
+1997,Yorkshire and the Humber,all_motor_vehicles,23102.2
+1997,South East,pedal_cycles,438.3
+1997,South East,two_wheeled_motor_vehicles,437.9
+1997,South East,cars_and_taxis,40295.1
+1997,South East,buses_and_coaches,420.1
+1997,South East,LGVs,5055.8
+1997,South East,all_HGVs,2286.9
+1997,South East,all_motor_vehicles,48495.8
+1997,West Midlands,pedal_cycles,198.1
+1997,West Midlands,two_wheeled_motor_vehicles,183.6
+1997,West Midlands,cars_and_taxis,22186.4
+1997,West Midlands,buses_and_coaches,330.4
+1997,West Midlands,LGVs,2951.8
+1997,West Midlands,all_HGVs,1880.4
+1997,West Midlands,all_motor_vehicles,27532.7
+1997,North East,pedal_cycles,88.4
+1997,North East,two_wheeled_motor_vehicles,58.8
+1997,North East,cars_and_taxis,9159.4
+1997,North East,buses_and_coaches,193.2
+1997,North East,LGVs,1166.1
+1997,North East,all_HGVs,497.6
+1997,North East,all_motor_vehicles,11075.1
+1998,South West,pedal_cycles,223.8
+1998,South West,two_wheeled_motor_vehicles,312.5
+1998,South West,cars_and_taxis,21679.4
+1998,South West,buses_and_coaches,296.4
+1998,South West,LGVs,2855.3
+1998,South West,all_HGVs,1529.6
+1998,South West,all_motor_vehicles,26673.2
+1998,East Midlands,pedal_cycles,197
+1998,East Midlands,two_wheeled_motor_vehicles,182.3
+1998,East Midlands,cars_and_taxis,17935
+1998,East Midlands,buses_and_coaches,211.6
+1998,East Midlands,LGVs,2534.3
+1998,East Midlands,all_HGVs,1942.8
+1998,East Midlands,all_motor_vehicles,22806.1
+1998,Scotland,pedal_cycles,141.6
+1998,Scotland,two_wheeled_motor_vehicles,134.9
+1998,Scotland,cars_and_taxis,19358.4
+1998,Scotland,buses_and_coaches,373.7
+1998,Scotland,LGVs,2831.5
+1998,Scotland,all_HGVs,1498.6
+1998,Scotland,all_motor_vehicles,24197.1
+1998,Wales,pedal_cycles,78.2
+1998,Wales,two_wheeled_motor_vehicles,113.9
+1998,Wales,cars_and_taxis,12320.6
+1998,Wales,buses_and_coaches,171.6
+1998,Wales,LGVs,1768.2
+1998,Wales,all_HGVs,845
+1998,Wales,all_motor_vehicles,15219.3
+1998,North West,pedal_cycles,249.9
+1998,North West,two_wheeled_motor_vehicles,213.7
+1998,North West,cars_and_taxis,26030.1
+1998,North West,buses_and_coaches,379
+1998,North West,LGVs,3372.7
+1998,North West,all_HGVs,2105
+1998,North West,all_motor_vehicles,32100.5
+1998,London,pedal_cycles,274.4
+1998,London,two_wheeled_motor_vehicles,406.5
+1998,London,cars_and_taxis,16283.3
+1998,London,buses_and_coaches,317.4
+1998,London,LGVs,2113.8
+1998,London,all_HGVs,698.6
+1998,London,all_motor_vehicles,19819.7
+1998,East of England,pedal_cycles,359
+1998,East of England,two_wheeled_motor_vehicles,295.2
+1998,East of England,cars_and_taxis,25241.9
+1998,East of England,buses_and_coaches,285.2
+1998,East of England,LGVs,3747.1
+1998,East of England,all_HGVs,1965.8
+1998,East of England,all_motor_vehicles,31535.3
+1998,Yorkshire and the Humber,pedal_cycles,228.6
+1998,Yorkshire and the Humber,two_wheeled_motor_vehicles,180.8
+1998,Yorkshire and the Humber,cars_and_taxis,18646.6
+1998,Yorkshire and the Humber,buses_and_coaches,259.4
+1998,Yorkshire and the Humber,LGVs,2679
+1998,Yorkshire and the Humber,all_HGVs,1843.4
+1998,Yorkshire and the Humber,all_motor_vehicles,23609.2
+1998,South East,pedal_cycles,427
+1998,South East,two_wheeled_motor_vehicles,462.2
+1998,South East,cars_and_taxis,41040
+1998,South East,buses_and_coaches,436.2
+1998,South East,LGVs,5315.6
+1998,South East,all_HGVs,2389.2
+1998,South East,all_motor_vehicles,49643.3
+1998,West Midlands,pedal_cycles,191.8
+1998,West Midlands,two_wheeled_motor_vehicles,190.2
+1998,West Midlands,cars_and_taxis,22492.9
+1998,West Midlands,buses_and_coaches,333.9
+1998,West Midlands,LGVs,3122.1
+1998,West Midlands,all_HGVs,1916.1
+1998,West Midlands,all_motor_vehicles,28055.2
+1998,North East,pedal_cycles,85.6
+1998,North East,two_wheeled_motor_vehicles,61
+1998,North East,cars_and_taxis,9251
+1998,North East,buses_and_coaches,196.7
+1998,North East,LGVs,1223.9
+1998,North East,all_HGVs,501.7
+1998,North East,all_motor_vehicles,11234.3
+1999,South West,pedal_cycles,229.4
+1999,South West,two_wheeled_motor_vehicles,337.9
+1999,South West,cars_and_taxis,21992.3
+1999,South West,buses_and_coaches,282
+1999,South West,LGVs,2969.5
+1999,South West,all_HGVs,1555.1
+1999,South West,all_motor_vehicles,27136.9
+1999,East Midlands,pedal_cycles,205.4
+1999,East Midlands,two_wheeled_motor_vehicles,199.4
+1999,East Midlands,cars_and_taxis,18420.9
+1999,East Midlands,buses_and_coaches,208.7
+1999,East Midlands,LGVs,2583.6
+1999,East Midlands,all_HGVs,1978.9
+1999,East Midlands,all_motor_vehicles,23391.6
+1999,Scotland,pedal_cycles,147.8
+1999,Scotland,two_wheeled_motor_vehicles,150.1
+1999,Scotland,cars_and_taxis,19628.5
+1999,Scotland,buses_and_coaches,380.8
+1999,Scotland,LGVs,2893.8
+1999,Scotland,all_HGVs,1510.8
+1999,Scotland,all_motor_vehicles,24564.1
+1999,Wales,pedal_cycles,81.6
+1999,Wales,two_wheeled_motor_vehicles,125
+1999,Wales,cars_and_taxis,12552.8
+1999,Wales,buses_and_coaches,175.7
+1999,Wales,LGVs,1806.2
+1999,Wales,all_HGVs,818.3
+1999,Wales,all_motor_vehicles,15477.9
+1999,North West,pedal_cycles,255.4
+1999,North West,two_wheeled_motor_vehicles,232.2
+1999,North West,cars_and_taxis,26464
+1999,North West,buses_and_coaches,381.1
+1999,North West,LGVs,3382.8
+1999,North West,all_HGVs,2146
+1999,North West,all_motor_vehicles,32606.1
+1999,London,pedal_cycles,280.9
+1999,London,two_wheeled_motor_vehicles,443.3
+1999,London,cars_and_taxis,16643.7
+1999,London,buses_and_coaches,329.8
+1999,London,LGVs,2224.2
+1999,London,all_HGVs,674
+1999,London,all_motor_vehicles,20315
+1999,East of England,pedal_cycles,373.2
+1999,East of England,two_wheeled_motor_vehicles,325.2
+1999,East of England,cars_and_taxis,25732.6
+1999,East of England,buses_and_coaches,295.6
+1999,East of England,LGVs,3769.8
+1999,East of England,all_HGVs,2033.8
+1999,East of England,all_motor_vehicles,32157.2
+1999,Yorkshire and the Humber,pedal_cycles,234.5
+1999,Yorkshire and the Humber,two_wheeled_motor_vehicles,195.5
+1999,Yorkshire and the Humber,cars_and_taxis,18907.1
+1999,Yorkshire and the Humber,buses_and_coaches,267.3
+1999,Yorkshire and the Humber,LGVs,2711.8
+1999,Yorkshire and the Humber,all_HGVs,1845.7
+1999,Yorkshire and the Humber,all_motor_vehicles,23927.3
+1999,South East,pedal_cycles,440.3
+1999,South East,two_wheeled_motor_vehicles,508.4
+1999,South East,cars_and_taxis,41913
+1999,South East,buses_and_coaches,429.7
+1999,South East,LGVs,5340.7
+1999,South East,all_HGVs,2463
+1999,South East,all_motor_vehicles,50654.8
+1999,West Midlands,pedal_cycles,197.9
+1999,West Midlands,two_wheeled_motor_vehicles,207.4
+1999,West Midlands,cars_and_taxis,22789.8
+1999,West Midlands,buses_and_coaches,341.2
+1999,West Midlands,LGVs,3155.1
+1999,West Midlands,all_HGVs,1927.1
+1999,West Midlands,all_motor_vehicles,28420.6
+1999,North East,pedal_cycles,88.3
+1999,North East,two_wheeled_motor_vehicles,68.8
+1999,North East,cars_and_taxis,9488.2
+1999,North East,buses_and_coaches,203.1
+1999,North East,LGVs,1218
+1999,North East,all_HGVs,525.9
+1999,North East,all_motor_vehicles,11503.9
+2000,South West,pedal_cycles,232.9
+2000,South West,two_wheeled_motor_vehicles,335.9
+2000,South West,cars_and_taxis,22145.9
+2000,South West,buses_and_coaches,274.3
+2000,South West,LGVs,3075.4
+2000,South West,all_HGVs,1525.1
+2000,South West,all_motor_vehicles,27356.7
+2000,East Midlands,pedal_cycles,208.8
+2000,East Midlands,two_wheeled_motor_vehicles,205.2
+2000,East Midlands,cars_and_taxis,18301.7
+2000,East Midlands,buses_and_coaches,202.5
+2000,East Midlands,LGVs,2641.6
+2000,East Midlands,all_HGVs,1966.7
+2000,East Midlands,all_motor_vehicles,23317.6
+2000,Scotland,pedal_cycles,150.3
+2000,Scotland,two_wheeled_motor_vehicles,155.1
+2000,Scotland,cars_and_taxis,19537.5
+2000,Scotland,buses_and_coaches,372.2
+2000,Scotland,LGVs,2853
+2000,Scotland,all_HGVs,1513.9
+2000,Scotland,all_motor_vehicles,24431.8
+2000,Wales,pedal_cycles,82.2
+2000,Wales,two_wheeled_motor_vehicles,129.6
+2000,Wales,cars_and_taxis,12451.9
+2000,Wales,buses_and_coaches,172
+2000,Wales,LGVs,1822.5
+2000,Wales,all_HGVs,794.5
+2000,Wales,all_motor_vehicles,15370.6
+2000,North West,pedal_cycles,260.5
+2000,North West,two_wheeled_motor_vehicles,244
+2000,North West,cars_and_taxis,26389.3
+2000,North West,buses_and_coaches,363.3
+2000,North West,LGVs,3410.9
+2000,North West,all_HGVs,2118.2
+2000,North West,all_motor_vehicles,32525.8
+2000,London,pedal_cycles,285.1
+2000,London,two_wheeled_motor_vehicles,443.2
+2000,London,cars_and_taxis,16579.1
+2000,London,buses_and_coaches,320.8
+2000,London,LGVs,2246.9
+2000,London,all_HGVs,698.4
+2000,London,all_motor_vehicles,20288.4
+2000,East of England,pedal_cycles,383.7
+2000,East of England,two_wheeled_motor_vehicles,330.3
+2000,East of England,cars_and_taxis,25542.9
+2000,East of England,buses_and_coaches,295.1
+2000,East of England,LGVs,3791.9
+2000,East of England,all_HGVs,2066.3
+2000,East of England,all_motor_vehicles,32026.5
+2000,Yorkshire and the Humber,pedal_cycles,241.1
+2000,Yorkshire and the Humber,two_wheeled_motor_vehicles,203.7
+2000,Yorkshire and the Humber,cars_and_taxis,18851.4
+2000,Yorkshire and the Humber,buses_and_coaches,262.1
+2000,Yorkshire and the Humber,LGVs,2747.8
+2000,Yorkshire and the Humber,all_HGVs,1828.5
+2000,Yorkshire and the Humber,all_motor_vehicles,23893.5
+2000,South East,pedal_cycles,447.3
+2000,South East,two_wheeled_motor_vehicles,503.2
+2000,South East,cars_and_taxis,41755.3
+2000,South East,buses_and_coaches,418.8
+2000,South East,LGVs,5451.1
+2000,South East,all_HGVs,2549.9
+2000,South East,all_motor_vehicles,50678.3
+2000,West Midlands,pedal_cycles,202.5
+2000,West Midlands,two_wheeled_motor_vehicles,210.8
+2000,West Midlands,cars_and_taxis,22674.7
+2000,West Midlands,buses_and_coaches,322.9
+2000,West Midlands,LGVs,3188.1
+2000,West Midlands,all_HGVs,1950.4
+2000,West Midlands,all_motor_vehicles,28346.9
+2000,North East,pedal_cycles,91.4
+2000,North East,two_wheeled_motor_vehicles,73.5
+2000,North East,cars_and_taxis,9317
+2000,North East,buses_and_coaches,190
+2000,North East,LGVs,1206.4
+2000,North East,all_HGVs,527.8
+2000,North East,all_motor_vehicles,11314.6
+2001,South West,pedal_cycles,231.9
+2001,South West,two_wheeled_motor_vehicles,360.3
+2001,South West,cars_and_taxis,22726.7
+2001,South West,buses_and_coaches,276.2
+2001,South West,LGVs,3163.1
+2001,South West,all_HGVs,1536
+2001,South West,all_motor_vehicles,28062.3
+2001,East Midlands,pedal_cycles,209.8
+2001,East Midlands,two_wheeled_motor_vehicles,214.5
+2001,East Midlands,cars_and_taxis,18661
+2001,East Midlands,buses_and_coaches,203.1
+2001,East Midlands,LGVs,2736.9
+2001,East Midlands,all_HGVs,1958.9
+2001,East Midlands,all_motor_vehicles,23774.4
+2001,Scotland,pedal_cycles,146.4
+2001,Scotland,two_wheeled_motor_vehicles,162.4
+2001,Scotland,cars_and_taxis,19824.4
+2001,Scotland,buses_and_coaches,375.1
+2001,Scotland,LGVs,2897
+2001,Scotland,all_HGVs,1489.8
+2001,Scotland,all_motor_vehicles,24748.6
+2001,Wales,pedal_cycles,81
+2001,Wales,two_wheeled_motor_vehicles,133.3
+2001,Wales,cars_and_taxis,12597.3
+2001,Wales,buses_and_coaches,170.1
+2001,Wales,LGVs,1854.4
+2001,Wales,all_HGVs,774.4
+2001,Wales,all_motor_vehicles,15529.5
+2001,North West,pedal_cycles,265.7
+2001,North West,two_wheeled_motor_vehicles,252
+2001,North West,cars_and_taxis,26759
+2001,North West,buses_and_coaches,359.1
+2001,North West,LGVs,3474.7
+2001,North West,all_HGVs,2121.2
+2001,North West,all_motor_vehicles,32966
+2001,London,pedal_cycles,303.2
+2001,London,two_wheeled_motor_vehicles,470.7
+2001,London,cars_and_taxis,16581.8
+2001,London,buses_and_coaches,318.6
+2001,London,LGVs,2275.2
+2001,London,all_HGVs,683.6
+2001,London,all_motor_vehicles,20329.9
+2001,East of England,pedal_cycles,390.7
+2001,East of England,two_wheeled_motor_vehicles,342.5
+2001,East of England,cars_and_taxis,25900.3
+2001,East of England,buses_and_coaches,295.5
+2001,East of England,LGVs,3930.1
+2001,East of England,all_HGVs,2062.4
+2001,East of England,all_motor_vehicles,32530.8
+2001,Yorkshire and the Humber,pedal_cycles,246
+2001,Yorkshire and the Humber,two_wheeled_motor_vehicles,213.4
+2001,Yorkshire and the Humber,cars_and_taxis,19144.1
+2001,Yorkshire and the Humber,buses_and_coaches,259.8
+2001,Yorkshire and the Humber,LGVs,2842.8
+2001,Yorkshire and the Humber,all_HGVs,1806.6
+2001,Yorkshire and the Humber,all_motor_vehicles,24266.7
+2001,South East,pedal_cycles,457.4
+2001,South East,two_wheeled_motor_vehicles,533.5
+2001,South East,cars_and_taxis,42203.5
+2001,South East,buses_and_coaches,415.6
+2001,South East,LGVs,5573.1
+2001,South East,all_HGVs,2551.2
+2001,South East,all_motor_vehicles,51277
+2001,West Midlands,pedal_cycles,205.2
+2001,West Midlands,two_wheeled_motor_vehicles,218
+2001,West Midlands,cars_and_taxis,22874.6
+2001,West Midlands,buses_and_coaches,322.1
+2001,West Midlands,LGVs,3230.9
+2001,West Midlands,all_HGVs,1922.6
+2001,West Midlands,all_motor_vehicles,28568.1
+2001,North East,pedal_cycles,94.8
+2001,North East,two_wheeled_motor_vehicles,76.7
+2001,North East,cars_and_taxis,9396.5
+2001,North East,buses_and_coaches,186.9
+2001,North East,LGVs,1224.4
+2001,North East,all_HGVs,521.4
+2001,North East,all_motor_vehicles,11406
+2002,South West,pedal_cycles,242
+2002,South West,two_wheeled_motor_vehicles,389.3
+2002,South West,cars_and_taxis,23550.3
+2002,South West,buses_and_coaches,280.6
+2002,South West,LGVs,3279.8
+2002,South West,all_HGVs,1540.5
+2002,South West,all_motor_vehicles,29040.5
+2002,East Midlands,pedal_cycles,219.7
+2002,East Midlands,two_wheeled_motor_vehicles,234.6
+2002,East Midlands,cars_and_taxis,19256.4
+2002,East Midlands,buses_and_coaches,207.9
+2002,East Midlands,LGVs,2859.1
+2002,East Midlands,all_HGVs,1970.1
+2002,East Midlands,all_motor_vehicles,24528.1
+2002,Scotland,pedal_cycles,155.3
+2002,Scotland,two_wheeled_motor_vehicles,181.5
+2002,Scotland,cars_and_taxis,20584
+2002,Scotland,buses_and_coaches,391.2
+2002,Scotland,LGVs,3000.1
+2002,Scotland,all_HGVs,1496.3
+2002,Scotland,all_motor_vehicles,25653.2
+2002,Wales,pedal_cycles,84.6
+2002,Wales,two_wheeled_motor_vehicles,141.6
+2002,Wales,cars_and_taxis,13023.9
+2002,Wales,buses_and_coaches,171.4
+2002,Wales,LGVs,1922.7
+2002,Wales,all_HGVs,777.9
+2002,Wales,all_motor_vehicles,16037.6
+2002,North West,pedal_cycles,273.6
+2002,North West,two_wheeled_motor_vehicles,265.3
+2002,North West,cars_and_taxis,27287.9
+2002,North West,buses_and_coaches,353.8
+2002,North West,LGVs,3531.8
+2002,North West,all_HGVs,2115.5
+2002,North West,all_motor_vehicles,33554.4
+2002,London,pedal_cycles,312
+2002,London,two_wheeled_motor_vehicles,471.4
+2002,London,cars_and_taxis,16689.5
+2002,London,buses_and_coaches,331.6
+2002,London,LGVs,2253.5
+2002,London,all_HGVs,669.5
+2002,London,all_motor_vehicles,20415.5
+2002,East of England,pedal_cycles,409.9
+2002,East of England,two_wheeled_motor_vehicles,356.5
+2002,East of England,cars_and_taxis,26451.3
+2002,East of England,buses_and_coaches,298.9
+2002,East of England,LGVs,3925.1
+2002,East of England,all_HGVs,2145.7
+2002,East of England,all_motor_vehicles,33177.4
+2002,Yorkshire and the Humber,pedal_cycles,256.3
+2002,Yorkshire and the Humber,two_wheeled_motor_vehicles,227.9
+2002,Yorkshire and the Humber,cars_and_taxis,19654.8
+2002,Yorkshire and the Humber,buses_and_coaches,260.5
+2002,Yorkshire and the Humber,LGVs,2974.2
+2002,Yorkshire and the Humber,all_HGVs,1823.5
+2002,Yorkshire and the Humber,all_motor_vehicles,24940.9
+2002,South East,pedal_cycles,477.6
+2002,South East,two_wheeled_motor_vehicles,548.9
+2002,South East,cars_and_taxis,42867.5
+2002,South East,buses_and_coaches,403.9
+2002,South East,LGVs,5649.2
+2002,South East,all_HGVs,2579.8
+2002,South East,all_motor_vehicles,52049.3
+2002,West Midlands,pedal_cycles,213.8
+2002,West Midlands,two_wheeled_motor_vehicles,233.1
+2002,West Midlands,cars_and_taxis,23461.2
+2002,West Midlands,buses_and_coaches,316.6
+2002,West Midlands,LGVs,3304.9
+2002,West Midlands,all_HGVs,1942.9
+2002,West Midlands,all_motor_vehicles,29258.7
+2002,North East,pedal_cycles,98.9
+2002,North East,two_wheeled_motor_vehicles,81.8
+2002,North East,cars_and_taxis,9530.7
+2002,North East,buses_and_coaches,185.3
+2002,North East,LGVs,1261.8
+2002,North East,all_HGVs,521.5
+2002,North East,all_motor_vehicles,11581.1
+2003,South West,pedal_cycles,246.1
+2003,South West,two_wheeled_motor_vehicles,426.8
+2003,South West,cars_and_taxis,23835.4
+2003,South West,buses_and_coaches,289.4
+2003,South West,LGVs,3481.2
+2003,South West,all_HGVs,1523.9
+2003,South West,all_motor_vehicles,29556.6
+2003,East Midlands,pedal_cycles,222.6
+2003,East Midlands,two_wheeled_motor_vehicles,264.7
+2003,East Midlands,cars_and_taxis,19560.5
+2003,East Midlands,buses_and_coaches,216.5
+2003,East Midlands,LGVs,3041.2
+2003,East Midlands,all_HGVs,1978.9
+2003,East Midlands,all_motor_vehicles,25061.9
+2003,Scotland,pedal_cycles,154.7
+2003,Scotland,two_wheeled_motor_vehicles,203.5
+2003,Scotland,cars_and_taxis,20647.1
+2003,Scotland,buses_and_coaches,401.6
+2003,Scotland,LGVs,3154
+2003,Scotland,all_HGVs,1560.1
+2003,Scotland,all_motor_vehicles,25966.2
+2003,Wales,pedal_cycles,85.2
+2003,Wales,two_wheeled_motor_vehicles,151.2
+2003,Wales,cars_and_taxis,13099
+2003,Wales,buses_and_coaches,176.6
+2003,Wales,LGVs,2012.7
+2003,Wales,all_HGVs,767.5
+2003,Wales,all_motor_vehicles,16207
+2003,North West,pedal_cycles,276.7
+2003,North West,two_wheeled_motor_vehicles,294
+2003,North West,cars_and_taxis,27173.7
+2003,North West,buses_and_coaches,359.4
+2003,North West,LGVs,3727.1
+2003,North West,all_HGVs,2132.2
+2003,North West,all_motor_vehicles,33686.4
+2003,London,pedal_cycles,337
+2003,London,two_wheeled_motor_vehicles,533.1
+2003,London,cars_and_taxis,16445.3
+2003,London,buses_and_coaches,361.6
+2003,London,LGVs,2434.5
+2003,London,all_HGVs,673.6
+2003,London,all_motor_vehicles,20448.1
+2003,East of England,pedal_cycles,414.4
+2003,East of England,two_wheeled_motor_vehicles,382.2
+2003,East of England,cars_and_taxis,26457.6
+2003,East of England,buses_and_coaches,306.7
+2003,East of England,LGVs,4052.8
+2003,East of England,all_HGVs,2150
+2003,East of England,all_motor_vehicles,33349.3
+2003,Yorkshire and the Humber,pedal_cycles,261.1
+2003,Yorkshire and the Humber,two_wheeled_motor_vehicles,251.3
+2003,Yorkshire and the Humber,cars_and_taxis,19626.2
+2003,Yorkshire and the Humber,buses_and_coaches,268.7
+2003,Yorkshire and the Humber,LGVs,3107.8
+2003,Yorkshire and the Humber,all_HGVs,1831
+2003,Yorkshire and the Humber,all_motor_vehicles,25084.9
+2003,South East,pedal_cycles,489.3
+2003,South East,two_wheeled_motor_vehicles,594.3
+2003,South East,cars_and_taxis,42441.8
+2003,South East,buses_and_coaches,404.3
+2003,South East,LGVs,5878.4
+2003,South East,all_HGVs,2585.8
+2003,South East,all_motor_vehicles,51904.6
+2003,West Midlands,pedal_cycles,216.6
+2003,West Midlands,two_wheeled_motor_vehicles,257.5
+2003,West Midlands,cars_and_taxis,23225.9
+2003,West Midlands,buses_and_coaches,325.1
+2003,West Midlands,LGVs,3463.7
+2003,West Midlands,all_HGVs,1951.2
+2003,West Midlands,all_motor_vehicles,29223.4
+2003,North East,pedal_cycles,100
+2003,North East,two_wheeled_motor_vehicles,88.2
+2003,North East,cars_and_taxis,9438.5
+2003,North East,buses_and_coaches,193.2
+2003,North East,LGVs,1309.5
+2003,North East,all_HGVs,523.5
+2003,North East,all_motor_vehicles,11552.9
+2004,South West,pedal_cycles,228.1
+2004,South West,two_wheeled_motor_vehicles,398.7
+2004,South West,cars_and_taxis,24119.3
+2004,South West,buses_and_coaches,275.3
+2004,South West,LGVs,3686.5
+2004,South West,all_HGVs,1551.4
+2004,South West,all_motor_vehicles,30031.3
+2004,East Midlands,pedal_cycles,204.2
+2004,East Midlands,two_wheeled_motor_vehicles,243.7
+2004,East Midlands,cars_and_taxis,19816.4
+2004,East Midlands,buses_and_coaches,213.1
+2004,East Midlands,LGVs,3206.1
+2004,East Midlands,all_HGVs,2062.5
+2004,East Midlands,all_motor_vehicles,25541.8
+2004,Scotland,pedal_cycles,137.3
+2004,Scotland,two_wheeled_motor_vehicles,188.4
+2004,Scotland,cars_and_taxis,20609.6
+2004,Scotland,buses_and_coaches,358.2
+2004,Scotland,LGVs,3235.5
+2004,Scotland,all_HGVs,1617.1
+2004,Scotland,all_motor_vehicles,26008.9
+2004,Wales,pedal_cycles,79.8
+2004,Wales,two_wheeled_motor_vehicles,141.1
+2004,Wales,cars_and_taxis,13393.5
+2004,Wales,buses_and_coaches,166.7
+2004,Wales,LGVs,2108.7
+2004,Wales,all_HGVs,793.9
+2004,Wales,all_motor_vehicles,16603.8
+2004,North West,pedal_cycles,253.4
+2004,North West,two_wheeled_motor_vehicles,260.6
+2004,North West,cars_and_taxis,27519.9
+2004,North West,buses_and_coaches,345
+2004,North West,LGVs,3907.2
+2004,North West,all_HGVs,2201.6
+2004,North West,all_motor_vehicles,34234.3
+2004,London,pedal_cycles,324.4
+2004,London,two_wheeled_motor_vehicles,498.4
+2004,London,cars_and_taxis,16383.7
+2004,London,buses_and_coaches,372.4
+2004,London,LGVs,2428.7
+2004,London,all_HGVs,680.4
+2004,London,all_motor_vehicles,20363.5
+2004,East of England,pedal_cycles,384.9
+2004,East of England,two_wheeled_motor_vehicles,347.1
+2004,East of England,cars_and_taxis,26663.5
+2004,East of England,buses_and_coaches,291.4
+2004,East of England,LGVs,4276.2
+2004,East of England,all_HGVs,2217.4
+2004,East of England,all_motor_vehicles,33795.5
+2004,Yorkshire and the Humber,pedal_cycles,240.2
+2004,Yorkshire and the Humber,two_wheeled_motor_vehicles,229
+2004,Yorkshire and the Humber,cars_and_taxis,19984
+2004,Yorkshire and the Humber,buses_and_coaches,262.3
+2004,Yorkshire and the Humber,LGVs,3318.8
+2004,Yorkshire and the Humber,all_HGVs,1896.1
+2004,Yorkshire and the Humber,all_motor_vehicles,25690.3
+2004,South East,pedal_cycles,449.3
+2004,South East,two_wheeled_motor_vehicles,533.6
+2004,South East,cars_and_taxis,42446.7
+2004,South East,buses_and_coaches,390.1
+2004,South East,LGVs,6124.4
+2004,South East,all_HGVs,2644.1
+2004,South East,all_motor_vehicles,52138.9
+2004,West Midlands,pedal_cycles,200.8
+2004,West Midlands,two_wheeled_motor_vehicles,229.8
+2004,West Midlands,cars_and_taxis,23538.4
+2004,West Midlands,buses_and_coaches,317.2
+2004,West Midlands,LGVs,3630.2
+2004,West Midlands,all_HGVs,2012.9
+2004,West Midlands,all_motor_vehicles,29728.5
+2004,North East,pedal_cycles,92.5
+2004,North East,two_wheeled_motor_vehicles,80.6
+2004,North East,cars_and_taxis,9410.3
+2004,North East,buses_and_coaches,181.8
+2004,North East,LGVs,1373.3
+2004,North East,all_HGVs,522.6
+2004,North East,all_motor_vehicles,11568.8
+2005,South West,pedal_cycles,238.2
+2005,South West,two_wheeled_motor_vehicles,426.1
+2005,South West,cars_and_taxis,24521.8
+2005,South West,buses_and_coaches,273.6
+2005,South West,LGVs,3855
+2005,South West,all_HGVs,1551
+2005,South West,all_motor_vehicles,30627.5
+2005,East Midlands,pedal_cycles,214
+2005,East Midlands,two_wheeled_motor_vehicles,251.9
+2005,East Midlands,cars_and_taxis,19841.7
+2005,East Midlands,buses_and_coaches,208.8
+2005,East Midlands,LGVs,3240.8
+2005,East Midlands,all_HGVs,2054.5
+2005,East Midlands,all_motor_vehicles,25597.7
+2005,Scotland,pedal_cycles,144
+2005,Scotland,two_wheeled_motor_vehicles,190.2
+2005,Scotland,cars_and_taxis,20511.5
+2005,Scotland,buses_and_coaches,354.4
+2005,Scotland,LGVs,3346.9
+2005,Scotland,all_HGVs,1632.1
+2005,Scotland,all_motor_vehicles,26035
+2005,Wales,pedal_cycles,84.1
+2005,Wales,two_wheeled_motor_vehicles,149.3
+2005,Wales,cars_and_taxis,13240.5
+2005,Wales,buses_and_coaches,165.1
+2005,Wales,LGVs,2167.2
+2005,Wales,all_HGVs,795.1
+2005,Wales,all_motor_vehicles,16517.2
+2005,North West,pedal_cycles,261.5
+2005,North West,two_wheeled_motor_vehicles,274.2
+2005,North West,cars_and_taxis,27219.1
+2005,North West,buses_and_coaches,345
+2005,North West,LGVs,3971
+2005,North West,all_HGVs,2182.1
+2005,North West,all_motor_vehicles,33991.4
+2005,London,pedal_cycles,365.2
+2005,London,two_wheeled_motor_vehicles,521.5
+2005,London,cars_and_taxis,16355.5
+2005,London,buses_and_coaches,374.1
+2005,London,LGVs,2483.3
+2005,London,all_HGVs,688.3
+2005,London,all_motor_vehicles,20422.7
+2005,East of England,pedal_cycles,402.8
+2005,East of England,two_wheeled_motor_vehicles,365.4
+2005,East of England,cars_and_taxis,26485.9
+2005,East of England,buses_and_coaches,283.9
+2005,East of England,LGVs,4420
+2005,East of England,all_HGVs,2165.6
+2005,East of England,all_motor_vehicles,33720.8
+2005,Yorkshire and the Humber,pedal_cycles,249
+2005,Yorkshire and the Humber,two_wheeled_motor_vehicles,245.4
+2005,Yorkshire and the Humber,cars_and_taxis,19985.5
+2005,Yorkshire and the Humber,buses_and_coaches,260
+2005,Yorkshire and the Humber,LGVs,3440.5
+2005,Yorkshire and the Humber,all_HGVs,1874.9
+2005,Yorkshire and the Humber,all_motor_vehicles,25806.4
+2005,South East,pedal_cycles,468.5
+2005,South East,two_wheeled_motor_vehicles,564.5
+2005,South East,cars_and_taxis,42004.4
+2005,South East,buses_and_coaches,376.5
+2005,South East,LGVs,6258.4
+2005,South East,all_HGVs,2596.5
+2005,South East,all_motor_vehicles,51800.3
+2005,West Midlands,pedal_cycles,210.9
+2005,West Midlands,two_wheeled_motor_vehicles,241.2
+2005,West Midlands,cars_and_taxis,23594.7
+2005,West Midlands,buses_and_coaches,315.6
+2005,West Midlands,LGVs,3763.9
+2005,West Midlands,all_HGVs,1956.5
+2005,West Midlands,all_motor_vehicles,29871.8
+2005,North East,pedal_cycles,96.2
+2005,North East,two_wheeled_motor_vehicles,82.6
+2005,North East,cars_and_taxis,9291.4
+2005,North East,buses_and_coaches,175.4
+2005,North East,LGVs,1395.7
+2005,North East,all_HGVs,508
+2005,North East,all_motor_vehicles,11453.1
+2006,South West,pedal_cycles,249.2
+2006,South West,two_wheeled_motor_vehicles,402.8
+2006,South West,cars_and_taxis,25085.2
+2006,South West,buses_and_coaches,293.3
+2006,South West,LGVs,4014.9
+2006,South West,all_HGVs,1532.2
+2006,South West,all_motor_vehicles,31328.6
+2006,East Midlands,pedal_cycles,223.3
+2006,East Midlands,two_wheeled_motor_vehicles,236.6
+2006,East Midlands,cars_and_taxis,20178.7
+2006,East Midlands,buses_and_coaches,218.5
+2006,East Midlands,LGVs,3336.3
+2006,East Midlands,all_HGVs,2082.5
+2006,East Midlands,all_motor_vehicles,26052.6
+2006,Scotland,pedal_cycles,154
+2006,Scotland,two_wheeled_motor_vehicles,183.5
+2006,Scotland,cars_and_taxis,21086.8
+2006,Scotland,buses_and_coaches,368.1
+2006,Scotland,LGVs,3527.5
+2006,Scotland,all_HGVs,1682.4
+2006,Scotland,all_motor_vehicles,26848.2
+2006,Wales,pedal_cycles,87.7
+2006,Wales,two_wheeled_motor_vehicles,142.8
+2006,Wales,cars_and_taxis,13528.6
+2006,Wales,buses_and_coaches,174.9
+2006,Wales,LGVs,2249.6
+2006,Wales,all_HGVs,791
+2006,Wales,all_motor_vehicles,16886.8
+2006,North West,pedal_cycles,273.2
+2006,North West,two_wheeled_motor_vehicles,256.5
+2006,North West,cars_and_taxis,27381.8
+2006,North West,buses_and_coaches,354.5
+2006,North West,LGVs,4118.6
+2006,North West,all_HGVs,2184.4
+2006,North West,all_motor_vehicles,34295.7
+2006,London,pedal_cycles,392.6
+2006,London,two_wheeled_motor_vehicles,533.1
+2006,London,cars_and_taxis,16333.9
+2006,London,buses_and_coaches,400.3
+2006,London,LGVs,2743
+2006,London,all_HGVs,671.3
+2006,London,all_motor_vehicles,20681.7
+2006,East of England,pedal_cycles,419.1
+2006,East of England,two_wheeled_motor_vehicles,345.9
+2006,East of England,cars_and_taxis,26769.4
+2006,East of England,buses_and_coaches,296.2
+2006,East of England,LGVs,4577.7
+2006,East of England,all_HGVs,2164.8
+2006,East of England,all_motor_vehicles,34154.1
+2006,Yorkshire and the Humber,pedal_cycles,258.8
+2006,Yorkshire and the Humber,two_wheeled_motor_vehicles,231.8
+2006,Yorkshire and the Humber,cars_and_taxis,20336.3
+2006,Yorkshire and the Humber,buses_and_coaches,269.3
+2006,Yorkshire and the Humber,LGVs,3576.2
+2006,Yorkshire and the Humber,all_HGVs,1895.6
+2006,Yorkshire and the Humber,all_motor_vehicles,26309.3
+2006,South East,pedal_cycles,485.7
+2006,South East,two_wheeled_motor_vehicles,530
+2006,South East,cars_and_taxis,42108.8
+2006,South East,buses_and_coaches,396.4
+2006,South East,LGVs,6446.9
+2006,South East,all_HGVs,2603.6
+2006,South East,all_motor_vehicles,52085.8
+2006,West Midlands,pedal_cycles,218.7
+2006,West Midlands,two_wheeled_motor_vehicles,227.2
+2006,West Midlands,cars_and_taxis,23842.6
+2006,West Midlands,buses_and_coaches,316.5
+2006,West Midlands,LGVs,3859.6
+2006,West Midlands,all_HGVs,1962.9
+2006,West Midlands,all_motor_vehicles,30208.8
+2006,North East,pedal_cycles,99.6
+2006,North East,two_wheeled_motor_vehicles,77.9
+2006,North East,cars_and_taxis,9331.9
+2006,North East,buses_and_coaches,169.4
+2006,North East,LGVs,1439.5
+2006,North East,all_HGVs,502.9
+2006,North East,all_motor_vehicles,11521.6
+2007,South West,pedal_cycles,229.4
+2007,South West,two_wheeled_motor_vehicles,439
+2007,South West,cars_and_taxis,25202
+2007,South West,buses_and_coaches,304.6
+2007,South West,LGVs,4264.6
+2007,South West,all_HGVs,1565.8
+2007,South West,all_motor_vehicles,31776
+2007,East Midlands,pedal_cycles,203.2
+2007,East Midlands,two_wheeled_motor_vehicles,256.6
+2007,East Midlands,cars_and_taxis,20293.4
+2007,East Midlands,buses_and_coaches,225
+2007,East Midlands,LGVs,3514.6
+2007,East Midlands,all_HGVs,2097.2
+2007,East Midlands,all_motor_vehicles,26386.9
+2007,Scotland,pedal_cycles,141.8
+2007,Scotland,two_wheeled_motor_vehicles,197.5
+2007,Scotland,cars_and_taxis,21129.1
+2007,Scotland,buses_and_coaches,392.9
+2007,Scotland,LGVs,3751.3
+2007,Scotland,all_HGVs,1720.2
+2007,Scotland,all_motor_vehicles,27191
+2007,Wales,pedal_cycles,80.9
+2007,Wales,two_wheeled_motor_vehicles,151.5
+2007,Wales,cars_and_taxis,13601.5
+2007,Wales,buses_and_coaches,178.7
+2007,Wales,LGVs,2348.2
+2007,Wales,all_HGVs,810.1
+2007,Wales,all_motor_vehicles,17090
+2007,North West,pedal_cycles,248.2
+2007,North West,two_wheeled_motor_vehicles,270.5
+2007,North West,cars_and_taxis,27362.2
+2007,North West,buses_and_coaches,353.4
+2007,North West,LGVs,4258.7
+2007,North West,all_HGVs,2186
+2007,North West,all_motor_vehicles,34430.8
+2007,London,pedal_cycles,364.1
+2007,London,two_wheeled_motor_vehicles,569.4
+2007,London,cars_and_taxis,16185.1
+2007,London,buses_and_coaches,403.1
+2007,London,LGVs,2823.3
+2007,London,all_HGVs,660.5
+2007,London,all_motor_vehicles,20641.4
+2007,East of England,pedal_cycles,383.5
+2007,East of England,two_wheeled_motor_vehicles,365.7
+2007,East of England,cars_and_taxis,26955.4
+2007,East of England,buses_and_coaches,308.6
+2007,East of England,LGVs,4884
+2007,East of England,all_HGVs,2177.8
+2007,East of England,all_motor_vehicles,34691.5
+2007,Yorkshire and the Humber,pedal_cycles,235.5
+2007,Yorkshire and the Humber,two_wheeled_motor_vehicles,250.1
+2007,Yorkshire and the Humber,cars_and_taxis,20435
+2007,Yorkshire and the Humber,buses_and_coaches,278
+2007,Yorkshire and the Humber,LGVs,3756.5
+2007,Yorkshire and the Humber,all_HGVs,1900.4
+2007,Yorkshire and the Humber,all_motor_vehicles,26620.1
+2007,South East,pedal_cycles,444.6
+2007,South East,two_wheeled_motor_vehicles,560.2
+2007,South East,cars_and_taxis,42045.8
+2007,South East,buses_and_coaches,384.8
+2007,South East,LGVs,6690
+2007,South East,all_HGVs,2633.4
+2007,South East,all_motor_vehicles,52314.2
+2007,West Midlands,pedal_cycles,199.7
+2007,West Midlands,two_wheeled_motor_vehicles,246.5
+2007,West Midlands,cars_and_taxis,23956.4
+2007,West Midlands,buses_and_coaches,325.2
+2007,West Midlands,LGVs,4039.1
+2007,West Midlands,all_HGVs,1969.8
+2007,West Midlands,all_motor_vehicles,30537
+2007,North East,pedal_cycles,91.2
+2007,North East,two_wheeled_motor_vehicles,84.6
+2007,North East,cars_and_taxis,9331.4
+2007,North East,buses_and_coaches,176.5
+2007,North East,LGVs,1522.9
+2007,North East,all_HGVs,500.2
+2007,North East,all_motor_vehicles,11615.5
+2008,South West,pedal_cycles,259.5
+2008,South West,two_wheeled_motor_vehicles,420.3
+2008,South West,cars_and_taxis,25529.9
+2008,South West,buses_and_coaches,291.5
+2008,South West,LGVs,4351.5
+2008,South West,all_HGVs,1515.8
+2008,South West,all_motor_vehicles,32109.1
+2008,East Midlands,pedal_cycles,228.5
+2008,East Midlands,two_wheeled_motor_vehicles,240.1
+2008,East Midlands,cars_and_taxis,20135.1
+2008,East Midlands,buses_and_coaches,209.7
+2008,East Midlands,LGVs,3530.4
+2008,East Midlands,all_HGVs,2010.4
+2008,East Midlands,all_motor_vehicles,26125.7
+2008,Scotland,pedal_cycles,161.4
+2008,Scotland,two_wheeled_motor_vehicles,191.4
+2008,Scotland,cars_and_taxis,21016.5
+2008,Scotland,buses_and_coaches,381.5
+2008,Scotland,LGVs,3763.2
+2008,Scotland,all_HGVs,1701.7
+2008,Scotland,all_motor_vehicles,27054.3
+2008,Wales,pedal_cycles,91.7
+2008,Wales,two_wheeled_motor_vehicles,145.3
+2008,Wales,cars_and_taxis,13532.5
+2008,Wales,buses_and_coaches,170.5
+2008,Wales,LGVs,2366.7
+2008,Wales,all_HGVs,797.1
+2008,Wales,all_motor_vehicles,17012.2
+2008,North West,pedal_cycles,282.9
+2008,North West,two_wheeled_motor_vehicles,248.5
+2008,North West,cars_and_taxis,27180.6
+2008,North West,buses_and_coaches,324.2
+2008,North West,LGVs,4189.7
+2008,North West,all_HGVs,2200.1
+2008,North West,all_motor_vehicles,34143.1
+2008,London,pedal_cycles,385.9
+2008,London,two_wheeled_motor_vehicles,493.8
+2008,London,cars_and_taxis,16003.8
+2008,London,buses_and_coaches,389
+2008,London,LGVs,2678.7
+2008,London,all_HGVs,668.1
+2008,London,all_motor_vehicles,20233.4
+2008,East of England,pedal_cycles,426
+2008,East of England,two_wheeled_motor_vehicles,337.1
+2008,East of England,cars_and_taxis,26835.1
+2008,East of England,buses_and_coaches,279.9
+2008,East of England,LGVs,4918
+2008,East of England,all_HGVs,2103.6
+2008,East of England,all_motor_vehicles,34473.7
+2008,Yorkshire and the Humber,pedal_cycles,265.6
+2008,Yorkshire and the Humber,two_wheeled_motor_vehicles,232.5
+2008,Yorkshire and the Humber,cars_and_taxis,20213.2
+2008,Yorkshire and the Humber,buses_and_coaches,254.3
+2008,Yorkshire and the Humber,LGVs,3671
+2008,Yorkshire and the Humber,all_HGVs,1868.8
+2008,Yorkshire and the Humber,all_motor_vehicles,26239.9
+2008,South East,pedal_cycles,501.3
+2008,South East,two_wheeled_motor_vehicles,513.1
+2008,South East,cars_and_taxis,41366.3
+2008,South East,buses_and_coaches,353.9
+2008,South East,LGVs,6664.2
+2008,South East,all_HGVs,2542.7
+2008,South East,all_motor_vehicles,51440.3
+2008,West Midlands,pedal_cycles,225.2
+2008,West Midlands,two_wheeled_motor_vehicles,225.8
+2008,West Midlands,cars_and_taxis,23856.4
+2008,West Midlands,buses_and_coaches,300
+2008,West Midlands,LGVs,3980.1
+2008,West Midlands,all_HGVs,1920.5
+2008,West Midlands,all_motor_vehicles,30282.9
+2008,North East,pedal_cycles,102.2
+2008,North East,two_wheeled_motor_vehicles,78.7
+2008,North East,cars_and_taxis,9162.3
+2008,North East,buses_and_coaches,163.1
+2008,North East,LGVs,1513.7
+2008,North East,all_HGVs,497.6
+2008,North East,all_motor_vehicles,11415.3
+2009,South West,pedal_cycles,274.1
+2009,South West,two_wheeled_motor_vehicles,428.9
+2009,South West,cars_and_taxis,25476.8
+2009,South West,buses_and_coaches,293.6
+2009,South West,LGVs,4290.8
+2009,South West,all_HGVs,1387.5
+2009,South West,all_motor_vehicles,31877.6
+2009,East Midlands,pedal_cycles,240.5
+2009,East Midlands,two_wheeled_motor_vehicles,244.6
+2009,East Midlands,cars_and_taxis,20176.6
+2009,East Midlands,buses_and_coaches,209.6
+2009,East Midlands,LGVs,3482.8
+2009,East Midlands,all_HGVs,1822.2
+2009,East Midlands,all_motor_vehicles,25935.8
+2009,Scotland,pedal_cycles,170.3
+2009,Scotland,two_wheeled_motor_vehicles,195.7
+2009,Scotland,cars_and_taxis,21044.6
+2009,Scotland,buses_and_coaches,384.6
+2009,Scotland,LGVs,3693
+2009,Scotland,all_HGVs,1582.2
+2009,Scotland,all_motor_vehicles,26900.2
+2009,Wales,pedal_cycles,96.7
+2009,Wales,two_wheeled_motor_vehicles,146.6
+2009,Wales,cars_and_taxis,13372
+2009,Wales,buses_and_coaches,169.8
+2009,Wales,LGVs,2326.9
+2009,Wales,all_HGVs,723.9
+2009,Wales,all_motor_vehicles,16739.2
+2009,North West,pedal_cycles,296.9
+2009,North West,two_wheeled_motor_vehicles,253.2
+2009,North West,cars_and_taxis,27213.8
+2009,North West,buses_and_coaches,322.2
+2009,North West,LGVs,4072.5
+2009,North West,all_HGVs,2063.4
+2009,North West,all_motor_vehicles,33925.1
+2009,London,pedal_cycles,390
+2009,London,two_wheeled_motor_vehicles,490.3
+2009,London,cars_and_taxis,16043
+2009,London,buses_and_coaches,389.8
+2009,London,LGVs,2562
+2009,London,all_HGVs,626.6
+2009,London,all_motor_vehicles,20111.6
+2009,East of England,pedal_cycles,444.4
+2009,East of England,two_wheeled_motor_vehicles,340.5
+2009,East of England,cars_and_taxis,26837.1
+2009,East of England,buses_and_coaches,275.6
+2009,East of England,LGVs,4801.4
+2009,East of England,all_HGVs,1963
+2009,East of England,all_motor_vehicles,34217.7
+2009,Yorkshire and the Humber,pedal_cycles,278.3
+2009,Yorkshire and the Humber,two_wheeled_motor_vehicles,236.2
+2009,Yorkshire and the Humber,cars_and_taxis,20099.8
+2009,Yorkshire and the Humber,buses_and_coaches,252.6
+2009,Yorkshire and the Humber,LGVs,3575.9
+2009,Yorkshire and the Humber,all_HGVs,1693.6
+2009,Yorkshire and the Humber,all_motor_vehicles,25858.1
+2009,South East,pedal_cycles,525.5
+2009,South East,two_wheeled_motor_vehicles,525.1
+2009,South East,cars_and_taxis,40953.5
+2009,South East,buses_and_coaches,340.2
+2009,South East,LGVs,6547.3
+2009,South East,all_HGVs,2297.2
+2009,South East,all_motor_vehicles,50663.3
+2009,West Midlands,pedal_cycles,235.9
+2009,West Midlands,two_wheeled_motor_vehicles,231.4
+2009,West Midlands,cars_and_taxis,23667.7
+2009,West Midlands,buses_and_coaches,295.2
+2009,West Midlands,LGVs,3883.6
+2009,West Midlands,all_HGVs,1752.6
+2009,West Midlands,all_motor_vehicles,29830.4
+2009,North East,pedal_cycles,107.5
+2009,North East,two_wheeled_motor_vehicles,79.4
+2009,North East,cars_and_taxis,9057.4
+2009,North East,buses_and_coaches,159.4
+2009,North East,LGVs,1470
+2009,North East,all_HGVs,445.3
+2009,North East,all_motor_vehicles,11211.5
+2010,South West,pedal_cycles,279.8
+2010,South West,two_wheeled_motor_vehicles,378.9
+2010,South West,cars_and_taxis,25070.7
+2010,South West,buses_and_coaches,289.5
+2010,South West,LGVs,4354.7
+2010,South West,all_HGVs,1373.8
+2010,South West,all_motor_vehicles,31467.5
+2010,East Midlands,pedal_cycles,243.9
+2010,East Midlands,two_wheeled_motor_vehicles,218
+2010,East Midlands,cars_and_taxis,19994.9
+2010,East Midlands,buses_and_coaches,210.3
+2010,East Midlands,LGVs,3562.7
+2010,East Midlands,all_HGVs,1824.2
+2010,East Midlands,all_motor_vehicles,25810.1
+2010,Scotland,pedal_cycles,177.1
+2010,Scotland,two_wheeled_motor_vehicles,178.6
+2010,Scotland,cars_and_taxis,20703.1
+2010,Scotland,buses_and_coaches,396
+2010,Scotland,LGVs,3779.8
+2010,Scotland,all_HGVs,1583.7
+2010,Scotland,all_motor_vehicles,26641.2
+2010,Wales,pedal_cycles,99.9
+2010,Wales,two_wheeled_motor_vehicles,130.8
+2010,Wales,cars_and_taxis,13123.8
+2010,Wales,buses_and_coaches,170.6
+2010,Wales,LGVs,2370.7
+2010,Wales,all_HGVs,712.4
+2010,Wales,all_motor_vehicles,16508.3
+2010,North West,pedal_cycles,298.1
+2010,North West,two_wheeled_motor_vehicles,231.7
+2010,North West,cars_and_taxis,26677.8
+2010,North West,buses_and_coaches,335.1
+2010,North West,LGVs,4068.1
+2010,North West,all_HGVs,2066.1
+2010,North West,all_motor_vehicles,33378.7
+2010,London,pedal_cycles,395.8
+2010,London,two_wheeled_motor_vehicles,452.2
+2010,London,cars_and_taxis,15844.2
+2010,London,buses_and_coaches,385.7
+2010,London,LGVs,2535.4
+2010,London,all_HGVs,634.4
+2010,London,all_motor_vehicles,19852
+2010,East of England,pedal_cycles,449.3
+2010,East of England,two_wheeled_motor_vehicles,303.1
+2010,East of England,cars_and_taxis,26074.3
+2010,East of England,buses_and_coaches,272
+2010,East of England,LGVs,4805.1
+2010,East of England,all_HGVs,1986.5
+2010,East of England,all_motor_vehicles,33441
+2010,Yorkshire and the Humber,pedal_cycles,279.7
+2010,Yorkshire and the Humber,two_wheeled_motor_vehicles,212.5
+2010,Yorkshire and the Humber,cars_and_taxis,19768.3
+2010,Yorkshire and the Humber,buses_and_coaches,254
+2010,Yorkshire and the Humber,LGVs,3602.5
+2010,Yorkshire and the Humber,all_HGVs,1706.8
+2010,Yorkshire and the Humber,all_motor_vehicles,25544.1
+2010,South East,pedal_cycles,527.8
+2010,South East,two_wheeled_motor_vehicles,474.3
+2010,South East,cars_and_taxis,40288.1
+2010,South East,buses_and_coaches,342.6
+2010,South East,LGVs,6655.7
+2010,South East,all_HGVs,2320.7
+2010,South East,all_motor_vehicles,50081.4
+2010,West Midlands,pedal_cycles,238.2
+2010,West Midlands,two_wheeled_motor_vehicles,209.2
+2010,West Midlands,cars_and_taxis,23196.3
+2010,West Midlands,buses_and_coaches,300.1
+2010,West Midlands,LGVs,3950.4
+2010,West Midlands,all_HGVs,1774.7
+2010,West Midlands,all_motor_vehicles,29430.7
+2010,North East,pedal_cycles,107.1
+2010,North East,two_wheeled_motor_vehicles,71.6
+2010,North East,cars_and_taxis,8883.5
+2010,North East,buses_and_coaches,160.8
+2010,North East,LGVs,1486.4
+2010,North East,all_HGVs,441
+2010,North East,all_motor_vehicles,11043.3
+2011,South West,pedal_cycles,287.5
+2011,South West,two_wheeled_motor_vehicles,392.6
+2011,South West,cars_and_taxis,25075
+2011,South West,buses_and_coaches,264.2
+2011,South West,LGVs,4382.4
+2011,South West,all_HGVs,1351.3
+2011,South West,all_motor_vehicles,31465.4
+2011,East Midlands,pedal_cycles,250.1
+2011,East Midlands,two_wheeled_motor_vehicles,224.6
+2011,East Midlands,cars_and_taxis,20131.2
+2011,East Midlands,buses_and_coaches,192.9
+2011,East Midlands,LGVs,3495.4
+2011,East Midlands,all_HGVs,1787.3
+2011,East Midlands,all_motor_vehicles,25831.3
+2011,Scotland,pedal_cycles,180.9
+2011,Scotland,two_wheeled_motor_vehicles,182.2
+2011,Scotland,cars_and_taxis,20706.2
+2011,Scotland,buses_and_coaches,370.7
+2011,Scotland,LGVs,3789.9
+2011,Scotland,all_HGVs,1541.7
+2011,Scotland,all_motor_vehicles,26590.6
+2011,Wales,pedal_cycles,102.1
+2011,Wales,two_wheeled_motor_vehicles,136.5
+2011,Wales,cars_and_taxis,13198.6
+2011,Wales,buses_and_coaches,155.6
+2011,Wales,LGVs,2388.4
+2011,Wales,all_HGVs,683.4
+2011,Wales,all_motor_vehicles,16562.3
+2011,North West,pedal_cycles,307.1
+2011,North West,two_wheeled_motor_vehicles,233.4
+2011,North West,cars_and_taxis,26925.1
+2011,North West,buses_and_coaches,309.8
+2011,North West,LGVs,4262.6
+2011,North West,all_HGVs,1932.3
+2011,North West,all_motor_vehicles,33663.2
+2011,London,pedal_cycles,392.1
+2011,London,two_wheeled_motor_vehicles,435.3
+2011,London,cars_and_taxis,15525.4
+2011,London,buses_and_coaches,374
+2011,London,LGVs,2529.3
+2011,London,all_HGVs,631.3
+2011,London,all_motor_vehicles,19495.3
+2011,East of England,pedal_cycles,461.5
+2011,East of England,two_wheeled_motor_vehicles,312.5
+2011,East of England,cars_and_taxis,26329.2
+2011,East of England,buses_and_coaches,245.4
+2011,East of England,LGVs,4861.4
+2011,East of England,all_HGVs,1931.3
+2011,East of England,all_motor_vehicles,33679.9
+2011,Yorkshire and the Humber,pedal_cycles,286
+2011,Yorkshire and the Humber,two_wheeled_motor_vehicles,219
+2011,Yorkshire and the Humber,cars_and_taxis,19894.4
+2011,Yorkshire and the Humber,buses_and_coaches,234.3
+2011,Yorkshire and the Humber,LGVs,3661.8
+2011,Yorkshire and the Humber,all_HGVs,1669.8
+2011,Yorkshire and the Humber,all_motor_vehicles,25679.3
+2011,South East,pedal_cycles,543.5
+2011,South East,two_wheeled_motor_vehicles,480.2
+2011,South East,cars_and_taxis,40656.2
+2011,South East,buses_and_coaches,319.6
+2011,South East,LGVs,6725.6
+2011,South East,all_HGVs,2265.3
+2011,South East,all_motor_vehicles,50446.9
+2011,West Midlands,pedal_cycles,244.4
+2011,West Midlands,two_wheeled_motor_vehicles,210.1
+2011,West Midlands,cars_and_taxis,23561.6
+2011,West Midlands,buses_and_coaches,271.8
+2011,West Midlands,LGVs,3963.2
+2011,West Midlands,all_HGVs,1749.1
+2011,West Midlands,all_motor_vehicles,29755.8
+2011,North East,pedal_cycles,110.2
+2011,North East,two_wheeled_motor_vehicles,72
+2011,North East,cars_and_taxis,8955.9
+2011,North East,buses_and_coaches,147.3
+2011,North East,LGVs,1497.7
+2011,North East,all_HGVs,443.8
+2011,North East,all_motor_vehicles,11116.7
+2012,South West,pedal_cycles,310.4
+2012,South West,two_wheeled_motor_vehicles,340
+2012,South West,cars_and_taxis,24968
+2012,South West,buses_and_coaches,262.9
+2012,South West,LGVs,4502.3
+2012,South West,all_HGVs,1324
+2012,South West,all_motor_vehicles,31397.1
+2012,East Midlands,pedal_cycles,268
+2012,East Midlands,two_wheeled_motor_vehicles,198.3
+2012,East Midlands,cars_and_taxis,20299.3
+2012,East Midlands,buses_and_coaches,195.4
+2012,East Midlands,LGVs,3593.4
+2012,East Midlands,all_HGVs,1756.6
+2012,East Midlands,all_motor_vehicles,26043
+2012,Scotland,pedal_cycles,200.4
+2012,Scotland,two_wheeled_motor_vehicles,164.1
+2012,Scotland,cars_and_taxis,20847.8
+2012,Scotland,buses_and_coaches,379.2
+2012,Scotland,LGVs,3898.8
+2012,Scotland,all_HGVs,1537.8
+2012,Scotland,all_motor_vehicles,26827.8
+2012,Wales,pedal_cycles,112.9
+2012,Wales,two_wheeled_motor_vehicles,122.2
+2012,Wales,cars_and_taxis,13209.4
+2012,Wales,buses_and_coaches,158.4
+2012,Wales,LGVs,2453.6
+2012,Wales,all_HGVs,671.8
+2012,Wales,all_motor_vehicles,16615.4
+2012,North West,pedal_cycles,321.3
+2012,North West,two_wheeled_motor_vehicles,209.2
+2012,North West,cars_and_taxis,26744.5
+2012,North West,buses_and_coaches,309.1
+2012,North West,LGVs,4409.1
+2012,North West,all_HGVs,1812.2
+2012,North West,all_motor_vehicles,33484.1
+2012,London,pedal_cycles,395.6
+2012,London,two_wheeled_motor_vehicles,409.2
+2012,London,cars_and_taxis,15344.9
+2012,London,buses_and_coaches,378.5
+2012,London,LGVs,2552.6
+2012,London,all_HGVs,655.3
+2012,London,all_motor_vehicles,19340.5
+2012,East of England,pedal_cycles,492.8
+2012,East of England,two_wheeled_motor_vehicles,273.9
+2012,East of England,cars_and_taxis,26497.8
+2012,East of England,buses_and_coaches,246.9
+2012,East of England,LGVs,4946.5
+2012,East of England,all_HGVs,1863.5
+2012,East of England,all_motor_vehicles,33828.6
+2012,Yorkshire and the Humber,pedal_cycles,304.1
+2012,Yorkshire and the Humber,two_wheeled_motor_vehicles,193.9
+2012,Yorkshire and the Humber,cars_and_taxis,19752.4
+2012,Yorkshire and the Humber,buses_and_coaches,235.7
+2012,Yorkshire and the Humber,LGVs,3706.1
+2012,Yorkshire and the Humber,all_HGVs,1643
+2012,Yorkshire and the Humber,all_motor_vehicles,25531.1
+2012,South East,pedal_cycles,573.1
+2012,South East,two_wheeled_motor_vehicles,430.6
+2012,South East,cars_and_taxis,40645.5
+2012,South East,buses_and_coaches,318.8
+2012,South East,LGVs,6894
+2012,South East,all_HGVs,2205
+2012,South East,all_motor_vehicles,50493.9
+2012,West Midlands,pedal_cycles,261
+2012,West Midlands,two_wheeled_motor_vehicles,185.4
+2012,West Midlands,cars_and_taxis,23609.6
+2012,West Midlands,buses_and_coaches,273.8
+2012,West Midlands,LGVs,4023.3
+2012,West Midlands,all_HGVs,1745.9
+2012,West Midlands,all_motor_vehicles,29838.1
+2012,North East,pedal_cycles,115.3
+2012,North East,two_wheeled_motor_vehicles,64.1
+2012,North East,cars_and_taxis,8999.8
+2012,North East,buses_and_coaches,149.8
+2012,North East,LGVs,1513.8
+2012,North East,all_HGVs,431.8
+2012,North East,all_motor_vehicles,11159.2
+2013,South West,pedal_cycles,303.1
+2013,South West,two_wheeled_motor_vehicles,354.8
+2013,South West,cars_and_taxis,25098.5
+2013,South West,buses_and_coaches,258.8
+2013,South West,LGVs,4560.8
+2013,South West,all_HGVs,1332.9
+2013,South West,all_motor_vehicles,31605.8
+2013,East Midlands,pedal_cycles,259.9
+2013,East Midlands,two_wheeled_motor_vehicles,207.9
+2013,East Midlands,cars_and_taxis,20313.5
+2013,East Midlands,buses_and_coaches,193.1
+2013,East Midlands,LGVs,3681.9
+2013,East Midlands,all_HGVs,1795.8
+2013,East Midlands,all_motor_vehicles,26192.3
+2013,Scotland,pedal_cycles,198.1
+2013,Scotland,two_wheeled_motor_vehicles,172.4
+2013,Scotland,cars_and_taxis,20903
+2013,Scotland,buses_and_coaches,376.1
+2013,Scotland,LGVs,3962.7
+2013,Scotland,all_HGVs,1548.5
+2013,Scotland,all_motor_vehicles,26962.7
+2013,Wales,pedal_cycles,110.6
+2013,Wales,two_wheeled_motor_vehicles,128.5
+2013,Wales,cars_and_taxis,13345.2
+2013,Wales,buses_and_coaches,157.7
+2013,Wales,LGVs,2493.4
+2013,Wales,all_HGVs,673.5
+2013,Wales,all_motor_vehicles,16798.3
+2013,North West,pedal_cycles,311.5
+2013,North West,two_wheeled_motor_vehicles,214.3
+2013,North West,cars_and_taxis,26809.9
+2013,North West,buses_and_coaches,301
+2013,North West,LGVs,4499.8
+2013,North West,all_HGVs,1809.7
+2013,North West,all_motor_vehicles,33634.7
+2013,London,pedal_cycles,374.1
+2013,London,two_wheeled_motor_vehicles,392
+2013,London,cars_and_taxis,15295.4
+2013,London,buses_and_coaches,363.1
+2013,London,LGVs,2618.5
+2013,London,all_HGVs,645.5
+2013,London,all_motor_vehicles,19314.5
+2013,East of England,pedal_cycles,476.3
+2013,East of England,two_wheeled_motor_vehicles,281.4
+2013,East of England,cars_and_taxis,26653.3
+2013,East of England,buses_and_coaches,242.3
+2013,East of England,LGVs,4992.2
+2013,East of England,all_HGVs,1891.1
+2013,East of England,all_motor_vehicles,34060.2
+2013,Yorkshire and the Humber,pedal_cycles,293.9
+2013,Yorkshire and the Humber,two_wheeled_motor_vehicles,202.1
+2013,Yorkshire and the Humber,cars_and_taxis,19829.6
+2013,Yorkshire and the Humber,buses_and_coaches,230.2
+2013,Yorkshire and the Humber,LGVs,3779.8
+2013,Yorkshire and the Humber,all_HGVs,1676.5
+2013,Yorkshire and the Humber,all_motor_vehicles,25718.1
+2013,South East,pedal_cycles,553.6
+2013,South East,two_wheeled_motor_vehicles,438.5
+2013,South East,cars_and_taxis,40528.6
+2013,South East,buses_and_coaches,311.6
+2013,South East,LGVs,6983.7
+2013,South East,all_HGVs,2213.1
+2013,South East,all_motor_vehicles,50475.4
+2013,West Midlands,pedal_cycles,252
+2013,West Midlands,two_wheeled_motor_vehicles,190.3
+2013,West Midlands,cars_and_taxis,23506.9
+2013,West Midlands,buses_and_coaches,264.1
+2013,West Midlands,LGVs,4115.9
+2013,West Midlands,all_HGVs,1744.6
+2013,West Midlands,all_motor_vehicles,29821.9
+2013,North East,pedal_cycles,111.3
+2013,North East,two_wheeled_motor_vehicles,65.1
+2013,North East,cars_and_taxis,8999.2
+2013,North East,buses_and_coaches,143.6
+2013,North East,LGVs,1537.4
+2013,North East,all_HGVs,429.7
+2013,North East,all_motor_vehicles,11175
+2014,South West,pedal_cycles,337.1
+2014,South West,two_wheeled_motor_vehicles,368.2
+2014,South West,cars_and_taxis,25765.3
+2014,South West,buses_and_coaches,265.3
+2014,South West,LGVs,4840.5
+2014,South West,all_HGVs,1363.1
+2014,South West,all_motor_vehicles,32602.4
+2014,East Midlands,pedal_cycles,288.4
+2014,East Midlands,two_wheeled_motor_vehicles,213.3
+2014,East Midlands,cars_and_taxis,20736.9
+2014,East Midlands,buses_and_coaches,195.1
+2014,East Midlands,LGVs,3893.1
+2014,East Midlands,all_HGVs,1837.6
+2014,East Midlands,all_motor_vehicles,26876.1
+2014,Scotland,pedal_cycles,222.5
+2014,Scotland,two_wheeled_motor_vehicles,179.2
+2014,Scotland,cars_and_taxis,21308.7
+2014,Scotland,buses_and_coaches,377.8
+2014,Scotland,LGVs,4194.1
+2014,Scotland,all_HGVs,1540.1
+2014,Scotland,all_motor_vehicles,27599.8
+2014,Wales,pedal_cycles,126.2
+2014,Wales,two_wheeled_motor_vehicles,136.3
+2014,Wales,cars_and_taxis,13833.5
+2014,Wales,buses_and_coaches,159.3
+2014,Wales,LGVs,2640.3
+2014,Wales,all_HGVs,679
+2014,Wales,all_motor_vehicles,17448.4
+2014,North West,pedal_cycles,339.1
+2014,North West,two_wheeled_motor_vehicles,218.9
+2014,North West,cars_and_taxis,27384
+2014,North West,buses_and_coaches,298.5
+2014,North West,LGVs,4770.8
+2014,North West,all_HGVs,1841.2
+2014,North West,all_motor_vehicles,34513.5
+2014,London,pedal_cycles,411.2
+2014,London,two_wheeled_motor_vehicles,407.8
+2014,London,cars_and_taxis,15488.6
+2014,London,buses_and_coaches,355.4
+2014,London,LGVs,2785.4
+2014,London,all_HGVs,643.2
+2014,London,all_motor_vehicles,19680.4
+2014,East of England,pedal_cycles,530.1
+2014,East of England,two_wheeled_motor_vehicles,290.4
+2014,East of England,cars_and_taxis,27322.6
+2014,East of England,buses_and_coaches,243.8
+2014,East of England,LGVs,5333.2
+2014,East of England,all_HGVs,1927.5
+2014,East of England,all_motor_vehicles,35117.5
+2014,Yorkshire and the Humber,pedal_cycles,323.5
+2014,Yorkshire and the Humber,two_wheeled_motor_vehicles,207.3
+2014,Yorkshire and the Humber,cars_and_taxis,20399.6
+2014,Yorkshire and the Humber,buses_and_coaches,232.9
+2014,Yorkshire and the Humber,LGVs,3992.8
+2014,Yorkshire and the Humber,all_HGVs,1735.8
+2014,Yorkshire and the Humber,all_motor_vehicles,26568.4
+2014,South East,pedal_cycles,609
+2014,South East,two_wheeled_motor_vehicles,454.1
+2014,South East,cars_and_taxis,41423.4
+2014,South East,buses_and_coaches,313.9
+2014,South East,LGVs,7410.2
+2014,South East,all_HGVs,2305.7
+2014,South East,all_motor_vehicles,51907.2
+2014,West Midlands,pedal_cycles,279.2
+2014,West Midlands,two_wheeled_motor_vehicles,195.7
+2014,West Midlands,cars_and_taxis,24089.4
+2014,West Midlands,buses_and_coaches,263.4
+2014,West Midlands,LGVs,4318.7
+2014,West Midlands,all_HGVs,1865.2
+2014,West Midlands,all_motor_vehicles,30732.5
+2014,North East,pedal_cycles,120
+2014,North East,two_wheeled_motor_vehicles,67.3
+2014,North East,cars_and_taxis,9175.1
+2014,North East,buses_and_coaches,143.8
+2014,North East,LGVs,1623.7
+2014,North East,all_HGVs,434.1
+2014,North East,all_motor_vehicles,11443.9
+2015,South West,pedal_cycles,313.9
+2015,South West,two_wheeled_motor_vehicles,366.3
+2015,South West,cars_and_taxis,26091.9
+2015,South West,buses_and_coaches,251.3
+2015,South West,LGVs,5075.2
+2015,South West,all_HGVs,1405.3
+2015,South West,all_motor_vehicles,33190
+2015,East Midlands,pedal_cycles,268.8
+2015,East Midlands,two_wheeled_motor_vehicles,212.3
+2015,East Midlands,cars_and_taxis,21040.2
+2015,East Midlands,buses_and_coaches,184.1
+2015,East Midlands,LGVs,4087.1
+2015,East Midlands,all_HGVs,1901
+2015,East Midlands,all_motor_vehicles,27424.6
+2015,Scotland,pedal_cycles,205.7
+2015,Scotland,two_wheeled_motor_vehicles,176.9
+2015,Scotland,cars_and_taxis,21496.9
+2015,Scotland,buses_and_coaches,364.5
+2015,Scotland,LGVs,4390.4
+2015,Scotland,all_HGVs,1560
+2015,Scotland,all_motor_vehicles,27988.6
+2015,Wales,pedal_cycles,119.4
+2015,Wales,two_wheeled_motor_vehicles,138.3
+2015,Wales,cars_and_taxis,14109.3
+2015,Wales,buses_and_coaches,149.7
+2015,Wales,LGVs,2774.3
+2015,Wales,all_HGVs,686.2
+2015,Wales,all_motor_vehicles,17857.9
+2015,North West,pedal_cycles,317.6
+2015,North West,two_wheeled_motor_vehicles,220.7
+2015,North West,cars_and_taxis,27638.1
+2015,North West,buses_and_coaches,287.4
+2015,North West,LGVs,4997.7
+2015,North West,all_HGVs,1895.4
+2015,North West,all_motor_vehicles,35039.4
+2015,London,pedal_cycles,408.5
+2015,London,two_wheeled_motor_vehicles,416.4
+2015,London,cars_and_taxis,15407.1
+2015,London,buses_and_coaches,343.1
+2015,London,LGVs,2820.2
+2015,London,all_HGVs,663.4
+2015,London,all_motor_vehicles,19650.2
+2015,East of England,pedal_cycles,492.8
+2015,East of England,two_wheeled_motor_vehicles,292.2
+2015,East of England,cars_and_taxis,27775.1
+2015,East of England,buses_and_coaches,230.8
+2015,East of England,LGVs,5596.7
+2015,East of England,all_HGVs,2051.3
+2015,East of England,all_motor_vehicles,35946.1
+2015,Yorkshire and the Humber,pedal_cycles,300.4
+2015,Yorkshire and the Humber,two_wheeled_motor_vehicles,206.7
+2015,Yorkshire and the Humber,cars_and_taxis,20719.5
+2015,Yorkshire and the Humber,buses_and_coaches,222.7
+2015,Yorkshire and the Humber,LGVs,4176.5
+2015,Yorkshire and the Humber,all_HGVs,1790.9
+2015,Yorkshire and the Humber,all_motor_vehicles,27116.2
+2015,South East,pedal_cycles,568.7
+2015,South East,two_wheeled_motor_vehicles,454.3
+2015,South East,cars_and_taxis,42370.5
+2015,South East,buses_and_coaches,303.5
+2015,South East,LGVs,7775.4
+2015,South East,all_HGVs,2435.8
+2015,South East,all_motor_vehicles,53339.6
+2015,West Midlands,pedal_cycles,259.9
+2015,West Midlands,two_wheeled_motor_vehicles,196.9
+2015,West Midlands,cars_and_taxis,24389.3
+2015,West Midlands,buses_and_coaches,249.7
+2015,West Midlands,LGVs,4460
+2015,West Midlands,all_HGVs,1939.6
+2015,West Midlands,all_motor_vehicles,31235.4
+2015,North East,pedal_cycles,112.8
+2015,North East,two_wheeled_motor_vehicles,66.2
+2015,North East,cars_and_taxis,9273
+2015,North East,buses_and_coaches,136.1
+2015,North East,LGVs,1681.3
+2015,North East,all_HGVs,443.7
+2015,North East,all_motor_vehicles,11600.4
+2016,South West,pedal_cycles,309.3
+2016,South West,two_wheeled_motor_vehicles,374.1
+2016,South West,cars_and_taxis,26877.8
+2016,South West,buses_and_coaches,236
+2016,South West,LGVs,5440.5
+2016,South West,all_HGVs,1410.5
+2016,South West,all_motor_vehicles,34338.9
+2016,East Midlands,pedal_cycles,271.5
+2016,East Midlands,two_wheeled_motor_vehicles,193.7
+2016,East Midlands,cars_and_taxis,21640.4
+2016,East Midlands,buses_and_coaches,218.9
+2016,East Midlands,LGVs,4181.6
+2016,East Midlands,all_HGVs,1955.4
+2016,East Midlands,all_motor_vehicles,28190
+2016,Scotland,pedal_cycles,180.4
+2016,Scotland,two_wheeled_motor_vehicles,165.5
+2016,Scotland,cars_and_taxis,22051.3
+2016,Scotland,buses_and_coaches,319.5
+2016,Scotland,LGVs,4797.9
+2016,Scotland,all_HGVs,1592.1
+2016,Scotland,all_motor_vehicles,28926.2
+2016,Wales,pedal_cycles,115.5
+2016,Wales,two_wheeled_motor_vehicles,136.7
+2016,Wales,cars_and_taxis,14631.8
+2016,Wales,buses_and_coaches,129.6
+2016,Wales,LGVs,2975.6
+2016,Wales,all_HGVs,691.5
+2016,Wales,all_motor_vehicles,18565.3
+2016,North West,pedal_cycles,285.3
+2016,North West,two_wheeled_motor_vehicles,214.8
+2016,North West,cars_and_taxis,27725.1
+2016,North West,buses_and_coaches,271.2
+2016,North West,LGVs,5139.2
+2016,North West,all_HGVs,1903.1
+2016,North West,all_motor_vehicles,35253.4
+2016,London,pedal_cycles,506.3
+2016,London,two_wheeled_motor_vehicles,473.6
+2016,London,cars_and_taxis,15421.4
+2016,London,buses_and_coaches,325.4
+2016,London,LGVs,3224.4
+2016,London,all_HGVs,638.2
+2016,London,all_motor_vehicles,20083
+2016,East of England,pedal_cycles,506.4
+2016,East of England,two_wheeled_motor_vehicles,284.2
+2016,East of England,cars_and_taxis,28162.6
+2016,East of England,buses_and_coaches,222.1
+2016,East of England,LGVs,5830.6
+2016,East of England,all_HGVs,2095.2
+2016,East of England,all_motor_vehicles,36594.8
+2016,Yorkshire and the Humber,pedal_cycles,258.9
+2016,Yorkshire and the Humber,two_wheeled_motor_vehicles,196.8
+2016,Yorkshire and the Humber,cars_and_taxis,21382.9
+2016,Yorkshire and the Humber,buses_and_coaches,206.9
+2016,Yorkshire and the Humber,LGVs,4443.6
+2016,Yorkshire and the Humber,all_HGVs,1796.3
+2016,Yorkshire and the Humber,all_motor_vehicles,28026.5
+2016,South East,pedal_cycles,563.1
+2016,South East,two_wheeled_motor_vehicles,468.6
+2016,South East,cars_and_taxis,42887.2
+2016,South East,buses_and_coaches,290.2
+2016,South East,LGVs,8195.8
+2016,South East,all_HGVs,2442.4
+2016,South East,all_motor_vehicles,54284.2
+2016,West Midlands,pedal_cycles,253.7
+2016,West Midlands,two_wheeled_motor_vehicles,196.9
+2016,West Midlands,cars_and_taxis,24707
+2016,West Midlands,buses_and_coaches,263.2
+2016,West Midlands,LGVs,4769.4
+2016,West Midlands,all_HGVs,1960.3
+2016,West Midlands,all_motor_vehicles,31896.7
+2016,North East,pedal_cycles,112
+2016,North East,two_wheeled_motor_vehicles,64.1
+2016,North East,cars_and_taxis,9337
+2016,North East,buses_and_coaches,129.2
+2016,North East,LGVs,1790.4
+2016,North East,all_HGVs,446.6
+2016,North East,all_motor_vehicles,11767.2
+2017,South West,pedal_cycles,333.1
+2017,South West,two_wheeled_motor_vehicles,339.3
+2017,South West,cars_and_taxis,27670
+2017,South West,buses_and_coaches,228.6
+2017,South West,LGVs,5633.7
+2017,South West,all_HGVs,1431.9
+2017,South West,all_motor_vehicles,35303.5
+2017,East Midlands,pedal_cycles,279.8
+2017,East Midlands,two_wheeled_motor_vehicles,189.9
+2017,East Midlands,cars_and_taxis,22002.7
+2017,East Midlands,buses_and_coaches,230.9
+2017,East Midlands,LGVs,4267.5
+2017,East Midlands,all_HGVs,1974.6
+2017,East Midlands,all_motor_vehicles,28665.5
+2017,Scotland,pedal_cycles,182.5
+2017,Scotland,two_wheeled_motor_vehicles,173.9
+2017,Scotland,cars_and_taxis,22416.5
+2017,Scotland,buses_and_coaches,326
+2017,Scotland,LGVs,5130.7
+2017,Scotland,all_HGVs,1624.3
+2017,Scotland,all_motor_vehicles,29671.4
+2017,Wales,pedal_cycles,111.5
+2017,Wales,two_wheeled_motor_vehicles,141.8
+2017,Wales,cars_and_taxis,14591.2
+2017,Wales,buses_and_coaches,124.3
+2017,Wales,LGVs,3083.3
+2017,Wales,all_HGVs,703.8
+2017,Wales,all_motor_vehicles,18644.4
+2017,North West,pedal_cycles,293.3
+2017,North West,two_wheeled_motor_vehicles,221.8
+2017,North West,cars_and_taxis,27873.3
+2017,North West,buses_and_coaches,208.2
+2017,North West,LGVs,5178.9
+2017,North West,all_HGVs,1914.4
+2017,North West,all_motor_vehicles,35396.5
+2017,London,pedal_cycles,500.5
+2017,London,two_wheeled_motor_vehicles,468.8
+2017,London,cars_and_taxis,15397.8
+2017,London,buses_and_coaches,314.8
+2017,London,LGVs,3268.1
+2017,London,all_HGVs,605.9
+2017,London,all_motor_vehicles,20055.4
+2017,East of England,pedal_cycles,525.3
+2017,East of England,two_wheeled_motor_vehicles,312.8
+2017,East of England,cars_and_taxis,29051.5
+2017,East of England,buses_and_coaches,213
+2017,East of England,LGVs,6162.1
+2017,East of England,all_HGVs,2144.2
+2017,East of England,all_motor_vehicles,37883.6
+2017,Yorkshire and the Humber,pedal_cycles,309.2
+2017,Yorkshire and the Humber,two_wheeled_motor_vehicles,196.4
+2017,Yorkshire and the Humber,cars_and_taxis,21404.3
+2017,Yorkshire and the Humber,buses_and_coaches,206.5
+2017,Yorkshire and the Humber,LGVs,4456.6
+2017,Yorkshire and the Humber,all_HGVs,1815.1
+2017,Yorkshire and the Humber,all_motor_vehicles,28078.9
+2017,South East,pedal_cycles,596.4
+2017,South East,two_wheeled_motor_vehicles,448.3
+2017,South East,cars_and_taxis,43150.3
+2017,South East,buses_and_coaches,275.9
+2017,South East,LGVs,8278.7
+2017,South East,all_HGVs,2461.8
+2017,South East,all_motor_vehicles,54615
+2017,West Midlands,pedal_cycles,218.2
+2017,West Midlands,two_wheeled_motor_vehicles,177.8
+2017,West Midlands,cars_and_taxis,24932.5
+2017,West Midlands,buses_and_coaches,247.5
+2017,West Midlands,LGVs,4843.2
+2017,West Midlands,all_HGVs,1998.2
+2017,West Midlands,all_motor_vehicles,32199.2
+2017,North East,pedal_cycles,114.2
+2017,North East,two_wheeled_motor_vehicles,73.8
+2017,North East,cars_and_taxis,9458.4
+2017,North East,buses_and_coaches,154.2
+2017,North East,LGVs,1847.5
+2017,North East,all_HGVs,456.4
+2017,North East,all_motor_vehicles,11990.3
+2018,South West,pedal_cycles,357.8
+2018,South West,two_wheeled_motor_vehicles,320.2
+2018,South West,cars_and_taxis,27672.5
+2018,South West,buses_and_coaches,220.8
+2018,South West,LGVs,5627.1
+2018,South West,all_HGVs,1434.9
+2018,South West,all_motor_vehicles,35275.4
+2018,East Midlands,pedal_cycles,270
+2018,East Midlands,two_wheeled_motor_vehicles,210.4
+2018,East Midlands,cars_and_taxis,22171.1
+2018,East Midlands,buses_and_coaches,225.5
+2018,East Midlands,LGVs,4318.8
+2018,East Midlands,all_HGVs,1991.7
+2018,East Midlands,all_motor_vehicles,28917.6
+2018,Scotland,pedal_cycles,193.2
+2018,Scotland,two_wheeled_motor_vehicles,175.5
+2018,Scotland,cars_and_taxis,22554.9
+2018,Scotland,buses_and_coaches,289.8
+2018,Scotland,LGVs,5106.7
+2018,Scotland,all_HGVs,1621.8
+2018,Scotland,all_motor_vehicles,29748.6
+2018,Wales,pedal_cycles,116.3
+2018,Wales,two_wheeled_motor_vehicles,163.7
+2018,Wales,cars_and_taxis,14761.1
+2018,Wales,buses_and_coaches,122
+2018,Wales,LGVs,3179.3
+2018,Wales,all_HGVs,702.6
+2018,Wales,all_motor_vehicles,18928.6
+2018,North West,pedal_cycles,319.3
+2018,North West,two_wheeled_motor_vehicles,209.3
+2018,North West,cars_and_taxis,28260.8
+2018,North West,buses_and_coaches,198.5
+2018,North West,LGVs,5264.4
+2018,North West,all_HGVs,1903.5
+2018,North West,all_motor_vehicles,35836.5
+2018,London,pedal_cycles,518
+2018,London,two_wheeled_motor_vehicles,463.4
+2018,London,cars_and_taxis,15360.3
+2018,London,buses_and_coaches,311.4
+2018,London,LGVs,3259.9
+2018,London,all_HGVs,597.9
+2018,London,all_motor_vehicles,19992.9
+2018,East of England,pedal_cycles,493.5
+2018,East of England,two_wheeled_motor_vehicles,292.6
+2018,East of England,cars_and_taxis,28935.3
+2018,East of England,buses_and_coaches,207.9
+2018,East of England,LGVs,6226.4
+2018,East of England,all_HGVs,2184.1
+2018,East of England,all_motor_vehicles,37846.2
+2018,Yorkshire and the Humber,pedal_cycles,311
+2018,Yorkshire and the Humber,two_wheeled_motor_vehicles,186.7
+2018,Yorkshire and the Humber,cars_and_taxis,21901.4
+2018,Yorkshire and the Humber,buses_and_coaches,203.1
+2018,Yorkshire and the Humber,LGVs,4459.9
+2018,Yorkshire and the Humber,all_HGVs,1824.6
+2018,Yorkshire and the Humber,all_motor_vehicles,28575.6
+2018,South East,pedal_cycles,606.8
+2018,South East,two_wheeled_motor_vehicles,440
+2018,South East,cars_and_taxis,42884.9
+2018,South East,buses_and_coaches,269.4
+2018,South East,LGVs,8427
+2018,South East,all_HGVs,2466.9
+2018,South East,all_motor_vehicles,54488.1
+2018,West Midlands,pedal_cycles,228.6
+2018,West Midlands,two_wheeled_motor_vehicles,182.4
+2018,West Midlands,cars_and_taxis,24973.2
+2018,West Midlands,buses_and_coaches,228
+2018,West Midlands,LGVs,4985.2
+2018,West Midlands,all_HGVs,2002.2
+2018,West Midlands,all_motor_vehicles,32371
+2018,North East,pedal_cycles,105.2
+2018,North East,two_wheeled_motor_vehicles,73.8
+2018,North East,cars_and_taxis,9646.9
+2018,North East,buses_and_coaches,151.1
+2018,North East,LGVs,1902.1
+2018,North East,all_HGVs,458.6
+2018,North East,all_motor_vehicles,12232.4
+2019,South West,pedal_cycles,363.7
+2019,South West,two_wheeled_motor_vehicles,321.5
+2019,South West,cars_and_taxis,28297.8
+2019,South West,buses_and_coaches,220.2
+2019,South West,LGVs,5737.6
+2019,South West,all_HGVs,1456.5
+2019,South West,all_motor_vehicles,36033.5
+2019,East Midlands,pedal_cycles,287.2
+2019,East Midlands,two_wheeled_motor_vehicles,193.3
+2019,East Midlands,cars_and_taxis,22657.4
+2019,East Midlands,buses_and_coaches,223.6
+2019,East Midlands,LGVs,4409.2
+2019,East Midlands,all_HGVs,2005.3
+2019,East Midlands,all_motor_vehicles,29488.8
+2019,Scotland,pedal_cycles,227
+2019,Scotland,two_wheeled_motor_vehicles,181.1
+2019,Scotland,cars_and_taxis,22790.3
+2019,Scotland,buses_and_coaches,319.5
+2019,Scotland,LGVs,5143.1
+2019,Scotland,all_HGVs,1607.6
+2019,Scotland,all_motor_vehicles,30041.6
+2019,Wales,pedal_cycles,128.4
+2019,Wales,two_wheeled_motor_vehicles,133.4
+2019,Wales,cars_and_taxis,14937.3
+2019,Wales,buses_and_coaches,115.1
+2019,Wales,LGVs,3194.4
+2019,Wales,all_HGVs,701
+2019,Wales,all_motor_vehicles,19081.2
+2019,North West,pedal_cycles,335.7
+2019,North West,two_wheeled_motor_vehicles,196.5
+2019,North West,cars_and_taxis,28876.4
+2019,North West,buses_and_coaches,199
+2019,North West,LGVs,5414.2
+2019,North West,all_HGVs,1895.1
+2019,North West,all_motor_vehicles,36581.2
+2019,London,pedal_cycles,467.8
+2019,London,two_wheeled_motor_vehicles,493.2
+2019,London,cars_and_taxis,15628.9
+2019,London,buses_and_coaches,280.3
+2019,London,LGVs,3264.4
+2019,London,all_HGVs,597.5
+2019,London,all_motor_vehicles,20264.4
+2019,East of England,pedal_cycles,528
+2019,East of England,two_wheeled_motor_vehicles,285.4
+2019,East of England,cars_and_taxis,29013.7
+2019,East of England,buses_and_coaches,206.8
+2019,East of England,LGVs,6289.4
+2019,East of England,all_HGVs,2169.4
+2019,East of England,all_motor_vehicles,37964.8
+2019,Yorkshire and the Humber,pedal_cycles,333.9
+2019,Yorkshire and the Humber,two_wheeled_motor_vehicles,182.5
+2019,Yorkshire and the Humber,cars_and_taxis,22116
+2019,Yorkshire and the Humber,buses_and_coaches,191.8
+2019,Yorkshire and the Humber,LGVs,4576.1
+2019,Yorkshire and the Humber,all_HGVs,1889.2
+2019,Yorkshire and the Humber,all_motor_vehicles,28955.6
+2019,South East,pedal_cycles,623
+2019,South East,two_wheeled_motor_vehicles,447
+2019,South East,cars_and_taxis,43210.5
+2019,South East,buses_and_coaches,270
+2019,South East,LGVs,8513.8
+2019,South East,all_HGVs,2446.5
+2019,South East,all_motor_vehicles,54887.7
+2019,West Midlands,pedal_cycles,229.8
+2019,West Midlands,two_wheeled_motor_vehicles,168.4
+2019,West Midlands,cars_and_taxis,25258.1
+2019,West Midlands,buses_and_coaches,176.4
+2019,West Midlands,LGVs,4996
+2019,West Midlands,all_HGVs,1999.1
+2019,West Midlands,all_motor_vehicles,32597.9
+2019,North East,pedal_cycles,103.8
+2019,North East,two_wheeled_motor_vehicles,67.3
+2019,North East,cars_and_taxis,10100.8
+2019,North East,buses_and_coaches,153.1
+2019,North East,LGVs,1933.1
+2019,North East,all_HGVs,445.2
+2019,North East,all_motor_vehicles,12699.5
+2020,South West,pedal_cycles,482.2
+2020,South West,two_wheeled_motor_vehicles,246.9
+2020,South West,cars_and_taxis,20960.7
+2020,South West,buses_and_coaches,143.8
+2020,South West,LGVs,5157.8
+2020,South West,all_HGVs,1325.5
+2020,South West,all_motor_vehicles,27834.7
+2020,East Midlands,pedal_cycles,411.2
+2020,East Midlands,two_wheeled_motor_vehicles,153.1
+2020,East Midlands,cars_and_taxis,17126.9
+2020,East Midlands,buses_and_coaches,187.5
+2020,East Midlands,LGVs,4018.9
+2020,East Midlands,all_HGVs,1879.3
+2020,East Midlands,all_motor_vehicles,23365.7
+2020,Scotland,pedal_cycles,370.7
+2020,Scotland,two_wheeled_motor_vehicles,136.2
+2020,Scotland,cars_and_taxis,16797.1
+2020,Scotland,buses_and_coaches,234.6
+2020,Scotland,LGVs,4596.7
+2020,Scotland,all_HGVs,1403.9
+2020,Scotland,all_motor_vehicles,23168.5
+2020,Wales,pedal_cycles,210
+2020,Wales,two_wheeled_motor_vehicles,111.3
+2020,Wales,cars_and_taxis,10966.8
+2020,Wales,buses_and_coaches,74.3
+2020,Wales,LGVs,2782.8
+2020,Wales,all_HGVs,637.9
+2020,Wales,all_motor_vehicles,14573.1
+2020,North West,pedal_cycles,437.8
+2020,North West,two_wheeled_motor_vehicles,154
+2020,North West,cars_and_taxis,21937.9
+2020,North West,buses_and_coaches,129.3
+2020,North West,LGVs,5066.4
+2020,North West,all_HGVs,1835.1
+2020,North West,all_motor_vehicles,29122.8
+2020,London,pedal_cycles,697.7
+2020,London,two_wheeled_motor_vehicles,463.5
+2020,London,cars_and_taxis,12453.5
+2020,London,buses_and_coaches,226.1
+2020,London,LGVs,2877.5
+2020,London,all_HGVs,593
+2020,London,all_motor_vehicles,16613.6
+2020,East of England,pedal_cycles,708.7
+2020,East of England,two_wheeled_motor_vehicles,223.7
+2020,East of England,cars_and_taxis,22044.8
+2020,East of England,buses_and_coaches,130.2
+2020,East of England,LGVs,5873.1
+2020,East of England,all_HGVs,2107.6
+2020,East of England,all_motor_vehicles,30379.3
+2020,Yorkshire and the Humber,pedal_cycles,539.7
+2020,Yorkshire and the Humber,two_wheeled_motor_vehicles,146.5
+2020,Yorkshire and the Humber,cars_and_taxis,16883.9
+2020,Yorkshire and the Humber,buses_and_coaches,118.6
+2020,Yorkshire and the Humber,LGVs,4162.2
+2020,Yorkshire and the Humber,all_HGVs,1812.2
+2020,Yorkshire and the Humber,all_motor_vehicles,23123.4
+2020,South East,pedal_cycles,950.6
+2020,South East,two_wheeled_motor_vehicles,348.5
+2020,South East,cars_and_taxis,31854.7
+2020,South East,buses_and_coaches,162.9
+2020,South East,LGVs,7768.7
+2020,South East,all_HGVs,2283.9
+2020,South East,all_motor_vehicles,42418.7
+2020,West Midlands,pedal_cycles,332.1
+2020,West Midlands,two_wheeled_motor_vehicles,129.4
+2020,West Midlands,cars_and_taxis,18621.6
+2020,West Midlands,buses_and_coaches,92.3
+2020,West Midlands,LGVs,4458.7
+2020,West Midlands,all_HGVs,1922
+2020,West Midlands,all_motor_vehicles,25224
+2020,North East,pedal_cycles,158.2
+2020,North East,two_wheeled_motor_vehicles,50.3
+2020,North East,cars_and_taxis,7676.5
+2020,North East,buses_and_coaches,128.5
+2020,North East,LGVs,1811.6
+2020,North East,all_HGVs,402.8
+2020,North East,all_motor_vehicles,10069.8
+2021,South West,pedal_cycles,385.4
+2021,South West,two_wheeled_motor_vehicles,286.4
+2021,South West,cars_and_taxis,23913.5
+2021,South West,buses_and_coaches,164.1
+2021,South West,LGVs,5794.5
+2021,South West,all_HGVs,1450.8
+2021,South West,all_motor_vehicles,31609.4
+2021,East Midlands,pedal_cycles,331.8
+2021,East Midlands,two_wheeled_motor_vehicles,186.1
+2021,East Midlands,cars_and_taxis,19227.2
+2021,East Midlands,buses_and_coaches,200.7
+2021,East Midlands,LGVs,4576.2
+2021,East Midlands,all_HGVs,2073.7
+2021,East Midlands,all_motor_vehicles,26263.8
+2021,Scotland,pedal_cycles,270.3
+2021,Scotland,two_wheeled_motor_vehicles,151.2
+2021,Scotland,cars_and_taxis,19301.9
+2021,Scotland,buses_and_coaches,263.6
+2021,Scotland,LGVs,5433.6
+2021,Scotland,all_HGVs,1553.2
+2021,Scotland,all_motor_vehicles,26703.4
+2021,Wales,pedal_cycles,176.8
+2021,Wales,two_wheeled_motor_vehicles,123.5
+2021,Wales,cars_and_taxis,12383
+2021,Wales,buses_and_coaches,91.9
+2021,Wales,LGVs,3192.2
+2021,Wales,all_HGVs,695.5
+2021,Wales,all_motor_vehicles,16486
+2021,North West,pedal_cycles,381
+2021,North West,two_wheeled_motor_vehicles,169.6
+2021,North West,cars_and_taxis,24620
+2021,North West,buses_and_coaches,140.7
+2021,North West,LGVs,5627.8
+2021,North West,all_HGVs,1938.5
+2021,North West,all_motor_vehicles,32496.6
+2021,London,pedal_cycles,647.2
+2021,London,two_wheeled_motor_vehicles,607.6
+2021,London,cars_and_taxis,13983.4
+2021,London,buses_and_coaches,239
+2021,London,LGVs,2987.8
+2021,London,all_HGVs,635.5
+2021,London,all_motor_vehicles,18453.3
+2021,East of England,pedal_cycles,523.1
+2021,East of England,two_wheeled_motor_vehicles,260.1
+2021,East of England,cars_and_taxis,24596.8
+2021,East of England,buses_and_coaches,155.2
+2021,East of England,LGVs,6551.2
+2021,East of England,all_HGVs,2164.5
+2021,East of England,all_motor_vehicles,33727.9
+2021,Yorkshire and the Humber,pedal_cycles,377.9
+2021,Yorkshire and the Humber,two_wheeled_motor_vehicles,157.6
+2021,Yorkshire and the Humber,cars_and_taxis,18534.6
+2021,Yorkshire and the Humber,buses_and_coaches,136.8
+2021,Yorkshire and the Humber,LGVs,4611.1
+2021,Yorkshire and the Humber,all_HGVs,1956.7
+2021,Yorkshire and the Humber,all_motor_vehicles,25396.7
+2021,South East,pedal_cycles,725.4
+2021,South East,two_wheeled_motor_vehicles,377.3
+2021,South East,cars_and_taxis,35284.9
+2021,South East,buses_and_coaches,184.1
+2021,South East,LGVs,8622.1
+2021,South East,all_HGVs,2436.8
+2021,South East,all_motor_vehicles,46905.2
+2021,West Midlands,pedal_cycles,268.7
+2021,West Midlands,two_wheeled_motor_vehicles,148.9
+2021,West Midlands,cars_and_taxis,20912.7
+2021,West Midlands,buses_and_coaches,110.7
+2021,West Midlands,LGVs,4994.6
+2021,West Midlands,all_HGVs,2134.1
+2021,West Midlands,all_motor_vehicles,28301
+2021,North East,pedal_cycles,111
+2021,North East,two_wheeled_motor_vehicles,62.4
+2021,North East,cars_and_taxis,8601.3
+2021,North East,buses_and_coaches,119.6
+2021,North East,LGVs,1985.4
+2021,North East,all_HGVs,446.6
+2021,North East,all_motor_vehicles,11215.3
+2022,South West,pedal_cycles,344.6
+2022,South West,two_wheeled_motor_vehicles,317.6
+2022,South West,cars_and_taxis,25812.4
+2022,South West,buses_and_coaches,169.8
+2022,South West,LGVs,6156.9
+2022,South West,all_HGVs,1413.1
+2022,South West,all_motor_vehicles,33869.9
+2022,East Midlands,pedal_cycles,294.3
+2022,East Midlands,two_wheeled_motor_vehicles,200.2
+2022,East Midlands,cars_and_taxis,21415.1
+2022,East Midlands,buses_and_coaches,204.8
+2022,East Midlands,LGVs,4875.3
+2022,East Midlands,all_HGVs,2065.3
+2022,East Midlands,all_motor_vehicles,28760.7
+2022,Scotland,pedal_cycles,262.3
+2022,Scotland,two_wheeled_motor_vehicles,168.9
+2022,Scotland,cars_and_taxis,21359.7
+2022,Scotland,buses_and_coaches,293.7
+2022,Scotland,LGVs,5798.9
+2022,Scotland,all_HGVs,1556.8
+2022,Scotland,all_motor_vehicles,29177.9
+2022,Wales,pedal_cycles,144.2
+2022,Wales,two_wheeled_motor_vehicles,136.4
+2022,Wales,cars_and_taxis,13818.3
+2022,Wales,buses_and_coaches,110.2
+2022,Wales,LGVs,3407.4
+2022,Wales,all_HGVs,681.3
+2022,Wales,all_motor_vehicles,18153.6
+2022,North West,pedal_cycles,364.1
+2022,North West,two_wheeled_motor_vehicles,186.1
+2022,North West,cars_and_taxis,26912
+2022,North West,buses_and_coaches,156.7
+2022,North West,LGVs,5970.4
+2022,North West,all_HGVs,1897.6
+2022,North West,all_motor_vehicles,35122.7
+2022,London,pedal_cycles,605.8
+2022,London,two_wheeled_motor_vehicles,701.6
+2022,London,cars_and_taxis,14459.5
+2022,London,buses_and_coaches,247.8
+2022,London,LGVs,3031.9
+2022,London,all_HGVs,648.6
+2022,London,all_motor_vehicles,19089.3
+2022,East of England,pedal_cycles,507.6
+2022,East of England,two_wheeled_motor_vehicles,298.7
+2022,East of England,cars_and_taxis,27473.8
+2022,East of England,buses_and_coaches,164.7
+2022,East of England,LGVs,6946.1
+2022,East of England,all_HGVs,2188.3
+2022,East of England,all_motor_vehicles,37071.6
+2022,Yorkshire and the Humber,pedal_cycles,364.1
+2022,Yorkshire and the Humber,two_wheeled_motor_vehicles,168.1
+2022,Yorkshire and the Humber,cars_and_taxis,20294.3
+2022,Yorkshire and the Humber,buses_and_coaches,155.5
+2022,Yorkshire and the Humber,LGVs,4731.5
+2022,Yorkshire and the Humber,all_HGVs,1925
+2022,Yorkshire and the Humber,all_motor_vehicles,27274.4
+2022,South East,pedal_cycles,655.5
+2022,South East,two_wheeled_motor_vehicles,421
+2022,South East,cars_and_taxis,39319.9
+2022,South East,buses_and_coaches,198.8
+2022,South East,LGVs,9227.1
+2022,South East,all_HGVs,2453.3
+2022,South East,all_motor_vehicles,51620.2
+2022,West Midlands,pedal_cycles,238
+2022,West Midlands,two_wheeled_motor_vehicles,172.7
+2022,West Midlands,cars_and_taxis,23572.6
+2022,West Midlands,buses_and_coaches,120.1
+2022,West Midlands,LGVs,5281.5
+2022,West Midlands,all_HGVs,2111.3
+2022,West Midlands,all_motor_vehicles,31258.2
+2022,North East,pedal_cycles,117.5
+2022,North East,two_wheeled_motor_vehicles,66.2
+2022,North East,cars_and_taxis,9556.4
+2022,North East,buses_and_coaches,128.9
+2022,North East,LGVs,2086.8
+2022,North East,all_HGVs,440.2
+2022,North East,all_motor_vehicles,12278.5
+2023,South West,pedal_cycles,317
+2023,South West,two_wheeled_motor_vehicles,319
+2023,South West,cars_and_taxis,26570.5
+2023,South West,buses_and_coaches,167.3
+2023,South West,LGVs,6239.6
+2023,South West,all_HGVs,1387.1
+2023,South West,all_motor_vehicles,34683.4
+2023,East Midlands,pedal_cycles,268.6
+2023,East Midlands,two_wheeled_motor_vehicles,195.3
+2023,East Midlands,cars_and_taxis,22058.8
+2023,East Midlands,buses_and_coaches,197.1
+2023,East Midlands,LGVs,4905.2
+2023,East Midlands,all_HGVs,2016.1
+2023,East Midlands,all_motor_vehicles,29372.6
+2023,Scotland,pedal_cycles,250.3
+2023,Scotland,two_wheeled_motor_vehicles,169.4
+2023,Scotland,cars_and_taxis,21979.3
+2023,Scotland,buses_and_coaches,281.8
+2023,Scotland,LGVs,5896.1
+2023,Scotland,all_HGVs,1510.6
+2023,Scotland,all_motor_vehicles,29837.2
+2023,Wales,pedal_cycles,119.8
+2023,Wales,two_wheeled_motor_vehicles,129.6
+2023,Wales,cars_and_taxis,14263.8
+2023,Wales,buses_and_coaches,109.5
+2023,Wales,LGVs,3339.8
+2023,Wales,all_HGVs,656.4
+2023,Wales,all_motor_vehicles,18499.1
+2023,North West,pedal_cycles,325.5
+2023,North West,two_wheeled_motor_vehicles,177.6
+2023,North West,cars_and_taxis,27723.7
+2023,North West,buses_and_coaches,154.5
+2023,North West,LGVs,6021.4
+2023,North West,all_HGVs,1839.3
+2023,North West,all_motor_vehicles,35916.4
+2023,London,pedal_cycles,627.8
+2023,London,two_wheeled_motor_vehicles,742.1
+2023,London,cars_and_taxis,14591
+2023,London,buses_and_coaches,253
+2023,London,LGVs,2989.5
+2023,London,all_HGVs,621
+2023,London,all_motor_vehicles,19196.7
+2023,East of England,pedal_cycles,451.5
+2023,East of England,two_wheeled_motor_vehicles,299.4
+2023,East of England,cars_and_taxis,28290.7
+2023,East of England,buses_and_coaches,162
+2023,East of England,LGVs,6990.7
+2023,East of England,all_HGVs,2158.4
+2023,East of England,all_motor_vehicles,37901.2
+2023,Yorkshire and the Humber,pedal_cycles,325.2
+2023,Yorkshire and the Humber,two_wheeled_motor_vehicles,158.4
+2023,Yorkshire and the Humber,cars_and_taxis,20907.3
+2023,Yorkshire and the Humber,buses_and_coaches,151.7
+2023,Yorkshire and the Humber,LGVs,4785.7
+2023,Yorkshire and the Humber,all_HGVs,1875.7
+2023,Yorkshire and the Humber,all_motor_vehicles,27878.9
+2023,South East,pedal_cycles,603.2
+2023,South East,two_wheeled_motor_vehicles,428.7
+2023,South East,cars_and_taxis,40593.6
+2023,South East,buses_and_coaches,198.7
+2023,South East,LGVs,9206.1
+2023,South East,all_HGVs,2396
+2023,South East,all_motor_vehicles,52823.1
+2023,West Midlands,pedal_cycles,217.6
+2023,West Midlands,two_wheeled_motor_vehicles,166.9
+2023,West Midlands,cars_and_taxis,24387.7
+2023,West Midlands,buses_and_coaches,120.8
+2023,West Midlands,LGVs,5290.3
+2023,West Midlands,all_HGVs,2054.8
+2023,West Midlands,all_motor_vehicles,32020.5
+2023,North East,pedal_cycles,105.7
+2023,North East,two_wheeled_motor_vehicles,64.2
+2023,North East,cars_and_taxis,9933.3
+2023,North East,buses_and_coaches,122.1
+2023,North East,LGVs,2118.9
+2023,North East,all_HGVs,428.9
+2023,North East,all_motor_vehicles,12667.4

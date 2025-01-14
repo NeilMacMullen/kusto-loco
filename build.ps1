@@ -48,7 +48,9 @@ if (-not $skipBuild) {
      get-ChildItem -recurse -path .\publish\pskql-linux -include Microsoft.*.dll | remove-item
      get-ChildItem -recurse -path .\publish\pskql-linux -include System.*.dll | remove-item
 
-
+    #copy tutorials to publish folder
+    New-Item -ItemType Folder -Path .\publish\tutorials -Force
+    copy-item .\docs\tutorials\* .\publish\tutorials\*   
 }
 
 if (-not ($api -like '') ) {
