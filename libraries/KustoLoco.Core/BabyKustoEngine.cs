@@ -93,7 +93,16 @@ public class BabyKustoEngine
         var code = KustoCode.ParseAndAnalyze(query, globals);
 
         var visualizer = new IrNodeVisualizer(_console);
+        if (IrNodeVisualizer.ContainsForbidden(code))
+        {
+            _console.Warn("contains xted");
+        }
         visualizer.DumpKustoTree(code, dumpKustoTree);
+
+      
+        // extend, projedt, etc
+        // maybe just allow a forbidden operstors list ?....
+
 
         var diagnostics = code.GetDiagnostics();
         if (diagnostics.Count > 0)

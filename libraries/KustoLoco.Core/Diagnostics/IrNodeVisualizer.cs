@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using Kusto.Language;
 using Kusto.Language.Symbols;
@@ -35,6 +36,27 @@ internal class IrNodeVisualizer(IKustoConsole console)
         sb.AppendLine();
         var s=sb.ToString();
         console.WriteLine(s);
+    }
+
+    public static bool ContainsForbidden(KustoCode code)
+    {
+        var result = false;
+        SyntaxElement.WalkNodes(
+            code.Syntax,
+            node =>
+            {
+                if (node is QueryOperator op)
+                {
+                    var n = op.Kind.ToString()
+                        .ToLowerInvariant()
+                        .Replace("operator", "")
+                        ;
+                    if ("extend join summarize project".Contains(n))
+                        result = true;
+                }
+            
+            });
+        return result;
     }
 
     public void DumpIRTree(IRNode node,bool show)
