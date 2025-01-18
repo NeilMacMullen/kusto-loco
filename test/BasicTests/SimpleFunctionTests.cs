@@ -735,10 +735,11 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("True");
     }
 
+    //[Ignore("TODO - isFinite needs work")]
     [TestMethod]
     public async Task IsFinite2()
     {
-        var query = "print 1.0/0.0";
+        var query = "print isfinite(1.0/0.0)";
         var result = await LastLineOfResult(query);
         result.Should().Be("False");
     }

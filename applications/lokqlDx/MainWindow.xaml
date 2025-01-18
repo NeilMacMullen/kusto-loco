@@ -34,8 +34,9 @@
         <MenuItem Header="Register file association" Click="EnableJumpList" />
       </MenuItem>
       <MenuItem Header="Help">
-        <MenuItem Header="Getting started" Click="NavigateToGettingStarted" />
-        <MenuItem Header="Project Page" Click="NavigateToProjectPage" />
+        <MenuItem Header="Quick start" Click="NavigateToGettingStarted" />
+        <MenuItem Header="LokqlDx intro" Click="NavigateToLandingPage" />
+        <MenuItem Header="Kusto-loco Project Page" Click="NavigateToProjectPage" />
         <Separator />
         <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage" />
         <Separator/>
