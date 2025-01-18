@@ -132,7 +132,7 @@ public class InteractiveTableExplorer
             .Trim();
 
         //support comments
-        if (query.StartsWith("#") || query.StartsWith("//") || query.IsBlank()) return;
+        if (query.StartsWith("#")  || query.IsBlank()) return;
 
         try
         {

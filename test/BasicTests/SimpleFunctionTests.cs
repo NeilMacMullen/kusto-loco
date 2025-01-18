@@ -670,4 +670,78 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("123456789012345");
     }
 
+    [TestMethod]
+    public async Task IsEmpty()
+    {
+        var query = "print isempty('')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task IsEmpty2()
+    {
+        var query = "print isempty(' ')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("False");
+    }
+
+    [TestMethod]
+    public async Task IsNotEmpty()
+    {
+        var query = "print isnotempty('')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("False");
+    }
+
+    [TestMethod]
+    public async Task IsNotEmpty2()
+    {
+        var query = "print isnotempty(' ')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+
+    [TestMethod]
+    public async Task IsAscii()
+    {
+        var query = "print isascii('blahhh')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task IsUtf8()
+    {
+        var query = "print isutf8('blahhh')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task Reverse()
+    {
+        var query = "print reverse('acdef')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("fedca");
+    }
+
+    [TestMethod]
+    public async Task IsFinite()
+    {
+        var query = "print isfinite(1.0/10)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    //[Ignore("TODO - isFinite needs work")]
+    [TestMethod]
+    public async Task IsFinite2()
+    {
+        var query = "print isfinite(1.0/0.0)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("False");
+    }
+
 }
