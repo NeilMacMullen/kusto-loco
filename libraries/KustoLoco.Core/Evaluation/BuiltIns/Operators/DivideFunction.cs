@@ -17,9 +17,7 @@ internal partial class DivideFunction
                : a / b;
 
     private static double? DoubleImpl(double a, double b)
-        => b == 0
-               ? null
-               : a / b;
+        =>  a / b;
 
     private static TimeSpan? TsLongImpl(TimeSpan a, long b)
         => b == 0

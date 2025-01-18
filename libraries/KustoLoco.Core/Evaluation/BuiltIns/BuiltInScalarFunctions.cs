@@ -36,6 +36,13 @@ internal static class BuiltInScalarFunctions
 
         IsEmptyFunction.Register(functions);
 
+        IsNotEmptyFunction.Register(functions);
+        IsAsciiFunction.Register(functions);
+        IsFiniteFunction.Register(functions);
+        IsInfFunction.Register(functions);
+        IsNanFunction.Register(functions);
+        IsUtf8Function.Register(functions);
+        ReverseFunction.Register(functions);
         functions.Add(
             Functions.MinOf,
             new ScalarFunctionInfo(
