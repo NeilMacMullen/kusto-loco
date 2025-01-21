@@ -1,135 +1,130 @@
 ﻿@page "/settingspage"
+
 @using KustoLoco.AI
 @using KustoLoco.Services
-@using Newtonsoft.Json;
 @inherits OwningComponentBase
+
 @inject SettingsService SettingsService
 @inject IJSRuntime JSRuntime
+
+<!-- 7.css -->
+<link rel="stylesheet" href="https://unpkg.com/7.css" />
+
 <h3>Settings</h3>
-<!-- Include 7.css in your project if not already included -->
-<link rel="stylesheet" href="https://unpkg.com/7.css">
 
 <div class="grid gap-md p-sm-12">
     <div class="col-8 col-sm-4">
         <div class="stack gap-md">
 
             <!-- OpenAI Service Type -->
-            <div class="form-group">
-                <label for="aiType"><b>OpenAI Service Type:</b></label>
-                <select id="aiType"
-                class="form-control"
-                style="width:300px"
-                @bind="AIType">
+            <div>
+                <label for="aiType"><b>OpenAI Service Type:</b></label><br />
+                <InputSelect id="aiType" @bind-Value="AIType" class="form-control select-width">
                     @foreach (var type in colAITypes)
                     {
                         <option value="@type">@type</option>
                     }
-                </select>
+                </InputSelect>
             </div>
             <br />
-            <!-- ApiKey -->
-            <div class="form-group">
-                <label for="apiKey"><b>ApiKey:</b></label>
-                <input id="apiKey"
-                type="text"
-                class="form-control"
-                style="width:450px"
-                @bind="ApiKey"
-                @onkeydown="APIKeyDetection" />
-            </div>
-            <br />
-            <!-- Conditional Fields Based on AIType -->
+            @if (AIType != "Local LLM")
+            {
+                <div>
+                    <label for="apiKey"><b>Api Key (if needed):</b></label><br />
+                    <InputText id="apiKey" @bind-Value="ApiKey"
+                               class="form-control input-width"
+                               @oninput="HandleApiKeyChange" />
+                </div>
+                <br />
+            }
             @if (AIType == "OpenAI")
             {
                 <!-- Default AI Model -->
-                <div class="form-group">
-                    <label for="aiModel"><b>Default AI Model:</b></label>
-                    <select id="aiModel"
-                    class="form-control"
-                    style="width:300px"
-                    @bind="AIModel">
+                <div>
+                    <label for="aiModel"><b>Default AI Model:</b></label><br />
+                    <InputSelect id="aiModel" @bind-Value="AIModel" class="form-control select-width">
                         @foreach (var model in colModels)
                         {
                             <option value="@model">@model</option>
                         }
-                    </select>
+                    </InputSelect>
                 </div>
-                <br />
             }
             else if (AIType == "Azure OpenAI")
             {
                 <!-- Azure OpenAI Model Deployment Name -->
-                <div class="form-group">
-                    <label for="azureModel"><b>Azure OpenAI Model Deployment Name:</b></label>
-                    <input id="azureModel"
-                    type="text"
-                    class="form-control"
-                    style="width:450px"
-                    @bind="AIModel" />
+                <div>
+                    <label for="azureModel"><b>Azure OpenAI Model Deployment Name:</b></label><br />
+                    <InputText id="azureModel" @bind-Value="AIModel"
+                               class="form-control input-width" />
                 </div>
                 <br />
-
                 <!-- Azure OpenAI Endpoint -->
-                <div class="form-group">
-                    <label for="endpoint"><b>Azure OpenAI Endpoint:</b></label>
-                    <input id="endpoint"
-                    type="text"
-                    class="form-control"
-                    style="width:450px"
-                    @bind="Endpoint" />
+                <div>
+                    <label for="endpoint"><b>Azure OpenAI Endpoint:</b></label><br />
+                    <InputText id="endpoint" @bind-Value="Endpoint"
+                               class="form-control input-width" />
+                </div>
+            }
+            else if (AIType == "Local LLM")
+            {
+                <!-- Local LLM Endpoint -->
+                <div>
+                    <label for="endpoint"><b>Local LLM Endpoint:</b></label><br />
+                    <InputText id="endpoint" @bind-Value="Endpoint"
+                               class="form-control input-width" />
                 </div>
                 <br />
-
-                <!-- Azure OpenAI API Version -->
-                <div class="form-group">
-                    <label for="apiVersion"><b>Azure OpenAI API Version:</b></label>
-                    <input id="apiVersion"
-                    type="text"
-                    class="form-control"
-                    style="width:450px"
-                    @bind="ApiVersion" />
+                <!-- Local LLM Model -->
+                <div>
+                    <label for="localModel"><b>Local LLM Model Name:</b></label><br />
+                    <InputText id="localModel" @bind-Value="AIModel"
+                               class="form-control input-width" />
                 </div>
-                <br />
             }
             <br />
-            <!-- Conditional Buttons Based on Settings -->
-            @if (!IsSettingsEntered)
-            {
-                @if (AIType == "OpenAI")
+            <div class="mt-md">
+                @if (!IsSettingsEntered)
+                {
+                    <!-- Show a 'Get Key' link only for OpenAI/Azure. -->
+                    @if (AIType == "OpenAI" || AIType == "Azure OpenAI")
+                    {
+                        <button type="button"
+                                @onclick="OpenAIKeyLink"
+                                class="btn-wide">
+                            Get @AIType API Key
+                        </button>
+                    }
+                    else if (AIType == "Local LLM")
+                    {
+                        <!-- Local LLM doesn't require a key. You could hide or show a message here. -->
+                        <button type="button"
+                                disabled
+                                class="btn-wide">
+                            No external key needed
+                        </button>
+                    }
+                }
+                else
                 {
                     <button type="button"
-                    @onclick="GetAPIKey"
-                    style="margin-bottom: 10px; width: 500px">
-                        An OpenAI API Key is required (Click here to get one)
+                            @onclick="SettingsSave"
+                            class="btn-wide">
+                        Save
                     </button>
                 }
-                else if (AIType == "Azure OpenAI")
-                {
-                    <button type="button"
-                    @onclick="GetAzureAPIKey"
-                    style="margin-bottom: 10px; width: 500px">
-                        An Azure OpenAI API Key is required (Click here to get one)
-                    </button>
-                }
-            }
-            else
-            {
-                <button type="button"
-                @onclick="SettingsSave"
-                style="margin-bottom: 10px; width: 500px">
-                    Save
-                </button>
-            }
+            </div>
 
         </div>
     </div>
 </div>
-@if (Message != "")
+
+<!-- Modal for Message -->
+@if (!string.IsNullOrWhiteSpace(Message))
 {
     <div class="modal fade show" style="display: block;" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-
                 <div class="window glass active">
                     <div class="title-bar">
                         <div class="title-bar-text">Alert!</div>
@@ -148,112 +143,100 @@
     </div>
     <div class="modal-backdrop fade show"></div>
 }
+
 @code {
-    OrchestratorMethods OrchestratorMethods;
+    // Services
+    private OrchestratorMethods OrchestratorMethods;
+
+    // Fields
     private string Message = "";
-    string DefaultAIModel = "gpt-4o";
+    private bool IsSettingsEntered = false;
 
-    string Organization = "";
-    string ApiKey = "";
-    string AIModel = "gpt-4o";
-    string AIType = "OpenAI";
-    string Endpoint = "";
-    string AIEmbeddingModel = "";
-    string ApiVersion = "";
+    // Default Values
+    private string Organization = "";
+    private string ApiKey = "";
+    private string AIModel = "gpt-4o";
+    private string AIType = "OpenAI";
+    private string Endpoint = "";
+    private string AIEmbeddingModel = "";
+    private string ApiVersion = "";
 
-    private bool isFirstRender = true;
-
-    List<string> colAITypes = new List<string>()
-                {
-                   "OpenAI","Azure OpenAI"
-                };
-
-    List<string> colModels = new List<string>()
-                {
-                   "gpt-4o","gpt-4o-mini","gpt-4-turbo"
-                };
-
-    bool IsSettingsEntered = false;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // Collections
+    private readonly List<string> colAITypes = new()
     {
-        if (firstRender && isFirstRender)
+        "OpenAI",
+        "Azure OpenAI",
+        "Local LLM"
+    };
+
+    private readonly List<string> colModels = new()
+    {
+        "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SettingsService.InitializeAsync();
+        OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods));
+
+        // Load existing settings
+        Organization = SettingsService.Organization ?? "";
+        ApiKey = SettingsService.ApiKey ?? "";
+        AIModel = SettingsService.AIModel ?? "gpt-4o";
+        AIType = SettingsService.AIType ?? "OpenAI";
+        Endpoint = SettingsService.Endpoint ?? "";
+        ApiVersion = SettingsService.ApiVersion ?? "";
+        AIEmbeddingModel = SettingsService.AIEmbeddingModel ?? "";
+
+        // If an API key or local endpoint is set, we assume settings are "entered"
+        // You could refine this logic for Local LLM to also check Endpoint or Model, etc.
+        IsSettingsEntered = !string.IsNullOrWhiteSpace(ApiKey)
+                            || (AIType == "Local LLM" && !string.IsNullOrWhiteSpace(Endpoint));
+    }
+
+    private void HandleApiKeyChange(ChangeEventArgs e)
+    {
+        // Mark settings as entered if the user starts typing an API key
+        ApiKey = e.Value?.ToString() ?? string.Empty;
+        IsSettingsEntered = !string.IsNullOrWhiteSpace(ApiKey);
+    }
+
+    private async Task OpenAIKeyLink()
+    {
+        if (AIType == "OpenAI")
         {
-            isFirstRender = false;
-            await SettingsService.InitializeAsync();
-
-            OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods));
-
-            Organization = SettingsService.Organization ?? "";
-            ApiKey = SettingsService.ApiKey ?? "";
-            AIModel = SettingsService.AIModel ?? "";
-            AIType = SettingsService.AIType ?? "";
-            Endpoint = SettingsService.Endpoint ?? "";
-            ApiVersion = SettingsService.ApiVersion ?? "";
-            AIEmbeddingModel = SettingsService.AIEmbeddingModel ?? "";
-
-            if (ApiKey.Length > 1)
-            {
-                IsSettingsEntered = true;
-            }
-            else
-            {
-                IsSettingsEntered = false;
-            }
-
-            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("open", "https://platform.openai.com/account/api-keys", "_blank");
         }
-    }
-
-    private async Task GetAPIKey()
-    {
-        // Open a new window to the OpenAI API Key page
-        await JSRuntime.InvokeVoidAsync("open", "https://platform.openai.com/account/api-keys");
-    }
-
-    private async Task GetAzureAPIKey()
-    {
-        // Open a new window to the Azure OpenAI API Key page
-        await JSRuntime.InvokeVoidAsync("open", "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal");
-    }
-
-    private void APIKeyDetection(KeyboardEventArgs args)
-    {
-        IsSettingsEntered = true;
+        else // "Azure OpenAI"
+        {
+            await JSRuntime.InvokeVoidAsync("open",
+                "https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal", "_blank");
+        }
     }
 
     private async Task SettingsSave()
     {
+        // Validate the API key only if using OpenAI
+        if (AIType == "OpenAI" && !ApiKey.StartsWith("sk-"))
+        {
+            Message = "Invalid OpenAI API Key - must start with 'sk-'";
+            return;
+        }
+
         try
         {
-            if ((AIType == "OpenAI") && (!ApiKey.StartsWith("sk-")))
-            {
-                Message = "Invalid API Key - must start with: sk-";
+            // Save settings
+            await SettingsService.SaveSettingsAsync(
+                Organization, ApiKey, AIModel, AIType, Endpoint, ApiVersion, AIEmbeddingModel
+            );
 
-                return;
-            }
-
-            // Update Settings
-            await SettingsService.SaveSettingsAsync(Organization, ApiKey, AIModel, AIType, Endpoint, ApiVersion, AIEmbeddingModel);
-
-            // Test API Key
             var result = await OrchestratorMethods.TestAccess(SettingsService, AIModel);
 
-            Message = "Saved";
+            Message = "Saved successfully!";
         }
         catch (Exception ex)
         {
-            string message = ex.Message;
-            Message = message;
-        }
-    }
-
-    private void ChangeAIType(dynamic paramAIType)
-    {
-        // Set the default model based on the AI Type
-        if (paramAIType == "OpenAI")
-        {
-            AIModel = DefaultAIModel;
+            Message = ex.Message;
         }
     }
 

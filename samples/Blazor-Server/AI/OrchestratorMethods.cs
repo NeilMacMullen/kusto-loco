@@ -50,7 +50,7 @@ namespace KustoLoco.AI
                     apiKeyCredential, options)
                     .AsChatClient(AIModel);
             }
-            else // Azure OpenAI
+            else if (objSettings.AIType == "Azure OpenAI") 
             {
                 AzureOpenAIClientOptions options = new AzureOpenAIClientOptions();
                 options.NetworkTimeout = TimeSpan.FromSeconds(520);
@@ -59,6 +59,12 @@ namespace KustoLoco.AI
                     new Uri(Endpoint),
                     apiKeyCredential, options)
                     .AsChatClient(AIModel);
+            }
+            else // Local LLM
+            {
+                return new OllamaChatClient(
+                    new Uri(Endpoint),
+                    AIModel);
             }
         }
         #endregion
@@ -115,8 +121,7 @@ namespace KustoLoco.AI
                 // Extract the text from the first choice
                 string jsonResponse = response.Choices[0].Text.Trim();
 
-                // Remove ```json    and ```
-                jsonResponse = jsonResponse.Replace("```json", "").Replace("```", "");
+                jsonResponse = ExtractJsonFromResponse(jsonResponse);
 
                 try
                 {
@@ -144,5 +149,21 @@ namespace KustoLoco.AI
             }
         }
         #endregion
+
+        public static string ExtractJsonFromResponse(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            int startIndex = input.IndexOf('{');
+            int endIndex = input.LastIndexOf('}');
+
+            // Validate positions
+            if (startIndex == -1 || endIndex == -1 || endIndex < startIndex)
+                return string.Empty;
+
+            // Extract and return the substring that should represent valid JSON
+            return input.Substring(startIndex, endIndex - startIndex + 1);
+        }
     }
 }
