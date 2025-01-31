@@ -13,6 +13,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Search;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
@@ -213,6 +214,7 @@ public partial class QueryEditor : UserControl
         _kqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions!)!;
         using var ops = SafeGetResourceStream("IntellisenseOperators.json");
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
+        SearchPanel.Install(Query);
     }
 
     private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
