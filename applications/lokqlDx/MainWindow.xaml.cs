@@ -54,7 +54,7 @@ public partial class MainWindow : Window
             return;
         if (isBusy)
             return;
-      
+
         isBusy = true;
         Editor.SetBusy(true);
         //start capturing console output from the engine
@@ -87,12 +87,12 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Update the UI because a new workspace has been loaded
+    ///     Update the UI because a new workspace has been loaded
     /// </summary>
     /// <remarks>
-    /// The clearWorkingContext flags indicates whether we should clear all working context
-    /// We don't always want to do this, for example if we are doing a save-as in which case it's
-    /// a bit disconcerting for the user if all their charts/tables disappear
+    ///     The clearWorkingContext flags indicates whether we should clear all working context
+    ///     We don't always want to do this, for example if we are doing a save-as in which case it's
+    ///     a bit disconcerting for the user if all their charts/tables disappear
     /// </remarks>
     private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
     {
@@ -152,12 +152,8 @@ public partial class MainWindow : Window
         dataGrid.FontSize = preferences.FontSize;
         UserChat.FontSize = preferences.FontSize;
         ChatHistory.FontSize = preferences.FontSize;
-        if (preferences.EditorGridHeight > 10)
-            EditorConsoleGrid.RowDefinitions[0].Height =
-            new GridLength(preferences.EditorGridHeight  ,GridUnitType.Pixel);
-        if (preferences.EditorGridWidth > 10)
-            MainGrid.ColumnDefinitions[0].Width =
-                new GridLength(preferences.EditorGridWidth, GridUnitType.Pixel);
+        GridSerializer.DeSerialize(MainGrid,preferences.MainGridSerialization);
+        GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -177,13 +173,13 @@ public partial class MainWindow : Window
             : string.Empty;
         await LoadWorkspace(pathToLoad);
         await NavigateToLanding();
-
     }
 
-    async Task NavigateToLanding()
+    private async Task NavigateToLanding()
     {
         await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
     }
+
     private void ResizeWindowAccordingToStoredPreferences()
     {
         var ui = _preferenceManager.UIPreferences;
@@ -212,8 +208,8 @@ public partial class MainWindow : Window
         ui.WindowTop = Top;
         ui.WindowWidth = Width;
         ui.WindowHeight = Height;
-        ui.EditorGridHeight = EditorConsoleGrid.RowDefinitions[0].Height.Value;
-        ui.EditorGridWidth= MainGrid.ColumnDefinitions[0].Width.Value;
+        ui.MainGridSerialization = GridSerializer.Serialize(MainGrid);
+        ui.EditorGridSerialization = GridSerializer.Serialize(EditorConsoleGrid);
         _preferenceManager.SaveUiPrefs();
     }
 
@@ -247,8 +243,9 @@ public partial class MainWindow : Window
             if (result == MessageBoxResult.Cancel)
                 return YesNoCancel.Cancel;
 
-            shouldSave = (result == MessageBoxResult.Yes);
+            shouldSave = result == MessageBoxResult.Yes;
         }
+
         if (shouldSave)
             return await Save();
 
@@ -257,7 +254,7 @@ public partial class MainWindow : Window
 
     private async void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
-        if ( await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
+        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
         {
             e.Cancel = true;
             return;
@@ -315,25 +312,23 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Save the current workspace to the current file
+    ///     Save the current workspace to the current file
     /// </summary>
     private async Task<YesNoCancel> Save()
     {
         if (!CheckIfWorkspaceDirty())
             return YesNoCancel.Yes;
-        if (_workspaceManager.IsNewWorkspace)
-        {
-            return await SaveAs();
-        }
+        if (_workspaceManager.IsNewWorkspace) return await SaveAs();
 
         SaveWorkspace(_workspaceManager.Path);
         return YesNoCancel.Yes;
     }
 
     /// <summary>
-    /// Save the current workspace to a new file
+    ///     Save the current workspace to a new file
     /// </summary>
-    /// <returns>true if the user went ahead with the save
+    /// <returns>
+    ///     true if the user went ahead with the save
     /// </returns>
     private async Task<YesNoCancel> SaveAs()
     {
@@ -350,6 +345,7 @@ public partial class MainWindow : Window
             await UpdateUIFromWorkspace(false);
             return YesNoCancel.Yes;
         }
+
         //not saving the file counts as a cancel rather than "won't do anything"
         return YesNoCancel.Cancel;
     }
@@ -361,10 +357,7 @@ public partial class MainWindow : Window
 
     private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
-        if (await OfferSaveOfCurrentWorkspace()== YesNoCancel.Cancel)
-        {
-            return;
-        }
+        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel) return;
         await LoadWorkspace(string.Empty);
     }
 
@@ -508,10 +501,13 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save(appPreferences);
-           
+
             UpdateDynamicUiFromPreferences();
         }
-        else _preferenceManager.UIPreferences.FontFamily = oldFont;
+        else
+        {
+            _preferenceManager.UIPreferences.FontFamily = oldFont;
+        }
     }
 
     private async void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
@@ -587,11 +583,4 @@ public partial class MainWindow : Window
     {
         await NavigateToLanding();
     }
-}
-
-public enum YesNoCancel
-{
-    Yes,
-    No,
-    Cancel
 }
