@@ -3,11 +3,10 @@
 
 using System;
 using System.Diagnostics;
-using KustoLoco.Core.Extensions;
-using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using NLog;
 
@@ -30,21 +29,25 @@ internal partial class TreeEvaluator
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
-    private class TakeResultTable : DerivedTableSourceBase<TakeResultTableContext>
+    internal class TakeResultTable : DerivedTableSourceBase<TakeResultTableContext>
     {
         private readonly int _count;
 
         public TakeResultTable(ITableSource input, int count)
-            : base(input) =>
+            : base(input)
+        {
             _count = count;
+        }
 
         public override TableSymbol Type => Source.Type;
 
-        protected override TakeResultTableContext Init() =>
-            new()
+        protected override TakeResultTableContext Init()
+        {
+            return new TakeResultTableContext
             {
                 Remaining = _count
             };
+        }
 
         protected override (TakeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(TakeResultTableContext context, ITableChunk chunk)
@@ -64,7 +67,7 @@ internal partial class TreeEvaluator
         }
     }
 
-    private struct TakeResultTableContext
+    internal struct TakeResultTableContext
     {
         public int Remaining;
     }

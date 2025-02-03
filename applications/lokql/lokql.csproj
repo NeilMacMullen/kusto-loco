@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
     <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />

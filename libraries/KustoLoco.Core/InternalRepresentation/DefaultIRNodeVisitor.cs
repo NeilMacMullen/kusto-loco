@@ -89,6 +89,8 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
 
     public override TResult VisitSortOperator(IRSortOperatorNode node, TContext context) =>
         DefaultVisit(node, context);
+    public override TResult VisitTopOperator(IRTopOperatorNode node, TContext context) =>
+        DefaultVisit(node, context);
 
     public override TResult VisitSummarizeOperator(IRSummarizeOperatorNode node, TContext context) =>
         DefaultVisit(node, context);

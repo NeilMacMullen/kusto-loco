@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
+    <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>

@@ -36,6 +36,7 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitRenderOperator(IRRenderOperatorNode node, TContext context);
     public abstract TResult VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node, TContext context);
     public abstract TResult VisitSortOperator(IRSortOperatorNode node, TContext context);
+    public abstract TResult VisitTopOperator(IRTopOperatorNode node, TContext context);
     public abstract TResult VisitSummarizeOperator(IRSummarizeOperatorNode node, TContext context);
     public abstract TResult VisitTakeOperator(IRTakeOperatorNode node, TContext context);
     public abstract TResult VisitGetSchemaOperator(IRGetSchemaOperatorNode node, TContext context);

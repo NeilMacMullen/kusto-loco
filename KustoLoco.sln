@@ -90,6 +90,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntellisenseHelper", "utili
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor-Server", "samples\Blazor-Server\Blazor-Server.csproj", "{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CopilotSupport", "libraries\CopilotSupport\CopilotSupport.csproj", "{376ACB94-3327-4DE1-9F18-24C1EC896200}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -208,6 +210,10 @@ Global
 		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{376ACB94-3327-4DE1-9F18-24C1EC896200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{376ACB94-3327-4DE1-9F18-24C1EC896200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{376ACB94-3327-4DE1-9F18-24C1EC896200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{376ACB94-3327-4DE1-9F18-24C1EC896200}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -242,6 +248,7 @@ Global
 		{16A14511-618F-44F4-B09C-4C68BAF932CC} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{2E5F60B8-2A6A-4BB6-BA6A-1EA6C99C04D6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D99F9C50-54C3-4BE7-89FE-8F42977E47BD} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{376ACB94-3327-4DE1-9F18-24C1EC896200} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
