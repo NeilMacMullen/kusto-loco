@@ -279,7 +279,8 @@ public class KustoQueryContext
         //special case handling for when query is _only_ a table name without any operators
         if (!tables.Any() && query.Tokenize().Length == 1) tables.Add(query.Trim());
 
-        return tables.Select(KustoNameEscaping.RemoveFraming).Distinct().ToArray();
+        return tables.Select(KustoNameEscaping.RemoveFraming).Distinct()
+            .Where(t=>t.IsNotBlank()).ToArray();
     }
 
     public IEnumerable<ITableSource> Tables()

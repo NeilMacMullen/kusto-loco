@@ -8,6 +8,7 @@ public class AIResponse
 {
     public string Code { get; set; } = string.Empty;
 
+    public string Explanation { get; set; } = string.Empty;
     public string Error { get; set; } = string.Empty;
 }
 

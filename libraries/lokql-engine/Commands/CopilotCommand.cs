@@ -23,7 +23,8 @@ public static class CopilotCommand
 
         var query = blocks.Next();
         var resp = await _copilot.SendUserRequest(query);
-        exp.Info(resp.Code);
+        exp.Info(resp.Explanation);
+        exp.Warn(resp.Code);
         await exp.RunInput(resp.Code);
     }
 
