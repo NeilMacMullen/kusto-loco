@@ -33,7 +33,7 @@ public class UIPreferences
     public double WindowLeft { get; set; }
     public bool WordWrap { get; set; } = false;
     public bool ShowLineNumbers { get; set; } = false;
-    public double EditorGridHeight { get; set; }
-    public double EditorGridWidth { get; set; }
+    public string[] MainGridSerialization { get; set; } = [];
+    public string[] EditorGridSerialization { get; set; } = [];
 }
 

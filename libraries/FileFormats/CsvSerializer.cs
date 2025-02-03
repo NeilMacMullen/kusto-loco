@@ -44,7 +44,9 @@ public class CsvSerializer : ITableSerializer
         using var reader = new StreamReader(stream);
         var config = _config with { HasHeaderRecord = !inferColumnNames };
         var separator = _settings.Get(CsvSerializerSettings.Separator);
-        if (separator.Length >= 1) config = config with { Delimiter = separator };
+        if (separator.Length >= 1)
+            config = config with { Delimiter = separator };
+        else config = config with { DetectDelimiter = true };
 
         var csv = new CsvReader(reader, config);
 
@@ -196,7 +198,7 @@ public class CsvSerializer : ITableSerializer
             "Infer column names", "false", nameof(Boolean));
 
         public static readonly KustoSettingDefinition Separator = new(Setting("Separator"),
-            "Character that separates columns", string.Empty, nameof(String));
+            "Character that separates columns.  If left empty autodetect is used", string.Empty, nameof(String));
 
         private static string Setting(string setting)
         {

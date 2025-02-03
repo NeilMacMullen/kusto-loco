@@ -39,8 +39,8 @@ public class PptReportTarget : IReportTarget
             {
                 while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
                 while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
-                while (existingTable.Columns.Count > requiredColumns) existingTable.RemoveColumnAt(0);
-                while (existingTable.Columns.Count < requiredColumns) existingTable.AddColumn();
+                while (existingTable.Columns.Count > requiredColumns) existingTable.Columns.RemoveAt(0);
+                while (existingTable.Columns.Count < requiredColumns) existingTable.Columns.Add();
                 FillTable(existingTable);
             }
         }
