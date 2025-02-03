@@ -4,6 +4,13 @@ using KustoLoco.Core;
 
 namespace KustoLoco.CopilotSupport;
 
+/// <summary>
+/// Manages creation of CoPilot system prompt
+/// </summary
+/// <remarks>
+/// The general prompt is loaded from an embedded resource then
+/// schema information about available tables is provided
+/// </remarks>
 public static class SystemPromptCreator
 {
     private static Stream SafeGetResourceStream(string substring)

@@ -1,9 +1,5 @@
 ﻿using CommandLine;
 using KustoLoco.CopilotSupport;
-using KustoLoco.Core.Console;
-using KustoLoco.Core.Settings;
-using Lokql.Engine;
-using Lokql.Engine.Commands;
 using NLog;
 
 internal class CmdTest
@@ -13,10 +9,9 @@ internal class CmdTest
 
     public static async Task RunAsync(Options options)
     {
-
-        var template = OrchestratorMethods.GetTemplate();
+        var template = SystemPromptCreator.GetTemplate();
         Console.WriteLine(template);
-        
+
         await Task.CompletedTask;
     }
 
@@ -24,6 +19,5 @@ internal class CmdTest
     [Verb("test", HelpText = "")]
     public class Options
     {
-      
     }
 }

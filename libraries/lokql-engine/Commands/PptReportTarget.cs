@@ -8,10 +8,7 @@ public class PptReportTarget : IReportTarget
 {
     private readonly Presentation _pres;
 
-    private PptReportTarget(Presentation pres)
-    {
-        _pres = pres;
-    }
+    private PptReportTarget(Presentation pres) => _pres = pres;
 
     public async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
     {
@@ -104,15 +101,9 @@ public class PptReportTarget : IReportTarget
         }
     }
 
-    private int AllowableColumnCount(int wanted)
-    {
-        return Math.Min(wanted, 100);
-    }
+    private int AllowableColumnCount(int wanted) => Math.Min(wanted, 100);
 
-    private int AllowableRowCount(int wanted)
-    {
-        return Math.Min(wanted, 100);
-    }
+    private int AllowableRowCount(int wanted) => Math.Min(wanted, 100);
 
     private ISlide AddSlide()
     {
@@ -120,10 +111,11 @@ public class PptReportTarget : IReportTarget
         return _pres.Slides.Last();
     }
 
-    private T[] FindMatches<T>(string name) where T : IShape
+    private T[] FindMatches<T>(string name)
+        where T : IShape
     {
         return name.IsBlank()
-            ? []
+                   ? []
             : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
                 .Where(p => p.Name == name)
                 .ToArray();
@@ -132,8 +124,8 @@ public class PptReportTarget : IReportTarget
     public static PptReportTarget Create(string filename)
     {
         var pres = filename.IsBlank()
-            ? new Presentation()
-            : new Presentation(filename);
+                       ? new Presentation()
+                       : new Presentation(filename);
         return new PptReportTarget(pres);
     }
 }

@@ -43,8 +43,8 @@ I will now give some some information about the schema of the tables that you wi
 ### SPECIFICATIONS ###
 
 1. **Query Requirements**:
-   - Clearly define the purpose and functionality of the KQL query.
-   - Specify any particular operations such as filtering, joining, aggregating, or projecting data.
+   - Clearly define the purpose and functionality of the KQL query by placing it in the `Explanation` field of the json reponse.
+   - Explain any particular operations such as filtering, joining, aggregating, or projecting data.
 
 2. **Table Loading**:
    - Tables need to be referenced using their respective names in the Kusto database.
@@ -58,11 +58,11 @@ I will now give some some information about the schema of the tables that you wi
 
 
 4. **Response Format**:
-   - JSON format with two fields: `Code` and `Error`.
+   - JSON format with three fields: `Code`, and `Explanation`.
    - Example:
      {
        "Code": "",
-       "Error": ""
+       "Explanation:"
      }
 
 ---
@@ -75,7 +75,7 @@ I will now give some some information about the schema of the tables that you wi
 
 **Result:**
 {
-  "Code": "// KQL Query to retrieve the top 10 most active users based on the number of logins in the last 30 days\n\nLoginData\n| where LoginDate >= ago(30d) // Filter logins from the last 30 days\n| summarize LoginCount = count() by UserId // Count logins per user\n| top 10 by LoginCount desc // Select top 10 users with the highest login counts\n| project UserId, LoginCount // Select the UserId and LoginCount columns",
-  "Error": ""
+  "Code": "LoginData\n| where LoginDate >= ago(30d) // Filter logins from the last 30 days\n| summarize LoginCount = count() by UserId // Count logins per user\n| top 10 by LoginCount desc // Select top 10 users with the highest login counts\n| project UserId, LoginCount // Select the UserId and LoginCount columns",
+  "Explanation":"The LoginData table is being filtered using the `ago` operator"
 }
 
