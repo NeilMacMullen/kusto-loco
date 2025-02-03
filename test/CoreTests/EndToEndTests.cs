@@ -280,6 +280,34 @@ a:long; b:int
     }
 
     [Fact]
+    public void Top_Desc()
+    {
+        // Arrange
+        var query = @"
+datatable(a: long, b: int)
+[
+    3, 9,
+    2, 8,
+    1, 7,
+    long(null), 42,
+    4, 6,
+]
+| top 3 by a
+";
+
+        var expected = @"
+a:long; b:int
+------------------
+4; 6
+3; 9
+2; 8
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
     public void Sort_DescNullsFirst()
     {
         // Arrange
