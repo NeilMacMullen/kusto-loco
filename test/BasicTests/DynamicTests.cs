@@ -62,4 +62,23 @@ public class DynamicTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Contain("coordinates");
     }
+
+    [TestMethod]
+    public async Task JsonArrayCorrectlyTyped()
+    {
+        var query = """
+                    let Config = datatable(Key:string, Value:string) [
+                      "RequiredFolders", "folderA,folderB",
+                      "RequiredFolders2", "folderA,folderC"
+                      ];
+                    Config        
+                    | where Key == "RequiredFolders"
+                    | extend SplitValues = split(Value, ",")
+                    | extend ConfigValid = SplitValues contains "folderA"
+                    | project ConfigValid
+                      
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("True");
+    }
 }
