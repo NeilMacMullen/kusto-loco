@@ -49,6 +49,7 @@ public static class TypeMapping
     /// </remarks>
     public static TypeSymbol SymbolForType(Type type)
     {
+        
         if (NetToKustoLookup.TryGetValue(UnderlyingType(type), out var ts))
             return ts.Type;
         throw new NotImplementedException($"No TypeSymbol equivalent for .Net type {type.Name}");
@@ -99,10 +100,15 @@ public static class TypeMapping
     public static bool IsNullable(Type t)
         => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-    public static Type UnderlyingType(Type t) =>
-        IsNullable(t)
+    public static Type UnderlyingType(Type t)
+    {
+        var nonNullable= IsNullable(t)
             ? Nullable.GetUnderlyingType(t)!
             : t;
+        //Some in-built functions actually return JsonArrays rather than raw JsonNodes
+        //and we need to ensure that they are categorised as Dynamic types
+        return nonNullable.BaseType == typeof(JsonNode) ? typeof(JsonNode) : nonNullable;
+    }
 
 
     /// <summary>
