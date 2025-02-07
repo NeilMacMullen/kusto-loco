@@ -16,7 +16,7 @@ namespace KustoLoco.Core.DataSource;
 /// </summary>
 public class InMemoryTableSource : ITableSource
 {
-    public static readonly InMemoryTableSource Empty = new(TableSymbol.Empty, Array.Empty<BaseColumn>());
+    public static readonly InMemoryTableSource Empty = new(TableSymbol.Empty, []);
 
     //actually only ever one chunk
     private readonly ITableChunk[] _data;
@@ -24,7 +24,7 @@ public class InMemoryTableSource : ITableSource
     public InMemoryTableSource(TableSymbol type, BaseColumn[] columns)
     {
         Type = type;
-        _data = new ITableChunk[] { new TableChunk(this, columns) };
+        _data = [new TableChunk(this, columns)];
     }
 
     public int RowCount => _data.First().RowCount;
