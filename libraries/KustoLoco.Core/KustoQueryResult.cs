@@ -10,8 +10,6 @@ using KustoLoco.Core.Util;
 using NLog;
 using NotNullStrings;
 
-
-
 namespace KustoLoco.Core;
 
 public class KustoQueryResult
@@ -20,8 +18,6 @@ public class KustoQueryResult
 
     public static readonly KustoQueryResult Empty = new(string.Empty,
         InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
-    public static KustoQueryResult FromError(string query, string error)
-        => new(query, InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, error);
 
     /// <summary>
     ///     Provides the results of a Kusto query as a collection of dictionaries
@@ -45,60 +41,72 @@ public class KustoQueryResult
         QueryDuration = queryDuration;
         Error = error;
     }
+
     /// <summary>
-    /// Original query that generated the result
+    ///     Original query that generated the result
     /// </summary>
     public string Query { get; init; }
 
 
     public InMemoryTableSource Table { get; }
+
     /// <summary>
-    /// Duration of query execution
+    ///     Duration of query execution
     /// </summary>
     public TimeSpan QueryDuration { get; init; }
+
     /// <summary>
-    /// Error message if the query failed, otherwise string.Empty
+    ///     Error message if the query failed, otherwise string.Empty
     /// </summary>
     public string Error { get; init; }
 
     /// <summary>
-    /// Visualization state of the result (i.e. whether it's a table, chart, etc)
+    ///     Visualization state of the result (i.e. whether it's a table, chart, etc)
     /// </summary>
     public VisualizationState Visualization { get; init; }
 
     /// <summary>
-    /// Number of rows in the result
+    ///     Number of rows in the result
     /// </summary>
     public int RowCount { get; init; }
 
     /// <summary>
-    /// Number of columns in the result
+    ///     Number of columns in the result
     /// </summary>
     public int ColumnCount => ColumnDefinitions().Length;
 
+    public static KustoQueryResult FromError(string query, string error)
+    {
+        return new KustoQueryResult(query, InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, error);
+    }
+
     /// <summary>
-    /// Gets an array of nullable objects representing cells in the row at the given index
+    ///     Gets an array of nullable objects representing cells in the row at the given index
     /// </summary>
     /// <remarks>
-    /// Kusto uses null to represent missing values so we need to use nullable types here
+    ///     Kusto uses null to represent missing values so we need to use nullable types here
     /// </remarks>
     public object?[] GetRow(int row)
-        => Enumerable.Range(0, ColumnCount)
+    {
+        return Enumerable.Range(0, ColumnCount)
             .Select(c => Get(c, row))
             .ToArray();
+    }
 
     /// <summary>
-    /// Enumerate over all rows in the result   
+    ///     Enumerate over all rows in the result
     /// </summary>
     public IEnumerable<object?[]> EnumerateRows()
-        => Enumerable.Range(0, RowCount)
+    {
+        return Enumerable.Range(0, RowCount)
             .Select(GetRow);
+    }
 
     /// <summary>
-    /// Returns the column definitions for the result
+    ///     Returns the column definitions for the result
     /// </summary>
     /// <remarks>
-    /// A ColumnResult is a simple struct that contains the name index and underlying C# type of a column
+    ///     A ColumnResult is a simple struct that contains the name index and underlying C# type of a column
     /// </remarks>
     public ColumnResult[] ColumnDefinitions()
     {
@@ -113,12 +121,15 @@ public class KustoQueryResult
     }
 
     /// <summary>
-    /// Returns the names of the columns in the result
+    ///     Returns the names of the columns in the result
     /// </summary>
-    public string[] ColumnNames() => ColumnDefinitions().Select(c => c.Name).ToArray();
+    public string[] ColumnNames()
+    {
+        return ColumnDefinitions().Select(c => c.Name).ToArray();
+    }
 
     /// <summary>
-    /// Fetch a particular cell in the result
+    ///     Fetch a particular cell in the result
     /// </summary>
     public object? Get(int col, int row)
     {
@@ -151,15 +162,20 @@ public class KustoQueryResult
     }
 
     /// <summary>
-    /// For a particular column enumerate over all cells
+    ///     For a particular column enumerate over all cells
     /// </summary>
-    public IEnumerable<object?> EnumerateColumnData(ColumnResult col) => Table.GetColumnData(col.Index);
+    public IEnumerable<object?> EnumerateColumnData(ColumnResult col)
+    {
+        return Table.GetColumnData(col.Index);
+    }
 
     /// <summary>
     ///     Deserialises a Dictionary-based result to objects
     /// </summary>
     public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue)
-        => ToRecords<T>(AsOrderedDictionarySet(max));
+    {
+        return ToRecords<T>(AsOrderedDictionarySet(max));
+    }
 
     public static IReadOnlyCollection<T> ToRecords<T>(IEnumerable<OrderedDictionary> dictionaries)
     {
@@ -172,19 +188,28 @@ public class KustoQueryResult
         {
             return JsonSerializer.Deserialize<T[]>(json)!;
         }
-        catch 
+        catch
         {
             return [];
         }
     }
 
-    public string ToJsonString() => ToJsonString(AsOrderedDictionarySet());
-    public static string ToJsonString(object o) => JsonSerializer.Serialize(o);
+    public string ToJsonString()
+    {
+        return ToJsonString(AsOrderedDictionarySet());
+    }
+
+    public static string ToJsonString(object o)
+    {
+        return JsonSerializer.Serialize(o);
+    }
 
     public IReadOnlyCollection<OrderedDictionary> ResultOrErrorAsSet()
-        => Error.IsNotBlank()
+    {
+        return Error.IsNotBlank()
             ? [new OrderedDictionary { ["QUERY ERROR"] = Error }]
             : AsOrderedDictionarySet();
+    }
 
 
     /// <summary>
@@ -194,17 +219,20 @@ public class KustoQueryResult
     ///     We currently use an OrderedDictionary to represent the rows of the result set.
     ///     However, in future we may return a JsonObject
     /// </remarks>
-    public object ToSerializableObject() => AsOrderedDictionarySet();
+    public object ToSerializableObject()
+    {
+        return AsOrderedDictionarySet();
+    }
 
     /// <summary>
-    /// Returns the result of a query as a DataTable, suitable for use in a DataGridView or similar
+    ///     Returns the result of a query as a DataTable, suitable for use in a DataGridView or similar
     /// </summary>
-    public DataTable ToDataTable(int maxRows=Int32.MaxValue)
+    public DataTable ToDataTable(int maxRows = int.MaxValue)
     {
         var dt = new DataTable();
 
         foreach (var col in ColumnDefinitions())
-            dt.Columns.Add(col.Name,col.UnderlyingType);
+            dt.Columns.Add(col.Name, col.UnderlyingType);
 
         foreach (var row in EnumerateRows().Take(maxRows))
             dt.Rows.Add(row);
@@ -212,13 +240,13 @@ public class KustoQueryResult
         return dt;
     }
 
-    ///<summary>
-    /// Returns the result of a query as a DataTable, suitable for use in a DataGridView or similar
+    /// <summary>
+    ///     Returns the result of a query as a DataTable, suitable for use in a DataGridView or similar
     /// </summary>
     /// <remarks>
-    /// If the result has an error, returns a single cell DataTable that contains the error text
+    ///     If the result has an error, returns a single cell DataTable that contains the error text
     /// </remarks>
-    public DataTable ToDataTableOrError(int maxRows = Int32.MaxValue)
+    public DataTable ToDataTableOrError(int maxRows = int.MaxValue)
     {
         if (Error.IsNotBlank())
         {
@@ -227,6 +255,42 @@ public class KustoQueryResult
             dt.Rows.Add(Error);
             return dt;
         }
+
         return ToDataTable(maxRows);
+    }
+
+    /// <summary>
+    ///     Returns a page of the result
+    /// </summary>
+    public KustoQueryResult GetPage(int offset, int count)
+    {
+        if (RowCount == 0)
+            return this;
+        var pageOffset = Math.Min(RowCount, offset);
+        var pageCount = Math.Min(RowCount - pageOffset, count);
+        var pagedTable = PageOfKustoTable.Create(Table, pageOffset, pageCount);
+        return new KustoQueryResult(Query, InMemoryTableSource.FromITableSource(pagedTable), Visualization,
+            QueryDuration,
+            Error);
+    }
+
+    /// <summary>
+    /// Break a single result into multiple pages
+    /// </summary>
+    /// <remarks>
+    /// When transferring large result sets over the network it can be useful to break them into pages
+    /// So for example a client can issue a query that would return 100,000 rows and then paginate over them
+    /// </remarks>
+    public IReadOnlyCollection<KustoQueryResult> Paginate(int pageSize)
+    {
+        var pages = new List<KustoQueryResult>();
+
+        for (var start = 0; start < RowCount; start += pageSize)
+        {
+            var page = GetPage(start, pageSize);
+            pages.Add(page);
+        }
+
+        return pages;
     }
 }

@@ -6,6 +6,13 @@ using NLog;
 
 namespace KustoLoco.Core.DataSource;
 
+/// <summary>
+/// Splits a single large chunk into multiple smaller chunks
+/// </summary>
+/// <remarks>
+/// Primarily used for testing chunk spanning operations.  There's not really anywhere
+/// in the real codebase where we deliberately split a chunk into smaller chunks
+/// </remarks>
 public static class ChunkSplitter
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
