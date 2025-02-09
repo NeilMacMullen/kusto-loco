@@ -27,8 +27,15 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         _inScopeSymbolInfos.Add(name, resultKind);
     }
 
-    protected override IRNode DefaultVisit(SyntaxNode node) =>
+    protected override IRNode DefaultVisit(SyntaxNode node)
+    {
+        if (node is QueryOperator queryOp)
+        {
+            var keyword = queryOp.Kind.ToString().Replace("Operator", "").ToLowerInvariant();
+            throw new NotImplementedException($"Query operator '{keyword}' not supported");
+        }
         throw new NotImplementedException(TypeNameHelper.GetTypeDisplayName(node));
+    }
 
     public override IRNode VisitQueryBlock(QueryBlock node)
     {
