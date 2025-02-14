@@ -100,10 +100,7 @@ public partial class MainWindow : Window
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
-            var settings = _workspaceManager.Settings;
-            var loader = new StandardFormatAdaptor(settings, _console);
-            _explorer = new InteractiveTableExplorer(_console, loader, settings,
-                CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+           
             dataGrid.ItemsSource = null;
             await NavigateToLanding();
         }
@@ -269,6 +266,11 @@ public partial class MainWindow : Window
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
+
+        //create a new explorer context
+        var loader = new StandardFormatAdaptor(_workspaceManager.Settings, _console);
+        _explorer = new InteractiveTableExplorer(_console, loader, _workspaceManager.Settings,
+            CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
 
         //make sure we have the most recent global preferences
         var appPrefs = _preferenceManager.FetchApplicationPreferencesFromDisk();
