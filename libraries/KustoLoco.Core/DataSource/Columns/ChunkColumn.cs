@@ -29,6 +29,9 @@ public class ChunkColumn<T> : TypedBaseColumn<T>
     {
         if (backing is SingleValueColumn<T> single)
             return single.ResizeTo(length);
+        //if we're actually slicing the whole column, just return the original backing column
+        if (offset==0 && length == backing.RowCount)
+            return backing;
         return new ChunkColumn<T>(offset, length, backing);
     }
 

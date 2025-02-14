@@ -23,13 +23,7 @@ public class LambdaColumn<T> : TypedBaseColumn<T>
 
     public override BaseColumn Slice(int start, int length)
     {
-        var builder = ColumnHelpers.CreateBuilder(Type);
-        for (var i = 0; i < length; i++)
-        {
-            builder.Add(GetRawDataValue(i + start));
-        }
-
-        return builder.ToColumn();
+        return ChunkColumn<T>.Create(start, length, this);
     }
 
     public override void ForEach(Action<object?> action)

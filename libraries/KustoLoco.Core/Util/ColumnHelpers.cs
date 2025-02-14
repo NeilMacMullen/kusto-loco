@@ -207,7 +207,7 @@ public static class ColumnHelpers
                {
                    MappingType.Arbitrary => MapColumn(other[0], mapping),
                    MappingType.Chunk => ChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
-                   MappingType.Reassembly => new ReassembledChunkColumn<T>(other),
+                   MappingType.Reassembly => ReassembledChunkColumn<T>.Create(other),
                    _ => throw new NotImplementedException()
                };
     }

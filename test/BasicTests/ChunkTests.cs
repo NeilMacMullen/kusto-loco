@@ -38,7 +38,7 @@ public class ChunkTests
         result.RowCount.Should().Be(5);
         //TODO - here compare tabulated output for more coverage
     }
-
+    
 
     [TestMethod]
     public async Task Count()
@@ -130,5 +130,20 @@ public class ChunkTests
         var pagedTable = PageOfKustoTable.Create(result.Table, 1000, 1000);
         var resultPage = new KustoQueryResult(result.Query, InMemoryTableSource.FromITableSource(pagedTable), result.Visualization, result.QueryDuration, result.Error);
         resultPage.RowCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task SlicingReassembledChunks()
+    {
+        var context = CreateContext();
+        var rows = Enumerable.Range(0, 100).Select(i => new Row(i.ToString(), i)).ToArray();
+        
+        AddChunkedTableFromRecords(context, "data", rows, 3);
+        var result = (await context.RunQuery("data | project Value"));
+        context.MaterializeResultAsTable(result, "res");
+
+        result = (await context.RunQuery("res | take 10"));
+        result.RowCount.Should().Be(10);
+
     }
 }

@@ -18,11 +18,7 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
 
     public override BaseColumn Slice(int start, int length)
     {
-        var slicedData = new T[length];
-        //TODO - we really ought to be able to get away with copying
-        //the data here
-        Array.Copy(_data, start, slicedData, 0, length);
-        return ColumnFactory.Create(slicedData);
+        return ChunkColumn<T>.Create(start, length, this);
     }
 
     public override void ForEach(Action<object?> action)
