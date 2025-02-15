@@ -91,7 +91,15 @@ public class WebViewRenderer(
         dataGridSizeWarning.Visibility =
             result.RowCount > maxRows ? Visibility.Visible : Visibility.Collapsed;
         var dt = result.ToDataTable(maxRows);
+         //prevent the column names from being interpreted as hotkeys
+        for (var i=0;i< dt.Columns.Count;i++)
+        {
+            var c = dt.Columns[i];
+            c.ColumnName = c.ColumnName
+                .Replace("_", "__");
+        }
         dataGrid.ItemsSource = dt.DefaultView;
+
     }
 
     public readonly record struct UriOrHtml(string Uri, string Html);
