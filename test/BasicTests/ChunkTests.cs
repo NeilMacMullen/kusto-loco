@@ -1,6 +1,5 @@
 using FluentAssertions;
 using KustoLoco.Core;
-using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Util;
 using LogSetup;

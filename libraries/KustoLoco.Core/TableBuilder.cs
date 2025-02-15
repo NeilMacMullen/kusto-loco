@@ -12,6 +12,7 @@ using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource.Columns;
 using NLog;
 using KustoLoco.Core.DataSource;
+using NotNullStrings;
 
 namespace KustoLoco.Core;
 
@@ -55,7 +56,25 @@ public class TableBuilder
             [],
             [],
             length);
-
+    /// <summary>
+    /// Try to ensure that added column names are unique and not blank
+    /// </summary>
+    public string GetUniqueColumnName(string name)
+    {
+        if (name.IsBlank())
+            name = "_column";
+       
+        if (!_columnNames.Contains(name))
+            return name;
+        for(var i = 1; i < 1000;i++)
+        {
+            var newName = $"{name}_{i}";
+            if (!_columnNames.Contains(newName))
+                return newName;
+        }
+        //if we ever see this I shudder to think what the input must be
+        throw new InvalidOperationException("can't find a unique column name amongst large number of duplicate names ");
+    }
     /// <summary>
     /// Adds a column to the builder 
     /// </summary>
@@ -65,6 +84,7 @@ public class TableBuilder
     /// </remarks>
     public TableBuilder WithColumn(string name, BaseColumn column)
     {
+        name = GetUniqueColumnName(name);
         _columns = _columns.Add(column);
         _columnNames = _columnNames.Add(name);
         return this;
