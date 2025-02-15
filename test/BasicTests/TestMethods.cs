@@ -1,5 +1,4 @@
 using KustoLoco.Core;
-using KustoLoco.Core.Console;
 using LogSetup;
 using NLog;
 using NotNullStrings;
