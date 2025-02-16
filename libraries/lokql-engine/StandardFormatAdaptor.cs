@@ -31,7 +31,8 @@ public class StandardFormatAdaptor : ITableAdaptor
             new TsvTableAdaptor(settings, console),
             new ParquetTableAdaptor(settings, console),
             new TextTableAdaptor(settings, console),
-            new JsonArrayTableAdaptor(settings, console)
+            new JsonArrayTableAdaptor(settings, console),
+            new ExcelTableAdaptor(settings, console)
         ];
         _settings.Register(Settings.KustoDataPath);
     }

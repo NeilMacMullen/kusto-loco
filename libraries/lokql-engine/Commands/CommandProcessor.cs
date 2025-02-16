@@ -41,6 +41,7 @@ public class CommandProcessor
                 .WithAdditionalCommand<EchoCommand.Options>(EchoCommand.RunAsync)
                 .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.RunAsync)
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
+                .WithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
 
 
                 .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)

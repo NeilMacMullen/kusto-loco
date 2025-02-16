@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Microsoft.Identity.Client;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
