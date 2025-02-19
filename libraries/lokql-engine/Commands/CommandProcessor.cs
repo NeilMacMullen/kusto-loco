@@ -39,7 +39,9 @@ public class CommandProcessor
                 .WithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
                 .WithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
                 .WithAdditionalCommand<EchoCommand.Options>(EchoCommand.RunAsync)
-                .WithAdditionalCommand<PivotCommand.Options>(PivotCommand.RunAsync)
+                .WithAdditionalCommand<PivotColumnsToRowsCommand.Options>(PivotColumnsToRowsCommand.RunAsync)
+                .WithAdditionalCommand<PivotRowsToColumnsCommand.Options>(PivotRowsToColumnsCommand.RunAsync)
+
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
                 .WithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
 
