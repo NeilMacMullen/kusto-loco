@@ -9,9 +9,13 @@ public static class StartReportCommand
     {
         var exp = econtext.Explorer;
         var type = o.Type.ToLowerInvariant();
+        var reportTemplate = Path.IsPathRooted(o.Template)
+            ? o.Template
+            : Path.Combine(exp.Settings.Get(StandardFormatAdaptor.Settings.KustoDataPath), o.Template);
+
         if (type=="pptx")
         {
-            exp.StartNewReport(PptReportTarget.Create(o.Template));
+            exp.StartNewReport(PptReportTarget.Create(reportTemplate));
         }
         /*
         else
