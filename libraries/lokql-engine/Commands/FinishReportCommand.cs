@@ -8,8 +8,11 @@ public static class FinishReportCommand
     {
         var exp = econtext.Explorer;
         var report = exp.ActiveReport;
-        report.SaveAs(o.File);
-        exp.Info($"Saved report {o.File}");
+        var reportPath = Path.IsPathRooted(o.File)
+            ? o.File
+            : Path.Combine(exp.Settings.Get(StandardFormatAdaptor.Settings.KustoDataPath), o.File);
+        report.SaveAs(reportPath);
+        exp.Info($"Saved report {reportPath}");
         return Task.CompletedTask;
     }
 
