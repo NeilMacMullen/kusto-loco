@@ -37,10 +37,10 @@ internal partial class TreeEvaluator
         public IEnumerable<ITableChunk> GetData()
         {
             var allData = new List<object?>[_input.Type.Columns.Count];
-            for (var i = 0; i < allData.Length; i++) allData[i] = new List<object?>();
+            for (var i = 0; i < allData.Length; i++) allData[i] = [];
 
             var sortColumnsData = new List<object?>[_sortColumns.Length];
-            for (var i = 0; i < _sortColumns.Length; i++) sortColumnsData[i] = new List<object?>();
+            for (var i = 0; i < _sortColumns.Length; i++) sortColumnsData[i] = [];
 
             foreach (var chunk in _input.GetData())
             {
@@ -82,7 +82,8 @@ internal partial class TreeEvaluator
             for (var i = 0; i < resultColumns.Length; i++)
             {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(_input.Type.Columns[i].Type);
-                for (var j = 0; j < sortedIndexes.Length; j++) resultColumns[i].Add(allData[i][sortedIndexes[j]]);
+                foreach (var t in sortedIndexes)
+                    resultColumns[i].Add(allData[i][t]);
             }
 
             var resultChunk = new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray());

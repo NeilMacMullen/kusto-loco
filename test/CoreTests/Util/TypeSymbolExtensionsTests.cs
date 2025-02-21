@@ -10,27 +10,27 @@ namespace KustoLoco.Core.Extensions.Tests;
 public class TypeSymbolExtensionsTests
 {
     public static object[][] NonDynamicTypes =
-    {
-        new object[] { ScalarTypes.Bool },
-        new object[] { ScalarTypes.Int },
-        new object[] { ScalarTypes.Long },
-        new object[] { ScalarTypes.Real },
-        new object[] { ScalarTypes.String },
-        new object[] { ScalarTypes.TimeSpan },
-        new object[] { ScalarTypes.DateTime },
-    };
+    [
+        [ScalarTypes.Bool],
+        [ScalarTypes.Int],
+        [ScalarTypes.Long],
+        [ScalarTypes.Real],
+        [ScalarTypes.String],
+        [ScalarTypes.TimeSpan],
+        [ScalarTypes.DateTime]
+    ];
 
     public static object[][] DynamicTypes =
-    {
-        new object[] { ScalarTypes.Dynamic },
-        new object[] { ScalarTypes.DynamicBag },
-        new object[] { ScalarTypes.DynamicArrayOfLong },
-        new object[] { ScalarTypes.DynamicArrayOfReal },
-        new object[] { ScalarTypes.DynamicArrayOfArray },
-        new object[] { ScalarTypes.DynamicArrayOfString },
-        new object[] { ScalarTypes.GetDynamic(ScalarTypes.DateTime) },
-        new object[] { ScalarTypes.GetDynamicArray(ScalarTypes.DateTime) },
-    };
+    [
+        [ScalarTypes.Dynamic],
+        [ScalarTypes.DynamicBag],
+        [ScalarTypes.DynamicArrayOfLong],
+        [ScalarTypes.DynamicArrayOfReal],
+        [ScalarTypes.DynamicArrayOfArray],
+        [ScalarTypes.DynamicArrayOfString],
+        [ScalarTypes.GetDynamic(ScalarTypes.DateTime)],
+        [ScalarTypes.GetDynamicArray(ScalarTypes.DateTime)]
+    ];
 
     [Theory]
     [MemberData(nameof(NonDynamicTypes))]

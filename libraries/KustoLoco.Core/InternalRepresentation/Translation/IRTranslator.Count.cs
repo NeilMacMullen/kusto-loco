@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
-using KustoLoco.Core.Evaluation.BuiltIns;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
@@ -21,12 +20,12 @@ internal partial class IRTranslator
         {
             new IRAggregateCallNode(
                 Aggregates.Count.Signatures[0],
-                BuiltInAggregates.GetOverload(Aggregates.Count, Array.Empty<IRExpressionNode>(), new List<Parameter>()),
+                BuiltInAggregates.GetOverload(Aggregates.Count, [], []),
                 new List<Parameter>(),
                 IRListNode<IRExpressionNode>.Empty,
-                ScalarTypes.Long),
+                ScalarTypes.Long)
         };
-        return new IRSummarizeOperatorNode(aggregations: IRListNode.From(aggregations),
-            byColumns: IRListNode<IRExpressionNode>.Empty, node.ResultType);
+        return new IRSummarizeOperatorNode(IRListNode.From(aggregations),
+            IRListNode<IRExpressionNode>.Empty, node.ResultType);
     }
 }

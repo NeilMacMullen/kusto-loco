@@ -4,12 +4,11 @@
 using System;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -61,9 +60,7 @@ internal partial class TreeEvaluator
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
-            {
                 data[i] = IndexIntoPossibleJsonArray(itemsCol[i], node.Index);
-            }
 
             var column = new InMemoryColumn<JsonNode?>(data);
             return new ColumnarResult(column);
@@ -110,8 +107,10 @@ internal partial class TreeEvaluator
     }
 
     public override EvaluationResult
-        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context) =>
-        new ScalarResult(node.ResultType, node.Value);
+        VisitLiteralExpression(IRLiteralExpressionNode node, EvaluationContext context)
+    {
+        return new ScalarResult(node.ResultType, node.Value);
+    }
 
     public override EvaluationResult VisitPipeExpression(IRPipeExpressionNode node, EvaluationContext context)
     {
