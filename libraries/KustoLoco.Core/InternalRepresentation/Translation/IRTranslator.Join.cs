@@ -10,6 +10,7 @@ using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+// ReSharper disable StringLiteralTypo
 
 
 namespace KustoLoco.Core.InternalRepresentation;
@@ -56,7 +57,7 @@ internal partial class IRTranslator
                 $"Expected join operator's Right type to be tabular, found {SchemaDisplay.GetText(irExpression.ResultType)}");
         }
 
-        List<IRJoinOnClause> onExpressions = new();
+        List<IRJoinOnClause> onExpressions = [];
         if (node.ConditionClause is JoinOnClause onClause)
         {
             Debug.Assert(_rowScope != TableSymbol.Empty);

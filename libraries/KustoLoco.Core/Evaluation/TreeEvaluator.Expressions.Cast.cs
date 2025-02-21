@@ -3,10 +3,9 @@
 
 using System;
 using System.Diagnostics;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -101,6 +100,6 @@ internal partial class TreeEvaluator
 
         var expressionResult = node.Expression.Accept(this, context);
         Debug.Assert(expressionResult != null);
-        return impl(new[] { expressionResult });
+        return impl([expressionResult]);
     }
 }

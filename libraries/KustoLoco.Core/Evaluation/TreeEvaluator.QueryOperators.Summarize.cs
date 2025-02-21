@@ -2,18 +2,15 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using KustoLoco.Core.Extensions;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
-using NLog;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -36,7 +33,6 @@ internal partial class TreeEvaluator
 
     private class SummarizeResultTable : DerivedTableSourceBase<SummarizeResultTableContext>
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly List<IRExpressionNode> _aggregationExpressions;
         private readonly List<IRExpressionNode> _byExpressions;
         private readonly EvaluationContext _context;
@@ -56,11 +52,13 @@ internal partial class TreeEvaluator
 
         public override TableSymbol Type { get; }
 
-        protected override SummarizeResultTableContext Init() =>
-            new()
+        protected override SummarizeResultTableContext Init()
+        {
+            return new SummarizeResultTableContext
             {
                 BucketizedTables = new Dictionary<SummaryKey, SummarySet>()
             };
+        }
 
         private static SummarySet GetOrAddBucket(SummaryKey key,
             SummarizeResultTableContext context)
@@ -68,7 +66,7 @@ internal partial class TreeEvaluator
             if (!context.BucketizedTables.TryGetValue(key, out var bucket))
                 context.BucketizedTables[key] = bucket =
                     new SummarySet(key.GetArray(),
-                        new List<ITableChunk>(), new List<int>());
+                        [], []);
 
             return bucket;
         }
@@ -88,29 +86,31 @@ internal partial class TreeEvaluator
                 byValuesColumns.Add(byExpressionResult.Column);
             }
 
-            //Console.WriteLine($"created by col {watch.ElapsedMilliseconds}ms");
-
             if (byValuesColumns.Any())
             {
+                //it's important that we isolate the results for each chunk
+                //before merging them back to the global summary context
+                var thisChunkContext = new SummarizeResultTableContext
+                    { BucketizedTables = new Dictionary<SummaryKey, SummarySet>() };
+
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
                     //although it's tempting to use a linq select here, 
-                    //this loop has to be very performant and it's significantly
+                    //this loop has to be very performant, and it's significantly
                     //faster to set properties in a for loop
                     var key = new SummaryKey();
                     for (var c = 0; c < byValuesColumns.Count; c++)
                         key.Set(c, byValuesColumns[c].GetRawDataValue(rowIndex));
-
-
-                    var bucket = GetOrAddBucket(key, context);
+                    var bucket = GetOrAddBucket(key, thisChunkContext);
                     var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
                 }
 
-                foreach (var (summaryKey, summary) in context.BucketizedTables)
+                foreach (var (summaryKey, summary) in thisChunkContext.BucketizedTables)
                 {
-                    var wantedRowChunk = ChunkHelpers.Slice(chunk, summary.RowIds.ToImmutableArray());
-                    var set = context.BucketizedTables[summaryKey];
+                    var wantedRowChunk = ChunkHelpers.Slice(chunk, [..summary.RowIds]);
+                    //copy the values we found for this chunk back into the global context
+                    var set = GetOrAddBucket(summaryKey, context);
                     set.SummarisedChunks.Add(wantedRowChunk);
                 }
             }
@@ -121,7 +121,6 @@ internal partial class TreeEvaluator
                 bucket.SummarisedChunks.Add(chunk);
             }
 
-            //Console.WriteLine($"Summarize chunk took {watch.ElapsedMilliseconds}ms");
             return (context, TableChunk.Empty, false);
         }
 

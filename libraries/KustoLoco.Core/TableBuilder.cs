@@ -37,8 +37,8 @@ public class TableBuilder
     private TableBuilder(string name, IEnumerable<BaseColumn> columns,
         IEnumerable<string> columnNames, int length)
     {
-        _columns = columns.ToImmutableArray();
-        _columnNames = columnNames.ToImmutableArray();
+        _columns = [..columns];
+        _columnNames = [..columnNames];
         Length = length;
         Name = name;
     }

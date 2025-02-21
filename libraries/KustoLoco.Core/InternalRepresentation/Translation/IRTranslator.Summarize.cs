@@ -13,7 +13,7 @@ internal partial class IRTranslator
 {
     public override IRNode VisitSummarizeOperator(SummarizeOperator node)
     {
-        List<IRExpressionNode> byColumns = new();
+        List<IRExpressionNode> byColumns = [];
         if (node.ByClause != null)
         {
             var byExpressionsCount = node.ByClause.Expressions.Count;

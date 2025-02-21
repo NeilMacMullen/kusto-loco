@@ -188,13 +188,13 @@ public static class ColumnHelpers
     {
         //TODO - packing the offset and length into a mapping array is just a bit of 
         //a hack to make the internal API easier
-        return MapColumn(new[] { other }, new[] { offset, length }.ToImmutableArray(),
+        return MapColumn([other], [..new[] { offset, length }],
             MappingType.Chunk);
     }
 
     public static BaseColumn MapColumn(BaseColumn other, ImmutableArray<int> mapping)
     {
-        return MapColumn(new[] { other }, mapping, MappingType.Arbitrary);
+        return MapColumn([other], mapping, MappingType.Arbitrary);
     }
 
     public static BaseColumn ReassembleInOrder(BaseColumn[] others)

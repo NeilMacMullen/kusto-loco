@@ -7,7 +7,7 @@ public class BlockInterpolator
 {
 
 
-    private readonly List<KustoSettingsProvider> _settingsStack = new List<KustoSettingsProvider>();
+    private readonly List<KustoSettingsProvider> _settingsStack = [];
     public BlockInterpolator(KustoSettingsProvider coreSettings)
     {
         _settingsStack.Add(coreSettings);
@@ -24,7 +24,9 @@ public class BlockInterpolator
 
     public string Interpolate(string query)
     {
-        string rep(Match m)
+        return Regex.Replace(query, @"\$?\$(\(?)([a-zA-Z0-9_\.]+)(\)?)", ReplaceVar);
+
+        string ReplaceVar(Match m)
         {
             var fullMatch =m.Value;
             if(fullMatch.StartsWith("$$"))
@@ -43,7 +45,5 @@ public class BlockInterpolator
             }
             return fullMatch;
         }
-
-        return Regex.Replace(query, @"\$?\$(\(?)([a-zA-Z0-9_\.]+)(\)?)", rep);
     }
 }

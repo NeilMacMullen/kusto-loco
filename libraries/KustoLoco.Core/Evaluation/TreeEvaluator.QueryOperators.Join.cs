@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using KustoLoco.Core.Extensions;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -55,21 +54,19 @@ internal partial class TreeEvaluator
             var rightContext = new EvaluationContext(_context.Scope);
             var rightResult = _rightExpression.Accept(_owner, rightContext);
             if (rightResult == EvaluationResult.Null || !rightResult.IsTabular)
-            {
                 throw new InvalidOperationException(
                     $"Expected right expression to produce tabular result, got {SchemaDisplay.GetText(rightResult.Type)}");
-            }
 
             var rightTabularResult = (TabularResult)rightResult;
             var right = rightTabularResult.Value;
 
-            var leftBuckets = Bucketize(_left, isLeft: true);
-            var rightBuckets = Bucketize(right, isLeft: false);
+            var leftBuckets = Bucketize(_left, true);
+            var rightBuckets = Bucketize(right, false);
 
             return _joinKind switch
             {
-                IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, dedupeLeft: true),
-                IRJoinKind.Inner => InnerJoin(leftBuckets, rightBuckets, dedupeLeft: false),
+                IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, true),
+                IRJoinKind.Inner => InnerJoin(leftBuckets, rightBuckets, false),
                 IRJoinKind.LeftOuter => LeftOuterJoin(leftBuckets, rightBuckets),
                 IRJoinKind.RightOuter => RightOuterJoin(leftBuckets, rightBuckets),
                 IRJoinKind.FullOuter => FullOuterJoin(leftBuckets, rightBuckets),
@@ -81,8 +78,10 @@ internal partial class TreeEvaluator
             };
         }
 
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
+        public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
+        {
             throw new NotSupportedException();
+        }
 
         private BucketedRows Bucketize(ITableSource table, bool isLeft)
         {
@@ -115,20 +114,15 @@ internal partial class TreeEvaluator
                     var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
-                        bucket = new NpmJoinSet(OnValues: onValues,
-                            Data: new BaseColumnBuilder[numColumns]);
+                        bucket = new NpmJoinSet(onValues,
+                            new BaseColumnBuilder[numColumns]);
                         for (var j = 0; j < numColumns; j++)
-                        {
                             bucket.Data[j] = ColumnHelpers.CreateBuilder(chunk.Columns[j].Type);
-                        }
 
                         result.Buckets.Add(key, bucket);
                     }
 
-                    for (var j = 0; j < numColumns; j++)
-                    {
-                        bucket.Data[j].Add(chunk.Columns[j].GetRawDataValue(i));
-                    }
+                    for (var j = 0; j < numColumns; j++) bucket.Data[j].Add(chunk.Columns[j].GetRawDataValue(i));
                 }
             }
 
@@ -147,14 +141,10 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in left.Buckets)
             {
@@ -166,20 +156,18 @@ internal partial class TreeEvaluator
                     var numRightRows = rightValue.Data[0].RowCount;
 
                     for (var i = 0; i < numLeftRows; i++)
+                    for (var j = 0; j < numRightRows; j++)
                     {
-                        for (var j = 0; j < numRightRows; j++)
+                        for (var c = 0; c < numLeftColumns; c++)
                         {
-                            for (var c = 0; c < numLeftColumns; c++)
-                            {
-                                var leftCol = kvp.Value.Data[c];
-                                resultColumns[c].Add(leftCol[i]);
-                            }
+                            var leftCol = kvp.Value.Data[c];
+                            resultColumns[c].Add(leftCol[i]);
+                        }
 
-                            for (var c = 0; c < numRightColumns; c++)
-                            {
-                                var rightCol = rightValue.Data[c];
-                                resultColumns[numLeftColumns + c].Add(rightCol[j]);
-                            }
+                        for (var c = 0; c < numRightColumns; c++)
+                        {
+                            var rightCol = rightValue.Data[c];
+                            resultColumns[numLeftColumns + c].Add(rightCol[j]);
                         }
                     }
                 }
@@ -189,7 +177,7 @@ internal partial class TreeEvaluator
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
@@ -197,27 +185,20 @@ internal partial class TreeEvaluator
             var numLeftColumns = left.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in right.Buckets)
-            {
                 if (left.Buckets.TryGetValue(kvp.Key, out var leftValue))
                 {
                     Debug.Assert(numLeftColumns == leftValue.Data.Length);
-                    for (var i = 0; i < numLeftColumns; i++)
-                    {
-                        resultColumns[i].AddRange(leftValue.Data[i]);
-                    }
+                    for (var i = 0; i < numLeftColumns; i++) resultColumns[i].AddRange(leftValue.Data[i]);
                 }
-            }
 
             var columns = resultColumns
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
@@ -225,27 +206,20 @@ internal partial class TreeEvaluator
             var numLeftColumns = left.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in left.Buckets)
-            {
                 if (!right.Buckets.ContainsKey(kvp.Key))
                 {
                     Debug.Assert(numLeftColumns == kvp.Value.Data.Length);
-                    for (var i = 0; i < numLeftColumns; i++)
-                    {
-                        resultColumns[i].AddRange(kvp.Value.Data[i]);
-                    }
+                    for (var i = 0; i < numLeftColumns; i++) resultColumns[i].AddRange(kvp.Value.Data[i]);
                 }
-            }
 
             var columns = resultColumns
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
@@ -254,14 +228,10 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in left.Buckets)
             {
@@ -274,20 +244,18 @@ internal partial class TreeEvaluator
                     var numRightRows = rightValue.Data[0].RowCount;
 
                     for (var i = 0; i < numLeftRows; i++)
+                    for (var j = 0; j < numRightRows; j++)
                     {
-                        for (var j = 0; j < numRightRows; j++)
+                        for (var c = 0; c < numLeftColumns; c++)
                         {
-                            for (var c = 0; c < numLeftColumns; c++)
-                            {
-                                var leftCol = kvp.Value.Data[c];
-                                resultColumns[c].Add(leftCol[i]);
-                            }
+                            var leftCol = kvp.Value.Data[c];
+                            resultColumns[c].Add(leftCol[i]);
+                        }
 
-                            for (var c = 0; c < numRightColumns; c++)
-                            {
-                                var rightCol = rightValue.Data[c];
-                                resultColumns[numLeftColumns + c].Add(rightCol[j]);
-                            }
+                        for (var c = 0; c < numRightColumns; c++)
+                        {
+                            var rightCol = rightValue.Data[c];
+                            resultColumns[numLeftColumns + c].Add(rightCol[j]);
                         }
                     }
                 }
@@ -301,10 +269,7 @@ internal partial class TreeEvaluator
                             resultColumns[c].Add(leftCol[i]);
                         }
 
-                        for (var c = 0; c < numRightColumns; c++)
-                        {
-                            resultColumns[numLeftColumns + c].Add(null);
-                        }
+                        for (var c = 0; c < numRightColumns; c++) resultColumns[numLeftColumns + c].Add(null);
                     }
                 }
             }
@@ -313,7 +278,7 @@ internal partial class TreeEvaluator
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
@@ -321,27 +286,20 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numRightColumns];
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in left.Buckets)
-            {
                 if (right.Buckets.TryGetValue(kvp.Key, out var rightValue))
                 {
                     Debug.Assert(numRightColumns == rightValue.Data.Length);
-                    for (var i = 0; i < numRightColumns; i++)
-                    {
-                        resultColumns[i].AddRange(rightValue.Data[i]);
-                    }
+                    for (var i = 0; i < numRightColumns; i++) resultColumns[i].AddRange(rightValue.Data[i]);
                 }
-            }
 
             var columns = resultColumns
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
@@ -349,27 +307,20 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numRightColumns];
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in right.Buckets)
-            {
                 if (!left.Buckets.ContainsKey(kvp.Key))
                 {
                     Debug.Assert(numRightColumns == kvp.Value.Data.Length);
-                    for (var i = 0; i < numRightColumns; i++)
-                    {
-                        resultColumns[i].AddRange(kvp.Value.Data[i]);
-                    }
+                    for (var i = 0; i < numRightColumns; i++) resultColumns[i].AddRange(kvp.Value.Data[i]);
                 }
-            }
 
             var columns = resultColumns
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> RightOuterJoin(BucketedRows left, BucketedRows right)
@@ -378,14 +329,10 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in right.Buckets)
             {
@@ -398,20 +345,18 @@ internal partial class TreeEvaluator
                     var numLeftRows = leftValue.Data[0].RowCount;
 
                     for (var i = 0; i < numLeftRows; i++)
+                    for (var j = 0; j < numRightRows; j++)
                     {
-                        for (var j = 0; j < numRightRows; j++)
+                        for (var c = 0; c < numLeftColumns; c++)
                         {
-                            for (var c = 0; c < numLeftColumns; c++)
-                            {
-                                var leftCol = leftValue.Data[c];
-                                resultColumns[c].Add(leftCol[i]);
-                            }
+                            var leftCol = leftValue.Data[c];
+                            resultColumns[c].Add(leftCol[i]);
+                        }
 
-                            for (var c = 0; c < numRightColumns; c++)
-                            {
-                                var rightCol = kvp.Value.Data[c];
-                                resultColumns[numLeftColumns + c].Add(rightCol[j]);
-                            }
+                        for (var c = 0; c < numRightColumns; c++)
+                        {
+                            var rightCol = kvp.Value.Data[c];
+                            resultColumns[numLeftColumns + c].Add(rightCol[j]);
                         }
                     }
                 }
@@ -419,10 +364,7 @@ internal partial class TreeEvaluator
                 {
                     for (var i = 0; i < numRightRows; i++)
                     {
-                        for (var c = 0; c < numLeftColumns; c++)
-                        {
-                            resultColumns[c].Add(null);
-                        }
+                        for (var c = 0; c < numLeftColumns; c++) resultColumns[c].Add(null);
 
                         for (var c = 0; c < numRightColumns; c++)
                         {
@@ -437,7 +379,7 @@ internal partial class TreeEvaluator
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private IEnumerable<ITableChunk> FullOuterJoin(BucketedRows left, BucketedRows right)
@@ -446,14 +388,10 @@ internal partial class TreeEvaluator
             var numRightColumns = right.Table.Type.Columns.Count;
             var resultColumns = new BaseColumnBuilder[numLeftColumns + numRightColumns];
             for (var i = 0; i < numLeftColumns; i++)
-            {
                 resultColumns[i] = ColumnHelpers.CreateBuilder(left.Table.Type.Columns[i].Type);
-            }
 
             for (var i = 0; i < numRightColumns; i++)
-            {
                 resultColumns[numLeftColumns + i] = ColumnHelpers.CreateBuilder(right.Table.Type.Columns[i].Type);
-            }
 
             foreach (var kvp in left.Buckets)
             {
@@ -466,20 +404,18 @@ internal partial class TreeEvaluator
                     var numRightRows = rightValue.Data[0].RowCount;
 
                     for (var i = 0; i < numLeftRows; i++)
+                    for (var j = 0; j < numRightRows; j++)
                     {
-                        for (var j = 0; j < numRightRows; j++)
+                        for (var c = 0; c < numLeftColumns; c++)
                         {
-                            for (var c = 0; c < numLeftColumns; c++)
-                            {
-                                var leftCol = kvp.Value.Data[c];
-                                resultColumns[c].Add(leftCol[i]);
-                            }
+                            var leftCol = kvp.Value.Data[c];
+                            resultColumns[c].Add(leftCol[i]);
+                        }
 
-                            for (var c = 0; c < numRightColumns; c++)
-                            {
-                                var rightCol = rightValue.Data[c];
-                                resultColumns[numLeftColumns + c].Add(rightCol[j]);
-                            }
+                        for (var c = 0; c < numRightColumns; c++)
+                        {
+                            var rightCol = rightValue.Data[c];
+                            resultColumns[numLeftColumns + c].Add(rightCol[j]);
                         }
                     }
                 }
@@ -493,10 +429,7 @@ internal partial class TreeEvaluator
                             resultColumns[c].Add(leftCol[i]);
                         }
 
-                        for (var c = 0; c < numRightColumns; c++)
-                        {
-                            resultColumns[numLeftColumns + c].Add(null);
-                        }
+                        for (var c = 0; c < numRightColumns; c++) resultColumns[numLeftColumns + c].Add(null);
                     }
                 }
             }
@@ -506,13 +439,9 @@ internal partial class TreeEvaluator
                 var numRightRows = kvp.Value.Data[0].RowCount;
 
                 if (!left.Buckets.TryGetValue(kvp.Key, out var leftValue))
-                {
                     for (var i = 0; i < numRightRows; i++)
                     {
-                        for (var c = 0; c < numLeftColumns; c++)
-                        {
-                            resultColumns[c].Add(null);
-                        }
+                        for (var c = 0; c < numLeftColumns; c++) resultColumns[c].Add(null);
 
                         for (var c = 0; c < numRightColumns; c++)
                         {
@@ -520,19 +449,21 @@ internal partial class TreeEvaluator
                             resultColumns[numLeftColumns + c].Add(rightCol[i]);
                         }
                     }
-                }
             }
 
             var columns = resultColumns
                 .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
-            return new[] { chunk };
+            return [chunk];
         }
 
         private class BucketedRows
         {
-            public BucketedRows(ITableSource table) => Table = table;
+            public BucketedRows(ITableSource table)
+            {
+                Table = table;
+            }
 
             public ITableSource Table { get; }
             public Dictionary<SummaryKey, NpmJoinSet> Buckets { get; } = new();

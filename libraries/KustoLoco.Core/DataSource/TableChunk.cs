@@ -10,7 +10,7 @@ namespace KustoLoco.Core.DataSource;
 
 public class TableChunk : ITableChunk
 {
-    public static readonly TableChunk Empty = new(NullTableSource.Instance, Array.Empty<BaseColumn>());
+    public static readonly TableChunk Empty = new(NullTableSource.Instance, []);
 
     public TableChunk(ITableSource table, BaseColumn[] columns)
     {
