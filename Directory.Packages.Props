@@ -5,6 +5,7 @@
   <ItemGroup>
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
     <PackageVersion Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageVersion Include="AwesomeAssertions" Version="8.0.1" />
     <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <PackageVersion Include="Azure.Monitor.Query" Version="1.6.0" />
@@ -48,7 +49,7 @@
     <PackageVersion Include="System.Text.Json" Version="9.0.2" />
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
     <PackageVersion Include="geohash-dotnet" Version="2.2.0" />
-    <PackageVersion Include="FluentAssertions" Version="8.0.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.1.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
