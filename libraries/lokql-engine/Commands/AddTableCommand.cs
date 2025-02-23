@@ -6,7 +6,7 @@ namespace Lokql.Engine.Commands;
 /// <summary>
 ///     quickly import inline data
 /// </summary>
-public static class CsvDataCommand
+public static class AddTableCommand
 {
     internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
@@ -40,16 +40,23 @@ public static class CsvDataCommand
         return Task.CompletedTask;
     }
 
-    [Verb("csvdata",
-        HelpText = @"loads data from csv-formatted inline text
+    [Verb("addtable",aliases:["csvdata"],
+        HelpText = @"loads data from formatted inline text and adds a table
+The first line is assumed to be the header row.  Separators are inferred from
+the first row and items are trimmed by default
 Examples:
-  .csvdata ages
-  Name,Age
-  Alice,30
-  Bob,28")]
+  .addtable ages
+  Name   | Age
+  Alice  | 30
+  Bob    | 28
+
+The table name is optional and defaults to 'data' if not provided.
+"
+
+        )]
     internal class Options
     {
-        [Value(0, HelpText = "Name of table (defaults to 'csvdata')")]
-        public string As { get; set; } = "csvdata";
+        [Value(0, HelpText = "Name of table (defaults to 'data')")]
+        public string As { get; set; } = "data";
     }
 }

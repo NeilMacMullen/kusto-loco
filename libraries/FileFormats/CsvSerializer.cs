@@ -48,13 +48,17 @@ public class CsvSerializer : ITableSerializer
             config = config with { Delimiter = separator };
         else config = config with { DetectDelimiter = true };
 
+
+        var isTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
+
         var csv = new CsvReader(reader, config);
 
         if (!inferColumnNames)
         {
             csv.Read();
             csv.ReadHeader();
-            keys = csv.Context.Reader?.HeaderRecord;
+            keys = csv.Context.Reader?.HeaderRecord.Select(TrimIfRequired)
+                .ToArray(); ;
             builders = keys
                 .Select(_ => new ColumnBuilder<string>())
                 .ToArray();
@@ -63,6 +67,7 @@ public class CsvSerializer : ITableSerializer
         var rowCount = 0;
         while (csv.Read())
         {
+            //handle the case where we don't have a header row
             if (!builders.Any())
             {
                 keys = Enumerable.Range(0, csv.ColumnCount).Select(c => $"Column{c}").ToArray();
@@ -71,12 +76,6 @@ public class CsvSerializer : ITableSerializer
                     .ToArray();
             }
 
-            var isTrimRequired = _settings.GetBool(CsvSerializerSettings.TrimCells);
-
-            string TrimIfRequired(string s)
-            {
-                return isTrimRequired ? s.Trim() : s;
-            }
 
             for (var i = 0; i < builders.Length; i++) builders[i].Add(TrimIfRequired(csv.GetField<string>(i)));
 
@@ -94,6 +93,11 @@ public class CsvSerializer : ITableSerializer
         if (!_settings.GetBool(CsvSerializerSettings.SkipTypeInference))
             tableSource = TableBuilder.AutoInferColumnTypes(tableSource, _console);
         return Task.FromResult(TableLoadResult.Success(tableSource));
+
+        string TrimIfRequired(string s)
+        {
+            return isTrimRequired ? s.Trim() : s;
+        }
     }
 
 
