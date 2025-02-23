@@ -29,7 +29,7 @@ public class CommandProcessor
                 .WithAdditionalCommand<PushCommand.Options>(PushCommand.RunAsync)
                 .WithAdditionalCommand<PullCommand.Options>(PullCommand.RunAsync)
                 .WithAdditionalCommand<ResultsCommand.Options>(ResultsCommand.RunAsync)
-                .WithAdditionalCommand<CsvDataCommand.Options>(CsvDataCommand.RunAsync)
+                .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
                 .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
                 .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
