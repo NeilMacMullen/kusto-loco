@@ -21,10 +21,13 @@
       <RowDefinition Height="150"/>
       <RowDefinition />
     </Grid.RowDefinitions>
-    <TextBox Grid.Row="0" Name="QueryEntry" AcceptsReturn="True" FontFamily="Consolas" FontSize="16"/>
+    
+    <ui:TextBox Grid.Row="0" Text="{Binding ViewModel.Query}" AcceptsReturn="True" FontFamily="Consolas" FontSize="16"/>
+    
     <DockPanel Grid.Row="1">
-      <Button DockPanel.Dock="Bottom" Click="OnRunButtonClicked" Content="Run" Width="100" HorizontalAlignment="Right" />
-      <DataGrid DockPanel.Dock="Top" Name="ResultDataGrid" />
+      <ui:Button DockPanel.Dock="Bottom" Command="{Binding ViewModel.RunCommand}" Icon="{ui:SymbolIcon Symbol=Checkmark24}"
+                 ToolTip="Run" Width="100" HorizontalAlignment="Right" />
+      <ui:DataGrid ItemsSource="{Binding ViewModel.ResultData}"/>
 
     </DockPanel>
 
