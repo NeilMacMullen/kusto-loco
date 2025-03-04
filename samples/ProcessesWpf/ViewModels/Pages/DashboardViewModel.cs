@@ -14,7 +14,6 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     private ObservableCollection<Object> _resultData = [];
 
-
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
     public Task OnNavigatedToAsync() => Task.CompletedTask;
 
