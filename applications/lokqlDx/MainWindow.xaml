@@ -136,7 +136,9 @@
                       AlternatingRowBackground="DarkBlue"
                       IsReadOnly="True"
                       ClipboardCopyMode="ExcludeHeader"
-                      SelectionUnit="Cell">
+                      SelectionUnit="Cell"
+                      AutoGeneratingColumn="OnAutoGeneratingColumn"
+                      >
 
               <DataGrid.Resources>
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"
