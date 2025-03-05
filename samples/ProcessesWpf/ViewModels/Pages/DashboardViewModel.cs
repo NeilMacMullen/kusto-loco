@@ -37,6 +37,7 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
         var result = await context.RunQuery(query);
 
         //render results
+        ResultData.Clear();
         foreach(var item in result.ToDataTableOrError().DefaultView)
         {
             ResultData.Add(item);
