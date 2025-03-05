@@ -585,4 +585,21 @@ public partial class MainWindow : Window
     {
         await NavigateToLanding();
     }
+
+    private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+
+      
+        if (e.PropertyType == typeof(System.DateTime))
+        {
+            if (e.Column is DataGridTextColumn textColumn)
+            {
+                var fmt = _explorer.Settings.GetOr("datagrid.datetime_format", "dd MMM yyyy HH:mm");
+                textColumn.Binding.StringFormat = fmt;
+            }
+           
+        }
+
+
+    }
 }
