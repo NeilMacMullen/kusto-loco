@@ -22,10 +22,11 @@
       <RowDefinition />
     </Grid.RowDefinitions>
     
-    <ui:TextBox Grid.Row="0" Text="{Binding ViewModel.Query}" AcceptsReturn="True" FontFamily="Consolas" FontSize="16"/>
+    <ui:TextBox Grid.Row="0" Text="{Binding ViewModel.Query}" AcceptsReturn="True" FontFamily="Consolas" FontSize="16"
+                />
     
     <DockPanel Grid.Row="1">
-      <ui:Button DockPanel.Dock="Bottom" Command="{Binding ViewModel.RunCommand}" Icon="{ui:SymbolIcon Symbol=Checkmark24}"
+      <ui:Button DockPanel.Dock="Top" Command="{Binding ViewModel.RunCommand}" Content="Run"
                  ToolTip="Run" Width="100" HorizontalAlignment="Right" />
       <ui:DataGrid ItemsSource="{Binding ViewModel.ResultData}"/>
 
