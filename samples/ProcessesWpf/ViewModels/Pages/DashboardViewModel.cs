@@ -1,21 +1,28 @@
-﻿using KustoLoco.Core;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Data;
+using KustoLoco.Core;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace ProcessesWpf.ViewModels.Pages;
 
 public partial class DashboardViewModel : ObservableObject, INavigationAware
 {
-    [ObservableProperty]
-    private string _query = string.Empty;
-    [ObservableProperty]
-    private ObservableCollection<Object> _resultData = [];
+    [ObservableProperty] private string _query = @"processes
+| summarize TotalThreads=sum(NumThreads) by Name
+| order by TotalThreads";
 
-    public Task OnNavigatedFromAsync() => Task.CompletedTask;
-    public Task OnNavigatedToAsync() => Task.CompletedTask;
+    [ObservableProperty] private ObservableCollection<object> _resultData = [];
+
+    public Task OnNavigatedFromAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavigatedToAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     [RelayCommand]
     private async Task RunAsync()
@@ -24,10 +31,10 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
         var context = new KustoQueryContext();
 
         var processes = Process.GetProcesses()
-            .Select(p => new ProcessInfo(Pid: p.Id,
-                                         Name: p.ProcessName,
-                                         NumThreads: p.Threads.Count,
-                                         WorkingSet: p.WorkingSet64))
+            .Select(p => new ProcessInfo(p.Id,
+                p.ProcessName,
+                p.Threads.Count,
+                p.WorkingSet64))
             .ToImmutableArray();
 
         context.WrapDataIntoTable("processes", processes);
@@ -38,9 +45,6 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
 
         //render results
         ResultData.Clear();
-        foreach(var item in result.ToDataTableOrError().DefaultView)
-        {
-            ResultData.Add(item);
-        }
+        foreach (var item in result.ToDataTableOrError().DefaultView) ResultData.Add(item);
     }
 }
