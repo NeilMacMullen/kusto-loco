@@ -14,6 +14,8 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Search;
+using Intellisense;
+using Intellisense.FileSystem;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
@@ -32,6 +34,8 @@ public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
+    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
+    private readonly FileIoCommandParser _fileIoCommandParser = new();
 
     private CompletionWindow? _completionWindow;
 
@@ -233,11 +237,35 @@ public partial class QueryEditor : UserControl
         _completionWindow.Closed += delegate { _completionWindow = null; };
     }
 
+    private bool ShowPathCompletions()
+    {
+        if (_completionWindow is not null)
+        {
+            return false;
+        }
+        if (_fileIoCommandParser.Parse(_editorHelper.GetCurrentLineText()) is { } path)
+        {
+            var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+            if (result.Entries.ToList() is { Count: > 0 } entries)
+            {
+                result = result with { Entries = entries };
+                ShowCompletions(result.Entries, result.Prefix, result.Rewind);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
     {
         if (_completionWindow != null && !_completionWindow.CompletionList.ListBox.HasItems)
         {
             _completionWindow.Close();
+            return;
+        }
+
+        if (ShowPathCompletions())
+        {
             return;
         }
 
@@ -364,6 +392,11 @@ public class EditorHelper(TextEditor query)
         return GetText(Query.Document.GetLineByNumber(line));
     }
 
+    public string GetCurrentLineText()
+    {
+        return TextInLine(LineAtCaret().LineNumber);
+    }
+
     public DocumentLine LineAtCaret()
     {
         return Query.Document.GetLineByOffset(Query.CaretOffset);
@@ -375,8 +408,6 @@ public class EditorHelper(TextEditor query)
         return Query.Document.GetText(line.Offset, Query.CaretOffset - line.Offset);
     }
 }
-
-public readonly record struct IntellisenseEntry(string Name, string Description, string Syntax);
 
 public class SchemaIntellisenseProvider
 {

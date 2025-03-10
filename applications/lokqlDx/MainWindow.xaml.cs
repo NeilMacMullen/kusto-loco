@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using Intellisense;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
@@ -103,7 +104,7 @@ public partial class MainWindow : Window
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
-           
+
             dataGrid.ItemsSource = null;
             await NavigateToLanding();
         }
@@ -592,7 +593,7 @@ public partial class MainWindow : Window
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
 
-      
+
         if (e.PropertyType == typeof(System.DateTime))
         {
             if (e.Column is DataGridTextColumn textColumn)
@@ -600,7 +601,7 @@ public partial class MainWindow : Window
                 var fmt = _explorer.Settings.GetOr("datagrid.datetime_format", "dd MMM yyyy HH:mm");
                 textColumn.Binding.StringFormat = fmt;
             }
-           
+
         }
 
 
