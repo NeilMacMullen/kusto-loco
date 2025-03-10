@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -96,7 +97,9 @@ public partial class MainWindow : Window
     /// </remarks>
     private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
     {
-        Title = $"LokqlDX - {_workspaceManager.Path.OrWhenBlank("new workspace")}";
+        var version = Assembly.GetEntryAssembly()!.GetName().Version!;
+        Title = _workspaceManager.Path.IsBlank() ? $"LokqlDX {version.Major}.{version.Minor}.{version.Build} - new workspace"
+            : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
