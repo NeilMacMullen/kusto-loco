@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <SyntaxDefinition name="KQL"
                   xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-	<Color name="Comment" foreground="#b6ea8b" />
+	<Color name="Comment" foreground="#95ffa4" />
 	<Color name="String" foreground="#ce9178" />
-	<Color name="ScriptComment" foreground="Blue" />
+	<Color name="ScriptComment" foreground="#95ffa4" />
 	<Color name="InternalCommand" foreground="#b65fff" />
 
 	<!-- This is the main ruleset. -->
