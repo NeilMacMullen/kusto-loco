@@ -11,7 +11,7 @@ public record CompletionResult
     /// </summary>
     public IReadOnlyList<IntellisenseEntry> Entries { get; init; } = ImmutableArray<IntellisenseEntry>.Empty;
     /// <summary>
-    /// The text filter to be applied to the completion entries.
+    /// An initial text filter that should be applied to the completion entries by an external processor to show the initial list of filtered entries.
     /// </summary>
     public string Filter { get; init; } = string.Empty;
 }

@@ -1,5 +1,8 @@
 ﻿namespace Intellisense.FileSystem;
 
+/// <summary>
+/// Guarantees that the path either starts with a directory separator (i.e. /) or a drive letter followed by a volume separator (i.e. C:).
+/// </summary>
 internal readonly record struct RootedPath
 {
     public string Value { get; }

@@ -41,6 +41,7 @@ internal static class PathExtensions
 
     public static string? GetNonEmptyFileName(this string path)
     {
+        // Note that directories ending in a separator would have an empty file name.
         var res = Path.GetFileName(path);
         if (string.IsNullOrEmpty(res))
         {

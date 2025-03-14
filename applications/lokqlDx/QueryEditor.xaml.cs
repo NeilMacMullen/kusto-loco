@@ -242,6 +242,7 @@ public partial class QueryEditor : UserControl
 
     private bool ShowPathCompletions()
     {
+        // Avoid unnecessary IO calls
         if (_completionWindow is not null)
         {
             return false;
