@@ -509,7 +509,10 @@ public class FileIoCommandParser
             return null;
         }
 
-        if (args[0] is not (".save" or ".load"))
+        var isIoCommand = args[0].Equals(".save", StringComparison.OrdinalIgnoreCase) ||
+                          args[0].Equals(".load", StringComparison.OrdinalIgnoreCase);
+
+        if (!isIoCommand)
         {
             return null;
         }
