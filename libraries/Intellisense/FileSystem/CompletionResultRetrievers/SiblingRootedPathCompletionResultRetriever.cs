@@ -13,6 +13,6 @@ internal class SiblingRootedPathCompletionResultRetriever(IFileSystemReader read
 
     public bool CanHandle(RootedPath rootedPath)
     {
-        return !rootedPath.IsRootDirectory() && !rootedPath.Value.EndsWithDirectorySeparator();
+        return ParentChildPathPair.Create(rootedPath.Value) is not null;
     }
 }

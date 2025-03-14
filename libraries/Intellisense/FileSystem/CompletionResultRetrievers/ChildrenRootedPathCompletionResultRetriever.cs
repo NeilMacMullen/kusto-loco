@@ -12,6 +12,6 @@ internal class ChildrenRootedPathCompletionResultRetriever(IFileSystemReader rea
 
     public bool CanHandle(RootedPath rootedPath)
     {
-        return !rootedPath.IsRootDirectory() && rootedPath.Value.EndsWithDirectorySeparator();
+        return rootedPath.Value.EndsWithDirectorySeparator() && rootedPath.Value.GetNonEmptyParentDirectory() is not null;
     }
 }

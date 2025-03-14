@@ -226,6 +226,29 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File5.txt", "Folder3");
         result.Filter.Should().BeEmpty();
     }
+
+    [Theory]
+    [InlineData("//")]
+    [InlineData(@"\\")]
+    [InlineData("/:")]
+    [InlineData("/.")]
+    [InlineData("/a/b")]
+    [InlineData("C://")]
+    [InlineData("C:/a")]
+    public void GetPathIntellisenseOptions_UnusualPaths_ShouldNotThrow(string path)
+    {
+        var data = new Dictionary<string, MockFileData>
+        {
+            ["C:/Folder1/File1.txt"] = new("")
+        };
+
+        var f = new FileSystemIntellisenseServiceTestFixture(data);
+
+        f
+            .Invoking(x => x.GetPathIntellisenseOptions(path))
+            .Should()
+            .NotThrow();
+    }
 }
 
 file class FileSystemIntellisenseServiceTestFixture
