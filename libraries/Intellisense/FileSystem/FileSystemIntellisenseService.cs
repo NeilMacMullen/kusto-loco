@@ -7,29 +7,32 @@ public interface IFileSystemIntellisenseService
     CompletionResult GetPathIntellisenseOptions(string path);
 }
 
-internal class FileSystemIntellisenseService(IFileSystemReader reader)
-    : IFileSystemIntellisenseService
+internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
 {
-    private readonly IRootedPathCompletionResultRetriever[] _retrievers =
-    [
-        new RootChildrenRootedPathCompletionResultRetriever(reader),
-        new ChildrenRootedPathCompletionResultRetriever(reader),
-        new SiblingRootedPathCompletionResultRetriever(reader)
-    ];
+    private readonly IPathCompletionResultRetriever[] _retrievers;
+
+    public FileSystemIntellisenseService(IFileSystemReader reader)
+    {
+        IRootedPathCompletionResultRetriever[] rootedPathRetrievers =
+        [
+            new RootChildrenRootedPathCompletionResultRetriever(reader),
+            new ChildrenRootedPathCompletionResultRetriever(reader),
+            new SiblingRootedPathCompletionResultRetriever(reader)
+        ];
+
+        _retrievers =
+        [
+            new RootedPathCompletionResultRetriever(rootedPathRetrievers)
+        ];
+    }
 
     public CompletionResult GetPathIntellisenseOptions(string path)
     {
-        if (RootedPath.Create(path) is not { } rootedPath)
-        {
-            return CompletionResult.Empty;
-        }
         try
         {
-            if (_retrievers.FirstOrDefault(x => x.CanHandle(rootedPath)) is not { } retriever)
-            {
-                return CompletionResult.Empty;
-            }
-            return retriever.GetCompletionResult(rootedPath);
+            return _retrievers
+                .Select(x => x.GetCompletionResult(path))
+                .FirstOrDefault(x => x is not null) ?? CompletionResult.Empty;
         }
         catch (IOException e)
         {

@@ -3,13 +3,12 @@
 internal class RootChildrenRootedPathCompletionResultRetriever(IFileSystemReader reader)
     : IRootedPathCompletionResultRetriever
 {
-    public CompletionResult GetCompletionResult(RootedPath rootedPath)
+    public CompletionResult? GetCompletionResult(RootedPath rootedPath)
     {
+        if (!rootedPath.IsRootDirectory())
+        {
+            return null;
+        }
         return reader.GetChildren(rootedPath.Value).ToCompletionResult();
-    }
-
-    public bool CanHandle(RootedPath rootedPath)
-    {
-        return rootedPath.IsRootDirectory();
     }
 }

@@ -2,17 +2,15 @@
 
 internal class SiblingRootedPathCompletionResultRetriever(IFileSystemReader reader) : IRootedPathCompletionResultRetriever
 {
-    public CompletionResult GetCompletionResult(RootedPath rootedPath)
+    public CompletionResult? GetCompletionResult(RootedPath rootedPath)
     {
-        var pair = ParentChildPathPair.CreateOrThrow(rootedPath.Value);
+        if (ParentChildPathPair.Create(rootedPath.Value) is not { } pair)
+        {
+            return null;
+        }
 
         return reader
             .GetChildren(pair.ParentPath)
             .ToCompletionResult() with { Filter = pair.CurrentPath };
-    }
-
-    public bool CanHandle(RootedPath rootedPath)
-    {
-        return ParentChildPathPair.Create(rootedPath.Value) is not null;
     }
 }

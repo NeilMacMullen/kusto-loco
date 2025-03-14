@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -19,21 +18,21 @@ public class CompletionResultRetrieverTests
     [InlineData("D:/")]
     [InlineData("/")]
     [InlineData("\\")]
-    public void Root_CanHandle_Roots_ReturnsTrue(string path)
+    public void Root_GetCompletions_Roots_Handles(string path)
     {
         var retriever = new RootChildrenRootedPathCompletionResultRetriever(new MockReader());
 
-        retriever.CanHandle(RootedPath.CreateOrThrow(path)).Should().BeTrue();
+        retriever.GetCompletionResult(RootedPath.CreateOrThrow(path)).Should().NotBeNull();
     }
 
     [Theory]
     [InlineData("C:./")]
     [InlineData("C:.")]
-    public void Root_CanHandle_NotRoot_ReturnsFalse(string path)
+    public void Root_GetCompletions_NotRoot_DoesNotHandle(string path)
     {
         var retriever = new RootChildrenRootedPathCompletionResultRetriever(new MockReader());
 
-        retriever.CanHandle(RootedPath.CreateOrThrow(path)).Should().BeFalse();
+        retriever.GetCompletionResult(RootedPath.CreateOrThrow(path)).Should().BeNull();
     }
 
     [Theory]
@@ -54,6 +53,7 @@ public class CompletionResultRetrieverTests
 
         using var _ = new AssertionScope();
 
+        result.Should().NotBeNull();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("Folder11", "File11.txt");
         result.Filter.Should().BeEmpty();
     }
@@ -61,26 +61,22 @@ public class CompletionResultRetrieverTests
     [Theory]
     [InlineData("/Folder1/")]
     [InlineData("C:/Folder1/")]
-    public void Children_CanHandle_ChildDirectoryEndingInSep_ReturnsTrue(string path)
+    public void Children_GetCompletions_ChildDirectoryEndingInSep_Handles(string path)
     {
         var retriever = new ChildrenRootedPathCompletionResultRetriever(new MockReader());
 
-        var result = retriever.CanHandle(RootedPath.CreateOrThrow(path));
-
-        result.Should().BeTrue();
+        retriever.GetCompletionResult(RootedPath.CreateOrThrow(path)).Should().NotBeNull();
     }
 
     [Theory]
     [InlineData("/Folder1")]
     [InlineData("C:/Folder1")]
-    public void Sibling_CanHandle_PartialPath_ReturnsTrue( string path)
+    public void Sibling_GetCompletions_PartialPath_Handles( string path)
     {
 
         var retriever = new SiblingRootedPathCompletionResultRetriever(new MockReader());
 
-        var result = retriever.CanHandle(RootedPath.CreateOrThrow(path));
-
-        result.Should().BeTrue();
+        retriever.GetCompletionResult(RootedPath.CreateOrThrow(path)).Should().NotBeNull();
     }
 
     [Fact]
@@ -99,6 +95,7 @@ public class CompletionResultRetrieverTests
         var result = retriever.GetCompletionResult(RootedPath.CreateOrThrow("C:/Folder1"));
 
         using var _ = new AssertionScope();
+        result.Should().NotBeNull();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("Folder1","Folder2");
         result.Filter.Should().Be("Folder1");
     }
@@ -110,6 +107,6 @@ file class MockReader : IFileSystemReader
 
     public IEnumerable<IFileSystemInfo> GetChildren(string path)
     {
-        throw new NotImplementedException();
+        return [];
     }
 }

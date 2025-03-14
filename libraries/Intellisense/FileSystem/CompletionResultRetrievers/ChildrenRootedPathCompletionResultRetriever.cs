@@ -3,15 +3,14 @@
 internal class ChildrenRootedPathCompletionResultRetriever(IFileSystemReader reader)
     : IRootedPathCompletionResultRetriever
 {
-    public CompletionResult GetCompletionResult(RootedPath rootedPath)
+    public CompletionResult? GetCompletionResult(RootedPath rootedPath)
     {
+        if (!rootedPath.Value.EndsWithDirectorySeparator() || rootedPath.Value.GetNonEmptyParentDirectory() is not { } parentDir)
+        {
+            return null;
+        }
         return reader
-            .GetChildren(rootedPath.Value.GetNonEmptyParentDirectoryOrThrow())
+            .GetChildren(parentDir)
             .ToCompletionResult();
-    }
-
-    public bool CanHandle(RootedPath rootedPath)
-    {
-        return rootedPath.Value.EndsWithDirectorySeparator() && rootedPath.Value.GetNonEmptyParentDirectory() is not null;
     }
 }
