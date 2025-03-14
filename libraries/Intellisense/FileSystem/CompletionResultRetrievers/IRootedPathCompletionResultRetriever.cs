@@ -1,0 +1,3 @@
+﻿namespace Intellisense.FileSystem.CompletionResultRetrievers;
+
+internal interface IRootedPathCompletionResultRetriever : ICompletionResultRetriever<RootedPath>;
