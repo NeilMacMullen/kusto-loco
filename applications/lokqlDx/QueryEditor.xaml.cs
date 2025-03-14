@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.CommandLine.Parsing;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -441,5 +442,25 @@ public class SchemaIntellisenseProvider
     public void SetSchema(SchemaLine[] schema)
     {
         _schemaLines = schema;
+    }
+}
+
+public class FileIoCommandParser
+{
+    public string? GetLastArg(string lineText)
+    {
+        var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
+
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        if (args[0] is not (".save" or ".load"))
+        {
+            return null;
+        }
+
+        return args[^1];
     }
 }
