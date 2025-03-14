@@ -253,13 +253,13 @@ public partial class QueryEditor : UserControl
         }
 
         var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
-        if (result.Entries.ToArray() is not { Length: > 0 } entries)
+        if (result.Entries.Count <= 0)
         {
             return false;
         }
 
         ShowCompletions(
-            entries,
+            result.Entries,
             string.Empty,
             0,
             completionWindow =>

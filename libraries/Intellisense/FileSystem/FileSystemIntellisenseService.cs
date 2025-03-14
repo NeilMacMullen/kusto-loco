@@ -14,7 +14,7 @@ internal class FileSystemIntellisenseService(IFileSystemReader reader)
     [
         new RootChildrenRootedPathCompletionResultRetriever(reader),
         new ChildrenRootedPathCompletionResultRetriever(reader),
-        new SiblingRootedPathCompletionResultRetriever(reader),
+        new SiblingRootedPathCompletionResultRetriever(reader)
     ];
 
     public CompletionResult GetPathIntellisenseOptions(string path)
@@ -29,12 +29,7 @@ internal class FileSystemIntellisenseService(IFileSystemReader reader)
             {
                 return CompletionResult.Empty;
             }
-            var result = retriever.GetCompletionResult(rootedPath);
-
-            return result with
-            {
-                Entries = result.Entries.ToArray()
-            };
+            return retriever.GetCompletionResult(rootedPath);
         }
         catch (IOException e)
         {

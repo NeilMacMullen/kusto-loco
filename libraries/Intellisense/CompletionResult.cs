@@ -9,7 +9,7 @@ public record CompletionResult
     /// <summary>
     /// List of available completion entries.
     /// </summary>
-    public IEnumerable<IntellisenseEntry> Entries { get; init; } = ImmutableArray<IntellisenseEntry>.Empty;
+    public IReadOnlyList<IntellisenseEntry> Entries { get; init; } = ImmutableArray<IntellisenseEntry>.Empty;
     /// <summary>
     /// The text filter to be applied to the completion entries.
     /// </summary>
@@ -22,7 +22,7 @@ internal static class CompletionResultExtensions
     {
         return new CompletionResult
         {
-            Entries = files.Select(x => new IntellisenseEntry { Name = x.Name }),
+            Entries = files.Select(x => new IntellisenseEntry { Name = x.Name }).ToArray()
         };
     }
 }
