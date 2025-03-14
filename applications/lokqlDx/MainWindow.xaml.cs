@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using Intellisense;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;

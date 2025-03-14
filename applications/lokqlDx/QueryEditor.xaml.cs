@@ -14,6 +14,7 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Search;
+using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
@@ -375,8 +376,6 @@ public class EditorHelper(TextEditor query)
         return Query.Document.GetText(line.Offset, Query.CaretOffset - line.Offset);
     }
 }
-
-public readonly record struct IntellisenseEntry(string Name, string Description, string Syntax);
 
 public class SchemaIntellisenseProvider
 {
