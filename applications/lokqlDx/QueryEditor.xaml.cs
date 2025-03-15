@@ -262,11 +262,9 @@ public partial class QueryEditor : UserControl
         ShowCompletions(
             result.Entries,
             string.Empty,
-            0,
+            result.Filter.Length,
             completionWindow =>
             {
-                // since we could be starting in the middle of a path name, we need to adjust the start offset to account for the extant fragment of the name
-                completionWindow.StartOffset = Query.CaretOffset - result.Filter.Length;
                 // when editor loses focus mid-path and user resumes typing, it won't require a second keypress to select the relevant result
                 completionWindow.CompletionList.SelectItem(result.Filter);
                 if (!completionWindow.CompletionList.ListBox.HasItems)
