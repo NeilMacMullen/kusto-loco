@@ -41,7 +41,7 @@ internal readonly record struct RootedPath
 
         if (Value.Length is 2)
         {
-            return true;
+            return false;
         }
 
         return Value.Length is 3 && Value[2].IsDirectorySeparator();

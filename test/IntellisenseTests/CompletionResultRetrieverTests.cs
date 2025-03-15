@@ -28,6 +28,7 @@ public class CompletionResultRetrieverTests
     [Theory]
     [InlineData("C:./")]
     [InlineData("C:.")]
+    [InlineData("C:")]
     public void Root_GetCompletions_NotRoot_DoesNotHandle(string path)
     {
         var retriever = new RootChildrenRootedPathCompletionResultRetriever(new MockReader());
