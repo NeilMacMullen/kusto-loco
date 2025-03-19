@@ -67,6 +67,7 @@ public static class PivotRowsToColumnsCommand
 
         var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods.Values.ToList());
         exp.GetCurrentContext().AddTable(builder);
+        exp.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
     }
 
@@ -97,7 +98,7 @@ Usage:
         public string ResultName { get; set; } = string.Empty;
 
         [Option(Required=true,HelpText = "Name of table into which to project the result")]
-        public string As { get; set; } = string.Empty;
+        public string As { get; set; } = "pivoted";
 
         [Option(Required = true, HelpText = "Name column holding data values")]
         public string ValueFrom { get; set; } = string.Empty;
