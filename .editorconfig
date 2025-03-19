@@ -20,6 +20,8 @@ dotnet_diagnostic.CA1031.severity = none
 
 # UA0013: 'ApiController' does not exist
 dotnet_diagnostic.UA0013.severity = none
+# annoying warnign to use Length==0 instead of !.Any()
+dotnet_diagnostic.CA1860.severity = none
 
 [*.csproj]
 indent_style = space
