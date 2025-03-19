@@ -11,7 +11,6 @@ public static class PivotColumnsToRowsCommand
     {
         var exp = econtext.Explorer;
         var result = exp._resultHistory.Fetch(o.ResultName);
-        int GetColumnIndex(string name) => result.ColumnNames().IndexOf(name);
         var specialColumns = o.Columns.Select(GetColumnIndex).ToArray()!;
         var boringColumns = Enumerable.Range(0, result.ColumnCount).Except(specialColumns)
             .ToArray();
@@ -26,9 +25,11 @@ public static class PivotColumnsToRowsCommand
         {
             foreach(var i in specialColumns)
             {
-                var od = new OrderedDictionary();
-                od[o.ColumnNamesInto] = columns[i].Name;
-                od[o.ValuesInto] = row[i];
+                var od = new OrderedDictionary
+                {
+                    [o.ColumnNamesInto] = columns[i].Name,
+                    [o.ValuesInto] = row[i]
+                };
                 foreach (var k in boringColumns)
                 {
                     od[columns[k].Name] = row[k];
@@ -41,6 +42,7 @@ public static class PivotColumnsToRowsCommand
         exp.GetCurrentContext().AddTable(builder);
         exp.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
+        int GetColumnIndex(string name) => result.ColumnNames().IndexOf(name);
     }
 
     [Verb("pivotColumnsToRows", HelpText = @"pivots columns into rows
@@ -66,7 +68,7 @@ might be better expressed as
         public string ResultName { get; set; } = string.Empty;
 
         [Option(HelpText = "Name of table into which to project the result")]
-        public string As { get; set; } = "pivot";
+        public string As { get; set; } = "pivoted";
 
         [Option(Required=true,HelpText = "Columns to move into rows")]
         public IEnumerable<string> Columns { get; set; } = [];

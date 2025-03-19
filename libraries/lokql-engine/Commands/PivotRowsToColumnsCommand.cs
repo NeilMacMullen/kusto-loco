@@ -12,42 +12,27 @@ public static class PivotRowsToColumnsCommand
     {
         var exp = econtext.Explorer;
         var result = exp._resultHistory.Fetch(o.ResultName);
-        int GetColumnIndex(string name) => result.ColumnNames().IndexOf(name);
 
 
         var ods = new Dictionary<object, OrderedDictionary>();
         var columns = result.ColumnDefinitions();
         var newColumnNamesIndex = GetColumnIndex(o.ColumnsFrom);
         var valueIndex = GetColumnIndex(o.ValueFrom);
-        if (newColumnNamesIndex < 0 || valueIndex < 0 )
+        if (newColumnNamesIndex < 0 || valueIndex < 0)
         {
             exp.Warn("Unable to find requested columns");
             return Task.CompletedTask;
-        }
-
-        string MakeKey(object?[] row)
-        {
-            var key = string.Empty;
-            for (var c = 0; c < result.ColumnCount; c++)
-            {
-                if (c == newColumnNamesIndex || c == valueIndex)
-                    continue;
-                key += " | " + row[c];
-            }
-
-            return key;
         }
 
         foreach (var row in result.EnumerateRows())
         {
             var key = MakeKey(row);
             var od = ods.TryGetValue(key, out var found)
-                         ? found
-                         : new OrderedDictionary();
+                ? found
+                : new OrderedDictionary();
             ods[key] = od;
 
             for (var c = 0; c < result.ColumnCount; c++)
-            {
                 if (c == newColumnNamesIndex)
                 {
                     var colHeader = row.GetValue(c)?.ToString().NullToEmpty()!;
@@ -62,13 +47,30 @@ public static class PivotRowsToColumnsCommand
                     var colHeader = columns[c].Name;
                     od[colHeader] = row.GetValue(c);
                 }
-            }
         }
 
         var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods.Values.ToList());
         exp.GetCurrentContext().AddTable(builder);
         exp.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
+
+        int GetColumnIndex(string name)
+        {
+            return result.ColumnNames().IndexOf(name);
+        }
+
+        string MakeKey(object?[] row)
+        {
+            var key = string.Empty;
+            for (var c = 0; c < result.ColumnCount; c++)
+            {
+                if (c == newColumnNamesIndex || c == valueIndex)
+                    continue;
+                key += " | " + row[c];
+            }
+
+            return key;
+        }
     }
 
     [Verb("pivotRowsToColumns", HelpText = @"pivots values in a column into new column names
@@ -97,7 +99,7 @@ Usage:
         [Value(0, HelpText = "Name of result to pivot")]
         public string ResultName { get; set; } = string.Empty;
 
-        [Option(Required=true,HelpText = "Name of table into which to project the result")]
+        [Option(Required = true, HelpText = "Name of table into which to project the result")]
         public string As { get; set; } = "pivoted";
 
         [Option(Required = true, HelpText = "Name column holding data values")]
