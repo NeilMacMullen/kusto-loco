@@ -39,6 +39,7 @@ public static class PivotColumnsToRowsCommand
 
         var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods);
         exp.GetCurrentContext().AddTable(builder);
+        exp.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
     }
 
@@ -65,7 +66,7 @@ might be better expressed as
         public string ResultName { get; set; } = string.Empty;
 
         [Option(HelpText = "Name of table into which to project the result")]
-        public string As { get; set; } = string.Empty;
+        public string As { get; set; } = "pivot";
 
         [Option(Required=true,HelpText = "Columns to move into rows")]
         public IEnumerable<string> Columns { get; set; } = [];
