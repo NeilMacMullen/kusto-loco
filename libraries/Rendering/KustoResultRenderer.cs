@@ -89,9 +89,7 @@ tr:nth-child(odd) {
     }
 
     public string RenderStringAsHtml(string x)
-    {
-        return "<HTML><BODY><font color=\"green\">" + x + "</font></BODY></HTML>";
-    }
+        => "<HTML><BODY><font color=\"green\">" + x + "</font></BODY></HTML>";
 
     public void RenderToComposer(KustoQueryResult result, VegaComposer composer)
     {
@@ -154,39 +152,38 @@ tr:nth-child(odd) {
         }
     }
 
-    private void MakeLineChart(KustoQueryResult result, VegaChart chart)
+    private static void MakeLineChart(KustoQueryResult result, VegaChart chart)
     {
         if (result.ColumnDefinitions().Length > 2) chart.UseCursorTooltip();
     }
 
-    private void MakeStackedArea(KustoQueryResult result, VegaChart chart)
-    {
-        chart.StackAxis(VegaAxisName.Y);
-    }
+    private static void MakeStackedArea(KustoQueryResult result, VegaChart chart)
+        => chart.StackAxis(VegaAxisName.Y);
 
-    private string VisualizationKind(KustoQueryResult result)
-    {
-        return result.Visualization.PropertyOr(KustoVisualizationProperties.Kind, string.Empty);
-    }
+    private static string VisualizationKind(KustoQueryResult result) => result.Visualization.PropertyOr(KustoVisualizationProperties.Kind, string.Empty);
 
-    private void MakeBarChart(KustoQueryResult result, VegaChart b)
+    private static void MakeBarChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == KustoVisualizationProperties.Stacked)
             b.StackAxis(VegaAxisName.X);
+        //check for case where we are trying to draw "true" barchart oriented horizontally
+        var ytype =b._builder.Get("encoding.y.type","");
+        if (ytype != "nominal")
+            b._builder.Set($"encoding.x.type", "ordinal");
     }
 
-    private void MakeColumnChart(KustoQueryResult result, VegaChart b)
+    private static void MakeColumnChart(KustoQueryResult result, VegaChart b)
     {
         if (VisualizationKind(result) == KustoVisualizationProperties.Stacked)
             b.StackAxis(VegaAxisName.Y);
     }
 
-    public void NoOp(KustoQueryResult result, VegaChart o)
+    private static void NoOp(KustoQueryResult result, VegaChart o)
     {
     }
 
 
-    public void RenderToChart(VegaMark vegaType, KustoQueryResult result,
+    private void RenderToChart(VegaMark vegaType, KustoQueryResult result,
         Action<KustoQueryResult, VegaChart> jmutate, ImmutableArray<ExpectedColumnSet> expected, VegaComposer composer)
     {
         if (result.RowCount == 0)
@@ -238,7 +235,7 @@ tr:nth-child(odd) {
     }
 
 
-    public VegaMark InferChartTypeFromResult(KustoQueryResult result)
+    private static VegaMark InferChartTypeFromResult(KustoQueryResult result)
     {
         var headers = result.ColumnDefinitions();
         var types = headers.Select(h => h.UnderlyingType).ToArray();
@@ -264,18 +261,15 @@ tr:nth-child(odd) {
     public static ColumnDescription[] TryMatch(ColumnDescription[] columns,
         ImmutableArray<ExpectedColumnSet> expectedColumns)
     {
-        bool IsMatch(ExpectedColumnSet ex, ColumnDescription c1, ColumnDescription c2)
-        {
-            return ex.X.Contains(c1.VegaAxisType) && ex.Y.Contains(c2.VegaAxisType);
-        }
-
-
         foreach (var e in expectedColumns)
         foreach (var (x, y, z) in new[] { (0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0) })
             if (IsMatch(e, columns[x], columns[y]))
                 return [columns[x], columns[y], columns[z]];
 
         return columns;
+
+        bool IsMatch(ExpectedColumnSet ex, ColumnDescription c1, ColumnDescription c2)
+            => ex.X.Contains(c1.VegaAxisType) && ex.Y.Contains(c2.VegaAxisType);
     }
 
     public static VegaChart RenderToJObjectBuilder(VegaMark chartType,
@@ -310,8 +304,34 @@ tr:nth-child(odd) {
         {
             spec.FillContainer();
         }
+        FixBinning(columns[0],"x");
+        FixBinning(columns[1],"y");
 
         return spec;
+
+        //set appropriate x axis scale if this is a time series
+        void FixBinning(ColumnDescription column, string axis)
+        {
+            if (column.VegaAxisType != VegaAxisType.Temporal) return;
+            var q = column.QualifiedColumnName;
+            var data = rows.Select(r => r[q]).Cast<DateTime>().ToArray();
+            var u = "";
+            if (data.DistinctBy(d => d.Year).Count() > 1)
+                u += "year";
+            if (data.DistinctBy(d => d.Month).Count() > 1)
+                u += "month";
+            if (data.DistinctBy(d => d.Day).Count() > 1)
+                u += "date";
+            if (data.DistinctBy(d => d.Hour).Count() > 1)
+                u += "hours";
+            if (data.DistinctBy(d => d.Hour).Count() > 1)
+                u += "minutes";
+            if (u.IsNotBlank())
+            {
+                spec._builder.Set($"encoding.{axis}.timeUnit", $"binned{u}");
+                spec._builder.Set($"encoding.{axis}.type", "ordinal");
+            }
+        }
     }
 
     private static VegaAxisType InferSuitableAxisType(Type t)
@@ -326,9 +346,9 @@ tr:nth-child(odd) {
         var x = axisTypes[0];
         var y = axisTypes.Skip(1).ToArray();
 
-        if (x == VegaAxisType.Ordinal)
-            return VegaMark.Bar;
-        return VegaMark.Line;
+        return x == VegaAxisType.Ordinal
+            ? VegaMark.Bar
+            : VegaMark.Line;
     }
 }
 
