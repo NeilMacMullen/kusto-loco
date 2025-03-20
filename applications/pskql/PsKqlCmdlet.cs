@@ -183,7 +183,7 @@ public class PsKqlCmdlet : Cmdlet
         var type = TypeNameHelper.GetTypeFromName(typeName);
         if (_columnBuilders!.TryGetValue(name, out var b))
             return b;
-        b = ColumnHelpers.CreateBuilder(type);
+        b = ColumnHelpers.CreateBuilder(type, String.Empty);
         _columnBuilders[name] = b;
         _columnNames.Add(name);
         return b;

@@ -128,55 +128,57 @@ public static class ColumnHelpers
         return table.Columns.Select(c => CreateBuilder(c.Type)).ToArray();
     }
 
-    public static BaseColumnBuilder CreateBuilder(Type type) => CreateBuilder(TypeMapping.SymbolForType(type));
-
+    public static BaseColumnBuilder CreateBuilder(Type type,string name) => CreateBuilder(TypeMapping.SymbolForType(type),name);
 
     public static BaseColumnBuilder CreateBuilder(TypeSymbol typeSymbol)
+    => CreateBuilder(typeSymbol, string.Empty);
+
+    public static BaseColumnBuilder CreateBuilder(TypeSymbol typeSymbol,string name)
     {
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
         {
-            return new ColumnBuilder<int?>();
+            return new ColumnBuilder<int?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Long)
         {
-            return new ColumnBuilder<long?>();
+            return new ColumnBuilder<long?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return new ColumnBuilder<double?>();
+            return new ColumnBuilder<double?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return new ColumnBuilder<bool?>();
+            return new ColumnBuilder<bool?>(name);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return new ColumnBuilder<string?>();
+            return new ColumnBuilder<string?>(name);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return new ColumnBuilder<DateTime?>();
+            return new ColumnBuilder<DateTime?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Guid)
         {
-            return new ColumnBuilder<Guid?>();
+            return new ColumnBuilder<Guid?>(name);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return new ColumnBuilder<TimeSpan?>();
+            return new ColumnBuilder<TimeSpan?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return new ColumnBuilder<JsonNode?>();
+            return new ColumnBuilder<JsonNode?>(name);
         }
 
         // TODO: Support all data types

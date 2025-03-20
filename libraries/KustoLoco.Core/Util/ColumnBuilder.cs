@@ -11,6 +11,8 @@ namespace KustoLoco.Core.Util;
 
 public class ColumnBuilder<T> : BaseColumnBuilder
 {
+    public ColumnBuilder() : this (string.Empty){}
+    public ColumnBuilder(string name) => Name = name;
     private readonly List<T?> _data = [];
 
     public override int RowCount => _data.Count;

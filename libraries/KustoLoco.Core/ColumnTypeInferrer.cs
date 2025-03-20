@@ -43,7 +43,7 @@ public static class ColumnTypeInferrer
         foreach (var t in TypeTriers)
         {
             var processedAll = true;
-            var builder = ColumnHelpers.CreateBuilder(t.Type);
+            var builder = ColumnHelpers.CreateBuilder(t.Type,source.Name);
             for (var i = 0; i < stringColumn.RowCount; i++)
             {
                 var cell = stringColumn[i];
