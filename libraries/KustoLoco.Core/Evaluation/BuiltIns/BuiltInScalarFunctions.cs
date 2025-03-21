@@ -107,6 +107,9 @@ internal static class BuiltInScalarFunctions
         ReplaceStringFunction.Register(functions);
         SubstringFunction.Register(functions);
 
+        Base64Decode.Register(functions);
+        Base64Encode.Register(functions);
+
         BinFunction.Register(functions);
         functions.Add(Functions.Floor, BinFunction.S);
         GetYearFunction.Register(functions);
