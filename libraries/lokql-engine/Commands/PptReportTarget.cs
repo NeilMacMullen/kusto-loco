@@ -78,7 +78,7 @@ public class PptReportTarget : IReportTarget
 
     public void SaveAs(string name)
     {
-        _pres.Save(name);
+        _pres.SaveAs(name);
     }
 
     private async Task UpdateOrAddImage(string name, IResultRenderingSurface surface, KustoQueryResult result)
