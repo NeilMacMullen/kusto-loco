@@ -86,6 +86,34 @@ iso:string
         Test(query, expected);
     }
 
+    [Fact]
+    public void TestBase64Encode()
+    {
+        var query = """
+                    print base64=base64_encode_tostring("This string will be base64 encoded")
+                    """;
+        var expected = @"
+base64:string
+------------------
+VGhpcyBzdHJpbmcgd2lsbCBiZSBiYXNlNjQgZW5jb2RlZA==
+";
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void TestBase64Decode()
+    {
+        var query = """
+                    print text=base64_decode_tostring("VGhpcyBzdHJpbmcgd2lsbCBiZSBiYXNlNjQgZW5jb2RlZA==")
+                    """;
+        var expected = @"
+text:string
+------------------
+This string will be base64 encoded
+";
+        Test(query, expected);
+    }
+
     private static void Test(string query, string expectedOutput)
     {
         var engine = BabyKustoEngine.CreateForTest();
