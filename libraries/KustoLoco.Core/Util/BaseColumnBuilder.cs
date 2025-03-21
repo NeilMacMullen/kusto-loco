@@ -1,5 +1,6 @@
 ﻿using System;
 using KustoLoco.Core.DataSource.Columns;
+using RTools_NTS.Util;
 
 namespace KustoLoco.Core.Util;
 
@@ -10,7 +11,7 @@ public abstract class BaseColumnBuilder
     public abstract void Add(object? value);
     public abstract void AddRange(BaseColumnBuilder other);
     public abstract BaseColumn ToColumn();
-
+    public string Name { get; protected set; } = string.Empty;
     public abstract Array GetDataAsArray();
 
     public void PadTo(int size)

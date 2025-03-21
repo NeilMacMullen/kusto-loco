@@ -107,7 +107,7 @@ public class ExcelSerializer : ITableSerializer
             }
             else
             {
-                var colBuilder = ColumnHelpers.CreateBuilder(columnType);
+                var colBuilder = ColumnHelpers.CreateBuilder(columnType,String.Empty);
                 foreach (var item in colData) colBuilder.Add(item is DBNull ? null : item);
                 column = colBuilder.ToColumn();
             }

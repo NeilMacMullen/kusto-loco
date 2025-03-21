@@ -1,18 +1,21 @@
-﻿using System;
+﻿using Kusto.Language.Symbols;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Util;
+using NLog;
+using NotNullStrings;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text.Json;
-using KustoLoco.Core.Evaluation;
-using KustoLoco.Core.Util;
-using Kusto.Language.Symbols;
-using KustoLoco.Core.Console;
-using KustoLoco.Core.DataSource.Columns;
-using NLog;
-using KustoLoco.Core.DataSource;
-using NotNullStrings;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KustoLoco.Core;
 
@@ -106,7 +109,7 @@ public class TableBuilder
         //TODO - since we know the length of the column we could use a more efficient allocation scheme in the builder
         //TODO - in fact this is only currently called from places we have already forced a ToArray so
         //we're doing a double copy here
-        var builder = ColumnHelpers.CreateBuilder(type);
+        var builder = ColumnHelpers.CreateBuilder(type,name);
         foreach (var item in items)
         {
             builder.Add(item);
@@ -214,6 +217,37 @@ public class TableBuilder
         }
 
         return builder;
+    }
+
+    /// <summary>
+    /// Creates a TableBuilder instance from a DataTable, populating it with the data from the table's rows and columns.
+    /// </summary>
+    /// <param name="dataTable">The source of data that will be used to populate the new table structure.</param>
+    /// <param name="tableName">Specifies the name of the table, defaulting to the source's name if not provided.</param>
+    /// <returns>Returns a TableBuilder populated with the data from the provided DataTable.</returns>
+    public static TableBuilder FromDataTable(
+        DataTable dataTable, string tableName)
+    {
+        tableName = tableName.OrWhenBlank(dataTable.TableName);
+        //currently we rely on the dictionary having valid types and avoiding null values in unfortunate places
+        var columnBuilders = dataTable.Columns.Cast<DataColumn>()
+            .Select(h => ColumnHelpers.CreateBuilder(h.DataType,h.ColumnName))
+            .ToArray();
+
+        var tableBuilder = CreateEmpty(tableName,dataTable.Rows.Count);
+
+        foreach (DataRow row  in dataTable.Rows)
+        {
+            for (var i = 0; i < columnBuilders.Length; i++)
+            {
+                var cb = columnBuilders[i];
+                cb.Add(row[i]);
+            }
+        }
+        foreach(var b in columnBuilders)
+            tableBuilder.WithColumn(b.Name,b.ToColumn());
+
+        return tableBuilder;
     }
     /// <summary>
     /// Produce a single-column, single-row table from a scalar result

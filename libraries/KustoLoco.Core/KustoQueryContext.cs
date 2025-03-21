@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -116,6 +117,30 @@ public class KustoQueryContext
     public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
     {
         return AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
+    }
+    /// <summary>
+    /// Adds table from a named DataTable
+    /// </summary>
+    public KustoQueryContext AddTableFromDataTable(DataTable datatable)
+    => AddTableFromDataTable(datatable, datatable.TableName);
+
+    /// <summary>
+    /// Adds a table from a datatable, with the ability to override the name
+    /// </summary>
+    public KustoQueryContext AddTableFromDataTable(DataTable datatable,string name)
+    {
+        return AddTable(TableBuilder.FromDataTable(datatable,name));
+    }
+
+    /// <summary>
+    /// Adds all tables from a DataSet
+    /// </summary>
+    /// <param name="dataSet"></param>
+    public KustoQueryContext AddTablesFromDataSet(DataSet dataSet)
+    {
+        foreach (DataTable table in dataSet.Tables)
+            AddTableFromDataTable(table);
+        return this;
     }
 
     /// <summary>

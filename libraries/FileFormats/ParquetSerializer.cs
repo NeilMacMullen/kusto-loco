@@ -84,7 +84,7 @@ public class ParquetSerializer : ITableSerializer
             return TableLoadResult.Failure("No row groups in file");
 
         var totalRows = 0;
-        BuilderInfo[] columnBuilders = [];
+        BaseColumnBuilder[] columnBuilders = [];
 
         for (var rowGroupIndex = 0; rowGroupIndex < rowGroupCount; rowGroupIndex++)
         {
@@ -94,8 +94,7 @@ public class ParquetSerializer : ITableSerializer
             if (!columnBuilders.Any())
             {
                 columnBuilders = rowGroup
-                    .Select(dataColumn=>
-                        new BuilderInfo(dataColumn.Field.Name, dataColumn.Field.ClrType, ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType)))
+                    .Select(dataColumn=> ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
                     .ToArray();
             }
 
@@ -106,10 +105,10 @@ public class ParquetSerializer : ITableSerializer
                 //lookup the builder for this column
                 var builderInfo = columnBuilders[columnIndex];
                 _console.ShowProgress(
-                    $"Reading column {builderInfo.Name} of type {builderInfo.Type.Name} from rowGroup {rowGroupIndex}");
+                    $"Reading column {builderInfo.Name} of type {builderInfo.Name} from rowGroup {rowGroupIndex}");
                 //TODO - surely there is a more efficient way to do this by wrapping the original data?
                 foreach (var cellData in column.Data)
-                    builderInfo.Builder.Add(cellData);
+                    builderInfo.Add(cellData);
                 columnIndex++;
             }
 
@@ -119,7 +118,7 @@ public class ParquetSerializer : ITableSerializer
         //having read all the data, we can now create the table
         var tableBuilder = TableBuilder.CreateEmpty(tableName, totalRows);
         foreach (var colBuilder in columnBuilders)
-            tableBuilder = tableBuilder.WithColumn(colBuilder.Name, colBuilder.Builder.ToColumn());
+            tableBuilder = tableBuilder.WithColumn(colBuilder.Name, colBuilder.ToColumn());
 
         _console.CompleteProgress("");
         return TableLoadResult.Success(tableBuilder.ToTableSource());
@@ -134,11 +133,10 @@ public class ParquetSerializer : ITableSerializer
     private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
     {
         //TODO - it feels like this could be done more efficiently
-        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType);
+        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType,String.Empty);
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
         return builder.GetDataAsArray();
     }
 
-    private readonly record struct BuilderInfo(string Name, Type Type, BaseColumnBuilder Builder);
 }
