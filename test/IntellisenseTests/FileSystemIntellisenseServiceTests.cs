@@ -249,12 +249,28 @@ public class FileSystemIntellisenseServiceTests
             .Should()
             .NotThrow();
     }
+
+    [Fact]
+    public void GetPathIntellisenseOptions_UncRootPaths_RetrievesChildren()
+    {
+        var data = new Dictionary<string, MockFileData>
+        {
+            ["c:/folder1/file11.txt"] = new(""),
+            ["//unc/c/folderC1/fileC11.txt"] = new(""),
+            ["//unc/c/folderC2/fileC21.txt"] = new(""),
+            ["//unc/d/folderD1/fileD11.txt"] = new(""),
+        };
+
+        var f = new FileSystemIntellisenseServiceTestFixture(data);
+        var result = f.GetPathIntellisenseOptions("//unc/c/");
+        result.Entries.Select(x => x.Name).Should().BeEquivalentTo("folderC1", "folderC2");
+    }
 }
 
 file class FileSystemIntellisenseServiceTestFixture
 {
-    public IFileSystem FileSystem { get; }
-    public IFileSystemIntellisenseService FileSystemIntellisenseService { get; }
+    private IFileSystem FileSystem { get; }
+    private IFileSystemIntellisenseService FileSystemIntellisenseService { get; }
 
     public FileSystemIntellisenseServiceTestFixture(Dictionary<string, MockFileData> fileData, MockFileSystemOptions? options = null)
     {

@@ -254,7 +254,7 @@ public partial class QueryEditor : UserControl
         }
 
         var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
-        if (result.Entries.Count <= 0)
+        if (result.IsEmpty())
         {
             return false;
         }
