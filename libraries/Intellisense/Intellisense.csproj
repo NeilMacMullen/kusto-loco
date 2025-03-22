@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NotNullStrings" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+        <_Parameter1>IntellisenseTests</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+
+</Project>
