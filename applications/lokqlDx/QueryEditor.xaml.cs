@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
-using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
@@ -82,6 +81,25 @@ public partial class QueryEditor : UserControl
         }
 
         return sb.ToString().Trim();
+    }
+
+
+    public void ScrollDownToComment()
+    {
+        var i = _editorHelper.GetCurrentLineNumber + 1;
+
+        while (!_editorHelper.LineIsTopOfBlock(i) && i <= Query.LineCount)
+            i++;
+        _editorHelper.ScrollToLine(i);
+    }
+
+    public void ScrollUpToComment()
+    {
+        var i = _editorHelper.GetCurrentLineNumber - 1;
+
+        while (!_editorHelper.LineIsTopOfBlock(i) && i >= 1)
+            i--;
+        _editorHelper.ScrollToLine(i);
     }
 
     public void SetFontSize(double newSize)
@@ -179,13 +197,29 @@ public partial class QueryEditor : UserControl
 
     private void InternalEditor_OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
-            if (Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                e.Handled = true;
-                var query = GetTextAroundCursor();
-                if (query.Length > 0) RunEvent?.Invoke(this, new QueryEditorRunEventArgs(query));
-            }
+        var shiftDown = Keyboard.IsKeyDown(Key.RightShift) || Keyboard.IsKeyDown(Key.LeftShift);
+        var ctrlDown = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+        if (e.Key == Key.Enter && shiftDown)
+        {
+            e.Handled = true;
+            var query = ctrlDown
+                ? Query.Text
+                : GetTextAroundCursor();
+            if (query.Length > 0)
+                RunEvent?.Invoke(this, new QueryEditorRunEventArgs(query));
+        }
+
+        if (e.Key == Key.Down && shiftDown)
+        {
+            e.Handled = true;
+            ScrollDownToComment();
+        }
+
+        if (e.Key == Key.Up && shiftDown)
+        {
+            e.Handled = true;
+            ScrollUpToComment();
+        }
     }
 
     /// <summary>
@@ -287,14 +321,16 @@ public partial class QueryEditor : UserControl
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
     {
-        bool CharContinuesAutoComplete(char c) => (char.IsLetterOrDigit(c) || c == '_' || c == '.');
-        if (e.Text.Length > 0 && _completionWindow != null)
+        bool CharContinuesAutoComplete(char c)
         {
+            return char.IsLetterOrDigit(c) || c == '_' || c == '.';
+        }
+
+        if (e.Text.Length > 0 && _completionWindow != null)
             // Whenever a non-letter is typed while the completion window is open,
             // insert the currently selected element.
             if (!CharContinuesAutoComplete(e.Text[0]))
                 _completionWindow.CompletionList.RequestInsertion(e);
-        }
         // Do not set e.Handled=true.
         // We still want to insert the character that was typed.
     }
@@ -346,33 +382,6 @@ Usage: {entry.Syntax}";
             Length = completionSegment.Length + rewind
         };
         textArea.Document.Replace(seg, prefix + Text);
-    }
-}
-
-public class EditorHelper(TextEditor query)
-{
-    public TextEditor Query { get; set; } = query;
-
-
-    public string GetText(DocumentLine line)
-    {
-        return Query.Document.GetText(line.Offset, line.Length);
-    }
-
-    public string TextInLine(int line)
-    {
-        return GetText(Query.Document.GetLineByNumber(line));
-    }
-
-    public DocumentLine LineAtCaret()
-    {
-        return Query.Document.GetLineByOffset(Query.CaretOffset);
-    }
-
-    public string TextToLeftOfCaret()
-    {
-        var line = LineAtCaret();
-        return Query.Document.GetText(line.Offset, Query.CaretOffset - line.Offset);
     }
 }
 
