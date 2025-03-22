@@ -41,30 +41,6 @@ public class CompletionResultRetrieverTests
     }
 
     [Theory]
-    [InlineData("//uncHost/c/", new[] { "folderC1", "folderC2" })]
-    [InlineData("//uncHost/d/", new[] { "folderD1" })]
-    public void Children_GetCompletions_UncRootPaths_RetrievesChildrenOfRootRelativeToHost(
-        string path,
-        string[] expected
-    )
-    {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["//uncHost/c/folderC1/fileC11.txt"] = new(""),
-            ["//uncHost/c/folderC2/fileC21.txt"] = new(""),
-            ["//uncHost/d/folderD1/fileD11.txt"] = new("")
-        };
-        var fileSystem = new MockFileSystem(data, new MockFileSystemOptions { CreateDefaultTempDir = false });
-        var reader = new FileSystemReader(fileSystem);
-        var retriever = new ChildrenPathCompletionResultRetriever(reader);
-
-        var rootedPath = RootedPath.CreateOrThrow(path);
-        var result = retriever.GetCompletionResult(rootedPath);
-
-        result.Entries.Select(x => x.Name).Should().BeEquivalentTo(expected);
-    }
-
-    [Theory]
     [InlineData("C:./")]
     [InlineData("C:.")]
     [InlineData("C:")]

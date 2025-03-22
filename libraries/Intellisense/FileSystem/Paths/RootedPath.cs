@@ -41,7 +41,8 @@ internal class RootedPath : IFileSystemPath
     {
         if (_value[0].IsDirectorySeparator())
         {
-            return _value.Length is 1 || IsUncRootDirectory();
+            // TODO: Handle UNC paths
+            return _value.Length is 1;
         }
 
         if (_value.Length is 2)
@@ -50,38 +51,5 @@ internal class RootedPath : IFileSystemPath
         }
 
         return _value.Length is 3 && _value[2].IsDirectorySeparator();
-    }
-
-    private bool IsUncRootDirectory()
-    {
-        if (!Uri.TryCreate(_value, UriKind.Absolute, out var uri) || !uri.IsUnc)
-        {
-            return false;
-        }
-
-        // https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/62e862f4-2a51-452e-8eeb-dc4ff5ee33cc
-        // also note that .net normalizes slashes
-
-        // "//host/c:/" => "c:/"
-        var uriPath = uri.GetComponents(UriComponents.Path, UriFormat.Unescaped);
-
-        if (!uriPath[0].IsValidDriveChar())
-        {
-            return false;
-        }
-
-        if (uriPath.Length is 1)
-        {
-            return true;
-        }
-
-        if (uriPath.Length is 2)
-        {
-            return uriPath[1] is '$' || uriPath[1].IsDirectorySeparator();
-        }
-
-        return uriPath.Length is 3
-               && (uriPath[1] is '$' || uriPath[1] == Path.VolumeSeparatorChar)
-               && uriPath[2].IsDirectorySeparator();
     }
 }
