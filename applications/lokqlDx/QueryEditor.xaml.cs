@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.CommandLine.Parsing;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -14,12 +15,14 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Search;
+using Intellisense;
+using Intellisense.FileSystem;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
 using FontFamily = System.Windows.Media.FontFamily;
-
 namespace lokqlDx;
+
 
 /// <summary>
 ///     Simple text editor for running queries
@@ -32,6 +35,8 @@ public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
+    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
+    private readonly FileIoCommandParser _fileIoCommandParser = new();
 
     private CompletionWindow? _completionWindow;
 
@@ -217,7 +222,7 @@ public partial class QueryEditor : UserControl
         SearchPanel.Install(Query);
     }
 
-    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind)
+    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind, Action<CompletionWindow>? onCompletionWindowDataPopulated = null)
     {
         if (!completions.Any())
             return;
@@ -229,8 +234,46 @@ public partial class QueryEditor : UserControl
         IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
         foreach (var k in completions.OrderBy(k => k.Name))
             data.Add(new MyCompletionData(k, prefix, rewind));
-        _completionWindow.Show();
+
         _completionWindow.Closed += delegate { _completionWindow = null; };
+        onCompletionWindowDataPopulated?.Invoke(_completionWindow);
+        _completionWindow?.Show();
+    }
+
+    private bool ShowPathCompletions()
+    {
+        // Avoid unnecessary IO calls
+        if (_completionWindow is not null)
+        {
+            return false;
+        }
+
+        if (_fileIoCommandParser.GetLastArg(_editorHelper.GetCurrentLineText()) is not { } path)
+        {
+            return false;
+        }
+
+        var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+        if (result.Entries.Count <= 0)
+        {
+            return false;
+        }
+
+        ShowCompletions(
+            result.Entries,
+            string.Empty,
+            result.Filter.Length,
+            completionWindow =>
+            {
+                // when editor loses focus mid-path and user resumes typing, it won't require a second keypress to select the relevant result
+                completionWindow.CompletionList.SelectItem(result.Filter);
+                if (!completionWindow.CompletionList.ListBox.HasItems)
+                {
+                    completionWindow.Close();
+                }
+            });
+
+        return true;
     }
 
     private void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
@@ -238,6 +281,11 @@ public partial class QueryEditor : UserControl
         if (_completionWindow != null && !_completionWindow.CompletionList.ListBox.HasItems)
         {
             _completionWindow.Close();
+            return;
+        }
+
+        if (ShowPathCompletions())
+        {
             return;
         }
 
@@ -364,6 +412,11 @@ public class EditorHelper(TextEditor query)
         return GetText(Query.Document.GetLineByNumber(line));
     }
 
+    public string GetCurrentLineText()
+    {
+        return TextInLine(LineAtCaret().LineNumber);
+    }
+
     public DocumentLine LineAtCaret()
     {
         return Query.Document.GetLineByOffset(Query.CaretOffset);
@@ -375,8 +428,6 @@ public class EditorHelper(TextEditor query)
         return Query.Document.GetText(line.Offset, Query.CaretOffset - line.Offset);
     }
 }
-
-public readonly record struct IntellisenseEntry(string Name, string Description, string Syntax);
 
 public class SchemaIntellisenseProvider
 {
@@ -442,5 +493,28 @@ public class SchemaIntellisenseProvider
     public void SetSchema(SchemaLine[] schema)
     {
         _schemaLines = schema;
+    }
+}
+
+public class FileIoCommandParser
+{
+    public string? GetLastArg(string lineText)
+    {
+        var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
+
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        var isIoCommand = args[0].Equals(".save", StringComparison.OrdinalIgnoreCase) ||
+                          args[0].Equals(".load", StringComparison.OrdinalIgnoreCase);
+
+        if (!isIoCommand)
+        {
+            return null;
+        }
+
+        return args[^1];
     }
 }
