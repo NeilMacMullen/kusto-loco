@@ -14,6 +14,10 @@ public record CompletionResult
     /// An initial text filter that should be applied to the completion entries by an external processor to show the initial list of filtered entries.
     /// </summary>
     public string Filter { get; init; } = string.Empty;
+    public bool IsEmpty()
+    {
+        return Entries.Count is 0;
+    }
 }
 
 internal static class CompletionResultExtensions
