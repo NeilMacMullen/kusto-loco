@@ -256,7 +256,7 @@ public partial class QueryEditor : UserControl
         SearchPanel.Install(Query);
     }
 
-    private void ShowCompletions(IEnumerable<IntellisenseEntry> completions, string prefix, int rewind, Action<CompletionWindow>? onCompletionWindowDataPopulated = null)
+    private void ShowCompletions(IReadOnlyList<IntellisenseEntry> completions, string prefix, int rewind, Action<CompletionWindow>? onCompletionWindowDataPopulated = null)
     {
         if (!completions.Any())
             return;
@@ -432,9 +432,6 @@ Usage: {entry.Syntax}";
         textArea.Document.Replace(seg, prefix + Text);
     }
 }
-
-
-public readonly record struct IntellisenseEntry(string Name, string Description, string Syntax);
 
 
 public class SchemaIntellisenseProvider
