@@ -214,13 +214,13 @@ public partial class QueryEditor : UserControl
                 RunEvent?.Invoke(this, new QueryEditorRunEventArgs(query));
         }
 
-        if (e.Key == Key.Down && shiftDown)
+        if (e.Key == Key.Down && ctrlDown)
         {
             e.Handled = true;
             ScrollDownToComment();
         }
 
-        if (e.Key == Key.Up && shiftDown)
+        if (e.Key == Key.Up && ctrlDown)
         {
             e.Handled = true;
             ScrollUpToComment();
