@@ -314,7 +314,7 @@ tr:nth-child(odd) {
         {
             if (column.VegaAxisType != VegaAxisType.Temporal) return;
             var q = column.QualifiedColumnName;
-            var data = rows.Select(r => r[q]).Cast<DateTime>().ToArray();
+            var data = rows.Select(r => r[q]).OfType<DateTime>().ToArray();
             var u = "";
             if (data.DistinctBy(d => d.Year).Count() > 1)
                 u += "year";
