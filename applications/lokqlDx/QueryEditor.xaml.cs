@@ -194,7 +194,7 @@ public partial class QueryEditor : UserControl
     {
         Query.WordWrap = wordWrap;
     }
-
+    
     public void ShowLineNumbers(bool show)
     {
         Query.ShowLineNumbers = show;
