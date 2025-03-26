@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>KustoLoco.FileFormats</RootNamespace>
@@ -35,6 +35,7 @@
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="ExcelDataReader.DataSet" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="Parquet.Net" />
     <PackageReference Include="System.Text.Encoding.CodePages" />

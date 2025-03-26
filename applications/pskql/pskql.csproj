@@ -9,6 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
     <PackageReference Include="Microsoft.PowerShell.SDK" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="ScottPlot" />
+    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
 
   <ItemGroup>

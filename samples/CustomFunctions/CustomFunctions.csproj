@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Azure.Kusto.Language" />
+		<PackageReference Include="Microsoft.Web.WebView2" />
 		
 	</ItemGroup>
 

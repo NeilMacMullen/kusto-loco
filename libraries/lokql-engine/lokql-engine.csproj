@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="ShapeCrawler" />
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>

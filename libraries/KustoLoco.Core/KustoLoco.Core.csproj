@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -34,6 +34,7 @@
     <PackageReference Include="Fastenshtein" />
     <PackageReference Include="geohash-dotnet" />
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="NLog" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="System.Linq.Async" />
