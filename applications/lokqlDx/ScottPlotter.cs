@@ -6,6 +6,34 @@ using ScottPlot.WPF;
 
 namespace lokqlDx;
 
+
+public class AxisLookup
+{
+    private readonly Dictionary<object, double> _lookup;
+
+    public static AxisLookup From(ColumnResult col,object?[] data)
+    {
+        if (col.UnderlyingType == typeof(string))
+        {
+            var d = new Dictionary<object, double>();
+            var index = 1.0;
+            foreach (var o in data)
+            {
+                if (o is null)
+                    continue;
+                if (!d.ContainsKey(o))
+                    d[o] = index++;
+            }
+
+            return new AxisLookup(d);
+        }
+    }
+
+    public AxisLookup(Dictionary<object, double> lookup)
+    {
+        _lookup = lookup;
+    }
+}
 public static class ScottPlotter
 {
     public static async Task<bool> Render(WpfPlot plotter, KustoQueryResult result)
@@ -36,16 +64,21 @@ public static class ScottPlotter
         plot.ShowLegend(Edge.Right);
     }
 
+
     public static async Task<bool> Render(Plot plot, KustoQueryResult result)
     {
         plot.Clear();
-       
 
         if (result.Visualization.ChartType.IsNotBlank() && result.ColumnCount == 3)
         {
             var series = result.EnumerateRows()
                 .GroupBy(r => r[2])
                 .ToArray();
+
+            var xColumn = result.ColumnDefinitions()[0];
+            var fullXdata = result.EnumerateColumnData(xColumn).ToArray();
+
+            var lookup = AxisLookup.From(xColumn,fullXdata);
             foreach (var s in series)
             {
                 var xData = s.Select(r => r[0]).ToArray();
