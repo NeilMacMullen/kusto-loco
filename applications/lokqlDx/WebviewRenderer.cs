@@ -6,6 +6,8 @@ using KustoLoco.Rendering;
 using Lokql.Engine.Commands;
 using Microsoft.Web.WebView2.Wpf;
 using NotNullStrings;
+using ScottPlot.WPF;
+using Label = System.Windows.Controls.Label;
 
 namespace lokqlDx;
 
@@ -14,15 +16,20 @@ public class WebViewRenderer(
     WebView2 webView,
     DataGrid dataGrid,
     Label dataGridSizeWarning,
+    WpfPlot plotter,
     KustoSettingsProvider settings)
     : IResultRenderingSurface
 {
+    public WpfPlot Plotter { get; } = plotter;
     public UriOrHtml LastRendered { get; private set; } = new(string.Empty, string.Empty);
 
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
+        await SafeInvoke(async () => await ScottPlotter.Render(Plotter,result));
     }
+
+  
 
     /// <summary>
     ///     Renders the result to an image using a headless webview
@@ -61,7 +68,7 @@ public class WebViewRenderer(
         await webView.EnsureCoreWebView2Async();
         await WebViewExtensions.NavigateToStringAsync(webView.CoreWebView2, html);
         FillInDataGrid(result);
-        tabControl.SelectedIndex = result.Visualization.ChartType.IsBlank() ? 0 : 1;
+        tabControl.SelectedIndex = result.Visualization.ChartType.IsBlank() ? 0 : 2;
 
         return true;
     }
