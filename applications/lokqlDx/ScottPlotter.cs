@@ -48,6 +48,13 @@ public class DoubleAxisLookup : IAxisLookup
     public Dictionary<double, string> Dict() => throw new NotImplementedException();
 }
 
+public class LongAxisLookup : IAxisLookup
+{
+    public double ValueFor(object? o) => o is null ? 0 : (double) (long)o;
+    public string GetLabel(double position) => throw new NotImplementedException();
+    public Dictionary<double, string> Dict() => throw new NotImplementedException();
+}
+
 public class AxisLookup
 {
     public static IAxisLookup From(ColumnResult col, object?[] data)
@@ -76,8 +83,11 @@ public class AxisLookup
         {
             return new DoubleAxisLookup();
         }
-
-        throw new InvalidOperationException("Unsupported type");
+        if (col.UnderlyingType == typeof(long))
+        {
+            return new LongAxisLookup();
+        }
+        throw new InvalidOperationException($"Unsupported type {col.UnderlyingType.Name}");
     }
 }
 
@@ -115,6 +125,24 @@ public static class ScottPlotter
     public static async Task<bool> Render(Plot plot, KustoQueryResult result)
     {
         plot.Clear();
+        plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
+        if (result.Visualization.ChartType.Contains("pie") && result.ColumnCount == 2)
+        {
+           
+            var slices = result.EnumerateRows()
+                .Index()
+                .Select(kv => new PieSlice(){Label = kv.Item[0]?.ToString() ?? string.Empty,
+                    LegendText = kv.Item[0]?.ToString() ?? string.Empty,
+                    Value =(double) kv.Item[1]!,
+                    FillColor = plot.Add.Palette.GetColor(kv.Index)
+                })
+                .ToArray();
+            plot.Add.Pie(slices);
+            plot.ShowLegend();
+            // hide unnecessary plot components
+            plot.Axes.Frameless();
+            plot.HideGrid();
+        }
 
         if (result.Visualization.ChartType.IsNotBlank() && result.ColumnCount == 3)
         {
@@ -126,12 +154,14 @@ public static class ScottPlotter
             var fullXdata = result.EnumerateColumnData(xColumn).ToArray();
 
             var lookup = AxisLookup.From(xColumn, fullXdata);
-            foreach (var s in series)
+            var acc = fullXdata.Distinct().ToDictionary(k => k!, _ => 0.0);
+            foreach (var (index,item) in series.Index())
             {
-                var xData = s.Select(r => r[0]).ToArray();
-                var yData = s.Select(r => r[1]).ToArray();
-                var legend = s.Key?.ToString() ?? string.Empty;
-                AddSeries(result.Visualization, plot, xData, yData, legend, lookup);
+                var xData = item.Select(r => r[0]).ToArray();
+                var yData = item.Select(r => r[1]).ToArray();
+                var legend = item.Key?.ToString() ?? string.Empty;
+              
+                AddSeries(index, result.Visualization, plot, xData, yData, legend, lookup, acc);
             }
 
             if (xColumn.UnderlyingType == typeof(DateTime))
@@ -169,8 +199,8 @@ public static class ScottPlotter
         return await Task.FromResult(true);
     }
 
-    private static void AddSeries(VisualizationState state, Plot plot, object?[] xData, object?[] yData,
-        string legend, IAxisLookup xLookup)
+    private static void AddSeries(int n,VisualizationState state, Plot plot, object?[] xData, object?[] yData,
+        string legend, IAxisLookup xLookup,Dictionary<object,double> acc)
     {
         switch (state.ChartType.ToLowerInvariant())
         {
@@ -191,22 +221,49 @@ public static class ScottPlotter
             }
             case "barchart":
             {
-                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
-                var b = plot.Add.Bars(xpoints, yData);
-                b.LegendText = legend;
-                b.Horizontal = true;
+                CreateBars(n, plot, xData, yData, legend, xLookup, acc,true);
                 break;
             }
             case "columnchart":
             {
-                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
-                var b = plot.Add.Bars(xpoints, yData);
-                b.LegendText = legend;
-                break;
+                CreateBars(n, plot, xData, yData, legend, xLookup, acc, false);
+                    break;
             }
+            case "piechart":
+                {
+                   
+                    break;
+                }
             case "ladderchart":
             case "heatmap":
                 break;
         }
+    }
+
+    private static void CreateBars(int n, Plot plot, object?[] xData, object?[] yData, string legend, IAxisLookup xLookup,
+        Dictionary<object, double> acc,bool makeHorizontal)
+    {
+        var bars = xData.Zip(yData)
+            .Select(tuple =>
+            {
+                var valBase = acc.TryGetValue(tuple.First!, out var b)
+                    ? b
+                    : 0.0;
+                var pos = xLookup.ValueFor(tuple.First);
+                acc[tuple.First!] = valBase + (double)tuple.Second!;
+
+                return new Bar()
+                {
+                    Position = pos,
+                    ValueBase = valBase,
+                    Value = valBase + (double)tuple.Second!,
+                    FillColor = plot.Add.Palette.GetColor(n),
+                };
+
+            }).ToArray();
+        var b = plot.Add.Bars(bars);
+              
+        b.LegendText = legend;
+        b.Horizontal = makeHorizontal;
     }
 }
