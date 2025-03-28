@@ -6,12 +6,51 @@ using ScottPlot.WPF;
 
 namespace lokqlDx;
 
+public interface IAxisLookup
+{
+    public double ValueFor(object? o);
+    string GetLabel(double position);
+    Dictionary<double, string> Dict();
+}
+
+public class StringAxisLookup : IAxisLookup
+{
+    private readonly Dictionary<object, double> _lookup;
+    private readonly Dictionary<double, object> _labelLookup;
+
+    public double ValueFor(object? o) => o is null ? 0 : _lookup[o];
+
+    public string GetLabel(double position) => _labelLookup.TryGetValue(position, out var o)
+        ? o.ToString().NullToEmpty()
+        : string.Empty;
+
+    public Dictionary<double, string> Dict() =>
+        _labelLookup.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString().NullToEmpty()!);
+
+    public StringAxisLookup(Dictionary<object, double> lookup)
+    {
+        _lookup = lookup;
+        _labelLookup = _lookup.ToDictionary(kv => kv.Value, kv => kv.Key);
+    }
+}
+
+public class DateTimeAxisLookup : IAxisLookup
+{
+    public double ValueFor(object? o) => o is null ? 0 : ((DateTime)o).ToOADate();
+    public string GetLabel(double position) => throw new NotImplementedException();
+    public Dictionary<double, string> Dict() => throw new NotImplementedException();
+}
+
+public class DoubleAxisLookup : IAxisLookup
+{
+    public double ValueFor(object? o) => o is null ? 0 : (double)o;
+    public string GetLabel(double position) => throw new NotImplementedException();
+    public Dictionary<double, string> Dict() => throw new NotImplementedException();
+}
 
 public class AxisLookup
 {
-    private readonly Dictionary<object, double> _lookup;
-
-    public static AxisLookup From(ColumnResult col,object?[] data)
+    public static IAxisLookup From(ColumnResult col, object?[] data)
     {
         if (col.UnderlyingType == typeof(string))
         {
@@ -25,15 +64,23 @@ public class AxisLookup
                     d[o] = index++;
             }
 
-            return new AxisLookup(d);
+            return new StringAxisLookup(d);
         }
-    }
 
-    public AxisLookup(Dictionary<object, double> lookup)
-    {
-        _lookup = lookup;
+        if (col.UnderlyingType == typeof(DateTime))
+        {
+            return new DateTimeAxisLookup();
+        }
+
+        if (col.UnderlyingType == typeof(double))
+        {
+            return new DoubleAxisLookup();
+        }
+
+        throw new InvalidOperationException("Unsupported type");
     }
 }
+
 public static class ScottPlotter
 {
     public static async Task<bool> Render(WpfPlot plotter, KustoQueryResult result)
@@ -78,17 +125,43 @@ public static class ScottPlotter
             var xColumn = result.ColumnDefinitions()[0];
             var fullXdata = result.EnumerateColumnData(xColumn).ToArray();
 
-            var lookup = AxisLookup.From(xColumn,fullXdata);
+            var lookup = AxisLookup.From(xColumn, fullXdata);
             foreach (var s in series)
             {
                 var xData = s.Select(r => r[0]).ToArray();
                 var yData = s.Select(r => r[1]).ToArray();
                 var legend = s.Key?.ToString() ?? string.Empty;
-                AddSeries(result.Visualization, plot, xData, yData, legend);
+                AddSeries(result.Visualization, plot, xData, yData, legend, lookup);
             }
 
-            if (result.ColumnDefinitions()[0].UnderlyingType == typeof(DateTime))
+            if (xColumn.UnderlyingType == typeof(DateTime))
                 plot.Axes.DateTimeTicksBottom();
+
+            if (xColumn.UnderlyingType == typeof(string))
+            {
+                Tick[] ticks =
+                    lookup.Dict().Select(kv =>
+                        new Tick(kv.Key, kv.Value)).ToArray();
+
+
+                if (result.Visualization.ChartType.Contains("barchart"))
+                {
+                    plot.Axes.Left.TickGenerator = new ScottPlot.TickGenerators.NumericManual(ticks);
+                    plot.Axes.Left.MajorTickStyle.Length = 0;
+                    plot.HideGrid();
+
+
+                    plot.Axes.Margins(left: 0);
+                }
+                else
+                {
+                    plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(ticks);
+                    plot.Axes.Bottom.MajorTickStyle.Length = 0;
+                    plot.HideGrid();
+                    plot.Axes.Margins(bottom: 0);
+                }
+            }
+
 
             return true;
         }
@@ -97,33 +170,38 @@ public static class ScottPlotter
     }
 
     private static void AddSeries(VisualizationState state, Plot plot, object?[] xData, object?[] yData,
-        string legend)
+        string legend, IAxisLookup xLookup)
     {
         switch (state.ChartType.ToLowerInvariant())
         {
             case "linechart":
             {
-                var line = plot.Add.Scatter(xData, yData);
+                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
+                var line = plot.Add.Scatter(xpoints, yData);
                 line.LegendText = legend;
                 break;
             }
             case "scatterchart":
             {
-                var line = plot.Add.ScatterPoints(xData, yData);
+                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
+                var line = plot.Add.ScatterPoints(xpoints, yData);
 
                 line.LegendText = legend;
                 break;
             }
             case "barchart":
             {
-                var bars = xData.Zip(yData).Select(t =>
-                    new Bar()
-                    {
-                        Position = ((DateTime)t.First!).ToOADate(),
-                        Value = (double)t.Second!
-                    }
-                ).ToArray();
-                plot.Add.Bars(bars);
+                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
+                var b = plot.Add.Bars(xpoints, yData);
+                b.LegendText = legend;
+                b.Horizontal = true;
+                break;
+            }
+            case "columnchart":
+            {
+                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
+                var b = plot.Add.Bars(xpoints, yData);
+                b.LegendText = legend;
                 break;
             }
             case "ladderchart":
