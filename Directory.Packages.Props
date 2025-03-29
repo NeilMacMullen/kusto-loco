@@ -27,6 +27,7 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.0" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3124.44" />
+    <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog" Version="5.4.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />

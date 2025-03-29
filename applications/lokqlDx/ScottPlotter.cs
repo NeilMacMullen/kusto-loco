@@ -1,7 +1,9 @@
 ﻿using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using NotNullStrings;
 using ScottPlot;
+using ScottPlot.Palettes;
+using ScottPlot.Plottables;
+using ScottPlot.TickGenerators;
 using ScottPlot.WPF;
 
 namespace lokqlDx;
@@ -15,8 +17,14 @@ public interface IAxisLookup
 
 public class StringAxisLookup : IAxisLookup
 {
-    private readonly Dictionary<object, double> _lookup;
     private readonly Dictionary<double, object> _labelLookup;
+    private readonly Dictionary<object, double> _lookup;
+
+    public StringAxisLookup(Dictionary<object, double> lookup)
+    {
+        _lookup = lookup;
+        _labelLookup = _lookup.ToDictionary(kv => kv.Value, kv => kv.Key);
+    }
 
     public double ValueFor(object? o) => o is null ? 0 : _lookup[o];
 
@@ -26,12 +34,6 @@ public class StringAxisLookup : IAxisLookup
 
     public Dictionary<double, string> Dict() =>
         _labelLookup.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString().NullToEmpty()!);
-
-    public StringAxisLookup(Dictionary<object, double> lookup)
-    {
-        _lookup = lookup;
-        _labelLookup = _lookup.ToDictionary(kv => kv.Value, kv => kv.Key);
-    }
 }
 
 public class DateTimeAxisLookup : IAxisLookup
@@ -50,7 +52,7 @@ public class DoubleAxisLookup : IAxisLookup
 
 public class LongAxisLookup : IAxisLookup
 {
-    public double ValueFor(object? o) => o is null ? 0 : (double) (long)o;
+    public double ValueFor(object? o) => o is null ? 0 : (double)(long)o;
     public string GetLabel(double position) => throw new NotImplementedException();
     public Dictionary<double, string> Dict() => throw new NotImplementedException();
 }
@@ -74,19 +76,12 @@ public class AxisLookup
             return new StringAxisLookup(d);
         }
 
-        if (col.UnderlyingType == typeof(DateTime))
-        {
-            return new DateTimeAxisLookup();
-        }
+        if (col.UnderlyingType == typeof(DateTime)) return new DateTimeAxisLookup();
 
-        if (col.UnderlyingType == typeof(double))
-        {
-            return new DoubleAxisLookup();
-        }
-        if (col.UnderlyingType == typeof(long))
-        {
-            return new LongAxisLookup();
-        }
+        if (col.UnderlyingType == typeof(double)) return new DoubleAxisLookup();
+
+        if (col.UnderlyingType == typeof(long)) return new LongAxisLookup();
+
         throw new InvalidOperationException($"Unsupported type {col.UnderlyingType.Name}");
     }
 }
@@ -98,13 +93,14 @@ public static class ScottPlotter
         plotter.Reset();
         var r = await Render(plotter.Plot, result);
         UseDarkMode(plotter.Plot);
+        plotter.Plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
         plotter.Refresh();
         return r;
     }
 
     private static void UseDarkMode(Plot plot)
     {
-        plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
+        plot.Add.Palette = new Penumbra();
         plot.FigureBackground.Color = Color.FromHex("#181818");
         plot.DataBackground.Color = Color.FromHex("#1f1f1f");
 
@@ -124,17 +120,22 @@ public static class ScottPlotter
 
     public static async Task<bool> Render(Plot plot, KustoQueryResult result)
     {
+        var accessor = new ResultChartAccessor(result);
         plot.Clear();
-        plot.Add.Palette = new ScottPlot.Palettes.Penumbra();
-        if (result.Visualization.ChartType.Contains("pie") && result.ColumnCount == 2)
+        plot.Add.Palette = new Penumbra();
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount == 2)
         {
-           
-            var slices = result.EnumerateRows()
-                .Index()
-                .Select(kv => new PieSlice(){Label = kv.Item[0]?.ToString() ?? string.Empty,
-                    LegendText = kv.Item[0]?.ToString() ?? string.Empty,
-                    Value =(double) kv.Item[1]!,
-                    FillColor = plot.Add.Palette.GetColor(kv.Index)
+            accessor.AssignXColumn(0);
+            accessor.AssignValueColumn(1);
+            accessor.AssignSeriesNameColumn(0);
+
+            var slices = accessor.CalculateSeries()
+                .Select(ser => new PieSlice
+                {
+                    Label = ser.Legend,
+                    LegendText = ser.Legend,
+                    Value = ser.Y[0],
+                    FillColor = plot.Add.Palette.GetColor(ser.Index)
                 })
                 .ToArray();
             plot.Add.Pie(slices);
@@ -142,128 +143,217 @@ public static class ScottPlotter
             // hide unnecessary plot components
             plot.Axes.Frameless();
             plot.HideGrid();
+            return true;
         }
 
-        if (result.Visualization.ChartType.IsNotBlank() && result.ColumnCount == 3)
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount == 3)
         {
-            var series = result.EnumerateRows()
-                .GroupBy(r => r[2])
+            StandardAxisAssignment(accessor);
+            foreach (var ser in accessor.CalculateSeries())
+            {
+                var line = plot.Add.Scatter(ser.X, ser.Y);
+                line.LegendText = ser.Legend;
+            }
+
+            FixupAxisTicks(plot, accessor, false);
+            return true;
+        }
+
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount == 3)
+        {
+            StandardAxisAssignment(accessor);
+            foreach (var ser in accessor.CalculateSeries())
+            {
+                var line = plot.Add.ScatterPoints(ser.X, ser.Y);
+                line.LegendText = ser.Legend;
+            }
+
+            FixupAxisTicks(plot, accessor, false);
+            return true;
+        }
+
+
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
+        {
+            StandardAxisAssignment(accessor);
+            var acc = accessor.CreateAccumulatorForStacking();
+            var barWidth = accessor.GetSuggestedBarWidth();
+            var bars = accessor.CalculateSeries()
+                .Select(ser => CreateBars(plot, acc, ser, false, barWidth))
                 .ToArray();
 
-            var xColumn = result.ColumnDefinitions()[0];
-            var fullXdata = result.EnumerateColumnData(xColumn).ToArray();
+            FixupAxisTicks(plot, accessor, false);
+            return true;
+        }
 
-            var lookup = AxisLookup.From(xColumn, fullXdata);
-            var acc = fullXdata.Distinct().ToDictionary(k => k!, _ => 0.0);
-            foreach (var (index,item) in series.Index())
-            {
-                var xData = item.Select(r => r[0]).ToArray();
-                var yData = item.Select(r => r[1]).ToArray();
-                var legend = item.Key?.ToString() ?? string.Empty;
-              
-                AddSeries(index, result.Visualization, plot, xData, yData, legend, lookup, acc);
-            }
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
+        {
+            StandardAxisAssignment(accessor);
+            var acc = accessor.CreateAccumulatorForStacking();
+            var barWidth = accessor.GetSuggestedBarWidth();
+            var bars = accessor.CalculateSeries()
+                .Select(ser => CreateBars(plot, acc, ser, true, barWidth))
+                .ToArray();
 
-            if (xColumn.UnderlyingType == typeof(DateTime))
-                plot.Axes.DateTimeTicksBottom();
+            FixupAxisTicks(plot, accessor, true);
+            return true;
+        }
 
-            if (xColumn.UnderlyingType == typeof(string))
-            {
-                Tick[] ticks =
-                    lookup.Dict().Select(kv =>
-                        new Tick(kv.Key, kv.Value)).ToArray();
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
+        {
+            StandardAxisAssignment(accessor);
 
-
-                if (result.Visualization.ChartType.Contains("barchart"))
-                {
-                    plot.Axes.Left.TickGenerator = new ScottPlot.TickGenerators.NumericManual(ticks);
-                    plot.Axes.Left.MajorTickStyle.Length = 0;
-                    plot.HideGrid();
-
-
-                    plot.Axes.Margins(left: 0);
-                }
-                else
-                {
-                    plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(ticks);
-                    plot.Axes.Bottom.MajorTickStyle.Length = 0;
-                    plot.HideGrid();
-                    plot.Axes.Margins(bottom: 0);
-                }
-            }
-
-
+            var bars = accessor.CalculateSeries()
+                .Select(ser => CreateRangeBars(plot, ser, true))
+                .ToArray();
+            FixupAxisForLadder(plot, accessor);
             return true;
         }
 
         return await Task.FromResult(true);
     }
 
-    private static void AddSeries(int n,VisualizationState state, Plot plot, object?[] xData, object?[] yData,
-        string legend, IAxisLookup xLookup,Dictionary<object,double> acc)
+    private static void StandardAxisAssignment(ResultChartAccessor accessor)
     {
-        switch (state.ChartType.ToLowerInvariant())
-        {
-            case "linechart":
-            {
-                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
-                var line = plot.Add.Scatter(xpoints, yData);
-                line.LegendText = legend;
-                break;
-            }
-            case "scatterchart":
-            {
-                var xpoints = xData.Select(xLookup.ValueFor).ToArray();
-                var line = plot.Add.ScatterPoints(xpoints, yData);
-
-                line.LegendText = legend;
-                break;
-            }
-            case "barchart":
-            {
-                CreateBars(n, plot, xData, yData, legend, xLookup, acc,true);
-                break;
-            }
-            case "columnchart":
-            {
-                CreateBars(n, plot, xData, yData, legend, xLookup, acc, false);
-                    break;
-            }
-            case "piechart":
-                {
-                   
-                    break;
-                }
-            case "ladderchart":
-            case "heatmap":
-                break;
-        }
+        accessor.AssignXColumn(0);
+        accessor.AssignValueColumn(1);
+        accessor.AssignSeriesNameColumn(2);
     }
 
-    private static void CreateBars(int n, Plot plot, object?[] xData, object?[] yData, string legend, IAxisLookup xLookup,
-        Dictionary<object, double> acc,bool makeHorizontal)
+
+    private static void SetTicksOnAxis(IAxis axis, Tick[] ticks)
     {
-        var bars = xData.Zip(yData)
+        axis.TickGenerator = new NumericManual(ticks);
+        axis.MajorTickStyle.Length = 0;
+    }
+
+
+    private static void FixupAxisTicks(Plot plot, ResultChartAccessor accessor, bool invertAxes)
+    {
+        if (invertAxes)
+        {
+            if (accessor.XisDateTime)
+                MakeYAxisDateTime(plot);
+            if (accessor.YisDateTime)
+                plot.Axes.DateTimeTicksBottom();
+            if (accessor.XisNominal)
+            {
+                var ticks = accessor.GetXTicks();
+                SetTicksOnAxis(plot.Axes.Left, ticks);
+                plot.Axes.Margins(left: 0);
+            }
+
+            if (accessor.YisNominal)
+            {
+                var ticks = accessor.GetYTicks();
+                SetTicksOnAxis(plot.Axes.Bottom, ticks);
+                plot.Axes.Margins(bottom: 0);
+            }
+        }
+        else
+        {
+            if (accessor.XisDateTime)
+                plot.Axes.DateTimeTicksBottom();
+
+            if (accessor.XisNominal)
+            {
+                var ticks = accessor.GetXTicks();
+                SetTicksOnAxis(plot.Axes.Bottom, ticks);
+                plot.Axes.Margins(bottom: 0);
+            }
+
+            if (accessor.YisDateTime)
+                MakeYAxisDateTime(plot);
+
+            if (accessor.YisNominal)
+            {
+                var ticks = accessor.GetYTicks();
+                SetTicksOnAxis(plot.Axes.Left, ticks);
+                plot.Axes.Margins(left: 0);
+            }
+        }
+
+        if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
+    }
+
+    private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new DateTimeAutomatic();
+
+    private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
+    {
+        if (accessor.XisDateTime)
+            plot.Axes.DateTimeTicksBottom();
+
+        if (accessor.XisNominal)
+        {
+            var ticks = accessor.GetXTicks();
+            SetTicksOnAxis(plot.Axes.Bottom, ticks);
+            plot.Axes.Margins(bottom: 0);
+        }
+
+
+        var yTicks = accessor.CalculateSeries().Select(ser =>
+            new Tick(ser.Index, ser.Legend, true)).ToArray();
+
+        SetTicksOnAxis(plot.Axes.Left, yTicks);
+        plot.Axes.Margins(left: 0);
+
+        //plot.HideGrid();
+    }
+
+
+    private static BarPlot CreateBars(Plot plot, Dictionary<double, double> acc,
+        ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth)
+    {
+        var bars = series.X.Zip(series.Y)
             .Select(tuple =>
             {
-                var valBase = acc.TryGetValue(tuple.First!, out var b)
-                    ? b
-                    : 0.0;
-                var pos = xLookup.ValueFor(tuple.First);
-                acc[tuple.First!] = valBase + (double)tuple.Second!;
+                var x = tuple.First;
+                var y = tuple.Second;
+                var valBase = acc.GetValueOrDefault(x!, 0.0);
+                var top = valBase + y;
 
-                return new Bar()
+                acc[x] = top;
+
+                var bar = new Bar
                 {
-                    Position = pos,
+                    Position = x,
                     ValueBase = valBase,
-                    Value = valBase + (double)tuple.Second!,
-                    FillColor = plot.Add.Palette.GetColor(n),
+                    Value = top,
+                    FillColor = plot.Add.Palette.GetColor(series.Index)
                 };
+                if (barWidth > 0)
+                    bar.Size = barWidth;
 
+                return bar;
             }).ToArray();
         var b = plot.Add.Bars(bars);
-              
-        b.LegendText = legend;
+
+
+        b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
+        return b;
+    }
+
+    private static BarPlot CreateRangeBars(Plot plot,
+        ResultChartAccessor.ChartSeries series, bool makeHorizontal)
+    {
+        var bars = series.X.Zip(series.Y)
+            .Select(tuple =>
+            {
+                var left = tuple.First;
+                var right = tuple.Second;
+                return new Bar
+                {
+                    Position = series.Index,
+                    ValueBase = left,
+                    Value = right,
+                    FillColor = plot.Add.Palette.GetColor(series.Index)
+                };
+            }).ToArray();
+        var b = plot.Add.Bars(bars);
+
+        b.LegendText = series.Legend;
+        b.Horizontal = makeHorizontal;
+        return b;
     }
 }
