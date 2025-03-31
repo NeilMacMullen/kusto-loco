@@ -2,23 +2,11 @@
 using NotNullStrings;
 using ScottPlot;
 using static MoreLinq.Extensions.PairwiseExtension;
+
 namespace lokqlDx;
 
 public class ResultChartAccessor
 {
-    private readonly KustoQueryResult _result = KustoQueryResult.Empty;
-    private ColumnResult _xColumn;
-    private ColumnResult _seriesNameColumn;
-    private IAxisLookup _xLookup = new DoubleAxisLookup();
-    private ColumnResult _valueColumn;
-    private IAxisLookup _valueLookup=new DoubleAxisLookup();
-
-    public ResultChartAccessor(KustoQueryResult result)
-    {
-        _result = result;
-
-    }
-
     public enum ChartKind
     {
         Table,
@@ -29,6 +17,23 @@ public class ResultChartAccessor
         Scatter,
         Ladder
     }
+
+    private readonly KustoQueryResult _result = KustoQueryResult.Empty;
+    private ColumnResult _seriesNameColumn = ColumnResult.Empty;
+    private ColumnResult _valueColumn = ColumnResult.Empty;
+    private IAxisLookup _valueLookup = new DoubleAxisLookup();
+    private ColumnResult _xColumn = ColumnResult.Empty;
+    private IAxisLookup _xLookup = new DoubleAxisLookup();
+
+    public ResultChartAccessor(KustoQueryResult result)
+    {
+        _result = result;
+    }
+
+    public bool XisDateTime => _xColumn.UnderlyingType == typeof(DateTime);
+    public bool XisNominal => IsNominal(_xColumn);
+    public bool YisNominal => IsNominal(_valueColumn);
+    public bool YisDateTime => _valueColumn.UnderlyingType == typeof(DateTime);
 
     public ChartKind Kind()
     {
@@ -65,47 +70,46 @@ public class ResultChartAccessor
 
     public void AssignSeriesNameColumn(int i)
     {
-        _seriesNameColumn = _result.ColumnDefinitions()[i];
+        if (i < _result.ColumnCount)
+            _seriesNameColumn = _result.ColumnDefinitions()[i];
     }
 
     public void AssignValueColumn(int i)
     {
         _valueColumn = _result.ColumnDefinitions()[i];
-        _valueLookup= CreateLookup(_valueColumn);
+        _valueLookup = CreateLookup(_valueColumn);
     }
+
+    private object? SeriesValue(object?[] row)
+        => _seriesNameColumn == ColumnResult.Empty
+            ? string.Empty
+            : row[_seriesNameColumn.Index];
 
     public IReadOnlyCollection<ChartSeries> CalculateSeries()
     {
         var series = _result.EnumerateRows()
-            .GroupBy(r => r[_seriesNameColumn.Index])
+            .GroupBy(SeriesValue)
             .ToArray();
 
         var all = new List<ChartSeries>();
-        
-        foreach (var (index,s) in series.Index())
+
+        foreach (var (index, s) in series.Index())
         {
             var x = s.Select(r => _xLookup.ValueFor(r[_xColumn.Index])).ToArray();
             var y = s.Select(r => _valueLookup!.ValueFor(r[_valueColumn.Index])).ToArray();
-           var legend = s.Key!.ToString().NullToEmpty();
-           all.Add(new ChartSeries(index,legend,x,y));
+            var legend = s.Key!.ToString().NullToEmpty();
+            all.Add(new ChartSeries(index, legend, x, y));
         }
 
         return all;
     }
-    public readonly record struct ChartSeries(int Index,string Legend, double[] X, double[] Y);
 
-    public bool XisDateTime => _xColumn.UnderlyingType == typeof(DateTime);
-    public bool IsNominal(ColumnResult column)=> column.UnderlyingType == typeof(string);
-    public bool XisNominal => IsNominal(_xColumn);
-    public bool YisNominal => IsNominal(_valueColumn);
-    public bool YisDateTime =>_valueColumn.UnderlyingType == typeof(DateTime);
+    public bool IsNominal(ColumnResult column) => column.UnderlyingType == typeof(string);
 
-    public Tick[] GetTicks(IAxisLookup lookup)
-    {
-        return
-            lookup.Dict().Select(kv =>
-                new Tick(kv.Key, kv.Value)).ToArray();
-    }
+    public Tick[] GetTicks(IAxisLookup lookup) =>
+        lookup.Dict().Select(kv =>
+            new Tick(kv.Key, kv.Value)).ToArray();
+
     public Tick[] GetXTicks() => GetTicks(_xLookup);
     public Tick[] GetYTicks() => GetTicks(_valueLookup);
 
@@ -115,13 +119,20 @@ public class ResultChartAccessor
         {
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
-               .OfType<DateTime>()
+                .OfType<DateTime>()
                 .Distinct()
                 .OrderBy(d => d)
                 .Pairwise((a, b) => (b - a).TotalDays)
                 .Min();
-            return smallestGap*0.9;
+            return smallestGap * 0.9;
         }
-        else return 0.0;
+
+        return 0.0;
     }
+
+    public string GetXLabel() => _xColumn.Name;
+
+    public string GetYLabel() => _valueColumn.Name;
+
+    public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y);
 }

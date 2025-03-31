@@ -100,12 +100,14 @@ public static class ScottPlotter
 
     private static void UseDarkMode(Plot plot)
     {
+        
         plot.Add.Palette = new Penumbra();
         plot.FigureBackground.Color = Color.FromHex("#181818");
         plot.DataBackground.Color = Color.FromHex("#1f1f1f");
 
         // change axis and grid colors
-        plot.Axes.Color(Color.FromHex("#d7d7d7"));
+        //plot.Axes.Color(Color.FromHex("#d7d7d7"));
+        plot.Axes.Color(Color.FromHex("#ffffff"));
         plot.Grid.MajorLineColor = Color.FromHex("#404040");
 
         // change legend colors
@@ -123,7 +125,7 @@ public static class ScottPlotter
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
         plot.Add.Palette = new Penumbra();
-        if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount == 2)
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
             accessor.AssignXColumn(0);
             accessor.AssignValueColumn(1);
@@ -146,7 +148,7 @@ public static class ScottPlotter
             return true;
         }
 
-        if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount == 3)
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >=2)
         {
             StandardAxisAssignment(accessor);
             foreach (var ser in accessor.CalculateSeries())
@@ -159,7 +161,7 @@ public static class ScottPlotter
             return true;
         }
 
-        if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount == 3)
+        if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
             StandardAxisAssignment(accessor);
             foreach (var ser in accessor.CalculateSeries())
@@ -249,6 +251,8 @@ public static class ScottPlotter
                 SetTicksOnAxis(plot.Axes.Bottom, ticks);
                 plot.Axes.Margins(bottom: 0);
             }
+            plot.Axes.Left.Label.Text = accessor.GetXLabel();
+            plot.Axes.Bottom.Label.Text = accessor.GetYLabel();
         }
         else
         {
@@ -271,6 +275,9 @@ public static class ScottPlotter
                 SetTicksOnAxis(plot.Axes.Left, ticks);
                 plot.Axes.Margins(left: 0);
             }
+
+            plot.Axes.Left.Label.Text = accessor.GetYLabel();
+            plot.Axes.Bottom.Label.Text = accessor.GetXLabel();
         }
 
         if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
