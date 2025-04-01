@@ -127,9 +127,7 @@ public static class ScottPlotter
         plot.Add.Palette = new Penumbra();
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
-            accessor.AssignXColumn(0);
-            accessor.AssignValueColumn(1);
-            accessor.AssignSeriesNameColumn(0);
+            StandardAxisAssignment(accessor,"on|ot",0,1,0);
 
             var slices = accessor.CalculateSeries()
                 .Select(ser => new PieSlice
@@ -150,7 +148,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >=2)
         {
-            StandardAxisAssignment(accessor);
+            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.Scatter(ser.X, ser.Y);
@@ -163,7 +161,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor);
+            StandardAxisAssignment(accessor, "tno|nno|noo",0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
@@ -177,7 +175,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor);
+            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -190,7 +188,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor);
+            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -203,7 +201,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor);
+            StandardAxisAssignment(accessor, "tto|nno", 0, 1, 2);
 
             var bars = accessor.CalculateSeries()
                 .Select(ser => CreateRangeBars(plot, ser, true))
@@ -215,11 +213,13 @@ public static class ScottPlotter
         return await Task.FromResult(true);
     }
 
-    private static void StandardAxisAssignment(ResultChartAccessor accessor)
+    private static void StandardAxisAssignment(ResultChartAccessor accessor,
+        string preferences,int x,int y,int s)
     {
-        accessor.AssignXColumn(0);
-        accessor.AssignValueColumn(1);
-        accessor.AssignSeriesNameColumn(2);
+        var cols = accessor.TryOrdering(preferences);
+        accessor.AssignXColumn(cols[x].Index);
+        accessor.AssignValueColumn(cols[y].Index);
+        accessor.AssignSeriesNameColumn(cols[s].Index);
     }
 
 

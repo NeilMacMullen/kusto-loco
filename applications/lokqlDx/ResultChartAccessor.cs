@@ -30,10 +30,13 @@ public class ResultChartAccessor
         _result = result;
     }
 
-    public bool XisDateTime => _xColumn.UnderlyingType == typeof(DateTime);
+    public bool IsTemporal(ColumnResult column)=> column.UnderlyingType == typeof(DateTime);
+    public bool IsNumeric(ColumnResult column) =>
+        new[] {typeof(double),typeof(long),typeof(float),typeof(int)}.Contains(column.UnderlyingType);
+    public bool XisDateTime => IsTemporal(_xColumn);
     public bool XisNominal => IsNominal(_xColumn);
     public bool YisNominal => IsNominal(_valueColumn);
-    public bool YisDateTime => _valueColumn.UnderlyingType == typeof(DateTime);
+    public bool YisDateTime => IsTemporal(_valueColumn);
 
     public ChartKind Kind()
     {
@@ -104,6 +107,10 @@ public class ResultChartAccessor
         return all;
     }
 
+    /// <summary>
+    /// True if the type of column represents an unordered, non-numeric value such as a name
+    /// </summary>
+  
     public bool IsNominal(ColumnResult column) => column.UnderlyingType == typeof(string);
 
     public Tick[] GetTicks(IAxisLookup lookup) =>
@@ -135,4 +142,60 @@ public class ResultChartAccessor
     public string GetYLabel() => _valueColumn.Name;
 
     public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y);
+
+    /// <summary>
+    /// Try to reorder the columns in a way that makes most sense to the
+    /// particular chart
+    /// </summary>
+    /// <remarks>
+    /// We use a little DSL here to specify desired orderings....
+    /// "tno|too" means we prefer Time, Numeric, nOminal or, failing that
+    /// Time, nOminal,nOminal
+    /// </remarks>
+    public ColumnResult[] TryOrdering(string cn)
+    {
+        var combos = cn.Tokenize("|");
+        var availableColumns = _result.ColumnDefinitions();
+        foreach (var c in combos)
+        {
+            var claimed = new List<ColumnResult>();
+            if (availableColumns.Length < c.Length)
+                continue;
+
+            foreach (var ch in c.ToLowerInvariant())
+            {
+                switch (ch)
+                {
+                    case 'n':
+                        ClaimFirstMatchingColumn(IsNumeric);
+                        break;
+                    case 't':
+                        ClaimFirstMatchingColumn(IsTemporal);
+                        break;
+                    case 'o':
+                        ClaimFirstMatchingColumn(IsNominal);
+                        break;
+                }
+            }
+
+            if (claimed.Count == c.Length)
+                return claimed.ToArray();
+            continue;
+
+            void ClaimFirstMatchingColumn(Func<ColumnResult, bool> criteria)
+            {
+                var matches = availableColumns.Except(claimed)
+                    .OrderBy(c => c.Index)
+                    .Where(criteria).ToArray();
+                if (matches.Any())
+                    claimed.Add(matches.First());
+                
+            }
+        }
+        //if all else fails return the original set...
+        return availableColumns;
+    }
+
+  
 }
+
