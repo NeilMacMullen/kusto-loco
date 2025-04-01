@@ -156,16 +156,24 @@ public class ResultChartAccessor
     {
         var combos = cn.Tokenize("|");
         var availableColumns = _result.ColumnDefinitions();
-        foreach (var c in combos)
+        foreach (var axisCombo in combos)
         {
-            var claimed = new List<ColumnResult>();
-            if (availableColumns.Length < c.Length)
+            if (availableColumns.Length < axisCombo.Length)
                 continue;
 
-            foreach (var ch in c.ToLowerInvariant())
+            var claimed = new List<ColumnResult>();
+            var chars = axisCombo.ToLowerInvariant().ToCharArray();
+
+            AllowOverrideFrom("xcolumn",0);
+            AllowOverrideFrom("ycolumns",1);
+            AllowOverrideFrom("series", 2);
+            foreach (var ch in chars)
             {
                 switch (ch)
                 {
+                    case '_':
+                        //indicates we've already handled this
+                        break;
                     case 'n':
                         ClaimFirstMatchingColumn(IsNumeric);
                         break;
@@ -178,9 +186,17 @@ public class ResultChartAccessor
                 }
             }
 
-            if (claimed.Count == c.Length)
+            if (claimed.Count == axisCombo.Length)
                 return claimed.ToArray();
             continue;
+
+            void AllowOverrideFrom(string property, int index)
+            {
+                ClaimFirstMatchingColumn(
+                    col => col.Name == _result.Visualization.PropertyOr(property, string.Empty));
+                if (claimed.Any())
+                    chars[index] = '_';
+            }
 
             void ClaimFirstMatchingColumn(Func<ColumnResult, bool> criteria)
             {

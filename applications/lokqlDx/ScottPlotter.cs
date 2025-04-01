@@ -219,7 +219,8 @@ public static class ScottPlotter
         var cols = accessor.TryOrdering(preferences);
         accessor.AssignXColumn(cols[x].Index);
         accessor.AssignValueColumn(cols[y].Index);
-        accessor.AssignSeriesNameColumn(cols[s].Index);
+        if (s< cols.Length)
+            accessor.AssignSeriesNameColumn(cols[s].Index);
     }
 
 
