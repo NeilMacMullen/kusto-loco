@@ -88,6 +88,8 @@ public class AxisLookup
 
 public static class ScottPlotter
 {
+    private const string StandardAxisPrefs= "tno|nno|noo|tn|nn|on|to";
+
     public static async Task<bool> Render(WpfPlot plotter, KustoQueryResult result)
     {
         plotter.Reset();
@@ -148,7 +150,8 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >=2)
         {
-            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
+           
+            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.Scatter(ser.X, ser.Y);
@@ -161,7 +164,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "tno|nno|noo",0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPrefs,0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
@@ -175,7 +178,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -188,7 +191,7 @@ public static class ScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "tno|nno|noo", 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
