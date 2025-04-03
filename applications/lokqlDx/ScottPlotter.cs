@@ -1,4 +1,5 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.ScottPlotRendering;
 using NotNullStrings;
 using ScottPlot;
 using ScottPlot.Palettes;
@@ -8,99 +9,26 @@ using ScottPlot.WPF;
 
 namespace lokqlDx;
 
-public interface IAxisLookup
-{
-    public double ValueFor(object? o);
-    string GetLabel(double position);
-    Dictionary<double, string> Dict();
-}
-
-public class StringAxisLookup : IAxisLookup
-{
-    private readonly Dictionary<double, object> _labelLookup;
-    private readonly Dictionary<object, double> _lookup;
-
-    public StringAxisLookup(Dictionary<object, double> lookup)
-    {
-        _lookup = lookup;
-        _labelLookup = _lookup.ToDictionary(kv => kv.Value, kv => kv.Key);
-    }
-
-    public double ValueFor(object? o) => o is null ? 0 : _lookup[o];
-
-    public string GetLabel(double position) => _labelLookup.TryGetValue(position, out var o)
-        ? o.ToString().NullToEmpty()
-        : string.Empty;
-
-    public Dictionary<double, string> Dict() =>
-        _labelLookup.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString().NullToEmpty()!);
-}
-
-public class DateTimeAxisLookup : IAxisLookup
-{
-    public double ValueFor(object? o) => o is null ? 0 : ((DateTime)o).ToOADate();
-    public string GetLabel(double position) => throw new NotImplementedException();
-    public Dictionary<double, string> Dict() => throw new NotImplementedException();
-}
-
-public class DoubleAxisLookup : IAxisLookup
-{
-    public double ValueFor(object? o) => o is null ? 0 : (double)o;
-    public string GetLabel(double position) => throw new NotImplementedException();
-    public Dictionary<double, string> Dict() => throw new NotImplementedException();
-}
-
-public class LongAxisLookup : IAxisLookup
-{
-    public double ValueFor(object? o) => o is null ? 0 : (double)(long)o;
-    public string GetLabel(double position) => throw new NotImplementedException();
-    public Dictionary<double, string> Dict() => throw new NotImplementedException();
-}
-
-public class AxisLookup
-{
-    public static IAxisLookup From(ColumnResult col, object?[] data)
-    {
-        if (col.UnderlyingType == typeof(string))
-        {
-            var d = new Dictionary<object, double>();
-            var index = 1.0;
-            foreach (var o in data)
-            {
-                if (o is null)
-                    continue;
-                if (!d.ContainsKey(o))
-                    d[o] = index++;
-            }
-
-            return new StringAxisLookup(d);
-        }
-
-        if (col.UnderlyingType == typeof(DateTime)) return new DateTimeAxisLookup();
-
-        if (col.UnderlyingType == typeof(double)) return new DoubleAxisLookup();
-
-        if (col.UnderlyingType == typeof(long)) return new LongAxisLookup();
-
-        throw new InvalidOperationException($"Unsupported type {col.UnderlyingType.Name}");
-    }
-}
 
 public static class ScottPlotter
 {
-    private const string StandardAxisPrefs= "tno|nno|noo|tn|nn|on|to";
-
-    public static async Task<bool> Render(WpfPlot plotter, KustoQueryResult result)
+    public static void Render(WpfPlot plotter, KustoQueryResult result)
     {
         plotter.Reset();
-        var r = await Render(plotter.Plot, result);
-        UseDarkMode(plotter.Plot);
+         GenericScottPlotter.Render(plotter.Plot, result);
+        GenericScottPlotter.UseDarkMode(plotter.Plot);
         plotter.Plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
         plotter.Refresh();
-        return r;
+       
     }
+}
 
-    private static void UseDarkMode(Plot plot)
+public static class GenericScottPlotter
+{
+    private const string StandardAxisPrefs= "tno|nno|noo|tn|nn|on|to";
+
+
+    public static void UseDarkMode(Plot plot)
     {
         
         plot.Add.Palette = new Penumbra();
@@ -122,7 +50,7 @@ public static class ScottPlotter
     }
 
 
-    public static async Task<bool> Render(Plot plot, KustoQueryResult result)
+    public static void Render(Plot plot, KustoQueryResult result)
     {
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
@@ -145,7 +73,7 @@ public static class ScottPlotter
             // hide unnecessary plot components
             plot.Axes.Frameless();
             plot.HideGrid();
-            return true;
+           
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >=2)
@@ -159,7 +87,7 @@ public static class ScottPlotter
             }
 
             FixupAxisTicks(plot, accessor, false);
-            return true;
+            return ;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
@@ -172,7 +100,7 @@ public static class ScottPlotter
             }
 
             FixupAxisTicks(plot, accessor, false);
-            return true;
+            return ;
         }
 
 
@@ -186,7 +114,7 @@ public static class ScottPlotter
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, false);
-            return true;
+            return ;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
@@ -199,7 +127,7 @@ public static class ScottPlotter
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, true);
-            return true;
+            return;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
@@ -210,13 +138,14 @@ public static class ScottPlotter
                 .Select(ser => CreateRangeBars(plot, ser, true))
                 .ToArray();
             FixupAxisForLadder(plot, accessor);
-            return true;
+            return;
         }
 
-        return await Task.FromResult(true);
+        return ;
     }
 
     private static void StandardAxisAssignment(ResultChartAccessor accessor,
+
         string preferences,int x,int y,int s)
     {
         var cols = accessor.TryOrdering(preferences);
@@ -227,9 +156,9 @@ public static class ScottPlotter
     }
 
 
-    private static void SetTicksOnAxis(IAxis axis, Tick[] ticks)
+    private static void SetTicksOnAxis(IAxis axis, GenericTick[] ticks)
     {
-        axis.TickGenerator = new NumericManual(ticks);
+        axis.TickGenerator = new NumericManual(ticks.ToMajorTicks());
         axis.MajorTickStyle.Length = 0;
     }
 
@@ -303,7 +232,7 @@ public static class ScottPlotter
 
 
         var yTicks = accessor.CalculateSeries().Select(ser =>
-            new Tick(ser.Index, ser.Legend, true)).ToArray();
+            new GenericTick(ser.Index, ser.Legend)).ToArray();
 
         SetTicksOnAxis(plot.Axes.Left, yTicks);
         plot.Axes.Margins(left: 0);
@@ -366,5 +295,18 @@ public static class ScottPlotter
         b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
         return b;
+    }
+}
+
+public static class TickExtension
+{
+    public static Tick[] ToMajorTicks(this IEnumerable<GenericTick> genericTicks)
+    {
+        return genericTicks.Select(kv => new Tick(kv.Value, kv.Name, true)).ToArray();
+    }
+
+    public static Tick[] ToMinorTicks(this IEnumerable<GenericTick> genericTicks)
+    {
+        return genericTicks.Select(kv => new Tick(kv.Value, kv.Name, false)).ToArray();
     }
 }

@@ -26,7 +26,11 @@ public class WebViewRenderer(
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
-        await SafeInvoke(async () => await ScottPlotter.Render(Plotter,result));
+        await SafeInvoke(() =>
+        {
+            ScottPlotter.Render(Plotter, result);
+            return Task.FromResult(true);
+        });
     }
 
   
