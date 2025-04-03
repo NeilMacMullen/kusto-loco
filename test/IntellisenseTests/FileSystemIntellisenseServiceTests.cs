@@ -291,31 +291,31 @@ public class FileSystemIntellisenseServiceTests
 
 file class FileSystemIntellisenseServiceTestFixture
 {
-    private FileSystemIntellisenseService FileSystemIntellisenseService { get; }
-    private FakeLogger<IFileSystemIntellisenseService> Logger { get; }
+    private readonly FileSystemIntellisenseService _fileSystemIntellisenseService;
+    private readonly FakeLogger<IFileSystemIntellisenseService> _logger;
 
     public FileSystemIntellisenseServiceTestFixture(Dictionary<string, MockFileData> fileData, MockFileSystemOptions? options = null)
     {
         options ??= new MockFileSystemOptions { CreateDefaultTempDir = false };
         var fileSystem = new MockFileSystem(fileData, options);
         var reader = new FileSystemReader(fileSystem);
-        Logger = new FakeLogger<IFileSystemIntellisenseService>();
-        FileSystemIntellisenseService = new FileSystemIntellisenseService(reader,Logger);
+        _logger = new FakeLogger<IFileSystemIntellisenseService>();
+        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader,_logger);
     }
 
     public FileSystemIntellisenseServiceTestFixture(IFileSystemReader reader)
     {
-        Logger = new FakeLogger<IFileSystemIntellisenseService>();
-        FileSystemIntellisenseService = new FileSystemIntellisenseService(reader,Logger);
+        _logger = new FakeLogger<IFileSystemIntellisenseService>();
+        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader,_logger);
     }
 
     public IReadOnlyList<FakeLogRecord> GetLogs()
     {
-        return Logger.Collector.GetSnapshot();
+        return _logger.Collector.GetSnapshot();
     }
 
     public CompletionResult GetPathIntellisenseOptions(string path)
     {
-        return FileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+        return _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
     }
 }
