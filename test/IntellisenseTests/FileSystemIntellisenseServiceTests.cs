@@ -4,9 +4,8 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Intellisense;
 using Intellisense.FileSystem;
-using Microsoft.Extensions.Logging.Testing;
+using IntellisenseTests.Fixtures;
 using Moq;
 using Xunit;
 
@@ -286,30 +285,4 @@ public class FileSystemIntellisenseServiceTests
         var result = f.GetPathIntellisenseOptions("//unc/c/");
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("folderC1", "folderC2");
     }
-}
-
-
-file class FileSystemIntellisenseServiceTestFixture
-{
-    private readonly FileSystemIntellisenseService _fileSystemIntellisenseService;
-    private readonly FakeLogger<IFileSystemIntellisenseService> _logger;
-
-    public FileSystemIntellisenseServiceTestFixture(Dictionary<string, MockFileData> fileData, MockFileSystemOptions? options = null)
-    {
-        options ??= new MockFileSystemOptions { CreateDefaultTempDir = false };
-        var fileSystem = new MockFileSystem(fileData, options);
-        var reader = new FileSystemReader(fileSystem);
-        _logger = new FakeLogger<IFileSystemIntellisenseService>();
-        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader,_logger);
-    }
-
-    public FileSystemIntellisenseServiceTestFixture(IFileSystemReader reader)
-    {
-        _logger = new FakeLogger<IFileSystemIntellisenseService>();
-        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader,_logger);
-    }
-
-    public IReadOnlyList<FakeLogRecord> GetLogs() => _logger.Collector.GetSnapshot();
-
-    public CompletionResult GetPathIntellisenseOptions(string path) => _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
 }
