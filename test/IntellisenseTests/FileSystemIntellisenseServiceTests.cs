@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Intellisense;
 using Intellisense.FileSystem;
+using Microsoft.Extensions.Logging.Testing;
+using Moq;
 using Xunit;
 
 namespace IntellisenseTests;
@@ -251,6 +253,25 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [Fact]
+    public void GetPathIntellisenseOptions_IOException_LogsError()
+    {
+
+        var mock = new Mock<IFileSystemReader>();
+        mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<PathTooLongException>();
+
+        var f = new FileSystemIntellisenseServiceTestFixture(mock.Object);
+
+        f.GetLogs().Should().NotContain(x => x.Exception is IOException);
+
+        f
+            .Invoking(x => x.GetPathIntellisenseOptions(""))
+            .Should()
+            .NotThrow();
+
+        f.GetLogs().Should().ContainSingle(x => x.Exception is IOException);
+    }
+
+    [Fact]
     public void GetPathIntellisenseOptions_UncRootPaths_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -267,17 +288,30 @@ public class FileSystemIntellisenseServiceTests
     }
 }
 
+
 file class FileSystemIntellisenseServiceTestFixture
 {
-    private IFileSystem FileSystem { get; }
-    private IFileSystemIntellisenseService FileSystemIntellisenseService { get; }
+    private FileSystemIntellisenseService FileSystemIntellisenseService { get; }
+    private FakeLogger<IFileSystemIntellisenseService> Logger { get; }
 
     public FileSystemIntellisenseServiceTestFixture(Dictionary<string, MockFileData> fileData, MockFileSystemOptions? options = null)
     {
         options ??= new MockFileSystemOptions { CreateDefaultTempDir = false };
-        FileSystem = new MockFileSystem(fileData, options);
-        FileSystemIntellisenseService =
-            FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService(FileSystem);
+        var fileSystem = new MockFileSystem(fileData, options);
+        var reader = new FileSystemReader(fileSystem);
+        Logger = new FakeLogger<IFileSystemIntellisenseService>();
+        FileSystemIntellisenseService = new FileSystemIntellisenseService(reader,Logger);
+    }
+
+    public FileSystemIntellisenseServiceTestFixture(IFileSystemReader reader)
+    {
+        Logger = new FakeLogger<IFileSystemIntellisenseService>();
+        FileSystemIntellisenseService = new FileSystemIntellisenseService(reader,Logger);
+    }
+
+    public IReadOnlyList<FakeLogRecord> GetLogs()
+    {
+        return Logger.Collector.GetSnapshot();
     }
 
     public CompletionResult GetPathIntellisenseOptions(string path)
