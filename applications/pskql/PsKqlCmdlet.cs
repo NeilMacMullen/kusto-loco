@@ -3,14 +3,17 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using KustoLoco.Rendering;
-using Microsoft.Web.WebView2.Core;
-using ScottPlot;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Management.Automation;
 using System.Runtime.InteropServices;
+using KustoLoco.ScottPlotRendering;
+
+using ScottPlot;
 using Image = SixLabors.ImageSharp.Image;
+using ImageFormat = ScottPlot.ImageFormat;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace pskql;
@@ -181,44 +184,22 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                /*
-                WriteObject("creating renderer");
-               var renderer = new KustoResultRenderer(new KustoSettingsProvider());
-               WriteObject("generating html");
-                var html = renderer.RenderToHtml(result);
-                WriteObject("rendering toimage");
-                var res =  RenderToImage(html, 100, 100).GetAwaiter().GetResult();
-                WriteObject("rendered to image");
-                */
-                double[] dataX = { 1, 2, 3, 4, 5 };
-                double[] dataY = { 1, 4, 9, 16, 25 };
-
-                ScottPlot.Plot myPlot = new();
-                myPlot.Add.Scatter(dataX, dataY);
-                byte[] bytes = myPlot.GetImageBytes(100,100,ImageFormat.Png);
+                ScottPlot.Plot lot = new();
+                GenericScottPlotter.Render(lot, result);
+                GenericScottPlotter.UseDarkMode(lot);
+                lot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
+              
+                var bytes = lot.GetImageBytes(800,800,ImageFormat.Png);
 
                 using MemoryStream strm = new(bytes);
-              
-
-               // var strm = new MemoryStream(res);
               var image = Image.Load<Rgba32>(strm);
-              WriteObject("getting sixel...");
-              var str = Sixel.ImageToSixel(image, 256, 20);
-              WriteObject("sixel....");
-              using var writer = new VTWriter();
-              writer.Write(str);
+              var str = Sixel.ImageToSixel(image, 256, 80);
               WriteObject(str);
             }
         }
     }
 
-    public async Task<byte[]> RenderToImage(string html, double pWidth, double pHeight)
-    {
-       
-        return await WebViewExtensions.RenderToImage(html, pWidth, pHeight);
-    }
-
-
+   
     private BaseColumnBuilder GetOrCreateBuilder(string name, string typeName)
     {
         var type = TypeNameHelper.GetTypeFromName(typeName);
@@ -279,61 +260,6 @@ public class PsKqlCmdlet : Cmdlet
     }
 }
 
-public static class WebViewExtensions
-{
-    private static readonly IntPtr HWND_MESSAGE = new(-3);
-
-    /// <summary>
-    ///     Captures the image currently displayed in the webview.
-    /// </summary>
-    public static async Task<byte[]> CaptureImage(CoreWebView2 webview)
-    {
-        var stream = new MemoryStream();
-        await webview.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, stream);
-
-        return stream.GetBuffer();
-    }
-
-    public static async Task<byte[]> RenderToImage(string html, double pixelWidth, double pixelHeight)
-    {
-        var environment = await CoreWebView2Environment.CreateAsync();
-        var browserController = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
-        var bounds = new Rectangle(0, 0, (int)pixelWidth, (int)pixelHeight);
-        browserController.Bounds = bounds;
-        await NavigateToStringAsync(browserController.CoreWebView2, html);
-        var image = await CaptureImage(browserController.CoreWebView2);
-        browserController.Close();
-        return image;
-    }
-
-    /// <summary>
-    ///     Navigates to a string in the specified webView and waits for the navigation to complete.
-    /// </summary>
-    public static async Task NavigateToStringAsync(CoreWebView2 webView, string htmlContent, bool retry = false)
-    {
-        try
-        {
-            var tcs = new TaskCompletionSource<bool>();
-
-            void NavigationCompletedHandler(object sender, CoreWebView2NavigationCompletedEventArgs e)
-            {
-                webView.NavigationCompleted -= NavigationCompletedHandler!;
-                tcs.SetResult(true);
-            }
-
-            webView.NavigationCompleted += NavigationCompletedHandler!;
-            webView.NavigateToString(htmlContent);
-
-            await tcs.Task;
-        }
-        catch
-        {
-            //sometimes we can't render content, for example if it's way too large, if so attempt to provide a warning
-            if (!retry)
-                await NavigateToStringAsync(webView, "<html><body><font color=\"red\">Unable to render content</font></body></html>", true);
-        }
-    }
-}
 
 internal class VTWriter : IDisposable
 {
