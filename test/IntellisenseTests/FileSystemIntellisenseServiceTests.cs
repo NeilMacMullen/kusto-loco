@@ -309,13 +309,7 @@ file class FileSystemIntellisenseServiceTestFixture
         _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader,_logger);
     }
 
-    public IReadOnlyList<FakeLogRecord> GetLogs()
-    {
-        return _logger.Collector.GetSnapshot();
-    }
+    public IReadOnlyList<FakeLogRecord> GetLogs() => _logger.Collector.GetSnapshot();
 
-    public CompletionResult GetPathIntellisenseOptions(string path)
-    {
-        return _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
-    }
+    public CompletionResult GetPathIntellisenseOptions(string path) => _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
 }
