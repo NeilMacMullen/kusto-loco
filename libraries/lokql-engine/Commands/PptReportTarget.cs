@@ -7,17 +7,22 @@ namespace Lokql.Engine.Commands;
 public class PptReportTarget : IReportTarget
 {
     private readonly Presentation _pres;
+    private bool _isDisposed;
 
     private PptReportTarget(Presentation pres) => _pres = pres;
 
     public async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
     {
+        if (_isDisposed)
+            return;
         var surface = explorer.GetRenderingSurface();
         await UpdateOrAddImage(name, surface, result);
     }
 
     public void UpdateOrAddText(string name, string text)
     {
+        if (_isDisposed)
+            return;
         var matches = FindMatches<IShape>(name);
         if (matches.Any())
             foreach (var p in matches)
@@ -26,6 +31,10 @@ public class PptReportTarget : IReportTarget
 
     public void UpdateOrAddTable(string name, KustoQueryResult res)
     {
+        if (_isDisposed)
+            return;
+
+
         var matchingTables = FindMatches<ITable>(name);
 
         if (matchingTables.Any())
@@ -78,11 +87,16 @@ public class PptReportTarget : IReportTarget
 
     public void SaveAs(string name)
     {
+        if(_isDisposed) return;
         _pres.Save(name);
+        _pres.Dispose();
+        _isDisposed = true;
     }
 
     private async Task UpdateOrAddImage(string name, IResultRenderingSurface surface, KustoQueryResult result)
     {
+        if (_isDisposed)
+            return;
         var matchingPictures = FindMatches<IPicture>(name);
         if (matchingPictures.Any())
         {
@@ -107,6 +121,7 @@ public class PptReportTarget : IReportTarget
 
     private ISlide AddSlide()
     {
+
         _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
         return _pres.Slides.Last();
     }

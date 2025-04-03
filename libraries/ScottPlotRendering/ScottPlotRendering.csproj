@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>KustoLoco.ScottPlotRendering</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="morelinq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
+  </ItemGroup>
+
+</Project>

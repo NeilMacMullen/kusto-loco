@@ -45,7 +45,7 @@ public partial class MainWindow : Window
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
         _renderingSurface = new WebViewRenderer(RenderingSurface, webview, dataGrid,
-            DatagridOverflowWarning,
+            DatagridOverflowWarning,WpfPlot1,
             settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
     }

@@ -23,6 +23,8 @@ dotnet_diagnostic.UA0013.severity = none
 # annoying warnign to use Length==0 instead of !.Any()
 dotnet_diagnostic.CA1860.severity = none
 
+csharp_style_expression_bodied_methods=true	
+
 [*.csproj]
 indent_style = space
 indent_size = 2
