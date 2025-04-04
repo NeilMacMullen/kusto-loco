@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Intellisense;
 using Intellisense.FileSystem;
+using IntellisenseTests.Fixtures;
+using Moq;
 using Xunit;
 
 namespace IntellisenseTests;
@@ -251,6 +252,25 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [Fact]
+    public void GetPathIntellisenseOptions_IOException_LogsError()
+    {
+
+        var mock = new Mock<IFileSystemReader>();
+        mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<PathTooLongException>();
+
+        var f = new FileSystemIntellisenseServiceTestFixture(mock.Object);
+
+        f.GetLogs().Should().NotContain(x => x.Exception is IOException);
+
+        f
+            .Invoking(x => x.GetPathIntellisenseOptions(""))
+            .Should()
+            .NotThrow();
+
+        f.GetLogs().Should().ContainSingle(x => x.Exception is IOException);
+    }
+
+    [Fact]
     public void GetPathIntellisenseOptions_UncRootPaths_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -264,24 +284,5 @@ public class FileSystemIntellisenseServiceTests
         var f = new FileSystemIntellisenseServiceTestFixture(data);
         var result = f.GetPathIntellisenseOptions("//unc/c/");
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("folderC1", "folderC2");
-    }
-}
-
-file class FileSystemIntellisenseServiceTestFixture
-{
-    private IFileSystem FileSystem { get; }
-    private IFileSystemIntellisenseService FileSystemIntellisenseService { get; }
-
-    public FileSystemIntellisenseServiceTestFixture(Dictionary<string, MockFileData> fileData, MockFileSystemOptions? options = null)
-    {
-        options ??= new MockFileSystemOptions { CreateDefaultTempDir = false };
-        FileSystem = new MockFileSystem(fileData, options);
-        FileSystemIntellisenseService =
-            FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService(FileSystem);
-    }
-
-    public CompletionResult GetPathIntellisenseOptions(string path)
-    {
-        return FileSystemIntellisenseService.GetPathIntellisenseOptions(path);
     }
 }

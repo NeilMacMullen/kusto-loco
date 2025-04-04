@@ -1,5 +1,6 @@
 ﻿using Intellisense.FileSystem.CompletionResultRetrievers;
 using Intellisense.FileSystem.Paths;
+using Microsoft.Extensions.Logging;
 
 namespace Intellisense.FileSystem;
 
@@ -17,9 +18,11 @@ public interface IFileSystemIntellisenseService
 internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
 {
     private readonly IFileSystemPathCompletionResultRetriever[] _retrievers;
+    private readonly ILogger<IFileSystemIntellisenseService> _logger;
 
-    public FileSystemIntellisenseService(IFileSystemReader reader)
+    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger)
     {
+        _logger = logger;
         _retrievers =
         [
             new ChildrenPathCompletionResultRetriever(reader),
@@ -41,9 +44,9 @@ internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
                 .FirstOrDefault(x => !x.IsEmpty(),CompletionResult.Empty);
 
         }
-        catch (IOException)
+        catch (IOException e)
         {
-            // TODO: Add error logger. If a DI container ends up being introduced, extract out new() calls.
+            _logger.LogError(e,"IO error occurred while fetching intellisense results. Returning empty result.");
             return CompletionResult.Empty;
         }
     }
