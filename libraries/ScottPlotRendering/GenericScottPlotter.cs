@@ -13,7 +13,6 @@ public static class GenericScottPlotter
 
     public static void UseDarkMode(Plot plot)
     {
-
         plot.Add.Palette = new Penumbra();
         plot.FigureBackground.Color = Color.FromHex("#181818");
         plot.DataBackground.Color = Color.FromHex("#1f1f1f");
@@ -56,12 +55,10 @@ public static class GenericScottPlotter
             // hide unnecessary plot components
             plot.Axes.Frameless();
             plot.HideGrid();
-
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >= 2)
         {
-
             StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
@@ -121,14 +118,10 @@ public static class GenericScottPlotter
                 .Select(ser => CreateRangeBars(plot, ser, true))
                 .ToArray();
             FixupAxisForLadder(plot, accessor);
-            return;
         }
-
-        return;
     }
 
     private static void StandardAxisAssignment(ResultChartAccessor accessor,
-
         string preferences, int x, int y, int s)
     {
         var cols = accessor.TryOrdering(preferences);
@@ -167,6 +160,7 @@ public static class GenericScottPlotter
                 SetTicksOnAxis(plot.Axes.Bottom, ticks);
                 plot.Axes.Margins(bottom: 0);
             }
+
             plot.Axes.Left.Label.Text = accessor.GetXLabel();
             plot.Axes.Bottom.Label.Text = accessor.GetYLabel();
         }
