@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="morelinq" />
+    <PackageReference Include="ScottPlot" />
   </ItemGroup>
 
   <ItemGroup>
