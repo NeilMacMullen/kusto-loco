@@ -118,6 +118,7 @@ public class CommandProcessor
 
     public Dictionary<string, string> GetVerbs()
     {
+
         var verbs= _registrations
             .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
             .OfType<VerbAttribute>()
@@ -126,6 +127,16 @@ public class CommandProcessor
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
         return verbs;
+    }
+
+    public IEnumerable<string> GetVerbsOfOptionsThatTakeFilesAsInput()
+    {
+        var verbs = _registrations
+            .Where(x => x.OptionType.IsAssignableTo(typeof(IFileCommandOption)))
+            .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
+            .OfType<VerbAttribute>();
+
+        return verbs.Select(x => x.Name);
     }
 
     private readonly record struct RegisteredCommand(

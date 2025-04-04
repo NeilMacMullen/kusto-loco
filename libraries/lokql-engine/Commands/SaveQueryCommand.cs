@@ -28,7 +28,7 @@ public static class SaveQueryCommand
 
     [Verb("savequery", aliases: ["sq"],
         HelpText = "save the previous query to a file so you can reuse it")]
-    internal class Options
+    internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of queryFile", Required = true)]
         public string File { get; set; } = string.Empty;

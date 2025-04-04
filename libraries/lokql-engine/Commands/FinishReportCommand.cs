@@ -17,7 +17,7 @@ public static class FinishReportCommand
     }
 
     [Verb("finishreport", HelpText = @"finish a report by saving it out as a file")]
-    internal class Options
+    internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of file to save report to ", Required = true)]
         public string File { get; set; } = string.Empty;

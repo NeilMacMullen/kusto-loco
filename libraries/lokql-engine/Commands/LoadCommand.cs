@@ -42,7 +42,7 @@ When loading text files, a single column named 'Line' is created.
 Examples:
  .load c:\temp\data.csv        
  .load d.parquet data2 ")]
-    internal class Options
+    internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of file", Required = true)]
         public string File { get; set; } = string.Empty;
