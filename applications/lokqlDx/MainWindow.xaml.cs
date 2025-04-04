@@ -163,7 +163,9 @@ public partial class MainWindow : Window
         Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
             .Select(v =>
                 new IntellisenseEntry(v.Key, v.Value, string.Empty))
-            .ToArray());
+            .ToArray(),
+            _explorer._commandProcessor.GetVerbsOfOptionsThatTakeFilesAsInput().Select(x => "." + x)
+            );
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
         UpdateDynamicUiFromPreferences();

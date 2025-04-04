@@ -1,4 +1,5 @@
 ﻿using System.CommandLine.Parsing;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -35,7 +36,7 @@ public partial class QueryEditor : UserControl
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
-    private readonly FileIoCommandParser _fileIoCommandParser = new();
+    private FileIoCommandParser? _fileIoCommandParser;
 
     private CompletionWindow? _completionWindow;
 
@@ -282,6 +283,11 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
+        if (_fileIoCommandParser is null)
+        {
+            throw new UnreachableException("Did not expect FileIoCommandParser to be uninitialized.");
+        }
+
         if (_fileIoCommandParser.GetLastArg(_editorHelper.GetCurrentLineText()) is not { } path)
         {
             return false;
@@ -362,9 +368,10 @@ public partial class QueryEditor : UserControl
         if (e.Text == "?") ShowCompletions(_kqlFunctionEntries, string.Empty, 1);
     }
 
-    public void AddInternalCommands(IntellisenseEntry[] verbs)
+    public void AddInternalCommands(IntellisenseEntry[] verbs, IEnumerable<string> fileIoVerbs)
     {
         _internalCommands = verbs;
+        _fileIoCommandParser = new FileIoCommandParser(fileIoVerbs);
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -503,6 +510,14 @@ public class SchemaIntellisenseProvider
 
 public class FileIoCommandParser
 {
+
+    private HashSet<string> _ioCommands;
+
+    public FileIoCommandParser(IEnumerable<string> supportedCommands)
+    {
+        _ioCommands = supportedCommands.ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
     public string? GetLastArg(string lineText)
     {
         var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
@@ -512,8 +527,8 @@ public class FileIoCommandParser
             return null;
         }
 
-        var isIoCommand = args[0].Equals(".save", StringComparison.OrdinalIgnoreCase) ||
-                          args[0].Equals(".load", StringComparison.OrdinalIgnoreCase);
+
+        var isIoCommand = _ioCommands.Contains(args[0]);
 
         if (!isIoCommand)
         {

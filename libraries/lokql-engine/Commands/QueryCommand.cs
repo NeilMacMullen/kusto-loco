@@ -16,7 +16,7 @@ public static class QueryCommand
 
     [Verb("query", aliases: ["q"],
         HelpText = "run a multi-line query from a file")]
-    internal class Options
+    internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of queryFile", Required = true)]
         public string File { get; set; } = string.Empty;
