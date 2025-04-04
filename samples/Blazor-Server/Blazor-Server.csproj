@@ -24,7 +24,6 @@
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.AI.Ollama" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 

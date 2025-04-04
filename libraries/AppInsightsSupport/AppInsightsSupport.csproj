@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Azure.Monitor.Query" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
   </ItemGroup>
 
   <ItemGroup>

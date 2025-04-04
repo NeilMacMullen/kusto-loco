@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" />
     <PackageReference Include="CsvHelper" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="NLog" />
     <PackageReference Include="ShapeCrawler" />
     <PackageReference Include="System.CommandLine" />
