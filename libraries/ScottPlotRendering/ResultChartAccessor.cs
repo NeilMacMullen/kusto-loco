@@ -1,5 +1,4 @@
-﻿
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using NotNullStrings;
 using static MoreLinq.Extensions.PairwiseExtension;
 
@@ -21,9 +20,9 @@ public class ResultChartAccessor
     private readonly KustoQueryResult _result = KustoQueryResult.Empty;
     private ColumnResult _seriesNameColumn = ColumnResult.Empty;
     private ColumnResult _valueColumn = ColumnResult.Empty;
-    private IAxisLookup _valueLookup = new DoubleAxisLookup();
+    private IAxisLookup _valueLookup = new NumericAxisLookup<double>();
     private ColumnResult _xColumn = ColumnResult.Empty;
-    private IAxisLookup _xLookup = new DoubleAxisLookup();
+    private IAxisLookup _xLookup = new NumericAxisLookup<double>();
 
     public ResultChartAccessor(KustoQueryResult result)
     {
@@ -70,7 +69,7 @@ public class ResultChartAccessor
     public Dictionary<double, double> CreateAccumulatorForStacking()
     {
         var fullXdata = _result.EnumerateColumnData(_xColumn).ToArray();
-        return fullXdata.Distinct().ToDictionary(k => _xLookup.ValueFor(k), _ => 0.0);
+        return fullXdata.Distinct().ToDictionary(k => _xLookup.AxisValueFor(k), _ => 0.0);
     }
 
     public void AssignSeriesNameColumn(int i)
@@ -100,8 +99,8 @@ public class ResultChartAccessor
 
         foreach (var (index, s) in series.Index())
         {
-            var x = s.Select(r => _xLookup.ValueFor(r[_xColumn.Index])).ToArray();
-            var y = s.Select(r => _valueLookup!.ValueFor(r[_valueColumn.Index])).ToArray();
+            var x = s.Select(r => _xLookup.AxisValueFor(r[_xColumn.Index])).ToArray();
+            var y = s.Select(r => _valueLookup!.AxisValueFor(r[_valueColumn.Index])).ToArray();
             var legend = s.Key!.ToString().NullToEmpty();
             all.Add(new ChartSeries(index, legend, x, y));
         }
@@ -112,10 +111,11 @@ public class ResultChartAccessor
     /// <summary>
     ///     True if the type of column represents an unordered, non-numeric value such as a name
     /// </summary>
-    public bool IsNominal(ColumnResult column) => column.UnderlyingType == typeof(string);
+    public bool IsNominal(ColumnResult column) =>
+        new[] { typeof(string), typeof(bool), typeof(Guid) }.Contains(column.UnderlyingType);
 
     public GenericTick[] GetTicks(IAxisLookup lookup) =>
-        lookup.Dict().Select(kv =>
+        lookup.AxisValuesAndLabels().Select(kv =>
             new GenericTick(kv.Key, kv.Value)).ToArray();
 
     public GenericTick[] GetXTicks() => GetTicks(_xLookup);

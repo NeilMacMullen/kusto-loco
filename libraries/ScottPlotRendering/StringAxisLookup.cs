@@ -2,23 +2,35 @@
 
 namespace KustoLoco.ScottPlotRendering;
 
+/// <summary>
+/// Axis Lookup for string values
+/// </summary>
+/// <remarks>
+/// Sometimes we just want to plot strings on the axis.
+/// </remarks>
 public class StringAxisLookup : IAxisLookup
 {
-    private readonly Dictionary<double, object> _labelLookup;
-    private readonly Dictionary<object, double> _lookup;
+    private readonly Dictionary<double, string> _labelLookup;
+    private readonly Dictionary<string, double> _lookup;
 
-    public StringAxisLookup(Dictionary<object, double> lookup)
+    public StringAxisLookup(object? [] data)
     {
-        _lookup = lookup;
+        _lookup = new Dictionary<string, double>();
+        //start at 1.0 to reserve 0.0 for null
+        var index = 1.0;
+        foreach (var o in data)
+        {
+            if (o is not string s)
+                continue;
+            if (!_lookup.ContainsKey(s))
+                _lookup[s] = index++;
+        }
         _labelLookup = _lookup.ToDictionary(kv => kv.Value, kv => kv.Key);
     }
 
-    public double ValueFor(object? o) => o is null ? 0 : _lookup[o];
+    public double AxisValueFor(object? o) => o is string s ? _lookup[s] : 0.0;
 
-    public string GetLabel(double position) => _labelLookup.TryGetValue(position, out var o)
-        ? o.ToString().NullToEmpty()
-        : string.Empty;
 
-    public Dictionary<double, string> Dict() =>
-        _labelLookup.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString().NullToEmpty()!);
+    public Dictionary<double, string> AxisValuesAndLabels() =>
+        _labelLookup;
 }

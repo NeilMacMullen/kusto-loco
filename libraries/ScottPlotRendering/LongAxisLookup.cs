@@ -1,8 +1,42 @@
-﻿namespace KustoLoco.ScottPlotRendering;
+﻿using System.Numerics;
 
-public class LongAxisLookup : IAxisLookup
+namespace KustoLoco.ScottPlotRendering;
+
+public class NumericAxisLookup<T> : IAxisLookup
+    where T : INumber<T>
 {
-    public double ValueFor(object? o) => o is null ? 0 : (double)(long)o;
-    public string GetLabel(double position) => throw new NotImplementedException();
-    public Dictionary<double, string> Dict() => throw new NotImplementedException();
+    public double AxisValueFor(object? o) => o is T t ?  Convert.ToDouble(t) :0;
+
+    //we shouldn't need to generate labels for a numeric axis
+    public Dictionary<double, string> AxisValuesAndLabels() => throw new NotImplementedException();
 }
+
+public class BoolAxisLookup : IAxisLookup
+{
+    private static readonly Dictionary<double, string> _axisValuesAndLabels = new()
+    {
+        { 1, "False" },
+        { 2, "True" },
+    };
+    public double AxisValueFor(object? o) => o is bool b
+        ? b
+            ? 2
+            : 1
+        : 0;
+
+    //we shouldn't need to generate labels for a numeric axis
+    public Dictionary<double, string> AxisValuesAndLabels() => _axisValuesAndLabels;
+}
+
+
+public class TimeSpanAxisLookup : IAxisLookup
+{
+   
+    public double AxisValueFor(object? o) => o is TimeSpan b
+        ? b.TotalSeconds
+        : 0;
+
+    //we shouldn't need to generate labels for a numeric axis
+    public Dictionary<double, string> AxisValuesAndLabels() => throw new NotImplementedException();
+}
+
