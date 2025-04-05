@@ -190,7 +190,7 @@ public static class GenericScottPlotter
             if (accessor.XisDateTime)
                 MakeYAxisDateTime(plot);
             if (accessor.YisDateTime)
-                plot.Axes.DateTimeTicksBottom();
+                MakeXAxisDateTime(plot);
             if (accessor.XisNominal)
             {
                 var ticks = accessor.GetXTicks();
@@ -211,7 +211,7 @@ public static class GenericScottPlotter
         else
         {
             if (accessor.XisDateTime)
-                plot.Axes.DateTimeTicksBottom();
+                MakeXAxisDateTime(plot);
 
             if (accessor.XisNominal)
             {
@@ -238,11 +238,13 @@ public static class GenericScottPlotter
     }
 
     private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new DateTimeAutomatic();
+    private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new DateTimeAutomatic();
+
 
     private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
     {
         if (accessor.XisDateTime)
-            plot.Axes.DateTimeTicksBottom();
+           MakeXAxisDateTime(plot);
 
         if (accessor.XisNominal)
         {

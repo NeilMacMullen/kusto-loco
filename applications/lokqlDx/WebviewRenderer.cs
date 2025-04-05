@@ -3,9 +3,10 @@ using System.Windows.Controls;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering;
+using KustoLoco.ScottPlotRendering;
 using Lokql.Engine.Commands;
-using Microsoft.Web.WebView2.Wpf;
 using NotNullStrings;
+using ScottPlot;
 using ScottPlot.WPF;
 using Label = System.Windows.Controls.Label;
 
@@ -13,7 +14,6 @@ namespace lokqlDx;
 
 public class WebViewRenderer(
     TabControl tabControl,
-    WebView2 webView,
     DataGrid dataGrid,
     Label dataGridSizeWarning,
     WpfPlot plotter,
@@ -40,8 +40,14 @@ public class WebViewRenderer(
     /// </summary>
     public async Task<byte[]> RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
-        var html = GetHtmlFromResult(result);
-        return await SafeInvoke(async () => await WebViewExtensions.RenderToImage(html, pWidth, pHeight));
+        var plot = new Plot();
+        await SafeInvoke(() =>
+        {
+            GenericScottPlotter.Render(plot, result, settings);
+            return Task.FromResult(true);
+        });
+        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
+        return bytes;
     }
 
 
@@ -50,31 +56,21 @@ public class WebViewRenderer(
         await SafeInvoke(async () =>
         {
             LastRendered = new UriOrHtml(url.ToString(), string.Empty);
-            await webView.EnsureCoreWebView2Async();
-            webView.CoreWebView2.Navigate(url.ToString());
+           
             tabControl.SelectedIndex =1;
-            return true;
+            return await Task.FromResult(true);
         });
     }
 
 
-    private string GetHtmlFromResult(KustoQueryResult result)
-    {
-        var renderer = new KustoResultRenderer(settings);
-        return renderer.RenderToHtml(result);
-    }
-
     private async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)
     {
-        var html = GetHtmlFromResult(result);
-        //annoying we have to do this, but it's the only way to get the webview to render
-        LastRendered = new UriOrHtml(string.Empty, html);
-        await webView.EnsureCoreWebView2Async();
-        await WebViewExtensions.NavigateToStringAsync(webView.CoreWebView2, html);
+       
+       
         FillInDataGrid(result);
-        tabControl.SelectedIndex = result.Visualization.ChartType.IsBlank() ? 0 : 2;
+        tabControl.SelectedIndex = result.Visualization.ChartType.IsBlank() ? 0 : 1;
 
-        return true;
+        return await Task.FromResult(true);
     }
 
     public async Task<T> SafeInvoke<T>(Func<Task<T>> func)

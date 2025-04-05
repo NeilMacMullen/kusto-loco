@@ -13,6 +13,7 @@ using Intellisense;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
+using ScottPlot;
 
 namespace lokqlDx;
 
@@ -44,7 +45,7 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
-        _renderingSurface = new WebViewRenderer(RenderingSurface, webview, dataGrid,
+        _renderingSurface = new WebViewRenderer(RenderingSurface, dataGrid,
             DatagridOverflowWarning,WpfPlot1,
             settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
@@ -542,12 +543,14 @@ public partial class MainWindow : Window
         UpdateDynamicUiFromPreferences();
     }
 
-    private async void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
+    private  void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
     {
         try
         {
-            var bytes = await WebViewExtensions.CaptureImage(webview.CoreWebView2);
-            using var memoryStream = new MemoryStream(bytes);
+
+            var bytes = WpfPlot1.Plot.GetImageBytes((int)WpfPlot1.ActualWidth,
+                (int)WpfPlot1.ActualHeight, ImageFormat.Png);
+             using var memoryStream = new MemoryStream(bytes);
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
             bitmapImage.StreamSource = memoryStream;
@@ -556,6 +559,7 @@ public partial class MainWindow : Window
             bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
             Clipboard.SetImage(bitmapImage);
             _explorer.Info("Chart copied to clipboard");
+            
         }
         catch
         {

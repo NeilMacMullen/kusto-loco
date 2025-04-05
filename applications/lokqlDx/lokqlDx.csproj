@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="morelinq" />
     <PackageReference Include="ScottPlot.WPF" />
     <PackageReference Include="ShapeCrawler" />
