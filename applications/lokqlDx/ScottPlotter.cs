@@ -1,24 +1,18 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using KustoLoco.ScottPlotRendering;
-using NotNullStrings;
-using ScottPlot;
-using ScottPlot.Palettes;
-using ScottPlot.Plottables;
-using ScottPlot.TickGenerators;
 using ScottPlot.WPF;
 
 namespace lokqlDx;
 
-
 public static class ScottPlotter
 {
-    public static void Render(WpfPlot plotter, KustoQueryResult result)
+    public static void Render(WpfPlot plotter, KustoQueryResult result, KustoSettingsProvider settings)
     {
         plotter.Reset();
-         GenericScottPlotter.Render(plotter.Plot, result);
-        GenericScottPlotter.UseDarkMode(plotter.Plot);
-        plotter.Plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
+        GenericScottPlotter.Render(plotter.Plot, result,settings);
+      
+        
         plotter.Refresh();
-       
     }
 }

@@ -28,7 +28,7 @@ public class WebViewRenderer(
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
         await SafeInvoke(() =>
         {
-            ScottPlotter.Render(Plotter, result);
+            ScottPlotter.Render(Plotter, result,settings);
             return Task.FromResult(true);
         });
     }

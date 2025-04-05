@@ -1,4 +1,6 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Settings;
+using NotNullStrings;
 using ScottPlot;
 using ScottPlot.Palettes;
 using ScottPlot.Plottables;
@@ -11,32 +13,79 @@ public static class GenericScottPlotter
     private const string StandardAxisPrefs = "tno|nno|noo|tn|nn|on|to";
 
 
-    public static void UseDarkMode(Plot plot)
+    private static void SetColorFromSetting(KustoSettingsProvider settings, string settingName, Action<Color> setter,
+        string defaultColour)
     {
-        plot.Add.Palette = new Penumbra();
-        plot.FigureBackground.Color = Color.FromHex("#181818");
-        plot.DataBackground.Color = Color.FromHex("#1f1f1f");
-
-        // change axis and grid colors
-        //plot.Axes.Color(Color.FromHex("#d7d7d7"));
-        plot.Axes.Color(Color.FromHex("#ffffff"));
-        plot.Grid.MajorLineColor = Color.FromHex("#404040");
-
-        // change legend colors
-        plot.Legend.BackgroundColor = Color.FromHex("#404040");
-        plot.Legend.FontColor = Color.FromHex("#d7d7d7");
-        plot.Legend.OutlineColor = Color.FromHex("#d7d7d7");
-
-        plot.Legend.FontSize = 16;
-        plot.ShowLegend(Edge.Right);
+        var s = settings.GetOr(settingName, defaultColour);
+        try
+        {
+            var col = Color.FromHex(s);
+            setter(col);
+        }
+        catch
+        {
+            setter(Color.FromHex(defaultColour));
+        }
     }
 
+    public static void UseDarkMode(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
+    {
+        var palette = settings.GetOr("scottplot.palette", "");
 
-    public static void Render(Plot plot, KustoQueryResult result)
+        var p = Palette.GetPalettes()
+                    .FirstOrDefault(f => f.Name.Equals(palette, StringComparison.InvariantCultureIgnoreCase))
+                ?? new Penumbra();
+
+
+        plot.Add.Palette = p;
+        SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c, "#181818");
+        SetColorFromSetting(settings, "scottplot.databackground.color", c => plot.DataBackground.Color = c, "#1f1f1f");
+        SetColorFromSetting(settings, "scottplot.axes.color", c => plot.Axes.Color(c), "#ffffff");
+        SetColorFromSetting(settings, "scottplot.majorlinecolor", c => plot.Grid.MajorLineColor = c, "#404040");
+
+        // change legend colors
+        SetColorFromSetting(settings, "scottplot.legend.backgroundcolor", c => plot.Legend.BackgroundColor = c,
+            "#404040");
+
+        SetColorFromSetting(settings, "scottplot.legend.fontcolor", c => plot.Legend.FontColor = c, "#d7d7d7");
+        SetColorFromSetting(settings, "scottplot.legend.outlinecolor", c => plot.Legend.OutlineColor = c, "#d7d7d7");
+
+
+        plot.Legend.FontSize = 16;
+        plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
+        
+        if (result.Visualization.PropertyOr("legend", "") == "hidden")
+        {
+            plot.Legend.IsVisible = false;
+        }
+        else
+        {
+            var toks = settings.GetOr("scottplot.legend.placement", "right").Tokenize();
+            var edge = Edge.Right;
+            if (toks.Any(t => Enum.TryParse(t, true, out edge)))
+            {
+                plot.ShowLegend(edge);
+            }
+            else
+            {
+                //there seems to be some deadlock if we try to set both alignment/orientation
+                //at the same time as declaring an edge
+                var alignment = Alignment.UpperRight;
+                if (toks.Any(t => Enum.TryParse(t, true, out alignment)))
+                    plot.Legend.Alignment = alignment;
+                var orientation = Orientation.Vertical;
+                if (toks.Any(t => Enum.TryParse(t, true, out orientation)))
+                    plot.Legend.Orientation = orientation;
+            }
+        }
+    }
+
+    public static void Render(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
-        plot.Add.Palette = new Penumbra();
+        UseDarkMode(result, plot, settings);
+        //plot.Add.Palette = new Penumbra();
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
             StandardAxisAssignment(accessor, "on|ot", 0, 1, 0);
@@ -51,7 +100,6 @@ public static class GenericScottPlotter
                 })
                 .ToArray();
             plot.Add.Pie(slices);
-            plot.ShowLegend();
             // hide unnecessary plot components
             plot.Axes.Frameless();
             plot.HideGrid();
@@ -67,7 +115,6 @@ public static class GenericScottPlotter
             }
 
             FixupAxisTicks(plot, accessor, false);
-            return;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
@@ -80,7 +127,6 @@ public static class GenericScottPlotter
             }
 
             FixupAxisTicks(plot, accessor, false);
-            return;
         }
 
 
@@ -94,7 +140,6 @@ public static class GenericScottPlotter
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, false);
-            return;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
@@ -107,7 +152,6 @@ public static class GenericScottPlotter
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, true);
-            return;
         }
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
