@@ -36,7 +36,7 @@ public partial class QueryEditor : UserControl
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
-    private FileIoCommandParser? _fileIoCommandParser;
+    private CommandParser? _commandParser;
 
     private CompletionWindow? _completionWindow;
 
@@ -283,12 +283,14 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        if (_fileIoCommandParser is null)
+        if (_commandParser is null)
         {
-            throw new UnreachableException("Did not expect FileIoCommandParser to be uninitialized.");
+            throw new UnreachableException($"Did not expect {nameof(CommandParser)} to be uninitialized.");
         }
 
-        if (_fileIoCommandParser.GetLastArg(_editorHelper.GetCurrentLineText()) is not { } path)
+        var path = _commandParser.GetLastArg(_editorHelper.GetCurrentLineText());
+
+        if (path.IsBlank())
         {
             return false;
         }
@@ -374,7 +376,7 @@ public partial class QueryEditor : UserControl
         _internalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        _fileIoCommandParser = new FileIoCommandParser(verbs.Select(x => "." + x.Name));
+        _commandParser = new CommandParser(verbs.Select(x => "." + x.Name));
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -511,31 +513,28 @@ public class SchemaIntellisenseProvider
     }
 }
 
-public class FileIoCommandParser
+public class CommandParser
 {
 
-    private HashSet<string> _ioCommands;
+    private readonly HashSet<string> _supportedCommands;
 
-    public FileIoCommandParser(IEnumerable<string> supportedCommands)
+    public CommandParser(IEnumerable<string> supportedCommands)
     {
-        _ioCommands = supportedCommands.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _supportedCommands = supportedCommands.ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
-    public string? GetLastArg(string lineText)
+    public string GetLastArg(string lineText)
     {
         var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
 
         if (args.Length < 2)
         {
-            return null;
+            return string.Empty;
         }
 
-
-        var isIoCommand = _ioCommands.Contains(args[0]);
-
-        if (!isIoCommand)
+        if (!_supportedCommands.Contains(args[0]))
         {
-            return null;
+            return string.Empty;
         }
 
         return args[^1];
