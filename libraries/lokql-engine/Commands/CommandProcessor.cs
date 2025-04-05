@@ -116,27 +116,29 @@ public class CommandProcessor
         exp.Info(textWriter.ToString());
     }
 
-    public Dictionary<string, string> GetVerbs()
+    public IEnumerable<VerbEntry> GetVerbs()
     {
 
-        var verbs= _registrations
-            .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
-            .OfType<VerbAttribute>()
-            .ToDictionary(a => a.Name, a => a.HelpText);
-        verbs["help"]= @"Shows a list of available commands or help for a specific command
+        var verbs = new List<VerbEntry>();
+
+        foreach (var type in _registrations.Select(x => x.OptionType))
+        {
+            var supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption));
+            var attributes = type.GetTypeInfo()
+                .GetCustomAttributes(typeof(VerbAttribute), true)
+                .OfType<VerbAttribute>()
+                .Select(x => new VerbEntry(x.Name, x.HelpText, supportsFiles));
+
+            verbs.AddRange(attributes);
+        }
+
+        const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
+        var helpEntry = new VerbEntry("help", helpText, false);
+        verbs.Add(helpEntry);
+
         return verbs;
-    }
-
-    public IEnumerable<string> GetVerbsOfOptionsThatTakeFilesAsInput()
-    {
-        var verbs = _registrations
-            .Where(x => x.OptionType.IsAssignableTo(typeof(IFileCommandOption)))
-            .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
-            .OfType<VerbAttribute>();
-
-        return verbs.Select(x => x.Name);
     }
 
     private readonly record struct RegisteredCommand(

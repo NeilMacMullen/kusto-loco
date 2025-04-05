@@ -368,10 +368,13 @@ public partial class QueryEditor : UserControl
         if (e.Text == "?") ShowCompletions(_kqlFunctionEntries, string.Empty, 1);
     }
 
-    public void AddInternalCommands(IntellisenseEntry[] verbs, IEnumerable<string> fileIoVerbs)
+    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
     {
-        _internalCommands = verbs;
-        _fileIoCommandParser = new FileIoCommandParser(fileIoVerbs);
+        var verbs = verbEntries.ToArray();
+        _internalCommands = verbs.Select(v =>
+                new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
+            .ToArray();
+        _fileIoCommandParser = new FileIoCommandParser(verbs.Select(x => "." + x.Name));
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)

@@ -160,12 +160,7 @@ public partial class MainWindow : Window
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.RetrieveUiPreferencesFromDisk();
-        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
-            .Select(v =>
-                new IntellisenseEntry(v.Key, v.Value, string.Empty))
-            .ToArray(),
-            _explorer._commandProcessor.GetVerbsOfOptionsThatTakeFilesAsInput().Select(x => "." + x)
-            );
+        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
         UpdateDynamicUiFromPreferences();
