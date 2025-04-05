@@ -119,26 +119,21 @@ public class CommandProcessor
     public IEnumerable<VerbEntry> GetVerbs()
     {
 
-        var verbs = new List<VerbEntry>();
+        var verbs = from type in _registrations.Select(x => x.OptionType)
+            let attribute = type.GetTypeInfo().GetCustomAttribute<VerbAttribute>()
+            where attribute is not null
+            let supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption))
+            select new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles);
 
-        foreach (var type in _registrations.Select(x => x.OptionType))
+        return verbs.Append(CreateHelpEntry());
+
+        static VerbEntry CreateHelpEntry()
         {
-            var supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption));
-            var attributes = type.GetTypeInfo()
-                .GetCustomAttributes(typeof(VerbAttribute), true)
-                .OfType<VerbAttribute>()
-                .Select(x => new VerbEntry(x.Name, x.HelpText, supportsFiles));
-
-            verbs.AddRange(attributes);
-        }
-
-        const string helpText = @"Shows a list of available commands or help for a specific command
+            const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
-        var helpEntry = new VerbEntry("help", helpText, false);
-        verbs.Add(helpEntry);
-
-        return verbs;
+            return new VerbEntry("help", helpText, false);
+        }
     }
 
     private readonly record struct RegisteredCommand(

@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Lokql.Engine.Commands;
 
 namespace LokqlEngineTests;
@@ -7,15 +8,24 @@ namespace LokqlEngineTests;
 public class CommandProcessorTests
 {
     [TestMethod]
-    public void GetVerbs_SupportsFiles_OnlyContainsVerbsWithFileParameter()
+    public void GetVerbsIdentifiesVerbsOfOptionsAcceptingFiles()
     {
         var processor = CommandProcessor.Default();
 
-        var result = processor.GetVerbs().Where(x => x.SupportsFiles);
+        var result = processor.GetVerbs().ToArray();
+
+        using var _ = new AssertionScope();
 
         result
             .Should()
             .ContainSingle(x => x.Name.Equals("load", StringComparison.OrdinalIgnoreCase))
-            .And.NotContain(x => x.Name.Equals("synonym", StringComparison.OrdinalIgnoreCase)); // SynTableCommand
+            .Which.SupportsFiles.Should()
+            .BeTrue();
+
+        result
+            .Should()
+            .ContainSingle(x => x.Name.Equals("synonym", StringComparison.OrdinalIgnoreCase))
+            .Which.SupportsFiles.Should()
+            .BeFalse();
     }
 }
