@@ -1,5 +1,4 @@
-﻿using System.CommandLine.Parsing;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -36,7 +35,12 @@ public partial class QueryEditor : UserControl
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
-    private CommandParser? _commandParser;
+    private CommandParser? _parser;
+    private CommandParser Parser
+    {
+        get => _parser ?? throw new UnreachableException($"Did not expect {nameof(Parser)} to be uninitialized.");
+        set => _parser = value;
+    }
 
     private CompletionWindow? _completionWindow;
 
@@ -283,12 +287,7 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        if (_commandParser is null)
-        {
-            throw new UnreachableException($"Did not expect {nameof(CommandParser)} to be uninitialized.");
-        }
-
-        var path = _commandParser.GetLastArg(_editorHelper.GetCurrentLineText());
+        var path = Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
 
         if (path.IsBlank())
         {
@@ -376,7 +375,7 @@ public partial class QueryEditor : UserControl
         _internalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        _commandParser = new CommandParser(verbs.Select(x => "." + x.Name));
+        Parser = new CommandParser(verbs.Select(x => x.Name),".");
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -510,33 +509,5 @@ public class SchemaIntellisenseProvider
     public void SetSchema(SchemaLine[] schema)
     {
         _schemaLines = schema;
-    }
-}
-
-public class CommandParser
-{
-
-    private readonly HashSet<string> _supportedCommands;
-
-    public CommandParser(IEnumerable<string> supportedCommands)
-    {
-        _supportedCommands = supportedCommands.ToHashSet(StringComparer.OrdinalIgnoreCase);
-    }
-
-    public string GetLastArg(string lineText)
-    {
-        var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
-
-        if (args.Length < 2)
-        {
-            return string.Empty;
-        }
-
-        if (!_supportedCommands.Contains(args[0]))
-        {
-            return string.Empty;
-        }
-
-        return args[^1];
     }
 }
