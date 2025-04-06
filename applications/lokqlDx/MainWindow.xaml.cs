@@ -1,6 +1,12 @@
-﻿using System.ComponentModel;
+﻿using Intellisense;
+using Lokql.Engine;
+using Microsoft.Win32;
+using NotNullStrings;
+using ScottPlot;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Abstractions;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -9,11 +15,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
-using Intellisense;
-using Lokql.Engine;
-using Microsoft.Win32;
-using NotNullStrings;
-using ScottPlot;
+using DocumentFormat.OpenXml.Packaging;
+using Colors = ScottPlot.Colors;
 
 namespace lokqlDx;
 
@@ -174,12 +177,14 @@ public partial class MainWindow : Window
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-        await NavigateToLanding();
+       await   NavigateToLanding();
     }
 
-    private async Task NavigateToLanding()
+    private  Task NavigateToLanding()
     {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
+        //https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco/lokqlDx%E2%80%90landing.md
+        //Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
+        return Task.CompletedTask;
     }
 
     private void ResizeWindowAccordingToStoredPreferences()
@@ -389,24 +394,24 @@ public partial class MainWindow : Window
         MainMenu.RaiseMenuItemClickOnKeyGesture(e);
     }
 
-    private async Task Navigate(string url)
+    private void Navigate(string url)
     {
-        await _renderingSurface.NavigateToUrl(new Uri(url));
+       OpenUriInBrowser(url);
     }
 
-    private async void NavigateToGettingStarted(object sender, RoutedEventArgs e)
+    private  void NavigateToGettingStarted(object sender, RoutedEventArgs e)
     {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
+         Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
     }
 
-    private async void NavigateToProjectPage(object sender, RoutedEventArgs e)
+    private  void NavigateToProjectPage(object sender, RoutedEventArgs e)
     {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco");
+        Navigate("https://github.com/NeilMacMullen/kusto-loco");
     }
 
-    private async void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
+    private  void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
     {
-        await Navigate(
+         Navigate(
             "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
     }
 
@@ -566,32 +571,21 @@ public partial class MainWindow : Window
         }
     }
 
-    private void onOpenInBrowser(object sender, RoutedEventArgs e)
+   
+
+
+    private static void OpenUriInBrowser(string uri)
     {
-        var textOrUri = _renderingSurface.LastRendered;
-        if (textOrUri.Html.IsNotBlank())
-        {
-            var fileName = Path.ChangeExtension(Path.GetTempFileName(), "html");
-            File.WriteAllText(fileName, textOrUri.Html);
-
-            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
-        }
-
-        if (textOrUri.Uri.IsNotBlank())
-        {
-            var fileName = textOrUri.Uri;
-            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
-        }
+        Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
+    }
+    private  void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
+    {
+         Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
     }
 
-    private async void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
+    private  void NavigateToLandingPage(object sender, RoutedEventArgs e)
     {
-        await Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
-    }
-
-    private async void NavigateToLandingPage(object sender, RoutedEventArgs e)
-    {
-        await NavigateToLanding();
+         NavigateToLanding();
     }
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -605,9 +599,11 @@ public partial class MainWindow : Window
                 var fmt = _explorer.Settings.GetOr("datagrid.datetime_format", "dd MMM yyyy HH:mm");
                 textColumn.Binding.StringFormat = fmt;
             }
-           
         }
+    }
 
-
+    private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
+    {
+       
     }
 }

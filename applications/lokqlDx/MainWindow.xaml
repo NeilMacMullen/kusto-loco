@@ -125,7 +125,7 @@
                     Background="DarkGray" />
 
       <TabControl Name="RenderingSurface" Grid.Column="2" Background="Black">
-        <TabItem Header="Data">
+        <TabItem Header="Data" IsSelected="True">
           <DockPanel>
             <StackPanel DockPanel.Dock="Top">
               <Label Visibility="Collapsed" Name="DatagridOverflowWarning" Foreground="Red" />
@@ -150,18 +150,16 @@
             </DataGrid>
           </DockPanel>
         </TabItem>
-        <TabItem Header="Chart" IsSelected="True">
+        <TabItem Header="Chart" >
           <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right"
                         Margin="4">
               <Button Content="&#x1F4CB;" ToolTip="Copy image to clipboard"
                       Click="OnCopyImageToClipboard" />
 
-              <Button Content="&#x1F310;" ToolTip="Open in browser"
-                      Click="onOpenInBrowser" />
-
             </StackPanel>
-            <scottplot:WpfPlot x:Name="WpfPlot1" />
+            <scottplot:WpfPlot x:Name="WpfPlot1"
+                               Loaded="WpfPlot1_OnLoaded"/>
           </DockPanel>
           </TabItem>
 

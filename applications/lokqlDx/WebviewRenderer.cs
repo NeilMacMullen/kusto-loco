@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
-using KustoLoco.Rendering;
 using KustoLoco.ScottPlotRendering;
 using Lokql.Engine.Commands;
 using NotNullStrings;
@@ -28,12 +27,11 @@ public class WebViewRenderer(
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
         await SafeInvoke(() =>
         {
-            ScottPlotter.Render(Plotter, result,settings);
+            ScottPlotter.Render(Plotter, result, settings);
             return Task.FromResult(true);
         });
     }
 
-  
 
     /// <summary>
     ///     Renders the result to an image using a headless webview
@@ -51,32 +49,15 @@ public class WebViewRenderer(
     }
 
 
-    public async Task NavigateToUrl(Uri url)
-    {
-        await SafeInvoke(async () =>
-        {
-            LastRendered = new UriOrHtml(url.ToString(), string.Empty);
-           
-            tabControl.SelectedIndex =1;
-            return await Task.FromResult(true);
-        });
-    }
-
-
     private async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)
     {
-       
-       
         FillInDataGrid(result);
         tabControl.SelectedIndex = result.Visualization.ChartType.IsBlank() ? 0 : 1;
 
         return await Task.FromResult(true);
     }
 
-    public async Task<T> SafeInvoke<T>(Func<Task<T>> func)
-    {
-        return await Application.Current.Dispatcher.Invoke(func);
-    }
+    public async Task<T> SafeInvoke<T>(Func<Task<T>> func) => await Application.Current.Dispatcher.Invoke(func);
 
 
     private void FillInDataGrid(KustoQueryResult result)
@@ -98,15 +79,15 @@ public class WebViewRenderer(
         dataGridSizeWarning.Visibility =
             result.RowCount > maxRows ? Visibility.Visible : Visibility.Collapsed;
         var dt = result.ToDataTable(maxRows);
-         //prevent the column names from being interpreted as hotkeys
-        for (var i=0;i< dt.Columns.Count;i++)
+        //prevent the column names from being interpreted as hotkeys
+        for (var i = 0; i < dt.Columns.Count; i++)
         {
             var c = dt.Columns[i];
             c.ColumnName = c.ColumnName
                 .Replace("_", "__");
         }
-        dataGrid.ItemsSource = dt.DefaultView;
 
+        dataGrid.ItemsSource = dt.DefaultView;
     }
 
     public readonly record struct UriOrHtml(string Uri, string Html);
