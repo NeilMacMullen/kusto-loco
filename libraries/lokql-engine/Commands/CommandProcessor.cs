@@ -128,6 +128,7 @@ public class CommandProcessor
 
         static VerbEntry CreateHelpEntry()
         {
+            // Help is a default command in CommandLineParser but we still need to provide metadata for it.
             const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
