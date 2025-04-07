@@ -125,6 +125,8 @@ public class ResultChartAccessor
     {
         if (XisDateTime)
         {
+            if (_result.RowCount < 1)
+                return 1.0;
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
