@@ -38,7 +38,7 @@ public partial class QueryEditor : UserControl
     private CommandParser? _parser;
     private CommandParser Parser
     {
-        get => _parser ?? throw new UnreachableException($"Did not expect {nameof(Parser)} to be uninitialized.");
+        get => _parser ?? throw new InvalidOperationException($"Did not expect {nameof(Parser)} to be uninitialized. Was this accessed before initialization in {nameof(AddInternalCommands)}?");
         set => _parser = value;
     }
 
