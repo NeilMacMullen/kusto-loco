@@ -118,10 +118,9 @@ public class CommandProcessor
 
     public IEnumerable<VerbEntry> GetVerbs()
     {
-
         var verbs = from type in _registrations.Select(x => x.OptionType)
             let attribute = type.GetTypeInfo().GetCustomAttribute<VerbAttribute>()
-            where attribute is not null
+                            ?? throw new InvalidOperationException($"All registered command options should have a {nameof(VerbAttribute)}. {type.FullName ?? type.Name} does not.")
             let supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption))
             select new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles);
 
