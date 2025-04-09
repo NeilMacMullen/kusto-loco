@@ -9,7 +9,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
-using Intellisense;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
@@ -160,10 +159,7 @@ public partial class MainWindow : Window
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.RetrieveUiPreferencesFromDisk();
-        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
-            .Select(v =>
-                new IntellisenseEntry(v.Key, v.Value, string.Empty))
-            .ToArray());
+        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
         UpdateDynamicUiFromPreferences();

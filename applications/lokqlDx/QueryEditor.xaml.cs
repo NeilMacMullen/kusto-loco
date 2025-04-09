@@ -1,4 +1,4 @@
-﻿using System.CommandLine.Parsing;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -35,7 +35,12 @@ public partial class QueryEditor : UserControl
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
-    private readonly FileIoCommandParser _fileIoCommandParser = new();
+    private CommandParser? _parser;
+    private CommandParser Parser
+    {
+        get => _parser ?? throw new InvalidOperationException($"Did not expect {nameof(Parser)} to be uninitialized. Was this accessed before initialization in {nameof(AddInternalCommands)}?");
+        set => _parser = value;
+    }
 
     private CompletionWindow? _completionWindow;
 
@@ -282,7 +287,9 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        if (_fileIoCommandParser.GetLastArg(_editorHelper.GetCurrentLineText()) is not { } path)
+        var path = Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
+
+        if (path.IsBlank())
         {
             return false;
         }
@@ -362,9 +369,13 @@ public partial class QueryEditor : UserControl
         if (e.Text == "?") ShowCompletions(_kqlFunctionEntries, string.Empty, 1);
     }
 
-    public void AddInternalCommands(IntellisenseEntry[] verbs)
+    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
     {
-        _internalCommands = verbs;
+        var verbs = verbEntries.ToArray();
+        _internalCommands = verbs.Select(v =>
+                new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
+            .ToArray();
+        Parser = new CommandParser(verbs.Select(x => x.Name),".");
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -498,28 +509,5 @@ public class SchemaIntellisenseProvider
     public void SetSchema(SchemaLine[] schema)
     {
         _schemaLines = schema;
-    }
-}
-
-public class FileIoCommandParser
-{
-    public string? GetLastArg(string lineText)
-    {
-        var args = CommandLineStringSplitter.Instance.Split(lineText).ToArray();
-
-        if (args.Length < 2)
-        {
-            return null;
-        }
-
-        var isIoCommand = args[0].Equals(".save", StringComparison.OrdinalIgnoreCase) ||
-                          args[0].Equals(".load", StringComparison.OrdinalIgnoreCase);
-
-        if (!isIoCommand)
-        {
-            return null;
-        }
-
-        return args[^1];
     }
 }
