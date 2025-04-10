@@ -735,13 +735,122 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("True");
     }
 
-    //[Ignore("TODO - isFinite needs work")]
+  
     [TestMethod]
     public async Task IsFinite2()
     {
         var query = "print isfinite(1.0/0.0)";
         var result = await LastLineOfResult(query);
         result.Should().Be("False");
+    }
+
+    [TestMethod]
+    public async Task BinaryAnd()
+    {
+        var a = 0b101101;
+        var b = 0b111101;
+        var query = $"print binary_and({a},{b})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((a & b).ToString());
+    }
+
+    [TestMethod]
+    public async Task BinaryOr()
+    {
+        var a = 0b101101;
+        var b = 0b111101;
+        var query = $"print binary_or({a},{b})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((a | b).ToString());
+    }
+    [TestMethod]
+    public async Task BinaryXOr()
+    {
+        var a = 0b101101;
+        var b = 0b111101;
+        var query = $"print binary_xor({a},{b})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((a ^ b).ToString());
+    }
+    [TestMethod]
+    public async Task BinaryNot()
+    {
+        var a = 0b101101;
+        var query = $"print binary_not({a})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((~a).ToString());
+    }
+
+    [TestMethod]
+    public async Task BitSetCountOnes()
+    {
+        var a = 0b101101;
+        var query = $"print bitset_count_ones({a})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4");
+    }
+
+    [TestMethod]
+    public async Task BinaryShiftLeft()
+    {
+        var a = 17;
+        var b = 6;
+        var query = $"print binary_shift_left({a},{b})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((a<<b).ToString());
+    }
+
+    [TestMethod]
+    public async Task BinaryShiftRight()
+    {
+        var a = 123478324875648645;
+        var b = 6;
+        var query = $"print binary_shift_right({a},{b})";
+        var result = await LastLineOfResult(query);
+        result.Should().Be((a >> b).ToString());
+    }
+
+    [TestMethod]
+    public async Task ToGuid()
+    {
+        var g = Guid.NewGuid().ToString();
+        var query = $"print toguid('{g}')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(g);
+    }
+
+
+    [TestMethod]
+    public async Task MakeDateTime()
+    {
+        var query = $"print make_datetime(2000,4,15,1,1)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2000-04-15 01:01:00Z");
+    }
+
+
+    [TestMethod]
+    public async Task MakeDateTime2()
+    {
+        var query = $"print make_datetime(2000,4,15)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2000-04-15 00:00:00Z");
+    }
+
+    [TestMethod]
+    public async Task MakeTimespan()
+    {
+        var query = $"print make_timespan(1,15)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("01:15:00");
+    }
+
+    [TestMethod]
+    public async Task MakeTimespan2()
+    {
+        var query = $"print make_timespan(1,15,10)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("01:15:10");
     }
 
 }
