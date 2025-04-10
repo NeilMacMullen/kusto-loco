@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging" />
       <PackageReference Include="NotNullStrings" />
+      <PackageReference Include="System.CommandLine" />
       <PackageReference Include="TestableIO.System.IO.Abstractions" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />

@@ -116,16 +116,24 @@ public class CommandProcessor
         exp.Info(textWriter.ToString());
     }
 
-    public Dictionary<string, string> GetVerbs()
+    public IEnumerable<VerbEntry> GetVerbs()
     {
-        var verbs= _registrations
-            .SelectMany(t => t.OptionType.GetTypeInfo().GetCustomAttributes(typeof(VerbAttribute), true))
-            .OfType<VerbAttribute>()
-            .ToDictionary(a => a.Name, a => a.HelpText);
-        verbs["help"]= @"Shows a list of available commands or help for a specific command
+        var verbs = from type in _registrations.Select(x => x.OptionType)
+            let attribute = type.GetTypeInfo().GetCustomAttribute<VerbAttribute>()
+                            ?? throw new InvalidOperationException($"All registered command options should have a {nameof(VerbAttribute)}. {type.FullName ?? type.Name} does not.")
+            let supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption))
+            select new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles);
+
+        return verbs.Append(CreateHelpEntry());
+
+        static VerbEntry CreateHelpEntry()
+        {
+            // Help is a default command in CommandLineParser but we still need to provide metadata for it.
+            const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
-        return verbs;
+            return new VerbEntry("help", helpText, false);
+        }
     }
 
     private readonly record struct RegisteredCommand(
