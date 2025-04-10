@@ -106,6 +106,11 @@ public static class ColumnHelpers
             return CreateFromScalar((TimeSpan?)value, numRows);
         }
 
+        if (typeSymbol == ScalarTypes.Guid)
+        {
+            return CreateFromScalar((Guid?)value, numRows);
+        }
+
         if (typeSymbol == ScalarTypes.Dynamic)
         {
             return CreateFromScalar((JsonNode?)value, numRows);
