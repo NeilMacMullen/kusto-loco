@@ -31,19 +31,16 @@ public class WebViewRenderer(
             return Task.FromResult(true);
         });
     }
-
+    
 
     /// <summary>
     ///     Renders the result to an image using a headless webview
     /// </summary>
-    public async Task<byte[]> RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
-        var plot = new Plot();
-        await SafeInvoke(() =>
-        {
-            GenericScottPlotter.Render(plot, result, settings);
-            return Task.FromResult(true);
-        });
+        using var plot = new Plot() ;
+        GenericScottPlotter.Render(plot, result, settings);
+        plot.Axes.AutoScale();
         var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
         return bytes;
     }
