@@ -10,7 +10,7 @@ namespace KustoLoco.ScottPlotRendering;
 
 public static class GenericScottPlotter
 {
-    private const string StandardAxisPrefs = "tno|nno|noo|tn|nn|on|to";
+    private const string StandardAxisPreferences = "tno|nno|ono|tn|nn|on|to";
 
 
     private static void SetColorFromSetting(KustoSettingsProvider settings, string settingName, Action<Color> setter,
@@ -60,9 +60,9 @@ public static class GenericScottPlotter
         }
         else
         {
-            var toks = settings.GetOr("scottplot.legend.placement", "right").Tokenize();
+            var tokens = settings.GetOr("scottplot.legend.placement", "right").Tokenize();
             var edge = Edge.Right;
-            if (toks.Any(t => Enum.TryParse(t, true, out edge)))
+            if (tokens.Any(t => Enum.TryParse(t, true, out edge)))
             {
                 plot.ShowLegend(edge);
             }
@@ -71,10 +71,10 @@ public static class GenericScottPlotter
                 //there seems to be some deadlock if we try to set both alignment/orientation
                 //at the same time as declaring an edge
                 var alignment = Alignment.UpperRight;
-                if (toks.Any(t => Enum.TryParse(t, true, out alignment)))
+                if (tokens.Any(t => Enum.TryParse(t, true, out alignment)))
                     plot.Legend.Alignment = alignment;
                 var orientation = Orientation.Vertical;
-                if (toks.Any(t => Enum.TryParse(t, true, out orientation)))
+                if (tokens.Any(t => Enum.TryParse(t, true, out orientation)))
                     plot.Legend.Orientation = orientation;
             }
         }
@@ -107,11 +107,14 @@ public static class GenericScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
-                var line = plot.Add.Scatter(ser.X, ser.Y);
-                line.LegendText = ser.Legend;
+                //for lines, it's important that order by X otherwise
+                //we'll get a real spiderweb
+                var ordered = ser.OrderByX();
+                var line = plot.Add.Scatter(ordered.X, ordered.Y);
+                line.LegendText = ordered.Legend;
             }
 
             FixupAxisTicks(plot, accessor, false);
@@ -119,7 +122,7 @@ public static class GenericScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
@@ -132,7 +135,7 @@ public static class GenericScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -144,7 +147,7 @@ public static class GenericScottPlotter
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPrefs, 0, 1, 2);
+            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -237,8 +240,8 @@ public static class GenericScottPlotter
         if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
     }
 
-    private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new DateTimeAutomatic();
-    private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new DateTimeAutomatic();
+    private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new FixedDateTimeAutomatic();
+    private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new FixedDateTimeAutomatic();
 
 
     private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
