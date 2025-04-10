@@ -1,12 +1,6 @@
-﻿using Intellisense;
-using Lokql.Engine;
-using Microsoft.Win32;
-using NotNullStrings;
-using ScottPlot;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Abstractions;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -18,8 +12,7 @@ using System.Windows.Shell;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
-using DocumentFormat.OpenXml.Packaging;
-using Colors = ScottPlot.Colors;
+using ScottPlot;
 
 namespace lokqlDx;
 
@@ -29,7 +22,7 @@ public partial class MainWindow : Window
     private readonly WpfConsole _console;
     private readonly Size _minWindowSize = new(600, 400);
     private readonly PreferencesManager _preferenceManager = new();
-    private readonly WebViewRenderer _renderingSurface;
+    private readonly WpfRenderingSurface _wpfRenderingSurface;
     private readonly WorkspaceManager _workspaceManager;
 
     private Copilot _copilot = new(string.Empty);
@@ -51,10 +44,10 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
-        _renderingSurface = new WebViewRenderer(RenderingSurface, dataGrid,
-            DatagridOverflowWarning,WpfPlot1,
+        _wpfRenderingSurface = new WpfRenderingSurface(RenderingSurface, dataGrid,
+            DatagridOverflowWarning, WpfPlot1,
             settings);
-        _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
+        _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _wpfRenderingSurface);
     }
 
     private async Task RunQuery(string query)
@@ -106,12 +99,13 @@ public partial class MainWindow : Window
     private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
     {
         var version = Assembly.GetEntryAssembly()!.GetName().Version!;
-        Title = _workspaceManager.Path.IsBlank() ? $"LokqlDX {version.Major}.{version.Minor}.{version.Build} - new workspace"
+        Title = _workspaceManager.Path.IsBlank()
+            ? $"LokqlDX {version.Major}.{version.Minor}.{version.Build} - new workspace"
             : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
-           
+
             dataGrid.ItemsSource = null;
             await NavigateToLanding();
         }
@@ -160,7 +154,7 @@ public partial class MainWindow : Window
         dataGrid.FontSize = preferences.FontSize;
         UserChat.FontSize = preferences.FontSize;
         ChatHistory.FontSize = preferences.FontSize;
-        GridSerializer.DeSerialize(MainGrid,preferences.MainGridSerialization);
+        GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
         GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
     }
 
@@ -177,15 +171,13 @@ public partial class MainWindow : Window
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-       await   NavigateToLanding();
+        await NavigateToLanding();
     }
 
-    private  Task NavigateToLanding()
-    {
+    private Task NavigateToLanding() =>
         //https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco/lokqlDx%E2%80%90landing.md
         //Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
-        return Task.CompletedTask;
-    }
+        Task.CompletedTask;
 
     private void ResizeWindowAccordingToStoredPreferences()
     {
@@ -280,7 +272,7 @@ public partial class MainWindow : Window
         //create a new explorer context
         var loader = new StandardFormatAdaptor(_workspaceManager.Settings, _console);
         _explorer = new InteractiveTableExplorer(_console, loader, _workspaceManager.Settings,
-            CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+            CommandProcessorProvider.GetCommandProcessor(), _wpfRenderingSurface);
 
         //make sure we have the most recent global preferences
         var appPrefs = _preferenceManager.FetchApplicationPreferencesFromDisk();
@@ -307,15 +299,9 @@ public partial class MainWindow : Window
     }
 
 
-    private async void OnSaveWorkspace(object sender, RoutedEventArgs e)
-    {
-        await Save();
-    }
+    private async void OnSaveWorkspace(object sender, RoutedEventArgs e) => await Save();
 
-    private void UpdateCurrentWorkspaceFromUI()
-    {
-        currentWorkspace = currentWorkspace with { Text = Editor.GetText() };
-    }
+    private void UpdateCurrentWorkspaceFromUI() => currentWorkspace = currentWorkspace with { Text = Editor.GetText() };
 
     private bool CheckIfWorkspaceDirty()
     {
@@ -362,10 +348,7 @@ public partial class MainWindow : Window
         return YesNoCancel.Cancel;
     }
 
-    private async void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
-    {
-        await SaveAs();
-    }
+    private async void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e) => await SaveAs();
 
     private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
@@ -394,31 +377,19 @@ public partial class MainWindow : Window
         MainMenu.RaiseMenuItemClickOnKeyGesture(e);
     }
 
-    private void Navigate(string url)
-    {
-       OpenUriInBrowser(url);
-    }
+    private void Navigate(string url) => OpenUriInBrowser(url);
 
-    private  void NavigateToGettingStarted(object sender, RoutedEventArgs e)
-    {
-         Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
-    }
+    private void NavigateToGettingStarted(object sender, RoutedEventArgs e) =>
+        Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
 
-    private  void NavigateToProjectPage(object sender, RoutedEventArgs e)
-    {
+    private void NavigateToProjectPage(object sender, RoutedEventArgs e) =>
         Navigate("https://github.com/NeilMacMullen/kusto-loco");
-    }
 
-    private  void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
-    {
-         Navigate(
+    private void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e) =>
+        Navigate(
             "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
-    }
 
-    private void EnableJumpList(object sender, RoutedEventArgs e)
-    {
-        RegistryOperations.AssociateFileType(false);
-    }
+    private void EnableJumpList(object sender, RoutedEventArgs e) => RegistryOperations.AssociateFileType(false);
 
     private async void SubmitToCopilot(object sender, RoutedEventArgs e)
     {
@@ -548,14 +519,13 @@ public partial class MainWindow : Window
         UpdateDynamicUiFromPreferences();
     }
 
-    private  void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
+    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
     {
         try
         {
-
             var bytes = WpfPlot1.Plot.GetImageBytes((int)WpfPlot1.ActualWidth,
                 (int)WpfPlot1.ActualHeight, ImageFormat.Png);
-             using var memoryStream = new MemoryStream(bytes);
+            using var memoryStream = new MemoryStream(bytes);
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
             bitmapImage.StreamSource = memoryStream;
@@ -564,46 +534,32 @@ public partial class MainWindow : Window
             bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
             Clipboard.SetImage(bitmapImage);
             _explorer.Info("Chart copied to clipboard");
-            
         }
         catch
         {
         }
     }
 
-   
 
-
-    private static void OpenUriInBrowser(string uri)
-    {
+    private static void OpenUriInBrowser(string uri) =>
         Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
-    }
-    private  void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
-    {
-         Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
-    }
 
-    private  void NavigateToLandingPage(object sender, RoutedEventArgs e)
-    {
-         NavigateToLanding();
-    }
+    private void NavigateToDiscussionForum(object sender, RoutedEventArgs e) =>
+        Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
+
+    private void NavigateToLandingPage(object sender, RoutedEventArgs e) => NavigateToLanding();
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-
-      
-        if (e.PropertyType == typeof(System.DateTime))
-        {
+        if (e.PropertyType == typeof(DateTime))
             if (e.Column is DataGridTextColumn textColumn)
             {
                 var fmt = _explorer.Settings.GetOr("datagrid.datetime_format", "dd MMM yyyy HH:mm");
                 textColumn.Binding.StringFormat = fmt;
             }
-        }
     }
 
     private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
     {
-       
     }
 }

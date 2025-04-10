@@ -11,7 +11,11 @@ using Label = System.Windows.Controls.Label;
 
 namespace lokqlDx;
 
-public class WebViewRenderer(
+
+/// <summary>
+/// Provides a rendering surface for the WPF lokqlDx application.
+/// </summary>
+public class WpfRenderingSurface(
     TabControl tabControl,
     DataGrid dataGrid,
     Label dataGridSizeWarning,
@@ -20,7 +24,6 @@ public class WebViewRenderer(
     : IResultRenderingSurface
 {
     public WpfPlot Plotter { get; } = plotter;
-    public UriOrHtml LastRendered { get; private set; } = new(string.Empty, string.Empty);
 
     public async Task RenderToDisplay(KustoQueryResult result)
     {
@@ -34,7 +37,7 @@ public class WebViewRenderer(
     
 
     /// <summary>
-    ///     Renders the result to an image using a headless webview
+    ///     Renders the result to an image
     /// </summary>
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
@@ -66,13 +69,13 @@ public class WebViewRenderer(
             return;
         }
 
-        var defaultMax = 10000;
-        var settingName = "datagrid.maxrows";
+        const int defaultMax = 10000;
+        const string settingName = "datagrid.maxrows";
         var maxRows = settings.GetIntOr(settingName, defaultMax);
 
         if (result.RowCount > maxRows)
             dataGridSizeWarning.Content =
-                @$"Warning: Displaying only the first {maxRows} rows of {result.RowCount} rows.  Set {settingName} to see more";
+                $"Warning: Displaying only the first {maxRows} rows of {result.RowCount} rows.  Set {settingName} to see more";
         dataGridSizeWarning.Visibility =
             result.RowCount > maxRows ? Visibility.Visible : Visibility.Collapsed;
         var dt = result.ToDataTable(maxRows);
@@ -86,6 +89,4 @@ public class WebViewRenderer(
 
         dataGrid.ItemsSource = dt.DefaultView;
     }
-
-    public readonly record struct UriOrHtml(string Uri, string Html);
 }
