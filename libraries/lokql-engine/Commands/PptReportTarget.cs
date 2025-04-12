@@ -28,7 +28,9 @@ public class PptReportTarget : IReportTarget
         var matches = FindMatches<IShape>(name);
         if (matches.Any())
             foreach (var p in matches)
-                p.Text = text;
+            {
+                if (p.TextBox is { } tb) tb.Text = text;
+            }
     }
 
     public void UpdateOrAddTable(string name, KustoQueryResult res)
