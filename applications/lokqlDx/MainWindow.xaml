@@ -44,6 +44,8 @@
           <MenuItem Header="LokqlDx intro" Click="NavigateToWiki" Tag="LokqlDX" />
           <MenuItem Header="Quick start" Click="NavigateToWiki" Tag="LokqlDx-tutorial-‐-quick-start" />
           <MenuItem Header="Chart customisation" Click="NavigateToWiki" Tag="ScottPlot-Chart-customisation" />
+          <MenuItem Header="Command reference" Click="NavigateToWiki" Tag="LokqlDx-‐-commands" />
+
           <Separator />
           <MenuItem Header="Kusto-loco Project Page" Click="NavigateToUri"
                     Tag="https://github.com/NeilMacMullen/kusto-loco" />
