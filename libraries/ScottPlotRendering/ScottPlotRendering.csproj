@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>KustoLoco.Rendering.ScottPlot</RootNamespace>
+    <Title>ScottPlot Chart rendering for KustoLoco </Title>
+    <Version>1.0.0</Version>
+    <Authors>Neil MacMullen</Authors>
+    <Description>ScottPlot Chart rendering for KustoLoco</Description>
+    <Copyright>(C) 2024</Copyright>
+    <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/wiki/Release-Notes</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyName>KustoLoco.Rendering.ScottPlot</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="morelinq" />
+    <PackageReference Include="ScottPlot" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

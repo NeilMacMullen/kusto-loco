@@ -28,7 +28,9 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="Markdig.Wpf" />
+    <PackageReference Include="morelinq" />
+    <PackageReference Include="ScottPlot.WPF" />
     <PackageReference Include="ShapeCrawler" />
    
   </ItemGroup>
@@ -36,6 +38,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Intellisense\Intellisense.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
   </ItemGroup>
 
 </Project>

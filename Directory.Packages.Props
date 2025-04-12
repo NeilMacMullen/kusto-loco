@@ -16,6 +16,7 @@
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.10" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
+    <PackageVersion Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.3" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
@@ -28,7 +29,7 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.3" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.0" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3124.44" />
+    <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog" Version="5.4.0" />
@@ -39,6 +40,8 @@
     <PackageVersion Include="OpenAI" Version="2.1.0" />
     <PackageVersion Include="Parquet.Net" Version="5.1.1" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
+    <PackageVersion Include="ScottPlot" Version="5.0.55" />
+    <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
     <PackageVersion Include="ShapeCrawler" Version="0.64.3" />
     <PackageVersion Include="Spectre.Console" Version="0.49.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
