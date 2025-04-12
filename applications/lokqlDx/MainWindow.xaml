@@ -9,7 +9,14 @@
         Title="lokqlDx" Width="1280" Height="800"
         Loaded="MainWindow_OnLoaded"
         Closing="MainWindow_OnClosing">
+<DockPanel>
+  <StatusBar DockPanel.Dock="Bottom" Name="StatusBar" Visibility="Collapsed">
+    <StatusBarItem>
+      <Label Name="UpdateInfo" />
+    </StatusBarItem>
+  </StatusBar>
 
+ 
   <DockPanel>
     <Menu DockPanel.Dock="Top" Name="MainMenu">
       <MenuItem Header="_File">
@@ -41,8 +48,12 @@
         <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage" />
         <Separator/>
         <MenuItem Header="Github Discussion Forum" Click="NavigateToDiscussionForum" />
+        <Separator/>
+        <MenuItem Header="About" Click="AboutBox" />
+
       </MenuItem>
     </Menu>
+   
     <Grid Name="MainGrid">
       <Grid.ColumnDefinitions>
 
@@ -167,4 +178,5 @@
       </TabControl>
     </Grid>
   </DockPanel>
+</DockPanel>
 </Window>

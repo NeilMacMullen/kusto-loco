@@ -30,6 +30,7 @@ public partial class MainWindow : Window
 
     private Workspace currentWorkspace = new();
     private bool isBusy;
+   
 
 
     public MainWindow(
@@ -98,10 +99,12 @@ public partial class MainWindow : Window
     /// </remarks>
     private void UpdateUIFromWorkspace(bool clearWorkingContext)
     {
-        var version = Assembly.GetEntryAssembly()!.GetName().Version!;
-        Title = _workspaceManager.Path.IsBlank()
-            ? $"LokqlDX {version.Major}.{version.Minor}.{version.Build} - new workspace"
+        var version = UpgradeManager.GetCurrentVersion();
+        var title = _workspaceManager.Path.IsBlank()
+            ? $"LokqlDX {version} - new workspace"
             : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
+
+        Title = title;
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
@@ -170,7 +173,12 @@ public partial class MainWindow : Window
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-        NavigateToLanding();
+        var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
+        if (isNewVersionAvailable)
+        {
+            StatusBar.Visibility = Visibility.Visible;
+            UpdateInfo.Content = "New version available";
+        }
     }
 
 
@@ -285,6 +293,12 @@ public partial class MainWindow : Window
         await RunQuery(_workspaceManager.Workspace.StartupScript);
         UpdateMostRecentlyUsed(path);
         UpdateUIFromWorkspace(true);
+        if (!appPrefs.HasShownLanding)
+        {
+           NavigateToLanding();
+            appPrefs.HasShownLanding = true;
+            _preferenceManager.Save(appPrefs);
+        }
     }
 
     private async void OnOpenWorkSpace(object sender, RoutedEventArgs e)
@@ -372,9 +386,12 @@ public partial class MainWindow : Window
     }
 
 
-    protected override void OnKeyDown(KeyEventArgs e) => base.OnKeyDown(e);
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        MainMenu.RaiseMenuItemClickOnKeyGesture(e);
+    }
 
-    //MainMenu.RaiseMenuItemClickOnKeyGesture(e);
     private void Navigate(string url) => OpenUriInBrowser(url);
 
     private void NavigateToGettingStarted(object sender, RoutedEventArgs e) =>
@@ -456,8 +473,6 @@ public partial class MainWindow : Window
                 break;
             userchat = $"That query gave an error: {lastResult.Error}";
         }
-
-
         SubmitButton.IsEnabled = true;
     }
 
@@ -482,7 +497,6 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save(appPreferences);
-
             UpdateDynamicUiFromPreferences();
         }
         else
@@ -559,5 +573,11 @@ public partial class MainWindow : Window
 
     private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
     {
+    }
+
+    private void AboutBox(object sender, RoutedEventArgs e)
+    {
+        var thisVersion = UpgradeManager.GetCurrentVersion();
+        MessageBox.Show($"LokqlDx - version {thisVersion} ");
     }
 }
