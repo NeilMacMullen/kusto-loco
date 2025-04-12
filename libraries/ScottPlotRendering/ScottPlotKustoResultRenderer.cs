@@ -87,7 +87,6 @@ public static class ScottPlotKustoResultRenderer
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
         UseDarkMode(result, plot, settings);
-        //plot.Add.Palette = new Penumbra();
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
             StandardAxisAssignment(accessor, "on|ot", 0, 1, 0);

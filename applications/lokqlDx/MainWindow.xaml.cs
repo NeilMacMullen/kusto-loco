@@ -394,16 +394,7 @@ public partial class MainWindow : Window
 
     private void Navigate(string url) => OpenUriInBrowser(url);
 
-    private void NavigateToGettingStarted(object sender, RoutedEventArgs e) =>
-        ShowMarkdownHelp("LokqlDx-tutorial-‐-quick-start");
-
-    private void NavigateToProjectPage(object sender, RoutedEventArgs e) =>
-        Navigate("https://github.com/NeilMacMullen/kusto-loco");
-
-    private void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e) =>
-        Navigate(
-            "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
-
+ 
     private void EnableJumpList(object sender, RoutedEventArgs e) => RegistryOperations.AssociateFileType(false);
 
     private async void SubmitToCopilot(object sender, RoutedEventArgs e)
@@ -556,11 +547,8 @@ public partial class MainWindow : Window
     private static void OpenUriInBrowser(string uri) =>
         Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
 
-    private void NavigateToDiscussionForum(object sender, RoutedEventArgs e) =>
-        Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions");
-
-    private void NavigateToLandingPage(object sender, RoutedEventArgs e) => NavigateToLanding();
-
+  
+   
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         if (e.PropertyType == typeof(DateTime))
@@ -579,5 +567,17 @@ public partial class MainWindow : Window
     {
         var thisVersion = UpgradeManager.GetCurrentVersion();
         MessageBox.Show($"LokqlDx - version {thisVersion} ");
+    }
+
+    private void NavigateToWiki(object sender, RoutedEventArgs e)
+    {
+       if (sender is MenuItem { Tag: string page })
+            ShowMarkdownHelp(page);
+    }
+
+    private void NavigateToUri(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: string page })
+            Navigate(page);
     }
 }
