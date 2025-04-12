@@ -6,9 +6,9 @@ using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
-public static class GenericScottPlotter
+public static class ScottPlotKustoResultRenderer
 {
     private const string StandardAxisPreferences = "tno|nno|ono|tn|nn|on|to";
 
@@ -79,8 +79,10 @@ public static class GenericScottPlotter
             }
         }
     }
-
-    public static void Render(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
+    /// <summary>
+    /// Renders various types of charts based on the provided query results and settings.
+    /// </summary>
+    public static void RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
         var accessor = new ResultChartAccessor(result);
         plot.Clear();

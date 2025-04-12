@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
-using KustoLoco.ScottPlotRendering;
+using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 using ScottPlot;
@@ -42,7 +42,7 @@ public class WpfRenderingSurface(
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
         using var plot = new Plot() ;
-        GenericScottPlotter.Render(plot, result, settings);
+        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, settings);
         plot.Axes.AutoScale();
         var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
         return bytes;

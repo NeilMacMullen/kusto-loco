@@ -1,4 +1,4 @@
-﻿namespace KustoLoco.ScottPlotRendering;
+﻿namespace KustoLoco.Rendering.ScottPlot;
 
 /// <summary>
 /// Interface for converting axis object values to doubles used for plotting.

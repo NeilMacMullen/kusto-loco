@@ -2,7 +2,7 @@
 using NotNullStrings;
 using static MoreLinq.Extensions.PairwiseExtension;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
 public class ResultChartAccessor
 {

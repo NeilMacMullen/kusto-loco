@@ -1,6 +1,6 @@
 ﻿using KustoLoco.Core;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
 public class AxisLookup
 {
