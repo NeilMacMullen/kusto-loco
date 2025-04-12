@@ -18,6 +18,7 @@ public partial class MarkdownHelpWindow : Window
         _pageName = pageName;
         InitializeComponent();
         Owner = Application.Current.MainWindow;
+        Title= pageName;
     }
 
     private string MakeUri(string prefix)

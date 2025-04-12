@@ -11,9 +11,9 @@
 Loaded="MarkdownHelpWindow_OnLoaded"
         >
     <DockPanel>
-      <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right"
+    <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right"
 Margin="5" Padding="2" Click="ButtonBase_OnClick"
-              >Show this help in the browser</Button>
+              >Show on github</Button>
       <wpf:MarkdownViewer x:Name="Viewer"/>
   </DockPanel>
 </Window>
