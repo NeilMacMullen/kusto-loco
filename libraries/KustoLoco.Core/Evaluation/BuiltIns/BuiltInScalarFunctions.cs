@@ -109,6 +109,14 @@ internal static class BuiltInScalarFunctions
 
         Base64Decode.Register(functions);
         Base64Encode.Register(functions);
+        BinaryAnd.Register(functions);
+        BinaryOr.Register(functions);
+        BinaryXor.Register(functions);
+        BinaryNot.Register(functions);
+        BinaryShiftLeft.Register(functions);
+        BinaryShiftRight.Register(functions);
+        BitsetCountOnes.Register(functions);
+
 
         BinFunction.Register(functions);
         functions.Add(Functions.Floor, BinFunction.S);
@@ -148,6 +156,8 @@ internal static class BuiltInScalarFunctions
         EndOfYearFunction.Register(functions);
         DatetimeDiffFunction.Register(functions);
         DatetimePartFunction.Register(functions);
+        MakeDateTime.Register(functions);
+        MakeTimeSpan.Register(functions);
         functions.Add(Functions.DatetimeUtcToLocal,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(),
                 ScalarTypes.DateTime,
@@ -178,7 +188,7 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.String, ScalarTypes.String));
         functions.Add(Functions.Iff, iffFunctionInfo);
         functions.Add(Functions.Iif, iffFunctionInfo);
-
+        functions.Add(Functions.ToGuid,new ScalarFunctionInfo(ToGuidStringFunctionImpl.Overload));
         functions.Add(Functions.ToInt,
             new ScalarFunctionInfo(ToIntStringFunctionImpl.Overload));
         functions.Add(Functions.ToLong,

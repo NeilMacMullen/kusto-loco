@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
 public class NumericAxisLookup<T> : IAxisLookup
     where T : INumber<T>

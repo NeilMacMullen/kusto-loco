@@ -8,13 +8,10 @@ public class NullResultRenderingSurface : IResultRenderingSurface
     {
         return Task.CompletedTask;
     }
-    public Task<byte[]> RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
-        return Task.FromResult(Array.Empty<byte>());
+        return [];
     }
 
-    public Task NavigateToUrl(Uri url)
-    {
-        return Task.CompletedTask;
-    }
+  
 }

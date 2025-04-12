@@ -1,4 +1,6 @@
-﻿using KustoLoco.Core;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using KustoLoco.Core;
+using NLog;
 using NotNullStrings;
 using ShapeCrawler;
 
@@ -11,12 +13,12 @@ public class PptReportTarget : IReportTarget
 
     private PptReportTarget(Presentation pres) => _pres = pres;
 
-    public async Task UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
+    public void UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
     {
         if (_isDisposed)
             return;
         var surface = explorer.GetRenderingSurface();
-        await UpdateOrAddImage(name, surface, result);
+        UpdateOrAddImage(name, surface, result);
     }
 
     public void UpdateOrAddText(string name, string text)
@@ -26,7 +28,9 @@ public class PptReportTarget : IReportTarget
         var matches = FindMatches<IShape>(name);
         if (matches.Any())
             foreach (var p in matches)
-                p.Text = text;
+            {
+                if (p.TextBox is { } tb) tb.Text = text;
+            }
     }
 
     public void UpdateOrAddTable(string name, KustoQueryResult res)
@@ -93,7 +97,7 @@ public class PptReportTarget : IReportTarget
         _isDisposed = true;
     }
 
-    private async Task UpdateOrAddImage(string name, IResultRenderingSurface surface, KustoQueryResult result)
+    private void UpdateOrAddImage(string name, IResultRenderingSurface surface, KustoQueryResult result)
     {
         if (_isDisposed)
             return;
@@ -102,14 +106,14 @@ public class PptReportTarget : IReportTarget
         {
             foreach (var p in matchingPictures)
             {
-                var data = await surface.RenderToImage(result, (double)p.Width, (double)p.Height);
+                var data = surface.RenderToImage(result, (double)p.Width, (double)p.Height);
                 p.Image!.Update(new MemoryStream(data));
             }
         }
         else
         {
             var slide = AddSlide();
-            var data = await surface.RenderToImage(result, 800, 600);
+            var data = surface.RenderToImage(result, 800, 600);
             slide.Shapes.AddPicture(new MemoryStream(data));
             slide.Shapes.Last().Name = name;
         }

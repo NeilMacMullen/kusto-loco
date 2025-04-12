@@ -1,6 +1,6 @@
 ﻿using ScottPlot;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
 public static class TickExtension
 {

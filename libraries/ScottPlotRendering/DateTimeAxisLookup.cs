@@ -1,4 +1,4 @@
-﻿namespace KustoLoco.ScottPlotRendering;
+﻿namespace KustoLoco.Rendering.ScottPlot;
 
 public class DateTimeAxisLookup : IAxisLookup
 {

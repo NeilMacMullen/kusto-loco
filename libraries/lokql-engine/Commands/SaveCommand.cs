@@ -21,7 +21,7 @@ Examples:
   .save c:\temp\data.csv #saves the most recent result to a csv file
   .save d.parquet abc    #saves a named result called 'abc' to a parquet file
 ")]
-    internal class Options
+    internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of file", Required = true)]
         public string File { get; set; } = string.Empty;

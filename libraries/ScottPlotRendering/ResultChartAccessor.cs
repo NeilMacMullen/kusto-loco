@@ -2,7 +2,7 @@
 using NotNullStrings;
 using static MoreLinq.Extensions.PairwiseExtension;
 
-namespace KustoLoco.ScottPlotRendering;
+namespace KustoLoco.Rendering.ScottPlot;
 
 public class ResultChartAccessor
 {
@@ -17,7 +17,7 @@ public class ResultChartAccessor
         Ladder
     }
 
-    private readonly KustoQueryResult _result = KustoQueryResult.Empty;
+    private readonly KustoQueryResult _result;
     private ColumnResult _seriesNameColumn = ColumnResult.Empty;
     private ColumnResult _valueColumn = ColumnResult.Empty;
     private IAxisLookup _valueLookup = new NumericAxisLookup<double>();
@@ -100,7 +100,7 @@ public class ResultChartAccessor
         foreach (var (index, s) in series.Index())
         {
             var x = s.Select(r => _xLookup.AxisValueFor(r[_xColumn.Index])).ToArray();
-            var y = s.Select(r => _valueLookup!.AxisValueFor(r[_valueColumn.Index])).ToArray();
+            var y = s.Select(r => _valueLookup.AxisValueFor(r[_valueColumn.Index])).ToArray();
             var legend = s.Key!.ToString().NullToEmpty();
             all.Add(new ChartSeries(index, legend, x, y));
         }
@@ -125,6 +125,8 @@ public class ResultChartAccessor
     {
         if (XisDateTime)
         {
+            if (_result.RowCount < 1)
+                return 1.0;
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
@@ -208,6 +210,24 @@ public class ResultChartAccessor
         //if all else fails return the original set...
         return availableColumns;
     }
-
-    public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y);
+    /// <summary>
+    /// Represents a plottable chart series for ScottPlot
+    /// </summary>
+    public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y)
+    {
+        /// <summary>
+        /// Return a version of the ChartSeries with the X and Y values ordered by X
+        /// </summary>
+        public ChartSeries OrderByX()
+        {
+            var pairs = X.Zip(Y)
+                .OrderBy(tuple => tuple.First)
+                .ThenBy(tuple => tuple.Second)
+                .ToArray();
+            return new ChartSeries(Index, Legend,
+                    pairs.Select(t => t.First).ToArray(),
+                    pairs.Select(t => t.Second).ToArray())
+                ;
+        }
+    }
 }

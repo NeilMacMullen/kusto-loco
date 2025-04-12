@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using KustoLoco.ScottPlotRendering;
+using KustoLoco.Rendering.ScottPlot;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace RenderTests;
