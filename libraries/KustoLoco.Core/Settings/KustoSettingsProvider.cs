@@ -134,4 +134,10 @@ public class KustoSettingsProvider
     {
         _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
     }
+
+    public double GetDoubleOr(string settingName, double p1)
+    {
+        var s = GetOr(settingName,"");
+        return double.TryParse(s, out var v) ? v : p1;
+    }
 }

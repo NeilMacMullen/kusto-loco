@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,7 +29,6 @@ public partial class MainWindow : Window
 
     private Workspace currentWorkspace = new();
     private bool isBusy;
-   
 
 
     public MainWindow(
@@ -144,7 +142,7 @@ public partial class MainWindow : Window
         RebuildRecentFilesList();
     }
 
-    private void UpdateDynamicUiFromPreferences()
+    private void UpdateDynamicUiFromPreferences(bool moveGrid)
     {
         var preferences = _preferenceManager.UIPreferences;
         Editor.SetFont(preferences.FontFamily);
@@ -156,8 +154,11 @@ public partial class MainWindow : Window
         dataGrid.FontSize = preferences.FontSize;
         UserChat.FontSize = preferences.FontSize;
         ChatHistory.FontSize = preferences.FontSize;
-        GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
-        GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        if (moveGrid)
+        {
+            GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
+            GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        }
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -166,7 +167,7 @@ public partial class MainWindow : Window
         Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(true);
         RebuildRecentFilesList();
         ResizeWindowAccordingToStoredPreferences();
         var pathToLoad = _args.Any()
@@ -295,7 +296,7 @@ public partial class MainWindow : Window
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
-           NavigateToLanding();
+            NavigateToLanding();
             appPrefs.HasShownLanding = true;
             _preferenceManager.Save(appPrefs);
         }
@@ -376,13 +377,13 @@ public partial class MainWindow : Window
     private void IncreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Min(40, _preferenceManager.UIPreferences.FontSize + 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void DecreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Max(6, _preferenceManager.UIPreferences.FontSize - 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
 
@@ -394,7 +395,7 @@ public partial class MainWindow : Window
 
     private void Navigate(string url) => OpenUriInBrowser(url);
 
- 
+
     private void EnableJumpList(object sender, RoutedEventArgs e) => RegistryOperations.AssociateFileType(false);
 
     private async void SubmitToCopilot(object sender, RoutedEventArgs e)
@@ -464,6 +465,7 @@ public partial class MainWindow : Window
                 break;
             userchat = $"That query gave an error: {lastResult.Error}";
         }
+
         SubmitButton.IsEnabled = true;
     }
 
@@ -488,7 +490,7 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save(appPreferences);
-            UpdateDynamicUiFromPreferences();
+            UpdateDynamicUiFromPreferences(false);
         }
         else
         {
@@ -513,13 +515,13 @@ public partial class MainWindow : Window
     private void ToggleWordWrap(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.WordWrap = !_preferenceManager.UIPreferences.WordWrap;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void ToggleLineNumbers(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.ShowLineNumbers = !_preferenceManager.UIPreferences.ShowLineNumbers;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
@@ -547,8 +549,7 @@ public partial class MainWindow : Window
     private static void OpenUriInBrowser(string uri) =>
         Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
 
-  
-   
+
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         if (e.PropertyType == typeof(DateTime))
@@ -571,7 +572,7 @@ public partial class MainWindow : Window
 
     private void NavigateToWiki(object sender, RoutedEventArgs e)
     {
-       if (sender is MenuItem { Tag: string page })
+        if (sender is MenuItem { Tag: string page })
             ShowMarkdownHelp(page);
     }
 

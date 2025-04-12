@@ -28,7 +28,7 @@ public static class ScottPlotKustoResultRenderer
         }
     }
 
-    public static void UseDarkMode(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
+    public static void SetInitialUiPreferences(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
     {
         var palette = settings.GetOr("scottplot.palette", "");
 
@@ -50,8 +50,8 @@ public static class ScottPlotKustoResultRenderer
         SetColorFromSetting(settings, "scottplot.legend.fontcolor", c => plot.Legend.FontColor = c, "#d7d7d7");
         SetColorFromSetting(settings, "scottplot.legend.outlinecolor", c => plot.Legend.OutlineColor = c, "#d7d7d7");
 
-
-        plot.Legend.FontSize = 16;
+        var legendFontSize = settings.GetIntOr("scottplot.legend.fontsize", 12);
+        plot.Legend.FontSize = legendFontSize;
         plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
         
         if (result.Visualization.PropertyOr("legend", "") == "hidden")
@@ -86,7 +86,7 @@ public static class ScottPlotKustoResultRenderer
     {
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
-        UseDarkMode(result, plot, settings);
+        SetInitialUiPreferences(result, plot, settings);
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
             StandardAxisAssignment(accessor, "on|ot", 0, 1, 0);
@@ -167,6 +167,23 @@ public static class ScottPlotKustoResultRenderer
                 .ToArray();
             FixupAxisForLadder(plot, accessor);
         }
+
+        FinishUIPreferences(plot,settings);
+
+    }
+
+    private static void FinishUIPreferences(Plot plot,KustoSettingsProvider settings)
+    {
+
+        plot.Axes.Bottom.Label.FontSize = settings.GetIntOr("scottplot.axes.bottom.label.fontsize", 12);
+        plot.Axes.Left.Label.FontSize = settings.GetIntOr("scottplot.axes.left.label.fontsize", 12);
+        plot.Axes.Bottom.Label.Rotation = (float) settings.GetDoubleOr("scottplot.axes.bottom.label.rotation", 0.0);
+        plot.Axes.Left.Label.Rotation = (float) settings.GetDoubleOr("scottplot.axes.left.label.rotation", -90.0);
+
+        plot.Axes.Bottom.TickLabelStyle.Rotation = (float)settings.GetDoubleOr("scottplot.axes.bottom.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Left.TickLabelStyle.Rotation = (float)settings.GetDoubleOr("scottplot.axes.left.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Bottom.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.bottom.ticklabelstyle.fontsize", 12);
+        plot.Axes.Left.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.left.ticklabelstyle.fontsize", 12);
     }
 
     private static void StandardAxisAssignment(ResultChartAccessor accessor,
