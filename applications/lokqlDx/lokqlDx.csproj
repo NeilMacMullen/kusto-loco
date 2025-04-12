@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" />
+    <PackageReference Include="Markdig.Wpf" />
     <PackageReference Include="morelinq" />
     <PackageReference Include="ScottPlot.WPF" />
     <PackageReference Include="ShapeCrawler" />

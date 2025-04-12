@@ -174,10 +174,14 @@ public partial class MainWindow : Window
         await NavigateToLanding();
     }
 
-    private Task NavigateToLanding() =>
+    private Task NavigateToLanding()
+    {
+        var dlg = new MarkdownHelpWindow("lokqlDx‐landing");
+        dlg.ShowDialog();
         //https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco/lokqlDx%E2%80%90landing.md
         //Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
-        Task.CompletedTask;
+        return Task.CompletedTask;
+    }
 
     private void ResizeWindowAccordingToStoredPreferences()
     {
