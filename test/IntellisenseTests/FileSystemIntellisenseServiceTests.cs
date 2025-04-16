@@ -6,14 +6,16 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
+using IntellisenseTests.Platforms;
 using Moq;
 using Xunit;
+
 
 namespace IntellisenseTests;
 
 public class FileSystemIntellisenseServiceTests
 {
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_ExistentRootNonExistentChildDir_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
@@ -29,7 +31,7 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("Folder1");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_ValidDirNoDirectorySeparator_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
@@ -48,7 +50,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().Be("Folder1");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_RootWithDirSeparator_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -67,7 +69,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_PartialPathAtRoot_RetrievesRootChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -84,7 +86,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().Be("F");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_NonexistentDirDirectorySeparatorSuffix_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
@@ -99,7 +101,7 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_ValidDirDirectorySeparatorSuffix_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -116,7 +118,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_PartialDir_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
@@ -133,7 +135,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().Be("Fol");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_PartialFile_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
@@ -150,7 +152,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().Be("MyF");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_PartialPath_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
@@ -167,7 +169,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().Be("Fil");
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_NonexistentParent_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
@@ -181,7 +183,7 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_NonexistentRootPath_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
@@ -195,7 +197,7 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_NonexistentDirAndChild_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
@@ -209,7 +211,7 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Should().BeEmpty();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_RootedRelativePath_RelativeChildren()
     {
         var data = new Dictionary<string, MockFileData>
@@ -228,7 +230,7 @@ public class FileSystemIntellisenseServiceTests
         result.Filter.Should().BeEmpty();
     }
 
-    [Theory]
+    [WindowsOnlyTheory]
     [InlineData("//")]
     [InlineData(@"\\")]
     [InlineData("/:")]
@@ -251,7 +253,7 @@ public class FileSystemIntellisenseServiceTests
             .NotThrow();
     }
 
-    [Fact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_IOException_LogsError()
     {
 
@@ -270,7 +272,7 @@ public class FileSystemIntellisenseServiceTests
         f.GetLogs().Should().ContainSingle(x => x.Exception is IOException);
     }
 
-    [Fact]
+    [WindowsOnlyFact(Skip = "Not implemented")]
     public void GetPathIntellisenseOptions_UncRootPaths_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>

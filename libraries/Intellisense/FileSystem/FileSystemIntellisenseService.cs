@@ -19,9 +19,11 @@ internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
 {
     private readonly IFileSystemPathCompletionResultRetriever[] _retrievers;
     private readonly ILogger<IFileSystemIntellisenseService> _logger;
+    private readonly IRootedPathFactory _rootedPathFactory;
 
-    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger)
+    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger, IRootedPathFactory rootedPathFactory)
     {
+        _rootedPathFactory = rootedPathFactory;
         _logger = logger;
         _retrievers =
         [
@@ -37,7 +39,7 @@ internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
         {
             // Only rooted paths supported at this time
 
-            var rootedPath = RootedPath.Create(path);
+            var rootedPath = _rootedPathFactory.Create(path);
 
             return _retrievers
                 .Select(x => x.GetCompletionResult(rootedPath))
