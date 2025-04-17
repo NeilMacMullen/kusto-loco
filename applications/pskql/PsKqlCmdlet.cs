@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Management.Automation;
 using System.Runtime.InteropServices;
-using KustoLoco.ScottPlotRendering;
+using KustoLoco.Rendering.ScottPlot;
 
 using ScottPlot;
 using Image = SixLabors.ImageSharp.Image;
@@ -189,7 +189,7 @@ public class PsKqlCmdlet : Cmdlet
                 GenericScottPlotter.UseDarkMode(lot);
                 lot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
               
-                var bytes = lot.GetImageBytes(800,800,ImageFormat.Png);
+                var bytes = lot.GetImageBytes(800,800,ImageFormat.);
 
                 using MemoryStream strm = new(bytes);
               var image = Image.Load<Rgba32>(strm);

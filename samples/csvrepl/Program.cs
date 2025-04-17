@@ -1,10 +1,12 @@
-﻿using System.Reflection;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
+using Microsoft.VisualBasic;
 using NotNullStrings;
 using Spectre.Console;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 ShowHelpIfAppropriate();
 var settings = new KustoSettingsProvider();
