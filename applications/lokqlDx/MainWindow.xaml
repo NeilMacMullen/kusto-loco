@@ -3,175 +3,187 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:lokqlDx"
         xmlns:scottplot="http://schemas.scottplot.net/2008/xaml/presentation"
         mc:Ignorable="d"
         Title="lokqlDx" Width="1280" Height="800"
         Loaded="MainWindow_OnLoaded"
         Closing="MainWindow_OnClosing">
-
   <DockPanel>
-    <Menu DockPanel.Dock="Top" Name="MainMenu">
-      <MenuItem Header="_File">
-        <MenuItem Header="_New Workspace" Click="NewWorkspace" />
-        <MenuItem Header="_Open Workspace" Click="OnOpenWorkSpace" />
-        <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
+    <StatusBar DockPanel.Dock="Bottom" Name="StatusBar" Visibility="Collapsed">
+      <StatusBarItem>
+        <Label Name="UpdateInfo" />
+      </StatusBarItem>
+    </StatusBar>
 
-        <MenuItem Header="_Save" Click="OnSaveWorkspace" />
-        <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent" />
-      </MenuItem>
-      <MenuItem Header="_Preferences">
-        <MenuItem Header="Application Options" Click="OpenApplicationOptionsDialog" />
-        <MenuItem Header="Workspace Options" Click="OpenWorkspaceOptionsDialog" />
-        <Separator />
-        <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize" />
-        <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize" />
-        <MenuItem Header="Toggle word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap" />
-        <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers" />
 
-      </MenuItem>
-      <MenuItem Header="Misc">
-        <MenuItem Header="Register file association" Click="EnableJumpList" />
-      </MenuItem>
-      <MenuItem Header="Help">
-        <MenuItem Header="Quick start" Click="NavigateToGettingStarted" />
-        <MenuItem Header="LokqlDx intro" Click="NavigateToLandingPage" />
-        <MenuItem Header="Kusto-loco Project Page" Click="NavigateToProjectPage" />
-        <Separator />
-        <MenuItem Header="KQL Introduction" Click="NavigateToKqlIntroductionPage" />
-        <Separator/>
-        <MenuItem Header="Github Discussion Forum" Click="NavigateToDiscussionForum" />
-      </MenuItem>
-    </Menu>
-    <Grid Name="MainGrid">
-      <Grid.ColumnDefinitions>
+    <DockPanel>
+      <Menu DockPanel.Dock="Top" Name="MainMenu">
+        <MenuItem Header="_File">
+          <MenuItem Header="_New Workspace" Click="NewWorkspace" />
+          <MenuItem Header="_Open Workspace" Click="OnOpenWorkSpace" />
+          <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
 
-        <ColumnDefinition Width="400" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
+          <MenuItem Header="_Save" Click="OnSaveWorkspace" />
+          <MenuItem Header="Save _As" Click="SaveWorkspaceAsEvent" />
+        </MenuItem>
+        <MenuItem Header="_Preferences">
+          <MenuItem Header="Application Options" Click="OpenApplicationOptionsDialog" />
+          <MenuItem Header="Workspace Options" Click="OpenWorkspaceOptionsDialog" />
+          <Separator />
+          <MenuItem Header="Decrease FontSize" InputGestureText="Ctrl+9" Click="DecreaseFontSize" />
+          <MenuItem Header="Increase FontSize" InputGestureText="Ctrl+0" Click="IncreaseFontSize" />
+          <MenuItem Header="Toggle word-wrap" InputGestureText="Alt+Z" Click="ToggleWordWrap" />
+          <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers" />
 
-      <Grid Grid.Column="0" Name="EditorConsoleGrid">
-        <Grid.RowDefinitions>
+        </MenuItem>
+        <MenuItem Header="Misc">
+          <MenuItem Header="Register file association" Click="EnableJumpList" />
+        </MenuItem>
+        <MenuItem Header="Help">
+          <MenuItem Header="LokqlDx intro" Click="NavigateToWiki" Tag="LokqlDX" />
+          <MenuItem Header="Quick start" Click="NavigateToWiki" Tag="LokqlDx-tutorial-‐-quick-start" />
+          <MenuItem Header="Chart customisation" Click="NavigateToWiki" Tag="ScottPlot-Chart-customisation" />
+          <MenuItem Header="Command reference" Click="NavigateToWiki" Tag="LokqlDx-‐-commands" />
 
-          <RowDefinition Height="*" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TabControl Grid.Row="0">
-          <TabItem Header="Edit">
-            <local:QueryEditor x:Name="Editor"
-                               RunEvent="OnQueryEditorRunTextBlock" />
-          </TabItem>
-          <TabItem Header="Copilot">
-            <DockPanel>
-              <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <CheckBox Name="TerseMode" VerticalAlignment="Center">Terse</CheckBox>
-              </StackPanel>
-              <Grid>
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="*" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <RichTextBox Grid.Row="0" Name="ChatHistory" FontFamily="Consolas"
-                             Background="DarkBlue"
-                             FontSize="10" />
-                <GridSplitter Grid.Row="1"
-                              VerticalAlignment="Stretch"
-                              Height="5"
-                              HorizontalAlignment="Stretch"
-                              Background="DarkGray" />
-                <DockPanel Grid.Row="2">
-                  <DockPanel DockPanel.Dock="Bottom" Margin="5">
-                    <Button Name="SubmitButton" DockPanel.Dock="Right" Width="100" HorizontalAlignment="Right"
-                            Click="SubmitToCopilot">
-                      Submit
-                    </Button>
-                    <Button Name="ClearChatButton" DockPanel.Dock="Left" Width="100" HorizontalAlignment="Left"
-                            Click="ResetCopilot">
-                      Restart
-                    </Button>
+          <Separator />
+          <MenuItem Header="Kusto-loco Project Page" Click="NavigateToUri"
+                    Tag="https://github.com/NeilMacMullen/kusto-loco" />
+          <MenuItem Header="Github Discussion Forum" Click="NavigateToUri"
+                    Tag="https://github.com/NeilMacMullen/kusto-loco/discussions" />
+          <Separator />
+          <MenuItem Header="KQL Introduction" Click="NavigateToUri"
+                    Tag="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
+          <Separator />
+
+
+          <MenuItem Header="About" Click="AboutBox" />
+
+        </MenuItem>
+      </Menu>
+
+      <Grid Name="MainGrid">
+        <Grid.ColumnDefinitions>
+
+          <ColumnDefinition Width="400" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Name="EditorConsoleGrid">
+          <Grid.RowDefinitions>
+
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <TabControl Grid.Row="0">
+            <TabItem Header="Edit">
+              <local:QueryEditor x:Name="Editor"
+                                 RunEvent="OnQueryEditorRunTextBlock" />
+            </TabItem>
+            <TabItem Header="Copilot">
+              <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                  <CheckBox Name="TerseMode" VerticalAlignment="Center">Terse</CheckBox>
+                </StackPanel>
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+                  <RichTextBox Grid.Row="0" Name="ChatHistory" FontFamily="Consolas"
+                               Background="DarkBlue"
+                               FontSize="10" />
+                  <GridSplitter Grid.Row="1"
+                                VerticalAlignment="Stretch"
+                                Height="5"
+                                HorizontalAlignment="Stretch"
+                                Background="DarkGray" />
+                  <DockPanel Grid.Row="2">
+                    <DockPanel DockPanel.Dock="Bottom" Margin="5">
+                      <Button Name="SubmitButton" DockPanel.Dock="Right" Width="100" HorizontalAlignment="Right"
+                              Click="SubmitToCopilot">
+                        Submit
+                      </Button>
+                      <Button Name="ClearChatButton" DockPanel.Dock="Left" Width="100" HorizontalAlignment="Left"
+                              Click="ResetCopilot">
+                        Restart
+                      </Button>
+                    </DockPanel>
+
+                    <TextBox Name="UserChat" FontFamily="Consolas"
+                             Background="LightBlue"
+                             FontSize="10"
+                             AcceptsReturn="True" />
+
                   </DockPanel>
 
-                  <TextBox Name="UserChat" FontFamily="Consolas"
-                           Background="LightBlue"
-                           FontSize="10"
-                           AcceptsReturn="True" />
+                </Grid>
 
-                </DockPanel>
+              </DockPanel>
 
-              </Grid>
+            </TabItem>
+          </TabControl>
+          <GridSplitter Grid.Row="1"
+                        VerticalAlignment="Stretch"
+                        Height="5"
+                        HorizontalAlignment="Stretch"
+                        Background="DarkGray" />
+          <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
+                       Background="Black"
+                       FontSize="20"
+                       VerticalScrollBarVisibility="Auto" />
+        </Grid>
 
-            </DockPanel>
-
-          </TabItem>
-        </TabControl>
-        <GridSplitter Grid.Row="1"
+        <GridSplitter Grid.Column="1"
                       VerticalAlignment="Stretch"
-                      Height="5"
+                      Width="5"
                       HorizontalAlignment="Stretch"
                       Background="DarkGray" />
-        <RichTextBox Grid.Row="2" Name="OutputText" FontFamily="Consolas"
-                     Background="Black"
-                     FontSize="20"
-                     VerticalScrollBarVisibility="Auto" />
+
+        <TabControl Name="RenderingSurface" Grid.Column="2" Background="Black">
+          <TabItem Header="Data" IsSelected="True">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top">
+                <Label Visibility="Collapsed" Name="DatagridOverflowWarning" Foreground="Red" />
+              </StackPanel>
+
+              <DataGrid Name="dataGrid" Background="Black" RowBackground="Black"
+                        Foreground="GreenYellow"
+                        AlternatingRowBackground="DarkBlue"
+                        IsReadOnly="True"
+                        ClipboardCopyMode="ExcludeHeader"
+                        SelectionUnit="Cell"
+                        AutoGeneratingColumn="OnAutoGeneratingColumn">
+
+                <DataGrid.Resources>
+                  <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"
+                         TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Background" Value="DarkBlue" />
+                    <Setter Property="Padding" Value="2,0,5,0" />
+                  </Style>
+                </DataGrid.Resources>
+              </DataGrid>
+            </DockPanel>
+          </TabItem>
+          <TabItem Header="Chart">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right"
+                          Margin="4">
+                <Button Content="&#x1F4CB;" ToolTip="Copy image to clipboard"
+                        Click="OnCopyImageToClipboard" />
+
+              </StackPanel>
+              <scottplot:WpfPlot x:Name="WpfPlot1"
+                                 Loaded="WpfPlot1_OnLoaded" />
+            </DockPanel>
+          </TabItem>
+
+
+        </TabControl>
       </Grid>
-
-      <GridSplitter Grid.Column="1"
-                    VerticalAlignment="Stretch"
-                    Width="5"
-                    HorizontalAlignment="Stretch"
-                    Background="DarkGray" />
-
-      <TabControl Name="RenderingSurface" Grid.Column="2" Background="Black">
-        <TabItem Header="Data">
-          <DockPanel>
-            <StackPanel DockPanel.Dock="Top">
-              <Label Visibility="Collapsed" Name="DatagridOverflowWarning" Foreground="Red" />
-            </StackPanel>
-
-            <DataGrid Name="dataGrid" Background="Black" RowBackground="Black"
-                      Foreground="GreenYellow"
-                      AlternatingRowBackground="DarkBlue"
-                      IsReadOnly="True"
-                      ClipboardCopyMode="ExcludeHeader"
-                      SelectionUnit="Cell"
-                      AutoGeneratingColumn="OnAutoGeneratingColumn"
-                      >
-
-              <DataGrid.Resources>
-                <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"
-                       TargetType="{x:Type DataGridColumnHeader}">
-                  <Setter Property="Background" Value="DarkBlue" />
-                  <Setter Property="Padding" Value="2,0,5,0" />
-                </Style>
-              </DataGrid.Resources>
-            </DataGrid>
-          </DockPanel>
-        </TabItem>
-        <TabItem Header="Chart" IsSelected="True">
-          <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right"
-                        Margin="4">
-              <Button Content="&#x1F4CB;" ToolTip="Copy image to clipboard"
-                      Click="OnCopyImageToClipboard" />
-
-              <Button Content="&#x1F310;" ToolTip="Open in browser"
-                      Click="onOpenInBrowser" />
-
-            </StackPanel>
-            <wv2:WebView2 DockPanel.Dock="Bottom" Name="webview" DefaultBackgroundColor="Black" />
-
-          </DockPanel>
-
-        </TabItem>
-        <TabItem Header="Wpf">
-          <scottplot:WpfPlot x:Name="WpfPlot1" />
-        </TabItem>
-
-      </TabControl>
-    </Grid>
+    </DockPanel>
   </DockPanel>
 </Window>

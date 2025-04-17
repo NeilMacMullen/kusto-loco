@@ -5,7 +5,7 @@
   <ItemGroup>
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
     <PackageVersion Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageVersion Include="AwesomeAssertions" Version="8.0.2" />
+    <PackageVersion Include="AwesomeAssertions" Version="8.1.0" />
     <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
     <PackageVersion Include="Azure.Monitor.Query" Version="1.6.0" />
@@ -16,6 +16,7 @@
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.10" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
+    <PackageVersion Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.3" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
@@ -24,11 +25,10 @@
     <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="9.1.0-preview.1.25064.3" />
     <PackageVersion Include="Microsoft.Extensions.AI.Ollama" Version="9.1.0-preview.1.25064.3" />
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="9.1.0-preview.1.25064.3" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.3.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.4.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.4" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.0" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3124.44" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
@@ -42,16 +42,16 @@
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
-    <PackageVersion Include="ShapeCrawler" Version="0.64.3" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.7" />
-    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
+<PackageVersion Include="SixLabors.ImageSharp" Version="3.1.7" />
+    <PackageVersion Include="ShapeCrawler" Version="0.65.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.3" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.4" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.0.12" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.12" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.12" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.0.13" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.13" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.13" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.2" />
     <PackageVersion Include="xunit" Version="2.9.3" />
@@ -59,11 +59,11 @@
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.7.6" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.3" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.4" />
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
     <PackageVersion Include="geohash-dotnet" Version="2.2.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.0.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 </Project>

@@ -438,6 +438,53 @@
     "Name": "parsehex",
     "Description": "(non-standard) Parse a string as a hex value. The string may optionally start with 0x",
     "Syntax": "parsehex(*string*)"
+  },
+  {
+    "Name": "binary_and",
+    "Description": "binary and operator",
+    "Syntax": "binary_and(*long*,*long*)"
+  },
+  {
+    "Name": "binary_or",
+    "Description": "binary or operator",
+    "Syntax": "binary_or(*long*,*long*)"
+  },
+  {
+    "Name": "binary_xor",
+    "Description": "binary xor operator",
+    "Syntax": "binary_xor(*long*,*long*)"
+  },
+  {
+    "Name": "binary_not",
+    "Description": "binary not operator",
+    "Syntax": "binary_not(*long*)"
+  },
+  {
+    "Name": "bitset_count_ones",
+    "Description": "counts the number of '1' bits in the binary representation",
+    "Syntax": "bitset_count_ones(*long*)"
+  },
+  {
+    "Name": "binary_shift_left",
+    "Description": "shift left",
+    "Syntax": "binary_shift_left(*number*,*bits*)"
+  },
+  {
+    "Name": "binary_shift_right",
+    "Description": "shift right",
+    "Syntax": "binary_shift_right(*number*,*bits*)"
+  },
+  {
+    "Name": "make_datetime",
+    "Description": "makes a datetime from a number of fields",
+    "Syntax": "make_datetime(*year*,*month*,*day*)"
+  },
+  {
+    "Name": "make_timespan",
+    "Description": "makes a timespan from a number of fields",
+    "Syntax": "make_timespan(*hour*,*minute*,*second*)"
   }
+
+
 
 ]

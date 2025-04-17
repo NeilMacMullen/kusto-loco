@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,10 +8,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
-using Intellisense;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
+using ScottPlot;
 
 namespace lokqlDx;
 
@@ -22,8 +21,8 @@ public partial class MainWindow : Window
     private readonly WpfConsole _console;
     private readonly Size _minWindowSize = new(600, 400);
     private readonly PreferencesManager _preferenceManager = new();
-    private readonly WebViewRenderer _renderingSurface;
     private readonly WorkspaceManager _workspaceManager;
+    private readonly WpfRenderingSurface _wpfRenderingSurface;
 
     private Copilot _copilot = new(string.Empty);
     private InteractiveTableExplorer _explorer;
@@ -44,10 +43,10 @@ public partial class MainWindow : Window
         var settings = _workspaceManager.Settings;
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
-        _renderingSurface = new WebViewRenderer(RenderingSurface, webview, dataGrid,
-            DatagridOverflowWarning,WpfPlot1,
+        _wpfRenderingSurface = new WpfRenderingSurface(RenderingSurface, dataGrid,
+            DatagridOverflowWarning, WpfPlot1,
             settings);
-        _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _renderingSurface);
+        _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _wpfRenderingSurface);
     }
 
     private async Task RunQuery(string query)
@@ -83,7 +82,7 @@ public partial class MainWindow : Window
         //(we don't do it for new projects because that is just annoying)
         if (!_workspaceManager.IsNewWorkspace &&
             _preferenceManager.FetchCachedApplicationSettings().AutoSave)
-            await Save();
+            Save();
 
         await RunQuery(eventArgs.Query);
     }
@@ -96,17 +95,19 @@ public partial class MainWindow : Window
     ///     We don't always want to do this, for example if we are doing a save-as in which case it's
     ///     a bit disconcerting for the user if all their charts/tables disappear
     /// </remarks>
-    private async Task UpdateUIFromWorkspace(bool clearWorkingContext)
+    private void UpdateUIFromWorkspace(bool clearWorkingContext)
     {
-        var version = Assembly.GetEntryAssembly()!.GetName().Version!;
-        Title = _workspaceManager.Path.IsBlank() ? $"LokqlDX {version.Major}.{version.Minor}.{version.Build} - new workspace"
+        var version = UpgradeManager.GetCurrentVersion();
+        var title = _workspaceManager.Path.IsBlank()
+            ? $"LokqlDX {version} - new workspace"
             : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
+
+        Title = title;
         if (clearWorkingContext)
         {
             Editor.SetText(currentWorkspace.Text);
-           
+
             dataGrid.ItemsSource = null;
-            await NavigateToLanding();
         }
     }
 
@@ -141,7 +142,7 @@ public partial class MainWindow : Window
         RebuildRecentFilesList();
     }
 
-    private void UpdateDynamicUiFromPreferences()
+    private void UpdateDynamicUiFromPreferences(bool moveGrid)
     {
         var preferences = _preferenceManager.UIPreferences;
         Editor.SetFont(preferences.FontFamily);
@@ -153,33 +154,42 @@ public partial class MainWindow : Window
         dataGrid.FontSize = preferences.FontSize;
         UserChat.FontSize = preferences.FontSize;
         ChatHistory.FontSize = preferences.FontSize;
-        GridSerializer.DeSerialize(MainGrid,preferences.MainGridSerialization);
-        GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        if (moveGrid)
+        {
+            GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
+            GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        }
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         _preferenceManager.RetrieveUiPreferencesFromDisk();
-        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs()
-            .Select(v =>
-                new IntellisenseEntry(v.Key, v.Value, string.Empty))
-            .ToArray());
+        Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(true);
         RebuildRecentFilesList();
         ResizeWindowAccordingToStoredPreferences();
         var pathToLoad = _args.Any()
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-        await NavigateToLanding();
+        var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
+        if (isNewVersionAvailable)
+        {
+            StatusBar.Visibility = Visibility.Visible;
+            UpdateInfo.Content = "New version available";
+        }
     }
 
-    private async Task NavigateToLanding()
+
+    private void ShowMarkdownHelp(string page)
     {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/lokqlDx%E2%80%90landing");
+        var dlg = new MarkdownHelpWindow(page);
+        dlg.Show();
     }
+
+    private void NavigateToLanding() => ShowMarkdownHelp("lokqlDx‐landing");
 
     private void ResizeWindowAccordingToStoredPreferences()
     {
@@ -227,7 +237,7 @@ public partial class MainWindow : Window
     /// <returns>
     ///     true if the user did the save or didn't need to
     /// </returns>
-    private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
+    private YesNoCancel OfferSaveOfCurrentWorkspace()
     {
         if (!CheckIfWorkspaceDirty())
             return YesNoCancel.Yes;
@@ -248,14 +258,14 @@ public partial class MainWindow : Window
         }
 
         if (shouldSave)
-            return await Save();
+            return Save();
 
         return YesNoCancel.No;
     }
 
-    private async void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
-        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
+        if (OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
         {
             e.Cancel = true;
             return;
@@ -268,13 +278,13 @@ public partial class MainWindow : Window
 
     private async Task LoadWorkspace(string path)
     {
-        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
+        if (OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
 
         //create a new explorer context
         var loader = new StandardFormatAdaptor(_workspaceManager.Settings, _console);
         _explorer = new InteractiveTableExplorer(_console, loader, _workspaceManager.Settings,
-            CommandProcessorProvider.GetCommandProcessor(), _renderingSurface);
+            CommandProcessorProvider.GetCommandProcessor(), _wpfRenderingSurface);
 
         //make sure we have the most recent global preferences
         var appPrefs = _preferenceManager.FetchApplicationPreferencesFromDisk();
@@ -283,7 +293,13 @@ public partial class MainWindow : Window
         await RunQuery(appPrefs.StartupScript);
         await RunQuery(_workspaceManager.Workspace.StartupScript);
         UpdateMostRecentlyUsed(path);
-        await UpdateUIFromWorkspace(true);
+        UpdateUIFromWorkspace(true);
+        if (!appPrefs.HasShownLanding)
+        {
+            NavigateToLanding();
+            appPrefs.HasShownLanding = true;
+            _preferenceManager.Save(appPrefs);
+        }
     }
 
     private async void OnOpenWorkSpace(object sender, RoutedEventArgs e)
@@ -301,15 +317,9 @@ public partial class MainWindow : Window
     }
 
 
-    private async void OnSaveWorkspace(object sender, RoutedEventArgs e)
-    {
-        await Save();
-    }
+    private void OnSaveWorkspace(object sender, RoutedEventArgs e) => Save();
 
-    private void UpdateCurrentWorkspaceFromUI()
-    {
-        currentWorkspace = currentWorkspace with { Text = Editor.GetText() };
-    }
+    private void UpdateCurrentWorkspaceFromUI() => currentWorkspace = currentWorkspace with { Text = Editor.GetText() };
 
     private bool CheckIfWorkspaceDirty()
     {
@@ -320,11 +330,11 @@ public partial class MainWindow : Window
     /// <summary>
     ///     Save the current workspace to the current file
     /// </summary>
-    private async Task<YesNoCancel> Save()
+    private YesNoCancel Save()
     {
         if (!CheckIfWorkspaceDirty())
             return YesNoCancel.Yes;
-        if (_workspaceManager.IsNewWorkspace) return await SaveAs();
+        if (_workspaceManager.IsNewWorkspace) return SaveAs();
 
         SaveWorkspace(_workspaceManager.Path);
         return YesNoCancel.Yes;
@@ -336,7 +346,7 @@ public partial class MainWindow : Window
     /// <returns>
     ///     true if the user went ahead with the save
     /// </returns>
-    private async Task<YesNoCancel> SaveAs()
+    private YesNoCancel SaveAs()
     {
         var dialog = new SaveFileDialog
         {
@@ -348,7 +358,7 @@ public partial class MainWindow : Window
         {
             SaveWorkspace(dialog.FileName);
             //make sure we update title bar
-            await UpdateUIFromWorkspace(false);
+            UpdateUIFromWorkspace(false);
             return YesNoCancel.Yes;
         }
 
@@ -356,63 +366,37 @@ public partial class MainWindow : Window
         return YesNoCancel.Cancel;
     }
 
-    private async void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e)
-    {
-        await SaveAs();
-    }
+    private void SaveWorkspaceAsEvent(object sender, RoutedEventArgs e) => SaveAs();
 
     private async void NewWorkspace(object sender, RoutedEventArgs e)
     {
-        if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel) return;
+        if (OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel) return;
         await LoadWorkspace(string.Empty);
     }
 
     private void IncreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Min(40, _preferenceManager.UIPreferences.FontSize + 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void DecreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Max(6, _preferenceManager.UIPreferences.FontSize - 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
-
-        // here I suppose the window's menu is named "MainMenu"
         MainMenu.RaiseMenuItemClickOnKeyGesture(e);
     }
 
-    private async Task Navigate(string url)
-    {
-        await _renderingSurface.NavigateToUrl(new Uri(url));
-    }
+    private void Navigate(string url) => OpenUriInBrowser(url);
 
-    private async void NavigateToGettingStarted(object sender, RoutedEventArgs e)
-    {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDx-tutorial-%E2%80%90-quick-start");
-    }
 
-    private async void NavigateToProjectPage(object sender, RoutedEventArgs e)
-    {
-        await Navigate("https://github.com/NeilMacMullen/kusto-loco");
-    }
-
-    private async void NavigateToKqlIntroductionPage(object sender, RoutedEventArgs e)
-    {
-        await Navigate(
-            "https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators");
-    }
-
-    private void EnableJumpList(object sender, RoutedEventArgs e)
-    {
-        RegistryOperations.AssociateFileType(false);
-    }
+    private void EnableJumpList(object sender, RoutedEventArgs e) => RegistryOperations.AssociateFileType(false);
 
     private async void SubmitToCopilot(object sender, RoutedEventArgs e)
     {
@@ -482,7 +466,6 @@ public partial class MainWindow : Window
             userchat = $"That query gave an error: {lastResult.Error}";
         }
 
-
         SubmitButton.IsEnabled = true;
     }
 
@@ -507,8 +490,7 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save(appPreferences);
-
-            UpdateDynamicUiFromPreferences();
+            UpdateDynamicUiFromPreferences(false);
         }
         else
         {
@@ -516,7 +498,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
+    private void OpenWorkspaceOptionsDialog(object sender, RoutedEventArgs e)
     {
         UpdateCurrentWorkspaceFromUI();
         var dialog = new WorkspacePreferencesWindow(currentWorkspace, _preferenceManager.UIPreferences)
@@ -526,27 +508,28 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             currentWorkspace = dialog._workspace;
-            await Save();
+            Save();
         }
     }
 
     private void ToggleWordWrap(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.WordWrap = !_preferenceManager.UIPreferences.WordWrap;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void ToggleLineNumbers(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.ShowLineNumbers = !_preferenceManager.UIPreferences.ShowLineNumbers;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
-    private async void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
+    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
     {
         try
         {
-            var bytes = await WebViewExtensions.CaptureImage(webview.CoreWebView2);
+            var bytes = WpfPlot1.Plot.GetImageBytes((int)WpfPlot1.ActualWidth,
+                (int)WpfPlot1.ActualHeight, ImageFormat.Png);
             using var memoryStream = new MemoryStream(bytes);
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
@@ -562,48 +545,40 @@ public partial class MainWindow : Window
         }
     }
 
-    private void onOpenInBrowser(object sender, RoutedEventArgs e)
-    {
-        var textOrUri = _renderingSurface.LastRendered;
-        if (textOrUri.Html.IsNotBlank())
-        {
-            var fileName = Path.ChangeExtension(Path.GetTempFileName(), "html");
-            File.WriteAllText(fileName, textOrUri.Html);
 
-            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
-        }
+    private static void OpenUriInBrowser(string uri) =>
+        Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
 
-        if (textOrUri.Uri.IsNotBlank())
-        {
-            var fileName = textOrUri.Uri;
-            Process.Start(new ProcessStartInfo { FileName = fileName, UseShellExecute = true });
-        }
-    }
-
-    private async void NavigateToDiscussionForum(object sender, RoutedEventArgs e)
-    {
-        await Navigate(@"https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a");
-    }
-
-    private async void NavigateToLandingPage(object sender, RoutedEventArgs e)
-    {
-        await NavigateToLanding();
-    }
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-
-      
-        if (e.PropertyType == typeof(System.DateTime))
-        {
+        if (e.PropertyType == typeof(DateTime))
             if (e.Column is DataGridTextColumn textColumn)
             {
                 var fmt = _explorer.Settings.GetOr("datagrid.datetime_format", "dd MMM yyyy HH:mm");
                 textColumn.Binding.StringFormat = fmt;
             }
-           
-        }
+    }
 
+    private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
+    {
+    }
 
+    private void AboutBox(object sender, RoutedEventArgs e)
+    {
+        var thisVersion = UpgradeManager.GetCurrentVersion();
+        MessageBox.Show($"LokqlDx - version {thisVersion} ");
+    }
+
+    private void NavigateToWiki(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: string page })
+            ShowMarkdownHelp(page);
+    }
+
+    private void NavigateToUri(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: string page })
+            Navigate(page);
     }
 }

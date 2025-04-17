@@ -5,7 +5,7 @@ namespace Lokql.Engine.Commands;
 
 public static class AddToReportCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var resultName = o.ResultName.IsBlank() ? o.Element : o.ResultName;
@@ -17,7 +17,7 @@ public static class AddToReportCommand
         switch (type)
         {
             case "image":
-                await exp.ActiveReport.UpdateOrAddImage(o.Element, exp, result);
+                exp.ActiveReport.UpdateOrAddImage(o.Element, exp, result);
                 break;
             case "table":
                 exp.ActiveReport.UpdateOrAddTable(o.Element, result);
@@ -33,6 +33,7 @@ public static class AddToReportCommand
                 exp.Warn("Unrecognised type '{}'");
                 break;
         }
+        return Task.CompletedTask;
     }
 
     [Verb("addtoreport", HelpText = @"add results to the active report
