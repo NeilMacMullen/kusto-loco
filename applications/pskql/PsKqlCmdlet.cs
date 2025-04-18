@@ -184,17 +184,13 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                ScottPlot.Plot lot = new();
-                GenericScottPlotter.Render(lot, result);
-                GenericScottPlotter.UseDarkMode(lot);
-                lot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
-              
-                var bytes = lot.GetImageBytes(800,800,ImageFormat.);
+                var pw = 400;
+                var ph = 400;
+                var str = ScottPlotKustoResultRenderer.RenderToSixel(result,
+                    new KustoSettingsProvider(), pw, ph);
+                Console.WriteLine(str);
 
-                using MemoryStream strm = new(bytes);
-              var image = Image.Load<Rgba32>(strm);
-              var str = Sixel.ImageToSixel(image, 256, 80);
-              WriteObject(str);
+                WriteObject(str);
             }
         }
     }

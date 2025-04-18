@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\SixelSupport\SixelSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

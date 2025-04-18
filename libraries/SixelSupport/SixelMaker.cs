@@ -1,9 +1,12 @@
 ﻿using System.Text;
 
+namespace KustoLoco.Rendering.SixelSupport;
 public static class SixelMaker
 {
-    internal static string FrameToSixelString(IPixelSource frame)
+    public static string FrameToSixelString(IPixelSource frame)
     {
+        //ensure the frame is quantized
+        frame = new QuantizedPixelSource(frame);
 
         var sixelBuilder = new StringBuilder();
         var sixel = new StringBuilder();
@@ -15,27 +18,21 @@ public static class SixelMaker
         {
             var lastColor = -1;
             var repeatCounter = 0;
-            var c = (char)(Constants.SixelTransparent + (1 << (y % 6)));
+            var subRow = y % 6;
+
+            var c = (char)(Constants.SixelTransparent + (1 << subRow));
             for (var x = 0; x < frame.Width; x++)
             {
                 // The value of 1 left-shifted by the remainder of the current row divided by 6 gives the correct sixel character offset from the empty sixel char for each row.
                 // See the description of s...s for more detail on the sixel format https://vt100.net/docs/vt3xx-gp/chapter14.html#S14.2.1
-
-
                 var pixel = frame.GetPixel(x, y);
-
 
                 // The colors can be added to the palette and interleaved with the sixel data so long as the color is defined before it is used.
                 if (!palette.TryGetValue(pixel, out var colorIndex))
                 {
-
-
-
                     colorIndex = colorCounter++;
                     palette[pixel] = colorIndex;
                     sixel.AddColorToPalette(pixel, colorIndex);
-
-
                 }
 
                 // Transparency is a special color index of 0 that exists in our sixel palette.
@@ -64,12 +61,11 @@ public static class SixelMaker
 
             // Add a carriage return at the end of each row and a new line every 6 pixel rows.
             sixelBuilder.AppendCarriageReturn();
-            if (y % 6 == 5) sixelBuilder.AppendNextLine();
+            if (subRow== 5) sixelBuilder.AppendNextLine();
         }
 
         sixelBuilder.AppendNextLine();
         sixelBuilder.AppendExitSixel();
-        Console.WriteLine($"pallete colors {palette.Count}");
         return sixel.Append(sixelBuilder).ToString();
     }
 

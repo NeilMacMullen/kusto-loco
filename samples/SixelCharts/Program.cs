@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.VisualBasic;
-using System.IO.Pipelines;
+
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
@@ -23,7 +22,6 @@ var context = new KustoQueryContext()
 
 while (true)
 {
-   
     Console.Write(">");
     var query = Console.ReadLine()!.Trim();
     var res = await context.RunQuery(query);
@@ -35,60 +33,8 @@ while (true)
     {
         if (res.Visualization.ChartType.IsNotBlank())
         {
-            using var plot = new ScottPlot.Plot();
-            ScottPlotKustoResultRenderer.RenderToPlot(plot, res, settings);
-            var w = Console.WindowWidth;
-            var h = Console.WindowHeight;
-       
-            var (a, b) = TermHelper.GetCellSize();
-            var bytes = plot.GetImageBytes(w*a, h*b);
-            var src = ImageSource.FromBytes(bytes);
-            var q = Octree.Quantize(src, 250);
-            Console.WriteLine(SixelMaker.FrameToSixelString(q));
-          
+            var str = ScottPlotKustoResultRenderer.RenderToSixelWithPad(res, new KustoSettingsProvider(),3);
+            Console.WriteLine(str);
         }
     }
-}
-
-//from https://github.com/bacowan/cSharpColourQuantization/blob/master/ColourQuantization/Octree.cs
-
-public static class TermHelper
-{
-    public static (int w,int h) GetCellSize()
-    {
-
-        var response = GetControlSequenceResponse("[16t");
-
-        try
-        {
-            var parts = response.Split(';', 't');
-            var PixelWidth = int.Parse(parts[2]);
-            var PixelHeight = int.Parse(parts[1]);
-           return (PixelWidth, PixelHeight);
-        }
-        catch
-        {
-            Console.WriteLine("no cell size");
-        }
-        return (1, 1);
-
-    }
-    public static string GetControlSequenceResponse(string controlSequence)
-    {
-        char? c;
-        var response = string.Empty;
-
-        // Console.Write($"{Constants.ESC}{controlSequence}{Constants.ST}");
-        Console.Write($"{ESC}{controlSequence}");
-        do
-        {
-            c = Console.ReadKey(true).KeyChar;
-            response += c;
-        } while (c != 'c' && Console.KeyAvailable);
-
-        return response;
-    }
-
-    internal const string ESC = "\u001b";
-
 }
