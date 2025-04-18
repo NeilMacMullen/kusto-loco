@@ -19,11 +19,22 @@ namespace KustoLoco.Core.Settings;
 /// </remarks>
 public class KustoSettingsProvider
 {
-    private ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
+    private required ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
         ImmutableHashSet<KustoSettingDefinition>.Empty;
 
-    private ImmutableDictionary<string, RawKustoSetting> _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+    private Stack<ImmutableDictionary<string, RawKustoSetting>> _settingsStack;
 
+    public KustoSettingsProvider()
+    {
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+        AddLayer();
+    }
+
+    public void AddLayer()
+    {
+        var emptySettings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+        Push(emptySettings);
+    }
     public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions()
     {
         return _registeredSettings;
@@ -35,10 +46,21 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
+    {
+        _settingsStack.Push(layer);
+    }
+
+    public ImmutableDictionary<string, RawKustoSetting> Pop()
+    {
+       return _settingsStack.Pop();
+    }
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
+        var _settings= Pop();
         _settings = _settings.SetItem(k.Key, k);
+        Push(_settings);
     }
 
     public void Set(string setting, bool value)
@@ -52,10 +74,26 @@ public class KustoSettingsProvider
     }
 
 
+    private Dictionary<string, RawKustoSetting> GetFlattened()
+    {
+        var layers = _settingsStack.ToArray();
+        var d = new Dictionary<string, RawKustoSetting>();
+        foreach (var layer in layers)
+        {
+            foreach (var s in layer.Values)
+            {
+                d.TryAdd(s.Name, s);
+            }
+        }
+
+        return d;
+
+    }
     public string Get(KustoSettingDefinition setting)
     {
         var settingName = setting.Name;
         var fb = new RawKustoSetting(settingName, setting.DefaultValue);
+        var _settings= GetFlattened();
         return _settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
@@ -72,11 +110,12 @@ public class KustoSettingsProvider
     public string TrySubstitute(string name)
     {
         var fb = new RawKustoSetting(name, name);
+        var _settings = GetFlattened();
         return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
     public bool HasSetting(string name)
-        => _settings.ContainsKey(name.ToLowerInvariant());
+        => GetFlattened().ContainsKey(name.ToLowerInvariant());
 
     public string GetOr(string setting,string fallback)
     {
@@ -111,7 +150,7 @@ public class KustoSettingsProvider
 
     public IEnumerable<RawKustoSetting> Enumerate()
     {
-        return _settings.Values;
+        return GetFlattened().Values;
     }
 
     /// <summary>
@@ -132,7 +171,8 @@ public class KustoSettingsProvider
     /// </summary>
     public void Reset()
     {
-        _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+        AddLayer();
     }
 
     public double GetDoubleOr(string settingName, double p1)
