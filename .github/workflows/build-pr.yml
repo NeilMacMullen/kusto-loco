@@ -1,21 +1,21 @@
 name: PR Build
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
-      - name: Restore
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --no-restore
+          dotnet-version: 9.0.x
       - name: Test
-        run: dotnet test --no-restore --no-build
+        run: dotnet test
