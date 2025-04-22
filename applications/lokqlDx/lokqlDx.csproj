@@ -8,6 +8,8 @@
     <UseWPF>true</UseWPF>
     <PublishSingleFile>true</PublishSingleFile>
     <ApplicationIcon>Properties\kql.ico</ApplicationIcon>
+
+    <EnableWindowsTargeting>true</EnableWindowsTargeting> <!-- TODO: After migration we can remove this -->
   </PropertyGroup>
 
   <ItemGroup>
