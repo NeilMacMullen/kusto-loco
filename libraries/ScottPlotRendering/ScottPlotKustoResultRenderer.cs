@@ -54,7 +54,7 @@ public static class ScottPlotKustoResultRenderer
 
         var legendFontSize = settings.GetIntOr("scottplot.legend.fontsize", 12);
         plot.Legend.FontSize = legendFontSize;
-        plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
+        plot.Title(result.Visualization.PropertyOr("title", String.Empty));
         
         if (result.Visualization.PropertyOr("legend", "") == "hidden")
         {
