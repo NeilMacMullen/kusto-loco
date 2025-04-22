@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using NotNullStrings;
 using static MoreLinq.Extensions.PairwiseExtension;
 
@@ -128,7 +127,6 @@ public class ResultChartAccessor
             return 1.0;
         if (XisDateTime)
         {
-          
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
@@ -143,14 +141,15 @@ public class ResultChartAccessor
         {
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
-                .Select(d=>Convert.ChangeType(d,typeof(double)))
+                .Select(d => Convert.ChangeType(d, typeof(double)))
                 .OfType<double>()
                 .Distinct()
                 .OrderBy(d => d)
-                .Pairwise((a, b) => b-a)
+                .Pairwise((a, b) => b - a)
                 .Min();
             return smallestGap * 0.9;
         }
+
         return 1.0;
     }
 
@@ -224,13 +223,14 @@ public class ResultChartAccessor
         //if all else fails return the original set...
         return availableColumns;
     }
+
     /// <summary>
-    /// Represents a plottable chart series for ScottPlot
+    ///     Represents a plottable chart series for ScottPlot
     /// </summary>
     public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y)
     {
         /// <summary>
-        /// Return a version of the ChartSeries with the X and Y values ordered by X
+        ///     Return a version of the ChartSeries with the X and Y values ordered by X
         /// </summary>
         public ChartSeries OrderByX()
         {

@@ -1,5 +1,7 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
+using KustoLoco.Rendering.SixelSupport;
+using NetTopologySuite.Index.KdTree;
 using NotNullStrings;
 using ScottPlot;
 using ScottPlot.Palettes;
@@ -339,5 +341,44 @@ public static class ScottPlotKustoResultRenderer
         b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
         return b;
+    }
+
+    /// <summary>
+    /// Renders a KustoQueryResult to a Sixel
+    /// </summary>
+    public static string RenderToSixel(
+        KustoQueryResult result,
+        KustoSettingsProvider settings,
+        int widthInPixels,
+        int heightInPixels)
+    {
+        using var  plot = new Plot();
+        RenderToPlot(plot, result, settings);
+        var bytes = plot.GetImageBytes(widthInPixels,heightInPixels);
+        var src = ArgbPixelSource.FromScottPlotBmp(bytes);
+       
+        return SixelMaker.FrameToSixelString(src);
+    }
+
+    /// <summary>
+    /// Attempts to generate a sixel that fits the current screen
+    /// </summary>
+    public static string RenderToSixel(
+        KustoQueryResult result,
+        KustoSettingsProvider settings)
+    {
+        var (width, height) = TerminalHelper.GetScreenDimension();
+        return RenderToSixel(result, settings, width, height);
+    }
+
+    /// <summary>
+    /// Attempts to generate a sixel that fits the current screen
+    /// </summary>
+    public static string RenderToSixelWithPad(
+        KustoQueryResult result,
+        KustoSettingsProvider settings,int linesAtEnd)
+    {
+        var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
+        return RenderToSixel(result, settings, width, height);
     }
 }
