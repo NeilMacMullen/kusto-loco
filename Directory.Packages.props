@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
-    <PackageVersion Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="AwesomeAssertions" Version="8.1.0" />
     <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
