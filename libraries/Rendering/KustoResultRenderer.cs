@@ -192,7 +192,7 @@ tr:nth-child(odd) {
             return;
         }
 
-        var title = result.Visualization.PropertyOr("title", DateTime.Now.ToShortTimeString());
+        var title = result.Visualization.PropertyOr("title", string.Empty);
         var b = RenderToJObjectBuilder(vegaType, result, jmutate, expected);
         b.SetTitle(title);
         composer.AddChart(b);
