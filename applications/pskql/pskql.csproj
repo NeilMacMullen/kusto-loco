@@ -10,7 +10,6 @@
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
     <PackageReference Include="Microsoft.PowerShell.SDK" />
     <PackageReference Include="ScottPlot" />
-    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
 
   <ItemGroup>

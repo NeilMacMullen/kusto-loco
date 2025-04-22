@@ -1,20 +1,11 @@
-﻿using KustoLoco.Core;
+﻿using System.Diagnostics;
+using System.Management.Automation;
+using System.Runtime.InteropServices;
+using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
-using KustoLoco.Rendering;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.Management.Automation;
-using System.Runtime.InteropServices;
 using KustoLoco.Rendering.ScottPlot;
-
-using ScottPlot;
-using Image = SixLabors.ImageSharp.Image;
-using ImageFormat = ScottPlot.ImageFormat;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace pskql;
 
@@ -44,10 +35,7 @@ public class PsKqlCmdlet : Cmdlet
     )]
     public SwitchParameter NoQueryPrefix { get; set; }
 
-    protected override void ProcessRecord()
-    {
-        _objects.Add(Item);
-    }
+    protected override void ProcessRecord() => _objects.Add(Item);
 
 
     private void AddPropertyInfo(string prefix, PSPropertyInfo p, int rowIndex)
@@ -128,11 +116,8 @@ public class PsKqlCmdlet : Cmdlet
         foreach (var p in item.Properties) AddPropertyInfo(string.Empty, p, rowIndex);
     }
 
-    private static bool IsSimpleType(string typeName)
-    {
-        return TypeNameHelper.GetTypeFromName(typeName) != typeof(object);
-    }
-    
+    private static bool IsSimpleType(string typeName) => TypeNameHelper.GetTypeFromName(typeName) != typeof(object);
+
     protected override void EndProcessing()
     {
         var builder = TableBuilder.CreateEmpty(TableName, _objects.Count);
@@ -195,13 +180,13 @@ public class PsKqlCmdlet : Cmdlet
         }
     }
 
-   
+
     private BaseColumnBuilder GetOrCreateBuilder(string name, string typeName)
     {
         var type = TypeNameHelper.GetTypeFromName(typeName);
         if (_columnBuilders!.TryGetValue(name, out var b))
             return b;
-        b = ColumnHelpers.CreateBuilder(type, String.Empty);
+        b = ColumnHelpers.CreateBuilder(type, string.Empty);
         _columnBuilders[name] = b;
         _columnNames.Add(name);
         return b;
@@ -256,18 +241,17 @@ public class PsKqlCmdlet : Cmdlet
     }
 }
 
-
 internal class VTWriter : IDisposable
 {
-    private readonly TextWriter? _writer = null;
-    private readonly FileStream? _windowsStream = null;
-    private readonly bool _customwriter = false;
+    private readonly bool _customwriter;
+    private readonly FileStream? _windowsStream;
+    private readonly TextWriter? _writer;
     private bool _disposed;
 
     public VTWriter()
     {
-        bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        bool isRedirected = Console.IsOutputRedirected;
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        var isRedirected = Console.IsOutputRedirected;
 #if NET472
     if (isWindows && !isRedirected)
     {
@@ -287,28 +271,26 @@ internal class VTWriter : IDisposable
 #endif
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public void Write(string text)
     {
         if (_customwriter)
-        {
             _writer?.Write(text);
-        }
         else
-        {
             Console.Write(text);
-        }
     }
 
     public void WriteLine(string text)
     {
         if (_customwriter)
-        {
             _writer?.WriteLine(text);
-        }
         else
-        {
             Console.WriteLine(text);
-        }
     }
 
     protected virtual void Dispose(bool disposing)
@@ -320,14 +302,8 @@ internal class VTWriter : IDisposable
                 _writer?.Dispose();
                 _windowsStream?.Dispose();
             }
+
             _disposed = true;
         }
     }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
 }
-
