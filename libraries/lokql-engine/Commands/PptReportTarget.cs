@@ -29,7 +29,7 @@ public class PptReportTarget : IReportTarget
         if (matches.Any())
             foreach (var p in matches)
             {
-                if (p.TextBox is { } tb) tb.Text = text;
+                if (p.TextBox is { } tb) tb.SetText(text);
             }
     }
 
@@ -74,7 +74,7 @@ public class PptReportTarget : IReportTarget
             foreach (var header in res.ColumnNames().Take(maxColumns))
             {
                 var cell = addedTable[0, col];
-                cell.TextBox.Text = header;
+                cell.TextBox.SetText(header);
                 col++;
             }
 
@@ -83,7 +83,7 @@ public class PptReportTarget : IReportTarget
             for (var r = 0; r < AllowableRowCount(res.RowCount); r++)
             {
                 var cell = addedTable[r + 1, c];
-                cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
+                cell.TextBox.SetText(res.Get(c, r)?.ToString() ?? "<null>");
             }
         }
     }
