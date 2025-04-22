@@ -155,13 +155,12 @@ public class PsKqlCmdlet : Cmdlet
         else
         {
             WriteDebug("Emitting output...");
-            if (result.Visualization == VisualizationState.Empty)
+            if (!result.IsChart)
             {
                 var columns = result.ColumnDefinitions();
                 foreach (var row in result.EnumerateRows())
                 {
                     var o = new PSObject();
-
                     foreach (var k in columns)
                         o.Properties.Add(new PSVariableProperty(new PSVariable(k.Name, row[k.Index])));
                     WriteObject(o);
@@ -169,12 +168,8 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                var pw = 400;
-                var ph = 400;
-                var str = ScottPlotKustoResultRenderer.RenderToSixel(result,
-                    new KustoSettingsProvider(), pw, ph);
-                Console.WriteLine(str);
-
+                var str = ScottPlotKustoResultRenderer.RenderToSixelWithPad(result,
+                    new KustoSettingsProvider(),3);
                 WriteObject(str);
             }
         }

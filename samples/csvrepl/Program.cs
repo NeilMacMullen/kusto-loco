@@ -1,16 +1,16 @@
-﻿using KustoLoco.Core;
+﻿#nullable enable
+using System.Reflection;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
-using Microsoft.VisualBasic;
+using KustoLoco.Rendering.ScottPlot;
 using NotNullStrings;
 using Spectre.Console;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 ShowHelpIfAppropriate();
 var settings = new KustoSettingsProvider();
-var result = await CsvSerializer.Default(settings,new SystemConsole())
+var result = await CsvSerializer.Default(settings, new SystemConsole())
     .LoadTable(args.First(), "data");
 
 if (result.Error.IsNotBlank())
@@ -20,22 +20,14 @@ if (result.Error.IsNotBlank())
 }
 
 var context = new KustoQueryContext()
-     .AddTable(result.Table);
+    .AddTable(result.Table);
 
 while (true)
 {
     Console.Write(">");
-    var query = Console.ReadLine().Trim();
+    var query = Console.ReadLine()!.Trim();
     var res = await context.RunQuery(query);
-    if (res.Error.IsNotBlank())
-    {
-        Console.WriteLine(res.Error);
-    }
-    else
-    {
-        Console.WriteLine(KustoFormatter.Tabulate(res));
-        Console.WriteLine($"{res.QueryDuration}ms");
-    }
+    DisplayQueryResult(res);
 }
 
 
@@ -50,4 +42,43 @@ void ShowHelpIfAppropriate()
                 """;
     AnsiConsole.MarkupLineInterpolated($"[yellow]{help}[/]");
     Environment.Exit(0);
+}
+
+void DisplayQueryResult(KustoQueryResult queryResult)
+{
+    // if we got an error display it and skip rendering an empty table
+    if (queryResult.Error.IsNotBlank())
+    {
+        AnsiConsole.MarkupLineInterpolated($"[red]{queryResult.Error}[/]");
+        return;
+    }
+
+    if (queryResult.IsChart)
+    {
+            var str = ScottPlotKustoResultRenderer.RenderToSixelWithPad(queryResult, new KustoSettingsProvider(), 3);
+            Console.WriteLine(str);
+            return;
+    }
+    
+    //display the results as a pretty Spectre.Console table
+    var table = new Table();
+
+    // Add columns with header names
+    foreach (var column in queryResult.ColumnDefinitions()) table.AddColumn(column.Name);
+
+    // Add rows.  Note that cells could contain nulls in the general case
+    foreach (var row in queryResult.EnumerateRows())
+    {
+        var rowCells = row.Select(CellToString).ToArray();
+        table.AddRow(rowCells);
+    }
+
+    AnsiConsole.Write(table);
+
+    return;
+
+    string CellToString(object? cell)
+    {
+        return cell?.ToString() ?? "<null>";
+    }
 }

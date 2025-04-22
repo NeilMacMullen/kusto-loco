@@ -30,20 +30,15 @@ internal class Octree
         {
             var nodesToRemove = _levelNodes[7].Count - colourCount;
             var level = 6;
-            var toBreak = false;
+           
             while (level >= 0 && nodesToRemove > 0)
             {
                 var leaves = _levelNodes[level]
-                    .Where(n => n.ChildrenCount - 1 <= nodesToRemove)
                     .OrderBy(n => n.ChildrenCount)
                     .ToArray();
                 foreach (var leaf in leaves)
                 {
-                    if (leaf.ChildrenCount > nodesToRemove)
-                    {
-                        toBreak = true;
-                        continue;
-                    }
+                  
 
                     nodesToRemove -= leaf.ChildrenCount - 1;
                     leaf.Merge();
@@ -52,8 +47,9 @@ internal class Octree
 
                 _levelNodes.Remove(level + 1);
                 level--;
-                if (toBreak) break;
+                if (nodesToRemove <= 0) break;
             }
+
         }
     }
 
