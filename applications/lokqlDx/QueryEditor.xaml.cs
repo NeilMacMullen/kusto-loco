@@ -405,6 +405,11 @@ public partial class QueryEditor : UserControl
     {
         _schemaIntellisenseProvider.SetSchema(getSchema);
     }
+
+    public void SetFocus()
+    {
+        Query.Focus();
+    }
 }
 
 public class QueryEditorRunEventArgs(string query) : EventArgs
