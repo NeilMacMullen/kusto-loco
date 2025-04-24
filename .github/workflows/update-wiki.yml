@@ -1,0 +1,64 @@
+﻿name: Update Wiki
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions: # needed to write to wiki repository with just the workflow's access token rather than PAT
+  contents: write
+  pages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Main Repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Checkout Wiki
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Update Wiki
+        shell: pwsh
+        run: |
+          # generate docs
+          
+          pushd repo
+          
+          $fileName = "LokqlDx-‐-commands.md"
+          $location = "../wiki/$fileName"
+        
+          
+          Write-Host "Generating docs"
+          dotnet run --project ./applications/lokql -- -c ".help" | select -skip 3 | set-content $location
+          
+          # merge and push changes
+          
+          popd
+          cd wiki
+          
+          # https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          Write-Host "Adding changes"
+          git add --all
+          $hasChanges = (git diff --staged --shortstat | measure-object).Count -gt 0
+          if (!$hasChanges){
+            Write-Host "No changes detected. No changes made to wiki."
+            return;
+          }
+          
+          Write-Host "Committing changes"
+          git commit -m "chore: auto update command help ${{ github.run_id }}"
+          Write-Host "Pushing changes"
+          git push
+          Write-Host "Successfully updated wiki with changes."
