@@ -9,51 +9,51 @@ internal partial class MinAggregate
 {
     internal static int IntImpl(NumericAggregate context, int n)
     {
-        context.Total = context.Count == 0 ? n : Math.Min(context.Total, n);
+        context.LongValue = context.Count == 0 ? n : Math.Min(context.LongValue, n);
         context.Count++;
         return 0;
     }
 
     internal static int? IntImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (int)context.Total;
+        => context.Count == 0 ? null : (int)context.LongValue;
 
     internal static long LongImpl(NumericAggregate context, long n)
     {
-        context.Total = context.Count == 0 ? n : Math.Min(context.Total, n);
+        context.LongValue = context.Count == 0 ? n : Math.Min(context.LongValue, n);
         context.Count++;
         return 0;
     }
 
     internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (long)context.Total;
+        => context.Count == 0 ? null : (long)context.LongValue;
 
     internal static double DoubleImpl(NumericAggregate context, double n)
     {
-        context.Total = context.Count == 0 ? n : Math.Min(context.Total, n);
+        context.DoubleValue = context.Count == 0 ? n : Math.Min(context.DoubleValue, n);
         context.Count++;
         return 0;
     }
 
     internal static double? DoubleImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.Total;
+        => context.Count == 0 ? null : context.DoubleValue;
 
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
     {
-        context.Total = context.Count == 0 ? n.Ticks : Math.Min(context.Total, n.Ticks);
+        context.LongValue = context.Count == 0 ? n.Ticks : Math.Min(context.LongValue, n.Ticks);
         context.Count++;
         return TimeSpan.Zero;
     }
 
     internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan((long)context.Total);
+        => context.Count == 0 ? null : new TimeSpan((long)context.LongValue);
 
     internal static DateTime DtImpl(NumericAggregate context, DateTime n)
     {
-        context.Total = context.Count == 0 ? n.Ticks : Math.Min(context.Total, n.Ticks);
+        context.LongValue = context.Count == 0 ? n.Ticks : Math.Min(context.LongValue, n.Ticks);
         context.Count++;
         return DateTime.MinValue;
     }
 
     internal static DateTime? DtImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new DateTime((long)context.Total, DateTimeKind.Utc);
+        => context.Count == 0 ? null : new DateTime((long)context.LongValue, DateTimeKind.Utc);
 }
