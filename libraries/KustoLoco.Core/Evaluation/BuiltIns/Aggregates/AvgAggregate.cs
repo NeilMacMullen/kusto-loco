@@ -9,7 +9,7 @@ internal partial class AvgAggregate
     internal static double IntImpl(NumericAggregate context, int n)
     {
         context.Count++;
-        context.LongValue += n;
+        context.DoubleValue += n;
         return 0;
     }
 
