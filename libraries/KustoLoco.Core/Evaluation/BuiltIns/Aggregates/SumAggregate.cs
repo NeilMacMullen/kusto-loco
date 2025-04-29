@@ -9,41 +9,41 @@ internal partial class SumAggregate
 {
     internal static long IntImpl(NumericAggregate context, int n)
     {
-        context.Total += n;
+        context.LongValue += n;
         context.Count++;
         return 0;
     }
 
     internal static long? IntImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (long)context.Total;
+        => context.Count == 0 ? null : context.LongValue;
 
     internal static long LongImpl(NumericAggregate context, long n)
     {
-        context.Total += n;
+        context.LongValue += n;
         context.Count++;
         return 0;
     }
 
     internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (long)context.Total;
+        => context.Count == 0 ? null : context.LongValue;
 
     internal static double DoubleImpl(NumericAggregate context, double n)
     {
-        context.Total += n;
+        context.DoubleValue += n;
         context.Count++;
         return 0;
     }
 
     internal static double? DoubleImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.Total;
+        => context.Count == 0 ? null : context.DoubleValue;
 
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
     {
-        context.Total += n.Ticks;
+        context.LongValue += n.Ticks;
         context.Count++;
         return TimeSpan.Zero;
     }
 
     internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan((long)context.Total);
+        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
 }

@@ -853,4 +853,27 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("01:15:10");
     }
 
+    [TestMethod]
+    public async Task MaxLongTest()
+    {
+        //ensure precision is not lost with max
+        var query = @"let letters = datatable(bitmap:long)
+[851673153924341805,];
+print toscalar(letters | summarize mx=max(bitmap));";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("851673153924341805");
+    }
+
+    [TestMethod]
+    public async Task MinLongTest()
+    {
+        //ensure precision is not lost with min
+        var query = @"let letters = datatable(bitmap:long)
+[851673153924341808,851673153924341805];
+print toscalar(letters | summarize mx=min(bitmap));";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("851673153924341805");
+    }
+
+
 }
