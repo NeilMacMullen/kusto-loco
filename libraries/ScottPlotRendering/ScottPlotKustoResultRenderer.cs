@@ -4,6 +4,7 @@ using KustoLoco.Rendering.SixelSupport;
 using NetTopologySuite.Index.KdTree;
 using NotNullStrings;
 using ScottPlot;
+using ScottPlot.Colormaps;
 using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
@@ -32,14 +33,20 @@ public static class ScottPlotKustoResultRenderer
 
     public static void SetInitialUiPreferences(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
     {
-        var palette = settings.GetOr("scottplot.palette", "");
+        var paletteName = settings.GetOr("scottplot.palette", "");
 
-        var p = Palette.GetPalettes()
-                    .FirstOrDefault(f => f.Name.Equals(palette, StringComparison.InvariantCultureIgnoreCase))
-                ?? new Penumbra();
+        var ipallette = Palette.GetPalettes()
+                    .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
+        if (ipallette == null)
+        {
+            //allow palettes to be defined as lists of hex colors
+            var custom = paletteName.Tokenize(" ,;");
+            ipallette = custom.Length > 1
+                ? Palette.FromColors(custom)
+                : new Penumbra();
+        }
 
-
-        plot.Add.Palette = p;
+        plot.Add.Palette = ipallette;
         SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c, "#181818");
         SetColorFromSetting(settings, "scottplot.databackground.color", c => plot.DataBackground.Color = c, "#1f1f1f");
         SetColorFromSetting(settings, "scottplot.axes.color", c => plot.Axes.Color(c), "#ffffff");
