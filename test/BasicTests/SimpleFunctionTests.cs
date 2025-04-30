@@ -876,4 +876,65 @@ print toscalar(letters | summarize mx=min(bitmap));";
     }
 
 
+    [TestMethod]
+    public async Task CountOfTest()
+    {
+        var query = @"print countof('abc abc ab','abc')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task CountOfNormalTest()
+    {
+        var query = @"print countof('abc abc ab','abc','normal')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+    [TestMethod]
+    public async Task CountOfRegexTest()
+    {
+        var query = @"print countof('abc abc ab a','a.','regex')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+    [TestMethod]
+    public async Task IndexOfTest()
+    {
+        (await LastLineOfResult( @"print indexof('abc def ab','def')")).Should().Be("4");
+        (await LastLineOfResult( @"print indexof('abc def ab','xyz')")).Should().Be("-1");
+        (await LastLineOfResult( @"print indexof('abc def ab','ab',7)")).Should().Be("8");
+        (await LastLineOfResult( @"print indexof('abc def ab','ab',-2)")).Should().Be("8");
+        
+        //test cases from docs        
+        (await LastLineOfResult( """print indexof("abcdefg","cde")""")).Should().Be("2");
+        (await LastLineOfResult( """print indexof("abcdefg","cde",1,4)""")).Should().Be("2");
+        (await LastLineOfResult( """print indexof(   "abcdefg","cde",1,2     )""")).Should().Be("-1");
+        (await LastLineOfResult( """print indexof(   "abcdefg","cde",3,4    )""")).Should().Be("-1");
+        (await LastLineOfResult( """print indexof(  "abcdefg","cde",-5    )""")).Should().Be("2");
+        (await LastLineOfResult( """print indexof(  1234567,5,1,4  )""")).Should().Be("4");
+        (await LastLineOfResult( """print indexof(  "abcdefg","cde",2,-1    )""")).Should().Be("2");
+        (await LastLineOfResult( """print indexof(  "abcdefgabcdefg", "cd", 1, 10, 2  )""")).Should().Be("9");
+        (await LastLineOfResult( """print indexof(  "abcdefgabcdefg", "cde", 1, -1, 3  )""")).Should().Be("-1");
+        
+    }
+
+    [TestMethod]
+    public async Task ReplaceString()
+    {
+        var query = "print replace_string('A magic trick can turn a cat into a dog','cat','hamster')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("A magic trick can turn a hamster into a dog");
+    }
+
+    
+    [TestMethod]
+    public async Task StrRep()
+    {
+        var query = "print strrep('ABC', 2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("ABCABC");
+    }
+
 }
