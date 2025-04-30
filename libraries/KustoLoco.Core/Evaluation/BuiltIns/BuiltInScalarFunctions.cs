@@ -100,6 +100,9 @@ internal static class BuiltInScalarFunctions
 
 
         StrlenFunction.Register(functions);
+        StrRepFunction.Register(functions);
+        CountOfFunction.Register(functions);
+        IndexOfFunction.Register(functions);
         ToLowerFunction.Register(functions);
         ToUpperFunction.Register(functions);
         ToDateTimeFunction.Register(functions);
