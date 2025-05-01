@@ -246,9 +246,9 @@ datatable(Size:int) [50]
     [TestMethod]
     public async Task RowNumberNoParam()
     {
-        var query = "range i from 10 to 20 step 1 | extend r =row_number()";
+        var query = "range i from 1 to 10 step 1 | extend r =row_number()";
         var result = await LastLineOfResult(query);
-        result.Should().Be("20,10");
+        result.Should().Be("10,10");
     }
 
     [TestMethod]
