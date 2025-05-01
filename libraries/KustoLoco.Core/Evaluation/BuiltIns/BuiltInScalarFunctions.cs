@@ -158,7 +158,9 @@ internal static class BuiltInScalarFunctions
         StartOfYearFunction.Register(functions);
         EndOfYearFunction.Register(functions);
         DatetimeDiffFunction.Register(functions);
+        DatetimeAddFunction.Register(functions);
         DatetimePartFunction.Register(functions);
+        
         MakeDateTime.Register(functions);
         MakeTimeSpan.Register(functions);
         functions.Add(Functions.DatetimeUtcToLocal,
