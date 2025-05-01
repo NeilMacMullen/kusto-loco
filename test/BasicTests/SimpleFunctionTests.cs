@@ -150,7 +150,6 @@ datatable(Size:int) [50]
     }
 
 
-    
     [TestMethod]
     public async Task PadLeft()
     {
@@ -595,10 +594,10 @@ d | project Type='v1',Val=v1
     public async Task QuoteSlash()
     {
         var query = """ 
-datatable(T:string) ['abcd','"def']
-| where T contains "\"def"
-| count
-""";
+                    datatable(T:string) ['abcd','"def']
+                    | where T contains "\"def"
+                    | count
+                    """;
         var result = await LastLineOfResult(query);
         result.Should().Contain("1");
     }
@@ -612,7 +611,6 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("3.1");
     }
 
-  
 
     [TestMethod]
     public async Task LogDouble()
@@ -735,7 +733,7 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("True");
     }
 
-  
+
     [TestMethod]
     public async Task IsFinite2()
     {
@@ -763,6 +761,7 @@ datatable(T:string) ['abcd','"def']
         var result = await LastLineOfResult(query);
         result.Should().Be((a | b).ToString());
     }
+
     [TestMethod]
     public async Task BinaryXOr()
     {
@@ -772,6 +771,7 @@ datatable(T:string) ['abcd','"def']
         var result = await LastLineOfResult(query);
         result.Should().Be((a ^ b).ToString());
     }
+
     [TestMethod]
     public async Task BinaryNot()
     {
@@ -797,7 +797,7 @@ datatable(T:string) ['abcd','"def']
         var b = 6;
         var query = $"print binary_shift_left({a},{b})";
         var result = await LastLineOfResult(query);
-        result.Should().Be((a<<b).ToString());
+        result.Should().Be((a << b).ToString());
     }
 
     [TestMethod]
@@ -823,7 +823,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeDateTime()
     {
-        var query = $"print make_datetime(2000,4,15,1,1)";
+        var query = "print make_datetime(2000,4,15,1,1)";
         var result = await LastLineOfResult(query);
         result.Should().Be("2000-04-15 01:01:00Z");
     }
@@ -832,7 +832,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeDateTime2()
     {
-        var query = $"print make_datetime(2000,4,15)";
+        var query = "print make_datetime(2000,4,15)";
         var result = await LastLineOfResult(query);
         result.Should().Be("2000-04-15 00:00:00Z");
     }
@@ -840,7 +840,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeTimespan()
     {
-        var query = $"print make_timespan(1,15)";
+        var query = "print make_timespan(1,15)";
         var result = await LastLineOfResult(query);
         result.Should().Be("01:15:00");
     }
@@ -848,7 +848,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeTimespan2()
     {
-        var query = $"print make_timespan(1,15,10)";
+        var query = "print make_timespan(1,15,10)";
         var result = await LastLineOfResult(query);
         result.Should().Be("01:15:10");
     }
@@ -891,6 +891,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
         var result = await LastLineOfResult(query);
         result.Should().Be("2");
     }
+
     [TestMethod]
     public async Task CountOfRegexTest()
     {
@@ -902,22 +903,21 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task IndexOfTest()
     {
-        (await LastLineOfResult( @"print indexof('abc def ab','def')")).Should().Be("4");
-        (await LastLineOfResult( @"print indexof('abc def ab','xyz')")).Should().Be("-1");
-        (await LastLineOfResult( @"print indexof('abc def ab','ab',7)")).Should().Be("8");
-        (await LastLineOfResult( @"print indexof('abc def ab','ab',-2)")).Should().Be("8");
-        
+        (await LastLineOfResult(@"print indexof('abc def ab','def')")).Should().Be("4");
+        (await LastLineOfResult(@"print indexof('abc def ab','xyz')")).Should().Be("-1");
+        (await LastLineOfResult(@"print indexof('abc def ab','ab',7)")).Should().Be("8");
+        (await LastLineOfResult(@"print indexof('abc def ab','ab',-2)")).Should().Be("8");
+
         //test cases from docs        
-        (await LastLineOfResult( """print indexof("abcdefg","cde")""")).Should().Be("2");
-        (await LastLineOfResult( """print indexof("abcdefg","cde",1,4)""")).Should().Be("2");
-        (await LastLineOfResult( """print indexof(   "abcdefg","cde",1,2     )""")).Should().Be("-1");
-        (await LastLineOfResult( """print indexof(   "abcdefg","cde",3,4    )""")).Should().Be("-1");
-        (await LastLineOfResult( """print indexof(  "abcdefg","cde",-5    )""")).Should().Be("2");
-        (await LastLineOfResult( """print indexof(  1234567,5,1,4  )""")).Should().Be("4");
-        (await LastLineOfResult( """print indexof(  "abcdefg","cde",2,-1    )""")).Should().Be("2");
-        (await LastLineOfResult( """print indexof(  "abcdefgabcdefg", "cd", 1, 10, 2  )""")).Should().Be("9");
-        (await LastLineOfResult( """print indexof(  "abcdefgabcdefg", "cde", 1, -1, 3  )""")).Should().Be("-1");
-        
+        (await LastLineOfResult("""print indexof("abcdefg","cde")""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof("abcdefg","cde",1,4)""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(   "abcdefg","cde",1,2     )""")).Should().Be("-1");
+        (await LastLineOfResult("""print indexof(   "abcdefg","cde",3,4    )""")).Should().Be("-1");
+        (await LastLineOfResult("""print indexof(  "abcdefg","cde",-5    )""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(  1234567,5,1,4  )""")).Should().Be("4");
+        (await LastLineOfResult("""print indexof(  "abcdefg","cde",2,-1    )""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(  "abcdefgabcdefg", "cd", 1, 10, 2  )""")).Should().Be("9");
+        (await LastLineOfResult("""print indexof(  "abcdefgabcdefg", "cde", 1, -1, 3  )""")).Should().Be("-1");
     }
 
     [TestMethod]
@@ -928,7 +928,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().Be("A magic trick can turn a hamster into a dog");
     }
 
-    
+
     [TestMethod]
     public async Task StrRep()
     {
@@ -937,4 +937,42 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().Be("ABCABC");
     }
 
+    [TestMethod]
+    public async Task DatetimeAdd()
+    {
+        (await LastLineOfResult(@"print datetime_add('year',-5,make_datetime(2017,1,1))"))
+            .Should().Be("2012-01-01 00:00:00Z");
+    }
+    
+    [TestMethod]
+    public async Task DatetimeDiff()
+    {
+        (await LastLineOfResult(@"print  datetime_diff('year',datetime(2017-01-01),datetime(2000-12-31))"))
+            .Should().Be("17");
+        (await LastLineOfResult(@"print datetime_diff('quarter',datetime(2017-07-01),datetime(2017-03-30))"))
+            .Should().Be("2");
+        (await LastLineOfResult(@"print datetime_diff('month',datetime(2017-01-01),datetime(2015-12-30))"))
+            .Should().Be("13");
+        (await LastLineOfResult(@"print datetime_diff('week',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+            .Should().Be("5");
+        (await LastLineOfResult(@"print datetime_diff('day',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+            .Should().Be("29");
+        (await LastLineOfResult(@"print datetime_diff('hour',datetime(2017-10-31 01:00),datetime(2017-10-30 23:59))"))
+            .Should().Be("2");
+        (await LastLineOfResult(
+                @"print datetime_diff('minute',datetime(2017-10-30 23:05:01),datetime(2017-10-30 23:00:59))")).Should()
+            .Be("5");
+        (await LastLineOfResult(
+                @"print datetime_diff('second',datetime(2017-10-30 23:00:10.100),datetime(2017-10-30 23:00:00.900))"))
+            .Should().Be("10");
+        (await LastLineOfResult(
+                @"print datetime_diff('millisecond',datetime(2017-10-30 23:00:00.200100),datetime(2017-10-30 23:00:00.100900))"))
+            .Should().Be("100");
+        (await LastLineOfResult(
+                @"print datetime_diff('microsecond',datetime(2017-10-30 23:00:00.1009001),datetime(2017-10-30 23:00:00.1008009))"))
+            .Should().Be("100");
+        (await LastLineOfResult(
+                @"print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
+            .Should().Be("-700");
+    }
 }
