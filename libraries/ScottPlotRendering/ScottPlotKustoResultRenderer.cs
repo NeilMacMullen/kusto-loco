@@ -1,10 +1,8 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.SixelSupport;
-using NetTopologySuite.Index.KdTree;
 using NotNullStrings;
 using ScottPlot;
-using ScottPlot.Colormaps;
 using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
@@ -36,7 +34,7 @@ public static class ScottPlotKustoResultRenderer
         var paletteName = settings.GetOr("scottplot.palette", "");
 
         var ipallette = Palette.GetPalettes()
-                    .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
+            .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
         if (ipallette == null)
         {
             //allow palettes to be defined as lists of hex colors
@@ -47,7 +45,8 @@ public static class ScottPlotKustoResultRenderer
         }
 
         plot.Add.Palette = ipallette;
-        SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c, "#181818");
+        SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c,
+            "#181818");
         SetColorFromSetting(settings, "scottplot.databackground.color", c => plot.DataBackground.Color = c, "#1f1f1f");
         SetColorFromSetting(settings, "scottplot.axes.color", c => plot.Axes.Color(c), "#ffffff");
         SetColorFromSetting(settings, "scottplot.majorlinecolor", c => plot.Grid.MajorLineColor = c, "#404040");
@@ -61,8 +60,8 @@ public static class ScottPlotKustoResultRenderer
 
         var legendFontSize = settings.GetIntOr("scottplot.legend.fontsize", 12);
         plot.Legend.FontSize = legendFontSize;
-        plot.Title(result.Visualization.PropertyOr("title", String.Empty));
-        
+        plot.Title(result.Visualization.PropertyOr("title", string.Empty));
+
         if (result.Visualization.PropertyOr("legend", "") == "hidden")
         {
             plot.Legend.IsVisible = false;
@@ -88,8 +87,9 @@ public static class ScottPlotKustoResultRenderer
             }
         }
     }
+
     /// <summary>
-    /// Renders various types of charts based on the provided query results and settings.
+    ///     Renders various types of charts based on the provided query results and settings.
     /// </summary>
     public static void RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
@@ -125,6 +125,10 @@ public static class ScottPlotKustoResultRenderer
                 var ordered = ser.OrderByX();
                 var line = plot.Add.Scatter(ordered.X, ordered.Y);
                 line.LegendText = ordered.Legend;
+                line.LineWidth = (float)settings.GetDoubleOr("scottplot.line.linewidth",
+                    line.LineWidth);
+                line.MarkerSize = (float)settings.GetDoubleOr("scottplot.line.markersize",
+                    line.MarkerSize);
             }
 
             FixupAxisTicks(plot, accessor, false);
@@ -136,6 +140,8 @@ public static class ScottPlotKustoResultRenderer
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
+                var markerSize = settings.GetDoubleOr("scottplot.scatter.markersize", line.MarkerSize);
+                line.MarkerSize = (float)markerSize;
                 line.LegendText = ser.Legend;
             }
 
@@ -177,21 +183,22 @@ public static class ScottPlotKustoResultRenderer
             FixupAxisForLadder(plot, accessor);
         }
 
-        FinishUIPreferences(plot,settings);
-
+        FinishUIPreferences(plot, settings);
     }
 
-    private static void FinishUIPreferences(Plot plot,KustoSettingsProvider settings)
+    private static void FinishUIPreferences(Plot plot, KustoSettingsProvider settings)
     {
-
         plot.Axes.Bottom.Label.FontSize = settings.GetIntOr("scottplot.axes.bottom.label.fontsize", 12);
         plot.Axes.Left.Label.FontSize = settings.GetIntOr("scottplot.axes.left.label.fontsize", 12);
-        plot.Axes.Bottom.Label.Rotation = (float) settings.GetDoubleOr("scottplot.axes.bottom.label.rotation", 0.0);
-        plot.Axes.Left.Label.Rotation = (float) settings.GetDoubleOr("scottplot.axes.left.label.rotation", -90.0);
+        plot.Axes.Bottom.Label.Rotation = (float)settings.GetDoubleOr("scottplot.axes.bottom.label.rotation", 0.0);
+        plot.Axes.Left.Label.Rotation = (float)settings.GetDoubleOr("scottplot.axes.left.label.rotation", -90.0);
 
-        plot.Axes.Bottom.TickLabelStyle.Rotation = (float)settings.GetDoubleOr("scottplot.axes.bottom.ticklabelstyle.rotation", 0.0);
-        plot.Axes.Left.TickLabelStyle.Rotation = (float)settings.GetDoubleOr("scottplot.axes.left.ticklabelstyle.rotation", 0.0);
-        plot.Axes.Bottom.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.bottom.ticklabelstyle.fontsize", 12);
+        plot.Axes.Bottom.TickLabelStyle.Rotation =
+            (float)settings.GetDoubleOr("scottplot.axes.bottom.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Left.TickLabelStyle.Rotation =
+            (float)settings.GetDoubleOr("scottplot.axes.left.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Bottom.TickLabelStyle.FontSize =
+            settings.GetIntOr("scottplot.axes.bottom.ticklabelstyle.fontsize", 12);
         plot.Axes.Left.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.left.ticklabelstyle.fontsize", 12);
     }
 
@@ -266,7 +273,6 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
     }
-
     private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new FixedDateTimeAutomatic();
     private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new FixedDateTimeAutomatic();
 
@@ -274,7 +280,7 @@ public static class ScottPlotKustoResultRenderer
     private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
     {
         if (accessor.XisDateTime)
-           MakeXAxisDateTime(plot);
+            MakeXAxisDateTime(plot);
 
         if (accessor.XisNominal)
         {
@@ -351,7 +357,7 @@ public static class ScottPlotKustoResultRenderer
     }
 
     /// <summary>
-    /// Renders a KustoQueryResult to a Sixel
+    ///     Renders a KustoQueryResult to a Sixel
     /// </summary>
     public static string RenderToSixel(
         KustoQueryResult result,
@@ -359,16 +365,16 @@ public static class ScottPlotKustoResultRenderer
         int widthInPixels,
         int heightInPixels)
     {
-        using var  plot = new Plot();
+        using var plot = new Plot();
         RenderToPlot(plot, result, settings);
-        var bytes = plot.GetImageBytes(widthInPixels,heightInPixels);
+        var bytes = plot.GetImageBytes(widthInPixels, heightInPixels);
         var src = ArgbPixelSource.FromScottPlotBmp(bytes);
-       
+
         return SixelMaker.FrameToSixelString(src);
     }
 
     /// <summary>
-    /// Attempts to generate a sixel that fits the current screen
+    ///     Attempts to generate a sixel that fits the current screen
     /// </summary>
     public static string RenderToSixel(
         KustoQueryResult result,
@@ -379,11 +385,11 @@ public static class ScottPlotKustoResultRenderer
     }
 
     /// <summary>
-    /// Attempts to generate a sixel that fits the current screen
+    ///     Attempts to generate a sixel that fits the current screen
     /// </summary>
     public static string RenderToSixelWithPad(
         KustoQueryResult result,
-        KustoSettingsProvider settings,int linesAtEnd)
+        KustoSettingsProvider settings, int linesAtEnd)
     {
         var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
         return RenderToSixel(result, settings, width, height);
