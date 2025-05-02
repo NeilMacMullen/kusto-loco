@@ -1,6 +1,11 @@
-﻿using NLog;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using NLog.Config;
 using NLog.Targets;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace LogSetup;
 
@@ -60,5 +65,40 @@ public static class LoggingExtensions
             var debuggerTarget = new DebuggerTarget("debug") { Layout = "${time}|${message} ${exception}" };
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, LogLevel.Fatal, debuggerTarget));
         }
+    }
+
+    public static IServiceCollection AddApplicationLogging(this IServiceCollection services)
+    {
+        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+        var appName = Assembly.GetExecutingAssembly().GetName().Name ?? "Unknown";
+        var basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+        var logPath = Path.Combine(basePath, "logs.json");
+        Log.Information("Application storage path: {Path}", basePath);
+
+        services
+            .AddLogging(logBuilder =>
+                {
+                    var loggerConfig = new LoggerConfiguration()
+                        .WriteTo.File(new CompactJsonFormatter(), logPath)
+                        .WriteTo.Console(LogEventLevel.Error)
+                        .Enrich.FromLogContext();
+
+
+#if DEBUG
+
+                    loggerConfig
+                        .WriteTo.Console(LogEventLevel.Debug)
+                        .WriteTo.Debug(LogEventLevel.Debug)
+                        .WriteTo.File(new CompactJsonFormatter(), logPath, LogEventLevel.Debug);
+
+#endif
+                    var logger = loggerConfig.CreateLogger();
+
+                    logBuilder.AddSerilog(logger);
+                }
+            );
+
+
+        return services;
     }
 }
