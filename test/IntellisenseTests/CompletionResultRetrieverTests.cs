@@ -6,21 +6,26 @@ using FluentAssertions.Execution;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.CompletionResultRetrievers;
 using Intellisense.FileSystem.Paths;
+using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace IntellisenseTests;
 
 public class CompletionResultRetrieverTests
 {
+    private readonly IPathFactory _pathFactory = new ServiceCollection()
+        .AddMockedIo()
+        .BuildServiceProvider()
+        .GetRequiredService<IPathFactory>();
 
-    private readonly RootedPathFactory _rootedPathFactory = new RootedPathFactory();
-    
     [WindowsOnlyTheory]
-    [InlineData("C:/",new[]{"Folder1","Folder2"})]
-    [InlineData("D:/",new[]{"File1.txt"})]
-    [InlineData("/",new[]{"Folder1","Folder2"})]
-    [InlineData("\\",new[]{"Folder1","Folder2"})]
+    [InlineData("C:/", new[] { "Folder1", "Folder2" })]
+    [InlineData("D:/", new[] { "File1.txt" })]
+    [InlineData("/", new[] { "Folder1", "Folder2" })]
+    [InlineData("\\", new[] { "Folder1", "Folder2" })]
     public void Children_GetCompletions_Roots_RetrievesChildrenOfRoot(string path, string[] expected)
     {
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
@@ -35,7 +40,7 @@ public class CompletionResultRetrieverTests
         var reader = new FileSystemReader(fileSystem);
         var retriever = new ChildrenPathCompletionResultRetriever(reader);
 
-        var rootedPath = _rootedPathFactory.CreateOrThrow<WindowsRootedPath>(path);
+        var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);
         var result = retriever.GetCompletionResult(rootedPath);
 
         result
@@ -60,8 +65,8 @@ public class CompletionResultRetrieverTests
         );
         var reader = new FileSystemReader(fileSystem);
 
+        var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);
         var retriever = new ChildrenPathCompletionResultRetriever(reader);
-        var rootedPath = _rootedPathFactory.CreateOrThrow<WindowsRootedPath>(path);
 
         retriever
             .GetCompletionResult(rootedPath)
@@ -84,7 +89,7 @@ public class CompletionResultRetrieverTests
         var retriever = new ChildrenPathCompletionResultRetriever(new FileSystemReader(fileSystem));
 
 
-        var rootedPath = _rootedPathFactory.CreateOrThrow<WindowsRootedPath>(path);
+        var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);
         var result = retriever.GetCompletionResult(rootedPath);
 
         using var _ = new AssertionScope();
@@ -107,7 +112,7 @@ public class CompletionResultRetrieverTests
         );
         var retriever = new SiblingPathCompletionResultRetriever(new FileSystemReader(fileSystem));
 
-        var rootedPath = _rootedPathFactory.CreateOrThrow<WindowsRootedPath>("C:/Folder1");
+        var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>("C:/Folder1");
         var result = retriever.GetCompletionResult(rootedPath);
 
         using var _ = new AssertionScope();
