@@ -34,7 +34,7 @@ public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
-    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
+    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = App.Resolve<IFileSystemIntellisenseService>();
     private CommandParser? _parser;
     private CommandParser Parser
     {
