@@ -11,8 +11,9 @@ public static class IntellisenseServiceCollectionExtensions
 {
     public static IServiceCollection AddIntellisense(this IServiceCollection services)
     {
+
+
         // main services
-        services.TryAddSingleton<IFileSystem, System.IO.Abstractions.FileSystem>();
         services.AddSingleton<IFileSystemIntellisenseService, FileSystemIntellisenseService>();
 
         // completion result retrievers
@@ -28,8 +29,15 @@ public static class IntellisenseServiceCollectionExtensions
         // path processing
         services.AddSingleton<IPathFactory, PathFactory>();
 
+        // shares
+        services
+            .AddSingleton<IShareReader, Win32ApiShareReader>()
+            .AddSingleton<ShareClient>();
 
 
+
+        // auxiliary services
+        services.TryAddSingleton<IFileSystem, System.IO.Abstractions.FileSystem>();
 
 
         return services;

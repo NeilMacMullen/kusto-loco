@@ -18,7 +18,6 @@ internal class WindowsRootedPath : IFileSystemPath
     {
         if (_value[0].IsDirectorySeparator())
         {
-            // TODO: Handle UNC paths
             return _value.Length is 1;
         }
 
