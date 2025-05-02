@@ -1,11 +1,14 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
+using LogLevel = NLog.LogLevel;
+
 
 namespace LogSetup;
 
@@ -69,8 +72,8 @@ public static class LoggingExtensions
 
     public static IServiceCollection AddApplicationLogging(this IServiceCollection services)
     {
-        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
-        var appName = Assembly.GetExecutingAssembly().GetName().Name ?? "Unknown";
+        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+        var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "Unknown";
         var basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
         var logPath = Path.Combine(basePath, "logs.json");
         Log.Information("Application storage path: {Path}", basePath);
@@ -78,23 +81,25 @@ public static class LoggingExtensions
         services
             .AddLogging(logBuilder =>
                 {
-                    var loggerConfig = new LoggerConfiguration()
-                        .WriteTo.File(new CompactJsonFormatter(), logPath)
-                        .WriteTo.Console(LogEventLevel.Error)
-                        .Enrich.FromLogContext();
+                    logBuilder.ClearProviders();
+                    var loggerConfig = new LoggerConfiguration();
+
+                    loggerConfig.Enrich.FromLogContext();
 
 
 #if DEBUG
-
+                    loggerConfig.MinimumLevel.Debug();
                     loggerConfig
                         .WriteTo.Console(LogEventLevel.Debug)
-                        .WriteTo.Debug(LogEventLevel.Debug)
                         .WriteTo.File(new CompactJsonFormatter(), logPath, LogEventLevel.Debug);
-
+#else
+                    loggerConfig.MinimumLevel.Information();
+                    loggerConfig.WriteTo.File(new CompactJsonFormatter(), logPath)
+                        .WriteTo.Console(LogEventLevel.Error);
 #endif
                     var logger = loggerConfig.CreateLogger();
 
-                    logBuilder.AddSerilog(logger);
+                    logBuilder.AddSerilog(logger,true);
                 }
             );
 
