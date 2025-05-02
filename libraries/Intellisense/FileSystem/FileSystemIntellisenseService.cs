@@ -1,5 +1,4 @@
-﻿using Intellisense.FileSystem.CompletionResultRetrievers;
-using Intellisense.FileSystem.Paths;
+﻿using Intellisense.FileSystem.Paths;
 using Microsoft.Extensions.Logging;
 
 namespace Intellisense.FileSystem;
@@ -15,40 +14,27 @@ public interface IFileSystemIntellisenseService
     CompletionResult GetPathIntellisenseOptions(string path);
 }
 
-internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
+internal class FileSystemIntellisenseService(
+    ILogger<IFileSystemIntellisenseService> logger,
+    IPathFactory pathFactory,
+    IEnumerable<IFileSystemPathCompletionResultRetriever> retrievers
+    )
+    : IFileSystemIntellisenseService
 {
-    private readonly IFileSystemPathCompletionResultRetriever[] _retrievers;
-    private readonly ILogger<IFileSystemIntellisenseService> _logger;
-    private readonly IRootedPathFactory _rootedPathFactory;
-
-    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger, IRootedPathFactory rootedPathFactory)
-    {
-        _rootedPathFactory = rootedPathFactory;
-        _logger = logger;
-        _retrievers =
-        [
-            new ChildrenPathCompletionResultRetriever(reader),
-            new SiblingPathCompletionResultRetriever(reader)
-        ];
-    }
 
     public CompletionResult GetPathIntellisenseOptions(string path)
     {
-
         try
         {
-            // Only rooted paths supported at this time
+            var pathObj = pathFactory.Create(path);
 
-            var rootedPath = _rootedPathFactory.Create(path);
-
-            return _retrievers
-                .Select(x => x.GetCompletionResult(rootedPath))
-                .FirstOrDefault(x => !x.IsEmpty(),CompletionResult.Empty);
-
+            return retrievers
+                .Select(x => x.GetCompletionResult(pathObj))
+                .FirstOrDefault(x => !x.IsEmpty(), CompletionResult.Empty);
         }
         catch (IOException e)
         {
-            _logger.LogError(e,"IO error occurred while fetching intellisense results. Returning empty result.");
+            logger.LogError(e, "IO error occurred while fetching intellisense results. Returning empty result.");
             return CompletionResult.Empty;
         }
     }

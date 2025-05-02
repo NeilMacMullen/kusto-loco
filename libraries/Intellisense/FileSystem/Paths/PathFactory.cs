@@ -1,11 +1,14 @@
-﻿namespace Intellisense.FileSystem.Paths;
+﻿using System.Runtime.InteropServices;
 
-internal interface IRootedPathFactory
+namespace Intellisense.FileSystem.Paths;
+
+internal interface IPathFactory
 {
     IFileSystemPath Create(string path);
+    T CreateOrThrow<T>(string path) where T : IFileSystemPath;
 }
 
-internal class RootedPathFactory : IRootedPathFactory
+internal class PathFactory : IPathFactory
 {
     public IFileSystemPath Create(string path)
     {

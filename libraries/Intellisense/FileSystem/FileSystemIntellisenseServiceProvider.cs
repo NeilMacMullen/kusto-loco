@@ -1,15 +1,13 @@
-﻿using Intellisense.FileSystem.Paths;
-using Microsoft.Extensions.Logging;
+﻿using Intellisense.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Intellisense.FileSystem;
 
 public static class FileSystemIntellisenseServiceProvider
 {
-    private static readonly System.IO.Abstractions.FileSystem FileSystem = new();
-    public static IFileSystemIntellisenseService GetFileSystemIntellisenseService()
-    {
-        var logger = new LoggerFactory().CreateLogger<FileSystemIntellisenseService>();
-        var fileSystemReader = new FileSystemReader(FileSystem);
-        return new FileSystemIntellisenseService(fileSystemReader,logger,new RootedPathFactory());
-    }
+    private static readonly IServiceProvider Provider = new ServiceCollection()
+        .AddIntellisense()
+        .AddLogging() // in place to resolve dependencies, does nothing for now
+        .BuildServiceProvider();
+    public static IFileSystemIntellisenseService GetFileSystemIntellisenseService() => Provider.GetRequiredService<IFileSystemIntellisenseService>();
 }

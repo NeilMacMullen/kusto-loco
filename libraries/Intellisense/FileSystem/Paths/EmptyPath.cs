@@ -3,15 +3,9 @@
 
 internal class EmptyPath : IFileSystemPath
 {
-    public string GetPath()
-    {
-        return string.Empty;
-    }
+    public string GetPath() => string.Empty;
 
-    public bool IsRootDirectory()
-    {
-        return false;
-    }
+    public bool IsRootDirectory() => false;
 
     public static readonly EmptyPath Instance = new();
 }
