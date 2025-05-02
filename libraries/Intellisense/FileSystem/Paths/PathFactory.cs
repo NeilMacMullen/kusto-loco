@@ -17,8 +17,20 @@ internal class PathFactory : IPathFactory
             return EmptyPath.Instance;
         }
 
-        // we only care about windows or unix
-        if (OperatingSystem.IsWindows())
+
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+        if (Uri.TryCreate(path, UriKind.Absolute, out var uri) && uri.IsUnc)
+        {
+            if (!isWindows)
+            {
+                return EmptyPath.Instance;
+            }
+
+            return new UncPath(uri);
+        }
+
+        if (isWindows)
         {
             return new WindowsRootedPath(path);
         }

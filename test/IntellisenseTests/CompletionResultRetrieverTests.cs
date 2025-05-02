@@ -38,7 +38,7 @@ public class CompletionResultRetrieverTests
             new MockFileSystemOptions { CreateDefaultTempDir = false }
         );
         var reader = new FileSystemReader(fileSystem);
-        var retriever = new ChildrenPathCompletionResultRetriever(reader);
+        var retriever = new ChildrenPathCompletionResultRetriever(reader, Mock.Of<IShareReader>());
 
         var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);
         var result = retriever.GetCompletionResult(rootedPath);
@@ -65,8 +65,8 @@ public class CompletionResultRetrieverTests
         );
         var reader = new FileSystemReader(fileSystem);
 
+        var retriever = new ChildrenPathCompletionResultRetriever(reader, Mock.Of<IShareReader>());
         var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);
-        var retriever = new ChildrenPathCompletionResultRetriever(reader);
 
         retriever
             .GetCompletionResult(rootedPath)
@@ -86,7 +86,7 @@ public class CompletionResultRetrieverTests
                 ["C:/Folder2/File22.txt"] = new("")
             }
         );
-        var retriever = new ChildrenPathCompletionResultRetriever(new FileSystemReader(fileSystem));
+        var retriever = new ChildrenPathCompletionResultRetriever(new FileSystemReader(fileSystem),Mock.Of<IShareReader>());
 
 
         var rootedPath = _pathFactory.CreateOrThrow<WindowsRootedPath>(path);

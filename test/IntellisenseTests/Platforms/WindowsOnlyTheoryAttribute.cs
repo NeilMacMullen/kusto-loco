@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+﻿using System.Runtime.InteropServices;
 using Xunit;
 
 namespace IntellisenseTests.Platforms;
@@ -7,11 +7,11 @@ public sealed class WindowsOnlyTheoryAttribute : TheoryAttribute
 {
     public WindowsOnlyTheoryAttribute()
     {
-        if (MockUnixSupport.IsWindowsPlatform())
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return;
         }
 
-        Skip = TestConstants.WindowsSkipMessage;
+        Skip = PlatformHelper.WindowsSkipMessage;
     }
 }
