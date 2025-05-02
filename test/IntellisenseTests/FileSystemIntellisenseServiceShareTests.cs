@@ -17,7 +17,7 @@ public class FileSystemIntellisenseServiceShareTests
             .BuildServiceProvider()
             .GetRequiredService<IFileSystemIntellisenseService>();
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_ChildDir_RetrievesChildrenOfChildDir()
     {
         var dir = Directory.CreateDirectory($"//{Constants.LocalHost}/c$/TestShare/folder1");
@@ -33,7 +33,7 @@ public class FileSystemIntellisenseServiceShareTests
         }
     }
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_RootShare_RetrievesChildren()
     {
         var path = $"//{Constants.LocalHost}/c$/";
@@ -43,7 +43,7 @@ public class FileSystemIntellisenseServiceShareTests
         result.Entries.Select(x => x.Name).Should().Contain("Program Files");
     }
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_RootShareNoSeparator_ReturnsEmpty()
     {
         var path = $"//{Constants.LocalHost}/c$";
@@ -53,7 +53,7 @@ public class FileSystemIntellisenseServiceShareTests
         result.Entries.Select(x => x.Name).Should().BeEmpty();
     }
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_Host_RetrievesAvailableShares()
     {
         var path = $"//{Constants.LocalHost}/";
@@ -66,7 +66,7 @@ public class FileSystemIntellisenseServiceShareTests
             .Contain("C$");
     }
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public void GetPathIntellisenseOptions_HostNoSeparator_ReturnsEmpty()
     {
         var path = $"//{Constants.LocalHost}";
