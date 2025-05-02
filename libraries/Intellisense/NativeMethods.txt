@@ -1,6 +1,0 @@
-WNetOpenEnum
-WNetEnumResource
-WNetCloseEnum
-NetShareEnum
-NetApiBufferFree
-SHARE_INFO_1
