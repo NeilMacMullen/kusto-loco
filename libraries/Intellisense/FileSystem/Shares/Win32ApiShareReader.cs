@@ -47,6 +47,7 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
         hostRepository.Add(host);
 
 
+
         try
         {
             var res = Task.Run(async () => await GetSharesAsync(host)).GetAwaiter().GetResult();

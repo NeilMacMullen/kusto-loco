@@ -146,6 +146,8 @@ public class FileSystemIntellisenseServiceFileShareTests : IClassFixture<FileSha
     }
 }
 
+
+
 internal static class FileSystemExtensions
 {
     public static void Touch(this FileInfo file)
