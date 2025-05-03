@@ -279,7 +279,7 @@ public partial class QueryEditor : UserControl
         _completionWindow?.Show();
     }
 
-    private bool ShowPathCompletions()
+    private async Task<bool> ShowPathCompletions()
     {
         // Avoid unnecessary IO calls
         if (_completionWindow is not null)
@@ -294,7 +294,7 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+        var result = await _fileSystemIntellisenseService.GetPathIntellisenseOptionsAsync(path);
         if (result.IsEmpty())
         {
             return false;
@@ -317,7 +317,7 @@ public partial class QueryEditor : UserControl
         return true;
     }
 
-    private void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+    private async void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
     {
         if (_completionWindow != null && !_completionWindow.CompletionList.ListBox.HasItems)
         {
@@ -325,7 +325,7 @@ public partial class QueryEditor : UserControl
             return;
         }
 
-        if (ShowPathCompletions())
+        if (await ShowPathCompletions())
         {
             return;
         }

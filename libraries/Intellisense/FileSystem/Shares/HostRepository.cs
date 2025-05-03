@@ -4,6 +4,7 @@ namespace Intellisense.FileSystem.Shares;
 internal interface IHostRepository
 {
     IReadOnlyList<string> List();
+    Task<IReadOnlyList<string>> ListAsync();
     void Add(string host);
     void Remove(string host);
 }
@@ -13,6 +14,7 @@ internal class HostRepository : IHostRepository
     private readonly HashSet<string> _hosts = new([], StringComparer.OrdinalIgnoreCase);
 
     public IReadOnlyList<string> List() => _hosts.ToList();
+    public Task<IReadOnlyList<string>> ListAsync() => Task.FromResult(List());
 
     public void Add(string host) => _hosts.Add(host);
 

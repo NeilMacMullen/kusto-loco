@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FluentAssertions;
 using Intellisense;
 using Intellisense.FileSystem;
@@ -21,18 +22,18 @@ public class FileSystemIntellisenseServiceHostCompletionTests
     }
 
     [WindowsAdminOnlyFact]
-    public void GetPathIntellisenseOptions_AfterValidHostFound_ReturnsHost()
+    public async Task GetPathIntellisenseOptions_AfterValidHostFound_ReturnsHost()
     {
         var twoSlash = "//";
         var localHost = $"//{Constants.LocalHost}/";
 
-        var res1 = _service.GetPathIntellisenseOptions(twoSlash);
+        var res1 = await _service.GetPathIntellisenseOptionsAsync(twoSlash);
 
         res1.Entries.Should().BeEmpty();
 
-        _service.GetPathIntellisenseOptions(localHost);
+        await _service.GetPathIntellisenseOptionsAsync(localHost);
 
-        var res2 = _service.GetPathIntellisenseOptions(twoSlash);
+        var res2 = await _service.GetPathIntellisenseOptionsAsync(twoSlash);
 
         res2
             .Entries.Should()

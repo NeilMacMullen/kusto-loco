@@ -25,4 +25,6 @@ internal class ChildrenPathCompletionResultRetriever(IFileSystemReader reader)
             .GetChildren(fileSystemPath.GetParent())
             .ToCompletionResult();
     }
+
+    public Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath) => Task.FromResult(GetCompletionResult(fileSystemPath));
 }

@@ -5,7 +5,8 @@ namespace Intellisense.FileSystem.Shares;
 internal class SharePathCompletionResultRetriever(IShareReader shareReader)
     : IFileSystemPathCompletionResultRetriever
 {
-    public CompletionResult GetCompletionResult(IFileSystemPath fileSystemPath)
+
+    public async Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath)
     {
         if (fileSystemPath is not UncPath p)
         {
@@ -16,17 +17,18 @@ internal class SharePathCompletionResultRetriever(IShareReader shareReader)
 
         if (p.IsHost() && path.EndsWithDirectorySeparator())
         {
-            return shareReader.GetShares(p.Host).ToCompletionResult();
+            return (await shareReader.GetSharesAsync(p.Host)).ToCompletionResult();
         }
 
         if (p.IsShare() && !path.EndsWithDirectorySeparator())
         {
-            return shareReader.GetShares(p.Host).ToCompletionResult() with
+            return (await shareReader.GetSharesAsync(p.Host)).ToCompletionResult() with
             {
                 Filter = p.Share
             };
         }
 
         return CompletionResult.Empty;
+
     }
 }

@@ -17,10 +17,8 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
 
     private readonly SemaphoreSlim _semaphore = new(2, 2);
 
-    // TODO: full async refactor
-    public IEnumerable<string> GetShares(string host)
+    public async Task<IEnumerable<string>> GetSharesAsync(string host)
     {
-
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return [];
@@ -36,7 +34,7 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
         // so we check first by pinging (which is cancellable)
         // run concurrently in a different thread so that when it yields, it doesn't come back to this one (synchronous) and cause a deadlock
         // this should block for at most the maximum of the involved timeouts
-        var shouldContinue = Task.Run(async () => await PingHostAsync(host)).GetAwaiter().GetResult();
+        var shouldContinue = await PingHostAsync(host);
 
         if (!shouldContinue)
         {
@@ -50,7 +48,7 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
 
         try
         {
-            var res = Task.Run(async () => await GetSharesAsync(host)).GetAwaiter().GetResult();
+            var res = await GetSharesAsync2(host);
             return res.Select(x => x.Name);
         }
         catch (Exception e)
@@ -60,7 +58,7 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
         }
     }
 
-    private async Task<List<ShareInfo>> GetSharesAsync(string host)
+    private async Task<List<ShareInfo>> GetSharesAsync2(string host)
     {
         // we can still fail (firewall? permissions?)
         // Task.Run(async () => await action(),ctsToken) doesn't work here
