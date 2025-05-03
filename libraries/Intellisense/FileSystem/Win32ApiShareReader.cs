@@ -1,10 +1,12 @@
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Intellisense.FileSystem;
 
-internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareReader> logger) : IShareReader
+internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareReader> logger, IMemoryCache cache)
+    : IShareReader
 {
     // TODO: configs?
 
@@ -13,11 +15,19 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
     private static readonly TimeSpan IcmpTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan PingTimeout = IcmpTimeout.Add(TimeSpan.FromMilliseconds(100));
     private static readonly TimeSpan SemaphoreTimeout = ShareEnumerationTimeout.Add(PingTimeout);
+    private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(10);
+
     private readonly SemaphoreSlim _semaphore = new(2, 2);
 
     // TODO: full async refactor
     public IEnumerable<string> GetShares(string host)
     {
+        if (cache.Get<List<ShareInfo>>(host) is { } val)
+        {
+            logger.LogInformation("Found cached {@Shares} for {Host}", val, host);
+            return val.Select(x => x.Name);
+        }
+
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return [];
@@ -35,6 +45,17 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
 
         if (!shouldContinue)
         {
+            if (cache.Get<List<ShareInfo>>(host) is {Count: > 0})
+            {
+                logger.LogDebug("{Host} previously contained results, refusing to override cache",host);
+                return [];
+            }
+            logger.LogDebug(
+                "Adding {Host} to cache with expiration {Expiration} and empty entries because it failed to ping",
+                host,
+                CacheExpiration
+            );
+            cache.Set(host, new List<ShareInfo>(), CacheExpiration);
             return [];
         }
 
@@ -42,6 +63,8 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
         try
         {
             var res = Task.Run(async () => await GetSharesAsync(host)).GetAwaiter().GetResult();
+            cache.Set(host, res, CacheExpiration);
+            logger.LogDebug("Cached {@Shares} for {Host} with expiration {Expiration}", res, host, CacheExpiration);
             return res.Select(x => x.Name);
         }
         catch (Exception e)
@@ -66,7 +89,7 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
 
         logger.LogDebug("Acquired lock. {RemainingCount}", _semaphore.CurrentCount);
 
-        var shareTask = Task.Factory.StartNew(() => GetNetworkSharesImpl(host),TaskCreationOptions.LongRunning);
+        var shareTask = Task.Factory.StartNew(() => GetNetworkSharesImpl(host), TaskCreationOptions.LongRunning);
         var timeoutTask = Task.Delay(ShareEnumerationTimeout);
         var firstTask = await Task.WhenAny(timeoutTask, shareTask);
         if (firstTask == timeoutTask)
@@ -79,8 +102,6 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
         }
 
         return await shareTask;
-
-
     }
 
     private List<ShareInfo> GetNetworkSharesImpl(string host)

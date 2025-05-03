@@ -38,6 +38,7 @@ public static class IntellisenseServiceCollectionExtensions
 
         // auxiliary services
         services.TryAddSingleton<IFileSystem, System.IO.Abstractions.FileSystem>();
+        services.AddMemoryCache();
 
 
         return services;
