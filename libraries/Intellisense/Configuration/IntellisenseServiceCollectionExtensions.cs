@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.CompletionResultRetrievers;
 using Intellisense.FileSystem.Paths;
+using Intellisense.FileSystem.Shares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -19,7 +20,8 @@ public static class IntellisenseServiceCollectionExtensions
         // completion result retrievers
         services
             .AddSingleton<IFileSystemPathCompletionResultRetriever, ChildrenPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>();
+            .AddSingleton<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>()
+            .AddSingleton<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
 
 
 

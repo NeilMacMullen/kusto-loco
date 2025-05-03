@@ -16,5 +16,9 @@ internal class UncPath(Uri uri) : IFileSystemPath
 
     private bool HasValidHost() => Uri.CheckHostName(Host) is not UriHostNameType.Unknown;
 
+    public bool IsShare() => uri.Segments.Length is 2;
+
     public string Host => uri.Host;
+
+    public string Share => uri.Segments[1].TrimEnd(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar);
 }

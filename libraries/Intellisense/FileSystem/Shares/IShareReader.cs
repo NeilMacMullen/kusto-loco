@@ -1,4 +1,4 @@
-namespace Intellisense.FileSystem;
+namespace Intellisense.FileSystem.Shares;
 
 internal interface IShareReader
 {

@@ -2,9 +2,10 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
-namespace Intellisense.FileSystem;
+namespace Intellisense.FileSystem.Shares;
 
-internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareReader> logger) : IShareReader
+internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareReader> logger, IHostRepository hostRepository)
+    : IShareReader
 {
     // TODO: configs?
 
@@ -13,11 +14,13 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
     private static readonly TimeSpan IcmpTimeout = TimeSpan.FromMilliseconds(100);
     private static readonly TimeSpan PingTimeout = IcmpTimeout.Add(TimeSpan.FromMilliseconds(100));
     private static readonly TimeSpan SemaphoreTimeout = ShareEnumerationTimeout.Add(PingTimeout);
+
     private readonly SemaphoreSlim _semaphore = new(2, 2);
 
     // TODO: full async refactor
     public IEnumerable<string> GetShares(string host)
     {
+
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return [];
@@ -31,12 +34,17 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
 
         // win32 NetShareEnum is synchronous and will stall when querying nonexistent addresses
         // so we check first by pinging (which is cancellable)
+        // run concurrently in a different thread so that when it yields, it doesn't come back to this one (synchronous) and cause a deadlock
+        // this should block for at most the maximum of the involved timeouts
         var shouldContinue = Task.Run(async () => await PingHostAsync(host)).GetAwaiter().GetResult();
 
         if (!shouldContinue)
         {
             return [];
         }
+
+        // populate host autocompletion if it's a valid host
+        hostRepository.Add(host);
 
 
         try
@@ -54,7 +62,8 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
     private async Task<List<ShareInfo>> GetSharesAsync(string host)
     {
         // we can still fail (firewall? permissions?)
-        // so instead we will just ignore the result after a given amount of time instead of cancelling it
+        // Task.Run(async () => await action(),ctsToken) doesn't work here
+        // since we can't cancel the call, we will just ignore the thread execution result after timeout
         // but this might exhaust the thread pool, so we'll manage with a semaphore
 
         logger.LogDebug("Attempting to acquire lock. {CurrentCount}", _semaphore.CurrentCount);
@@ -66,12 +75,12 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
 
         logger.LogDebug("Acquired lock. {RemainingCount}", _semaphore.CurrentCount);
 
-        var shareTask = Task.Factory.StartNew(() => GetNetworkSharesImpl(host),TaskCreationOptions.LongRunning);
+        var shareTask = Task.Factory.StartNew(() => GetNetworkSharesAndRelease(host), TaskCreationOptions.LongRunning);
         var timeoutTask = Task.Delay(ShareEnumerationTimeout);
         var firstTask = await Task.WhenAny(timeoutTask, shareTask);
         if (firstTask == timeoutTask)
         {
-            logger.LogError("Timed out after {Time} while fetching shares from Win32 API for host {Host}",
+            logger.LogInformation("Timed out after {Time} while fetching shares from Win32 API for host {Host}",
                 ShareEnumerationTimeout,
                 host
             );
@@ -79,11 +88,9 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
         }
 
         return await shareTask;
-
-
     }
 
-    private List<ShareInfo> GetNetworkSharesImpl(string host)
+    private List<ShareInfo> GetNetworkSharesAndRelease(string host)
     {
         logger.LogDebug("Fetching shares from Win32 API for host {Host}", host);
         try
@@ -135,7 +142,7 @@ internal class Win32ApiShareReader(ShareClient client, ILogger<Win32ApiShareRead
         }
         catch (Exception e) when (e is TaskCanceledException or OperationCanceledException)
         {
-            logger.LogInformation("Timed out after {Time} while pinging {Host}", IcmpTimeout, host);
+            logger.LogInformation("Timed out after {Time} while pinging {Host}", PingTimeout, host);
             return false;
         }
         catch (Exception e)

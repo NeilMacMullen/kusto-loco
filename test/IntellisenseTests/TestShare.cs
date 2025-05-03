@@ -1,33 +1,48 @@
 using System;
 using System.IO;
+using NotNullStrings;
 using static SimpleExec.Command;
 
 namespace IntellisenseTests;
 
 public sealed class TestShare : IDisposable
 {
-    public DirectoryInfo Folder { get; }
-    public string Name { get; }
 
-    public TestShare()
+    private TestShare(){}
+
+    public DirectoryInfo Folder { get; set; } = null!;
+    public string Name { get; set; } = null!;
+
+    public static TestShare Create(string name = "")
     {
-        var id = Guid.NewGuid();
-        Name = $"TestShare_{id}";
-        var shareFolder = Path.Combine(Path.GetTempPath(), Name);
-        Folder = Directory.CreateDirectory(shareFolder);
+        var share = new TestShare();
+        if (name.IsBlank())
+        {
+            var id = Guid.NewGuid();
+            share.Name = $"TestShare_{id}";
+        }
+        else
+        {
+            share.Name = name;
+        }
+
+        var shareFolder = Path.Combine(Path.GetTempPath(), share.Name);
+        share.Folder = Directory.CreateDirectory(shareFolder);
 
         try
         {
             Run("net",
-                $"share {Name}=\"{Folder.FullName}\" /GRANT:Everyone,FULL",
+                $"share {share.Name}=\"{share.Folder.FullName}\" /GRANT:Everyone,FULL",
                 noEcho: true
             );
         }
         catch (Exception ex)
         {
-            Dispose();
-            throw new Exception($"Failed to create share {Name}", ex);
+            share.Dispose();
+            throw new Exception($"Failed to create share {share.Name}", ex);
         }
+
+        return share;
     }
 
     public void Dispose()
