@@ -41,4 +41,26 @@ public class FileSystemIntellisenseServiceHostCompletionTests
             .Which.Name.Should()
             .Be(Constants.LocalHost);
     }
+
+    [WindowsAdminOnlyFact]
+    public async Task GetPathIntellisenseOptions_AfterValidHostFoundAndPartialName_ReturnsHost()
+    {
+        var twoSlash = "//";
+        var localHost = $"//{Constants.LocalHost}/";
+        var localH = $"//localh";
+
+        var res1 = await _service.GetPathIntellisenseOptionsAsync(twoSlash);
+
+        res1.Entries.Should().BeEmpty();
+
+        await _service.GetPathIntellisenseOptionsAsync(localHost);
+
+        var res2 = await _service.GetPathIntellisenseOptionsAsync(localH);
+
+        res2
+            .Entries.Should()
+            .ContainSingle()
+            .Which.Name.Should()
+            .Be(Constants.LocalHost);
+    }
 }

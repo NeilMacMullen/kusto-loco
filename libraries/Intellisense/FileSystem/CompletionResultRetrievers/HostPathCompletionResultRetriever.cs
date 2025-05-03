@@ -21,7 +21,6 @@ internal class HostPathCompletionResultRetriever(IHostRepository hostRepository)
             };
         }
 
-
         return CompletionResult.Empty;
     }
 }

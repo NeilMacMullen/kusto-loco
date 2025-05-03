@@ -16,11 +16,15 @@ public static class IntellisenseServiceCollectionExtensions
         services.AddSingleton<IFileSystemIntellisenseService, FileSystemIntellisenseService>();
 
 
-        // standard file system
+        // file system
         services.AddSingleton<IFileSystemReader, FileSystemReader>();
+
+        // completion results
         services
             .AddSingleton<IFileSystemPathCompletionResultRetriever, ChildrenPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>();
+            .AddSingleton<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>()
+            .AddSingleton<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()
+            .AddSingleton<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
 
         // path processing
         services.AddSingleton<IPathFactory, PathFactory>();
@@ -29,9 +33,7 @@ public static class IntellisenseServiceCollectionExtensions
         services
             .AddSingleton<IShareReader, Win32ApiShareReader>()
             .AddSingleton<IShareClient, ShareClient>()
-            .AddSingleton<IHostRepository, HostRepository>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
+            .AddSingleton<IHostRepository, HostRepository>();
 
 
         // auxiliary services

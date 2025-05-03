@@ -1,6 +1,7 @@
 using Intellisense.FileSystem.Paths;
+using Intellisense.FileSystem.Shares;
 
-namespace Intellisense.FileSystem.Shares;
+namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
 internal class SharePathCompletionResultRetriever(IShareReader shareReader)
     : IFileSystemPathCompletionResultRetriever
