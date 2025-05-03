@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using Xunit;
 
@@ -7,6 +8,12 @@ public sealed class WindowsAdminOnlyFactAttribute : FactAttribute
 {
     public WindowsAdminOnlyFactAttribute()
     {
+        if (!PlatformHelper.IsCi())
+        {
+            Skip = PlatformHelper.CiSkipMessage;
+            return;
+        }
+
         var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         if (!isWindows)
@@ -17,11 +24,9 @@ public sealed class WindowsAdminOnlyFactAttribute : FactAttribute
 
         var isAdmin = PlatformHelper.IsWindowsAdmin();
 
-        if (isAdmin)
+        if (!isAdmin)
         {
-            return;
+            throw new InvalidOperationException("Windows CI should not skip admin tests");
         }
-
-        Skip = PlatformHelper.AdminSkipMessage;
     }
 }

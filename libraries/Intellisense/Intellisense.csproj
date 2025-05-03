@@ -13,10 +13,13 @@
       <PackageReference Include="NotNullStrings" />
       <PackageReference Include="SimpleExec" />
       <PackageReference Include="System.CommandLine" />
+      <PackageReference Include="System.Linq.Async" />
       <PackageReference Include="TestableIO.System.IO.Abstractions" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
       <PackageReference Include="Vanara.Core" />
+      <PackageReference Include="Vanara.PInvoke.IpHlpApi" />
+      <PackageReference Include="Vanara.PInvoke.Mpr" />
       <PackageReference Include="Vanara.PInvoke.NetApi32" />
     </ItemGroup>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
+using System.Threading.Tasks;
 using Intellisense;
 using Intellisense.FileSystem;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,6 @@ internal class FileSystemIntellisenseServiceTestFixture
 
     public IReadOnlyList<FakeLogRecord> GetLogs() => _provider.GetRequiredService<FakeLogCollector>().GetSnapshot();
 
-    public CompletionResult GetPathIntellisenseOptions(string path) =>
-        _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+    public Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path) =>
+        _fileSystemIntellisenseService.GetPathIntellisenseOptionsAsync(path);
 }

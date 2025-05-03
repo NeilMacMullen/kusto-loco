@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Formatting.Compact;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using Serilog.Filters;
 using Serilog.Templates;
 using Serilog.Templates.Themes;
 using LogLevel = NLog.LogLevel;
@@ -73,21 +75,26 @@ public static class LoggingExtensions
     public static IHostApplicationBuilder UseApplicationLogging(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
-        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-        var entryAssembly = Assembly.GetEntryAssembly();
-        var appName = entryAssembly?.GetName().Name ?? "Unknown";
-        var basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-        var logPath = Path.Combine(basePath, "logs.json");
-        Log.Information("Application storage path: {Path}", basePath);
+
+        builder.Services.AddOptions<LoggingOptions>().BindConfiguration(LoggingOptions.Logging);
+
 
         services
             .AddSerilog((sc, logBuilder) =>
                 {
 
+                    using var bootstrapLogger = new LoggerConfiguration().WriteTo.Console(new CompactJsonFormatter()).CreateLogger();
+
+                    var opts = sc.GetRequiredService<IOptions<LoggingOptions>>();
+                    var logPath = opts.Value.Directory;
+                    bootstrapLogger.Information("Log storage path: {Path}", logPath);
+
                     logBuilder
                         .ReadFrom.Configuration(builder.Configuration)
                         .ReadFrom.Services(sc)
                         .Enrich.FromLogContext();
+
+
 #if DEBUG
 
 
@@ -100,7 +107,9 @@ public static class LoggingExtensions
                     );
                     logBuilder
                         .WriteTo.Console(template)
-                        .WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000 ^ 2);
+                        .WriteTo.Debug(template)
+                        .WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000 ^ 2)
+                        .Filter.ByExcluding(Matching.WithProperty<string>("SourceContext",s => s.StartsWith("Microsoft.") || s.StartsWith("System.")));
 #else
                     logBuilder.MinimumLevel.Information();
                     logBuilder.WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000^2)
@@ -112,10 +121,18 @@ public static class LoggingExtensions
         return builder;
     }
 
-    private static TemplateTheme GetTheme() => new(TemplateTheme.Code,
+        public static IHostApplicationBuilder UseTestLogging(this IHostApplicationBuilder builder) => builder.UseApplicationLogging();
+
+        private static TemplateTheme GetTheme() => new(TemplateTheme.Code,
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.SecondaryText] = "\e[0;97m",
         }
     );
+}
+
+public class LoggingOptions
+{
+    public const string Logging = "Logging";
+    public string Directory { get; set; } = string.Empty;
 }

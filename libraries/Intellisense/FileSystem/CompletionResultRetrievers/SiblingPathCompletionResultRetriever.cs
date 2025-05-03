@@ -12,7 +12,13 @@ internal class SiblingPathCompletionResultRetriever(IFileSystemReader reader) : 
         var pair = ParentChildPathPair.Create(fileSystemPath.GetPath());
 
         return reader
-            .GetChildren(pair.ParentPath)
-            .ToCompletionResult() with { Filter = pair.CurrentPath };
+                .GetChildren(pair.ParentPath)
+                .ToCompletionResult() with
+            {
+                Filter = pair.CurrentPath
+            };
     }
+
+    public Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath) =>
+        Task.FromResult(GetCompletionResult(fileSystemPath));
 }

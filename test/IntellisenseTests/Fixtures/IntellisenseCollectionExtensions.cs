@@ -1,8 +1,8 @@
+
 using Intellisense.Configuration;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.Shares;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace IntellisenseTests.Fixtures;
@@ -13,11 +13,12 @@ public static class IntellisenseCollectionExtensions
         .AddIntellisense()
         .AddFakeLogging()
         .MockSingleton<IFileSystemReader>()
-        .MockSingleton<IShareReader>();
+        .MockSingleton<IShareReader>()
+        .MockSingleton<IHostReader>();
 
     public static IServiceCollection AddDefault(this IServiceCollection services) => services
         .AddIntellisense()
-        .AddLogging(x => x.AddConsole());
+        .AddFakeLogging();
 
     private static IServiceCollection MockSingleton<T>(this IServiceCollection services) where T : class => services
         .AddSingleton<T>(_ => Mock.Of<T>());
