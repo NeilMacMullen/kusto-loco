@@ -1,4 +1,4 @@
-namespace Intellisense;
+namespace IntellisenseTests;
 
 public static class Constants
 {

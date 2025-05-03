@@ -1,9 +1,10 @@
 ﻿namespace Intellisense.FileSystem.Paths;
 
-internal interface IFileSystemPath
+internal abstract class FileSystemPath(string value)
 {
-    string GetPath();
-    bool IsRootDirectory();
-    string GetParent() => Path.GetDirectoryName(GetPath()) ?? string.Empty;
+    public virtual string Value => value;
+    public abstract bool IsRootDirectory { get; }
+    public virtual string ParentPath => Path.GetDirectoryName(value) ?? string.Empty;
+    public virtual bool EndsWithDirectorySeparator => value.EndsWithDirectorySeparator();
+    public virtual bool IsEmpty => this is EmptyPath;
 }
-

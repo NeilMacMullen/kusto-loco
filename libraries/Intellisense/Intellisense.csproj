@@ -11,8 +11,8 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" />
       <PackageReference Include="Microsoft.Extensions.Logging" />
       <PackageReference Include="NotNullStrings" />
-      <PackageReference Include="SimpleExec" />
       <PackageReference Include="System.CommandLine" />
+      <PackageReference Include="System.Linq.Async" />
       <PackageReference Include="TestableIO.System.IO.Abstractions" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />

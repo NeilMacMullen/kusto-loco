@@ -3,7 +3,7 @@ using NotNullStrings;
 
 namespace Intellisense.FileSystem;
 
-internal interface IFileSystemReader
+public interface IFileSystemReader
 {
     IEnumerable<IFileSystemInfo> GetChildren(string path);
 }

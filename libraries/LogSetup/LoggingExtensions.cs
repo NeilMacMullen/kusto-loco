@@ -1,10 +1,14 @@
-﻿using System.Reflection;
+﻿// ReSharper disable RedundantUsingDirective DO NOT REMOVE, COMPILER DIRECTIVES WILL FALSELY FLAG PACKAGES
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Formatting.Compact;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using Serilog.Events;
+using Serilog.Filters;
 using Serilog.Templates;
 using Serilog.Templates.Themes;
 using LogLevel = NLog.LogLevel;
@@ -73,24 +77,35 @@ public static class LoggingExtensions
     public static IHostApplicationBuilder UseApplicationLogging(this IHostApplicationBuilder builder)
     {
         var services = builder.Services;
-        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-        var entryAssembly = Assembly.GetEntryAssembly();
-        var appName = entryAssembly?.GetName().Name ?? "Unknown";
-        var basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-        var logPath = Path.Combine(basePath, "logs.json");
-        Log.Information("Application storage path: {Path}", basePath);
+
+        builder.Services.AddOptions<LoggingOptions>().BindConfiguration(LoggingOptions.Logging);
+
 
         services
             .AddSerilog((sc, logBuilder) =>
                 {
-
                     logBuilder
                         .ReadFrom.Configuration(builder.Configuration)
                         .ReadFrom.Services(sc)
                         .Enrich.FromLogContext();
+
+                    using var bootstrapLogger = new LoggerConfiguration().WriteTo.Console(new CompactJsonFormatter()).CreateLogger();
+
+                    var opts = sc.GetRequiredService<IOptions<LoggingOptions>>();
+
+                    var logPath = opts.Value.LogPath;
+                    if (string.IsNullOrWhiteSpace(logPath))
+                    {
+                        bootstrapLogger.Information("Log storage path not configured.");
+                    }
+                    else
+                    {
+                        bootstrapLogger.Information("Log storage path: {Path}", logPath);
+                        logBuilder.WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000 ^ 2);
+                    }
+
+
 #if DEBUG
-
-
                     var newLine = Environment.NewLine;
                     var template = new ExpressionTemplate(
                         "[{@t:HH:mm:ss.fff} {@l:u3}] {Concat('\e[32m',Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1))} | {@mt}{NewLine}  {@p}{NewLine}{@x}"
@@ -98,13 +113,11 @@ public static class LoggingExtensions
                         theme: GetTheme(),
                         applyThemeWhenOutputIsRedirected: true
                     );
-                    logBuilder
-                        .WriteTo.Console(template)
-                        .WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000 ^ 2);
-#else
-                    logBuilder.MinimumLevel.Information();
-                    logBuilder.WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000^2)
-                        .WriteTo.Console(LogEventLevel.Error);
+                    logBuilder.WriteTo.Console(template)
+                        .WriteTo.Debug(template)
+                        .WriteTo.File(new CompactJsonFormatter(), logPath, fileSizeLimitBytes: 5 * 1000 ^ 2)
+                        .Filter.ByExcluding(Matching.WithProperty<string>("SourceContext",s => s.StartsWith("Microsoft.") || s.StartsWith("System.")));
+
 #endif
                 }
             );
@@ -112,10 +125,17 @@ public static class LoggingExtensions
         return builder;
     }
 
-    private static TemplateTheme GetTheme() => new(TemplateTheme.Code,
+        private static TemplateTheme GetTheme() => new(TemplateTheme.Code,
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.SecondaryText] = "\e[0;97m",
         }
     );
+}
+
+public class LoggingOptions
+{
+    public const string Logging = "Logging";
+    public string Directory { get; set; } = string.Empty;
+    internal string LogPath => Path.Combine(Directory, "log.json");
 }

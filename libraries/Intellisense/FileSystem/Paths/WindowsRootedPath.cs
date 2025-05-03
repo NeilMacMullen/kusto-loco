@@ -3,29 +3,23 @@
 /// <summary>
 /// Guarantees that the path either starts with a directory separator (i.e. /) or a drive letter followed by a volume separator (i.e. C:).
 /// </summary>
-internal class WindowsRootedPath : IFileSystemPath
+internal class WindowsRootedPath(string path) : FileSystemPath(path)
 {
-    private readonly string _value;
-
-    internal WindowsRootedPath(string path)
+    public override bool IsRootDirectory
     {
-        _value = path;
-    }
-
-    public string GetPath() => _value;
-
-    public bool IsRootDirectory()
-    {
-        if (_value[0].IsDirectorySeparator())
+        get
         {
-            return _value.Length is 1;
-        }
+            if (Value[0].IsDirectorySeparator())
+            {
+                return Value.Length is 1;
+            }
 
-        if (_value.Length is 2)
-        {
-            return false;
-        }
+            if (Value.Length is 2)
+            {
+                return false;
+            }
 
-        return _value.Length is 3 && _value[2].IsDirectorySeparator();
+            return Value.Length is 3 && Value[2].IsDirectorySeparator();
+        }
     }
 }

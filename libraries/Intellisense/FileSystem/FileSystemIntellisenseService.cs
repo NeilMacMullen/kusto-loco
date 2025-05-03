@@ -1,5 +1,4 @@
 ﻿using Intellisense.FileSystem.Paths;
-using Microsoft.Extensions.Logging;
 
 namespace Intellisense.FileSystem;
 
@@ -11,31 +10,29 @@ public interface IFileSystemIntellisenseService
     /// <returns>
     /// An empty completion result if the path is invalid, does not exist, or does not have any children.
     /// </returns>
-    CompletionResult GetPathIntellisenseOptions(string path);
+    Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path);
 }
 
 internal class FileSystemIntellisenseService(
-    ILogger<IFileSystemIntellisenseService> logger,
     IPathFactory pathFactory,
     IEnumerable<IFileSystemPathCompletionResultRetriever> retrievers
-    )
+)
     : IFileSystemIntellisenseService
 {
-
-    public CompletionResult GetPathIntellisenseOptions(string path)
+    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(
+        string path
+    )
     {
-        try
-        {
-            var pathObj = pathFactory.Create(path);
+        var pathObj = pathFactory.Create(path);
 
-            return retrievers
-                .Select(x => x.GetCompletionResult(pathObj))
-                .FirstOrDefault(x => !x.IsEmpty(), CompletionResult.Empty);
-        }
-        catch (IOException e)
-        {
-            logger.LogError(e, "IO error occurred while fetching intellisense results. Returning empty result.");
-            return CompletionResult.Empty;
-        }
+        var tasks = pathObj.EndsWithDirectorySeparator
+            ? retrievers.Select(x => x.GetChildrenAsync(pathObj))
+            : retrievers.Select(x => x.GetSiblingsAsync(pathObj));
+
+        return await Task
+            .WhenEach(tasks)
+            .SelectAwait(async x => await x)
+            .Where(x => !x.IsEmpty())
+            .FirstOrDefaultAsync() ?? CompletionResult.Empty;
     }
 }
