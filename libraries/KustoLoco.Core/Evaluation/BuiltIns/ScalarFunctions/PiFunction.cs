@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
+using Kusto.Language.Symbols;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-/*
-[KustoImplementation(Keyword = "Functions.Pi")]
-internal partial class PiFunction
+internal class PiFunctionImpl : IScalarFunctionImpl
 {
-    public double Impl(long n) => Math.PI;
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 0);
+        return new ScalarResult(ScalarTypes.Real, Math.PI);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+        => throw new NotSupportedException();
 }
-*/

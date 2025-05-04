@@ -85,6 +85,11 @@ internal static class BuiltInScalarFunctions
 
         functions.Add(Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
+        functions.Add(Functions.PI,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new PiFunctionImpl(),
+                ScalarTypes.Real)));
+
+
         AgoFunction.Register(functions);
         FormatDateTime.Register(functions);
 
@@ -107,9 +112,6 @@ internal static class BuiltInScalarFunctions
             .ToArray();
 
         functions.Add(Functions.StrcatDelim, new ScalarFunctionInfo(strcat_delim_overrides));
-
-
-        //PiFunction.Register(functions);
         AroundFunction.Register(functions);
         StrlenFunction.Register(functions);
         StrcmpFunction.Register(functions);
