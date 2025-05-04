@@ -1,5 +1,7 @@
 ﻿using Intellisense.FileSystem.Paths;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Intellisense.FileSystem;
 
@@ -11,18 +13,35 @@ public interface IFileSystemIntellisenseService
     /// <returns>
     /// An empty completion result if the path is invalid, does not exist, or does not have any children.
     /// </returns>
-    Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path);
+    Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path, CancellationToken cancelToken = default);
 }
 
 internal class FileSystemIntellisenseService(
     ILogger<IFileSystemIntellisenseService> logger,
     IPathFactory pathFactory,
-    IEnumerable<IFileSystemPathCompletionResultRetriever> retrievers
+    IServiceScopeFactory scopeFactory,
+    IOptions<IntellisenseTimeoutOptions> timeoutOptions
 )
     : IFileSystemIntellisenseService
 {
-    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path)
+
+    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path, CancellationToken cancelToken = default)
     {
+        // TODO: a late-returning request could potentially push stale results
+        // need to invalidate stale requests
+        using var scope = scopeFactory.CreateScope();
+        var retrievers =
+            scope.ServiceProvider.GetRequiredService<IEnumerable<IFileSystemPathCompletionResultRetriever>>();
+        using var ctx = scope.ServiceProvider.GetRequiredService<CancellationContext>();
+        ctx.TokenSource.CancelAfter(timeoutOptions.Value.IntellisenseTimeout);
+        ctx.LinkToken(cancelToken);
+        using var _ = logger.BeginScope(new()
+            {
+                [nameof(path)] = path,
+                [nameof(timeoutOptions.Value.IntellisenseTimeout)] = timeoutOptions.Value.IntellisenseTimeout,
+            }
+        );
+        var token = ctx.TokenSource.Token;
 
         try
         {
@@ -32,23 +51,22 @@ internal class FileSystemIntellisenseService(
                 .Select(x => x.GetCompletionResultAsync(pathObj))
                 .ToList()
                 .ToWhenAnyAsyncEnumerable()
+                .TakeWhile(_ => !token.IsCancellationRequested)
                 .Where(x => !x.IsEmpty())
-                .Take(1)
-                .ToListAsync();
+                .FirstOrDefaultAsync(ctx.TokenSource.Token);
 
-            if (result.Count is 0)
-            {
-                return CompletionResult.Empty;
-            }
-
-            return result[0];
+            return result ?? CompletionResult.Empty;
+        }
+        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException)
+        {
+            logger.LogTrace("Timed out while fetching intellisense results. Returning empty result.");
+            return CompletionResult.Empty;
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error occurred while fetching intellisense results. Returning empty result.");
             return CompletionResult.Empty;
         }
-
     }
 }
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -9,54 +6,16 @@ using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
-
-
 namespace IntellisenseTests;
 
-[CollectionDefinition(nameof(FileShareTestCollection), DisableParallelization = true)]
-public class FileShareTestCollection;
 
-[Collection(nameof(FileShareTestCollection))]
-public class FileSystemIntellisenseServiceFileShareTests : IClassFixture<FileShareTestCollection>
+public class FileSystemIntellisenseServiceFileShareTests
 {
-    private readonly IFileSystemIntellisenseService _service;
-    // ReSharper disable once NotAccessedField.Local
-    private readonly FileShareTestCollection _collection;
+    private readonly IFileSystemIntellisenseService _service = new ServiceCollection()
+        .AddDefault()
+        .BuildServiceProvider()
+        .GetRequiredService<IFileSystemIntellisenseService>();
 
-
-    public FileSystemIntellisenseServiceFileShareTests(FileShareTestCollection collection)
-    {
-        _service = new ServiceCollection()
-            .AddDefault()
-            .BuildServiceProvider()
-            .GetRequiredService<IFileSystemIntellisenseService>();
-
-        _collection = collection;
-    }
-
-    [WindowsAdminOnlyFact] // will change => siblings in later feature
-    public async Task GetPathIntellisenseOptions_PartialHost_Empty()
-    {
-        using var share = TestShare.Create("MyKustoTestShare1");
-        var sharePath = "//localhos";
-    
-        var result = await _service.GetPathIntellisenseOptionsAsync(sharePath);
-    
-        result.Entries.Should().BeEmpty();
-    }
-    
-    [WindowsAdminOnlyFact] // will change => siblings in later feature
-    public async Task GetPathIntellisenseOptions_HostNoSep_Empty()
-    {
-        using var share = TestShare.Create("MyKustoTestShare1");
-        var sharePath = $"//{Constants.LocalHost}";
-    
-        var result = await _service.GetPathIntellisenseOptionsAsync(sharePath);
-    
-        result.Entries.Should().BeEmpty();
-    }
-    
     [WindowsAdminOnlyFact]
     public async Task GetPathIntellisenseOptions_HostSep_ChildShares()
     {
@@ -148,32 +107,3 @@ public class FileSystemIntellisenseServiceFileShareTests : IClassFixture<FileSha
 }
 
 
-
-internal static class FileSystemExtensions
-{
-    public static void Touch(this FileInfo file)
-    {
-        if (file.Directory is not { } dir)
-        {
-            throw new NotImplementedException();
-        }
-
-        if (!dir.Exists)
-        {
-            dir.Create();
-        }
-
-        file.Create().Dispose();
-    }
-
-    public static List<FileInfo> TouchFiles(this DirectoryInfo directory, IEnumerable<string> filePaths) =>
-        filePaths.Select(directory.TouchFile).ToList();
-
-    public static FileInfo TouchFile(this DirectoryInfo directory, string fileName)
-    {
-        var path = Path.Combine(directory.FullName, fileName);
-        var file = new FileInfo(path);
-        file.Touch();
-        return file;
-    }
-}

@@ -1,3 +1,4 @@
+
 using Intellisense.Configuration;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.Shares;
@@ -13,7 +14,8 @@ public static class IntellisenseCollectionExtensions
         .AddIntellisense()
         .AddFakeLogging()
         .MockSingleton<IFileSystemReader>()
-        .MockSingleton<IShareReader>();
+        .MockSingleton<IShareReader>()
+        .MockSingleton<IHostRepository>();
 
     public static IServiceCollection AddDefault(this IServiceCollection services) => services
         .AddIntellisense()

@@ -1,22 +1,19 @@
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Intellisense.FileSystem.Shares;
 
-internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareReader> logger, IHostRepository hostRepository)
+internal class Win32ApiShareReader(
+    ILogger<Win32ApiShareReader> logger,
+    IHostRepository hostRepository,
+    IOptions<IntellisenseTimeoutOptions> options,
+    IShareResource resource,
+    CancellationTokenSource cts
+    )
     : IShareReader
 {
-    // TODO: configs?
-
-    // if this takes a long time it probably doesn't exist
-    private static readonly TimeSpan ShareEnumerationTimeout = TimeSpan.FromMilliseconds(100);
-    private static readonly TimeSpan IcmpTimeout = TimeSpan.FromMilliseconds(100);
-    private static readonly TimeSpan PingTimeout = IcmpTimeout.Add(TimeSpan.FromMilliseconds(100));
-    private static readonly TimeSpan SemaphoreTimeout = ShareEnumerationTimeout.Add(PingTimeout);
-
-    private readonly SemaphoreSlim _semaphore = new(2, 2);
-
     public async Task<IEnumerable<string>> GetSharesAsync(string host)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -26,14 +23,14 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
 
         using var _ = logger.BeginScope(new Dictionary<string, object>
             {
-                [nameof(UriHostNameType)] = Uri.CheckHostName(host)
+                [nameof(UriHostNameType)] = Uri.CheckHostName(host),
+                [nameof(host)] = host
             }
         );
 
         // win32 NetShareEnum is synchronous and will stall when querying nonexistent addresses
         // so we check first by pinging (which is cancellable)
-        // run concurrently in a different thread so that when it yields, it doesn't come back to this one (synchronous) and cause a deadlock
-        // this should block for at most the maximum of the involved timeouts
+        // if this takes a long time it probably doesn't exist
         var shouldContinue = await PingHostAsync(host);
 
         if (!shouldContinue)
@@ -42,111 +39,50 @@ internal class Win32ApiShareReader(IShareClient client, ILogger<Win32ApiShareRea
         }
 
         // populate host autocompletion if it's a valid host
-        hostRepository.Add(host);
+        await hostRepository.AddAsync(host);
 
-
-
-        try
-        {
-            var res = await GetSharesAsync2(host);
-            return res.Select(x => x.Name);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Failed to fetch shares from Win32 API for host {Host}", host);
-            return [];
-        }
+        var res = await resource.GetSharesAsync(host, cts.Token);
+        return res.Select(x => x.Name);
     }
-
-    private async Task<List<ShareInfo>> GetSharesAsync2(string host)
-    {
-        // we can still fail (firewall? permissions?)
-        // Task.Run(async () => await action(),ctsToken) doesn't work here
-        // since we can't cancel the call, we will just ignore the thread execution result after timeout
-        // but this might exhaust the thread pool, so we'll manage with a semaphore
-
-        logger.LogDebug("Attempting to acquire lock. {CurrentCount}", _semaphore.CurrentCount);
-        if (!await _semaphore.WaitAsync(SemaphoreTimeout))
-        {
-            logger.LogDebug("Thread pool is busy. Skipping share enumeration for host {Host}", host);
-            return [];
-        }
-
-        logger.LogDebug("Acquired lock. {RemainingCount}", _semaphore.CurrentCount);
-
-        var shareTask = Task.Factory.StartNew(() => GetNetworkSharesAndRelease(host), TaskCreationOptions.LongRunning);
-        var timeoutTask = Task.Delay(ShareEnumerationTimeout);
-        var firstTask = await Task.WhenAny(timeoutTask, shareTask);
-        if (firstTask == timeoutTask)
-        {
-            logger.LogInformation("Timed out after {Time} while fetching shares from Win32 API for host {Host}",
-                ShareEnumerationTimeout,
-                host
-            );
-            return [];
-        }
-
-        return await shareTask;
-    }
-
-    private List<ShareInfo> GetNetworkSharesAndRelease(string host)
-    {
-        logger.LogDebug("Fetching shares from Win32 API for host {Host}", host);
-        try
-        {
-            return client.GetNetworkShares(host).ToList();
-        }
-        catch (Exception e)
-        {
-            logger.LogWarning(e, "Failed to fetch shares from Win32 API for host {Host}", host);
-            return [];
-        }
-        finally
-        {
-            _semaphore.Release();
-            logger.LogDebug("Released lock. {CurrentLockCount}", _semaphore.CurrentCount);
-        }
-    }
-
 
     private async Task<bool> PingHostAsync(string host)
     {
-        using var cts = new CancellationTokenSource(PingTimeout);
+
         using var ping = new Ping();
 
         try
         {
             // most importantly, we want a cts for cancelling DNS resolution
             // https://github.com/dotnet/runtime/blob/0654416af35b729fd3620b2dc41208a22fc8b977/src/libraries/System.Net.Ping/src/System/Net/NetworkInformation/Ping.cs#L719-L725
-            var pingReply = await ping.SendPingAsync(host, IcmpTimeout, cancellationToken: cts.Token);
+            var pingReply = await ping.SendPingAsync(host, options.Value.IntellisenseTimeout, cancellationToken: cts.Token);
+            using var __ = logger.BeginScope(new()
+            {
+                [$"@{nameof(PingReply)}"] = pingReply
+            });
             if (pingReply.Status is IPStatus.TimedOut)
             {
-                logger.LogInformation("Timed out after {Time} during ICMP request {Host} {@PingReply}",
-                    IcmpTimeout,
-                    host,
-                    pingReply
-                );
+                logger.LogTrace("Timed out during ICMP request");
                 return false;
             }
 
             if (pingReply.Status is not IPStatus.Success)
             {
-                logger.LogWarning("Failed ICMP request {Host} {@PingReply}", host, pingReply);
+                logger.LogTrace("Failed ICMP request");
                 return false;
             }
 
-            logger.LogInformation("Found valid host {Host} {@PingReply}", host, pingReply);
+            logger.LogTrace("Confirmed host exists.");
 
             return true;
         }
         catch (Exception e) when (e is TaskCanceledException or OperationCanceledException)
         {
-            logger.LogInformation("Timed out after {Time} while pinging {Host}", PingTimeout, host);
+            logger.LogTrace("Timed out while pinging.");
             return false;
         }
         catch (Exception e)
         {
-            logger.LogWarning(e, "Failed to ping host. {Host}", host);
+            logger.LogTrace(e, "Failed to ping host.");
             return false;
         }
     }

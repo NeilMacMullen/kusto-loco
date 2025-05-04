@@ -21,19 +21,26 @@ public static class IntellisenseServiceCollectionExtensions
 
         // completion results
         services
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, ChildrenPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()
-            .AddSingleton<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
+            .AddScoped<IFileSystemPathCompletionResultRetriever, ChildrenPathCompletionResultRetriever>()
+            .AddScoped<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>()
+            .AddScoped<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()
+            .AddScoped<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
 
         // path processing
         services.AddSingleton<IPathFactory, PathFactory>();
 
         // shares
         services
-            .AddSingleton<IShareReader, Win32ApiShareReader>()
+            .AddScoped<IShareReader, Win32ApiShareReader>()
             .AddSingleton<IShareClient, ShareClient>()
-            .AddSingleton<IHostRepository, HostRepository>();
+            .AddSingleton<IHostRepository, HostRepository>()
+            .AddSingleton<IShareResource, Win32ShareResource>();
+
+
+        // timeouts
+        services.AddScoped<CancellationContext>();
+        services.AddScoped(x => x.GetRequiredService<CancellationContext>().TokenSource);
+        services.Configure<IntellisenseTimeoutOptions>(x => x.IntellisenseTimeout = TimeSpan.FromMilliseconds(5000));
 
 
         // auxiliary services
