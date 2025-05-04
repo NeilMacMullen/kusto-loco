@@ -15,9 +15,9 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length > 0);
         var builder = new StringBuilder();
-        for (var i = 0; i < arguments.Length; i++)
+        foreach (var t in arguments)
         {
-            builder.Append((string?)arguments[i].Value);
+            builder.Append((string?)t.Value);
         }
 
         return new ScalarResult(ScalarTypes.String, builder.ToString());
@@ -34,14 +34,14 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
 
         var data = new string?[columns[0].RowCount];
         var builder = new StringBuilder();
-        for (var i = 0; i < columns[0].RowCount; i++)
+        for (var row = 0; row < columns[0].RowCount; row++)
         {
-            for (var j = 0; j < columns.Length; j++)
+            foreach (var t in columns)
             {
-                builder.Append(columns[j][i]);
+                builder.Append(t[row]);
             }
 
-            data[i] = builder.ToString();
+            data[row] = builder.ToString();
 
             builder.Clear();
         }

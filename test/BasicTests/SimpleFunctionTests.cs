@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RTools_NTS.Util;
 
 // ReSharper disable StringLiteralTypo
 
@@ -974,5 +975,70 @@ print toscalar(letters | summarize mx=min(bitmap));";
         (await LastLineOfResult(
                 @"print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
             .Should().Be("-700");
+    }
+
+    [TestMethod]
+    public async Task StrcatArray()
+    {
+        var query = """
+                    let words = datatable(word:string, code:string) [
+                        "apple","A",
+                        "orange","B",
+                        "grapes","C"
+                    ];
+                    words
+                    | summarize result = strcat_array(make_list(word), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("apple,orange,grapes");
+    }
+
+    [TestMethod]
+    public async Task Strcmp()
+    {
+        var query = """
+                    datatable(string1:string, string2:string) [
+                        "ABC","ABC",
+                        "abc","ABC",
+                        "ABC","abc",
+                        "abcde","abc"
+                    ]
+                    | extend result = strcmp(string1,string2)
+                    | summarize cat = strcat_array(make_list(result), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("0,1,-1,1");
+    }
+
+    [TestMethod]
+    public async Task StrcatDelim()
+    {
+        var query = """
+                    print st = strcat_delim('-', 1, '2', 'A', 1s)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("1-2-A-00:00:01");
+    }
+
+    [TestMethod]
+    public async Task Around()
+    {
+        var query = """
+                    print st = around(100,99,2)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task Pi()
+    {
+        var query = """
+                    print pi()
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("3.1415");
     }
 }

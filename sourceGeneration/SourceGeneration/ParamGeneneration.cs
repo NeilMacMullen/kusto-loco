@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace KustoLoco.SourceGeneration
 {
@@ -7,7 +8,7 @@ namespace KustoLoco.SourceGeneration
         private const string RowIndex = "rowIndex";
 
         private const string RowCount = "rowCount";
-        public static string Val(Param p) => p.IsString ? $"{p.Name}" : $"{p.Name}.Value";
+        public static string Val(Param p) => p.IsRefType ? $"{p.Name}" : $"{p.Name}.Value";
 
         public static string ColumnName(Param p)
             => $"{p.Name}Column";
@@ -178,6 +179,9 @@ namespace KustoLoco.SourceGeneration
                 case "long": return "Long";
                 case "double": return "Real";
                 case "bool": return "Bool";
+                case "guid": return "Guid";
+                case "JsonNode": return "Dynamic";
+                case "JsonArray": return "Dynamic";
                 default: return t;
             }
         }

@@ -89,17 +89,32 @@ internal static class BuiltInScalarFunctions
         FormatDateTime.Register(functions);
 
         //add multiple overloads for strcat
-        var overrides = Enumerable.Range(1, 20)
+        var strcat_overrides = Enumerable.Range(1, 64)
             .Select(n =>
                 new ScalarOverloadInfo(new StrcatFunctionImpl(),
                     ScalarTypes.String,
                     Enumerable.Range(0, n).Select(_ => (TypeSymbol)ScalarTypes.String).ToArray()))
             .ToArray();
-        functions.Add(Functions.Strcat,
-            new ScalarFunctionInfo(overrides));
+        
+        functions.Add(Functions.Strcat, new ScalarFunctionInfo(strcat_overrides));
+
+        //add multiple overloads for strcat_delim
+        var strcat_delim_overrides = Enumerable.Range(2, 64)
+            .Select(n =>
+                new ScalarOverloadInfo(new StrcatDelimFunctionImpl(),
+                    ScalarTypes.String,
+                    Enumerable.Range(0, n).Select(_ => (TypeSymbol)ScalarTypes.String).ToArray()))
+            .ToArray();
+
+        functions.Add(Functions.StrcatDelim, new ScalarFunctionInfo(strcat_delim_overrides));
 
 
+        //PiFunction.Register(functions);
+        AroundFunction.Register(functions);
         StrlenFunction.Register(functions);
+        StrcmpFunction.Register(functions);
+        StrcatArrayFunction.Register(functions);
+        ArrayReverseFunction.Register(functions);
         StrRepFunction.Register(functions);
         CountOfFunction.Register(functions);
         IndexOfFunction.Register(functions);

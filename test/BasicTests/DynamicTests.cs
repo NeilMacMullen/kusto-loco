@@ -81,4 +81,30 @@ public class DynamicTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Contain("True");
     }
+
+
+    [TestMethod]
+    public async Task ArrayLength()
+    {
+        var query = """print array_length(dynamic([1, 2, 3, "four"]))""";
+
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4");
+    }
+
+    [TestMethod]
+    public async Task ArrayReverse()
+    {
+        var query = """
+                    print arr=dynamic(["this", "is", "an", "example"]) 
+                    | project Result=array_reverse(arr)
+                    | project A=Result[0]
+                    
+                    """;
+
+        var result = await LastLineOfResult(query);
+        result.Should().Be("example");
+    }
+
+
 }
