@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RTools_NTS.Util;
 
 // ReSharper disable StringLiteralTypo
 
@@ -975,4 +976,127 @@ print toscalar(letters | summarize mx=min(bitmap));";
                 @"print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
             .Should().Be("-700");
     }
+
+    [TestMethod]
+    public async Task StrcatArray()
+    {
+        var query = """
+                    let words = datatable(word:string, code:string) [
+                        "apple","A",
+                        "orange","B",
+                        "grapes","C"
+                    ];
+                    words
+                    | summarize result = strcat_array(make_list(word), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("apple,orange,grapes");
+    }
+
+    [TestMethod]
+    public async Task Strcmp()
+    {
+        var query = """
+                    datatable(string1:string, string2:string) [
+                        "ABC","ABC",
+                        "abc","ABC",
+                        "ABC","abc",
+                        "abcde","abc"
+                    ]
+                    | extend result = strcmp(string1,string2)
+                    | summarize cat = strcat_array(make_list(result), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("0,1,-1,1");
+    }
+
+    [TestMethod]
+    public async Task StrcatDelim()
+    {
+        var query = """
+                    print st = strcat_delim('-', 1, '2', 'A', 1s)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("1-2-A-00:00:01");
+    }
+
+    [TestMethod]
+    public async Task Around()
+    {
+        var query = """
+                    print st = around(100,99,2)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task Pi()
+    {
+        var query = """
+                    print pi()
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("3.1415");
+    }
+
+    [TestMethod]
+    public async Task MaxOf()
+    {
+       var res = await LastLineOfResult("print max_of(10,20)");
+        res.Should().Be("20");
+    }
+
+
+    [TestMethod]
+    public async Task ArrayRotateLeft()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateLeftNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, -2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRight()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRightNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr,-2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+   
 }
