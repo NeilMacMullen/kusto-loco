@@ -1048,4 +1048,55 @@ print toscalar(letters | summarize mx=min(bitmap));";
        var res = await LastLineOfResult("print max_of(10,20)");
         res.Should().Be("20");
     }
+
+
+    [TestMethod]
+    public async Task ArrayRotateLeft()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateLeftNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, -2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRight()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRightNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr,-2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+   
 }

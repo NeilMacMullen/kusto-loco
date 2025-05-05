@@ -129,6 +129,8 @@ internal static class BuiltInScalarFunctions
         ToTimespanFunction.Register(Functions);
         ReplaceStringFunction.Register(Functions);
         SubstringFunction.Register(Functions);
+        ArrayRotateLeftFunction.Register(Functions);
+        ArrayRotateRightFunction.Register(Functions);
 
         Base64Decode.Register(Functions);
         Base64Encode.Register(Functions);
