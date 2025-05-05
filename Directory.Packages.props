@@ -28,7 +28,7 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.4.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.4" />
-    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.0" />
+    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.1" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
@@ -42,7 +42,7 @@
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
-    <PackageVersion Include="ShapeCrawler" Version="0.66.0" />
+    <PackageVersion Include="ShapeCrawler" Version="0.67.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
@@ -54,7 +54,7 @@
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.2" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="11.7.6" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
