@@ -180,6 +180,8 @@ public partial class MainWindow : Window
             StatusBar.Visibility = Visibility.Visible;
             UpdateInfo.Content = "New version available";
         }
+
+        Editor.SetFocus();
     }
 
 

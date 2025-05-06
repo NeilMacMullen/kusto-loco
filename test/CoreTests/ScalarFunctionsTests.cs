@@ -129,3 +129,4 @@ This string will be base64 encoded
         canonicalOutput.Should().Be(canonicalExpectedOutput);
     }
 }
+

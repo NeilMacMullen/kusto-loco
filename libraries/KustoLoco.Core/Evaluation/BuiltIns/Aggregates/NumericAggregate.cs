@@ -2,6 +2,18 @@
 
 public class NumericAggregate
 {
+    /// <summary>
+    /// the number of items
+    /// </summary>
     public int Count;
-    public double Total;
+    /// <summary>
+    /// used for aggregations such as average
+    /// </summary>
+    public double DoubleValue;
+    /// <summary>
+    /// used for aggregations such as max/min for
+    /// longs where precision could otherwise be lost
+    /// </summary>
+    public long LongValue;
 }
+

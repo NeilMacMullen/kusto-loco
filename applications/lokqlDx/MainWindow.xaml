@@ -43,6 +43,7 @@
         <MenuItem Header="Help">
           <MenuItem Header="LokqlDx intro" Click="NavigateToWiki" Tag="LokqlDX" />
           <MenuItem Header="Quick start" Click="NavigateToWiki" Tag="LokqlDx-tutorial-‐-quick-start" />
+          <MenuItem Header="Keyboard shortcuts" Click="NavigateToWiki" Tag="LokqlDx-‐-Keyboard-shortcuts" />
           <MenuItem Header="Chart customisation" Click="NavigateToWiki" Tag="ScottPlot-Chart-customisation" />
           <MenuItem Header="Command reference" Click="NavigateToWiki" Tag="LokqlDx-‐-commands" />
 

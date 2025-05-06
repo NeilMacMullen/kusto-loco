@@ -27,7 +27,9 @@ if (-not $skipBuild) {
     dotnet pack   -p:PackageVersion=$version .\libraries\KustoLoco.Core\KustoLoco.Core.csproj
     dotnet pack   -p:PackageVersion=$version .\libraries\FileFormats\FileFormats.csproj
     dotnet pack   -p:PackageVersion=$version .\libraries\Rendering\Rendering.csproj
-     dotnet pack   -p:PackageVersion=$version .\libraries\ScottPlotRendering\ScottPlotRendering.csproj
+    dotnet pack   -p:PackageVersion=$version .\libraries\ScottPlotRendering\ScottPlotRendering.csproj
+    dotnet pack   -p:PackageVersion=$version .\libraries\SixelSupport\SixelSupport.csproj
+
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
 
     #build application exes
@@ -45,7 +47,7 @@ if (-not $skipBuild) {
     #clean up pskql....
      get-ChildItem -recurse -path .\publish\pskql -include Microsoft.*.dll | remove-item
      get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
-    #clean up pskql....
+    #clean up pskql linux....
      get-ChildItem -recurse -path .\publish\pskql-linux -include Microsoft.*.dll | remove-item
      get-ChildItem -recurse -path .\publish\pskql-linux -include System.*.dll | remove-item
 
@@ -59,6 +61,7 @@ if (-not ($api -like '') ) {
     dotnet nuget push libraries\FileFormats\bin\Release\KustoLoco.FileFormats.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
     dotnet nuget push libraries\Rendering\bin\Release\KustoLoco.Rendering.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
     dotnet nuget push libraries\ScottPlotRendering\bin\Release\KustoLoco.Rendering.ScottPlot.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
+    dotnet nuget push libraries\SixelSupport\bin\Release\KustoLoco.Rendering.SixelSupport.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
     dotnet nuget push sourceGeneration\SourceGenDependencies\bin\Release\KustoLoco.SourceGeneration.Attributes.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
 }
 

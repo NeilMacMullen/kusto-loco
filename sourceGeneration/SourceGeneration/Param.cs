@@ -9,7 +9,9 @@
         {
             ColumnIndex = index;
             Name = name.Trim();
-            Type = type.Trim();
+            //remove nullable annotation because some
+            //return types such as JsonNode need to return nulls
+            Type = type.Trim().Replace("?","");
         }
 
         /// <summary>
@@ -18,6 +20,8 @@
         public int ColumnIndex { get; }
 
         public bool IsString => Type.Contains("string");
+
+        public bool IsRefType => IsString || Type.Contains("Json");
 
         /// <summary>
         ///     Transforms a Param ColumnIndex

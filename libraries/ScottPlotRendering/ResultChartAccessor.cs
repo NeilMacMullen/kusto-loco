@@ -123,10 +123,10 @@ public class ResultChartAccessor
 
     public double GetSuggestedBarWidth()
     {
+        if (_result.RowCount < 1)
+            return 1.0;
         if (XisDateTime)
         {
-            if (_result.RowCount < 1)
-                return 1.0;
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
@@ -137,7 +137,20 @@ public class ResultChartAccessor
             return smallestGap * 0.9;
         }
 
-        return 0.0;
+        if (IsNumeric(_xColumn))
+        {
+            var smallestGap = _result
+                .EnumerateColumnData(_xColumn)
+                .Select(d => Convert.ChangeType(d, typeof(double)))
+                .OfType<double>()
+                .Distinct()
+                .OrderBy(d => d)
+                .Pairwise((a, b) => b - a)
+                .Min();
+            return smallestGap * 0.9;
+        }
+
+        return 1.0;
     }
 
     public string GetXLabel() => _xColumn.Name;
@@ -210,13 +223,14 @@ public class ResultChartAccessor
         //if all else fails return the original set...
         return availableColumns;
     }
+
     /// <summary>
-    /// Represents a plottable chart series for ScottPlot
+    ///     Represents a plottable chart series for ScottPlot
     /// </summary>
     public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y)
     {
         /// <summary>
-        /// Return a version of the ChartSeries with the X and Y values ordered by X
+        ///     Return a version of the ChartSeries with the X and Y values ordered by X
         /// </summary>
         public ChartSeries OrderByX()
         {
