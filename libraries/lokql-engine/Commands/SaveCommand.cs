@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using DocumentFormat.OpenXml.Linq;
+using KustoLoco.Core.Settings;
 
 namespace Lokql.Engine.Commands;
 
@@ -10,13 +11,15 @@ public static class SaveCommand
 {
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        exp.Settings.AddLayer();
+        var newLayer = new KustoSettingsProvider();
         if (o.NoHeader)
         {
-            exp.Settings.Set("csv.skipheader","true");
-            exp.Settings.Set("txy.skipheader", "true");
+            newLayer.Set("csv.skipheader", "true");
+            newLayer.Set("tsv.skipheader", "true");
         }
+        var exp = econtext.Explorer;
+        exp.Settings.AddLayer(newLayer);
+       
         await exp._loader.SaveResult(exp.GetResult(o.ResultName), o.File);
         exp.Settings.Pop();
     }

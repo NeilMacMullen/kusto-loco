@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using FluentAssertions;
 using KustoLoco.Core.Settings;
 
@@ -59,5 +60,32 @@ public class KustoSettingsTester
     {
         var settings = new KustoSettingsProvider();
         settings.Register(_pathList, _pathList);
+    }
+
+    [TestMethod]
+    public void SettingsCanBeLayered()
+    {
+        var settings = new KustoSettingsProvider();
+        settings.Set("s1","1");
+        settings.Set("s2", "2");
+        var layered = new KustoSettingsProvider();
+        layered.Set("s1","new");
+
+        settings.AddLayer(layered);
+        settings.GetOr("s1","").Should().Be("new");
+        settings.GetOr("s2", "").Should().Be("2");
+
+        settings.Pop();
+
+        settings.GetOr("s1", "").Should().Be("1");
+        settings.GetOr("s2", "").Should().Be("2");
+
+        settings.Pop();
+        settings.GetOr("s1", "").Should().Be("");
+        settings.GetOr("s2", "").Should().Be("");
+
+        settings.Pop();
+        settings.GetOr("s1", "").Should().Be("");
+        settings.GetOr("s2", "").Should().Be("");
     }
 }
