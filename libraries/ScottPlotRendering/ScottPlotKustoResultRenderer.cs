@@ -3,6 +3,7 @@ using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.SixelSupport;
 using NotNullStrings;
 using ScottPlot;
+using ScottPlot.Colormaps;
 using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
@@ -33,11 +34,22 @@ public static class ScottPlotKustoResultRenderer
     {
         var paletteName = settings.GetOr("scottplot.palette", "");
 
+        //look for a palette by name
         var ipallette = Palette.GetPalettes()
             .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
+
+        //alternatively try a colormap
         if (ipallette == null)
         {
-            //allow palettes to be defined as lists of hex colors
+            var map = Colormap.GetColormaps()
+                .FirstOrDefault(c => c.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
+            if (map != null)
+                ipallette = new HeatmapPalette(256, map);
+        }
+
+        //finally, allow palettes to be defined as lists of hex colors
+        if (ipallette == null)
+        {
             var custom = paletteName.Tokenize(" ,;");
             ipallette = custom.Length > 1
                 ? Palette.FromColors(custom)
@@ -98,7 +110,7 @@ public static class ScottPlotKustoResultRenderer
         SetInitialUiPreferences(result, plot, settings);
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "on|ot", 0, 1, 0);
+            StandardAxisAssignment(settings, accessor, "on|ot", 0, 1, 0);
 
             var slices = accessor.CalculateSeries()
                 .Select(ser => new PieSlice
@@ -106,7 +118,7 @@ public static class ScottPlotKustoResultRenderer
                     Label = ser.Legend,
                     LegendText = ser.Legend,
                     Value = ser.Y[0],
-                    FillColor = plot.Add.Palette.GetColor(ser.Index)
+                    FillColor = plot.Add.Palette.GetColor(ser.Color[0])
                 })
                 .ToArray();
             plot.Add.Pie(slices);
@@ -117,7 +129,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 //for lines, it's important that order by X otherwise
@@ -136,7 +148,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
@@ -151,7 +163,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -163,7 +175,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -175,7 +187,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "tto|nno", 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, "tto|nno", 0, 1, 2);
 
             var bars = accessor.CalculateSeries()
                 .Select(ser => CreateRangeBars(plot, ser, true))
@@ -202,10 +214,13 @@ public static class ScottPlotKustoResultRenderer
         plot.Axes.Left.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.left.ticklabelstyle.fontsize", 12);
     }
 
-    private static void StandardAxisAssignment(ResultChartAccessor accessor,
+    private static void StandardAxisAssignment(KustoSettingsProvider settings, ResultChartAccessor accessor,
         string preferences, int x, int y, int s)
     {
-        var cols = accessor.TryOrdering(preferences);
+        var cols = settings.GetOr("scottplot.axisorder", "automatic") =="explicit"
+            ? accessor.TryOrdering("xxx")
+            : accessor.TryOrdering(preferences);
+
         accessor.AssignXColumn(cols[x].Index);
         accessor.AssignValueColumn(cols[y].Index);
         if (s < cols.Length)
@@ -273,6 +288,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
     }
+
     private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new FixedDateTimeAutomatic();
     private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new FixedDateTimeAutomatic();
 
@@ -303,11 +319,12 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateBars(Plot plot, Dictionary<double, double> acc,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth)
     {
-        var bars = series.X.Zip(series.Y)
+        var bars = series.X.Zip(series.Y,series.Color)
             .Select(tuple =>
             {
                 var x = tuple.First;
                 var y = tuple.Second;
+                var color = tuple.Third;
                 var valBase = acc.GetValueOrDefault(x!, 0.0);
                 var top = valBase + y;
 
@@ -318,7 +335,7 @@ public static class ScottPlotKustoResultRenderer
                     Position = x,
                     ValueBase = valBase,
                     Value = top,
-                    FillColor = plot.Add.Palette.GetColor(series.Index)
+                    FillColor = plot.Add.Palette.GetColor(color)
                 };
                 if (barWidth > 0)
                     bar.Size = barWidth;
@@ -336,17 +353,18 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateRangeBars(Plot plot,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal)
     {
-        var bars = series.X.Zip(series.Y)
+        var bars = series.X.Zip(series.Y,series.Color)
             .Select(tuple =>
             {
                 var left = tuple.First;
                 var right = tuple.Second;
+                var color = tuple.Third;
                 return new Bar
                 {
                     Position = series.Index,
                     ValueBase = left,
                     Value = right,
-                    FillColor = plot.Add.Palette.GetColor(series.Index)
+                    FillColor = plot.Add.Palette.GetColor(color)
                 };
             }).ToArray();
         var b = plot.Add.Bars(bars);
@@ -394,4 +412,22 @@ public static class ScottPlotKustoResultRenderer
         var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
         return RenderToSixel(result, settings, width, height);
     }
+}
+
+public class HeatmapPalette : IPalette
+{
+    private readonly double _scale;
+    private readonly IColormap _v;
+
+    public HeatmapPalette(double scale,IColormap colorMap)
+    {
+        _scale = scale;
+        _v = colorMap;
+    }
+
+    public Color GetColor(int index) => _v.GetColor(index / _scale);
+
+    public Color[] Colors => throw new NotImplementedException();
+    public string Name => "Heatmap";
+    public string Description => "Heatmap";
 }
