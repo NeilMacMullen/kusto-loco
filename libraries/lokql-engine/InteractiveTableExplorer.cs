@@ -202,7 +202,7 @@ public class InteractiveTableExplorer
     /// </remarks>
     public void PushSettingLayer(KustoSettingsProvider settings)
     {
-        _interpolator.PushSettings(settings);
+        _interpolator.AddLayer(settings);
     }
 
     /// <summary>

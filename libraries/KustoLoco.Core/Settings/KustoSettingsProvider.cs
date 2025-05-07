@@ -19,11 +19,21 @@ namespace KustoLoco.Core.Settings;
 /// </remarks>
 public class KustoSettingsProvider
 {
-    private ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
+    private  ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
         ImmutableHashSet<KustoSettingDefinition>.Empty;
 
-    private ImmutableDictionary<string, RawKustoSetting> _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+    private Stack<ImmutableDictionary<string, RawKustoSetting>> _settingsStack;
 
+    public KustoSettingsProvider()
+    {
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+       _settingsStack.Push(ImmutableDictionary<string, RawKustoSetting>.Empty);
+    }
+
+    public void AddLayer(KustoSettingsProvider layeredSettings)
+    {
+        Push(layeredSettings.GetFlattened());
+    }
     public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions()
     {
         return _registeredSettings;
@@ -35,10 +45,23 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
+    {
+        _settingsStack.Push(layer);
+    }
+
+    public ImmutableDictionary<string, RawKustoSetting> Pop()
+    {
+        if (_settingsStack.Any())
+           return _settingsStack.Pop();
+        else return ImmutableDictionary<string, RawKustoSetting>.Empty;
+    }
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
-        _settings = _settings.SetItem(k.Key, k);
+        var settings= Pop();
+        settings = settings.SetItem(k.Key, k);
+        Push(settings);
     }
 
     public void Set(string setting, bool value)
@@ -52,11 +75,27 @@ public class KustoSettingsProvider
     }
 
 
+    private ImmutableDictionary<string, RawKustoSetting> GetFlattened()
+    {
+        var layers = _settingsStack.ToArray();
+        var d = new Dictionary<string, RawKustoSetting>();
+        foreach (var layer in layers)
+        {
+            foreach (var s in layer.Values)
+            {
+                d.TryAdd(s.Name, s);
+            }
+        }
+
+        return d.ToImmutableDictionary();
+
+    }
     public string Get(KustoSettingDefinition setting)
     {
         var settingName = setting.Name;
         var fb = new RawKustoSetting(settingName, setting.DefaultValue);
-        return _settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
+        var settings= GetFlattened();
+        return settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
     /// <summary>
@@ -72,11 +111,12 @@ public class KustoSettingsProvider
     public string TrySubstitute(string name)
     {
         var fb = new RawKustoSetting(name, name);
-        return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
+        var settings = GetFlattened();
+        return settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
     public bool HasSetting(string name)
-        => _settings.ContainsKey(name.ToLowerInvariant());
+        => GetFlattened().ContainsKey(name.ToLowerInvariant());
 
     public string GetOr(string setting,string fallback)
     {
@@ -105,13 +145,13 @@ public class KustoSettingsProvider
         var falseValues = new[] { "false", "no", "off", "0" };
         var s = Get(setting).ToLowerInvariant();
         if (trueValues.Contains(s)) return true;
-        if (falseValues.Contains(s)) return false;
+        //if (falseValues.Contains(s)) return false;
         return false;
     }
 
     public IEnumerable<RawKustoSetting> Enumerate()
     {
-        return _settings.Values;
+        return GetFlattened().Values;
     }
 
     /// <summary>
@@ -132,7 +172,8 @@ public class KustoSettingsProvider
     /// </summary>
     public void Reset()
     {
-        _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+        AddLayer(new KustoSettingsProvider());
     }
 
     public double GetDoubleOr(string settingName, double p1)
