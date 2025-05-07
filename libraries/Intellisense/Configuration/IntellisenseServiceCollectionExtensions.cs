@@ -30,6 +30,7 @@ public static class IntellisenseServiceCollectionExtensions
         services.AddSingleton<IPathFactory, PathFactory>();
 
         // shares
+
         services
             .AddScoped<IShareReader, Win32ApiShareReader>()
             .AddSingleton<IShareClient, ShareClient>()
@@ -38,15 +39,31 @@ public static class IntellisenseServiceCollectionExtensions
 
 
         // timeouts
-        services.AddScoped<CancellationContext>();
-        services.AddScoped(x => x.GetRequiredService<CancellationContext>().TokenSource);
-        services.Configure<IntellisenseTimeoutOptions>(x => x.IntellisenseTimeout = TimeSpan.FromMilliseconds(5000));
+        services.AddCancellationContext();
+
+        services.TryConfigure<IntellisenseTimeoutOptions>(x => x.IntellisenseTimeout = TimeSpan.FromMilliseconds(5000));
 
 
         // auxiliary services
         services.TryAddSingleton<IFileSystem, System.IO.Abstractions.FileSystem>();
+        services.TryAddSingleton(TimeProvider.System);
 
 
         return services;
+    }
+
+    public static IServiceCollection PostConfigureIntellisenseTimeouts(
+        this IServiceCollection services,
+        Action<IntellisenseTimeoutOptions> configure
+    )
+    {
+        services.PostConfigure(configure);
+        return services;
+    }
+
+    private static void AddCancellationContext(this IServiceCollection services)
+    {
+        services.TryAddScoped<CancellationContext>();
+        services.TryAddScoped(x => x.GetRequiredService<CancellationContext>().TokenSource);
     }
 }

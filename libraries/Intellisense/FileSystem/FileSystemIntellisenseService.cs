@@ -27,8 +27,6 @@ internal class FileSystemIntellisenseService(
 
     public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path, CancellationToken cancelToken = default)
     {
-        // TODO: a late-returning request could potentially push stale results
-        // need to invalidate stale requests
         using var scope = scopeFactory.CreateScope();
         var retrievers =
             scope.ServiceProvider.GetRequiredService<IEnumerable<IFileSystemPathCompletionResultRetriever>>();
@@ -50,21 +48,21 @@ internal class FileSystemIntellisenseService(
             var result = await retrievers
                 .Select(x => x.GetCompletionResultAsync(pathObj))
                 .ToList()
-                .ToWhenAnyAsyncEnumerable()
+                .AsWhenAnyAsyncEnumerable()
                 .TakeWhile(_ => !token.IsCancellationRequested)
                 .Where(x => !x.IsEmpty())
                 .FirstOrDefaultAsync(ctx.TokenSource.Token);
 
             return result ?? CompletionResult.Empty;
         }
-        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException)
+        catch (OperationCanceledException e)
         {
-            logger.LogTrace("Timed out while fetching intellisense results. Returning empty result.");
-            return CompletionResult.Empty;
+            logger.LogTrace(e, "Cancelled or timed out while fetching intellisense results.");
+            throw;
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            logger.LogError(e, "Error occurred while fetching intellisense results. Returning empty result.");
+            logger.LogError(e, "IO Error occurred while fetching intellisense results. Returning empty result.");
             return CompletionResult.Empty;
         }
     }
@@ -72,7 +70,7 @@ internal class FileSystemIntellisenseService(
 
 file static class AsyncExtensions
 {
-    public static async IAsyncEnumerable<T> ToWhenAnyAsyncEnumerable<T>(this IList<Task<T>> tasks)
+    public static async IAsyncEnumerable<T> AsWhenAnyAsyncEnumerable<T>(this IList<Task<T>> tasks)
     {
         while (tasks.Count > 0)
         {
