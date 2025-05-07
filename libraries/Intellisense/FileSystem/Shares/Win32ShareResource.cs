@@ -12,15 +12,17 @@ internal class Win32ShareResource(ILogger<Win32ShareResource> logger, IShareClie
         // we can try ignoring the thread if it doesn't complete within the timeout
         // but this might exhaust the thread pool, so we'll manage usage with a semaphore
 
+
+
         logger.LogTrace("Attempting to acquire lock. {CurrentCount}", _semaphore.CurrentCount);
 
         try
         {
             await _semaphore.WaitAsync(token);
         }
-        catch (Exception e) when (e is OperationCanceledException or TaskCanceledException)
+        catch (OperationCanceledException e)
         {
-            logger.LogTrace("Resource busy. Cannot accept additional requests.");
+            logger.LogTrace(e,"Resource busy. Cannot accept additional requests.");
             throw;
         }
 
@@ -47,17 +49,20 @@ internal class Win32ShareResource(ILogger<Win32ShareResource> logger, IShareClie
         {
             return client.GetNetworkShares(host).ToList();
         }
+        catch (UnauthorizedAccessException e)
+        {
+            logger.LogWarning(e, "Access denied while fetching shares.");
+            throw;
+        }
+        catch (FileNotFoundException e)
+        {
+            logger.LogDebug(e, "Could not find network path.");
+            return [];
+        }
         catch (Exception e)
         {
-            if (e is FileNotFoundException)
-            {
-                logger.LogDebug(e,"Could not find network path.");
-            }
-            else
-            {
-                logger.LogWarning(e, "Unexpected exception while fetching shares.");
-            }
-            return [];
+            logger.LogError(e, "Unexpected exception while fetching shares.");
+            throw;
         }
         finally
         {

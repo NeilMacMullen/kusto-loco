@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -15,7 +15,6 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Search;
 using Intellisense;
-using Intellisense.FileSystem;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
@@ -34,7 +33,7 @@ public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
-    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = App.Resolve<IFileSystemIntellisenseService>();
+    private readonly IntellisenseClient _intellisenseClient = App.Resolve<IntellisenseClient>();
     private CommandParser? _parser;
     private CommandParser Parser
     {
@@ -58,6 +57,8 @@ public partial class QueryEditor : UserControl
         InitializeComponent();
         Query.TextArea.TextEntering += textEditor_TextArea_TextEntering;
         Query.TextArea.TextEntered += textEditor_TextArea_TextEntered;
+        Query.TextArea.Caret.PositionChanged += async (_,_) => await _intellisenseClient.CancelPendingRequests();
+
         _editorHelper = new EditorHelper(Query);
     }
 
@@ -294,7 +295,7 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        var result = await _fileSystemIntellisenseService.GetPathIntellisenseOptionsAsync(path);
+        var result = await _intellisenseClient.GetPathIntellisenseOptionsAsync(path);
         if (result.IsEmpty())
         {
             return false;

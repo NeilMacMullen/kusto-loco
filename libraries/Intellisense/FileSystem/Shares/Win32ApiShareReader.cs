@@ -18,6 +18,7 @@ internal class Win32ApiShareReader(
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            logger.LogDebug("Not running on Windows. Skipping.");
             return [];
         }
 

@@ -33,7 +33,8 @@ public partial class App
         appBuilder
             .Services
             .AddIntellisense()
-            .AddApplicationLogging();
+            .AddApplicationLogging()
+            .AddSingleton<IntellisenseClient>();
 
 
         return appBuilder.Build();
@@ -72,7 +73,15 @@ public partial class App
         // For more info see https://docs.microsoft.com/en-us/dotnet/api/system.windows.application.dispatcherunhandledexception?view=windowsdesktop-6.0
 
         var logger = Resolve<ILogger<App>>();
-        logger.LogError(e.Exception, "Application exception occurred.");
+        if (e.Exception is OperationCanceledException exc)
+        {
+            logger.LogDebug(exc,"Operation was cancelled.");
+        }
+        else
+        {
+            logger.LogError(e.Exception, "Application exception occurred.");
+        }
+
 
         // top level exception handler
         // keep app open with unhandled exception unless there is risk of data corruption, then add handling for it here
