@@ -19,7 +19,7 @@ namespace KustoLoco.Core.Settings;
 /// </remarks>
 public class KustoSettingsProvider
 {
-    private  ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
+    private ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
         ImmutableHashSet<KustoSettingDefinition>.Empty;
 
     private Stack<ImmutableDictionary<string, RawKustoSetting>> _settingsStack;
@@ -27,17 +27,12 @@ public class KustoSettingsProvider
     public KustoSettingsProvider()
     {
         _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
-       _settingsStack.Push(ImmutableDictionary<string, RawKustoSetting>.Empty);
+        _settingsStack.Push(ImmutableDictionary<string, RawKustoSetting>.Empty);
     }
 
-    public void AddLayer(KustoSettingsProvider layeredSettings)
-    {
-        Push(layeredSettings.GetFlattened());
-    }
-    public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions()
-    {
-        return _registeredSettings;
-    }
+    public void AddLayer(KustoSettingsProvider layeredSettings) => Push(layeredSettings.GetFlattened());
+
+    public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions() => _registeredSettings;
 
     public void Register(params KustoSettingDefinition[] settings)
     {
@@ -45,34 +40,26 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
-    {
-        _settingsStack.Push(layer);
-    }
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
 
     public ImmutableDictionary<string, RawKustoSetting> Pop()
     {
         if (_settingsStack.Any())
-           return _settingsStack.Pop();
-        else return ImmutableDictionary<string, RawKustoSetting>.Empty;
+            return _settingsStack.Pop();
+        return ImmutableDictionary<string, RawKustoSetting>.Empty;
     }
+
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
-        var settings= Pop();
+        var settings = Pop();
         settings = settings.SetItem(k.Key, k);
         Push(settings);
     }
 
-    public void Set(string setting, bool value)
-    {
-        Set(setting, value.ToString());
-    }
+    public void Set(string setting, bool value) => Set(setting, value.ToString());
 
-    public void Set(string setting, int value)
-    {
-        Set(setting, value.ToString());
-    }
+    public void Set(string setting, int value) => Set(setting, value.ToString());
 
 
     private ImmutableDictionary<string, RawKustoSetting> GetFlattened()
@@ -80,33 +67,29 @@ public class KustoSettingsProvider
         var layers = _settingsStack.ToArray();
         var d = new Dictionary<string, RawKustoSetting>();
         foreach (var layer in layers)
-        {
-            foreach (var s in layer.Values)
-            {
-                d.TryAdd(s.Name, s);
-            }
-        }
+        foreach (var s in layer.Values)
+            d.TryAdd(s.Name, s);
 
         return d.ToImmutableDictionary();
-
     }
+
     public string Get(KustoSettingDefinition setting)
     {
         var settingName = setting.Name;
         var fb = new RawKustoSetting(settingName, setting.DefaultValue);
-        var settings= GetFlattened();
+        var settings = GetFlattened();
         return settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
     /// <summary>
-    /// Tries to interpret a string as a setting name 
+    ///     Tries to interpret a string as a setting name
     /// </summary>
     /// <remarks>
-    /// There are a number of places in application code where it's convenient to see if the
-    /// supplied string might actually be interpreted as a setting name.  For example
-    /// .set abc xyz
-    /// .command abc
-    /// --> could transform to .command xyz
+    ///     There are a number of places in application code where it's convenient to see if the
+    ///     supplied string might actually be interpreted as a setting name.  For example
+    ///     .set abc xyz
+    ///     .command abc
+    ///     --> could transform to .command xyz
     /// </remarks>
     public string TrySubstitute(string name)
     {
@@ -118,18 +101,19 @@ public class KustoSettingsProvider
     public bool HasSetting(string name)
         => GetFlattened().ContainsKey(name.ToLowerInvariant());
 
-    public string GetOr(string setting,string fallback)
+    public string GetOr(string setting, string fallback)
     {
-        var fb = new KustoSettingDefinition(setting, string.Empty,fallback,string.Empty);
+        var fb = new KustoSettingDefinition(setting, string.Empty, fallback, string.Empty);
         return Get(fb);
     }
+
     /// <summary>
-    /// Try to fetch a setting and interpret it as a number (int)
+    ///     Try to fetch a setting and interpret it as a number (int)
     /// </summary>
     /// <remarks> return the fallback value if the number can't be parsed</remarks>
-    public int GetIntOr(string setting,int fallback)
+    public int GetIntOr(string setting, int fallback)
     {
-        var s = GetOr(setting,fallback.ToString());
+        var s = GetOr(setting, fallback.ToString());
         return int.TryParse(s, out var v) ? v : fallback;
     }
 
@@ -149,10 +133,7 @@ public class KustoSettingsProvider
         return false;
     }
 
-    public IEnumerable<RawKustoSetting> Enumerate()
-    {
-        return GetFlattened().Values;
-    }
+    public IEnumerable<RawKustoSetting> Enumerate() => GetFlattened().Values;
 
     /// <summary>
     ///     Obtain an array of strings from a setting that is a list of paths
@@ -178,7 +159,19 @@ public class KustoSettingsProvider
 
     public double GetDoubleOr(string settingName, double p1)
     {
-        var s = GetOr(settingName,"");
+        var s = GetOr(settingName, "");
         return double.TryParse(s, out var v) ? v : p1;
+    }
+
+    /// <summary>
+    ///     Create a snapshot of the current settings
+    /// </summary>
+    /// <returns></returns>
+    public KustoSettingsProvider Snapshot()
+    {
+        var settings = GetFlattened();
+        var newSettings = new KustoSettingsProvider();
+        newSettings.Push(settings);
+        return newSettings;
     }
 }

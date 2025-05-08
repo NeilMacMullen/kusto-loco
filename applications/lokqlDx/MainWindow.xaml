@@ -37,6 +37,10 @@
           <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers" />
 
         </MenuItem>
+
+        <MenuItem Header="View">
+          <MenuItem Header="Create Flyout" Click="CreateFlyout" />
+        </MenuItem>
         <MenuItem Header="Misc">
           <MenuItem Header="Register file association" Click="EnableJumpList" />
         </MenuItem>

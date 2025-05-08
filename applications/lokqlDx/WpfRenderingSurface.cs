@@ -1,12 +1,14 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 using ScottPlot;
 using ScottPlot.WPF;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using Label = System.Windows.Controls.Label;
 
 namespace lokqlDx;
@@ -23,14 +25,14 @@ public class WpfRenderingSurface(
     KustoSettingsProvider settings)
     : IResultRenderingSurface
 {
-    public WpfPlot Plotter { get; } = plotter;
+   
 
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
         await SafeInvoke(() =>
         {
-            ScottPlotter.Render(Plotter, result, settings);
+            ScottPlotter.Render(plotter, result, settings);
             return Task.FromResult(true);
         });
     }
@@ -48,6 +50,25 @@ public class WpfRenderingSurface(
         return bytes;
     }
 
+    public void CopyToClipboard()
+    {
+        try
+        {
+            var bytes = plotter.Plot.GetImageBytes((int)plotter.ActualWidth,
+                (int)plotter.ActualHeight, ImageFormat.Png);
+            using var memoryStream = new MemoryStream(bytes);
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = memoryStream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
+            Clipboard.SetImage(bitmapImage);
+        }
+        catch
+        {
+        }
+    }
 
     private async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)
     {
