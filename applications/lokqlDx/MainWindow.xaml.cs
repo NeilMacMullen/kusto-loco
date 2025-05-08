@@ -528,23 +528,7 @@ public partial class MainWindow : Window
 
     private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var bytes = WpfPlot1.Plot.GetImageBytes((int)WpfPlot1.ActualWidth,
-                (int)WpfPlot1.ActualHeight, ImageFormat.Png);
-            using var memoryStream = new MemoryStream(bytes);
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
-            Clipboard.SetImage(bitmapImage);
-            _explorer.Info("Chart copied to clipboard");
-        }
-        catch
-        {
-        }
+        _wpfRenderingSurface.CopyToClipboard();
     }
 
 
@@ -582,5 +566,12 @@ public partial class MainWindow : Window
     {
         if (sender is MenuItem { Tag: string page })
             Navigate(page);
+    }
+
+    private void CreateFlyout(object sender, RoutedEventArgs e)
+    {
+        var lastResult = _explorer.GetPreviousResult();
+        var dlg = new FlyoutResult(lastResult, _explorer.Settings);
+        dlg.Show();
     }
 }
