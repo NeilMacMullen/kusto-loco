@@ -260,5 +260,16 @@ public class ResultChartAccessor
                     )
                 ;
         }
+
+        public ChartSeries AccumulateY()
+        {
+            var accumulatedY = new double[Y.Length];
+            accumulatedY[0] = Y[0];
+
+            for (var i = 1; i < Y.Length; i++)
+                accumulatedY[i] = accumulatedY[i - 1] + Y[i];
+
+            return new ChartSeries(Index, Legend, X, accumulatedY, Color);
+        }
     }
 }

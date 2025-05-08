@@ -8,6 +8,7 @@ using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
 
+
 namespace KustoLoco.Rendering.ScottPlot;
 
 public static class ScottPlotKustoResultRenderer
@@ -135,6 +136,8 @@ public static class ScottPlotKustoResultRenderer
                 //for lines, it's important that order by X otherwise
                 //we'll get a real spiderweb
                 var ordered = ser.OrderByX();
+                ordered=AccumulateIfRequired(result, ordered);
+                
                 var line = plot.Add.Scatter(ordered.X, ordered.Y);
                 line.LegendText = ordered.Legend;
                 line.LineWidth = (float)settings.GetDoubleOr("scottplot.line.linewidth",
@@ -196,6 +199,15 @@ public static class ScottPlotKustoResultRenderer
         }
 
         FinishUIPreferences(plot, settings);
+    }
+
+    private static ResultChartAccessor.ChartSeries AccumulateIfRequired(KustoQueryResult result,
+        ResultChartAccessor.ChartSeries ordered)
+    {
+        return result.Visualization.PropertyOr("accumulate", "false")
+            .Equals("true",StringComparison.InvariantCultureIgnoreCase)
+            ? ordered.AccumulateY()
+            : ordered;
     }
 
     private static void FinishUIPreferences(Plot plot, KustoSettingsProvider settings)
@@ -412,22 +424,4 @@ public static class ScottPlotKustoResultRenderer
         var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
         return RenderToSixel(result, settings, width, height);
     }
-}
-
-public class HeatmapPalette : IPalette
-{
-    private readonly double _scale;
-    private readonly IColormap _v;
-
-    public HeatmapPalette(double scale,IColormap colorMap)
-    {
-        _scale = scale;
-        _v = colorMap;
-    }
-
-    public Color GetColor(int index) => _v.GetColor(index / _scale);
-
-    public Color[] Colors => throw new NotImplementedException();
-    public string Name => "Heatmap";
-    public string Description => "Heatmap";
 }
