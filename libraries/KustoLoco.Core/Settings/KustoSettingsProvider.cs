@@ -121,7 +121,8 @@ public class KustoSettingsProvider
     ///     Try to interpret the setting as a boolean
     /// </summary>
     /// <remarks>
-    ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true
+    ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true.
+    /// A missing setting will be interpreted as false.
     /// </remarks>
     public bool GetBool(KustoSettingDefinition setting)
     {
