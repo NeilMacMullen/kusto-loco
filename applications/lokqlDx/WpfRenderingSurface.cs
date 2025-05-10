@@ -21,7 +21,7 @@ public class WpfRenderingSurface(
     TabControl tabControl,
     DataGrid dataGrid,
     Label dataGridSizeWarning,
-    WpfPlot plotter,
+    IScottPlotHost plotter,
     KustoSettingsProvider settings)
     : IResultRenderingSurface
 {
@@ -32,7 +32,9 @@ public class WpfRenderingSurface(
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
         await SafeInvoke(() =>
         {
-            ScottPlotter.Render(plotter, result, settings);
+            var plot = plotter.GetPlot(true);
+            ScottPlotKustoResultRenderer.RenderToPlot(plot, result, settings);
+            plotter.FinishUpdate();
             return Task.FromResult(true);
         });
     }
@@ -52,22 +54,7 @@ public class WpfRenderingSurface(
 
     public void CopyToClipboard()
     {
-        try
-        {
-            var bytes = plotter.Plot.GetImageBytes((int)plotter.ActualWidth,
-                (int)plotter.ActualHeight, ImageFormat.Png);
-            using var memoryStream = new MemoryStream(bytes);
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
-            Clipboard.SetImage(bitmapImage);
-        }
-        catch
-        {
-        }
+        plotter.CopyToClipboard();
     }
 
     private async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)

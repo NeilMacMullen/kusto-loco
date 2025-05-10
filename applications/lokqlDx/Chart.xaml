@@ -6,21 +6,23 @@
              xmlns:local="clr-namespace:lokqlDx"
              xmlns:scottplot="http://schemas.scottplot.net/2008/xaml/presentation"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             LostFocus="Chart_OnLostFocus">
     <Grid>
     <Grid>
       <DockPanel>
-        <StackPanel DockPanel.Dock="Top" >
-          <Button Click="ButtonBase_OnClick">X</Button>
-<Label Name="DebugText" Height="40" Foreground="White">Hello</Label>
-        </StackPanel>
+        <StatusBar DockPanel.Dock="Bottom" Background="Black">
+          <StackPanel>
+            <Label Name="DebugText" Foreground="White"></Label>
+          </StackPanel>
+        </StatusBar>
 
-        <scottplot:WpfPlot Name="WpfPlot1" DockPanel.Dock="Bottom"/>
+        <scottplot:WpfPlot Name="WpfPlot1" DockPanel.Dock="Top"/>
 
       </DockPanel>
-      <Popup Name="myPopup" Placement="MousePoint"  StaysOpen="True">
+      <Popup Name="myPopup" Placement="MousePoint"  StaysOpen="False">
         <Border BorderThickness="1">
-          <TextBlock Name="myPopupText" Background="LightBlue" Foreground="Blue" Padding="30">
+          <TextBlock Name="myPopupText" Background="Black" Foreground="White" Padding="3">
             Popup Text
           </TextBlock>
         </Border>
