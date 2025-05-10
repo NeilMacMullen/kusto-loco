@@ -181,8 +181,7 @@
                         Click="OnCopyImageToClipboard" />
 
               </StackPanel>
-              <scottplot:WpfPlot x:Name="WpfPlot1"
-                                 Loaded="WpfPlot1_OnLoaded" />
+              <local:Chart x:Name="TheChart"/>
             </DockPanel>
           </TabItem>
 

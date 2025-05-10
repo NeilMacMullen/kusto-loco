@@ -44,7 +44,7 @@ public partial class MainWindow : Window
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
         _wpfRenderingSurface = new WpfRenderingSurface(RenderingSurface, dataGrid,
-            DatagridOverflowWarning, WpfPlot1,
+            DatagridOverflowWarning, TheChart,
             settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _wpfRenderingSurface);
     }
@@ -546,9 +546,7 @@ public partial class MainWindow : Window
             }
     }
 
-    private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
-    {
-    }
+    
 
     private void AboutBox(object sender, RoutedEventArgs e)
     {
