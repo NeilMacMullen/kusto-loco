@@ -39,6 +39,7 @@ void ShowHelpIfAppropriate()
                 This program demonstrates the use of KQL to query a CSV file specified by the user.
                 Usage:
                  {programName} c:\temp\mydata.csv
+                Note that you must use Windows Terminal Preview in order to correctly display charts     
                 """;
     AnsiConsole.MarkupLineInterpolated($"[yellow]{help}[/]");
     Environment.Exit(0);
