@@ -452,12 +452,11 @@ Usage: {entry.Syntax}";
 
 public class SchemaIntellisenseProvider
 {
-    private readonly SchemaLine[] _dynamicSchema = [];
     private SchemaLine[] _schemaLines = [];
 
     private IEnumerable<SchemaLine> AllSchemaLines()
     {
-        return _schemaLines.Concat(_dynamicSchema);
+        return _schemaLines;
     }
 
 
