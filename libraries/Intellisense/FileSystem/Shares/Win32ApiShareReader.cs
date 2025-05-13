@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;
@@ -20,6 +19,7 @@ internal partial class Win32ApiShareReader(
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             logger.LogDebug("Share reader is not supported on this {Platform}", RuntimeInformation.OSDescription);
+            return [];
         }
 
         using var _ = logger.BeginScope(new()
@@ -129,15 +129,27 @@ internal partial class Win32ApiShareReader
 
 internal readonly record struct ShareInfo1(string Name = "", string Type = "", string Remark = "");
 
-[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+
 internal partial class Win32ApiShareReader
 {
-    private static IEnumerable<ShareInfo1> EnumerateShares(string host) =>
-        NetApi32
-            .NetShareEnum<NetApi32.SHARE_INFO_1>(host)
-            .Select(x =>
-                new ShareInfo1(x.shi1_netname.ToString(), x.shi1_type.ToString(), x.shi1_remark?.ToString() ?? "")
-            );
+    private static List<ShareInfo1> EnumerateShares(string host)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            throw new PlatformNotSupportedException();
+        }
+
+        var list = new List<ShareInfo1>();
+
+        // ReSharper disable once LoopCanBeConvertedToQuery why does platform check complain with linq even after materializing it
+        foreach (var item in NetApi32.NetShareEnum<NetApi32.SHARE_INFO_1>(host))
+        {
+            var share = new ShareInfo1(item.shi1_netname, item.shi1_type.ToString(), item.shi1_remark ?? "");
+            list.Add(share);
+        }
+
+        return list;
+    }
 }
 
 file static class TokenExtensions

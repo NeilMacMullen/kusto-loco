@@ -40,7 +40,7 @@ public class FileSystemIntellisenseServiceHostCompletionTests
         }
     }
 
-    [WindowsAdminOnlyFact]
+    [WindowsOnlyFact]
     public async Task GetPathIntellisenseOptions_UncPaths_ShowsLocalhost()
     {
         var provider = new ServiceCollection().AddDefault().BuildServiceProvider();
