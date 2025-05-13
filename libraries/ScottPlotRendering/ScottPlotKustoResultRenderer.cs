@@ -1,6 +1,7 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.SixelSupport;
+using NLog;
 using NotNullStrings;
 using ScottPlot;
 using ScottPlot.Colormaps;
@@ -152,6 +153,12 @@ public static class ScottPlotKustoResultRenderer
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
             StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
+
+            if (result.Visualization.PropertyOr("kind","") == "heatmap")
+            {
+                Console.WriteLine("here");
+            }
+            
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
