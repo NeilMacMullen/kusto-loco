@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
-using Moq;
 using Xunit;
 
 
@@ -245,31 +242,12 @@ public class FileSystemIntellisenseServiceTests
         {
             ["C:/Folder1/File1.txt"] = new("")
         };
-    
+
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-    
+
         await f
             .Invoking(async x => await x.GetPathIntellisenseOptionsAsync(path))
             .Should()
             .NotThrowAsync();
-    }
-    
-    [WindowsOnlyFact]
-    public async Task GetPathIntellisenseOptions_IOException_LogsError()
-    {
-    
-        var mock = new Mock<IFileSystemReader>();
-        mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<PathTooLongException>();
-    
-        var f = new FileSystemIntellisenseServiceTestFixture(mock.Object);
-    
-        f.GetLogs().Should().NotContain(x => x.Exception is IOException);
-    
-        await f
-            .Invoking(async x => await x.GetPathIntellisenseOptionsAsync(""))
-            .Should()
-            .NotThrowAsync();
-
-        f.GetLogs().Should().ContainSingle(x => x.Exception is IOException);
     }
 }

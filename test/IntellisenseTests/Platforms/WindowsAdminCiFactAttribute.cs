@@ -4,9 +4,9 @@ using Xunit;
 
 namespace IntellisenseTests.Platforms;
 
-public sealed class WindowsAdminOnlyFactAttribute : FactAttribute
+public sealed class WindowsAdminCiFactAttribute : FactAttribute
 {
-    public WindowsAdminOnlyFactAttribute()
+    public WindowsAdminCiFactAttribute()
     {
         if (!PlatformHelper.IsCi())
         {
@@ -14,17 +14,13 @@ public sealed class WindowsAdminOnlyFactAttribute : FactAttribute
             return;
         }
 
-        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-        if (!isWindows)
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             Skip = PlatformHelper.WindowsSkipMessage;
             return;
         }
 
-        var isAdmin = PlatformHelper.IsWindowsAdmin();
-
-        if (!isAdmin)
+        if (!PlatformHelper.IsWindowsAdmin())
         {
             throw new InvalidOperationException("Windows CI should not skip admin tests");
         }

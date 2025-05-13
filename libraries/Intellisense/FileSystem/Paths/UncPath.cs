@@ -1,44 +1,47 @@
-using System.Net;
 using NotNullStrings;
 
 namespace Intellisense.FileSystem.Paths;
 
-
-internal class UncPath(Uri uri) : IFileSystemPath
+internal class UncPath(Uri uri) : FileSystemPath(uri.OriginalString)
 {
+    /// <summary>
+    /// Checks if the UNC path only contains a host i.e. \\127.0.0.1\
+    /// </summary>
+    public bool IsOnlyHost => uri.Segments.Length is 1;
 
-    public string GetPath() => uri.OriginalString;
-    public bool IsRootDirectory() => false;
+    public bool HasValidHost => uri.HostNameType is not UriHostNameType.Unknown;
 
-    public bool IsHost()
-    {
-        var uriPath = uri.GetComponents(UriComponents.Path, UriFormat.UriEscaped);
-        return uriPath.IsBlank() && HasValidHost();
-    }
+    /// <summary>
+    /// Checks if the UNC path contains both the host and share i.e. \\127.0.0.1\share\
+    /// </summary>
+    public bool IsOnlyHostAndShare => uri.Segments.Length is 2;
 
-    private bool HasValidHost() => Uri.CheckHostName(uri.Host) is not UriHostNameType.Unknown;
-
-    public bool IsShare() => uri.Segments.Length is 2;
-
-    public string Host
+    /// <summary>
+    /// Retrieves the host segment of the UNC path i.e. "localhost" from \\localhost\share1\
+    /// </summary>
+    public string OriginalHost
     {
         get
         {
             // uri.Host changes 127 => 127.0.0.0
             // we want to preserve original for autocompletion with partial ip addresses
-            var host = uri.Host;
-            if (uri.Segments.Length is not 1)
+
+
+            if (uri.HostNameType is not (UriHostNameType.IPv4 or UriHostNameType.IPv6))
             {
-                return host;
-            }
-            if (!IPAddress.TryParse(host, out _))
-            {
-                return host;
+                return uri.Host;
             }
 
-            return uri.OriginalString.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            return uri
+                .OriginalString.Skip(2)
+                .TakeWhile(x => x != Path.AltDirectorySeparatorChar && x != Path.DirectorySeparatorChar)
+                .JoinString("");
         }
     }
 
-    public string Share => uri.Segments is not [_, var share] ? string.Empty : share.Trim(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar);
+    public string Share => uri.Segments.Length < 2
+        ? string.Empty
+        : uri.Segments[1].Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+    public override bool IsRootDirectory => IsOnlyHostAndShare && EndsWithDirectorySeparator;
 }

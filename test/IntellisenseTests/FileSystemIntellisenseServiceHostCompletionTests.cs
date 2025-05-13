@@ -5,49 +5,46 @@ using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 using static SimpleExec.Command;
 
 namespace IntellisenseTests;
 
-public class FileSystemIntellisenseServiceHostCompletionTests
+public class FileSystemIntellisenseServiceHostCompletionTests : IAsyncLifetime
 {
-    [WindowsAdminOnlyFact]
-    public async Task GetPathIntellisenseOptions_UncPaths_ShowsServersFromPersistedShareConnections()
+    private IFileSystemIntellisenseService _service = null!;
+
+    public async Task InitializeAsync()
     {
-        var loopback = IPAddress.Loopback;
-        using var share = TestShare.Create();
-        var provider = new ServiceCollection().AddDefault().BuildServiceProvider();
+        var provider = new ServiceCollection().AddDefaultIntellisense().BuildServiceProvider();
         var service = provider.GetRequiredService<IFileSystemIntellisenseService>();
+        var result = await service.GetPathIntellisenseOptionsAsync("//");
 
-
-        var result1 = await service.GetPathIntellisenseOptionsAsync("//");
-        result1
+        result
             .Entries.Should()
-            .NotContain(x => x.Name == loopback.ToString(),
-                "Error: Cannot run test when loopback address is already in use for SMB share. Disable this test if you need it for some other reason, otherwise remove the connection."
+            .NotContain(x => x.Name == IPAddress.Loopback.ToString(),
+                "Error: Cannot run test when loopback address is already in use for SMB share."
             );
-
-
-        try
-        {
-            await RunAsync("net", $@"use \\{loopback}", noEcho: true);
-            var result = await service.GetPathIntellisenseOptionsAsync("//");
-            result.Entries.Should().ContainSingle(x => x.Name == loopback.ToString());
-        }
-        finally
-        {
-            await RunAsync("net", $@"use \\{loopback} /delete", noEcho: true);
-        }
+        await RunAsync("net", $@"use \\{IPAddress.Loopback}", noEcho: true);
+        _service = service;
     }
 
-    [WindowsAdminOnlyFact]
-    public async Task GetPathIntellisenseOptions_UncPaths_ShowsLocalhost()
+    public async Task DisposeAsync() => await RunAsync("net", $@"use \\{IPAddress.Loopback} /delete", noEcho: true);
+
+    [WindowsAdminCiFact]
+    public async Task GetPathIntellisenseOptions_TwoSlash_ShowsServersFromPersistedShareConnections()
     {
-        var provider = new ServiceCollection().AddDefault().BuildServiceProvider();
-        var service = provider.GetRequiredService<IFileSystemIntellisenseService>();
-
-
-        var result1 = await service.GetPathIntellisenseOptionsAsync("//");
-        result1.Entries.Should().ContainSingle(x => x.Name == Constants.LocalHost);
+        var result = await _service.GetPathIntellisenseOptionsAsync("//");
+        result.Entries.Should().ContainSingle(x => x.Name == IPAddress.Loopback.ToString());
     }
+
+    [WindowsAdminCiFact]
+    public async Task GetPathIntellisenseOptions_PartialHost_ShowsServersFromPersistedShareConnectionsWithFilter()
+    {
+        var result = await _service.GetPathIntellisenseOptionsAsync("//172.");
+        result.Entries.Should().ContainSingle(x => x.Name == IPAddress.Loopback.ToString());
+        result.Filter.Should().Be("172.");
+    }
+
+
 }

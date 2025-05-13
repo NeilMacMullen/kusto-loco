@@ -1,11 +1,8 @@
 ﻿namespace Intellisense.FileSystem.Paths;
 
 
-internal class EmptyPath : IFileSystemPath
+internal class EmptyPath(string value) : FileSystemPath(value)
 {
-    public string GetPath() => string.Empty;
-
-    public bool IsRootDirectory() => false;
-
-    public static readonly EmptyPath Instance = new();
+    public static readonly EmptyPath Instance = new("");
+    public override bool IsRootDirectory => false;
 }

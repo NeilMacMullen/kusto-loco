@@ -1,24 +1,27 @@
 using System;
 using System.IO;
 using System.IO.Abstractions;
-using Intellisense.FileSystem;
 
 namespace IntellisenseTests;
 
-public static  class TestHelper
+public static class TestHelper
 {
-    public static FileSystem FileSystem { get; } = new();
-    public static Guid RunId { get; } = Guid.NewGuid();
+    private static FileSystem FileSystem { get; } = new();
+    private static Guid RunId { get; } = Guid.NewGuid();
 
-    public static IDirectoryInfo TestDirectory { get; } =
-        FileSystem.DirectoryInfo.New(Path.Combine(Path.GetTempPath(), nameof(IntellisenseTests)));
+    public static IDirectoryInfo TestDirectory { get; } = FileSystem.DirectoryInfo.New(Path.Combine(Path.GetTempPath(), nameof(IntellisenseTests)));
 
-    public static IDirectoryInfo RunDirectory { get; } = FileSystem.DirectoryInfo.New(Path.Combine(TestDirectory.FullName, RunId.ToString()));
-    public static IDirectoryInfo MethodDirectory() => FileSystem.DirectoryInfo.New(Path.Combine(RunDirectory.FullName, $"{Guid.NewGuid()}"));
+    private static IDirectoryInfo RunDirectory { get; } = FileSystem.DirectoryInfo.New(Path.Combine(TestDirectory.FullName, RunId.ToString()));
+    private static IDirectoryInfo IndividualTestDirectory(string name) => FileSystem.DirectoryInfo.New(Path.Combine(RunDirectory.FullName, name));
 
-    public static IDirectoryInfo CreateCleanTestDirectory()
+    public static IDirectoryInfo CreateCleanTestDirectory(string name = "")
     {
-        var dir = MethodDirectory();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = Guid.NewGuid().ToString();
+        }
+
+        var dir = IndividualTestDirectory(name);
         dir.CreateOrClean();
         return dir;
     }

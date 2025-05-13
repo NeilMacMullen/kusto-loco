@@ -3,33 +3,29 @@ using Intellisense.FileSystem.Shares;
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-internal class SharePathCompletionResultRetriever(IShareReader shareReader)
+internal class SharePathCompletionResultRetriever(IShareService shareService)
     : IFileSystemPathCompletionResultRetriever
 {
-
-    public async Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath)
+    public async Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
     {
-        if (fileSystemPath is not UncPath p)
+        if (path is not UncPath { IsOnlyHostAndShare: true } p)
         {
             return CompletionResult.Empty;
         }
 
-        var path = p.GetPath();
-
-        if (p.IsHost() && path.EndsWithDirectorySeparator())
+        return (await shareService.GetSharesAsync(p.OriginalHost)).ToCompletionResult() with
         {
-            return (await shareReader.GetSharesAsync(p.Host)).ToCompletionResult();
+            Filter = p.Share
+        };
+    }
+
+    public async Task<CompletionResult> GetChildrenAsync(FileSystemPath path)
+    {
+        if (path is not UncPath { IsOnlyHost: true } p)
+        {
+            return CompletionResult.Empty;
         }
 
-        if (p.IsShare() && !path.EndsWithDirectorySeparator())
-        {
-            return (await shareReader.GetSharesAsync(p.Host)).ToCompletionResult() with
-            {
-                Filter = p.Share
-            };
-        }
-
-        return CompletionResult.Empty;
-
+        return (await shareService.GetSharesAsync(p.OriginalHost)).ToCompletionResult();
     }
 }

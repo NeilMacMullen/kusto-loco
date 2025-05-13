@@ -57,7 +57,7 @@ public partial class QueryEditor : UserControl
         InitializeComponent();
         Query.TextArea.TextEntering += textEditor_TextArea_TextEntering;
         Query.TextArea.TextEntered += textEditor_TextArea_TextEntered;
-        Query.TextArea.Caret.PositionChanged += async (_,_) => await _intellisenseClient.CancelPendingRequests();
+        Query.TextArea.Caret.PositionChanged += async (_,_) => await _intellisenseClient.CancelRequestAsync();
 
         _editorHelper = new EditorHelper(Query);
     }
@@ -295,7 +295,7 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        var result = await _intellisenseClient.GetPathIntellisenseOptionsAsync(path);
+        var result = await _intellisenseClient.GetCompletionResultAsync(path);
         if (result.IsEmpty())
         {
             return false;

@@ -1,29 +1,31 @@
 using Intellisense.FileSystem.Paths;
 using Intellisense.FileSystem.Shares;
 
-
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-internal class HostPathCompletionResultRetriever(IHostReader reader)
+internal class HostPathCompletionResultRetriever(IShareService shareService)
     : IFileSystemPathCompletionResultRetriever
 {
-    public async Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath)
+    public async Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
     {
-        if (fileSystemPath.GetPath() is "//" or @"\\")
+        if (path is not UncPath { IsOnlyHost: true } p)
         {
-            var result = await reader.GetHostsAsync();
-            return result.ToCompletionResult();
+            return CompletionResult.Empty;
         }
 
-        if (fileSystemPath is UncPath p && p.IsHost() && !p.GetPath().EndsWithDirectorySeparator())
+        return (await shareService.GetHostsAsync()).ToCompletionResult() with
         {
-            var result = await reader.GetHostsAsync();
-            return result.ToCompletionResult() with
-            {
-                Filter = p.Host
-            };
+            Filter = p.OriginalHost
+        };
+    }
+
+    public async Task<CompletionResult> GetChildrenAsync(FileSystemPath path)
+    {
+        if (path.Value is not ("//" or @"\\"))
+        {
+            return CompletionResult.Empty;
         }
 
-        return CompletionResult.Empty;
+        return (await shareService.GetHostsAsync()).ToCompletionResult();
     }
 }

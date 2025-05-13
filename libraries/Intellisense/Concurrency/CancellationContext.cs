@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Intellisense;
+namespace Intellisense.Concurrency;
 
 /// <summary>
 /// Wrapper around a cancellation token for use in scoped requests.
@@ -9,15 +9,12 @@ namespace Intellisense;
 internal class CancellationContext : IDisposable
 {
     public CancellationTokenSource TokenSource { get; private set; } = new();
-    public void LinkToken(CancellationToken token)
-    {
-        var prev = TokenSource;
-        TokenSource = CancellationTokenSource.CreateLinkedTokenSource(token,prev.Token);
-    }
+
+    public void LinkToken(CancellationToken token) =>
+        TokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, TokenSource.Token);
 
     public void Dispose() => TokenSource.Dispose();
 }
-
 
 internal static class CancellationContextServiceCollectionExtensions
 {

@@ -1,13 +1,11 @@
 ﻿using System.IO;
 using System.Windows;
-
 using System.Windows.Threading;
 using Intellisense.Configuration;
 using LogSetup;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace lokqlDx;
 
@@ -40,12 +38,7 @@ public partial class App
         appBuilder
             .Services
             .AddIntellisense()
-            .AddSingleton<IntellisenseClient>()
-            .Configure<IntellisenseOptions>(opts =>
-            {
-                opts.Timeout = TimeSpan.FromSeconds(10);
-                opts.Directory = AppPath;
-            })
+            .AddSingleton<GlobalExceptionHandler>()
             .Configure<LoggingOptions>(x => x.Directory = AppPath);
 
         return appBuilder.Build();
@@ -63,15 +56,18 @@ public partial class App
     /// </summary>
     private async void OnExit(object sender, ExitEventArgs e)
     {
+        var logger = Resolve<ILogger<App>>();
         try
         {
             await Instance.StopAsync();
-
-            Instance.Dispose();
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Unhandled exception");
+            logger.LogCritical(ex, "Unhandled exception while closing application.");
+        }
+        finally
+        {
+            Instance.Dispose();
         }
 
     }
@@ -83,20 +79,9 @@ public partial class App
     {
         // For more info see https://docs.microsoft.com/en-us/dotnet/api/system.windows.application.dispatcherunhandledexception?view=windowsdesktop-6.0
 
-        var logger = Resolve<ILogger<App>>();
-        if (e.Exception is OperationCanceledException exc)
-        {
-            logger.LogDebug(exc,"Operation was cancelled.");
-        }
-        else
-        {
-            logger.LogError(e.Exception, "Application exception occurred.");
-        }
+        var handler = Resolve<GlobalExceptionHandler>();
 
-
-        // top level exception handler
-        // keep app open with unhandled exception unless there is risk of data corruption, then add handling for it here
-        e.Handled = true;
+        e.Handled = handler.Handle(e.Exception);
     }
 }
 

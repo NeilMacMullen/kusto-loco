@@ -1,14 +1,12 @@
 using System.IO.Abstractions;
-using System.Reflection;
 using System.Runtime.InteropServices;
+using Intellisense.Concurrency;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.CompletionResultRetrievers;
 using Intellisense.FileSystem.Paths;
 using Intellisense.FileSystem.Shares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Intellisense.Configuration;
 
@@ -16,49 +14,36 @@ public static class IntellisenseServiceCollectionExtensions
 {
     public static IServiceCollection AddIntellisense(this IServiceCollection services)
     {
-        // main services
-        services.AddSingleton<IFileSystemIntellisenseService, FileSystemIntellisenseService>();
+        services.AddSingleton<IntellisenseClient>();
+        services.AddSingleton<IIntellisenseService, IntellisenseService>();
 
-        services.Configure<IntellisenseOptions>(x =>
-            {
-                // default location
-                var folder1 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "Unknown";
-                x.Directory = Path.Combine(folder1, appName);
-            }
-        );
-
-
-        // file system
         services.AddSingleton<IFileSystemReader, FileSystemReader>();
+        services.AddScoped<IFileSystemIntellisenseService, FileSystemIntellisenseService>();
 
-        // completion results
-        services
-            .AddScoped<IFileSystemPathCompletionResultRetriever, ChildrenPathCompletionResultRetriever>()
-            .AddScoped<IFileSystemPathCompletionResultRetriever, SiblingPathCompletionResultRetriever>()
-            .AddScoped<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()
-            .AddScoped<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
+        services.AddScoped<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>();
+        services.AddScoped<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>();
+        services.AddScoped<IFileSystemPathCompletionResultRetriever, LocalFileSystemCompletionResultRetriever>();
 
-        // path processing
         services.AddSingleton<IPathFactory, PathFactory>();
-
-        // shares
-
-        services
-            .AddScoped<IShareReader, Win32ApiShareReader>()
-            .AddScoped<IHostReader, Win32ApiHostReader>();
-
-        services.AddScoped<IConnectionVerifier, ConnectionVerifier>();
+        AddShareService(services);
 
 
-        // timeouts
-        services.AddCancellationContext();
-
-        // auxiliary services
         services.TryAddSingleton<IFileSystem, System.IO.Abstractions.FileSystem>();
-        services.TryAddSingleton(TimeProvider.System);
+        services.AddCancellationContext();
+        services.AddSingleton<ExclusiveRequestSession>();
 
 
         return services;
+    }
+
+    private static void AddShareService(IServiceCollection services)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            services.AddScoped<IShareService, NullShareService>();
+            return;
+        }
+
+        services.AddScoped<IShareService, Win32ApiService>();
     }
 }
