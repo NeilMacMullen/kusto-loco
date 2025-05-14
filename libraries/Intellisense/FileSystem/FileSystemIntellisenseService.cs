@@ -1,6 +1,9 @@
-﻿using Intellisense.FileSystem.CompletionResultRetrievers;
+﻿using System.Runtime.CompilerServices;
+using Intellisense.Configuration;
 using Intellisense.FileSystem.Paths;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Intellisense.FileSystem;
 
@@ -12,44 +15,71 @@ public interface IFileSystemIntellisenseService
     /// <returns>
     /// An empty completion result if the path is invalid, does not exist, or does not have any children.
     /// </returns>
-    CompletionResult GetPathIntellisenseOptions(string path);
+    Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path, CancellationToken cancelToken = default);
 }
 
-internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
+internal class FileSystemIntellisenseService(
+    ILogger<IFileSystemIntellisenseService> logger,
+    IPathFactory pathFactory,
+    IServiceScopeFactory scopeFactory,
+    IOptions<IntellisenseOptions> timeoutOptions
+)
+    : IFileSystemIntellisenseService
 {
-    private readonly IFileSystemPathCompletionResultRetriever[] _retrievers;
-    private readonly ILogger<IFileSystemIntellisenseService> _logger;
-    private readonly IRootedPathFactory _rootedPathFactory;
-
-    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger, IRootedPathFactory rootedPathFactory)
+    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(
+        string path,
+        CancellationToken cancelToken = default
+    )
     {
-        _rootedPathFactory = rootedPathFactory;
-        _logger = logger;
-        _retrievers =
-        [
-            new ChildrenPathCompletionResultRetriever(reader),
-            new SiblingPathCompletionResultRetriever(reader)
-        ];
-    }
-
-    public CompletionResult GetPathIntellisenseOptions(string path)
-    {
+        using var scope = scopeFactory.CreateScope();
+        var retrievers =
+            scope.ServiceProvider.GetRequiredService<IEnumerable<IFileSystemPathCompletionResultRetriever>>();
+        using var ctx = scope.ServiceProvider.GetRequiredService<CancellationContext>();
+        ctx.TokenSource.CancelAfter(timeoutOptions.Value.Timeout);
+        ctx.LinkToken(cancelToken);
+        using var _ = logger.BeginScope(new()
+            {
+                [nameof(path)] = path,
+                [nameof(timeoutOptions.Value.Timeout)] = timeoutOptions.Value.Timeout,
+            }
+        );
+        var token = ctx.TokenSource.Token;
 
         try
         {
-            // Only rooted paths supported at this time
+            var pathObj = pathFactory.Create(path);
 
-            var rootedPath = _rootedPathFactory.Create(path);
+            var result = await retrievers
+                .Select(x => x.GetCompletionResultAsync(pathObj))
+                .WhenEach(token)
+                .Where(x => !x.IsEmpty())
+                .FirstOrDefaultAsync(token);
 
-            return _retrievers
-                .Select(x => x.GetCompletionResult(rootedPath))
-                .FirstOrDefault(x => !x.IsEmpty(),CompletionResult.Empty);
-
+            return result ?? CompletionResult.Empty;
+        }
+        catch (OperationCanceledException e)
+        {
+            logger.LogTrace(e, "Cancelled or timed out while fetching intellisense results.");
+            throw;
         }
         catch (IOException e)
         {
-            _logger.LogError(e,"IO error occurred while fetching intellisense results. Returning empty result.");
+            logger.LogError(e, "IO Error occurred while fetching intellisense results. Returning empty result.");
             return CompletionResult.Empty;
+        }
+    }
+}
+
+file static class AsyncExtensions
+{
+    public static async IAsyncEnumerable<T> WhenEach<T>(this IEnumerable<Task<T>> tasks, [EnumeratorCancellation] CancellationToken token)
+    {
+        ConfiguredCancelableAsyncEnumerable<Task<T>> enumerator = Task.WhenEach(tasks).WithCancellation(token);
+
+        await foreach (Task<T> item in enumerator)
+        {
+            yield return await item;
+
         }
     }
 }

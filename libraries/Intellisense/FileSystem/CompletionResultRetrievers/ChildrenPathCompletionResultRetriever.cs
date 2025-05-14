@@ -10,27 +10,21 @@ internal class ChildrenPathCompletionResultRetriever(IFileSystemReader reader)
 {
     public CompletionResult GetCompletionResult(IFileSystemPath fileSystemPath)
     {
-        var dir = GetTargetDirectory(fileSystemPath);
-
-        return reader
-            .GetChildren(dir)
-            .ToCompletionResult();
-    }
-
-    private static string GetTargetDirectory(IFileSystemPath fileSystemPath)
-    {
         var path = fileSystemPath.GetPath();
         if (!path.EndsWithDirectorySeparator())
         {
-            return string.Empty;
+            return CompletionResult.Empty;
         }
 
         if (fileSystemPath.IsRootDirectory())
         {
-            return path;
+            return reader.GetChildren(path).ToCompletionResult();
         }
 
-        return Path.GetDirectoryName(path) ?? string.Empty;
-
+        return reader
+            .GetChildren(fileSystemPath.GetParent())
+            .ToCompletionResult();
     }
+
+    public Task<CompletionResult> GetCompletionResultAsync(IFileSystemPath fileSystemPath) => Task.FromResult(GetCompletionResult(fileSystemPath));
 }
