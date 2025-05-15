@@ -1,8 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Presentation;
 using KustoLoco.Core;
 using NLog;
 using NotNullStrings;
 using ShapeCrawler;
+using Presentation = ShapeCrawler.Presentation;
 
 namespace Lokql.Engine.Commands;
 
@@ -125,8 +127,8 @@ public class PptReportTarget : IReportTarget
 
     private ISlide AddSlide()
     {
-
-        _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
+        var layout = _pres.SlideMasters[0].SlideLayouts[0];
+        _pres.Slides.Add(layout.Number);
         return _pres.Slides.Last();
     }
 

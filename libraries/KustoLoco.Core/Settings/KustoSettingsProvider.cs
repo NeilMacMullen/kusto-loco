@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using NLog.LayoutRenderers;
 using NotNullStrings;
 
 namespace KustoLoco.Core.Settings;
@@ -40,7 +42,11 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
+    {
+        
+        _settingsStack.Push(layer);
+    }
 
     public ImmutableDictionary<string, RawKustoSetting> Pop()
     {
@@ -52,9 +58,12 @@ public class KustoSettingsProvider
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
-        var settings = Pop();
-        settings = settings.SetItem(k.Key, k);
-        Push(settings);
+
+        var all = _settingsStack.Reverse().ToArray();
+        var last = all[0];
+        last = last.SetItem(k.Key, k);
+        all[0] = last;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>(all);
     }
 
     public void Set(string setting, bool value) => Set(setting, value.ToString());
