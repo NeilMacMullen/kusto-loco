@@ -88,4 +88,24 @@ public class KustoSettingsTester
         settings.GetOr("s1", "").Should().Be("");
         settings.GetOr("s2", "").Should().Be("");
     }
+
+    [TestMethod]
+    public void SettingsInsideMacrosDontGetLost()
+    {
+        var coreSettings = new KustoSettingsProvider();
+        coreSettings.Set("s1","s1");
+        coreSettings.Set("s2","s2");
+
+        
+        var newLayer = new KustoSettingsProvider();
+        newLayer.Set("s1","new");
+        newLayer.Set("s2","layered");
+        coreSettings.AddLayer(newLayer);
+
+        coreSettings.Set("s1", "frominside");
+        coreSettings.Pop();
+
+        coreSettings.GetOr("s1", "").Should().Be("frominside");
+        coreSettings.GetOr("s2", "").Should().Be("s2");
+    }
 }
