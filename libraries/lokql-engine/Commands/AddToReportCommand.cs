@@ -8,12 +8,14 @@ public static class AddToReportCommand
     internal static Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;
-        var resultName = o.ResultName.IsBlank() ? o.Element : o.ResultName;
+        var resultName = o.ResultName.IsBlank()
+                             ? o.Element
+                             : o.ResultName;
 
         var result = exp._resultHistory.Fetch(resultName);
 
         var type = o.Type.Trim().ToLowerInvariant();
-        
+
         switch (type)
         {
             case "image":
@@ -23,16 +25,19 @@ public static class AddToReportCommand
                 exp.ActiveReport.UpdateOrAddTable(o.Element, result);
                 break;
             case "text":
-                var text = (result.RowCount > 0) ? result.Get(0, 0)?.ToString()??"<null>" : "no data";
+                var text = (result.RowCount > 0)
+                               ? result.Get(0, 0)?.ToString() ?? "<null>"
+                               : "no data";
                 exp.ActiveReport.UpdateOrAddText(o.Element, text);
                 break;
             case "literal":
                 exp.ActiveReport.UpdateOrAddText(o.Element, o.ResultName);
                 break;
-            default :
-                exp.Warn("Unrecognised type '{}'");
+            default:
+                exp.Warn($"Unrecognised type '{type}'");
                 break;
         }
+
         return Task.CompletedTask;
     }
 
@@ -50,8 +55,8 @@ Examples:
 ")]
     internal class Options
     {
-        [Value(0,Required = true)] public string Type { get; set; } = string.Empty;
-        [Value(1,Required = true)] public string Element { get; set; } = string.Empty;
+        [Value(0, Required = true)] public string Type { get; set; } = string.Empty;
+        [Value(1, Required = true)] public string Element { get; set; } = string.Empty;
         [Value(2)] public string ResultName { get; set; } = string.Empty;
     }
 }
