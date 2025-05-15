@@ -40,7 +40,11 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
+    {
+        
+        _settingsStack.Push(layer);
+    }
 
     public ImmutableDictionary<string, RawKustoSetting> Pop()
     {
