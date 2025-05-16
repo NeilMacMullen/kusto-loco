@@ -42,7 +42,11 @@ public class ColumnBuilder<T> : BaseColumnBuilder
     public override void AddCapacity(int n) =>
         _data.Capacity = _data.Count + n;
 
-    public override void TrimExcess() => _data.TrimExcess();
+    public override void TrimExcess()
+    {
+        _pool.Reset();
+        _data.TrimExcess();
+    }
 
     public override void Add(object? value)
     {
@@ -68,6 +72,11 @@ public class ColumnBuilder<T> : BaseColumnBuilder
         }
     }
 
-    public override BaseColumn ToColumn() => ColumnFactory.Create(_data.ToArray());
+    public override BaseColumn ToColumn()
+    {
+        TrimExcess();
+        return ColumnFactory.Create(_data.ToArray());
+    }
+
     public override Array GetDataAsArray() => _data.ToArray();
 }
