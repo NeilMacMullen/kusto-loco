@@ -3476,7 +3476,7 @@ let Y = datatable(Key:string, Value2:long, Value3:string)
     'd',40,'dd',
 ];
 X | join kind=rightouter Y on Key
-| order by Key asc nulls last, Key1 asc
+| order by Value2 asc nulls last, Key1 asc
 ";
 
         var expected = @"
@@ -3513,7 +3513,7 @@ let Y = datatable(Key:string, Value2:long)
     'd',40
 ];
 X | join kind=fullouter Y on Key
-| order by Key asc nulls last, Key1 asc nulls first
+| order by Value1  asc nulls last, Key1 asc nulls first
 ";
 
         var expected = @"
