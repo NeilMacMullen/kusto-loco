@@ -35,6 +35,7 @@ public class CommandProcessor
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
                 .WithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
+                .WithAdditionalCommand<AdxCommand.Options>(AdxCommand.RunAsync)
                 .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.RunAsync)
                 .WithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
                 .WithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
