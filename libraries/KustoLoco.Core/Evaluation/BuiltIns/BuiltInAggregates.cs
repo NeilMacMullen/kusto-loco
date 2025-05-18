@@ -5,10 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
-using KustoLoco.Core.InternalRepresentation;
 using Kusto.Language;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
@@ -318,10 +317,8 @@ internal static class BuiltInAggregates
         List<Parameter> parameters)
     {
         if (!TryGetOverload(symbol, arguments, parameters, out var overload))
-        {
             throw new NotImplementedException(
                 $"Aggregate function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
-        }
 
         Debug.Assert(overload != null);
         return overload;
