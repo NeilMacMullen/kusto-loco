@@ -19,13 +19,14 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitJoinOperator(IRJoinOperatorNode node, EvaluationContext context)
     {
         var result = new JoinResultTable(this, context.Left.Value, node.Expression, node.Kind, context,
-            node.OnClauses, (TableSymbol)node.ResultType);
+            node.OnClauses, (TableSymbol)node.ResultType, node.IsLookup);
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
     private class JoinResultTable : ITableSource
     {
         private readonly EvaluationContext _context;
+        private readonly bool _isLookup;
         private readonly IRJoinKind _joinKind;
         private readonly ITableSource _left;
         private readonly List<IRJoinOnClause> _onClauses;
@@ -33,7 +34,8 @@ internal partial class TreeEvaluator
         private readonly IRExpressionNode _rightExpression;
 
         public JoinResultTable(TreeEvaluator owner, ITableSource left, IRExpressionNode rightExpression,
-            IRJoinKind joinKind, EvaluationContext context, List<IRJoinOnClause> onClauses, TableSymbol resultType)
+            IRJoinKind joinKind, EvaluationContext context, List<IRJoinOnClause> onClauses, TableSymbol resultType,
+            bool isLookup)
         {
             _owner = owner;
             _left = left;
@@ -41,6 +43,7 @@ internal partial class TreeEvaluator
             _joinKind = joinKind;
             _context = context;
             _onClauses = onClauses;
+            _isLookup = isLookup;
             Type = resultType;
         }
 
@@ -149,6 +152,7 @@ internal partial class TreeEvaluator
                     }
             }
 
+            rightColumns = FilterRightColumnsForLookup(rightColumns);
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
         }
 
@@ -187,11 +191,12 @@ internal partial class TreeEvaluator
         private BaseColumnBuilder[] BuildersFromBucketed(BucketedRows b)
             => b.Table.Type.Columns.Select(c => ColumnHelpers.CreateBuilder(c.Type)).ToArray();
 
-      
+
         private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
         {
             var leftColumns = BuildersFromBucketed(left);
             var rightColumns = BuildersFromBucketed(right);
+
 
             foreach (var (key, leftValue) in left.Buckets)
                 if (right.Buckets.TryGetValue(key, out var rightValue))
@@ -209,7 +214,21 @@ internal partial class TreeEvaluator
                             rightColumns[c].Add(null);
                     }
 
+            rightColumns = FilterRightColumnsForLookup(rightColumns);
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
+        }
+
+        private BaseColumnBuilder[] FilterRightColumnsForLookup(BaseColumnBuilder[] rightColumns)
+        {
+            if (!_isLookup)
+                return rightColumns;
+            var rightOns = _onClauses
+                .Select(c => c.Right.ReferencedColumnIndex)
+                .ToArray();
+            return rightColumns.Index()
+                .Where(v => !rightOns.Contains(v.Index))
+                .Select(v => v.Item)
+                .ToArray();
         }
 
         private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
@@ -266,7 +285,6 @@ internal partial class TreeEvaluator
 
         private IEnumerable<ITableChunk> FullOuterJoin(BucketedRows left, BucketedRows right)
         {
-           
             var leftColumns = BuildersFromBucketed(left);
             var rightColumns = BuildersFromBucketed(right);
 
