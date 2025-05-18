@@ -135,7 +135,7 @@ public class ResultChartAccessor
 
     public double GetSuggestedBarWidth()
     {
-        if (_result.RowCount < 1)
+        if (_result.RowCount < 2)
             return 1.0;
         if (XisDateTime)
         {

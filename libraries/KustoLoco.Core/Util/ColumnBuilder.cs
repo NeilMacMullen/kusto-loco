@@ -3,18 +3,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Text.Json.Nodes;
 using CommunityToolkit.HighPerformance.Buffers;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using NotNullStrings;
 
 namespace KustoLoco.Core.Util;
 
 public class ColumnBuilder<T> : BaseColumnBuilder
 {
     private readonly List<T?> _data = [];
-    private StringPool _pool=new StringPool(1000);
+
     public ColumnBuilder() : this(string.Empty)
     {
     }
@@ -22,7 +23,6 @@ public class ColumnBuilder<T> : BaseColumnBuilder
     public ColumnBuilder(string name)
     {
         Name = name;
-        
     }
 
     public override int RowCount => _data.Count;
@@ -42,26 +42,25 @@ public class ColumnBuilder<T> : BaseColumnBuilder
     public override void AddCapacity(int n) =>
         _data.Capacity = _data.Count + n;
 
-    public override void TrimExcess()
-    {
-        _pool.Reset();
+    public override void TrimExcess() =>
+      
         _data.TrimExcess();
-    }
 
     public override void Add(object? value)
     {
+        //prevent null strings being added
+        if (typeof(T) == typeof(string) && value is null)
+            value = string.Empty;
+        
         if (typeof(T) == typeof(JsonNode))
         {
             _data.Add((T?)value);
         }
-        else if (value is string str)
+        else if (
+            typeof(T) == typeof(DateTime?) &&
+            value is DateTime dt)
         {
-            str = _pool.GetOrAdd(str);
-            _data.Add(TypeMapping.CastOrConvertToNullable<T>(str));
-        }
-        else if (value is DateTime dt)
-        {
-            if (dt.Kind == DateTimeKind.Unspecified)
+           if (dt.Kind == DateTimeKind.Unspecified)
                 dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
             if (dt.Kind == DateTimeKind.Local) dt = dt.ToUniversalTime();
             _data.Add(TypeMapping.CastOrConvertToNullable<T>(dt));
@@ -75,6 +74,14 @@ public class ColumnBuilder<T> : BaseColumnBuilder
     public override BaseColumn ToColumn()
     {
         TrimExcess();
+        if (typeof(T) == typeof(string) && _data.Count>10000)
+        {
+            var pool = new StringPool(1000);
+            var c = _data.Select(d => pool.GetOrAdd((d as string).NullToEmpty()))
+                .ToArray();
+            return ColumnFactory.Create(c);
+           
+        }
         return ColumnFactory.Create(_data.ToArray());
     }
 

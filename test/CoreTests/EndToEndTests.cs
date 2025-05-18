@@ -3,11 +3,10 @@
 
 using System;
 using System.Diagnostics;
+using FluentAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
-using FluentAssertions;
-using KustoLoco.Core.Console;
 using LogSetup;
 using NLog;
 using Xunit;
@@ -3476,7 +3475,7 @@ let Y = datatable(Key:string, Value2:long, Value3:string)
     'd',40,'dd',
 ];
 X | join kind=rightouter Y on Key
-| order by Key asc nulls last, Key1 asc
+| order by Value2 asc nulls last, Key1 asc
 ";
 
         var expected = @"
@@ -3513,7 +3512,7 @@ let Y = datatable(Key:string, Value2:long)
     'd',40
 ];
 X | join kind=fullouter Y on Key
-| order by Key asc nulls last, Key1 asc nulls first
+| order by Value1  asc nulls last, Key1 asc nulls first
 ";
 
         var expected = @"
@@ -4066,139 +4065,38 @@ aaathis is a test";
         vis.Should().Be(VisualizationState.Empty);
     }
 
+    [Fact]
+    public void LookupTest()
+    {
+        // Arrange
+        var query = """
+                    let FactTable=datatable(Row:string,Personal:string,Family:string) [
+                      "1", "Rowan",   "Murphy",
+                      "2", "Ellis",   "Turner",
+                      "3", "Ellis",   "Turner",
+                      "4", "Maya",  "Robinson",
+                      "5", "Quinn",    "Campbell"
+                    ];
+                    let DimTable=datatable(Personal:string,Family:string,Alias:string) [
+                      "Rowan",  "Murphy",   "rowanm",
+                      "Ellis",  "Turner", "ellist",
+                      "Maya", "Robinson", "mayar",
+                      "Quinn",   "Campbell",    "quinnc"
+                    ];
+                    FactTable
+                    | lookup kind=leftouter DimTable on Personal, Family
+                    """;
 
-#if false
-        [Fact]
-        public void Union_Works()
-        {
-            // Arrange
-            var engine = new BabyKustoEngine();
-            var query = @"
-union
-  (datatable(a:real) [ 1, 2 ]),
-  (datatable(a:real) [ 3, 4 ])
-";
-
-            // Act
-            var result = engine.Evaluate(query) as ITableSource;
-
-            // Assert
-            result.Should().NotBeNull();
-            var dumped = result!.DumpToString();
-            dumped.Should().Be(
-                "a; " + Environment.NewLine +
-                "------------------" + Environment.NewLine +
-                "1; " + Environment.NewLine +
-                "2; " + Environment.NewLine +
-                "3; " + Environment.NewLine +
-                "4; " + Environment.NewLine);
-        }
-
-        [Fact]
-        public void Union_Works2()
-        {
-            // Arrange
-            var engine = new BabyKustoEngine();
-            var query = @"
-union
-  (datatable(a:real) [ 1, 2 ]),
-  (datatable(a:long) [ 3, 4 ])
-";
-
-            // Act
-            var result = engine.Evaluate(query) as ITableSource;
-
-            // Assert
-            result.Should().NotBeNull();
-            var dumped = result!.DumpToString();
-            dumped.Should().Be(
-                "a_real; a_long; " + Environment.NewLine +
-                "------------------" + Environment.NewLine +
-                "1; ; " + Environment.NewLine +
-                "2; ; " + Environment.NewLine +
-                "; 3; " + Environment.NewLine +
-                "; 4; " + Environment.NewLine);
-        }
-
-        [Fact]
-        public void Union_Works3()
-        {
-            // Arrange
-            var engine = new BabyKustoEngine();
-            var query = @"
-datatable(a:real) [ 1, 2 ]
-| union (datatable(a:long) [ 3, 4 ])
-";
-
-            // Act
-            var result = engine.Evaluate(query) as ITableSource;
-
-            // Assert
-            result.Should().NotBeNull();
-            var dumped = result!.DumpToString();
-            dumped.Should().Be(
-                "a_real; a_long; " + Environment.NewLine +
-                "------------------" + Environment.NewLine +
-                "1; ; " + Environment.NewLine +
-                "2; ; " + Environment.NewLine +
-                "; 3; " + Environment.NewLine +
-                "; 4; " + Environment.NewLine);
-        }
-
-        [Fact]
-        public void Example1_Works()
-        {
-            // Arrange
-            var engine = new BabyKustoEngine();
-            engine.AddGlobalTable("MyTable", GetSampleData());
-            var query = @"
-let c=100.0;
-MyTable
-| project frac=CounterValue/c, AppMachine, CounterName
-| summarize avg(frac) by CounterName
-| project CounterName, avgRoundedPercent=tolong(avg_frac*100)
-";
-
-            // Act
-            var result = engine.Evaluate(query) as ITableSource;
-
-            // Assert
-            result.Should().NotBeNull();
-            var dumped = result!.DumpToString();
-            dumped.Should().Be(
-                "CounterName; avgRoundedPercent; " + Environment.NewLine +
-                "------------------" + Environment.NewLine +
-                "cpu; 57; " + Environment.NewLine +
-                "mem; 18; " + Environment.NewLine);
-        }
-
-        private static ITableSource GetSampleData()
-        {
-            @"
-let input = datatable(AppMachine:string, CounterName:string, CounterValue:real)
-[
-    'vm0', 'cpu', 50,
-    'vm0', 'mem', 30,
-    'vm1', 'cpu', 20,
-    'vm1', 'mem', 5,
-    'vm2', 'cpu', 100,
-];
-input
-"
-            return new InMemoryTableSource(
-                new TableSchema(
-                    new List<ColumnDefinition>()
-                    {
-                        new ColumnDefinition("AppMachine",   KustoValueKind.String),
-                        new ColumnDefinition("CounterName",  KustoValueKind.String),
-                        new ColumnDefinition("CounterValue", KustoValueKind.Real),
-                    }),
-                    new[]
-                    {
-                        new Column(new object?[] { "vm0", "vm0", "vm1", "vm1", "vm2" }),
-                        new Column(new object?[] { "cpu", "mem", "cpu", "mem", "cpu" }),
-                        new Column(new object?[] {  50.0,  30.0,  20.0,  5.0,   100.0 }),
-                    });
-        }
-#endif
+        var expected = """
+                       Row:string; Personal:string; Family:string; Alias:string
+                       ------------------
+                       1; Rowan; Murphy; rowanm
+                       2; Ellis; Turner; ellist
+                       3; Ellis; Turner; ellist
+                       4; Maya; Robinson; mayar
+                       5; Quinn; Campbell; quinnc
+                       """;
+        // Act & Assert
+        Test(query, expected);
+    }
 }

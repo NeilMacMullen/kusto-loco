@@ -17,20 +17,22 @@ internal enum IRJoinKind
     LeftSemi,
     RightSemi,
     LeftAnti,
-    RightAnti,
+    RightAnti
 }
 
 internal class IRJoinOperatorNode : IRQueryOperatorNode
 {
     public IRJoinOperatorNode(IRJoinKind kind, IRExpressionNode expression, List<IRJoinOnClause> onClauses,
-        TypeSymbol resultType)
+        TypeSymbol resultType, bool isLookup)
         : base(resultType)
     {
+        IsLookup = isLookup;
         Kind = kind;
         Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         OnClauses = onClauses ?? throw new ArgumentNullException(nameof(onClauses));
     }
 
+    public bool IsLookup { get; }
     public IRJoinKind Kind { get; }
     public IRExpressionNode Expression { get; }
     public List<IRJoinOnClause> OnClauses { get; }
@@ -41,12 +43,12 @@ internal class IRJoinOperatorNode : IRQueryOperatorNode
         index switch
         {
             0 => Expression,
-            _ => throw new ArgumentOutOfRangeException(nameof(index)),
+            _ => throw new ArgumentOutOfRangeException(nameof(index))
         };
 
     public override TResult Accept<TResult, TContext>(IRNodeVisitor<TResult, TContext> visitor, TContext context)
-         =>
-        visitor.VisitJoinOperator(this, context);
+        =>
+            visitor.VisitJoinOperator(this, context);
 
     public override string ToString() =>
         $"JoinOperator(kind={Kind}, {string.Join(", ", OnClauses)}): {SchemaDisplay.GetText(ResultType)}";
