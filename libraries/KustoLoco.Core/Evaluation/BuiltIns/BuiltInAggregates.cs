@@ -40,7 +40,43 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new DCountAggregateStringImpl(), ScalarTypes.Long,
                     ScalarTypes.String)));
         aggregates.Add(
+            Aggregates.CountDistinct,
+            new AggregateInfo(
+                new AggregateOverloadInfo(new DCountAggregateIntImpl(), ScalarTypes.Long,
+                    ScalarTypes.Int),
+                new AggregateOverloadInfo(new DCountAggregateLongImpl(), ScalarTypes.Long,
+                    ScalarTypes.Long),
+                new AggregateOverloadInfo(new DCountAggregateDoubleImpl(), ScalarTypes.Long,
+                    ScalarTypes.Real),
+                new AggregateOverloadInfo(new DCountAggregateDateTimeImpl(), ScalarTypes.Long,
+                    ScalarTypes.DateTime),
+                new AggregateOverloadInfo(new DCountAggregateTimeSpanImpl(), ScalarTypes.Long,
+                    ScalarTypes.TimeSpan),
+                new AggregateOverloadInfo(new DCountAggregateStringImpl(), ScalarTypes.Long,
+                    ScalarTypes.String)));
+        aggregates.Add(
             Aggregates.DCountIf,
+            new AggregateInfo(
+                new AggregateOverloadInfo(new DCountIfAggregateIntImpl(), ScalarTypes.Long,
+                    ScalarTypes.Int,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateLongImpl(), ScalarTypes.Long,
+                    ScalarTypes.Long,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateDoubleImpl(), ScalarTypes.Long,
+                    ScalarTypes.Real,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateDateTimeImpl(),
+                    ScalarTypes.Long, ScalarTypes.DateTime,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateTimeSpanImpl(),
+                    ScalarTypes.Long, ScalarTypes.TimeSpan,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateStringImpl(), ScalarTypes.Long,
+                    ScalarTypes.String,
+                    ScalarTypes.Bool)));
+        aggregates.Add(
+            Aggregates.CountDistinctIf,
             new AggregateInfo(
                 new AggregateOverloadInfo(new DCountIfAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int,
