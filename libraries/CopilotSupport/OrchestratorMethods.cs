@@ -57,9 +57,10 @@ public class OrchestratorMethods
         var chatClient = CreateAIChatClient(objSettings);
         var SystemMessage =
             "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
-        var response = await chatClient.CompleteAsync(SystemMessage);
+        
+        var response = await chatClient.GetResponseAsync(SystemMessage);
 
-        return response.Choices.Count != 0;
+        return response.Messages.Count != 0;
     }
 
     #endregion
@@ -81,14 +82,14 @@ public class OrchestratorMethods
         {
           
             // Send the system message to the AI chat client
-            var response = await chatClient.CompleteAsync(history);
+            var response = await chatClient.GetResponseAsync(history);
 
             // Check if the response contains any choices
-            if (response.Choices == null || response.Choices.Count == 0)
+            if (response.Text.IsBlank())
                 // Optionally, log the absence of choices or handle it as needed
                 return new ModelResponse() { Error = "No choices returned in the AI response." };
 
-            var returnedText= response.Choices[0].Text.NullToEmpty();
+            var returnedText= response.Text.NullToEmpty();
             return new ModelResponse{Response =returnedText};
         }
         catch (Exception ex)
