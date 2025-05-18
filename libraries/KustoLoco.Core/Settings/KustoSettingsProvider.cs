@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using NLog.LayoutRenderers;
 using NotNullStrings;
 
 namespace KustoLoco.Core.Settings;
@@ -42,11 +40,7 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer)
-    {
-        
-        _settingsStack.Push(layer);
-    }
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
 
     public ImmutableDictionary<string, RawKustoSetting> Pop()
     {
@@ -77,7 +71,7 @@ public class KustoSettingsProvider
         var d = new Dictionary<string, RawKustoSetting>();
         foreach (var layer in layers)
         foreach (var s in layer.Values)
-            d.TryAdd(s.Name, s);
+            d.TryAdd(s.Key, s);
 
         return d.ToImmutableDictionary();
     }
@@ -131,7 +125,7 @@ public class KustoSettingsProvider
     /// </summary>
     /// <remarks>
     ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true.
-    /// A missing setting will be interpreted as false.
+    ///     A missing setting will be interpreted as false.
     /// </remarks>
     public bool GetBool(KustoSettingDefinition setting)
     {
