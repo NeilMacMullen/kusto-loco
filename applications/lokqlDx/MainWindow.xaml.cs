@@ -6,12 +6,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
-using ScottPlot;
 
 namespace lokqlDx;
 
@@ -526,10 +524,7 @@ public partial class MainWindow : Window
         UpdateDynamicUiFromPreferences(false);
     }
 
-    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
-    {
-        _wpfRenderingSurface.CopyToClipboard();
-    }
+    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e) => _wpfRenderingSurface.CopyToClipboard();
 
 
     private static void OpenUriInBrowser(string uri) =>
@@ -546,7 +541,6 @@ public partial class MainWindow : Window
             }
     }
 
-    
 
     private void AboutBox(object sender, RoutedEventArgs e)
     {

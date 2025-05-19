@@ -389,16 +389,6 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         result.Should().Be("8");
     }
 
-    [TestMethod]
-    [Ignore("not yet implemented")]
-    public async Task HasAny()
-    {
-        //ensure we didn't get any fractional values
-        var query = "print x='line1' | where x has_any('a','b')";
-        var result = await LastLineOfResult(query);
-        result.Should().Be("8");
-    }
-
 
     [TestMethod]
     [Ignore("not yet implemented")]
@@ -1098,5 +1088,94 @@ print toscalar(letters | summarize mx=min(bitmap));";
         res.Should().Be("3,4,5,1,2");
     }
 
-   
+    [TestMethod]
+    public async Task In()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A in ('AAA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1");
+    }
+
+    [TestMethod]
+    public async Task InCs()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A in~ ('AAA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task InLong()
+    {
+        var query = """
+                    datatable(A:long) [
+                    123,
+                    456,
+                    2
+                    ]
+                     | where A in (1,2,3,123) | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task HasAny()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A has_any('aA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task HasAll()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "BAAAaa",
+                    "C"
+                    ]
+                     | where A has_all('aA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1");
+    }
+
+    [TestMethod]
+    public async Task Has()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "BAAAaa",
+                    "C"
+                    ]
+                     | where A has('aA') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
 }
