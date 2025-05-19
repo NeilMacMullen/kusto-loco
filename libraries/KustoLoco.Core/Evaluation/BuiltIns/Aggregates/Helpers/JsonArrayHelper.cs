@@ -6,9 +6,9 @@ using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-internal static class JsonArrayHelper
+public static class JsonArrayHelper
 {
-    internal static JsonArray From<T>(ICollection<T> source)
+    public static JsonArray From<T>(ICollection<T> source)
     {
         var array = new JsonNode?[source.Count];
         var i = 0;

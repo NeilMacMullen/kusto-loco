@@ -24,3 +24,21 @@ public class ContainsContext
     public string LastB = string.Empty;
     public bool LastResult;
 }
+
+
+
+[KustoImplementation(Keyword = "Operators.Has")]
+internal partial class HasFunction
+{
+    private static bool Impl(ContainsContext context, string a, string b)
+    {
+        if (context.LastA == a && context.LastB == b) return context.LastResult;
+
+        var result = a.Contains(b, StringComparison.InvariantCultureIgnoreCase);
+        context.LastA = a;
+        context.LastB = b;
+        context.LastResult = result;
+        return result;
+    }
+}
+

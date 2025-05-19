@@ -1,15 +1,13 @@
-﻿using KustoLoco.Rendering.ScottPlot;
-using NotNullStrings;
-using ScottPlot;
-using ScottPlot.Plottables;
-using ScottPlot.WPF;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using KustoLoco.Rendering.ScottPlot;
+using NotNullStrings;
+using ScottPlot;
+using ScottPlot.Plottables;
 using Coordinates = ScottPlot.Coordinates;
 using Orientation = ScottPlot.Orientation;
 
@@ -77,7 +75,7 @@ public partial class Chart : UserControl, IScottPlotHost
         foreach (var scatter in WpfPlot1.Plot.GetPlottables<Scatter>())
         {
             var near = scatter.GetNearest(coordinates, WpfPlot1.Plot.LastRender);
-            if (near.IsReal) return new PopupResult(scatter.LegendText, near.X, near.Y, near.Y,false);
+            if (near.IsReal) return new PopupResult(scatter.LegendText, near.X, near.Y, near.Y, false);
         }
 
         return PopupResult.None;
@@ -87,14 +85,14 @@ public partial class Chart : UserControl, IScottPlotHost
     {
         if (WpfPlot1.Plot.Axes.Bottom.TickGenerator is FixedDateTimeAutomatic)
             return DateTime.FromOADate(x).ToString();
-        else return x.ToString();
+        return x.ToString();
     }
 
     private string GetYLabel(double y)
     {
         if (WpfPlot1.Plot.Axes.Left.TickGenerator is FixedDateTimeAutomatic)
             return DateTime.FromOADate(y).ToString();
-        else return y.ToString();
+        return y.ToString();
     }
 
 
@@ -104,7 +102,7 @@ public partial class Chart : UserControl, IScottPlotHost
         Pixel mousePixel = new(p.X * WpfPlot1.DisplayScale, p.Y * WpfPlot1.DisplayScale);
         var coordinates = WpfPlot1.Plot.GetCoordinates(mousePixel);
 
-      
+
         DebugText.Content = $"X:{GetXLabel(coordinates.X)} Y:{GetYLabel(coordinates.Y)}";
         Crosshair.Position = coordinates;
 
@@ -120,11 +118,11 @@ public partial class Chart : UserControl, IScottPlotHost
         else
             sb.AppendLine(GetXLabel(popup.X));
 
-        if (popup.Y==popup.V)
+        if (popup.Y == popup.V)
             sb.AppendLine(GetYLabel(popup.Y));
         else
-            sb.AppendLine((popup.V -popup.Y).ToString());
-      
+            sb.AppendLine((popup.V - popup.Y).ToString());
+
 
         myPopupText.Text = sb.ToString();
         //force pop up to move
@@ -135,7 +133,6 @@ public partial class Chart : UserControl, IScottPlotHost
         WpfPlot1.Refresh();
     }
 
-    
 
     private PopupResult TryPopupFromBar(Coordinates rawcoordinates)
     {
@@ -157,13 +154,13 @@ public partial class Chart : UserControl, IScottPlotHost
                     continue;
                 if (coordinates.X > barright)
                     continue;
-                if (coordinates.Y < b.ValueBase )
+                if (coordinates.Y < b.ValueBase)
                     continue;
                 if (coordinates.Y > b.Value)
                     continue;
 
                 //we have a candidate
-               return new PopupResult(bar.LegendText, b.Position, b.ValueBase, b.Value,invert);
+                return new PopupResult(bar.LegendText, b.Position, b.ValueBase, b.Value, invert);
             }
         }
 
@@ -173,14 +170,11 @@ public partial class Chart : UserControl, IScottPlotHost
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => Crosshair = WpfPlot1.Plot.Add.Crosshair(0, 0);
 
-    private readonly record struct PopupResult(string Series, double X, double Y, double V,bool invertAxes)
-    {
-        internal static readonly PopupResult None = new(string.Empty, 0, 0, 0,false);
-        public bool IsValid => Series.IsNotBlank();
-    }
+    private void Chart_OnLostFocus(object sender, RoutedEventArgs e) => myPopup.IsOpen = false;
 
-    private void Chart_OnLostFocus(object sender, RoutedEventArgs e)
+    private readonly record struct PopupResult(string Series, double X, double Y, double V, bool invertAxes)
     {
-        myPopup.IsOpen = false;
+        internal static readonly PopupResult None = new(string.Empty, 0, 0, 0, false);
+        public bool IsValid => Series.IsNotBlank();
     }
 }

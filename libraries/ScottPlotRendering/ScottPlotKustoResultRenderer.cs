@@ -1,14 +1,11 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.SixelSupport;
-using NLog;
 using NotNullStrings;
 using ScottPlot;
-using ScottPlot.Colormaps;
 using ScottPlot.Palettes;
 using ScottPlot.Plottables;
 using ScottPlot.TickGenerators;
-
 
 namespace KustoLoco.Rendering.ScottPlot;
 
@@ -137,8 +134,8 @@ public static class ScottPlotKustoResultRenderer
                 //for lines, it's important that order by X otherwise
                 //we'll get a real spiderweb
                 var ordered = ser.OrderByX();
-                ordered=AccumulateIfRequired(result, ordered);
-                
+                ordered = AccumulateIfRequired(result, ordered);
+
                 var line = plot.Add.Scatter(ordered.X, ordered.Y);
                 line.LegendText = ordered.Legend;
                 line.LineWidth = (float)settings.GetDoubleOr("scottplot.line.linewidth",
@@ -154,11 +151,9 @@ public static class ScottPlotKustoResultRenderer
         {
             StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
 
-            if (result.Visualization.PropertyOr("kind","") == "heatmap")
-            {
-                Console.WriteLine("here");
-            }
-            
+           // if (result.Visualization.PropertyOr("kind", "") == "heatmap")
+           
+
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
@@ -209,13 +204,11 @@ public static class ScottPlotKustoResultRenderer
     }
 
     private static ResultChartAccessor.ChartSeries AccumulateIfRequired(KustoQueryResult result,
-        ResultChartAccessor.ChartSeries ordered)
-    {
-        return result.Visualization.PropertyOr("accumulate", "false")
-            .Equals("true",StringComparison.InvariantCultureIgnoreCase)
+        ResultChartAccessor.ChartSeries ordered) =>
+        result.Visualization.PropertyOr("accumulate", "false")
+            .Equals("true", StringComparison.InvariantCultureIgnoreCase)
             ? ordered.AccumulateY()
             : ordered;
-    }
 
     private static void FinishUIPreferences(Plot plot, KustoSettingsProvider settings)
     {
@@ -236,7 +229,7 @@ public static class ScottPlotKustoResultRenderer
     private static void StandardAxisAssignment(KustoSettingsProvider settings, ResultChartAccessor accessor,
         string preferences, int x, int y, int s)
     {
-        var cols = settings.GetOr("scottplot.axisorder", "automatic") =="explicit"
+        var cols = settings.GetOr("scottplot.axisorder", "automatic") == "explicit"
             ? accessor.TryOrdering("xxx")
             : accessor.TryOrdering(preferences);
 
@@ -338,7 +331,7 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateBars(Plot plot, Dictionary<double, double> acc,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth)
     {
-        var bars = series.X.Zip(series.Y,series.Color)
+        var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
             {
                 var x = tuple.First;
@@ -372,7 +365,7 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateRangeBars(Plot plot,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal)
     {
-        var bars = series.X.Zip(series.Y,series.Color)
+        var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
             {
                 var left = tuple.First;
