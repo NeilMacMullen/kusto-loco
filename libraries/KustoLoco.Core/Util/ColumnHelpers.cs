@@ -33,6 +33,11 @@ public static class ColumnHelpers
             return CreateFromDoublesObjectArray(data);
         }
 
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return CreateFromDecimalsObjectArray(data);
+        }
+
         if (typeSymbol == ScalarTypes.Bool)
         {
             return CreateFromBoolsObjectArray(data);
@@ -85,6 +90,12 @@ public static class ColumnHelpers
         {
             return CreateFromDouble(value, numRows);
         }
+
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return CreateFromDouble(value, numRows);
+        }
+
 
         if (typeSymbol == ScalarTypes.Bool)
         {
@@ -334,6 +345,20 @@ public static class ColumnHelpers
             columnData[i] = item == null
                                 ? null
                                 : Convert.ToDouble(item);
+        }
+
+        return ColumnFactory.Create(columnData);
+    }
+
+    private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
+    {
+        var columnData = new decimal?[data.Length];
+        for (var i = 0; i < data.Length; i++)
+        {
+            var item = data[i];
+            columnData[i] = item == null
+                ? null
+                : Convert.ToDecimal(item);
         }
 
         return ColumnFactory.Create(columnData);
