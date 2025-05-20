@@ -27,6 +27,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Long),
                 new ScalarOverloadInfo(new IsNullDoubleFunctionImpl(), ScalarTypes.Bool,
                     ScalarTypes.Real),
+                new ScalarOverloadInfo(new IsNullDecimalFunctionImpl(), ScalarTypes.Bool,
+                    ScalarTypes.Decimal),
                 new ScalarOverloadInfo(new IsNullDateTimeFunctionImpl(), ScalarTypes.Bool,
                     ScalarTypes.DateTime),
                 new ScalarOverloadInfo(new IsNullTimeSpanFunctionImpl(), ScalarTypes.Bool,
@@ -63,6 +65,7 @@ internal static class BuiltInScalarFunctions
             AddCoalesce(overloads, () => new CoalesceIntFunctionImpl(), ScalarTypes.Int);
             AddCoalesce(overloads, () => new CoalesceLongFunctionImpl(), ScalarTypes.Long);
             AddCoalesce(overloads, () => new CoalesceDoubleFunctionImpl(), ScalarTypes.Real);
+            AddCoalesce(overloads, () => new CoalesceDecimalFunctionImpl(), ScalarTypes.Decimal);
             AddCoalesce(overloads, () => new CoalesceDateTimeFunctionImpl(), ScalarTypes.DateTime);
             AddCoalesce(overloads, () => new CoalesceTimeSpanFunctionImpl(), ScalarTypes.TimeSpan);
             AddCoalesce(overloads, () => new CoalesceStringFunctionImpl(), ScalarTypes.String);

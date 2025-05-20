@@ -9,6 +9,8 @@ internal partial class AroundFunction
         Math.Abs(val - center) <= delta;
     public bool DoubleImpl(double  val, double center, double delta) =>
         Math.Abs(val - center) <= delta;
+    public bool DecimalImpl(decimal  val, decimal center, decimal delta) =>
+        Math.Abs(val - center) <= delta;
     public bool DTImpl(DateTime val, DateTime center, TimeSpan delta) =>
         (val - center).Duration() <= delta;
     public bool TsImpl(TimeSpan val, TimeSpan center, TimeSpan delta) =>

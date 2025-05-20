@@ -136,6 +136,49 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
     }
 }
 
+internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
+{
+    public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
+        ColumnarResult? previousWindowResult)
+    {
+        Debug.Assert(thisWindowArguments.Length == 2);
+        var termCol = (TypedBaseColumn<decimal?>)thisWindowArguments[0].Column;
+        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+
+        decimal accumulator = 0;
+        if (previousWindowResult != null)
+        {
+            var previousColumn = (TypedBaseColumn<decimal?>)previousWindowResult.Column;
+            Debug.Assert(previousColumn.RowCount > 0);
+
+            var lastValue = previousColumn[previousColumn.RowCount - 1];
+            Debug.Assert(lastValue.HasValue);
+
+            accumulator = lastValue.Value;
+        }
+
+        var data = new decimal?[termCol.RowCount];
+        for (var i = 0; i < termCol.RowCount; i++)
+        {
+            var restart = restartCol[i];
+            if (restart == true)
+            {
+                accumulator = 0;
+            }
+
+            var term = termCol[i];
+            if (term.HasValue)
+            {
+                accumulator += term.Value;
+            }
+
+            data[i] = accumulator;
+        }
+
+        return new ColumnarResult(new InMemoryColumn<decimal?>(data));
+    }
+}
+
 internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
 {
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,

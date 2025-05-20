@@ -121,6 +121,43 @@ internal class MakeSetDoubleFunctionImpl : IAggregateImpl
     }
 }
 
+internal class MakeSetDecimalFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
+        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 2)
+        {
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+
+            if (maxSizeColumn.RowCount > 0)
+            {
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
+            }
+        }
+
+        var set = new HashSet<decimal>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            var v = valuesColumn[i];
+            if (v.HasValue)
+            {
+                set.Add(v.Value);
+                if (set.Count >= maxSize)
+                {
+                    break;
+                }
+            }
+        }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(set));
+    }
+}
+
 internal class MakeSetTimeSpanFunctionImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
