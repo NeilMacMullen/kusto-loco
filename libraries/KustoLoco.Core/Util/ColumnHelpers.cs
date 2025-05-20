@@ -151,6 +151,11 @@ public static class ColumnHelpers
             return new ColumnBuilder<long?>(name);
         }
 
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return new ColumnBuilder<decimal?>(name);
+        }
+
         if (typeSymbol == ScalarTypes.Real)
         {
             return new ColumnBuilder<double?>(name);
@@ -231,6 +236,11 @@ public static class ColumnHelpers
         if (typeSymbol == ScalarTypes.Long)
         {
             return Create(mapping, others.Cast<TypedBaseColumn<long?>>().ToArray(), mapType);
+        }
+
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return Create(mapping, others.Cast<TypedBaseColumn<decimal?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Real)

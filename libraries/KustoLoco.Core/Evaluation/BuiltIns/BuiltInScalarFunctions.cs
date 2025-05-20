@@ -182,6 +182,7 @@ internal static class BuiltInScalarFunctions
         DatetimeDiffFunction.Register(Functions);
         DatetimeAddFunction.Register(Functions);
         DatetimePartFunction.Register(Functions);
+        ToDecimalFunction.Register(Functions);
 
         MakeDateTime.Register(Functions);
         MakeTimeSpan.Register(Functions);
