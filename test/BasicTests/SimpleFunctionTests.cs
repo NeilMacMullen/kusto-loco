@@ -1178,4 +1178,28 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().Be("2");
     }
 
+    [TestMethod]
+    public async Task DecimalLiteral()
+    {
+        var query = "print decimal(1.23)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.23");
+    }
+
+    [TestMethod]
+    public async Task RealLiteral()
+    {
+        var query = "print double(1.23)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.23");
+    }
+
+    [TestMethod]
+    public async Task longLiteral()
+    {
+        var query = "print long(123)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("123");
+    }
+
 }
