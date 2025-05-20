@@ -338,10 +338,11 @@ internal static class BuiltInAggregates
                     ScalarTypes.String)));
     }
 
-    public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
+    public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol,
+        TypeSymbol returnType, IRExpressionNode[] arguments,
         List<Parameter> parameters)
     {
-        if (!TryGetOverload(symbol, arguments, parameters, out var overload))
+        if (!TryGetOverload(symbol, returnType, arguments, parameters, out var overload))
             throw new NotImplementedException(
                 $"Aggregate function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
 
@@ -349,7 +350,8 @@ internal static class BuiltInAggregates
         return overload;
     }
 
-    public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
+    public static bool TryGetOverload(FunctionSymbol symbol,
+        TypeSymbol returnType, IRExpressionNode[] arguments, List<Parameter> parameters,
         out AggregateOverloadInfo? overload)
     {
         if (!aggregates.TryGetValue(symbol, out var aggregateInfo))
@@ -358,7 +360,7 @@ internal static class BuiltInAggregates
             return false;
         }
 
-        overload = BuiltInsHelper.PickOverload(aggregateInfo.Overloads, arguments);
+        overload = BuiltInsHelper.PickOverload(returnType, aggregateInfo.Overloads, arguments);
         return overload != null;
     }
 }
