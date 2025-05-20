@@ -16,13 +16,15 @@ internal partial class DivideFunction
                ? null
                : a / b;
 
+   
+    private static double? DoubleImpl(double a, double b)
+        =>  a / b;
+
     private static decimal? DecimalImpl(decimal a, decimal b)
         => b == 0
             ? null
             : a / b;
 
-    private static double? DoubleImpl(double a, double b)
-        =>  a / b;
 
     private static TimeSpan? TsLongImpl(TimeSpan a, long b)
         => b == 0
