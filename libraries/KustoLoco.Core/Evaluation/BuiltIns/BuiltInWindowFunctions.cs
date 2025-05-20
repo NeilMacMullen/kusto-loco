@@ -28,6 +28,8 @@ internal static class BuiltInWindowFunctions
                     ScalarTypes.Bool),
                 new WindowOverloadInfo(new RowCumSumDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real,
                     ScalarTypes.Bool),
+                new WindowOverloadInfo(new RowCumSumDecimalFunctionImpl(), ScalarTypes.Decimal, ScalarTypes.Decimal,
+                    ScalarTypes.Bool),
                 new WindowOverloadInfo(new RowCumSumTimeSpanFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan,
                     ScalarTypes.Bool)));
     }
