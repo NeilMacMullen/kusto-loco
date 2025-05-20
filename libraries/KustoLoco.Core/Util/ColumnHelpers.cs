@@ -93,7 +93,7 @@ public static class ColumnHelpers
 
         if (typeSymbol == ScalarTypes.Decimal)
         {
-            return CreateFromDouble(value, numRows);
+            return CreateFromDecimal(value, numRows);
         }
 
 
@@ -395,6 +395,12 @@ public static class ColumnHelpers
         => CreateFromScalar<double?>(value == null
                                          ? null
                                          : Convert.ToDouble(value), rowCount);
+
+    private static TypedBaseColumn<decimal?> CreateFromDecimal(object? value, int rowCount)
+        => CreateFromScalar<decimal?>(value == null
+            ? null
+            : Convert.ToDecimal(value), rowCount);
+
 
     private static TypedBaseColumn<bool?> CreateFromBool(object? value, int rowCount)
         => CreateFromScalar<bool?>(value == null
