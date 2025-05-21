@@ -5,32 +5,29 @@ namespace Intellisense.FileSystem.CompletionResultRetrievers;
 /// <summary>
 /// Retrieves the children of a root or child directory ending with a directory separator.
 /// </summary>
-internal class ChildrenPathCompletionResultRetriever(IFileSystemReader reader)
+internal class ChildrenPathCompletionResultRetriever(IFileSystemReader reader, IShareReader shareReader)
     : IFileSystemPathCompletionResultRetriever
 {
     public CompletionResult GetCompletionResult(IFileSystemPath fileSystemPath)
     {
-        var dir = GetTargetDirectory(fileSystemPath);
-
-        return reader
-            .GetChildren(dir)
-            .ToCompletionResult();
-    }
-
-    private static string GetTargetDirectory(IFileSystemPath fileSystemPath)
-    {
         var path = fileSystemPath.GetPath();
         if (!path.EndsWithDirectorySeparator())
         {
-            return string.Empty;
+            return CompletionResult.Empty;
+        }
+
+        if (fileSystemPath is UncPath p && p.IsHost())
+        {
+            return shareReader.GetShares(p.Host).ToCompletionResult();
         }
 
         if (fileSystemPath.IsRootDirectory())
         {
-            return path;
+            return reader.GetChildren(path).ToCompletionResult();
         }
 
-        return Path.GetDirectoryName(path) ?? string.Empty;
-
+        return reader
+            .GetChildren(fileSystemPath.GetParent())
+            .ToCompletionResult();
     }
 }

@@ -1,5 +1,6 @@
 using Intellisense.Configuration;
 using Intellisense.FileSystem;
+using Intellisense.FileSystem.Shares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,7 +12,8 @@ public static class IntellisenseCollectionExtensions
     public static IServiceCollection AddMockedIo(this IServiceCollection services) => services
         .AddIntellisense()
         .AddFakeLogging()
-        .MockSingleton<IFileSystemReader>();
+        .MockSingleton<IFileSystemReader>()
+        .MockSingleton<IShareReader>();
 
     public static IServiceCollection AddDefault(this IServiceCollection services) => services
         .AddIntellisense()
