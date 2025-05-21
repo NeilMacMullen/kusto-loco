@@ -37,6 +37,16 @@ internal partial class SumAggregate
     internal static double? DoubleImplFinish(NumericAggregate context)
         => context.Count == 0 ? null : context.DoubleValue;
 
+    internal static decimal DecimalImpl(NumericAggregate context, decimal n)
+    {
+        context.DecimalValue += n;
+        context.Count++;
+        return 0;
+    }
+
+    internal static decimal? DecimalImplFinish(NumericAggregate context)
+        => context.Count == 0 ? null : context.DecimalValue;
+
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
     {
         context.LongValue += n.Ticks;
