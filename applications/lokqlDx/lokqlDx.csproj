@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Intellisense\Intellisense.csproj" />
-    <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
     <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
   </ItemGroup>

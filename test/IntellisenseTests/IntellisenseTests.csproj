@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Intellisense\Intellisense.csproj" />
-    <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
   </ItemGroup>
 
 </Project>
