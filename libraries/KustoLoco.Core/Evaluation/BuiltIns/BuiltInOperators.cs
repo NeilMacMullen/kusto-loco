@@ -120,16 +120,20 @@ internal static class BuiltInOperators
         MatchRegexFunction.Register(operators);
     }
 
-    public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments)
+    public static ScalarOverloadInfo GetOverload(OperatorSymbol symbol,
+        TypeSymbol resultType,
+        IRExpressionNode[] arguments)
     {
-        if (!TryGetOverload(symbol, arguments, out var overload))
+        if (!TryGetOverload(symbol,resultType, arguments, out var overload))
             throw new NotImplementedException(
                 $"Operator {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
 
         return overload!;
     }
 
-    public static bool TryGetOverload(OperatorSymbol symbol, IRExpressionNode[] arguments,
+    public static bool TryGetOverload(OperatorSymbol symbol,
+        TypeSymbol resultType,
+        IRExpressionNode[] arguments,
         out ScalarOverloadInfo? overload)
     {
         if (!operators.TryGetValue(symbol, out var operatorInfo))
@@ -138,7 +142,7 @@ internal static class BuiltInOperators
             return false;
         }
 
-        overload = BuiltInsHelper.PickOverload(operatorInfo.Overloads, arguments);
+        overload = BuiltInsHelper.PickOverload(resultType,operatorInfo.Overloads, arguments);
         return overload != null;
     }
 }

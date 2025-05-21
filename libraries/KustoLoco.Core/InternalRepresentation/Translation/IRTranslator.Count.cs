@@ -8,6 +8,7 @@ using Kusto.Language.Syntax;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.InternalRepresentation;
 
@@ -20,7 +21,9 @@ internal partial class IRTranslator
         {
             new IRAggregateCallNode(
                 Aggregates.Count.Signatures[0],
-                BuiltInAggregates.GetOverload(Aggregates.Count, [], []),
+                BuiltInAggregates.GetOverload(Aggregates.Count,
+                TypeMapping.SymbolForType(typeof(long)),
+                    [], []),
                 new List<Parameter>(),
                 IRListNode<IRExpressionNode>.Empty,
                 ScalarTypes.Long)

@@ -6,6 +6,11 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Operators.Divide")]
 internal partial class DivideFunction
 {
+    private static decimal? DecimalImpl(decimal a, decimal b)
+        => b == 0
+            ? null
+            : a / b;
+    
     private static long? IntImpl(int a, int b)
         => b == 0
                ? null
@@ -20,10 +25,7 @@ internal partial class DivideFunction
     private static double? DoubleImpl(double a, double b)
         =>  a / b;
 
-    private static decimal? DecimalImpl(decimal a, decimal b)
-        => b == 0
-            ? null
-            : a / b;
+  
 
 
     private static TimeSpan? TsLongImpl(TimeSpan a, long b)
