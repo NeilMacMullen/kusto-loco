@@ -1,5 +1,6 @@
 ﻿using KustoLoco.Core;
 using KustoLoco.Core.Settings;
+using KustoLoco.Rendering.SixelSupport;
 using NotNullStrings;
 using ScottPlot;
 using ScottPlot.Palettes;
@@ -28,17 +29,35 @@ public static class ScottPlotKustoResultRenderer
         }
     }
 
-    public static void UseDarkMode(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
+    public static void SetInitialUiPreferences(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
     {
-        var palette = settings.GetOr("scottplot.palette", "");
+        var paletteName = settings.GetOr("scottplot.palette", "");
 
-        var p = Palette.GetPalettes()
-                    .FirstOrDefault(f => f.Name.Equals(palette, StringComparison.InvariantCultureIgnoreCase))
-                ?? new Penumbra();
+        //look for a palette by name
+        var ipallette = Palette.GetPalettes()
+            .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
 
+        //alternatively try a colormap
+        if (ipallette == null)
+        {
+            var map = Colormap.GetColormaps()
+                .FirstOrDefault(c => c.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
+            if (map != null)
+                ipallette = new HeatmapPalette(256, map);
+        }
 
-        plot.Add.Palette = p;
-        SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c, "#181818");
+        //finally, allow palettes to be defined as lists of hex colors
+        if (ipallette == null)
+        {
+            var custom = paletteName.Tokenize(" ,;");
+            ipallette = custom.Length > 1
+                ? Palette.FromColors(custom)
+                : new Penumbra();
+        }
+
+        plot.Add.Palette = ipallette;
+        SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c,
+            "#181818");
         SetColorFromSetting(settings, "scottplot.databackground.color", c => plot.DataBackground.Color = c, "#1f1f1f");
         SetColorFromSetting(settings, "scottplot.axes.color", c => plot.Axes.Color(c), "#ffffff");
         SetColorFromSetting(settings, "scottplot.majorlinecolor", c => plot.Grid.MajorLineColor = c, "#404040");
@@ -50,10 +69,10 @@ public static class ScottPlotKustoResultRenderer
         SetColorFromSetting(settings, "scottplot.legend.fontcolor", c => plot.Legend.FontColor = c, "#d7d7d7");
         SetColorFromSetting(settings, "scottplot.legend.outlinecolor", c => plot.Legend.OutlineColor = c, "#d7d7d7");
 
+        var legendFontSize = settings.GetIntOr("scottplot.legend.fontsize", 12);
+        plot.Legend.FontSize = legendFontSize;
+        plot.Title(result.Visualization.PropertyOr("title", string.Empty));
 
-        plot.Legend.FontSize = 16;
-        plot.Title(result.Visualization.PropertyOr("title", DateTime.UtcNow.ToShortTimeString()));
-        
         if (result.Visualization.PropertyOr("legend", "") == "hidden")
         {
             plot.Legend.IsVisible = false;
@@ -79,17 +98,18 @@ public static class ScottPlotKustoResultRenderer
             }
         }
     }
+
     /// <summary>
-    /// Renders various types of charts based on the provided query results and settings.
+    ///     Renders various types of charts based on the provided query results and settings.
     /// </summary>
     public static void RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
         var accessor = new ResultChartAccessor(result);
         plot.Clear();
-        UseDarkMode(result, plot, settings);
+        SetInitialUiPreferences(result, plot, settings);
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "on|ot", 0, 1, 0);
+            StandardAxisAssignment(settings, accessor, "on|ot", 0, 1, 0);
 
             var slices = accessor.CalculateSeries()
                 .Select(ser => new PieSlice
@@ -97,7 +117,7 @@ public static class ScottPlotKustoResultRenderer
                     Label = ser.Legend,
                     LegendText = ser.Legend,
                     Value = ser.Y[0],
-                    FillColor = plot.Add.Palette.GetColor(ser.Index)
+                    FillColor = plot.Add.Palette.GetColor(ser.Color[0])
                 })
                 .ToArray();
             plot.Add.Pie(slices);
@@ -108,14 +128,20 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Line && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             foreach (var ser in accessor.CalculateSeries())
             {
                 //for lines, it's important that order by X otherwise
                 //we'll get a real spiderweb
                 var ordered = ser.OrderByX();
+                ordered = AccumulateIfRequired(result, ordered);
+
                 var line = plot.Add.Scatter(ordered.X, ordered.Y);
                 line.LegendText = ordered.Legend;
+                line.LineWidth = (float)settings.GetDoubleOr("scottplot.line.linewidth",
+                    line.LineWidth);
+                line.MarkerSize = (float)settings.GetDoubleOr("scottplot.line.markersize",
+                    line.MarkerSize);
             }
 
             FixupAxisTicks(plot, accessor, false);
@@ -123,10 +149,16 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Scatter && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
+
+           // if (result.Visualization.PropertyOr("kind", "") == "heatmap")
+           
+
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
+                var markerSize = settings.GetDoubleOr("scottplot.scatter.markersize", line.MarkerSize);
+                line.MarkerSize = (float)markerSize;
                 line.LegendText = ser.Legend;
             }
 
@@ -136,7 +168,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -148,7 +180,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -160,19 +192,47 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Ladder && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(accessor, "tto|nno", 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, "tto|nno", 0, 1, 2);
 
             var bars = accessor.CalculateSeries()
                 .Select(ser => CreateRangeBars(plot, ser, true))
                 .ToArray();
             FixupAxisForLadder(plot, accessor);
         }
+
+        FinishUIPreferences(plot, settings);
     }
 
-    private static void StandardAxisAssignment(ResultChartAccessor accessor,
+    private static ResultChartAccessor.ChartSeries AccumulateIfRequired(KustoQueryResult result,
+        ResultChartAccessor.ChartSeries ordered) =>
+        result.Visualization.PropertyOr("accumulate", "false")
+            .Equals("true", StringComparison.InvariantCultureIgnoreCase)
+            ? ordered.AccumulateY()
+            : ordered;
+
+    private static void FinishUIPreferences(Plot plot, KustoSettingsProvider settings)
+    {
+        plot.Axes.Bottom.Label.FontSize = settings.GetIntOr("scottplot.axes.bottom.label.fontsize", 12);
+        plot.Axes.Left.Label.FontSize = settings.GetIntOr("scottplot.axes.left.label.fontsize", 12);
+        plot.Axes.Bottom.Label.Rotation = (float)settings.GetDoubleOr("scottplot.axes.bottom.label.rotation", 0.0);
+        plot.Axes.Left.Label.Rotation = (float)settings.GetDoubleOr("scottplot.axes.left.label.rotation", -90.0);
+
+        plot.Axes.Bottom.TickLabelStyle.Rotation =
+            (float)settings.GetDoubleOr("scottplot.axes.bottom.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Left.TickLabelStyle.Rotation =
+            (float)settings.GetDoubleOr("scottplot.axes.left.ticklabelstyle.rotation", 0.0);
+        plot.Axes.Bottom.TickLabelStyle.FontSize =
+            settings.GetIntOr("scottplot.axes.bottom.ticklabelstyle.fontsize", 12);
+        plot.Axes.Left.TickLabelStyle.FontSize = settings.GetIntOr("scottplot.axes.left.ticklabelstyle.fontsize", 12);
+    }
+
+    private static void StandardAxisAssignment(KustoSettingsProvider settings, ResultChartAccessor accessor,
         string preferences, int x, int y, int s)
     {
-        var cols = accessor.TryOrdering(preferences);
+        var cols = settings.GetOr("scottplot.axisorder", "automatic") == "explicit"
+            ? accessor.TryOrdering("xxx")
+            : accessor.TryOrdering(preferences);
+
         accessor.AssignXColumn(cols[x].Index);
         accessor.AssignValueColumn(cols[y].Index);
         if (s < cols.Length)
@@ -248,7 +308,7 @@ public static class ScottPlotKustoResultRenderer
     private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
     {
         if (accessor.XisDateTime)
-           MakeXAxisDateTime(plot);
+            MakeXAxisDateTime(plot);
 
         if (accessor.XisNominal)
         {
@@ -271,11 +331,12 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateBars(Plot plot, Dictionary<double, double> acc,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth)
     {
-        var bars = series.X.Zip(series.Y)
+        var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
             {
                 var x = tuple.First;
                 var y = tuple.Second;
+                var color = tuple.Third;
                 var valBase = acc.GetValueOrDefault(x!, 0.0);
                 var top = valBase + y;
 
@@ -286,7 +347,7 @@ public static class ScottPlotKustoResultRenderer
                     Position = x,
                     ValueBase = valBase,
                     Value = top,
-                    FillColor = plot.Add.Palette.GetColor(series.Index)
+                    FillColor = plot.Add.Palette.GetColor(color)
                 };
                 if (barWidth > 0)
                     bar.Size = barWidth;
@@ -304,17 +365,18 @@ public static class ScottPlotKustoResultRenderer
     private static BarPlot CreateRangeBars(Plot plot,
         ResultChartAccessor.ChartSeries series, bool makeHorizontal)
     {
-        var bars = series.X.Zip(series.Y)
+        var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
             {
                 var left = tuple.First;
                 var right = tuple.Second;
+                var color = tuple.Third;
                 return new Bar
                 {
                     Position = series.Index,
                     ValueBase = left,
                     Value = right,
-                    FillColor = plot.Add.Palette.GetColor(series.Index)
+                    FillColor = plot.Add.Palette.GetColor(color)
                 };
             }).ToArray();
         var b = plot.Add.Bars(bars);
@@ -322,5 +384,44 @@ public static class ScottPlotKustoResultRenderer
         b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
         return b;
+    }
+
+    /// <summary>
+    ///     Renders a KustoQueryResult to a Sixel
+    /// </summary>
+    public static string RenderToSixel(
+        KustoQueryResult result,
+        KustoSettingsProvider settings,
+        int widthInPixels,
+        int heightInPixels)
+    {
+        using var plot = new Plot();
+        RenderToPlot(plot, result, settings);
+        var bytes = plot.GetImageBytes(widthInPixels, heightInPixels);
+        var src = ArgbPixelSource.FromScottPlotBmp(bytes);
+
+        return SixelMaker.FrameToSixelString(src);
+    }
+
+    /// <summary>
+    ///     Attempts to generate a sixel that fits the current screen
+    /// </summary>
+    public static string RenderToSixel(
+        KustoQueryResult result,
+        KustoSettingsProvider settings)
+    {
+        var (width, height) = TerminalHelper.GetScreenDimension();
+        return RenderToSixel(result, settings, width, height);
+    }
+
+    /// <summary>
+    ///     Attempts to generate a sixel that fits the current screen
+    /// </summary>
+    public static string RenderToSixelWithPad(
+        KustoQueryResult result,
+        KustoSettingsProvider settings, int linesAtEnd)
+    {
+        var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
+        return RenderToSixel(result, settings, width, height);
     }
 }

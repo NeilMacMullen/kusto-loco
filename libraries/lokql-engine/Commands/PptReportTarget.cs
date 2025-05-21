@@ -1,8 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Presentation;
 using KustoLoco.Core;
 using NLog;
 using NotNullStrings;
 using ShapeCrawler;
+using Presentation = ShapeCrawler.Presentation;
 
 namespace Lokql.Engine.Commands;
 
@@ -29,7 +31,7 @@ public class PptReportTarget : IReportTarget
         if (matches.Any())
             foreach (var p in matches)
             {
-                if (p.TextBox is { } tb) tb.Text = text;
+                if (p.TextBox is { } tb) tb.SetText(text);
             }
     }
 
@@ -74,7 +76,7 @@ public class PptReportTarget : IReportTarget
             foreach (var header in res.ColumnNames().Take(maxColumns))
             {
                 var cell = addedTable[0, col];
-                cell.TextBox.Text = header;
+                cell.TextBox.SetText(header);
                 col++;
             }
 
@@ -83,7 +85,7 @@ public class PptReportTarget : IReportTarget
             for (var r = 0; r < AllowableRowCount(res.RowCount); r++)
             {
                 var cell = addedTable[r + 1, c];
-                cell.TextBox.Text = res.Get(c, r)?.ToString() ?? "<null>";
+                cell.TextBox.SetText(res.Get(c, r)?.ToString() ?? "<null>");
             }
         }
     }
@@ -125,8 +127,8 @@ public class PptReportTarget : IReportTarget
 
     private ISlide AddSlide()
     {
-
-        _pres.Slides.AddEmptySlide(SlideLayoutType.Blank);
+        var layout = _pres.SlideMasters[0].SlideLayouts[0];
+        _pres.Slides.Add(layout.Number);
         return _pres.Slides.Last();
     }
 

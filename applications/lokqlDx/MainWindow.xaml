@@ -37,13 +37,20 @@
           <MenuItem Header="Toggle line-numbers" InputGestureText="Alt+N" Click="ToggleLineNumbers" />
 
         </MenuItem>
+
+        <MenuItem Header="View">
+          <MenuItem Header="Create Flyout" Click="CreateFlyout" />
+        </MenuItem>
         <MenuItem Header="Misc">
           <MenuItem Header="Register file association" Click="EnableJumpList" />
         </MenuItem>
         <MenuItem Header="Help">
           <MenuItem Header="LokqlDx intro" Click="NavigateToWiki" Tag="LokqlDX" />
           <MenuItem Header="Quick start" Click="NavigateToWiki" Tag="LokqlDx-tutorial-‐-quick-start" />
+          <MenuItem Header="Keyboard shortcuts" Click="NavigateToWiki" Tag="LokqlDx-‐-Keyboard-shortcuts" />
           <MenuItem Header="Chart customisation" Click="NavigateToWiki" Tag="ScottPlot-Chart-customisation" />
+          <MenuItem Header="Command reference" Click="NavigateToWiki" Tag="LokqlDx-‐-commands" />
+
           <Separator />
           <MenuItem Header="Kusto-loco Project Page" Click="NavigateToUri"
                     Tag="https://github.com/NeilMacMullen/kusto-loco" />
@@ -174,8 +181,7 @@
                         Click="OnCopyImageToClipboard" />
 
               </StackPanel>
-              <scottplot:WpfPlot x:Name="WpfPlot1"
-                                 Loaded="WpfPlot1_OnLoaded" />
+              <local:Chart x:Name="TheChart"/>
             </DockPanel>
           </TabItem>
 

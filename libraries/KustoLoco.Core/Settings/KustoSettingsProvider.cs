@@ -22,12 +22,17 @@ public class KustoSettingsProvider
     private ImmutableHashSet<KustoSettingDefinition> _registeredSettings =
         ImmutableHashSet<KustoSettingDefinition>.Empty;
 
-    private ImmutableDictionary<string, RawKustoSetting> _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+    private Stack<ImmutableDictionary<string, RawKustoSetting>> _settingsStack;
 
-    public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions()
+    public KustoSettingsProvider()
     {
-        return _registeredSettings;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+        _settingsStack.Push(ImmutableDictionary<string, RawKustoSetting>.Empty);
     }
+
+    public void AddLayer(KustoSettingsProvider layeredSettings) => Push(layeredSettings.GetFlattened());
+
+    public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions() => _registeredSettings;
 
     public void Register(params KustoSettingDefinition[] settings)
     {
@@ -35,61 +40,83 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
+
+    public ImmutableDictionary<string, RawKustoSetting> Pop()
+    {
+        if (_settingsStack.Any())
+            return _settingsStack.Pop();
+        return ImmutableDictionary<string, RawKustoSetting>.Empty;
+    }
+
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
-        _settings = _settings.SetItem(k.Key, k);
+
+        var all = _settingsStack.Reverse().ToArray();
+        var last = all[0];
+        last = last.SetItem(k.Key, k);
+        all[0] = last;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>(all);
     }
 
-    public void Set(string setting, bool value)
+    public void Set(string setting, bool value) => Set(setting, value.ToString());
+
+    public void Set(string setting, int value) => Set(setting, value.ToString());
+
+
+    private ImmutableDictionary<string, RawKustoSetting> GetFlattened()
     {
-        Set(setting, value.ToString());
-    }
+        var layers = _settingsStack.ToArray();
+        var d = new Dictionary<string, RawKustoSetting>();
+        foreach (var layer in layers)
+        foreach (var s in layer.Values)
+            d.TryAdd(s.Key, s);
 
-    public void Set(string setting, int value)
-    {
-        Set(setting, value.ToString());
+        return d.ToImmutableDictionary();
     }
-
 
     public string Get(KustoSettingDefinition setting)
     {
         var settingName = setting.Name;
         var fb = new RawKustoSetting(settingName, setting.DefaultValue);
-        return _settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
+        var settings = GetFlattened();
+        return settings.GetValueOrDefault(settingName.ToLowerInvariant(), fb).Value;
     }
 
     /// <summary>
-    /// Tries to interpret a string as a setting name 
+    ///     Tries to interpret a string as a setting name
     /// </summary>
     /// <remarks>
-    /// There are a number of places in application code where it's convenient to see if the
-    /// supplied string might actually be interpreted as a setting name.  For example
-    /// .set abc xyz
-    /// .command abc
-    /// --> could transform to .command xyz
+    ///     There are a number of places in application code where it's convenient to see if the
+    ///     supplied string might actually be interpreted as a setting name.  For example
+    ///     .set abc xyz
+    ///     .command abc
+    ///     --> could transform to .command xyz
     /// </remarks>
     public string TrySubstitute(string name)
     {
         var fb = new RawKustoSetting(name, name);
-        return _settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
+        var settings = GetFlattened();
+        return settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
     public bool HasSetting(string name)
-        => _settings.ContainsKey(name.ToLowerInvariant());
+        => GetFlattened().ContainsKey(name.ToLowerInvariant());
 
-    public string GetOr(string setting,string fallback)
+    public string GetOr(string setting, string fallback)
     {
-        var fb = new KustoSettingDefinition(setting, string.Empty,fallback,string.Empty);
+        var fb = new KustoSettingDefinition(setting, string.Empty, fallback, string.Empty);
         return Get(fb);
     }
+
     /// <summary>
-    /// Try to fetch a setting and interpret it as a number (int)
+    ///     Try to fetch a setting and interpret it as a number (int)
     /// </summary>
     /// <remarks> return the fallback value if the number can't be parsed</remarks>
-    public int GetIntOr(string setting,int fallback)
+    public int GetIntOr(string setting, int fallback)
     {
-        var s = GetOr(setting,fallback.ToString());
+        var s = GetOr(setting, fallback.ToString());
         return int.TryParse(s, out var v) ? v : fallback;
     }
 
@@ -97,7 +124,8 @@ public class KustoSettingsProvider
     ///     Try to interpret the setting as a boolean
     /// </summary>
     /// <remarks>
-    ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true
+    ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true.
+    ///     A missing setting will be interpreted as false.
     /// </remarks>
     public bool GetBool(KustoSettingDefinition setting)
     {
@@ -105,14 +133,11 @@ public class KustoSettingsProvider
         var falseValues = new[] { "false", "no", "off", "0" };
         var s = Get(setting).ToLowerInvariant();
         if (trueValues.Contains(s)) return true;
-        if (falseValues.Contains(s)) return false;
+        //if (falseValues.Contains(s)) return false;
         return false;
     }
 
-    public IEnumerable<RawKustoSetting> Enumerate()
-    {
-        return _settings.Values;
-    }
+    public IEnumerable<RawKustoSetting> Enumerate() => GetFlattened().Values;
 
     /// <summary>
     ///     Obtain an array of strings from a setting that is a list of paths
@@ -132,6 +157,25 @@ public class KustoSettingsProvider
     /// </summary>
     public void Reset()
     {
-        _settings = ImmutableDictionary<string, RawKustoSetting>.Empty;
+        _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
+        AddLayer(new KustoSettingsProvider());
+    }
+
+    public double GetDoubleOr(string settingName, double p1)
+    {
+        var s = GetOr(settingName, "");
+        return double.TryParse(s, out var v) ? v : p1;
+    }
+
+    /// <summary>
+    ///     Create a snapshot of the current settings
+    /// </summary>
+    /// <returns></returns>
+    public KustoSettingsProvider Snapshot()
+    {
+        var settings = GetFlattened();
+        var newSettings = new KustoSettingsProvider();
+        newSettings.Push(settings);
+        return newSettings;
     }
 }

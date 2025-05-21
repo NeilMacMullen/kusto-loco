@@ -75,6 +75,12 @@ public class KustoQueryResult
     /// </summary>
     public int ColumnCount => ColumnDefinitions().Length;
 
+    /// <summary>
+    /// True if the result should be visualised as a chart 
+    /// </summary>
+    public bool IsChart =>
+        Visualization.ChartType.IsNotBlank() && Visualization.ChartType.ToLowerInvariant() != "table";
+
     public static KustoQueryResult FromError(string query, string error)
     {
         return new KustoQueryResult(query, InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, error);

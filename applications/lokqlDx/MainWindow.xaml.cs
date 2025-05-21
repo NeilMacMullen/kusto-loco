@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using Lokql.Engine;
 using Microsoft.Win32;
 using NotNullStrings;
-using ScottPlot;
 
 namespace lokqlDx;
 
@@ -30,7 +27,6 @@ public partial class MainWindow : Window
 
     private Workspace currentWorkspace = new();
     private bool isBusy;
-   
 
 
     public MainWindow(
@@ -46,7 +42,7 @@ public partial class MainWindow : Window
         var loader = new StandardFormatAdaptor(settings, _console);
         var cp = CommandProcessorProvider.GetCommandProcessor();
         _wpfRenderingSurface = new WpfRenderingSurface(RenderingSurface, dataGrid,
-            DatagridOverflowWarning, WpfPlot1,
+            DatagridOverflowWarning, TheChart,
             settings);
         _explorer = new InteractiveTableExplorer(_console, loader, settings, cp, _wpfRenderingSurface);
     }
@@ -144,7 +140,7 @@ public partial class MainWindow : Window
         RebuildRecentFilesList();
     }
 
-    private void UpdateDynamicUiFromPreferences()
+    private void UpdateDynamicUiFromPreferences(bool moveGrid)
     {
         var preferences = _preferenceManager.UIPreferences;
         Editor.SetFont(preferences.FontFamily);
@@ -156,8 +152,11 @@ public partial class MainWindow : Window
         dataGrid.FontSize = preferences.FontSize;
         UserChat.FontSize = preferences.FontSize;
         ChatHistory.FontSize = preferences.FontSize;
-        GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
-        GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        if (moveGrid)
+        {
+            GridSerializer.DeSerialize(MainGrid, preferences.MainGridSerialization);
+            GridSerializer.DeSerialize(EditorConsoleGrid, preferences.EditorGridSerialization);
+        }
     }
 
     private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -166,7 +165,7 @@ public partial class MainWindow : Window
         Editor.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
         RegistryOperations.AssociateFileType(true);
         PreferencesManager.EnsureDefaultFolderExists();
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(true);
         RebuildRecentFilesList();
         ResizeWindowAccordingToStoredPreferences();
         var pathToLoad = _args.Any()
@@ -179,6 +178,8 @@ public partial class MainWindow : Window
             StatusBar.Visibility = Visibility.Visible;
             UpdateInfo.Content = "New version available";
         }
+
+        Editor.SetFocus();
     }
 
 
@@ -295,7 +296,7 @@ public partial class MainWindow : Window
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
-           NavigateToLanding();
+            NavigateToLanding();
             appPrefs.HasShownLanding = true;
             _preferenceManager.Save(appPrefs);
         }
@@ -376,13 +377,13 @@ public partial class MainWindow : Window
     private void IncreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Min(40, _preferenceManager.UIPreferences.FontSize + 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void DecreaseFontSize(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.FontSize = Math.Max(6, _preferenceManager.UIPreferences.FontSize - 1);
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
 
@@ -394,7 +395,7 @@ public partial class MainWindow : Window
 
     private void Navigate(string url) => OpenUriInBrowser(url);
 
- 
+
     private void EnableJumpList(object sender, RoutedEventArgs e) => RegistryOperations.AssociateFileType(false);
 
     private async void SubmitToCopilot(object sender, RoutedEventArgs e)
@@ -464,6 +465,7 @@ public partial class MainWindow : Window
                 break;
             userchat = $"That query gave an error: {lastResult.Error}";
         }
+
         SubmitButton.IsEnabled = true;
     }
 
@@ -488,7 +490,7 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             _preferenceManager.Save(appPreferences);
-            UpdateDynamicUiFromPreferences();
+            UpdateDynamicUiFromPreferences(false);
         }
         else
         {
@@ -513,42 +515,22 @@ public partial class MainWindow : Window
     private void ToggleWordWrap(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.WordWrap = !_preferenceManager.UIPreferences.WordWrap;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
     private void ToggleLineNumbers(object sender, RoutedEventArgs e)
     {
         _preferenceManager.UIPreferences.ShowLineNumbers = !_preferenceManager.UIPreferences.ShowLineNumbers;
-        UpdateDynamicUiFromPreferences();
+        UpdateDynamicUiFromPreferences(false);
     }
 
-    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var bytes = WpfPlot1.Plot.GetImageBytes((int)WpfPlot1.ActualWidth,
-                (int)WpfPlot1.ActualHeight, ImageFormat.Png);
-            using var memoryStream = new MemoryStream(bytes);
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze(); // Freeze the image to make it cross-thread accessible
-            Clipboard.SetImage(bitmapImage);
-            _explorer.Info("Chart copied to clipboard");
-        }
-        catch
-        {
-        }
-    }
+    private void OnCopyImageToClipboard(object sender, RoutedEventArgs e) => _wpfRenderingSurface.CopyToClipboard();
 
 
     private static void OpenUriInBrowser(string uri) =>
         Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
 
-  
-   
+
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         if (e.PropertyType == typeof(DateTime))
@@ -559,9 +541,6 @@ public partial class MainWindow : Window
             }
     }
 
-    private void WpfPlot1_OnLoaded(object sender, RoutedEventArgs e)
-    {
-    }
 
     private void AboutBox(object sender, RoutedEventArgs e)
     {
@@ -571,7 +550,7 @@ public partial class MainWindow : Window
 
     private void NavigateToWiki(object sender, RoutedEventArgs e)
     {
-       if (sender is MenuItem { Tag: string page })
+        if (sender is MenuItem { Tag: string page })
             ShowMarkdownHelp(page);
     }
 
@@ -579,5 +558,12 @@ public partial class MainWindow : Window
     {
         if (sender is MenuItem { Tag: string page })
             Navigate(page);
+    }
+
+    private void CreateFlyout(object sender, RoutedEventArgs e)
+    {
+        var lastResult = _explorer.GetPreviousResult();
+        var dlg = new FlyoutResult(lastResult, _explorer.Settings);
+        dlg.Show();
     }
 }

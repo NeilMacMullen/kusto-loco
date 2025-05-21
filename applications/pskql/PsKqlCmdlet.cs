@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
+using System.Runtime.InteropServices;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
-using KustoLoco.Rendering;
+using KustoLoco.Rendering.ScottPlot;
 
 namespace pskql;
 
@@ -33,10 +35,7 @@ public class PsKqlCmdlet : Cmdlet
     )]
     public SwitchParameter NoQueryPrefix { get; set; }
 
-    protected override void ProcessRecord()
-    {
-        _objects.Add(Item);
-    }
+    protected override void ProcessRecord() => _objects.Add(Item);
 
 
     private void AddPropertyInfo(string prefix, PSPropertyInfo p, int rowIndex)
@@ -117,10 +116,7 @@ public class PsKqlCmdlet : Cmdlet
         foreach (var p in item.Properties) AddPropertyInfo(string.Empty, p, rowIndex);
     }
 
-    private static bool IsSimpleType(string typeName)
-    {
-        return TypeNameHelper.GetTypeFromName(typeName) != typeof(object);
-    }
+    private static bool IsSimpleType(string typeName) => TypeNameHelper.GetTypeFromName(typeName) != typeof(object);
 
     protected override void EndProcessing()
     {
@@ -159,13 +155,12 @@ public class PsKqlCmdlet : Cmdlet
         else
         {
             WriteDebug("Emitting output...");
-            if (result.Visualization == VisualizationState.Empty)
+            if (!result.IsChart)
             {
                 var columns = result.ColumnDefinitions();
                 foreach (var row in result.EnumerateRows())
                 {
                     var o = new PSObject();
-
                     foreach (var k in columns)
                         o.Properties.Add(new PSVariableProperty(new PSVariable(k.Name, row[k.Index])));
                     WriteObject(o);
@@ -173,17 +168,20 @@ public class PsKqlCmdlet : Cmdlet
             }
             else
             {
-                KustoResultRenderer.RenderChartInBrowser(result);
+                var str = ScottPlotKustoResultRenderer.RenderToSixelWithPad(result,
+                    new KustoSettingsProvider(),3);
+                WriteObject(str);
             }
         }
     }
+
 
     private BaseColumnBuilder GetOrCreateBuilder(string name, string typeName)
     {
         var type = TypeNameHelper.GetTypeFromName(typeName);
         if (_columnBuilders!.TryGetValue(name, out var b))
             return b;
-        b = ColumnHelpers.CreateBuilder(type, String.Empty);
+        b = ColumnHelpers.CreateBuilder(type, string.Empty);
         _columnBuilders[name] = b;
         _columnNames.Add(name);
         return b;
@@ -235,5 +233,72 @@ public class PsKqlCmdlet : Cmdlet
         //WriteDebug($"Getting builder for {columnName}");
         var colBuilder = GetOrCreateBuilder(columnName, typeName);
         colBuilder.AddAt(value, rowIndex);
+    }
+}
+
+internal class VTWriter : IDisposable
+{
+    private readonly bool _customwriter;
+    private readonly FileStream? _windowsStream;
+    private readonly TextWriter? _writer;
+    private bool _disposed;
+
+    public VTWriter()
+    {
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        var isRedirected = Console.IsOutputRedirected;
+#if NET472
+    if (isWindows && !isRedirected)
+    {
+      _windowsStream = new FileStream(NativeMethods.OpenConOut(), FileAccess.Write);
+      _writer = new StreamWriter(_windowsStream);
+      _customwriter = true;
+    }
+#else
+        if (isWindows && !isRedirected)
+        {
+            // Open the Windows stream to CONOUT$, for better performance..
+            // Console.Write is too slow for gifs.
+            _windowsStream = File.OpenWrite("CONOUT$");
+            _writer = new StreamWriter(_windowsStream);
+            _customwriter = true;
+        }
+#endif
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public void Write(string text)
+    {
+        if (_customwriter)
+            _writer?.Write(text);
+        else
+            Console.Write(text);
+    }
+
+    public void WriteLine(string text)
+    {
+        if (_customwriter)
+            _writer?.WriteLine(text);
+        else
+            Console.WriteLine(text);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed && _customwriter)
+        {
+            if (disposing)
+            {
+                _writer?.Dispose();
+                _windowsStream?.Dispose();
+            }
+
+            _disposed = true;
+        }
     }
 }

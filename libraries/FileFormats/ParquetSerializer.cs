@@ -1,5 +1,4 @@
-﻿using Kusto.Language.Utils;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Settings;
@@ -8,7 +7,6 @@ using NLog;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
-using System.Linq;
 
 namespace KustoLoco.FileFormats;
 
@@ -92,11 +90,9 @@ public class ParquetSerializer : ITableSerializer
 
             //populate column builders if this is the first row group
             if (!columnBuilders.Any())
-            {
                 columnBuilders = rowGroup
-                    .Select(dataColumn=> ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
+                    .Select(dataColumn => ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
                     .ToArray();
-            }
 
             //add data from this row group
             var columnIndex = 0;
@@ -104,8 +100,9 @@ public class ParquetSerializer : ITableSerializer
             {
                 //lookup the builder for this column
                 var builderInfo = columnBuilders[columnIndex];
+                builderInfo.AddCapacity(column.Data.Length);
                 _console.ShowProgress(
-                    $"Reading column {builderInfo.Name} of type {builderInfo.Name} from rowGroup {rowGroupIndex}");
+                    $"Reading column {builderInfo.Name} from rowGroup {rowGroupIndex}");
                 //TODO - surely there is a more efficient way to do this by wrapping the original data?
                 foreach (var cellData in column.Data)
                     builderInfo.Add(cellData);
@@ -116,6 +113,9 @@ public class ParquetSerializer : ITableSerializer
         }
 
         //having read all the data, we can now create the table
+        foreach (var colBuilder in columnBuilders)
+            colBuilder.TrimExcess();
+
         var tableBuilder = TableBuilder.CreateEmpty(tableName, totalRows);
         foreach (var colBuilder in columnBuilders)
             tableBuilder = tableBuilder.WithColumn(colBuilder.Name, colBuilder.ToColumn());
@@ -133,10 +133,9 @@ public class ParquetSerializer : ITableSerializer
     private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
     {
         //TODO - it feels like this could be done more efficiently
-        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType,String.Empty);
+        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType, string.Empty);
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
         return builder.GetDataAsArray();
     }
-
 }

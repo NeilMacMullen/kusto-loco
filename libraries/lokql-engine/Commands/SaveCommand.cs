@@ -1,4 +1,6 @@
 ﻿using CommandLine;
+using DocumentFormat.OpenXml.Linq;
+using KustoLoco.Core.Settings;
 
 namespace Lokql.Engine.Commands;
 
@@ -9,8 +11,17 @@ public static class SaveCommand
 {
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
+        var newLayer = new KustoSettingsProvider();
+        if (o.NoHeader)
+        {
+            newLayer.Set("csv.skipheader", "true");
+            newLayer.Set("tsv.skipheader", "true");
+        }
         var exp = econtext.Explorer;
+        exp.Settings.AddLayer(newLayer);
+       
         await exp._loader.SaveResult(exp.GetResult(o.ResultName), o.File);
+        exp.Settings.Pop();
     }
 
     [Verb("save", aliases: ["sv"], HelpText = @"save results to file.
@@ -27,5 +38,7 @@ Examples:
         public string File { get; set; } = string.Empty;
         [Value(1, HelpText = "Name of result (or most recent result if left blank)")]
         public string ResultName { get; set; } = string.Empty;
+        [Option(HelpText = "Avoid writing headers for csv and text files")]
+        public bool NoHeader { get; set; }
     }
 }

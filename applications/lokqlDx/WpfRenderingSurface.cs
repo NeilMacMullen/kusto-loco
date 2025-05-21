@@ -6,48 +6,47 @@ using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 using ScottPlot;
-using ScottPlot.WPF;
 using Label = System.Windows.Controls.Label;
 
 namespace lokqlDx;
 
-
 /// <summary>
-/// Provides a rendering surface for the WPF lokqlDx application.
+///     Provides a rendering surface for the WPF lokqlDx application.
 /// </summary>
 public class WpfRenderingSurface(
     TabControl tabControl,
     DataGrid dataGrid,
     Label dataGridSizeWarning,
-    WpfPlot plotter,
+    IScottPlotHost plotter,
     KustoSettingsProvider settings)
     : IResultRenderingSurface
 {
-    public WpfPlot Plotter { get; } = plotter;
-
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await SafeInvoke(async () => await RenderResultToApplicationDisplay(result));
         await SafeInvoke(() =>
         {
-            ScottPlotter.Render(Plotter, result, settings);
+            var plot = plotter.GetPlot(true);
+            ScottPlotKustoResultRenderer.RenderToPlot(plot, result, settings);
+            plotter.FinishUpdate();
             return Task.FromResult(true);
         });
     }
-    
+
 
     /// <summary>
     ///     Renders the result to an image
     /// </summary>
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
     {
-        using var plot = new Plot() ;
+        using var plot = new Plot();
         ScottPlotKustoResultRenderer.RenderToPlot(plot, result, settings);
         plot.Axes.AutoScale();
         var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
         return bytes;
     }
 
+    public void CopyToClipboard() => plotter.CopyToClipboard();
 
     private async Task<bool> RenderResultToApplicationDisplay(KustoQueryResult result)
     {

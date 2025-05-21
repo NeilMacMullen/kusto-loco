@@ -55,11 +55,11 @@ public class BabyKustoEngine
 
     public IReadOnlyCollection<FunctionInfo> GetImplementedList()
     {
-        var funcs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
+        var funcs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
             .Select(f => new FunctionInfo(f.Key.Name, true))
             .ToArray();
         var notImplemented =
-            GlobalState.Default.Functions.Except(BuiltInScalarFunctions.functions.Keys)
+            GlobalState.Default.Functions.Except(BuiltInScalarFunctions.Functions.Keys)
                 .Select(f => new FunctionInfo(f.Name, false))
                 .ToArray();
         return funcs.Concat(notImplemented)
@@ -75,7 +75,7 @@ public class BabyKustoEngine
 
         Logger.Trace("Evaluate called");
         //combine all available functions
-        var allFuncs = BuiltInScalarFunctions.functions.Concat(CustomFunctions.functions)
+        var allFuncs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
             .Concat(_additionalfuncs)
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         //some functions are implicitly implemented so use the existing default
