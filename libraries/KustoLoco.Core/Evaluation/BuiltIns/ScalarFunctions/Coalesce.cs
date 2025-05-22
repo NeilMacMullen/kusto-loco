@@ -177,6 +177,48 @@ internal class CoalesceDoubleFunctionImpl : IScalarFunctionImpl
     }
 }
 
+internal class CoalesceDecimalFunctionImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        decimal? result = null;
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            var item = (decimal?)arguments[i].Value;
+            if (item.HasValue)
+            {
+                result = item.Value;
+                break;
+            }
+        }
+
+        return new ScalarResult(ScalarTypes.Real, result);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length > 0);
+
+        var numRows = arguments[0].Column.RowCount;
+        var data = new decimal?[numRows];
+        for (var j = 0; j < numRows; j++)
+        {
+            for (var i = 0; i < arguments.Length; i++)
+            {
+                var column = (TypedBaseColumn<decimal?>)arguments[i].Column;
+                var item = column[j];
+                if (item.HasValue)
+                {
+                    data[j] = item.Value;
+                    break;
+                }
+            }
+        }
+
+        return new ColumnarResult(ColumnFactory.Create(data));
+    }
+}
+
 internal class CoalesceDateTimeFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)

@@ -40,6 +40,16 @@ internal class DCountAggregateDoubleImpl : IAggregateImpl
     }
 }
 
+internal class DCountAggregateDecimalImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var column = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        return new ScalarResult(ScalarTypes.Long, DCountHelper.Compute(column));
+    }
+}
+
 internal class DCountAggregateDateTimeImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)

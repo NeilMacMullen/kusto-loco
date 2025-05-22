@@ -33,6 +33,11 @@ public static class ColumnHelpers
             return CreateFromDoublesObjectArray(data);
         }
 
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return CreateFromDecimalsObjectArray(data);
+        }
+
         if (typeSymbol == ScalarTypes.Bool)
         {
             return CreateFromBoolsObjectArray(data);
@@ -85,6 +90,12 @@ public static class ColumnHelpers
         {
             return CreateFromDouble(value, numRows);
         }
+
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return CreateFromDecimal(value, numRows);
+        }
+
 
         if (typeSymbol == ScalarTypes.Bool)
         {
@@ -149,6 +160,11 @@ public static class ColumnHelpers
         if (typeSymbol == ScalarTypes.Long)
         {
             return new ColumnBuilder<long?>(name);
+        }
+
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return new ColumnBuilder<decimal?>(name);
         }
 
         if (typeSymbol == ScalarTypes.Real)
@@ -231,6 +247,11 @@ public static class ColumnHelpers
         if (typeSymbol == ScalarTypes.Long)
         {
             return Create(mapping, others.Cast<TypedBaseColumn<long?>>().ToArray(), mapType);
+        }
+
+        if (typeSymbol == ScalarTypes.Decimal)
+        {
+            return Create(mapping, others.Cast<TypedBaseColumn<decimal?>>().ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Real)
@@ -329,6 +350,20 @@ public static class ColumnHelpers
         return ColumnFactory.Create(columnData);
     }
 
+    private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
+    {
+        var columnData = new decimal?[data.Length];
+        for (var i = 0; i < data.Length; i++)
+        {
+            var item = data[i];
+            columnData[i] = item == null
+                ? null
+                : Convert.ToDecimal(item);
+        }
+
+        return ColumnFactory.Create(columnData);
+    }
+
     private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
     {
         var columnData = new bool?[data.Length];
@@ -360,6 +395,12 @@ public static class ColumnHelpers
         => CreateFromScalar<double?>(value == null
                                          ? null
                                          : Convert.ToDouble(value), rowCount);
+
+    private static TypedBaseColumn<decimal?> CreateFromDecimal(object? value, int rowCount)
+        => CreateFromScalar<decimal?>(value == null
+            ? null
+            : Convert.ToDecimal(value), rowCount);
+
 
     private static TypedBaseColumn<bool?> CreateFromBool(object? value, int rowCount)
         => CreateFromScalar<bool?>(value == null

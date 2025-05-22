@@ -45,6 +45,19 @@ internal partial class AvgIfAggregate
         ? null
         : context.DoubleValue / context.Count;
 
+    internal static decimal DecimalImpl(NumericAggregate context, decimal n, bool t)
+    {
+        if (!t)
+            return 0;
+        context.Count++;
+        context.DecimalValue += n;
+        return 0;
+    }
+
+    internal static decimal? DecimalImplFinish(NumericAggregate context) => context.Count == 0
+        ? null
+        : context.DecimalValue / context.Count;
+
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n, bool t)
     {
         if (!t)
