@@ -32,6 +32,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.Long),
                 new AggregateOverloadInfo(new DCountAggregateDoubleImpl(), ScalarTypes.Long,
                     ScalarTypes.Real),
+                new AggregateOverloadInfo(new DCountAggregateDecimalImpl(), ScalarTypes.Long,
+                    ScalarTypes.Decimal),
                 new AggregateOverloadInfo(new DCountAggregateDateTimeImpl(), ScalarTypes.Long,
                     ScalarTypes.DateTime),
                 new AggregateOverloadInfo(new DCountAggregateTimeSpanImpl(), ScalarTypes.Long,
@@ -47,6 +49,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.Long),
                 new AggregateOverloadInfo(new DCountAggregateDoubleImpl(), ScalarTypes.Long,
                     ScalarTypes.Real),
+                new AggregateOverloadInfo(new DCountAggregateDecimalImpl(), ScalarTypes.Long,
+                    ScalarTypes.Decimal),
                 new AggregateOverloadInfo(new DCountAggregateDateTimeImpl(), ScalarTypes.Long,
                     ScalarTypes.DateTime),
                 new AggregateOverloadInfo(new DCountAggregateTimeSpanImpl(), ScalarTypes.Long,
@@ -64,6 +68,9 @@ internal static class BuiltInAggregates
                     ScalarTypes.Bool),
                 new AggregateOverloadInfo(new DCountIfAggregateDoubleImpl(), ScalarTypes.Long,
                     ScalarTypes.Real,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateDecimalImpl(), ScalarTypes.Long,
+                    ScalarTypes.Decimal,
                     ScalarTypes.Bool),
                 new AggregateOverloadInfo(new DCountIfAggregateDateTimeImpl(),
                     ScalarTypes.Long, ScalarTypes.DateTime,
@@ -85,6 +92,9 @@ internal static class BuiltInAggregates
                     ScalarTypes.Bool),
                 new AggregateOverloadInfo(new DCountIfAggregateDoubleImpl(), ScalarTypes.Long,
                     ScalarTypes.Real,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new DCountIfAggregateDecimalImpl(), ScalarTypes.Long,
+                    ScalarTypes.Decimal,
                     ScalarTypes.Bool),
                 new AggregateOverloadInfo(new DCountIfAggregateDateTimeImpl(),
                     ScalarTypes.Long, ScalarTypes.DateTime,
@@ -155,6 +165,11 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new MakeSetDoubleFunctionImpl(), ScalarTypes.Dynamic,
                     ScalarTypes.Real,
                     ScalarTypes.Long),
+                new AggregateOverloadInfo(new MakeSetDecimalFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Decimal),
+                new AggregateOverloadInfo(new MakeSetDecimalFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Decimal,
+                    ScalarTypes.Long),
                 new AggregateOverloadInfo(new MakeSetTimeSpanFunctionImpl(),
                     ScalarTypes.Dynamic, ScalarTypes.TimeSpan),
                 new AggregateOverloadInfo(new MakeSetTimeSpanFunctionImpl(),
@@ -191,6 +206,12 @@ internal static class BuiltInAggregates
                     ScalarTypes.Bool),
                 new AggregateOverloadInfo(new MakeSetIfDoubleFunctionImpl(),
                     ScalarTypes.Dynamic, ScalarTypes.Real,
+                    ScalarTypes.Bool, ScalarTypes.Long),
+                new AggregateOverloadInfo(new MakeSetIfDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new MakeSetIfDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal,
                     ScalarTypes.Bool, ScalarTypes.Long),
                 new AggregateOverloadInfo(new MakeSetIfTimeSpanFunctionImpl(),
                     ScalarTypes.Dynamic,
@@ -231,6 +252,11 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new MakeListDoubleFunctionImpl(),
                     ScalarTypes.Dynamic, ScalarTypes.Real,
                     ScalarTypes.Long),
+                new AggregateOverloadInfo(new MakeListDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal),
+                new AggregateOverloadInfo(new MakeListDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal,
+                    ScalarTypes.Long),
                 new AggregateOverloadInfo(new MakeListTimeSpanFunctionImpl(),
                     ScalarTypes.Dynamic,
                     ScalarTypes.TimeSpan),
@@ -270,6 +296,12 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new MakeListIfDoubleFunctionImpl(),
                     ScalarTypes.Dynamic, ScalarTypes.Real,
                     ScalarTypes.Bool, ScalarTypes.Long),
+                new AggregateOverloadInfo(new MakeListIfDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new MakeListIfDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic, ScalarTypes.Decimal,
+                    ScalarTypes.Bool, ScalarTypes.Long),
                 new AggregateOverloadInfo(new MakeListIfTimeSpanFunctionImpl(),
                     ScalarTypes.Dynamic,
                     ScalarTypes.TimeSpan, ScalarTypes.Bool),
@@ -302,6 +334,9 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new MakeListWithNullsDoubleFunctionImpl(),
                     ScalarTypes.Dynamic,
                     ScalarTypes.Real),
+                new AggregateOverloadInfo(new MakeListWithNullsDecimalFunctionImpl(),
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.Decimal),
                 new AggregateOverloadInfo(new MakeListWithNullsTimeSpanFunctionImpl(),
                     ScalarTypes.Dynamic,
                     ScalarTypes.TimeSpan),
@@ -313,10 +348,11 @@ internal static class BuiltInAggregates
                     ScalarTypes.String)));
     }
 
-    public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
+    public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol,
+        TypeSymbol returnType, IRExpressionNode[] arguments,
         List<Parameter> parameters)
     {
-        if (!TryGetOverload(symbol, arguments, parameters, out var overload))
+        if (!TryGetOverload(symbol, returnType, arguments, parameters, out var overload))
             throw new NotImplementedException(
                 $"Aggregate function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
 
@@ -324,7 +360,8 @@ internal static class BuiltInAggregates
         return overload;
     }
 
-    public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
+    public static bool TryGetOverload(FunctionSymbol symbol,
+        TypeSymbol returnType, IRExpressionNode[] arguments, List<Parameter> parameters,
         out AggregateOverloadInfo? overload)
     {
         if (!aggregates.TryGetValue(symbol, out var aggregateInfo))
@@ -333,7 +370,7 @@ internal static class BuiltInAggregates
             return false;
         }
 
-        overload = BuiltInsHelper.PickOverload(aggregateInfo.Overloads, arguments);
+        overload = BuiltInsHelper.PickOverload(returnType, aggregateInfo.Overloads, arguments);
         return overload != null;
     }
 }

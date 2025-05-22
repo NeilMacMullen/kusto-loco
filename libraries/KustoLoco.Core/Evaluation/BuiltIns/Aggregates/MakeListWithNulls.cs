@@ -61,6 +61,23 @@ internal class MakeListWithNullsDoubleFunctionImpl : IAggregateImpl
     }
 }
 
+internal class MakeListWithNullsDecimalFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+
+        var list = new List<decimal?>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            list.Add(valuesColumn[i]);
+        }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
+    }
+}
+
 internal class MakeListWithNullsTimeSpanFunctionImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)

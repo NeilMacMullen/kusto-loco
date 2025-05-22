@@ -113,6 +113,32 @@ internal class IsNullDoubleFunctionImpl : IScalarFunctionImpl
     }
 }
 
+internal class IsNullDecimalFunctionImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var value = (decimal?)arguments[0].Value;
+
+        return new ScalarResult(ScalarTypes.Bool, value == null);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 1);
+        var valueCol = (TypedBaseColumn<decimal?>)(arguments[0].Column);
+
+        var data = new bool?[valueCol.RowCount];
+        for (var i = 0; i < valueCol.RowCount; i++)
+        {
+            var value = valueCol[i];
+            data[i] = value == null;
+        }
+
+        return new ColumnarResult(ColumnFactory.Create(data));
+    }
+}
+
 internal class IsNullDateTimeFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)

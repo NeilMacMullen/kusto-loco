@@ -14,6 +14,11 @@ internal partial class MaxOfFunction
     public double R3Impl(double a, double b, double c) => Math.Max(Math.Max(a, b), c);
     public double R4Impl(double a, double b, double c, double d) => Math.Max(Math.Max(Math.Max(a, b), c), d);
 
+
+    public decimal D2Impl(decimal a, decimal b) => Math.Max(a, b);
+    public decimal D3Impl(decimal a, decimal b, decimal c) => Math.Max(Math.Max(a, b), c);
+    public decimal D4Impl(decimal a, decimal b, decimal c, decimal d) => Math.Max(Math.Max(Math.Max(a, b), c), d);
+
     
 
     public DateTime DT2Impl(DateTime a, DateTime b) => DateAndTimeSpanComparison.Max(a, b);

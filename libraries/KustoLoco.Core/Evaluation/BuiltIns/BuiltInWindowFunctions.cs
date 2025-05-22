@@ -28,14 +28,17 @@ internal static class BuiltInWindowFunctions
                     ScalarTypes.Bool),
                 new WindowOverloadInfo(new RowCumSumDoubleFunctionImpl(), ScalarTypes.Real, ScalarTypes.Real,
                     ScalarTypes.Bool),
+                new WindowOverloadInfo(new RowCumSumDecimalFunctionImpl(), ScalarTypes.Decimal, ScalarTypes.Decimal,
+                    ScalarTypes.Bool),
                 new WindowOverloadInfo(new RowCumSumTimeSpanFunctionImpl(), ScalarTypes.TimeSpan, ScalarTypes.TimeSpan,
                     ScalarTypes.Bool)));
     }
 
-    public static WindowOverloadInfo GetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments,
+    public static WindowOverloadInfo GetOverload(FunctionSymbol symbol,
+        TypeSymbol returnType,IRExpressionNode[] arguments,
         List<Parameter> parameters)
     {
-        if (!TryGetOverload(symbol, arguments, parameters, out var overload))
+        if (!TryGetOverload(symbol,returnType, arguments, parameters, out var overload))
         {
             throw new NotImplementedException(
                 $"Window function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
@@ -45,7 +48,8 @@ internal static class BuiltInWindowFunctions
         return overload;
     }
 
-    public static bool TryGetOverload(FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
+    public static bool TryGetOverload(FunctionSymbol symbol,
+        TypeSymbol resutType,IRExpressionNode[] arguments, List<Parameter> parameters,
         out WindowOverloadInfo? overload)
     {
         if (!functions.TryGetValue(symbol, out var functionInfo))
@@ -54,7 +58,7 @@ internal static class BuiltInWindowFunctions
             return false;
         }
 
-        overload = BuiltInsHelper.PickOverload(functionInfo.Overloads, arguments);
+        overload = BuiltInsHelper.PickOverload(resutType,functionInfo.Overloads, arguments);
         return overload != null;
     }
 }

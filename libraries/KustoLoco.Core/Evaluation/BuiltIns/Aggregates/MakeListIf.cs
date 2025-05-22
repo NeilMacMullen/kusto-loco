@@ -136,6 +136,49 @@ internal class MakeListIfDoubleFunctionImpl : IAggregateImpl
     }
 }
 
+
+internal class MakeListIfDecimalFunctionImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
+        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+
+        var maxSize = long.MaxValue;
+        if (arguments.Length == 3)
+        {
+            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
+            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+
+            if (maxSizeColumn.RowCount > 0)
+            {
+                maxSize = maxSizeColumn[0] ?? long.MaxValue;
+            }
+        }
+
+        var list = new List<decimal>();
+        for (var i = 0; i < valuesColumn.RowCount; i++)
+        {
+            if (predicatesColumn[i] == true)
+            {
+                var v = valuesColumn[i];
+                if (v.HasValue)
+                {
+                    list.Add(v.Value);
+                    if (list.Count >= maxSize)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return new ScalarResult(ScalarTypes.Dynamic, JsonArrayHelper.From(list));
+    }
+}
+
 internal class MakeListIfTimeSpanFunctionImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)

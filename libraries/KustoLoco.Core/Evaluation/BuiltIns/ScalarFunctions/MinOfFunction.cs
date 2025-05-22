@@ -14,6 +14,12 @@ internal partial class MinOfFunction
     public double R3Impl(double a, double b, double c) => Math.Min(Math.Min(a, b), c);
     public double R4Impl(double a, double b, double c, double d) => Math.Min(Math.Min(Math.Min(a, b), c), d);
 
+
+    public decimal D2Impl(decimal a, decimal b) => Math.Min(a, b);
+    public decimal D3Impl(decimal a, decimal b, decimal c) => Math.Min(Math.Min(a, b), c);
+    public decimal D4Impl(decimal a, decimal b, decimal c, decimal d) => Math.Min(Math.Min(Math.Min(a, b), c), d);
+
+
    
     public DateTime DT2Impl(DateTime a, DateTime b) => DateAndTimeSpanComparison.Min(a, b);
     public DateTime DT3Impl(DateTime a, DateTime b, DateTime c) => DateAndTimeSpanComparison.Min(DateAndTimeSpanComparison.Min(a, b), c);

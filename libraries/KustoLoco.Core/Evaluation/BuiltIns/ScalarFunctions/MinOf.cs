@@ -136,3 +136,46 @@ internal class MinOfDoubleFunctionImpl : IScalarFunctionImpl
         return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
+
+internal class MinOfDecimalFunctionImpl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        decimal? min = null;
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            var item = (decimal?)arguments[i].Value;
+            if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+            {
+                min = item.Value;
+            }
+        }
+
+        return new ScalarResult(ScalarTypes.Real, min);
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length > 0);
+
+        var numRows = arguments[0].Column.RowCount;
+        var data = new decimal?[numRows];
+        for (var j = 0; j < numRows; j++)
+        {
+            decimal? min = null;
+            for (var i = 0; i < arguments.Length; i++)
+            {
+                var column = (TypedBaseColumn<decimal?>)arguments[i].Column;
+                var item = column[j];
+                if (item.HasValue && (!min.HasValue || item.Value < min.Value))
+                {
+                    min = item.Value;
+                }
+            }
+
+            data[j] = min;
+        }
+
+        return new ColumnarResult(ColumnFactory.Create(data));
+    }
+}

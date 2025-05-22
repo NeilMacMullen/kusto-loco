@@ -36,7 +36,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
         //between used after datetime range thinks type is unknown...
         var irArguments = new[] { parameterExpression!, leftRange, rightRange };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
 
         //ApplyTypeCoercions(irArguments, overloadInfo);
 
@@ -76,7 +77,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
         var str1 = new IRPreEvaluatedScalarExpressionNode(ja, DynamicArraySymbol.From("dynamic"));
         var irArguments = new[] { parameterExpression!, str1! };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
         return new IRBuiltInScalarFunctionCallNode(signature,
             overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
     }
@@ -238,7 +240,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         var irRight = (IRExpressionNode)node.Right.Accept(this);
 
         var irArguments = new[] { irLeft, irRight };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRBinaryExpressionNode(signature, overloadInfo, irArguments[0], irArguments[1], node.ResultType);
@@ -260,7 +263,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
 
         var irArguments = new[] { irExpression };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, node.ResultType, irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRUnaryExpressionNode(signature, overloadInfo, irExpression, node.ResultType);
@@ -269,6 +272,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitFunctionCallExpression(FunctionCallExpression node)
     {
         var signature = node.ReferencedSignature;
+        var returnType = node.ResultType;
 
         var arguments = new Expression[node.ArgumentList.Expressions.Count];
         var irArguments = new IRExpressionNode[arguments.Length];
@@ -320,7 +324,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var functionSymbol = (FunctionSymbol)signature.Symbol;
-        if (FunctionFinder.TryGetOverload(_functions, functionSymbol, irArguments, parameters,
+        if (FunctionFinder.TryGetOverload(_functions, functionSymbol, returnType, irArguments, parameters,
                 out var functionOverload))
         {
             Debug.Assert(functionOverload != null);
@@ -329,7 +333,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 IRListNode.From(irArguments), node.ResultType);
         }
 
-        if (BuiltInAggregates.TryGetOverload(functionSymbol, irArguments, parameters, out var aggregateOverload))
+        if (BuiltInAggregates.TryGetOverload(functionSymbol,returnType, irArguments, parameters, out var aggregateOverload))
         {
             Debug.Assert(aggregateOverload != null);
             ApplyTypeCoercions(irArguments, aggregateOverload);
@@ -337,7 +341,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 node.ResultType);
         }
 
-        if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, irArguments, parameters,
+        if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
                 out var windowFunctionOverload))
         {
             Debug.Assert(windowFunctionOverload != null);

@@ -43,6 +43,19 @@ internal partial class MinIfAggregate
     internal static double? DoubleImplFinish(NumericAggregate context)
         => context.Count == 0 ? null : context.DoubleValue;
 
+
+    internal static decimal DecimalImpl(NumericAggregate context, decimal n, bool t)
+    {
+        if (!t)
+            return 0;
+        context.DecimalValue = context.Count == 0 ? n : Math.Min(context.DecimalValue, n);
+        context.Count++;
+        return 0;
+    }
+
+    internal static decimal? DecimalImplFinish(NumericAggregate context)
+        => context.Count == 0 ? null : context.DecimalValue;
+
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n, bool t)
     {
         if (!t)
