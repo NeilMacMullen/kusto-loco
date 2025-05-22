@@ -15,5 +15,9 @@ public class NumericAggregate
     /// longs where precision could otherwise be lost
     /// </summary>
     public long LongValue;
+    /// <summary>
+    /// used for aggregations for decimals
+    /// </summary>
+    public decimal DecimalValue;
 }
 
