@@ -870,7 +870,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task CountOfTest()
     {
-        var query = @"print countof('abc abc ab','abc')";
+        var query = "print countof('abc abc ab','abc')";
         var result = await LastLineOfResult(query);
         result.Should().Be("2");
     }
@@ -878,7 +878,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task CountOfNormalTest()
     {
-        var query = @"print countof('abc abc ab','abc','normal')";
+        var query = "print countof('abc abc ab','abc','normal')";
         var result = await LastLineOfResult(query);
         result.Should().Be("2");
     }
@@ -886,7 +886,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task CountOfRegexTest()
     {
-        var query = @"print countof('abc abc ab a','a.','regex')";
+        var query = "print countof('abc abc ab a','a.','regex')";
         var result = await LastLineOfResult(query);
         result.Should().Be("3");
     }
@@ -894,10 +894,10 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task IndexOfTest()
     {
-        (await LastLineOfResult(@"print indexof('abc def ab','def')")).Should().Be("4");
-        (await LastLineOfResult(@"print indexof('abc def ab','xyz')")).Should().Be("-1");
-        (await LastLineOfResult(@"print indexof('abc def ab','ab',7)")).Should().Be("8");
-        (await LastLineOfResult(@"print indexof('abc def ab','ab',-2)")).Should().Be("8");
+        (await LastLineOfResult("print indexof('abc def ab','def')")).Should().Be("4");
+        (await LastLineOfResult("print indexof('abc def ab','xyz')")).Should().Be("-1");
+        (await LastLineOfResult("print indexof('abc def ab','ab',7)")).Should().Be("8");
+        (await LastLineOfResult("print indexof('abc def ab','ab',-2)")).Should().Be("8");
 
         //test cases from docs        
         (await LastLineOfResult("""print indexof("abcdefg","cde")""")).Should().Be("2");
@@ -931,39 +931,39 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task DatetimeAdd()
     {
-        (await LastLineOfResult(@"print datetime_add('year',-5,make_datetime(2017,1,1))"))
+        (await LastLineOfResult("print datetime_add('year',-5,make_datetime(2017,1,1))"))
             .Should().Be("2012-01-01 00:00:00Z");
     }
     
     [TestMethod]
     public async Task DatetimeDiff()
     {
-        (await LastLineOfResult(@"print  datetime_diff('year',datetime(2017-01-01),datetime(2000-12-31))"))
+        (await LastLineOfResult("print  datetime_diff('year',datetime(2017-01-01),datetime(2000-12-31))"))
             .Should().Be("17");
-        (await LastLineOfResult(@"print datetime_diff('quarter',datetime(2017-07-01),datetime(2017-03-30))"))
+        (await LastLineOfResult("print datetime_diff('quarter',datetime(2017-07-01),datetime(2017-03-30))"))
             .Should().Be("2");
-        (await LastLineOfResult(@"print datetime_diff('month',datetime(2017-01-01),datetime(2015-12-30))"))
+        (await LastLineOfResult("print datetime_diff('month',datetime(2017-01-01),datetime(2015-12-30))"))
             .Should().Be("13");
-        (await LastLineOfResult(@"print datetime_diff('week',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+        (await LastLineOfResult("print datetime_diff('week',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
             .Should().Be("5");
-        (await LastLineOfResult(@"print datetime_diff('day',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+        (await LastLineOfResult("print datetime_diff('day',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
             .Should().Be("29");
-        (await LastLineOfResult(@"print datetime_diff('hour',datetime(2017-10-31 01:00),datetime(2017-10-30 23:59))"))
+        (await LastLineOfResult("print datetime_diff('hour',datetime(2017-10-31 01:00),datetime(2017-10-30 23:59))"))
             .Should().Be("2");
         (await LastLineOfResult(
-                @"print datetime_diff('minute',datetime(2017-10-30 23:05:01),datetime(2017-10-30 23:00:59))")).Should()
+                "print datetime_diff('minute',datetime(2017-10-30 23:05:01),datetime(2017-10-30 23:00:59))")).Should()
             .Be("5");
         (await LastLineOfResult(
-                @"print datetime_diff('second',datetime(2017-10-30 23:00:10.100),datetime(2017-10-30 23:00:00.900))"))
+                "print datetime_diff('second',datetime(2017-10-30 23:00:10.100),datetime(2017-10-30 23:00:00.900))"))
             .Should().Be("10");
         (await LastLineOfResult(
-                @"print datetime_diff('millisecond',datetime(2017-10-30 23:00:00.200100),datetime(2017-10-30 23:00:00.100900))"))
+                "print datetime_diff('millisecond',datetime(2017-10-30 23:00:00.200100),datetime(2017-10-30 23:00:00.100900))"))
             .Should().Be("100");
         (await LastLineOfResult(
-                @"print datetime_diff('microsecond',datetime(2017-10-30 23:00:00.1009001),datetime(2017-10-30 23:00:00.1008009))"))
+                "print datetime_diff('microsecond',datetime(2017-10-30 23:00:00.1009001),datetime(2017-10-30 23:00:00.1008009))"))
             .Should().Be("100");
         (await LastLineOfResult(
-                @"print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
+                "print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
             .Should().Be("-700");
     }
 
@@ -1195,11 +1195,92 @@ print toscalar(letters | summarize mx=min(bitmap));";
     }
 
     [TestMethod]
-    public async Task longLiteral()
+    public async Task LongLiteral()
     {
         var query = "print long(123)";
         var result = await LastLineOfResult(query);
         result.Should().Be("123");
     }
 
+    [TestMethod]
+    public async Task DecimalAddition()
+    {
+        var query = "print result = decimal(1.1) + decimal(2.2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.3");
+    }
+
+    [TestMethod]
+    public async Task DecimalSubtraction()
+    {
+        var query = "print result = decimal(5.5) - decimal(2.2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.3");
+    }
+
+    [TestMethod]
+    public async Task DecimalMultiplication()
+    {
+        var query = "print result = decimal(1.5) * decimal(2.0)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.00");
+    }
+
+    [TestMethod]
+    public async Task DecimalMultiplicationType()
+    {
+        var query = "print result = decimal(1.5) * decimal(2.0)|getschema";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("decimal");
+    }
+
+    [TestMethod]
+    public async Task DecimalDivision()
+    {
+        var query = "print result = decimal(7.5) / decimal(2.5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+    [TestMethod]
+    public async Task DecimalDivisionType()
+    {
+        var query = "print result = decimal(7.5) / decimal(2.5)|getschema";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("decimal");
+    }
+
+    [TestMethod]
+    public async Task DecimalComparison()
+    {
+        var query = "print result = decimal(2.5) > decimal(1.5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task DecimalEquality()
+    {
+        var query = "print result = decimal(3.3) == decimal(3.3)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task DecimalInTableSummarize()
+    {
+        var query = "datatable(a:decimal) [1.1, 2.2, 3.3] | summarize total = sum(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("6.6");
+    }
+
+    [TestMethod]
+    public async Task DecimalRound()
+    {
+        var query = "print result = round(decimal(3.14159), 2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.14");
+    }
+
+   
 }
