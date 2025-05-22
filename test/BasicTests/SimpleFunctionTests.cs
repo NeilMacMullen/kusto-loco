@@ -141,6 +141,49 @@ datatable(Size:int) [50]
         result.Should().Be("Cdef");
     }
 
+    [TestMethod]
+    public async Task Substring_OutOfRange_ShouldReturnEmpty()
+    {
+        var query = "print c=substring('abc', 10, 5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns empty string if start index is out of range
+    }
+
+    [TestMethod]
+    public async Task DivideByZero_ShouldReturnNullOrError()
+    {
+        var query = "print c=1/0";
+        var result = await LastLineOfResult(query);
+        // Depending on implementation, this may return null, error, or special value
+        result.Should().Match(r => r == "" || r.Contains("error") || r == "null");
+    }
+
+    [TestMethod]
+    public async Task InvalidDateTimeFormat_ShouldReturnNull()
+    {
+        var query = "print D=todatetime('not-a-date')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns null for invalid datetime parse
+    }
+
+   
+
+    [TestMethod]
+    public async Task ToInt_InvalidString_ShouldReturnNull()
+    {
+        var query = "print c=toint('notanumber')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns null for invalid conversion
+    }
+
+  
+    [TestMethod]
+    public async Task MakeDateTime_InvalidMonth_ShouldReturnNull()
+    {
+        var query = "print c=make_datetime(2020, 13, 1)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // Invalid month should return null
+    }
 
     [TestMethod]
     public async Task Trimws()
