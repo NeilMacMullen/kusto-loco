@@ -41,9 +41,9 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog" Version="5.4.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.8.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.9.0" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.9.0" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.1.0" />
     <PackageVersion Include="Parquet.Net" Version="5.1.1" />
@@ -72,8 +72,6 @@
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
     <PackageVersion Include="geohash-dotnet" Version="2.2.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
     <PackageVersion Include="Avalonia" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Desktop" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.0" />
@@ -88,5 +86,7 @@
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.0"/>
     <PackageVersion Include="MessageBox.Avalonia" Version="3.2.0" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0"/>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.2" />
   </ItemGroup>
 </Project>
