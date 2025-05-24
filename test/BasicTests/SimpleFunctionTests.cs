@@ -1325,5 +1325,6 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().Be("3.14");
     }
 
+  
    
 }
