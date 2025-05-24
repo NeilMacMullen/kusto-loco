@@ -1,0 +1,139 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:LokqlDx.ViewModels"
+             xmlns:views="using:LokqlDx.Views"
+             xmlns:labs="using:Avalonia.Labs.Controls"
+             xmlns:avaloniaEdit="using:AvaloniaEdit"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LokqlDx.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+    
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
+            <InvokeCommandAction Command="{Binding InitializeCommand}"/>
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Name="MainMenu">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Workspace"  /> <!--Click="NewWorkspace"-->
+                <MenuItem Header="_Open Workspace"  /> <!--Click="OnOpenWorkSpace"-->
+                <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
+
+                <MenuItem Header="_Save"/> <!-- Click="OnSaveWorkspace" -->
+                <MenuItem Header="Save _As" /> <!--Click="SaveWorkspaceAsEvent" -->
+            </MenuItem>
+            <MenuItem Header="_Preferences">
+                <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" /><!-- Click="OpenApplicationOptionsDialog"-->
+                <MenuItem Header="Workspace Options"  /> <!--Click="OpenWorkspaceOptionsDialog"-->
+                <Separator />
+                <MenuItem Header="Decrease FontSize" HotKey="Ctrl+9"  /> <!--Click="DecreaseFontSize"-->
+                <MenuItem Header="Increase FontSize" HotKey="Ctrl+0" /> <!--Click="IncreaseFontSize" -->
+                <MenuItem Header="Toggle word-wrap" HotKey="Alt+Z"  />
+                    <!--Click="ToggleWordWrap"-->
+                <MenuItem Header="Toggle line-numbers" HotKey="Alt+N" />
+                        <!--Click="ToggleLineNumbers"-->
+
+            </MenuItem>
+            <MenuItem Header="Misc">
+                <MenuItem Header="Register file association"  />
+                <!--Click="EnableJumpList"-->
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="LokqlDx intro"  Tag="LokqlDX" /> <!--Click="NavigateToWiki"-->
+            <MenuItem Header="Quick start"  Tag="LokqlDx-tutorial-‐-quick-start" />
+                    <!--Click="NavigateToWiki"-->
+                <MenuItem Header="Chart customisation"  Tag="ScottPlot-Chart-customisation" /> <!--Click="NavigateToWiki"-->
+                <Separator />
+                <MenuItem Header="Kusto-loco Project Page" 
+                          Tag="https://github.com/NeilMacMullen/kusto-loco" />
+                    <!--Click="NavigateToUri"-->
+                <MenuItem Header="Github Discussion Forum" 
+                          Tag="https://github.com/NeilMacMullen/kusto-loco/discussions" /> <!--Click="NavigateToUri"-->
+                <Separator />
+                <MenuItem Header="KQL Introduction" 
+                          Tag="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
+                    <!--Click="NavigateToUri"-->
+                <Separator />
+
+
+                <MenuItem Header="About"  />
+    <!--Click="AboutBox"-->
+
+            </MenuItem>
+        </Menu>
+
+        <Grid RowDefinitions="*,30">
+            <Grid
+                x:Name="MainGrid"
+                ColumnDefinitions="400,auto,*"
+                RowDefinitions="*,auto,*">
+                
+                <!--<Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding EditorColumn}"/>
+                    <ColumnDefinition Width="{Binding SplitterColumn}"/>
+                    <ColumnDefinition Width="{Binding OutputColumn}"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{Binding EditorRow}"/>
+                    <RowDefinition Height="{Binding SplitterRow}"/>
+                    <RowDefinition Height="{Binding ConsoleRow}"/>
+                </Grid.RowDefinitions>-->
+
+                <TabControl
+                    Grid.Row="0"
+                    Grid.Column="0">
+                    <TabItem Header="Edit">
+                        <views:QueryEditorView DataContext="{Binding QueryEditorViewModel}"/>
+                    </TabItem>
+                    <TabItem Header="Copilot">
+                        <views:CopilotChatView />
+                    </TabItem>
+                </TabControl>
+
+                <GridSplitter
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Height="5"
+                    Background="#227F7F7F"/>
+
+                <views:ConsoleView
+                    Background="{DynamicResource SystemAltLowColor}"
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    DataContext="{Binding ConsoleViewModel}"/>
+
+                <GridSplitter
+                    Grid.RowSpan="3"
+                    Grid.Column="1"
+                    Width="5"
+                    Background="#227F7F7F"/>
+
+                <views:RenderingSurfaceView
+                    DataContext="{Binding RenderingSurfaceViewModel}"
+                    Grid.RowSpan="3"
+                    Grid.Column="2"/>
+
+
+
+            </Grid>
+
+            <Grid
+                x:Name="StatusBar"
+                Background="{DynamicResource SystemAltMediumColor}"
+                Grid.Row="1"
+                Grid.ColumnSpan="3">
+
+            </Grid>
+        </Grid>
+    </DockPanel>
+</UserControl>

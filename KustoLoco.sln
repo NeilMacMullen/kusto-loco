@@ -102,6 +102,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderTests", "test\RenderT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SixelSupport", "libraries\SixelSupport\SixelSupport.csproj", "{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlDx-Av", "applications\lokqlDx-Av\lokqlDx-Av.csproj", "{41B66468-2406-9C1D-72C8-C947DABA324C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -244,6 +246,10 @@ Global
 		{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41B66468-2406-9C1D-72C8-C947DABA324C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41B66468-2406-9C1D-72C8-C947DABA324C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41B66468-2406-9C1D-72C8-C947DABA324C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41B66468-2406-9C1D-72C8-C947DABA324C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +290,7 @@ Global
 		{5F3F34FE-3B2A-4272-A8FD-AF73E496AAD3} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{0CE04FD8-ED41-4F30-AF15-11BA7548E428} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
+		{41B66468-2406-9C1D-72C8-C947DABA324C} = {B891952E-5D41-45F7-ABB2-B512A8200656}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
