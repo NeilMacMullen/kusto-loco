@@ -80,7 +80,7 @@ internal class Win32ApiService(
                 {
                     var path = pathFactory.Create(x.ui0_remote);
                     if (path is UncPath p) return p;
-                    logger.LogWarning("Unexpected {@Path} type", path);
+                    logger.LogWarning("Failed to retrieve host from unexpected {@Path} type", path);
                     return null;
                 }
             )
