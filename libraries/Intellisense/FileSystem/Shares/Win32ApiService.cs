@@ -20,16 +20,11 @@ internal class Win32ApiService(
     private const int MaxItemCount = 1000;
     private static readonly TimeSpan PingTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan ShareRetrievalWarningTime = TimeSpan.FromSeconds(3);
-    private static bool SupportAlternativeTcpPorts = false;
-    private const int TcpPort = 445;
 
     public async Task<IEnumerable<string>> GetSharesAsync(string host)
     {
-        var canConnect = SupportAlternativeTcpPorts
-            ? await CanConnect(host)
-            : await CanConnectTcp(host);
 
-        if (!canConnect)
+        if (!await PingHost(host))
         {
             return [];
         }
@@ -40,6 +35,7 @@ internal class Win32ApiService(
         try
         {
             // NetShareEnum can potentially block thread for a while (~11 seconds) when host exists but port isn't open
+            // smb client can use another port besides 445 in newer Windows versions
             var results = NetApi32
                 .NetShareEnum<NetApi32.SHARE_INFO_1>(host)
                 .Take(MaxItemCount)
@@ -65,16 +61,7 @@ internal class Win32ApiService(
         }
     }
 
-    private async Task<bool> CanConnectTcp(string host)
-    {
-        using var tcp = new TcpClient();
-        logger.LogDebug("Checking for port availability for host.");
-        await tcp.ConnectAsync(host, TcpPort, cts.Token);
-        logger.LogDebug("{ConnectionResult}", tcp.Connected);
-        return tcp.Connected;
-    }
-
-    private async Task<bool> CanConnect(string host)
+    private async Task<bool> PingHost(string host)
     {
         // NetShareEnum can potentially block thread for a while (~11 seconds)
         using var ping = new Ping();
