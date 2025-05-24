@@ -10,11 +10,12 @@ public interface IIntellisenseService
     Task<CompletionResult> GetCompletionResultAsync(string input, CancellationToken cancellationToken);
 }
 
-internal class IntellisenseService(IServiceScopeFactory scopeFactory, ILogger<IntellisenseClient> logger) : IIntellisenseService
+internal class IntellisenseService(IServiceScopeFactory scopeFactory, ILogger<IntellisenseClient> logger)
+    : IIntellisenseService
 {
     public async Task<CompletionResult> GetCompletionResultAsync(string input, CancellationToken cancellationToken)
     {
-        using var _ = logger.BeginScope(new() { [nameof(input)] = input });
+        using var _ = logger.BeginScope(new() { ["Input"] = input });
 
         using var scope = scopeFactory.CreateScope();
         using var ctx = scope.ServiceProvider.GetRequiredService<CancellationContext>();

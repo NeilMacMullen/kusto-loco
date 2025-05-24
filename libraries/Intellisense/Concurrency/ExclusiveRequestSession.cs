@@ -7,6 +7,7 @@ public class ExclusiveRequestSession
     public async Task<T> RunAsync<T>(Func<CancellationToken, Task<T>> fn)
     {
         var cts = Cancel();
+        // don't block main thread
         var result = await Task.Run(() => fn(cts.Token));
         cts.Token.ThrowIfCancellationRequested();
         return result;
