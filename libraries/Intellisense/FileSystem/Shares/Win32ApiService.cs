@@ -42,11 +42,15 @@ internal class Win32ApiService(
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            return NetApi32
+            var results = NetApi32
                 .NetShareEnum<NetApi32.SHARE_INFO_1>(host)
                 .Take(MaxItemCount)
                 .Select(x => x.shi1_netname)
-                .ToArray();
+                .ToList();
+
+            logger.LogTrace("Fetched shares: {@Shares}", results);
+
+            return results;
         }
         finally
         {
