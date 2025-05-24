@@ -20,28 +20,37 @@ internal class Win32ApiService(
 
     public async Task<IEnumerable<string>> GetSharesAsync(string host)
     {
-        var stopwatch = Stopwatch.StartNew();
+        // NetShareEnum can potentially block thread for a while (~11 seconds), may want to run this on another thread
+        // thread pool exhaustion probably won't be an issue with how often this would be invoked
+        // can occur if device exists but TCP port 445 isn't open
+        // https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-ports?tabs=command-line
+        // we may want to support other protocols + alternative TCP port (useful for docker testing)
+        // so only checking for host existence rather than port 445 availability
+        // we can't just use stored connections because they aren't exhaustive (i.e. IP address aliases) and we want to allow user to list shares for a given host even if we missed it
+        // we shouldn't use our own SMB client implementation because we'd have to obtain and manage credentials ourselves (which the OS implementation does for us)
+        using var ping = new Ping();
+        logger.LogDebug("Attempting to connect to host.");
+        var pingReply = await ping.SendPingAsync(host, PingTimeout, cancellationToken: cts.Token);
+        logger.LogDebug("Connection result: {@PingReply}", pingReply);
+        if (pingReply.Status is not IPStatus.Success)
+        {
+            return [];
+        }
 
+        logger.LogDebug("Fetching shares");
+
+        var stopwatch = Stopwatch.StartNew();
         try
         {
-            // NetShareEnum can potentially block thread for a while, catch most common cause to mitigate thread starvation
-            // https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-ports?tabs=command-line
-            // need to take into account different transport protocols and the fact the SMB client can now use port other than 445
-            using var ping = new Ping();
-            logger.LogDebug("Attempting to connect to host.");
-            var pingReply = await ping.SendPingAsync(host, PingTimeout, cancellationToken: cts.Token);
-            logger.LogDebug("Connection result: {@PingReply}", pingReply);
-            if (pingReply.Status is not IPStatus.Success)
-            {
-                return [];
-            }
-
-            logger.LogDebug("Fetching shares");
-
-            return NetApi32.NetShareEnum<NetApi32.SHARE_INFO_1>(host).Take(MaxItemCount).Select(x => x.shi1_netname);
+            return NetApi32
+                .NetShareEnum<NetApi32.SHARE_INFO_1>(host)
+                .Take(MaxItemCount)
+                .Select(x => x.shi1_netname)
+                .ToArray();
         }
         finally
         {
+            stopwatch.Stop();
             var timeLimit = TimeSpan.FromSeconds(3);
             if (stopwatch.Elapsed > timeLimit)
             {
