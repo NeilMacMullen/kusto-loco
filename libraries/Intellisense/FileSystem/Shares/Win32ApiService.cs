@@ -55,6 +55,7 @@ internal class Win32ApiService(
         finally
         {
             stopwatch.Stop();
+            logger.LogDebug("{ElapsedTime}", stopwatch.Elapsed);
             var timeLimit = TimeSpan.FromSeconds(3);
             if (stopwatch.Elapsed > timeLimit)
             {
@@ -75,7 +76,14 @@ internal class Win32ApiService(
         return NetApi32
             .NetUseEnum<NetApi32.USE_INFO_0>()
             .Take(MaxItemCount)
-            .Select(x => pathFactory.Create(x.ui0_remote))
+            .Select(x =>
+                {
+                    var path = pathFactory.Create(x.ui0_remote);
+                    if (path is UncPath p) return p;
+                    logger.LogWarning("Unexpected {@Path} type", path);
+                    return null;
+                }
+            )
             .OfType<UncPath>()
             .Select(x => x.OriginalHost);
     }
