@@ -15,12 +15,50 @@ namespace KustoLoco.Core.Evaluation.BuiltIns;
 
 internal static class BuiltInsHelper
 {
+    [Flags]
+    enum OverloadOptions
+    {
+        AllowExactMatch=(1<<1),
+        AllowWideningCast=(1<<2),
+        AllowStringCast=(1<<3),
+    }
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     internal static T? PickOverload<T>(TypeSymbol expectedReturnType, IReadOnlyList<T> overloads,
         IRExpressionNode[] arguments)
         where T : OverloadInfoBase
     {
+        //attempt to find the "best" overload by first considering only exact
+        //signature matches, then ones that fit larger numbers
+        //then finally, those that accept strings
+        foreach (var options in new[]
+                 {
+
+                     OverloadOptions.AllowExactMatch,
+                     OverloadOptions.AllowExactMatch |
+                     OverloadOptions.AllowWideningCast,
+                     OverloadOptions.AllowExactMatch |
+                     OverloadOptions.AllowWideningCast |
+                     OverloadOptions.AllowStringCast,
+
+                 })
+        {
+
+            if (OverloadInfoBase(expectedReturnType, overloads, arguments,
+                    options,
+                    out var pickOverload))
+                return pickOverload;
+        }
+
+        return null;
+    }
+
+    private static bool OverloadInfoBase<T>(TypeSymbol expectedReturnType, IReadOnlyList<T> overloads,
+        IRExpressionNode[] arguments,
+        OverloadOptions options,
+        out T? pickOverload) where T : OverloadInfoBase
+    {
+        pickOverload = null;
         foreach (var overload in overloads)
         {
             var returnType = overload.ReturnType;
@@ -50,9 +88,9 @@ internal static class BuiltInsHelper
                 if (argumentTypeIsUnknown)
                     throw new InvalidOperationException();
                 var thisCompatible =
-                        isArgumentSameTypeAsParameter ||
-                        isParameterWiderThanArgument ||
-                        parameterIsString ||
+                        (isArgumentSameTypeAsParameter && options.HasFlag(OverloadOptions.AllowExactMatch)) ||
+                        (isParameterWiderThanArgument && options.HasFlag(OverloadOptions.AllowWideningCast)) ||
+                        (parameterIsString && options.HasFlag(OverloadOptions.AllowStringCast))||
                         argumentTypeIsUnknown
                     ;
 
@@ -66,10 +104,11 @@ internal static class BuiltInsHelper
             if (!compatible) continue;
 
 
-            return overload;
+            pickOverload = overload;
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     private static EvaluationResult CreateResultForScalarInvocation(IScalarFunctionImpl impl,

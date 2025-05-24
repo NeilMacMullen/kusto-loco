@@ -1,14 +1,16 @@
-﻿using System.Globalization;
-using System;
-using System.Runtime.CompilerServices;
-
+﻿using System;
+using System.Globalization;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class ToLongStringFunction
+[KustoImplementation(Keyword = "Functions.ToLong")]
+internal partial class ToLongFunction
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static long DecImpl(decimal input) => (long)input;
+    private static long IntImpl(int input) => input;
+    private static long LongImpl(long input) => input;
+    private static long DoubleImpl(double input) => (long)input;
+
     private static long? Impl(string input)
     {
         if (input.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase))
@@ -23,8 +25,8 @@ internal class ToLongStringFunction
 
         return long.TryParse(input, out var parsedResult)
             ? parsedResult
-            : (double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) &&
-               !double.IsInfinity(parsedDouble))
+            : double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) &&
+              !double.IsInfinity(parsedDouble)
                 ? (long)parsedDouble
                 : null;
     }

@@ -44,20 +44,7 @@ internal static class BuiltInScalarFunctions
         IsNanFunction.Register(Functions);
         IsUtf8Function.Register(Functions);
         ReverseFunction.Register(Functions);
-        /*
-        Functions.Add(
-            Kusto.Language.Functions.MinOf,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new MinOfIntFunctionImpl(), ScalarTypes.Int,
-                    ScalarTypes.Int, ScalarTypes.Int),
-                new ScalarOverloadInfo(new MinOfLongFunctionImpl(), ScalarTypes.Long,
-                    ScalarTypes.Long,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new MinOfDoubleFunctionImpl(), ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real)));
-        */
-
+      
         {
             var overloads = new List<ScalarOverloadInfo>();
 
@@ -220,13 +207,12 @@ internal static class BuiltInScalarFunctions
         Functions.Add(Kusto.Language.Functions.Iff, iffFunctionInfo);
         Functions.Add(Kusto.Language.Functions.Iif, iffFunctionInfo);
         Functions.Add(Kusto.Language.Functions.ToGuid, new ScalarFunctionInfo(ToGuidStringFunctionImpl.Overload));
-        Functions.Add(Kusto.Language.Functions.ToInt,
-            new ScalarFunctionInfo(ToIntStringFunctionImpl.Overload));
-        Functions.Add(Kusto.Language.Functions.ToLong,
-            new ScalarFunctionInfo(ToLongStringFunctionImpl.Overload));
-        var toDoubleFunctionInfo = new ScalarFunctionInfo(ToDoubleStringFunctionImpl.Overload);
-        Functions.Add(Kusto.Language.Functions.ToReal, toDoubleFunctionInfo);
-        Functions.Add(Kusto.Language.Functions.ToDouble, toDoubleFunctionInfo);
+
+        ToIntFunction.Register(Functions);
+        ToLongFunction.Register(Functions);
+        ToDoubleFunction.Register(Functions);
+        ToRealFunction.Register(Functions);
+       
         Functions.Add(Kusto.Language.Functions.ToBool,
             new ScalarFunctionInfo(ToBoolStringFunctionImpl.Overload));
 
