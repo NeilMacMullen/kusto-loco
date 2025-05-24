@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
-using Moq;
 using Xunit;
 
 
@@ -16,7 +14,7 @@ namespace IntellisenseTests;
 public class FileSystemIntellisenseServiceTests
 {
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_ExistentRootNonExistentChildDir_RetrievesSiblings()
+    public async Task GetPathIntellisenseOptions_ExistentRootNonExistentChildDir_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -25,14 +23,14 @@ public class FileSystemIntellisenseServiceTests
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
 
-        var result = f.GetPathIntellisenseOptions("/NonExistentDir");
+        var result = await f.GetPathIntellisenseOptionsAsync("/NonExistentDir");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("Folder1");
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_ValidDirNoDirectorySeparator_RetrievesSiblings()
+    public async Task GetPathIntellisenseOptions_ValidDirNoDirectorySeparator_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -43,7 +41,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("/Folder1");
+        var result = await f.GetPathIntellisenseOptionsAsync("/Folder1");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File1.txt", "Folder1", "Folder1abc", "Folder2");
@@ -51,7 +49,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_RootWithDirSeparator_RetrievesChildren()
+    public async Task GetPathIntellisenseOptions_RootWithDirSeparator_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -62,7 +60,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("C:/");
+        var result = await f.GetPathIntellisenseOptionsAsync("C:/");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File1.txt", "File2.txt", "Folder1", "Folder2");
@@ -70,7 +68,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_PartialPathAtRoot_RetrievesRootChildren()
+    public async Task GetPathIntellisenseOptions_PartialPathAtRoot_RetrievesRootChildren()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -79,7 +77,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("/F");
+        var result = await f.GetPathIntellisenseOptionsAsync("/F");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File1.txt", "Folder1");
@@ -87,7 +85,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_NonexistentDirDirectorySeparatorSuffix_ReturnsEmptyResult()
+    public async Task GetPathIntellisenseOptions_NonexistentDirDirectorySeparatorSuffix_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -96,13 +94,13 @@ public class FileSystemIntellisenseServiceTests
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
 
-        var result = f.GetPathIntellisenseOptions("/NonExistentDir/");
+        var result = await f.GetPathIntellisenseOptionsAsync("/NonExistentDir/");
 
         result.Entries.Should().BeEmpty();
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_ValidDirDirectorySeparatorSuffix_RetrievesChildren()
+    public async Task GetPathIntellisenseOptions_ValidDirDirectorySeparatorSuffix_RetrievesChildren()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -111,7 +109,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("/Folder1/");
+        var result = await f.GetPathIntellisenseOptionsAsync("/Folder1/");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File1.txt");
@@ -119,7 +117,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_PartialDir_RetrievesSiblings()
+    public async Task GetPathIntellisenseOptions_PartialDir_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -128,7 +126,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("C:/Fol");
+        var result = await f.GetPathIntellisenseOptionsAsync("C:/Fol");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("Folder1", "Folder2");
@@ -136,7 +134,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_PartialFile_RetrievesSiblings()
+    public async Task GetPathIntellisenseOptions_PartialFile_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -145,7 +143,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("C:/Folder1/MyF");
+        var result = await f.GetPathIntellisenseOptionsAsync("C:/Folder1/MyF");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("MyFile1.txt", "MyFile2.txt");
@@ -153,7 +151,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_PartialPath_RetrievesSiblings()
+    public async Task GetPathIntellisenseOptions_PartialPath_RetrievesSiblings()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -162,7 +160,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("C:/Fil");
+        var result = await f.GetPathIntellisenseOptionsAsync("C:/Fil");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File1.txt", "Folder1");
@@ -170,7 +168,7 @@ public class FileSystemIntellisenseServiceTests
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_NonexistentParent_ReturnsEmptyResult()
+    public async Task GetPathIntellisenseOptions_NonexistentParent_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -178,13 +176,13 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("/Abc/Folder1");
+        var result = await f.GetPathIntellisenseOptionsAsync("/Abc/Folder1");
 
         result.Entries.Should().BeEmpty();
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_NonexistentRootPath_ReturnsEmptyResult()
+    public async Task GetPathIntellisenseOptions_NonexistentRootPath_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -192,13 +190,13 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("D:/");
+        var result = await f.GetPathIntellisenseOptionsAsync("D:/");
 
         result.Entries.Should().BeEmpty();
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_NonexistentDirAndChild_ReturnsEmptyResult()
+    public async Task GetPathIntellisenseOptions_NonexistentDirAndChild_ReturnsEmptyResult()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -206,13 +204,13 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("C:/Abc/def.txt");
+        var result = await f.GetPathIntellisenseOptionsAsync("C:/Abc/def.txt");
 
         result.Entries.Should().BeEmpty();
     }
 
     [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_RootedRelativePath_RelativeChildren()
+    public async Task GetPathIntellisenseOptions_RootedRelativePath_RelativeChildren()
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -223,7 +221,7 @@ public class FileSystemIntellisenseServiceTests
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("/Folder1/Folder2/Folder3/Folder4/../../");
+        var result = await f.GetPathIntellisenseOptionsAsync("/Folder1/Folder2/Folder3/Folder4/../../");
 
         using var _ = new AssertionScope();
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File5.txt", "Folder3");
@@ -238,7 +236,7 @@ public class FileSystemIntellisenseServiceTests
     [InlineData("/a/b")]
     [InlineData("C://")]
     [InlineData("C:/a")]
-    public void GetPathIntellisenseOptions_UnusualPaths_ShouldNotThrow(string path)
+    public async Task GetPathIntellisenseOptions_UnusualPaths_ShouldNotThrow(string path)
     {
         var data = new Dictionary<string, MockFileData>
         {
@@ -247,44 +245,9 @@ public class FileSystemIntellisenseServiceTests
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
 
-        f
-            .Invoking(x => x.GetPathIntellisenseOptions(path))
+        await f
+            .Invoking(async x => await x.GetPathIntellisenseOptionsAsync(path))
             .Should()
-            .NotThrow();
-    }
-
-    [WindowsOnlyFact]
-    public void GetPathIntellisenseOptions_IOException_LogsError()
-    {
-
-        var mock = new Mock<IFileSystemReader>();
-        mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<PathTooLongException>();
-
-        var f = new FileSystemIntellisenseServiceTestFixture(mock.Object);
-
-        f.GetLogs().Should().NotContain(x => x.Exception is IOException);
-
-        f
-            .Invoking(x => x.GetPathIntellisenseOptions(""))
-            .Should()
-            .NotThrow();
-
-        f.GetLogs().Should().ContainSingle(x => x.Exception is IOException);
-    }
-
-    [WindowsOnlyFact(Skip = "Not implemented")]
-    public void GetPathIntellisenseOptions_UncRootPaths_RetrievesChildren()
-    {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["c:/folder1/file11.txt"] = new(""),
-            ["//unc/c/folderC1/fileC11.txt"] = new(""),
-            ["//unc/c/folderC2/fileC21.txt"] = new(""),
-            ["//unc/d/folderD1/fileD11.txt"] = new(""),
-        };
-
-        var f = new FileSystemIntellisenseServiceTestFixture(data);
-        var result = f.GetPathIntellisenseOptions("//unc/c/");
-        result.Entries.Select(x => x.Name).Should().BeEquivalentTo("folderC1", "folderC2");
+            .NotThrowAsync();
     }
 }

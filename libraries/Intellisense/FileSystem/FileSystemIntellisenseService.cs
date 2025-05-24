@@ -1,6 +1,4 @@
-﻿using Intellisense.FileSystem.CompletionResultRetrievers;
-using Intellisense.FileSystem.Paths;
-using Microsoft.Extensions.Logging;
+﻿using Intellisense.FileSystem.Paths;
 
 namespace Intellisense.FileSystem;
 
@@ -12,44 +10,29 @@ public interface IFileSystemIntellisenseService
     /// <returns>
     /// An empty completion result if the path is invalid, does not exist, or does not have any children.
     /// </returns>
-    CompletionResult GetPathIntellisenseOptions(string path);
+    Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path);
 }
 
-internal class FileSystemIntellisenseService : IFileSystemIntellisenseService
+internal class FileSystemIntellisenseService(
+    IPathFactory pathFactory,
+    IEnumerable<IFileSystemPathCompletionResultRetriever> retrievers
+)
+    : IFileSystemIntellisenseService
 {
-    private readonly IFileSystemPathCompletionResultRetriever[] _retrievers;
-    private readonly ILogger<IFileSystemIntellisenseService> _logger;
-    private readonly IRootedPathFactory _rootedPathFactory;
-
-    public FileSystemIntellisenseService(IFileSystemReader reader, ILogger<IFileSystemIntellisenseService> logger, IRootedPathFactory rootedPathFactory)
+    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(
+        string path
+    )
     {
-        _rootedPathFactory = rootedPathFactory;
-        _logger = logger;
-        _retrievers =
-        [
-            new ChildrenPathCompletionResultRetriever(reader),
-            new SiblingPathCompletionResultRetriever(reader)
-        ];
-    }
+        var pathObj = pathFactory.Create(path);
 
-    public CompletionResult GetPathIntellisenseOptions(string path)
-    {
+        var tasks = pathObj.EndsWithDirectorySeparator
+            ? retrievers.Select(x => x.GetChildrenAsync(pathObj))
+            : retrievers.Select(x => x.GetSiblingsAsync(pathObj));
 
-        try
-        {
-            // Only rooted paths supported at this time
-
-            var rootedPath = _rootedPathFactory.Create(path);
-
-            return _retrievers
-                .Select(x => x.GetCompletionResult(rootedPath))
-                .FirstOrDefault(x => !x.IsEmpty(),CompletionResult.Empty);
-
-        }
-        catch (IOException e)
-        {
-            _logger.LogError(e,"IO error occurred while fetching intellisense results. Returning empty result.");
-            return CompletionResult.Empty;
-        }
+        return await Task
+            .WhenEach(tasks)
+            .SelectAwait(async x => await x)
+            .Where(x => !x.IsEmpty())
+            .FirstOrDefaultAsync() ?? CompletionResult.Empty;
     }
 }
