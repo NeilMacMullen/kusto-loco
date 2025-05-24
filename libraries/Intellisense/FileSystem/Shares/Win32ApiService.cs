@@ -76,11 +76,17 @@ internal class Win32ApiService(
         return NetApi32
             .NetUseEnum<NetApi32.USE_INFO_0>()
             .Take(MaxItemCount)
-            .Select(x =>
+            .Select(useInfo0 =>
                 {
-                    var path = pathFactory.Create(x.ui0_remote);
+                    var remote = useInfo0.ui0_remote;
+                    var path = pathFactory.Create(remote);
                     if (path is UncPath p) return p;
-                    logger.LogWarning("Failed to retrieve host from unexpected {@Path} type", path);
+                    logger.LogWarning(
+                        "Failed to parse host from unexpected remote format {@FileSystemPath} {PathInfo} {Remote}",
+                        path,
+                        useInfo0,
+                        remote
+                    );
                     return null;
                 }
             )
