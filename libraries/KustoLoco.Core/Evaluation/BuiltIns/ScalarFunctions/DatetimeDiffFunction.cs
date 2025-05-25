@@ -5,25 +5,25 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Functions.DatetimeDiff")]
 internal partial class DatetimeDiffFunction
 {
-    //TODO - I'm not sure this matches the Kusto implementation
-    //It's unclear from the documentation whether things like "day" should be rounded or truncated
-    private static long Impl(string period, DateTime a, DateTime b)
+      private static long Impl(string period, DateTime a, DateTime b)
     {
+       
         return period.ToLowerInvariant() switch
         {
-            "year" => a.Year - b.Year,
-            "month" => (a.Year - b.Year) * 12 + a.Month - b.Month,
-            "quarter" => (a.Year - b.Year) * 4 + (a.Month - b.Month) / 3,
-            "week" => (long)(a - b).TotalDays / 7,
-            "day" => (long)(a - b).TotalDays,
-            "hour" => (long)(a - b).TotalHours,
-            "minute" => (long)(a - b).TotalMinutes,
-            "second" => (long)(a - b).TotalSeconds,
-            "millisecond" => (long)(a - b).TotalMilliseconds,
-            "microsecond" => (long)(a - b).Ticks / 10,
-            "nanosecond" => (a - b).Ticks,
+            DateTimeParts.Year => a.Year - b.Year,
+            DateTimeParts.Month => (a.Year - b.Year) * 12 + a.Month - b.Month,
+            DateTimeParts.Quarter => (a.Year - b.Year) * 4 + (long)Math.Ceiling((a.Month - b.Month) / 3.0),
+            DateTimeParts.Week => (long)(Math.Ceiling((a - b).TotalDays / 7.0)),
+            DateTimeParts.Day => (long)Math.Ceiling((a - b).TotalDays),
+            DateTimeParts.Hour => (long)Math.Ceiling((a - b).TotalHours),
+            DateTimeParts.Minute => (long)Math.Ceiling((a - b).TotalMinutes),
+            DateTimeParts.Second => (long)Math.Ceiling((a - b).TotalSeconds),
+            DateTimeParts.Millisecond => (long)Math.Ceiling((a - b).TotalMilliseconds),
+            DateTimeParts.Microsecond => (long)Math.Ceiling((a - b).TotalMicroseconds),
+            DateTimeParts.Nanosecond => (a - b).Ticks * 100,
             _ => 0
         };
+    
     }
     
 }

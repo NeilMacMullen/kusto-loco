@@ -43,6 +43,17 @@ internal class DCountIfAggregateDoubleImpl : IAggregateImpl
     }
 }
 
+internal class DCountIfAggregateDecimalImpl : IAggregateImpl
+{
+    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 2);
+        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
+        return new ScalarResult(ScalarTypes.Long, DCountIfHelper.Compute(valuesColumn, predicatesColumn));
+    }
+}
+
 internal class DCountIfAggregateDateTimeImpl : IAggregateImpl
 {
     public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RTools_NTS.Util;
 
 // ReSharper disable StringLiteralTypo
 
@@ -140,6 +141,49 @@ datatable(Size:int) [50]
         result.Should().Be("Cdef");
     }
 
+    [TestMethod]
+    public async Task Substring_OutOfRange_ShouldReturnEmpty()
+    {
+        var query = "print c=substring('abc', 10, 5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns empty string if start index is out of range
+    }
+
+    [TestMethod]
+    public async Task DivideByZero_ShouldReturnNullOrError()
+    {
+        var query = "print c=1/0";
+        var result = await LastLineOfResult(query);
+        // Depending on implementation, this may return null, error, or special value
+        result.Should().Match(r => r == "" || r.Contains("error") || r == "null");
+    }
+
+    [TestMethod]
+    public async Task InvalidDateTimeFormat_ShouldReturnNull()
+    {
+        var query = "print D=todatetime('not-a-date')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns null for invalid datetime parse
+    }
+
+   
+
+    [TestMethod]
+    public async Task ToInt_InvalidString_ShouldReturnNull()
+    {
+        var query = "print c=toint('notanumber')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // KQL returns null for invalid conversion
+    }
+
+  
+    [TestMethod]
+    public async Task MakeDateTime_InvalidMonth_ShouldReturnNull()
+    {
+        var query = "print c=make_datetime(2020, 13, 1)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be(""); // Invalid month should return null
+    }
 
     [TestMethod]
     public async Task Trimws()
@@ -150,7 +194,6 @@ datatable(Size:int) [50]
     }
 
 
-    
     [TestMethod]
     public async Task PadLeft()
     {
@@ -246,9 +289,9 @@ datatable(Size:int) [50]
     [TestMethod]
     public async Task RowNumberNoParam()
     {
-        var query = "range i from 10 to 20 step 1 | extend r =row_number()";
+        var query = "range i from 1 to 10 step 1 | extend r =row_number()";
         var result = await LastLineOfResult(query);
-        result.Should().Be("20,10");
+        result.Should().Be("10,10");
     }
 
     [TestMethod]
@@ -385,16 +428,6 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
         //ensure we didn't get any fractional values
         var query = @"range x from 1 to 10 step 1
 | where x !between (9 .. 11)";
-        var result = await LastLineOfResult(query);
-        result.Should().Be("8");
-    }
-
-    [TestMethod]
-    [Ignore("not yet implemented")]
-    public async Task HasAny()
-    {
-        //ensure we didn't get any fractional values
-        var query = "print x='line1' | where x has_any('a','b')";
         var result = await LastLineOfResult(query);
         result.Should().Be("8");
     }
@@ -595,10 +628,10 @@ d | project Type='v1',Val=v1
     public async Task QuoteSlash()
     {
         var query = """ 
-datatable(T:string) ['abcd','"def']
-| where T contains "\"def"
-| count
-""";
+                    datatable(T:string) ['abcd','"def']
+                    | where T contains "\"def"
+                    | count
+                    """;
         var result = await LastLineOfResult(query);
         result.Should().Contain("1");
     }
@@ -612,7 +645,6 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("3.1");
     }
 
-  
 
     [TestMethod]
     public async Task LogDouble()
@@ -735,7 +767,7 @@ datatable(T:string) ['abcd','"def']
         result.Should().Be("True");
     }
 
-  
+
     [TestMethod]
     public async Task IsFinite2()
     {
@@ -763,6 +795,7 @@ datatable(T:string) ['abcd','"def']
         var result = await LastLineOfResult(query);
         result.Should().Be((a | b).ToString());
     }
+
     [TestMethod]
     public async Task BinaryXOr()
     {
@@ -772,6 +805,7 @@ datatable(T:string) ['abcd','"def']
         var result = await LastLineOfResult(query);
         result.Should().Be((a ^ b).ToString());
     }
+
     [TestMethod]
     public async Task BinaryNot()
     {
@@ -797,7 +831,7 @@ datatable(T:string) ['abcd','"def']
         var b = 6;
         var query = $"print binary_shift_left({a},{b})";
         var result = await LastLineOfResult(query);
-        result.Should().Be((a<<b).ToString());
+        result.Should().Be((a << b).ToString());
     }
 
     [TestMethod]
@@ -823,7 +857,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeDateTime()
     {
-        var query = $"print make_datetime(2000,4,15,1,1)";
+        var query = "print make_datetime(2000,4,15,1,1)";
         var result = await LastLineOfResult(query);
         result.Should().Be("2000-04-15 01:01:00Z");
     }
@@ -832,7 +866,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeDateTime2()
     {
-        var query = $"print make_datetime(2000,4,15)";
+        var query = "print make_datetime(2000,4,15)";
         var result = await LastLineOfResult(query);
         result.Should().Be("2000-04-15 00:00:00Z");
     }
@@ -840,7 +874,7 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeTimespan()
     {
-        var query = $"print make_timespan(1,15)";
+        var query = "print make_timespan(1,15)";
         var result = await LastLineOfResult(query);
         result.Should().Be("01:15:00");
     }
@@ -848,9 +882,448 @@ datatable(T:string) ['abcd','"def']
     [TestMethod]
     public async Task MakeTimespan2()
     {
-        var query = $"print make_timespan(1,15,10)";
+        var query = "print make_timespan(1,15,10)";
         var result = await LastLineOfResult(query);
         result.Should().Be("01:15:10");
     }
 
+    [TestMethod]
+    public async Task MaxLongTest()
+    {
+        //ensure precision is not lost with max
+        var query = @"let letters = datatable(bitmap:long)
+[851673153924341805,];
+print toscalar(letters | summarize mx=max(bitmap));";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("851673153924341805");
+    }
+
+    [TestMethod]
+    public async Task MinLongTest()
+    {
+        //ensure precision is not lost with min
+        var query = @"let letters = datatable(bitmap:long)
+[851673153924341808,851673153924341805];
+print toscalar(letters | summarize mx=min(bitmap));";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("851673153924341805");
+    }
+
+
+    [TestMethod]
+    public async Task CountOfTest()
+    {
+        var query = "print countof('abc abc ab','abc')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task CountOfNormalTest()
+    {
+        var query = "print countof('abc abc ab','abc','normal')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task CountOfRegexTest()
+    {
+        var query = "print countof('abc abc ab a','a.','regex')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+    [TestMethod]
+    public async Task IndexOfTest()
+    {
+        (await LastLineOfResult("print indexof('abc def ab','def')")).Should().Be("4");
+        (await LastLineOfResult("print indexof('abc def ab','xyz')")).Should().Be("-1");
+        (await LastLineOfResult("print indexof('abc def ab','ab',7)")).Should().Be("8");
+        (await LastLineOfResult("print indexof('abc def ab','ab',-2)")).Should().Be("8");
+
+        //test cases from docs        
+        (await LastLineOfResult("""print indexof("abcdefg","cde")""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof("abcdefg","cde",1,4)""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(   "abcdefg","cde",1,2     )""")).Should().Be("-1");
+        (await LastLineOfResult("""print indexof(   "abcdefg","cde",3,4    )""")).Should().Be("-1");
+        (await LastLineOfResult("""print indexof(  "abcdefg","cde",-5    )""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(  1234567,5,1,4  )""")).Should().Be("4");
+        (await LastLineOfResult("""print indexof(  "abcdefg","cde",2,-1    )""")).Should().Be("2");
+        (await LastLineOfResult("""print indexof(  "abcdefgabcdefg", "cd", 1, 10, 2  )""")).Should().Be("9");
+        (await LastLineOfResult("""print indexof(  "abcdefgabcdefg", "cde", 1, -1, 3  )""")).Should().Be("-1");
+    }
+
+    [TestMethod]
+    public async Task ReplaceString()
+    {
+        var query = "print replace_string('A magic trick can turn a cat into a dog','cat','hamster')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("A magic trick can turn a hamster into a dog");
+    }
+
+
+    [TestMethod]
+    public async Task StrRep()
+    {
+        var query = "print strrep('ABC', 2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("ABCABC");
+    }
+
+    [TestMethod]
+    public async Task DatetimeAdd()
+    {
+        (await LastLineOfResult("print datetime_add('year',-5,make_datetime(2017,1,1))"))
+            .Should().Be("2012-01-01 00:00:00Z");
+    }
+    
+    [TestMethod]
+    public async Task DatetimeDiff()
+    {
+        (await LastLineOfResult("print  datetime_diff('year',datetime(2017-01-01),datetime(2000-12-31))"))
+            .Should().Be("17");
+        (await LastLineOfResult("print datetime_diff('quarter',datetime(2017-07-01),datetime(2017-03-30))"))
+            .Should().Be("2");
+        (await LastLineOfResult("print datetime_diff('month',datetime(2017-01-01),datetime(2015-12-30))"))
+            .Should().Be("13");
+        (await LastLineOfResult("print datetime_diff('week',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+            .Should().Be("5");
+        (await LastLineOfResult("print datetime_diff('day',datetime(2017-10-29 00:00),datetime(2017-09-30 23:59))"))
+            .Should().Be("29");
+        (await LastLineOfResult("print datetime_diff('hour',datetime(2017-10-31 01:00),datetime(2017-10-30 23:59))"))
+            .Should().Be("2");
+        (await LastLineOfResult(
+                "print datetime_diff('minute',datetime(2017-10-30 23:05:01),datetime(2017-10-30 23:00:59))")).Should()
+            .Be("5");
+        (await LastLineOfResult(
+                "print datetime_diff('second',datetime(2017-10-30 23:00:10.100),datetime(2017-10-30 23:00:00.900))"))
+            .Should().Be("10");
+        (await LastLineOfResult(
+                "print datetime_diff('millisecond',datetime(2017-10-30 23:00:00.200100),datetime(2017-10-30 23:00:00.100900))"))
+            .Should().Be("100");
+        (await LastLineOfResult(
+                "print datetime_diff('microsecond',datetime(2017-10-30 23:00:00.1009001),datetime(2017-10-30 23:00:00.1008009))"))
+            .Should().Be("100");
+        (await LastLineOfResult(
+                "print datetime_diff('nanosecond',datetime(2017-10-30 23:00:00.0000000),datetime(2017-10-30 23:00:00.0000007))"))
+            .Should().Be("-700");
+    }
+
+    [TestMethod]
+    public async Task StrcatArray()
+    {
+        var query = """
+                    let words = datatable(word:string, code:string) [
+                        "apple","A",
+                        "orange","B",
+                        "grapes","C"
+                    ];
+                    words
+                    | summarize result = strcat_array(make_list(word), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("apple,orange,grapes");
+    }
+
+    [TestMethod]
+    public async Task Strcmp()
+    {
+        var query = """
+                    datatable(string1:string, string2:string) [
+                        "ABC","ABC",
+                        "abc","ABC",
+                        "ABC","abc",
+                        "abcde","abc"
+                    ]
+                    | extend result = strcmp(string1,string2)
+                    | summarize cat = strcat_array(make_list(result), ",")
+
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("0,1,-1,1");
+    }
+
+    [TestMethod]
+    public async Task StrcatDelim()
+    {
+        var query = """
+                    print st = strcat_delim('-', 1, '2', 'A', 1s)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("1-2-A-00:00:01");
+    }
+
+    [TestMethod]
+    public async Task Around()
+    {
+        var query = """
+                    print st = around(100,99,2)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task Pi()
+    {
+        var query = """
+                    print pi()
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("3.1415");
+    }
+
+    [TestMethod]
+    public async Task MaxOf()
+    {
+       var res = await LastLineOfResult("print max_of(10,20)");
+        res.Should().Be("20");
+    }
+
+
+    [TestMethod]
+    public async Task ArrayRotateLeft()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateLeftNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_left(arr, -2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRight()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr, 2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("4,5,1,2,3");
+    }
+
+    [TestMethod]
+    public async Task ArrayRotateRightNeg()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5])
+                    | project x=array_rotate_right(arr,-2)
+                    | project y=strcat_array(x,",")
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("3,4,5,1,2");
+    }
+
+    [TestMethod]
+    public async Task In()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A in ('AAA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1");
+    }
+
+    [TestMethod]
+    public async Task InCs()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A in~ ('AAA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task InLong()
+    {
+        var query = """
+                    datatable(A:long) [
+                    123,
+                    456,
+                    2
+                    ]
+                     | where A in (1,2,3,123) | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task HasAny()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "B",
+                    "C"
+                    ]
+                     | where A has_any('aA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task HasAll()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "BAAAaa",
+                    "C"
+                    ]
+                     | where A has_all('aA','b') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1");
+    }
+
+    [TestMethod]
+    public async Task Has()
+    {
+        var query = """
+                    datatable(A:string) [
+                    "AAA",
+                    "BAAAaa",
+                    "C"
+                    ]
+                     | where A has('aA') | count
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task DecimalLiteral()
+    {
+        var query = "print decimal(1.23)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.23");
+    }
+
+    [TestMethod]
+    public async Task RealLiteral()
+    {
+        var query = "print double(1.23)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("1.23");
+    }
+
+    [TestMethod]
+    public async Task LongLiteral()
+    {
+        var query = "print long(123)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("123");
+    }
+
+    [TestMethod]
+    public async Task DecimalAddition()
+    {
+        var query = "print result = decimal(1.1) + decimal(2.2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.3");
+    }
+
+    [TestMethod]
+    public async Task DecimalSubtraction()
+    {
+        var query = "print result = decimal(5.5) - decimal(2.2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.3");
+    }
+
+    [TestMethod]
+    public async Task DecimalMultiplication()
+    {
+        var query = "print result = decimal(1.5) * decimal(2.0)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.00");
+    }
+
+    [TestMethod]
+    public async Task DecimalMultiplicationType()
+    {
+        var query = "print result = decimal(1.5) * decimal(2.0)|getschema";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("decimal");
+    }
+
+    [TestMethod]
+    public async Task DecimalDivision()
+    {
+        var query = "print result = decimal(7.5) / decimal(2.5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3");
+    }
+
+    [TestMethod]
+    public async Task DecimalDivisionType()
+    {
+        var query = "print result = decimal(7.5) / decimal(2.5)|getschema";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("decimal");
+    }
+
+    [TestMethod]
+    public async Task DecimalComparison()
+    {
+        var query = "print result = decimal(2.5) > decimal(1.5)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task DecimalEquality()
+    {
+        var query = "print result = decimal(3.3) == decimal(3.3)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+
+    [TestMethod]
+    public async Task DecimalInTableSummarize()
+    {
+        var query = "datatable(a:decimal) [1.1, 2.2, 3.3] | summarize total = sum(a)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("6.6");
+    }
+
+    [TestMethod]
+    public async Task DecimalRound()
+    {
+        var query = "print result = round(decimal(3.14159), 2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("3.14");
+    }
+
+   
 }

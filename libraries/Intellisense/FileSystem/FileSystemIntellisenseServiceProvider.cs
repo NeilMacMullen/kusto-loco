@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Intellisense.FileSystem.Paths;
+using Microsoft.Extensions.Logging;
 
 namespace Intellisense.FileSystem;
 
@@ -9,6 +10,6 @@ public static class FileSystemIntellisenseServiceProvider
     {
         var logger = new LoggerFactory().CreateLogger<FileSystemIntellisenseService>();
         var fileSystemReader = new FileSystemReader(FileSystem);
-        return new FileSystemIntellisenseService(fileSystemReader,logger);
+        return new FileSystemIntellisenseService(fileSystemReader,logger,new RootedPathFactory());
     }
 }

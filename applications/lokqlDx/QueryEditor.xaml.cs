@@ -405,6 +405,11 @@ public partial class QueryEditor : UserControl
     {
         _schemaIntellisenseProvider.SetSchema(getSchema);
     }
+
+    public void SetFocus()
+    {
+        Query.Focus();
+    }
 }
 
 public class QueryEditorRunEventArgs(string query) : EventArgs
@@ -447,12 +452,11 @@ Usage: {entry.Syntax}";
 
 public class SchemaIntellisenseProvider
 {
-    private readonly SchemaLine[] _dynamicSchema = [];
     private SchemaLine[] _schemaLines = [];
 
     private IEnumerable<SchemaLine> AllSchemaLines()
     {
-        return _schemaLines.Concat(_dynamicSchema);
+        return _schemaLines;
     }
 
 

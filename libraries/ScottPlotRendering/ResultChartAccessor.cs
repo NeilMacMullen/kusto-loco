@@ -88,7 +88,7 @@ public class ResultChartAccessor
         => _seriesNameColumn == ColumnResult.Empty
             ? string.Empty
             : row[_seriesNameColumn.Index];
-
+    
     public IReadOnlyCollection<ChartSeries> CalculateSeries()
     {
         var series = _result.EnumerateRows()
@@ -97,12 +97,24 @@ public class ResultChartAccessor
 
         var all = new List<ChartSeries>();
 
+        //allow point colors to be specifically defined
+        var colorColumn = _result.ColumnDefinitions()
+            .Where(c => c.Name == "_color" && c.UnderlyingType == typeof(long))
+            .ToArray();
+        
+        var colorIndex = colorColumn.Any()? colorColumn.First().Index : -1;
+
         foreach (var (index, s) in series.Index())
         {
             var x = s.Select(r => _xLookup.AxisValueFor(r[_xColumn.Index])).ToArray();
             var y = s.Select(r => _valueLookup.AxisValueFor(r[_valueColumn.Index])).ToArray();
             var legend = s.Key!.ToString().NullToEmpty();
-            all.Add(new ChartSeries(index, legend, x, y));
+            var c = colorIndex < 0
+                ? s.Select(r => index).ToArray()
+                : s.Select(r => (int) ((long?) r[colorIndex] ?? 0)).ToArray();
+           
+
+            all.Add(new ChartSeries(index, legend, x, y,c));
         }
 
         return all;
@@ -123,10 +135,10 @@ public class ResultChartAccessor
 
     public double GetSuggestedBarWidth()
     {
+        if (_result.RowCount < 2)
+            return 1.0;
         if (XisDateTime)
         {
-            if (_result.RowCount < 1)
-                return 1.0;
             var smallestGap = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
@@ -137,7 +149,20 @@ public class ResultChartAccessor
             return smallestGap * 0.9;
         }
 
-        return 0.0;
+        if (IsNumeric(_xColumn))
+        {
+            var smallestGap = _result
+                .EnumerateColumnData(_xColumn)
+                .Select(d => Convert.ChangeType(d, typeof(double)))
+                .OfType<double>()
+                .Distinct()
+                .OrderBy(d => d)
+                .Pairwise((a, b) => b - a)
+                .Min();
+            return smallestGap * 0.9;
+        }
+
+        return 1.0;
     }
 
     public string GetXLabel() => _xColumn.Name;
@@ -183,6 +208,9 @@ public class ResultChartAccessor
                     case 'o':
                         ClaimFirstMatchingColumn(IsNominal);
                         break;
+                    case 'x':
+                        ClaimFirstMatchingColumn(_=>true);
+                        break;
                 }
 
             if (claimed.Count == axisCombo.Length)
@@ -210,24 +238,38 @@ public class ResultChartAccessor
         //if all else fails return the original set...
         return availableColumns;
     }
+
     /// <summary>
-    /// Represents a plottable chart series for ScottPlot
+    ///     Represents a plottable chart series for ScottPlot
     /// </summary>
-    public readonly record struct ChartSeries(int Index, string Legend, double[] X, double[] Y)
+    public readonly record struct ChartSeries(double Index, string Legend, double[] X, double[] Y,int[] Color)
     {
         /// <summary>
-        /// Return a version of the ChartSeries with the X and Y values ordered by X
+        ///     Return a version of the ChartSeries with the X and Y values ordered by X
         /// </summary>
         public ChartSeries OrderByX()
         {
-            var pairs = X.Zip(Y)
+            var rows = X.Zip(Y,Color)
                 .OrderBy(tuple => tuple.First)
                 .ThenBy(tuple => tuple.Second)
                 .ToArray();
             return new ChartSeries(Index, Legend,
-                    pairs.Select(t => t.First).ToArray(),
-                    pairs.Select(t => t.Second).ToArray())
+                    rows.Select(t => t.First).ToArray(),
+                    rows.Select(t => t.Second).ToArray(),
+                    rows.Select(t=>t.Third).ToArray()
+                    )
                 ;
+        }
+
+        public ChartSeries AccumulateY()
+        {
+            var accumulatedY = new double[Y.Length];
+            accumulatedY[0] = Y[0];
+
+            for (var i = 1; i < Y.Length; i++)
+                accumulatedY[i] = accumulatedY[i - 1] + Y[i];
+
+            return new ChartSeries(Index, Legend, X, accumulatedY, Color);
         }
     }
 }

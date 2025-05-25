@@ -7,17 +7,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using KustoLoco.Core.Evaluation.BuiltIns;
-using KustoLoco.Core.Extensions;
-using KustoLoco.Core.Util;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
+using KustoLoco.Core.Evaluation.BuiltIns;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
+using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.InternalRepresentation.Nodes.Other;
-
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.InternalRepresentation;
 
@@ -36,7 +36,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
         //between used after datetime range thinks type is unknown...
         var irArguments = new[] { parameterExpression!, leftRange, rightRange };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
 
         //ApplyTypeCoercions(irArguments, overloadInfo);
 
@@ -44,28 +45,76 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
             overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
     }
 
+    public  IRNode VisitExpressionWithArray(Expression node,Expression left,ExpressionList right)
+    {
+        var signature = node.ReferencedSignature;
+        var parameterExpression = left.Accept(this) as IRExpressionNode;
+        var ja = new JsonArray();
+        var expresions =right.Expressions
+            .OfType<SeparatedElement>()
+            .Select(e => e.Element)
+            .OfType<LiteralExpression>()
+            .ToArray();
+
+        if (parameterExpression!.ResultType.IsStringOrArray())
+        {
+            var items = expresions
+                .Select(expr => expr.LiteralValue as string)
+                .ToArray();
+            ja = JsonArrayHelper.From(items);
+        }
+        else if (parameterExpression.ResultType.IsNumeric())
+        {
+            var items = expresions
+                .Select(expr => expr.LiteralValue as long?)
+                .ToArray();
+            ja = JsonArrayHelper.From(items);
+        }
+        else
+        {
+            throw new NotImplementedException("In expressions are only supported for arrays of string/long literals");
+        }
+
+        var str1 = new IRPreEvaluatedScalarExpressionNode(ja, DynamicArraySymbol.From("dynamic"));
+        var irArguments = new[] { parameterExpression!, str1! };
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
+        return new IRBuiltInScalarFunctionCallNode(signature,
+            overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
+    }
+
+    public override IRNode VisitInExpression(InExpression node)
+    {
+        return VisitExpressionWithArray(node, node.Left, node.Right);
+    }
+
+
+    public override IRNode VisitHasAnyExpression(HasAnyExpression node)
+    {
+        return VisitExpressionWithArray(node, node.Left, node.Right);
+    }
+
+    public override IRNode VisitHasAllExpression(HasAllExpression node)
+    {
+        return VisitExpressionWithArray(node, node.Left, node.Right);
+    }
+
     public override IRNode VisitSimpleNamedExpression(SimpleNamedExpression node) => node.Expression.Accept(this);
 
     //TODO - this is a nightmare.... there's an assumption that elementary Kusto types are reference equatable but it simply
-    //isn't true (or else we can't trust it to be so).  Really we want to compare only the important properties.
+//isn't true (or else we can't trust it to be so).  Really we want to compare only the important properties.
     public override IRNode VisitNameReference(NameReference node)
     {
         if (_rowScope != TableSymbol.Empty)
         {
             var index = _rowScope.Members.IndexOf(node.ReferencedSymbol);
-            if (index >= 0)
-            {
-                return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, index);
-            }
-
+            if (index >= 0) return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, index);
 
 
             //try column lookup ...
-            var m = _rowScope.Members.FirstIndex(t =>  t is ColumnSymbol cs &&  cs.Name == node.ReferencedSymbol.Name && cs.Type==node.ResultType);
-            if (m >= 0)
-            {
-                return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, m);
-            }
+            var m = _rowScope.Members.FirstIndex(t =>
+                t is ColumnSymbol cs && cs.Name == node.ReferencedSymbol.Name && cs.Type == node.ResultType);
+            if (m >= 0) return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, m);
 
             //if the node referenced symbol has type unknown because it may have come
             //from an expression that failed to be evaluated (possibly bug in parser) then 
@@ -76,9 +125,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 var matchingNames = _rowScope.Members.FirstIndex(t => t.Name == node.ReferencedSymbol.Name);
 
                 if (matchingNames >= 0)
-                {
                     return new IRRowScopeNameReferenceNode(node.ReferencedSymbol, node.ResultType, matchingNames);
-                }
             }
         }
 
@@ -126,10 +173,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
 
         if (node.Selector is not BracketedExpression selector)
-        {
             throw new InvalidOperationException(
                 $"Expected element selector to be {TypeNameHelper.GetTypeDisplayName(typeof(NameReference))}, but found {TypeNameHelper.GetTypeDisplayName(node.Selector)}");
-        }
 
         var selectorExpression = selector.Expression;
 
@@ -148,24 +193,17 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         if (selectorExpression is not LiteralExpression literalExpressionSelector)
-        {
             throw new InvalidOperationException(
                 $"Expected element selector expression to be {TypeNameHelper.GetTypeDisplayName(typeof(LiteralExpression))}, but found {TypeNameHelper.GetTypeDisplayName(selector.Expression)}");
-        }
 
         var value = selectorExpression.Accept(this) as IRLiteralExpressionNode;
         if (value == null)
-        {
             throw new InvalidOperationException(
                 $"Expected element selector expression to evaluate to {TypeNameHelper.GetTypeDisplayName(typeof(IRLiteralExpressionNode))}, but found {TypeNameHelper.GetTypeDisplayName(value)}");
-        }
 
 
         //support array access for dynamic objects
-        if (value.Value is long index)
-        {
-            return new IRArrayAccessNode(irExpression, (int)index, node.ResultType);
-        }
+        if (value.Value is long index) return new IRArrayAccessNode(irExpression, (int)index, node.ResultType);
 
 
         return value.Value is not string stringValue
@@ -202,12 +240,12 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         var irRight = (IRExpressionNode)node.Right.Accept(this);
 
         var irArguments = new[] { irLeft, irRight };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
+            node.ResultType,irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRBinaryExpressionNode(signature, overloadInfo, irArguments[0], irArguments[1], node.ResultType);
     }
-
 
     public override IRNode VisitExpressionCouple(ExpressionCouple node)
     {
@@ -225,7 +263,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
 
         var irArguments = new[] { irExpression };
-        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, irArguments);
+        var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol, node.ResultType, irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRUnaryExpressionNode(signature, overloadInfo, irExpression, node.ResultType);
@@ -234,6 +272,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     public override IRNode VisitFunctionCallExpression(FunctionCallExpression node)
     {
         var signature = node.ReferencedSignature;
+        var returnType = node.ResultType;
 
         var arguments = new Expression[node.ArgumentList.Expressions.Count];
         var irArguments = new IRExpressionNode[arguments.Length];
@@ -251,19 +290,15 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         {
             var expansion = node.GetCalledFunctionBody();
             if (expansion == null)
-            {
                 throw new InvalidOperationException(
                     $"Failed to get function expansion for {node.Name.SimpleName}.");
-            }
 
             var paramSymbols = new VariableSymbol[arguments.Length];
             for (var i = 0; i < parameters.Count; i++)
             {
                 if (parameters[i].DeclaredTypes.Count != 1)
-                {
                     throw new InvalidOperationException(
                         $"Parameters with more than one declared type is not supported, found {parameters[i].DeclaredTypes.Count}.");
-                }
 
                 paramSymbols[i] = new VariableSymbol(parameters[i].Name, parameters[i].DeclaredTypes.Single());
             }
@@ -276,9 +311,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                     // NOTE: For now we only support type coercions for scalars. Bad things may happen for tabular inputs, oh well...
                     if (irArguments[i].ResultType is ScalarSymbol &&
                         paramSymbols[i].Type.Simplify() != irArguments[i].ResultType.Simplify())
-                    {
                         irArguments[i] = new IRCastExpressionNode(irArguments[i], paramSymbols[i].Type);
-                    }
 
                     nestedTranslator.SetInScopeSymbolInfo(paramSymbols[i].Name, irArguments[i].ResultKind);
                 }
@@ -291,7 +324,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var functionSymbol = (FunctionSymbol)signature.Symbol;
-        if (FunctionFinder.TryGetOverload(_functions, functionSymbol, irArguments, parameters,
+        if (FunctionFinder.TryGetOverload(_functions, functionSymbol, returnType, irArguments, parameters,
                 out var functionOverload))
         {
             Debug.Assert(functionOverload != null);
@@ -300,7 +333,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 IRListNode.From(irArguments), node.ResultType);
         }
 
-        if (BuiltInAggregates.TryGetOverload(functionSymbol, irArguments, parameters, out var aggregateOverload))
+        if (BuiltInAggregates.TryGetOverload(functionSymbol,returnType, irArguments, parameters, out var aggregateOverload))
         {
             Debug.Assert(aggregateOverload != null);
             ApplyTypeCoercions(irArguments, aggregateOverload);
@@ -308,7 +341,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 node.ResultType);
         }
 
-        if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, irArguments, parameters,
+        if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
                 out var windowFunctionOverload))
         {
             Debug.Assert(windowFunctionOverload != null);
@@ -324,12 +357,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     private static void ApplyTypeCoercions(IRExpressionNode[] irArguments, OverloadInfoBase overloadInfo)
     {
         for (var i = 0; i < irArguments.Length; i++)
-        {
             if (overloadInfo.ParameterTypes[i].Simplify() != irArguments[i].ResultType.Simplify())
-            {
                 irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[i]);
-            }
-        }
     }
 
     public override IRNode VisitMaterializeExpression(MaterializeExpression node)
@@ -338,28 +367,23 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         return new IRMaterializeExpressionNode(irExpression, node.ResultType);
     }
 
-    public override IRNode VisitParenthesizedExpression(ParenthesizedExpression node) =>
-        node.Expression.Accept(this);
+    public override IRNode VisitParenthesizedExpression(ParenthesizedExpression node) => node.Expression.Accept(this);
 
     public override IRNode VisitDataTableExpression(DataTableExpression node)
     {
         var numColumns = node.Schema.Columns.Count;
 
         if (node.Values.Count % numColumns != 0)
-        {
             throw new InvalidOperationException(
                 $"Expected number of values ({node.Values.Count}) to be a multiple of the number of columns ({numColumns}).");
-        }
 
         var data = new object?[node.Values.Count];
         for (var i = 0; i < node.Values.Count; i++)
         {
             var irLiteralExpression = node.Values[i].Element.Accept(this);
             if (irLiteralExpression is not IRLiteralExpressionNode literalExpression)
-            {
                 throw new InvalidOperationException(
                     $"Expected literal expression in datatable values, found {TypeNameHelper.GetTypeDisplayName(irLiteralExpression)}.");
-            }
 
             data[i] = literalExpression.Value;
         }

@@ -8,6 +8,7 @@ using System.ClientModel;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Azure;
+using NotNullStrings;
 
 namespace KustoLoco.AI
 {
@@ -74,9 +75,9 @@ namespace KustoLoco.AI
         {
             var chatClient = CreateAIChatClient(objSettings);
             string SystemMessage = "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
-            var response = await chatClient.CompleteAsync(SystemMessage);
+            var response = await chatClient.GetResponseAsync(SystemMessage);
 
-            if (response.Choices.Count == 0)
+            if (response.Text.IsBlank())
             {
                 return false;
             }
@@ -109,17 +110,17 @@ namespace KustoLoco.AI
                 var chatClient = CreateAIChatClient(objSettings);
 
                 // Send the system message to the AI chat client
-                var response = await chatClient.CompleteAsync(AIQuery);
+                var response = await chatClient.GetResponseAsync(AIQuery);
 
                 // Check if the response contains any choices
-                if (response.Choices == null || response.Choices.Count == 0)
+                if (response.Text.IsBlank())
                 {
                     // Optionally, log the absence of choices or handle it as needed
                     return new AIResponse() { Code = "", Error = "No choices returned in the AI response." };
                 }
 
                 // Extract the text from the first choice
-                string jsonResponse = response.Choices[0].Text.Trim();
+                string jsonResponse = response.Text.Trim();
 
                 jsonResponse = ExtractJsonFromResponse(jsonResponse);
 

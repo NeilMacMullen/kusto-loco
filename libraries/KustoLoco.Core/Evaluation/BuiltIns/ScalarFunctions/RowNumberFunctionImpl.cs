@@ -19,7 +19,7 @@ internal class RowNumberFunctionImpl : IScalarFunctionImpl
         //because we specified this as "ForceColumnarResult"
         var column = (TypedBaseColumn<int?>)arguments[0].Column;
 
-        var indexResetValue = 0L;
+        var indexResetValue = 1L;
         if (arguments.Length > 1)
         {
             var indexResetColumn = (TypedBaseColumn<long?>)arguments[1].Column;

@@ -50,7 +50,7 @@ Kusto-Loco even comes with a Powershell module that allows you use KQL queries i
 
 ## Status
 
-The current version is 1.0.8.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
+The current version is 1.2.0.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
 
 ## Credits and Contributors
 

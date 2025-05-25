@@ -15,5 +15,6 @@ internal class NowFunctionImpl : IScalarFunctionImpl
         return new ScalarResult(ScalarTypes.DateTime, DateTime.UtcNow);
     }
 
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments) => throw new NotSupportedException();
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+        => throw new NotSupportedException();
 }

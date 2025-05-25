@@ -8,6 +8,8 @@
     <UseWPF>true</UseWPF>
     <PublishSingleFile>true</PublishSingleFile>
     <ApplicationIcon>Properties\kql.ico</ApplicationIcon>
+
+    <EnableWindowsTargeting>true</EnableWindowsTargeting> <!-- TODO: After migration we can remove this -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" />
     <PackageReference Include="Markdig.Wpf" />
     <PackageReference Include="morelinq" />
     <PackageReference Include="ScottPlot.WPF" />
