@@ -221,12 +221,12 @@ internal static class BuiltInScalarFunctions
         Functions.Add(Kusto.Language.Functions.UrlDecode,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlDecodeFunctionImpl(), ScalarTypes.String,
                 ScalarTypes.String)));
-
-        Functions.Add(Kusto.Language.Functions.Extract,
+        ExtractFunction.Register(Functions);
+        /*Functions.Add(Kusto.Language.Functions.Extract,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new ExtractRegexFunctionImpl(), ScalarTypes.String,
                 ScalarTypes.String, ScalarTypes.Long,
                 ScalarTypes.String)));
-
+        */
         var rowNumberHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
         Functions.Add(Kusto.Language.Functions.RowNumber,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new RowNumberFunctionImpl(),
