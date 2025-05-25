@@ -32,9 +32,9 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
         Debug.Assert(
             arguments[0].Column.RowCount == arguments[1].Column.RowCount &&
             arguments[0].Column.RowCount == arguments[2].Column.RowCount);
-        var patterns = (TypedBaseColumn<string?>)(arguments[0].Column);
-        var captureGroups = (TypedBaseColumn<long?>)(arguments[1].Column);
-        var values = (TypedBaseColumn<string?>)(arguments[2].Column);
+        var patterns = (TypedBaseColumn<string?>)arguments[0].Column;
+        var captureGroups = (TypedBaseColumn<long?>)arguments[1].Column;
+        var values = (TypedBaseColumn<string?>)arguments[2].Column;
 
         var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
         var data = new string?[values.RowCount];
@@ -42,9 +42,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
         {
             var pattern = patterns[i];
             if (i == 0 || !string.Equals(pattern, cacheEntry.Pattern))
-            {
                 cacheEntry = (Pattern: pattern, Regex: GetRegex(pattern));
-            }
 
             data[i] = GetResult(cacheEntry.Regex!, captureGroups[i], values[i]);
         }
@@ -63,12 +61,8 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
             var captureGroupVal = (int)captureGroup.Value;
             var match = regex.Match(input ?? string.Empty);
             if (match.Success)
-            {
                 if (captureGroupVal < match.Groups.Count)
-                {
                     return match.Groups[captureGroupVal].Value;
-                }
-            }
         }
 
         return string.Empty;

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using Kusto.Language.Symbols;
+﻿using System.Linq;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
@@ -24,7 +23,8 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             }
         }
 
-        return new ScalarResult(ScalarTypeFromNetType(typeof(T)), val);
+        var typeSymbol = TypeMapping.SymbolForType(typeof(T));
+        return new ScalarResult(typeSymbol, val);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -46,36 +46,15 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
         {
             var val = fallback[i];
             foreach (var c in condValues)
-            {
                 if (c.Pred[i]!.Value)
                 {
                     val = c.Val[i];
                     break;
                 }
-            }
 
             data[i] = val;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));
-    }
-
-    private static TypeSymbol ScalarTypeFromNetType(Type t)
-    {
-        if (t == typeof(string))
-            return ScalarTypes.String;
-        if (t == typeof(int?))
-            return ScalarTypes.Int;
-        if (t == typeof(long?))
-            return ScalarTypes.Long;
-        if (t == typeof(double?))
-            return ScalarTypes.Real;
-        if (t == typeof(DateTime?))
-            return ScalarTypes.DateTime;
-        if (t == typeof(bool?))
-            return ScalarTypes.Bool;
-
-
-        throw new NotImplementedException($"Don't know what to do with type {t.Name}");
     }
 }
