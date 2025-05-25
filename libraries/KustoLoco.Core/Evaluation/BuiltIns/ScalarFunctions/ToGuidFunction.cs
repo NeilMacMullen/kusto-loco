@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation]
-internal class ToGuidStringFunction
+[KustoImplementation(Keyword = "Functions.ToGuid")]
+internal partial class ToGuidFunction
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Guid? Impl(string input)
+    private static Guid GuidImpl(Guid input) => input;
+
+    private static Guid? StringImpl(string input)
     {
-       
         return Guid.TryParse(input.Replace("-",""), out var parsedResult)
             ? parsedResult
             : null;

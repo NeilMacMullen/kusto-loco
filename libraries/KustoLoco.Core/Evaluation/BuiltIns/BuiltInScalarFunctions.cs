@@ -63,8 +63,8 @@ internal static class BuiltInScalarFunctions
                 ScalarSymbol type)
             {
                 var impl = factory();
-
-                for (var numArgs = 2; numArgs <= 4; numArgs++)
+                // Coalesce can take up to 64 arguments but we limit it to 16 here
+                for (var numArgs = 2; numArgs <= 16; numArgs++)
                 {
                     var argTypes = new TypeSymbol[numArgs];
                     for (var i = 0; i < numArgs; i++) argTypes[i] = type;
@@ -115,8 +115,7 @@ internal static class BuiltInScalarFunctions
         IndexOfFunction.Register(Functions);
         ToLowerFunction.Register(Functions);
         ToUpperFunction.Register(Functions);
-        ToDateTimeFunction.Register(Functions);
-        ToTimespanFunction.Register(Functions);
+       
         ReplaceStringFunction.Register(Functions);
         SubstringFunction.Register(Functions);
         ArrayRotateLeftFunction.Register(Functions);
@@ -172,7 +171,7 @@ internal static class BuiltInScalarFunctions
         DatetimeDiffFunction.Register(Functions);
         DatetimeAddFunction.Register(Functions);
         DatetimePartFunction.Register(Functions);
-        ToDecimalFunction.Register(Functions);
+      
 
         MakeDateTime.Register(Functions);
         MakeTimeSpan.Register(Functions);
@@ -206,26 +205,19 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.String, ScalarTypes.String));
         Functions.Add(Kusto.Language.Functions.Iff, iffFunctionInfo);
         Functions.Add(Kusto.Language.Functions.Iif, iffFunctionInfo);
-        Functions.Add(Kusto.Language.Functions.ToGuid, new ScalarFunctionInfo(ToGuidStringFunctionImpl.Overload));
+        
 
         ToIntFunction.Register(Functions);
         ToLongFunction.Register(Functions);
         ToDoubleFunction.Register(Functions);
+        ToDecimalFunction.Register(Functions);
         ToRealFunction.Register(Functions);
-       
-        Functions.Add(Kusto.Language.Functions.ToBool,
-            new ScalarFunctionInfo(ToBoolStringFunctionImpl.Overload));
+        ToBoolFunction.Register(Functions);
+        ToGuidFunction.Register(Functions);
+        ToStringFunction.Register(Functions);
+        ToDateTimeFunction.Register(Functions);
+        ToTimespanFunction.Register(Functions);
 
-        Functions.Add(Kusto.Language.Functions.ToString, new ScalarFunctionInfo(
-            ToStringFromIntFunctionImpl.Overload,
-            ToStringFromLongFunctionImpl.Overload,
-            ToStringFromRealFunctionImpl.Overload,
-            ToStringFromTimeSpanFunctionImpl.Overload,
-            ToStringFromDateTimeFunctionImpl.Overload,
-            new
-                ScalarOverloadInfo(new ToStringFromDynamicFunctionImpl(),
-                    ScalarTypes.String, ScalarTypes.Dynamic),
-            ToStringFromStringFunctionImpl.Overload));
 
         Functions.Add(Kusto.Language.Functions.UrlEncode_Component,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(),
