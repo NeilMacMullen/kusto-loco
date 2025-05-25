@@ -214,19 +214,11 @@ internal static class BuiltInScalarFunctions
         ToTimespanFunction.Register(Functions);
 
 
-        Functions.Add(Kusto.Language.Functions.UrlEncode_Component,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlEncodeComponentFunctionImpl(),
-                ScalarTypes.String,
-                ScalarTypes.String)));
-        Functions.Add(Kusto.Language.Functions.UrlDecode,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new UrlDecodeFunctionImpl(), ScalarTypes.String,
-                ScalarTypes.String)));
+       
+        UrlDecodeFunction.Register(Functions);
+        UrlEncodeComponentFunction.Register(Functions);
         ExtractFunction.Register(Functions);
-        /*Functions.Add(Kusto.Language.Functions.Extract,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new ExtractRegexFunctionImpl(), ScalarTypes.String,
-                ScalarTypes.String, ScalarTypes.Long,
-                ScalarTypes.String)));
-        */
+   
         var rowNumberHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
         Functions.Add(Kusto.Language.Functions.RowNumber,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new RowNumberFunctionImpl(),
