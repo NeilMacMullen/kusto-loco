@@ -36,7 +36,6 @@ internal static class BuiltInScalarFunctions
                 IsNullStringFunctionImpl.Overload));
 
         IsEmptyFunction.Register(Functions);
-
         IsNotEmptyFunction.Register(Functions);
         IsAsciiFunction.Register(Functions);
         IsFiniteFunction.Register(Functions);
@@ -175,11 +174,7 @@ internal static class BuiltInScalarFunctions
 
         MakeDateTime.Register(Functions);
         MakeTimeSpan.Register(Functions);
-        Functions.Add(Kusto.Language.Functions.DatetimeUtcToLocal,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new DateTimeUtcToLocalFunctionImpl(),
-                ScalarTypes.DateTime,
-                ScalarTypes.DateTime, ScalarTypes.String)));
-
+        DateTimeUtcToLocalFunction.Register(Functions);
 
         var iffFunctionInfo = new ScalarFunctionInfo(
             new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool,
