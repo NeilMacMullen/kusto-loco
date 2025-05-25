@@ -79,25 +79,8 @@ public partial class QueryEditorView : UserControl, IDisposable
 
     private void UserControl_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        using var s = SafeGetResourceStream("SyntaxHighlighting.xml");
+        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
         using var reader = new XmlTextReader(s);
         TextEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-    }
-
-    /// <summary>
-    ///     Gets a resource name independent of namespace
-    /// </summary>
-    /// <remarks>
-    ///     For some reason dotnet publish decides to lower-case the
-    ///     namespace in the resource name. In any case, we really don't want to trust
-    ///     that the namespace won't change so do a match against the filename
-    /// </remarks>
-    private Stream SafeGetResourceStream(string substring)
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var availableResources = assembly.GetManifestResourceNames();
-        var wanted =
-            availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
-        return assembly.GetManifestResourceStream(wanted)!;
     }
 }

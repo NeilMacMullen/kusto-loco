@@ -45,11 +45,13 @@ class Program
 [Transient<RegistryOperations>]
 [Transient<CommandProcessorFactory>]
 [Transient<IStorageProvider>(Factory = nameof(GetStorageProvider))]
+[Transient<TopLevel>(Factory = nameof(GetTopLevel))]
 internal partial class DiContainer
 {
     private TopLevel? _topLevel;
 
     internal void SetTopLevel(TopLevel? topLevel) => _topLevel = topLevel;
+    internal TopLevel GetTopLevel() => _topLevel ?? throw new InvalidOperationException();
     internal IStorageProvider GetStorageProvider() => _topLevel?.StorageProvider ?? throw new InvalidOperationException();
 }
 

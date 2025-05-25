@@ -1,15 +1,20 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExcelDataReader.Log;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using lokqlDx;
 using LokqlDx.Desktop;
+using LokqlDx.Models;
 using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using NotNullStrings;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace LokqlDx.ViewModels;
 
@@ -26,7 +31,7 @@ public partial class MainViewModel : ObservableObject
 
     private InteractiveTableExplorer _explorer;
     private CommandProcessor _commandProcessor;
-    private Workspace? _currentWorkspace;
+    
     private string? _initWorkspacePath;
 
     public MainViewModel(
@@ -59,8 +64,10 @@ public partial class MainViewModel : ObservableObject
             RenderingSurfaceViewModel);
 
         QueryEditorViewModel = new(_explorer, ConsoleViewModel);
+        QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
     }
 
+    [ObservableProperty] Workspace? _currentWorkspace;
     [ObservableProperty] string _windowTitle = "LokqlDX";
     [ObservableProperty] ConsoleViewModel _consoleViewModel;
     [ObservableProperty] RenderingSurfaceViewModel _renderingSurfaceViewModel;
@@ -68,7 +75,16 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] CopilotChatViewModel _copilotChatViewModel;
     [ObservableProperty] ColumnDefinitions? _columnDefinitions;
     [ObservableProperty] RowDefinitions? _rowDefinitions;
-    
+    [ObservableProperty] string? _updateInfo;
+    [ObservableProperty] Point _windowPosition;
+    [ObservableProperty] Size _windowSize;
+    [ObservableProperty] ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
+
+    partial void OnCurrentWorkspaceChanged(Workspace? value)
+    {
+        QueryEditorViewModel.CurrentWorkspace = value;
+    }
+
     internal void SetInitWorkspacePath(string workspacePath)
     {
         _initWorkspacePath = workspacePath;
@@ -82,13 +98,13 @@ public partial class MainViewModel : ObservableObject
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.EnsureDefaultFolderExists();
 
-        ApplyUiPreferences();
-        //TODO: rebuild recents
-        //TODO: resize window
+        ApplyUiPreferences(false);
+        RebuildRecentFilesList();
+        ResizeWindowAccordingToStoredPreferences();
 
         await LoadWorkspace(_initWorkspacePath ?? "");
 
-        //var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
+        var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
         //if (isNewVersionAvailable)
         //{
         //    StatusBar.Visibility = Visibility.Visible;
@@ -96,18 +112,114 @@ public partial class MainViewModel : ObservableObject
         //}
     }
 
-    [RelayCommand] async Task OpenAppPreferences()
+    [RelayCommand] async Task Closing(WindowClosingEventArgs? cancelEventArgs)
     {
-        await _dialogService.ShowAppPreferences();
+        if (cancelEventArgs is not null && (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel))
+        {
+            cancelEventArgs.Cancel = true;
+            return;
+        }
+
+        PersistUiPreferencesToDisk();
     }
 
-    private void ApplyUiPreferences()
+    [RelayCommand] async Task NewWorkspace()
+    {
+        if ((await OfferSaveOfCurrentWorkspace()) == YesNoCancel.Cancel)
+            return;
+        await LoadWorkspace(string.Empty);
+    }
+
+    [RelayCommand] async Task OpenWorkspace()
+    {
+        var folder = _workspaceManager.ContainingFolder();
+
+        var result = await _storage.OpenFilePickerAsync(new()
+        {
+            Title = "Open workspace",
+            FileTypeFilter = [
+                new($"Lokql Workspace ({WorkspaceManager.GlobPattern})"){
+                    Patterns = [WorkspaceManager.GlobPattern]
+                }
+            ],
+            SuggestedFileName = Path.GetFileName(_workspaceManager.Path),
+            SuggestedStartLocation = await _storage.TryGetFolderFromPathAsync(folder),
+            AllowMultiple = false,
+        });
+
+        if (result?.FirstOrDefault() is IStorageFile file && file.TryGetLocalPath() is string path)
+        {
+            await LoadWorkspace(path);
+        }
+    }
+
+    bool CanExecuteOpenRecentWorkspace(RecentWorkspace? obj) => obj is RecentWorkspace;
+    [RelayCommand(CanExecute = nameof(CanExecuteOpenRecentWorkspace))]
+    async Task OpenRecentWorkspace(RecentWorkspace? obj)
+    {
+        if ((await OfferSaveOfCurrentWorkspace()) == YesNoCancel.Cancel)
+            return;
+
+        if (obj is RecentWorkspace workspace)
+            await LoadWorkspace(workspace.Path);
+    }
+
+    [RelayCommand] async Task SaveWorkspace()
+    {
+        await Save();
+    }
+
+    [RelayCommand] async Task SaveWorkspaceAs()
+    {
+        await SaveAs();
+    }
+
+    [RelayCommand] async Task OpenAppPreferences()
+    {
+        await _dialogService.ShowAppPreferences(_preferencesManager);
+        ApplyUiPreferences(true);
+    }
+
+    [RelayCommand] async Task OpenWorkspacePreferences()
+    {
+        await _dialogService.ShowWorkspacePreferences(_workspaceManager, _preferencesManager.UIPreferences);
+    }
+
+    [RelayCommand] void ChangeFontSize(int by)
+    {
+        _preferencesManager.UIPreferences.FontSize = Math.Clamp(
+            _preferencesManager.UIPreferences.FontSize + by,
+            6, 40);
+        ApplyUiPreferences(true);
+    }
+
+    [RelayCommand] void ToggleWordWrap()
+    {
+        _preferencesManager.UIPreferences.WordWrap = !_preferencesManager.UIPreferences.WordWrap;
+        ApplyUiPreferences(true);
+    }
+
+    [RelayCommand] void ToggleLineNumbers()
+    {
+        _preferencesManager.UIPreferences.ShowLineNumbers = !_preferencesManager.UIPreferences.ShowLineNumbers;
+        ApplyUiPreferences(true);
+    }
+
+    [RelayCommand] async Task RegisterFileAssociation()
+    {
+        await _registryOperations.AssociateFileType(true);
+    }
+
+    private void ApplyUiPreferences(bool skipGrid)
     {
         var uiPreferences = _preferencesManager.UIPreferences;
         QueryEditorViewModel.SetUiPreferences(uiPreferences);
         ConsoleViewModel.SetUiPreferences(uiPreferences);
         RenderingSurfaceViewModel.SetUiPreferences(uiPreferences);
         CopilotChatViewModel.SetUiPreferences(uiPreferences);
+
+        if (skipGrid)
+            return;
 
         var columnDefs = ColumnDefinitions.Parse(
             string.Join(",", uiPreferences.MainGridSerialization));
@@ -138,7 +250,7 @@ public partial class MainViewModel : ObservableObject
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         _workspaceManager.Load(path);
-        _currentWorkspace = _workspaceManager.Workspace;
+        CurrentWorkspace = _workspaceManager.Workspace;
 
         // AsyncRelayCommand<T> has an IsRunning property
         await QueryEditorViewModel.RunQueryCommand.ExecuteAsync(appPrefs.StartupScript);
@@ -166,12 +278,12 @@ public partial class MainViewModel : ObservableObject
         var version = UpgradeManager.GetCurrentVersion();
         var title = _workspaceManager.Path.IsBlank()
             ? $"LokqlDX {version} - new workspace"
-            : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
+            : $"LokqlDX {version} - {Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
 
         WindowTitle = title;
         if (clearWorkingContext)
         {
-            QueryEditorViewModel.SetText(_currentWorkspace?.Text ?? "");
+            QueryEditorViewModel.SetText(CurrentWorkspace?.Text ?? "");
             RenderingSurfaceViewModel.Clear();
         }
     }
@@ -184,7 +296,7 @@ public partial class MainViewModel : ObservableObject
     /// </returns>
     private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
-        if (!_workspaceManager.IsDirty(_currentWorkspace))
+        if (!_workspaceManager.IsDirty(CurrentWorkspace))
             return YesNoCancel.Yes;
 
         var shouldSave = _preferencesManager.FetchCachedApplicationSettings().AutoSave;
@@ -211,7 +323,7 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private async Task<YesNoCancel> Save()
     {
-        if (!_workspaceManager.IsDirty(_currentWorkspace))
+        if (!_workspaceManager.IsDirty(CurrentWorkspace))
             return YesNoCancel.Yes;
 
         if (_workspaceManager.IsNewWorkspace) return await SaveAs();
@@ -236,6 +348,7 @@ public partial class MainViewModel : ObservableObject
                     Patterns = [WorkspaceManager.GlobPattern]
                 }
             ],
+            ShowOverwritePrompt = true,
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path),
         });
 
@@ -243,7 +356,9 @@ public partial class MainViewModel : ObservableObject
         {
             SaveWorkspace(path);
             //make sure we update title bar
-            //UpdateUIFromWorkspace(false);
+            var version = UpgradeManager.GetCurrentVersion();
+            var title = $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
+            WindowTitle = title;
             return YesNoCancel.Yes;
         }
 
@@ -253,8 +368,55 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveWorkspace(string path)
     {
-        //UpdateCurrentWorkspaceFromUI();
-        _workspaceManager.Save(path, _currentWorkspace!);
-        //UpdateMostRecentlyUsed(path);
+        _workspaceManager.Save(path, CurrentWorkspace!);
+        UpdateMostRecentlyUsed(path);
+    }
+
+    private async Task QueryEditorViewModel_ExecutingQuery(object? sender, EventArgs args)
+    {
+        if (!_workspaceManager.IsNewWorkspace &&
+            _preferencesManager.FetchCachedApplicationSettings().AutoSave)
+            await Save();
+    }
+
+    private void UpdateMostRecentlyUsed(string path)
+    {
+        if (path.IsBlank())
+            return;
+        _preferencesManager.BringToTopOfMruList(path);
+
+        //JumpList.AddToRecentCategory(path);
+
+        RebuildRecentFilesList();
+    }
+
+    private void RebuildRecentFilesList()
+    {
+        RecentWorkspaces.Clear();
+        foreach (var path in _preferencesManager.GetMruItems().Take(10))
+        {
+            RecentWorkspaces.Add(new(
+                $"{Path.GetFileName(path)} ({Path.GetDirectoryName(path)})",
+                path));
+        }
+    }
+
+    private void ResizeWindowAccordingToStoredPreferences()
+    {
+        var ui = _preferencesManager.UIPreferences;
+        WindowPosition = new Point(ui.WindowLeft, ui.WindowTop);
+        WindowSize = new Size(ui.WindowWidth, ui.WindowHeight);
+    }
+
+    private void PersistUiPreferencesToDisk()
+    {
+        var ui = _preferencesManager.UIPreferences;
+        ui.WindowLeft = WindowPosition.X;
+        ui.WindowTop = WindowPosition.Y;
+        ui.WindowWidth = WindowSize.Width;
+        ui.WindowHeight = WindowSize.Height;
+        ui.MainGridSerialization = ColumnDefinitions?.ToString().Split(",").ToArray() ?? [];
+        ui.EditorGridSerialization = RowDefinitions?.ToString().Split(",").ToArray() ?? [];
+        _preferencesManager.SaveUiPrefs();
     }
 }

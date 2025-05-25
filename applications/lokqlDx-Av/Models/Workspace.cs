@@ -1,4 +1,4 @@
-﻿namespace LokqlDx.Services;
+﻿namespace LokqlDx.Models;
 
 /// <summary>
 ///     A Workspace is the query text and settings for a user's session.

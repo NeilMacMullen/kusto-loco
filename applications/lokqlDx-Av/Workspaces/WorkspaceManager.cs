@@ -59,6 +59,7 @@ data
             var json = JsonSerializer.Serialize(workspace,_options);
             File.WriteAllText(Path, json);
             _workspace = workspace;
+            _workspace.IsDirty = false;
         }
         catch (Exception e)
         {
@@ -90,6 +91,7 @@ data
             {
                 var json = File.ReadAllText(Path);
                 _workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+                _workspace.IsDirty = false;
             }
             catch (Exception e)
             {

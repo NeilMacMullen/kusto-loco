@@ -42,8 +42,9 @@
     <PackageReference Include="Topten.RichTextKit" />
     <PackageReference Include="Jab" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <PackageReference Include="MessageBox.Avalonia"/>
+    <PackageReference Include="MessageBox.Avalonia" />
     <PackageReference Include="DependencyPropertyGenerator" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
   </ItemGroup>
 
   <ItemGroup>

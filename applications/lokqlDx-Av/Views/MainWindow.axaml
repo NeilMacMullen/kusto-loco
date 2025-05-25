@@ -8,8 +8,17 @@
         x:Class="LokqlDx.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding WindowTitle, FallbackValue='lokqlDx'}"
-        TransparencyLevelHint="Mica"
+        TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="{DynamicResource SystemListLowColor}"
-        x:DataType="vm:MainViewModel">
-        <views:MainView x:Name="MainView" />
+        x:DataType="vm:MainViewModel"
+        PositionChanged="Window_PositionChanged"
+        SizeChanged="Window_SizeChanged"
+        WindowPosition="{Binding WindowPosition}"
+        WindowSize="{Binding WindowSize}">
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Closing" SourceObject="RootControl">
+            <InvokeCommandAction Command="{Binding ClosingCommand}" PassEventArgsToCommand="True"/>
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
+    <views:MainView x:Name="MainView" />
 </Window>
