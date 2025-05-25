@@ -33,6 +33,12 @@ internal static class BuiltInComparers
             new DoubleDescNullsFirstComparer());
         comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Real), new DoubleDescNullsLastComparer());
 
+        comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Decimal), new DecimalAscNullsFirstComparer());
+        comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Decimal), new DecimalAscNullsLastComparer());
+        comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Decimal),
+            new DecimalDescNullsFirstComparer());
+        comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Decimal), new DecimalDescNullsLastComparer());
+
         comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Bool), new BoolAscNullsFirstComparer());
         comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Bool), new BoolAscNullsLastComparer());
         comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Bool), new BoolDescNullsFirstComparer());

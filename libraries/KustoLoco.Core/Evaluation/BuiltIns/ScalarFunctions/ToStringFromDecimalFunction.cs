@@ -4,9 +4,9 @@
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation]
-internal class ToDoubleStringFunction
+internal class ToStringFromDecimalFunction
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static double? Impl(string input) =>
-        double.TryParse(input, out var parsedResult) ? parsedResult : null;
+    private static string Impl(decimal input)
+        => input.ToString();
 }

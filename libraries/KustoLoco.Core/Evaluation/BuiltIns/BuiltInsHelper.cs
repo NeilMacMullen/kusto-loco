@@ -5,28 +5,66 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using KustoLoco.Core.Extensions;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
+using KustoLoco.Core.Util;
 using NLog;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 
 internal static class BuiltInsHelper
 {
+    [Flags]
+    enum OverloadOptions
+    {
+        AllowExactMatch=(1<<1),
+        AllowWideningCast=(1<<2),
+        AllowStringCast=(1<<3),
+    }
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    internal static T? PickOverload<T>(IReadOnlyList<T> overloads, IRExpressionNode[] arguments)
+    internal static T? PickOverload<T>(TypeSymbol expectedReturnType, IReadOnlyList<T> overloads,
+        IRExpressionNode[] arguments)
         where T : OverloadInfoBase
     {
+        //attempt to find the "best" overload by first considering only exact
+        //signature matches, then ones that fit larger numbers
+        //then finally, those that accept strings
+        foreach (var options in new[]
+                 {
+
+                     OverloadOptions.AllowExactMatch,
+                     OverloadOptions.AllowExactMatch |
+                     OverloadOptions.AllowWideningCast,
+                     OverloadOptions.AllowExactMatch |
+                     OverloadOptions.AllowWideningCast |
+                     OverloadOptions.AllowStringCast,
+
+                 })
+        {
+
+            if (OverloadInfoBase(expectedReturnType, overloads, arguments,
+                    options,
+                    out var pickOverload))
+                return pickOverload;
+        }
+
+        return null;
+    }
+
+    private static bool OverloadInfoBase<T>(TypeSymbol expectedReturnType, IReadOnlyList<T> overloads,
+        IRExpressionNode[] arguments,
+        OverloadOptions options,
+        out T? pickOverload) where T : OverloadInfoBase
+    {
+        pickOverload = null;
         foreach (var overload in overloads)
         {
-            if (overload.ParameterTypes.Count != arguments.Length)
-            {
-                continue;
-            }
+            var returnType = overload.ReturnType;
+            if (returnType.Simplify() != expectedReturnType.Simplify()) continue;
+
+            if (overload.ParameterTypes.Count != arguments.Length) continue;
 
             var compatible = true;
             for (var i = 0; i < arguments.Length; i++)
@@ -40,14 +78,21 @@ internal static class BuiltInsHelper
                 //TODO The parser can sometimes fail to figure out the type of the parameter
                 //and therefore emits 'Unknown'  That might need to false matches 
                 //-this needs to be reviewed at some point
+                var isArgumentSameTypeAsParameter = simplifiedArgType == simplifiedParamType;
+                var isParameterWiderThanArgument =
+                    simplifiedArgType is ScalarSymbol scalarArg &&
+                    simplifiedParamType is ScalarSymbol scalarParam &&
+                    scalarParam.IsWiderThan(scalarArg);
+                var parameterIsString = simplifiedParamType == ScalarTypes.String;
+                var argumentTypeIsUnknown = simplifiedArgType == ScalarTypes.Unknown;
+                if (argumentTypeIsUnknown)
+                    throw new InvalidOperationException();
                 var thisCompatible =
-                        simplifiedArgType == simplifiedParamType ||
-                        (simplifiedArgType is ScalarSymbol scalarArg &&
-                         simplifiedParamType is ScalarSymbol scalarParam &&
-                         scalarParam.IsWiderThan(scalarArg)) ||
-                        simplifiedParamType == ScalarTypes.String
-                        || simplifiedArgType == ScalarTypes.Unknown // really ?
-                    ; // TODO: Is it true that anything is coercible to string?
+                        (isArgumentSameTypeAsParameter && options.HasFlag(OverloadOptions.AllowExactMatch)) ||
+                        (isParameterWiderThanArgument && options.HasFlag(OverloadOptions.AllowWideningCast)) ||
+                        (parameterIsString && options.HasFlag(OverloadOptions.AllowStringCast))||
+                        argumentTypeIsUnknown
+                    ;
 
                 if (!thisCompatible)
                 {
@@ -56,15 +101,14 @@ internal static class BuiltInsHelper
                 }
             }
 
-            if (!compatible)
-            {
-                continue;
-            }
+            if (!compatible) continue;
 
-            return overload;
+
+            pickOverload = overload;
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     private static EvaluationResult CreateResultForScalarInvocation(IScalarFunctionImpl impl,
@@ -148,9 +192,8 @@ internal static class BuiltInsHelper
     // TODO: Support named parameters
     public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IScalarFunctionImpl impl,
         EvaluatedExpressionKind resultKind,
-        TypeSymbol expectedResultType, EvaluationHints hints)
-    {
-        return resultKind switch
+        TypeSymbol expectedResultType, EvaluationHints hints) =>
+        resultKind switch
         {
             EvaluatedExpressionKind.Scalar => arguments =>
                 CreateResultForScalarInvocation(impl, arguments, expectedResultType),
@@ -158,16 +201,13 @@ internal static class BuiltInsHelper
                 CreateResultForColumnarInvocation(impl, arguments, expectedResultType, hints),
             _ => throw new InvalidOperationException($"Unexpected result kind {resultKind}")
         };
-    }
 
     public static Func<EvaluationResult[], EvaluationResult> GetWindowImplementation(IWindowFunctionImpl impl,
         EvaluatedExpressionKind resultKind,
         TypeSymbol expectedResultType)
     {
         if (resultKind != EvaluatedExpressionKind.Columnar)
-        {
             throw new InvalidOperationException($"Unexpected result kind {resultKind}");
-        }
 
         //TODO - this looks completely broken as soon as we try to use chunks or
         //multiple windowed functions !!!

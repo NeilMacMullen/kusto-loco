@@ -9,7 +9,8 @@ internal static class FunctionFinder
 {
     internal static bool TryGetOverload(
         Dictionary<FunctionSymbol, ScalarFunctionInfo> functions,
-        FunctionSymbol symbol, IRExpressionNode[] arguments, List<Parameter> parameters,
+        FunctionSymbol symbol,
+        TypeSymbol returnType,IRExpressionNode[] arguments, List<Parameter> parameters,
         out ScalarOverloadInfo? overload)
     {
         if (!functions.TryGetValue(symbol, out var functionInfo))
@@ -18,7 +19,7 @@ internal static class FunctionFinder
             return false;
         }
 
-        overload = BuiltInsHelper.PickOverload(functionInfo.Overloads, arguments);
+        overload = BuiltInsHelper.PickOverload(returnType, functionInfo.Overloads, arguments);
         return overload != null;
     }
 }
