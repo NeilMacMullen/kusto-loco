@@ -25,21 +25,21 @@ public partial class MainViewModel : ObservableObject
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
-    [ObservableProperty] private ColumnDefinitions? _columnDefinitions;
+    [ObservableProperty] private ColumnDefinitions _columnDefinitions = [];
     private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
     [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
 
-    [ObservableProperty] private Workspace? _currentWorkspace;
+    [ObservableProperty] private Workspace _currentWorkspace = new();
 
     private InteractiveTableExplorer _explorer;
 
-    private string? _initWorkspacePath;
+    private string _initWorkspacePath = string.Empty;
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-    [ObservableProperty] private RowDefinitions? _rowDefinitions;
-    [ObservableProperty] private string? _updateInfo;
+    [ObservableProperty] private RowDefinitions _rowDefinitions = [];
+    [ObservableProperty] private string _updateInfo = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
@@ -79,7 +79,7 @@ public partial class MainViewModel : ObservableObject
         QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
     }
 
-    partial void OnCurrentWorkspaceChanged(Workspace? value) => QueryEditorViewModel.CurrentWorkspace = value;
+    partial void OnCurrentWorkspaceChanged(Workspace value) => QueryEditorViewModel.CurrentWorkspace = value;
 
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
@@ -91,12 +91,11 @@ public partial class MainViewModel : ObservableObject
         QueryEditorViewModel.AddInternalCommands(_commandProcessor.GetVerbs());
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.EnsureDefaultFolderExists();
-
         ApplyUiPreferences(false);
         RebuildRecentFilesList();
         ResizeWindowAccordingToStoredPreferences();
 
-        await LoadWorkspace(_initWorkspacePath ?? "");
+        await LoadWorkspace(_initWorkspacePath);
 
         var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
         //if (isNewVersionAvailable)
@@ -105,6 +104,8 @@ public partial class MainViewModel : ObservableObject
         //    UpdateInfo.Content = "New version available";
         //}
     }
+
+   
 
     [RelayCommand]
     private async Task Closing(WindowClosingEventArgs? cancelEventArgs)
@@ -146,20 +147,25 @@ public partial class MainViewModel : ObservableObject
             AllowMultiple = false
         });
 
-        if (result?.FirstOrDefault() is IStorageFile file && file.TryGetLocalPath() is string path)
-            await LoadWorkspace(path);
+        if (result.Any())
+        {
+            var path = result[0].TryGetLocalPath().NullToEmpty();
+            if (path.IsNotBlank())
+                await LoadWorkspace(path);
+        }
     }
 
-    private bool CanExecuteOpenRecentWorkspace(RecentWorkspace? obj) => obj is RecentWorkspace;
+    //This is a case where the parameter really _can_ be null since
+    //the UI can call this even if the SelectedItem is null because
+    //there are no items in the list
+    private bool CanExecuteOpenRecentWorkspace(RecentWorkspace? obj) => obj != null;
 
     [RelayCommand(CanExecute = nameof(CanExecuteOpenRecentWorkspace))]
-    private async Task OpenRecentWorkspace(RecentWorkspace? obj)
+    private async Task OpenRecentWorkspace(RecentWorkspace workspace)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
-
-        if (obj is RecentWorkspace workspace)
-            await LoadWorkspace(workspace.Path);
+        await LoadWorkspace(workspace.Path);
     }
 
     [RelayCommand]
@@ -221,14 +227,6 @@ public partial class MainViewModel : ObservableObject
 
         if (skipGrid)
             return;
-
-        var columnDefs = ColumnDefinitions.Parse(
-            string.Join(",", uiPreferences.MainGridSerialization));
-        ColumnDefinitions = columnDefs;
-
-        var rowDefs = RowDefinitions.Parse(
-            string.Join(",", uiPreferences.MainGridSerialization));
-        RowDefinitions = rowDefs;
     }
 
     private async Task LoadWorkspace(string path)
@@ -284,7 +282,7 @@ public partial class MainViewModel : ObservableObject
         WindowTitle = title;
         if (clearWorkingContext)
         {
-            QueryEditorViewModel.SetText(CurrentWorkspace?.Text ?? "");
+            QueryEditorViewModel.SetText(CurrentWorkspace.Text);
             RenderingSurfaceViewModel.Clear();
         }
     }
@@ -336,7 +334,7 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>
     ///     Save the current workspace to a new file
-    /// </summary>
+    /// </summary
     /// <returns>
     ///     true if the user went ahead with the save
     /// </returns>
@@ -409,7 +407,24 @@ public partial class MainViewModel : ObservableObject
         var ui = _preferencesManager.UIPreferences;
         WindowPosition = new Point(ui.WindowLeft, ui.WindowTop);
         WindowSize = new Size(ui.WindowWidth, ui.WindowHeight);
+        var columnDefs = ColumnDefinitions.Parse(
+            ui.AvGridRowSerialization.JoinString());
+        ColumnDefinitions = columnDefs;
+
+        var rowDefs = RowDefinitions.Parse(ui.AvGridRowSerialization.JoinString());
+        RowDefinitions = rowDefs;
     }
+
+    /// <summary>
+    /// Allows the grid layout to be reset in case it ends up with off-screen values
+    /// </summary>
+    [RelayCommand]
+    private void ResetGridLayout()
+    {
+        ColumnDefinitions = ColumnDefinitions.Parse($"{WindowSize.Width*0.6},auto,*");
+        RowDefinitions = RowDefinitions.Parse($"{WindowSize.Height*0.6},auto,*");
+    }
+
 
     private void PersistUiPreferencesToDisk()
     {
@@ -418,8 +433,8 @@ public partial class MainViewModel : ObservableObject
         ui.WindowTop = WindowPosition.Y;
         ui.WindowWidth = WindowSize.Width;
         ui.WindowHeight = WindowSize.Height;
-        ui.MainGridSerialization = ColumnDefinitions?.ToString().Split(",") ?? [];
-        ui.EditorGridSerialization = RowDefinitions?.ToString().Split(",") ?? [];
+        ui.AvGridRowSerialization = ColumnDefinitions!.ToString().Tokenize(",");
+        ui.AvGridColumnSerialization = RowDefinitions!.ToString().Tokenize(",");
         _preferencesManager.SaveUiPrefs();
     }
 }
