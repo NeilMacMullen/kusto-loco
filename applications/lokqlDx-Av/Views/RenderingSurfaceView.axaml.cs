@@ -1,29 +1,30 @@
-using Avalonia;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Data;
-using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using LokqlDx.ViewModels;
-using System.ComponentModel;
 
 namespace LokqlDx.Views;
 
 public partial class RenderingSurfaceView : UserControl, IDisposable
 {
-    RenderingSurfaceViewModel? _vm;
+    private RenderingSurfaceViewModel? _vm;
+
     public RenderingSurfaceView()
     {
         InitializeComponent();
+    }
+
+    public void Dispose()
+    {
+        if (_vm is not null) _vm.PropertyChanged -= Vm_PropertyChanged;
     }
 
 
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        if (_vm is not null)
-        {
-            _vm.PropertyChanged -= Vm_PropertyChanged;
-        }
+        if (_vm is not null) _vm.PropertyChanged -= Vm_PropertyChanged;
 
         if (DataContext is RenderingSurfaceViewModel vm)
         {
@@ -39,28 +40,18 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
     private void Vm_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(RenderingSurfaceViewModel.Columns) && _vm is not null)
-        {
             Dispatcher.UIThread.Invoke(() =>
             {
                 DataGrid.Columns.Clear();
-                for (int i = 0; i < _vm.Columns.Count; i++)
+                for (var i = 0; i < _vm.Columns.Count; i++)
                 {
-                    string? column = _vm.Columns[i];
-                    DataGrid.Columns.Add(new DataGridTextColumn()
+                    var column = _vm.Columns[i];
+                    DataGrid.Columns.Add(new DataGridTextColumn
                     {
                         Header = column,
-                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i)),
+                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i))
                     });
                 }
             });
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_vm is not null)
-        {
-            _vm.PropertyChanged -= Vm_PropertyChanged;
-        }
     }
 }
