@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>LokqlDx</RootNamespace>
+    <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Label="Avalonia">
+    <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>
+    <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SyntaxHighlighting.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Labs.Controls" />
+    <PackageReference Include="Avalonia.Labs.Panels" />
+    <PackageReference Include="Avalonia.Skia" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="AvaloniaEdit.TextMate" />
+    <PackageReference Include="Avalonia.Xaml.Interactivity" />
+    <PackageReference Include="Avalonia.Xaml.Interactions" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" />
+    <PackageReference Include="Avalonia.Xaml.Interactions.Events" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
+    <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
+    <PackageReference Include="NotNullStrings" />
+    <PackageReference Include="ScottPlot.Avalonia" />
+    <PackageReference Include="Topten.RichTextKit" />
+    <PackageReference Include="Jab" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="MessageBox.Avalonia" />
+    <PackageReference Include="DependencyPropertyGenerator" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ConsoleView.axaml.cs">
+      <DependentUpon>ConsoleView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\QueryEditorView.axaml.cs">
+      <DependentUpon>QueryEditorView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+</Project>
