@@ -15,12 +15,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     private readonly KustoSettingsProvider _kustoSettings;
     [ObservableProperty] private List<string> _columns = [];
 
-    [ObservableProperty] private string? _dataGridSizeWarning;
+    [ObservableProperty] private string _dataGridSizeWarning=string.Empty;
     [ObservableProperty] private double _fontSize = 20;
 
 
     private IScottPlotHost _plotter = new NullScottPlotHost();
-    [ObservableProperty] private ObservableCollection<Row>? _results;
+    [ObservableProperty] private ObservableCollection<Row> _results = [];
     [ObservableProperty] private bool _showDataGridSizeWarning;
 
     public RenderingSurfaceViewModel(KustoSettingsProvider kustoSettings)
