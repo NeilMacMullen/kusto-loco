@@ -51,7 +51,8 @@ public partial class RenderingSurfaceView : UserControl, IDisposable, IScottPlot
                     DataGrid.Columns.Add(new DataGridTextColumn
                     {
                         Header = column,
-                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i))
+                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i),BindingMode.OneWay)
+                       
                     });
                 }
             });

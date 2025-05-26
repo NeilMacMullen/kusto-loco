@@ -1,13 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using lokqlDx;
 using ScottPlot;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Reflection;
 
 namespace LokqlDx.ViewModels;
 
@@ -65,34 +63,16 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 $"Warning: Displaying only the first {maxRows} rows of {result.RowCount} rows.  Set {settingName} to see more";
 
         ShowDataGridSizeWarning = result.RowCount > maxRows;
-        var dt = result.ToDataTable(maxRows);
 
-        var columns = new List<string>();
-        //prevent the column names from being interpreted as hotkeys
-        for (var i = 0; i < dt.Columns.Count; i++)
-        {
-            var c = dt.Columns[i];
-
-            columns.Add(c.ColumnName);
-        }
-
-        var results = new ObservableCollection<Row>();
-
-        foreach (DataRow row in dt.Rows)
-        {
-            var newRow = new Row();
-
-            for (var i = 0; i < dt.Columns.Count; i++)
-            {
-                var c = dt.Columns[i];
-                newRow[i] = row.ItemArray[i] ?? "";
-            }
-
-            results.Add(newRow);
-        }
-
-        Results = results;
-        Columns = columns;
+        var rows = result.EnumerateRows()
+            .Take(maxRows)
+            .Select(row => new Row(row))
+            .ToArray();
+        
+        Results = new ObservableCollection<Row>(rows);
+        //note that changing Columns is the trigger for the view to redraw
+        //soi we need to do this after the results are created
+        Columns = result.ColumnNames().ToList();
 
         return Task.CompletedTask;
     }
@@ -104,60 +84,19 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     public void RegisterHost(IScottPlotHost plotter) => _plotter = plotter;
 
     /// <summary>
-    ///     This thing is stupid.<br />
-    ///     Avalonia's DataGrid doesn't support binding to a DataTable.<br />
-    ///     Untill someone comes up with a better idea, I'm converting DataTable to list of this abominations, and creating
-    ///     rows in CodeBehind, it works for now
+    ///     Avalonia's DataGrid doesn't support binding to a DataTable so
+    ///     create a fake row with indexer
     /// </summary>
-    public class Row
+    public class Row(object?[] rowItems)
     {
-        private Row? _next;
-
         public object? this[int index]
         {
-            set
-            {
-                if (index < 10)
-                    Prop(index)?.SetValue(this, value);
-                else
-                    Next[index - 10] = value;
-            }
-            get => index switch
-            {
-                < 10 => Prop(index)?.GetValue(this),
-                _ => Next[index - 10]
-            };
+            set => throw new InvalidOperationException();
+            //it's possible to get transient mismatches during update so
+            //just return a dummy value if the binding is temporarily invalid
+            get => index >= rowItems.Length ? string.Empty : rowItems[index];
         }
 
-        public object? Value0 { get; set; }
-        public object? Value1 { get; set; }
-        public object? Value2 { get; set; }
-        public object? Value3 { get; set; }
-        public object? Value4 { get; set; }
-        public object? Value5 { get; set; }
-        public object? Value6 { get; set; }
-        public object? Value7 { get; set; }
-        public object? Value8 { get; set; }
-        public object? Value9 { get; set; }
-
-        public Row Next
-        {
-            get
-            {
-                if (_next is null)
-                    _next = new Row();
-
-                return _next;
-            }
-        }
-
-        public static string GetPath(int i)
-        {
-            if (i < 10) return $"Value{i}";
-
-            return $"{nameof(Next)}.{GetPath(i - 10)}";
-        }
-
-        private static PropertyInfo? Prop(int index) => typeof(Row).GetProperty($"Value{index}");
+        public static string GetPath(int i) => $"[{i}]";
     }
 }
