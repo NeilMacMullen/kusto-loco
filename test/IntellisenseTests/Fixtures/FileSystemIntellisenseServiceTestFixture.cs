@@ -1,36 +1,36 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
+using System.Threading.Tasks;
 using Intellisense;
 using Intellisense.FileSystem;
-using Intellisense.FileSystem.Paths;
-using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IntellisenseTests.Fixtures;
 
 internal class FileSystemIntellisenseServiceTestFixture
 {
-    private readonly FileSystemIntellisenseService _fileSystemIntellisenseService;
-    private readonly FakeLogger<IFileSystemIntellisenseService> _logger;
+    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService;
 
     public FileSystemIntellisenseServiceTestFixture(
-        Dictionary<string, MockFileData> fileData,
-        MockFileSystemOptions? options = null
+        Dictionary<string, MockFileData> fileData
     )
+        : this(
+            new FileSystemReader(
+                new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false })
+            )
+        )
     {
-        options ??= new MockFileSystemOptions { CreateDefaultTempDir = false };
-        var fileSystem = new MockFileSystem(fileData, options);
-        var reader = new FileSystemReader(fileSystem);
-        _logger = new FakeLogger<IFileSystemIntellisenseService>();
-        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader, _logger, new RootedPathFactory());
     }
 
     public FileSystemIntellisenseServiceTestFixture(IFileSystemReader reader)
     {
-        _logger = new FakeLogger<IFileSystemIntellisenseService>();
-        _fileSystemIntellisenseService = new FileSystemIntellisenseService(reader, _logger, new RootedPathFactory());
+        var provider = new ServiceCollection()
+            .AddIntellisenseWithMockedIo()
+            .AddSingleton(reader)
+            .BuildServiceProvider();
+        _fileSystemIntellisenseService = provider.GetRequiredService<IFileSystemIntellisenseService>();
     }
 
-    public IReadOnlyList<FakeLogRecord> GetLogs() => _logger.Collector.GetSnapshot();
-
-    public CompletionResult GetPathIntellisenseOptions(string path) => _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+    public Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path) =>
+        _fileSystemIntellisenseService.GetPathIntellisenseOptionsAsync(path);
 }
