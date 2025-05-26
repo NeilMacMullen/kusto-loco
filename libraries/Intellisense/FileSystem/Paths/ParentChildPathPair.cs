@@ -2,7 +2,7 @@
 
 namespace Intellisense.FileSystem.Paths;
 
-public readonly record struct ParentChildPathPair
+internal readonly record struct ParentChildPathPair
 {
     public string ParentPath { get; }
     public string CurrentPath { get; }

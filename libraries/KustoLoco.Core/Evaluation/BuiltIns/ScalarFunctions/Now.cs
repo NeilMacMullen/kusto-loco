@@ -18,3 +18,5 @@ internal class NowFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         => throw new NotSupportedException();
 }
+
+

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -15,7 +15,6 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Search;
 using Intellisense;
-using Intellisense.FileSystem;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using NotNullStrings;
@@ -34,7 +33,7 @@ public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
     private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
-    private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService = FileSystemIntellisenseServiceProvider.GetFileSystemIntellisenseService();
+    private readonly IntellisenseClient _intellisenseClient = App.Resolve<IntellisenseClient>();
     private CommandParser? _parser;
     private CommandParser Parser
     {
@@ -58,6 +57,8 @@ public partial class QueryEditor : UserControl
         InitializeComponent();
         Query.TextArea.TextEntering += textEditor_TextArea_TextEntering;
         Query.TextArea.TextEntered += textEditor_TextArea_TextEntered;
+        Query.TextArea.Caret.PositionChanged += async (_,_) => await _intellisenseClient.CancelRequestAsync();
+
         _editorHelper = new EditorHelper(Query);
     }
 
@@ -279,7 +280,7 @@ public partial class QueryEditor : UserControl
         _completionWindow?.Show();
     }
 
-    private bool ShowPathCompletions()
+    private async Task<bool> ShowPathCompletions()
     {
         // Avoid unnecessary IO calls
         if (_completionWindow is not null)
@@ -294,7 +295,7 @@ public partial class QueryEditor : UserControl
             return false;
         }
 
-        var result = _fileSystemIntellisenseService.GetPathIntellisenseOptions(path);
+        var result = await _intellisenseClient.GetCompletionResultAsync(path);
         if (result.IsEmpty())
         {
             return false;
@@ -317,7 +318,7 @@ public partial class QueryEditor : UserControl
         return true;
     }
 
-    private void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+    private async void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
     {
         if (_completionWindow != null && !_completionWindow.CompletionList.ListBox.HasItems)
         {
@@ -325,7 +326,7 @@ public partial class QueryEditor : UserControl
             return;
         }
 
-        if (ShowPathCompletions())
+        if (await ShowPathCompletions())
         {
             return;
         }
