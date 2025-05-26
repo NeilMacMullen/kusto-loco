@@ -143,8 +143,7 @@ public class InteractiveTableExplorer
             }
 
             var result = await GetCurrentContext().RunQuery(query);
-            if (result.Error.Length == 0) await _renderingSurface.RenderToDisplay(result);
-
+            await _renderingSurface.RenderToDisplay(result);
             _resultHistory.Push(result);
 
             DisplayResults(result);
