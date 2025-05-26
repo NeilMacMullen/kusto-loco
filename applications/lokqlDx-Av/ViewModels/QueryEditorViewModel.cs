@@ -1,23 +1,25 @@
-﻿using Avalonia.Input;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lokql.Engine;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LokqlDx.ViewModels;
+
 public partial class QueryEditorViewModel : ObservableObject, IDisposable
 {
-    private InteractiveTableExplorer _explorer;
-    private ConsoleViewModel _consoleViewModel;
-    public event AsyncEventHandler? ExecutingQuery;
+    private readonly ConsoleViewModel _consoleViewModel;
+    [ObservableProperty] private Workspace? _currentWorkspace;
+
+    [ObservableProperty] private TextDocument _document = new();
+    private readonly InteractiveTableExplorer _explorer;
+    [ObservableProperty] private FontFamily? _fontFamily;
+    [ObservableProperty] private double _fontSize = 20;
+    [ObservableProperty] private string? _queryText;
+    [ObservableProperty] private bool _showLineNumbers;
+    [ObservableProperty] private bool _wordWrap;
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer, ConsoleViewModel consoleViewModel)
     {
@@ -27,29 +29,25 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         Document.Changed += Document_Changed;
     }
 
-    private void Document_Changing(object? sender, DocumentChangeEventArgs e)
+
+    public void Dispose()
     {
-        OnPropertyChanging(nameof(Document));
+        Document.Changing -= Document_Changing;
+        Document.Changed -= Document_Changed;
     }
+
+    public event AsyncEventHandler? ExecutingQuery;
+
+    private void Document_Changing(object? sender, DocumentChangeEventArgs e) => OnPropertyChanging(nameof(Document));
+
     private void Document_Changed(object? sender, DocumentChangeEventArgs e)
     {
         OnPropertyChanged(nameof(Document));
-        if (CurrentWorkspace is not null)
-        {
-            CurrentWorkspace.Text = Document.Text;
-        }
+        if (CurrentWorkspace is not null) CurrentWorkspace.Text = Document.Text;
     }
 
-    [ObservableProperty] TextDocument _document = new();
-    [ObservableProperty] string? _queryText;
-    [ObservableProperty] FontFamily? _fontFamily;
-    [ObservableProperty] double _fontSize = 20;
-    [ObservableProperty] bool _wordWrap;
-    [ObservableProperty] bool _showLineNumbers;
-    [ObservableProperty] Workspace? _currentWorkspace;
-
     [RelayCommand(AllowConcurrentExecutions = false)]
-    async Task RunQuery(string query)
+    private async Task RunQuery(string query)
     {
         if (query.IsBlank())
             return;
@@ -71,7 +69,6 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
 
     internal void AddInternalCommands(IEnumerable<VerbEntry> enumerable)
     {
-
     }
 
     internal void SetUiPreferences(UIPreferences uiPreferences)
@@ -82,15 +79,5 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         WordWrap = uiPreferences.WordWrap;
     }
 
-    internal void SetText(string text)
-    {
-        Document.Text = text;
-    }
-
-
-    public void Dispose()
-    {
-        Document.Changing -= Document_Changing;
-        Document.Changed -= Document_Changed;
-    }
+    internal void SetText(string text) => Document.Text = text;
 }

@@ -2,13 +2,12 @@
 
 namespace LokqlDx.Services;
 
-public class BrowserServices {
-
-    public BrowserServices()
+public class BrowserServices
+{
+    public void OpenUriInBrowser(string uri)
     {
+        if (OperatingSystem.IsWindows())
+            Process.Start(new ProcessStartInfo
+                { FileName = uri, UseShellExecute = true });
     }
-
-    public void OpenUriInBrowser(string uri) =>
-        Process.Start(new ProcessStartInfo { FileName = uri, UseShellExecute = true });
 }
-

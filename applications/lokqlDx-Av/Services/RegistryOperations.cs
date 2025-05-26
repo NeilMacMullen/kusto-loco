@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Security.Principal;
-using System.Windows;
 using Microsoft.Win32;
 
 namespace LokqlDx.Services;
@@ -44,12 +43,14 @@ public class RegistryOperations
 
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\.{WorkspaceManager.Extension}", null, progId);
             if (!quiet)
-                await _dialogService.ShowMessageBox($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
+                await _dialogService.ShowMessageBox(
+                    $"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
         }
         catch
         {
             if (!quiet)
-                await _dialogService.ShowMessageBox("Unable to register file association - you may need to run the application as admin");
+                await _dialogService.ShowMessageBox(
+                    "Unable to register file association - you may need to run the application as admin");
         }
     }
 }

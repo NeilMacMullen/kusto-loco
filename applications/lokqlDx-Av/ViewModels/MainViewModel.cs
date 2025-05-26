@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,13 +16,13 @@ namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    private readonly BrowserServices _browserServices;
     private readonly CommandProcessorFactory _commandProcessorFactory;
     private readonly DialogService _dialogService;
     private readonly KustoSettingsProvider _kustoSettings;
     private readonly StandardFormatAdaptor _loader;
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
-    private readonly BrowserServices _browserServices;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     [ObservableProperty] private ColumnDefinitions? _columnDefinitions;
@@ -208,8 +207,9 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private async Task NavigateToWiki(string path) => await _dialogService.ShowHelp(path);
+
     [RelayCommand]
-    private void NavigateToUri(string path) =>  _browserServices.OpenUriInBrowser(path);
+    private void NavigateToUri(string path) => _browserServices.OpenUriInBrowser(path);
 
     private void ApplyUiPreferences(bool skipGrid)
     {

@@ -1,32 +1,24 @@
-﻿using Avalonia.Media;
+﻿using System.Collections.ObjectModel;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core.Console;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LokqlDx.ViewModels;
+
 public partial class ConsoleViewModel : ObservableObject, IKustoConsole
 {
-    [ObservableProperty] ObservableCollection<ColoredText> _consoleContent = [];
-    [ObservableProperty] ColoredText? _selectedItem;
-    [ObservableProperty] double _consoleWidth;
-    [ObservableProperty] FontFamily? _fontFamily;
-    [ObservableProperty] double _fontSize = 20;
-
-    partial void OnConsoleWidthChanged(double value)
-    {
-        WindowWidth = (int)value;
-    }
+    [ObservableProperty] private ObservableCollection<ColoredText> _consoleContent = [];
+    [ObservableProperty] private double _consoleWidth;
+    [ObservableProperty] private FontFamily? _fontFamily;
+    [ObservableProperty] private double _fontSize = 20;
+    [ObservableProperty] private ColoredText? _selectedItem;
 
     public int WindowWidth { get; private set; } = 80;
 
     public ConsoleColor ForegroundColor { get; set; }
 
     public string ReadLine() => string.Empty;
+
     public void Write(string text)
     {
         var item = new ColoredText(GetColor(ForegroundColor), text);
@@ -34,9 +26,10 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         SelectedItem = item;
     }
 
-    private IImmutableBrush GetColor(ConsoleColor lineColor)
-    {
-        return lineColor switch
+    partial void OnConsoleWidthChanged(double value) => WindowWidth = (int)value;
+
+    private IImmutableBrush GetColor(ConsoleColor lineColor) =>
+        lineColor switch
         {
             ConsoleColor.Black => Brushes.Black,
             ConsoleColor.DarkBlue => Brushes.DarkBlue,
@@ -54,9 +47,8 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
             ConsoleColor.Magenta => Brushes.Magenta,
             ConsoleColor.Yellow => Brushes.Gold,
             ConsoleColor.White => Brushes.White,
-            _ => Brushes.Black,
+            _ => Brushes.Black
         };
-    }
 
     internal void SetUiPreferences(UIPreferences uiPreferences)
     {
@@ -64,10 +56,7 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         FontSize = uiPreferences.FontSize;
     }
 
-    internal void PrepareForOutput()
-    {
-        ConsoleContent.Clear();
-    }
+    internal void PrepareForOutput() => ConsoleContent.Clear();
 
     public record ColoredText(IImmutableBrush Color, string Text);
 }

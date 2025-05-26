@@ -1,19 +1,17 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using HotAvalonia;
 using Jab;
 using Lokql.Engine.Commands;
+using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
-using LokqlDx.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Avalonia.Controls;
-using Avalonia.Platform.Storage;
 
 namespace LokqlDx.Desktop;
 
-class Program
+internal class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -32,7 +30,6 @@ class Program
             .WithInterFont()
             .UseHotReload()
             .LogToTrace();
-
 }
 
 [ServiceProvider]
@@ -53,7 +50,9 @@ internal partial class DiContainer
 
     internal void SetTopLevel(TopLevel? topLevel) => _topLevel = topLevel;
     internal TopLevel GetTopLevel() => _topLevel ?? throw new InvalidOperationException();
-    internal IStorageProvider GetStorageProvider() => _topLevel?.StorageProvider ?? throw new InvalidOperationException();
+
+    internal IStorageProvider GetStorageProvider() =>
+        _topLevel?.StorageProvider ?? throw new InvalidOperationException();
 }
 
 public class CommandProcessorFactory
