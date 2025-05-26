@@ -1,20 +1,26 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
-using System.Reflection;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
+using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
+using lokqlDx;
+using ScottPlot;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Reflection;
 
 namespace LokqlDx.ViewModels;
 
 public partial class RenderingSurfaceViewModel : ObservableObject, IResultRenderingSurface
 {
+    private readonly KustoSettingsProvider _kustoSettings;
     [ObservableProperty] private List<string> _columns = [];
 
     [ObservableProperty] private string? _dataGridSizeWarning;
     [ObservableProperty] private double _fontSize = 20;
-    private readonly KustoSettingsProvider _kustoSettings;
+
+
+    private IScottPlotHost _plotter = new NullScottPlotHost();
     [ObservableProperty] private ObservableCollection<Row>? _results;
     [ObservableProperty] private bool _showDataGridSizeWarning;
 
@@ -23,9 +29,23 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         _kustoSettings = kustoSettings;
     }
 
-    public async Task RenderToDisplay(KustoQueryResult result) => await RenderTable(result);
+    public async Task RenderToDisplay(KustoQueryResult result)
+    {
+        await RenderTable(result);
+        var plot = _plotter.GetPlot(false);
+        plot.Clear();
+        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, _kustoSettings);
+        _plotter.FinishUpdate();
+    }
 
-    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight) => [];
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
+    {
+        using var plot = new Plot();
+        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, _kustoSettings);
+        plot.Axes.AutoScale();
+        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
+        return bytes;
+    }
 
     private Task RenderTable(KustoQueryResult result)
     {
@@ -80,6 +100,8 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     internal void SetUiPreferences(UIPreferences uiPreferences) => FontSize = uiPreferences.FontSize;
 
     internal void Clear() => Results?.Clear();
+
+    public void RegisterHost(IScottPlotHost plotter) => _plotter = plotter;
 
     /// <summary>
     ///     This thing is stupid.<br />
