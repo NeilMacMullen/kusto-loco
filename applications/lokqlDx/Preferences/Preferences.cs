@@ -35,5 +35,7 @@ public class UIPreferences
     public bool ShowLineNumbers { get; set; } = false;
     public string[] MainGridSerialization { get; set; } = [];
     public string[] EditorGridSerialization { get; set; } = [];
+    public string[] AvGridRowSerialization { get; set; } = [];
+    public string[] AvGridColumnSerialization { get; set; } = [];
 }
 
