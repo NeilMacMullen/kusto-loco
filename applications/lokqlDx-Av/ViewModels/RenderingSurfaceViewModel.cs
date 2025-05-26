@@ -5,6 +5,7 @@ using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using lokqlDx;
+using NotNullStrings;
 using ScottPlot;
 
 namespace LokqlDx.ViewModels;
@@ -47,10 +48,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
     private Task RenderTable(KustoQueryResult result)
     {
+        
         //ensure that if there are no results we clear the data grid
-        if (result.RowCount == 0)
+        if (result.Error.IsNotBlank())
         {
-            Results = null;
+            Results = new ObservableCollection<Row>([new Row([result.Error])]);
+            Columns = new List<string>(["ERROR"]);
             return Task.CompletedTask;
         }
 
