@@ -23,6 +23,7 @@ public partial class MainViewModel : ObservableObject
     private readonly StandardFormatAdaptor _loader;
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
+    private readonly BrowserServices _browserServices;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     [ObservableProperty] private ColumnDefinitions? _columnDefinitions;
@@ -50,6 +51,7 @@ public partial class MainViewModel : ObservableObject
         CommandProcessorFactory commandProcessorFactory,
         WorkspaceManager workspaceManager,
         RegistryOperations registryOperations,
+        BrowserServices browserServices,
         IStorageProvider storage)
     {
         _dialogService = dialogService;
@@ -58,6 +60,7 @@ public partial class MainViewModel : ObservableObject
         _commandProcessor = _commandProcessorFactory.GetCommandProcessor();
         _workspaceManager = workspaceManager;
         _registryOperations = registryOperations;
+        _browserServices = browserServices;
         _storage = storage;
         _kustoSettings = workspaceManager.Settings;
 
@@ -205,6 +208,8 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private async Task NavigateToWiki(string path) => await _dialogService.ShowHelp(path);
+    [RelayCommand]
+    private void NavigateToUri(string path) =>  _browserServices.OpenUriInBrowser(path);
 
     private void ApplyUiPreferences(bool skipGrid)
     {

@@ -12,10 +12,12 @@ namespace LokqlDx.Services;
 public class DialogService
 {
     private readonly TopLevel _topLevel;
+    private readonly BrowserServices _browserServices;
 
-    public DialogService(TopLevel topLevel)
+    public DialogService(TopLevel topLevel,BrowserServices browserServices)
     {
         _topLevel = topLevel;
+        _browserServices = browserServices;
     }
 
     public Task ShowMessageBox(string message)
@@ -51,7 +53,7 @@ public class DialogService
         await ShowDialog(
                 page,
                 new MarkdownHelpWindow(),
-                new MarkDownHelpModel(page))
+                new MarkDownHelpModel(page,_browserServices))
             .ConfigureAwait(false);
 
 

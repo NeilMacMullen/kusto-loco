@@ -41,6 +41,7 @@ class Program
 [Transient<MainView>]
 [Transient<PreferencesManager>]
 [Transient<DialogService>]
+[Transient<BrowserServices>]
 [Transient<WorkspaceManager>]
 [Transient<RegistryOperations>]
 [Transient<CommandProcessorFactory>]
