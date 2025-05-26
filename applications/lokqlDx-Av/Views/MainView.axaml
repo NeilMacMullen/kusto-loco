@@ -6,6 +6,7 @@
              xmlns:views="using:LokqlDx.Views"
              xmlns:labs="using:Avalonia.Labs.Controls"
              xmlns:avaloniaEdit="using:AvaloniaEdit"
+             xmlns:system="using:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -24,28 +25,42 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Name="MainMenu">
             <MenuItem Header="_File">
-                <MenuItem Header="_New Workspace"  /> <!--Click="NewWorkspace"-->
-                <MenuItem Header="_Open Workspace"  /> <!--Click="OnOpenWorkSpace"-->
-                <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
+                <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
+                <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" /> <!--Click="OnOpenWorkSpace"-->
+                <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
+                          ItemsSource="{Binding RecentWorkspaces}"
+                          Command="{Binding OpenRecentWorkspaceCommand}"
+                          CommandParameter="{Binding SelectedItem, ElementName=RecentlyUsed}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
 
-                <MenuItem Header="_Save"/> <!-- Click="OnSaveWorkspace" -->
-                <MenuItem Header="Save _As" /> <!--Click="SaveWorkspaceAsEvent" -->
+                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" HotKey="Ctrl+S"/>
+                <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" HotKey="Ctrl+Shift+S" />
             </MenuItem>
             <MenuItem Header="_Preferences">
-                <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" /><!-- Click="OpenApplicationOptionsDialog"-->
-                <MenuItem Header="Workspace Options"  /> <!--Click="OpenWorkspaceOptionsDialog"-->
+                <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
+                <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" /> 
                 <Separator />
-                <MenuItem Header="Decrease FontSize" HotKey="Ctrl+9"  /> <!--Click="DecreaseFontSize"-->
-                <MenuItem Header="Increase FontSize" HotKey="Ctrl+0" /> <!--Click="IncreaseFontSize" -->
-                <MenuItem Header="Toggle word-wrap" HotKey="Alt+Z"  />
-                    <!--Click="ToggleWordWrap"-->
-                <MenuItem Header="Toggle line-numbers" HotKey="Alt+N" />
-                        <!--Click="ToggleLineNumbers"-->
+                <MenuItem Header="Decrease FontSize" HotKey="Ctrl+9" Command="{Binding ChangeFontSizeCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:Int32>-1</system:Int32>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Increase FontSize" HotKey="Ctrl+0" Command="{Binding ChangeFontSizeCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:Int32>1</system:Int32>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Toggle word-wrap" HotKey="Alt+Z" Command="{Binding ToggleWordWrapCommand}" />
+                <MenuItem Header="Toggle line-numbers" HotKey="Alt+N" Command="{Binding ToggleLineNumbersCommand}" />
 
             </MenuItem>
             <MenuItem Header="Misc">
-                <MenuItem Header="Register file association"  />
-                <!--Click="EnableJumpList"-->
+                <MenuItem Header="Register file association" Command="{Binding RegisterFileAssociationCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="LokqlDx intro"  Tag="LokqlDX" /> <!--Click="NavigateToWiki"-->
@@ -77,18 +92,6 @@
                 ColumnDefinitions="400,auto,*"
                 RowDefinitions="*,auto,*">
                 
-                <!--<Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding EditorColumn}"/>
-                    <ColumnDefinition Width="{Binding SplitterColumn}"/>
-                    <ColumnDefinition Width="{Binding OutputColumn}"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="{Binding EditorRow}"/>
-                    <RowDefinition Height="{Binding SplitterRow}"/>
-                    <RowDefinition Height="{Binding ConsoleRow}"/>
-                </Grid.RowDefinitions>-->
-
                 <TabControl
                     Grid.Row="0"
                     Grid.Column="0">
@@ -104,7 +107,8 @@
                     Grid.Row="1"
                     Grid.Column="0"
                     Height="5"
-                    Background="#227F7F7F"/>
+                    Background="#227F7F7F"
+                    DragCompleted="RowGridSplitter_DragCompleted"/>
 
                 <views:ConsoleView
                     Background="{DynamicResource SystemAltLowColor}"
@@ -116,24 +120,23 @@
                     Grid.RowSpan="3"
                     Grid.Column="1"
                     Width="5"
-                    Background="#227F7F7F"/>
+                    Background="#227F7F7F"
+                    DragCompleted="ColumnGridSplitter_DragCompleted"/>
 
                 <views:RenderingSurfaceView
                     DataContext="{Binding RenderingSurfaceViewModel}"
                     Grid.RowSpan="3"
                     Grid.Column="2"/>
 
-
-
             </Grid>
 
-            <Grid
+            <StackPanel
                 x:Name="StatusBar"
                 Background="{DynamicResource SystemAltMediumColor}"
                 Grid.Row="1"
                 Grid.ColumnSpan="3">
-
-            </Grid>
+                <TextBlock Text="{Binding UpdateInfo}"/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </UserControl>

@@ -4,6 +4,7 @@ using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lokql.Engine;
+using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,31 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace LokqlDx.ViewModels;
-public partial class QueryEditorViewModel : ObservableObject
+public partial class QueryEditorViewModel : ObservableObject, IDisposable
 {
     private InteractiveTableExplorer _explorer;
     private ConsoleViewModel _consoleViewModel;
+    public event AsyncEventHandler? ExecutingQuery;
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer, ConsoleViewModel consoleViewModel)
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
+        Document.Changing += Document_Changing;
+        Document.Changed += Document_Changed;
+    }
+
+    private void Document_Changing(object? sender, DocumentChangeEventArgs e)
+    {
+        OnPropertyChanging(nameof(Document));
+    }
+    private void Document_Changed(object? sender, DocumentChangeEventArgs e)
+    {
+        OnPropertyChanged(nameof(Document));
+        if (CurrentWorkspace is not null)
+        {
+            CurrentWorkspace.Text = Document.Text;
+        }
     }
 
     [ObservableProperty] TextDocument _document = new();
@@ -29,12 +46,16 @@ public partial class QueryEditorViewModel : ObservableObject
     [ObservableProperty] double _fontSize = 20;
     [ObservableProperty] bool _wordWrap;
     [ObservableProperty] bool _showLineNumbers;
+    [ObservableProperty] Workspace? _currentWorkspace;
 
     [RelayCommand(AllowConcurrentExecutions = false)]
     async Task RunQuery(string query)
     {
         if (query.IsBlank())
             return;
+
+        if (ExecutingQuery is not null)
+            await ExecutingQuery.InvokeAsync(this, EventArgs.Empty);
 
         ////start capturing console output from the engine
         _consoleViewModel.PrepareForOutput();
@@ -46,7 +67,6 @@ public partial class QueryEditorViewModel : ObservableObject
 
         //Editor.SetSchema(_explorer.GetSchema());
         //Editor.AddSettingsForIntellisense(_explorer.Settings);
-        //Editor.SetBusy(false);
     }
 
     internal void AddInternalCommands(IEnumerable<VerbEntry> enumerable)
@@ -59,10 +79,18 @@ public partial class QueryEditorViewModel : ObservableObject
         FontFamily = new FontFamily(uiPreferences.FontFamily);
         FontSize = uiPreferences.FontSize;
         ShowLineNumbers = uiPreferences.ShowLineNumbers;
+        WordWrap = uiPreferences.WordWrap;
     }
 
     internal void SetText(string text)
     {
         Document.Text = text;
+    }
+
+
+    public void Dispose()
+    {
+        Document.Changing -= Document_Changing;
+        Document.Changed -= Document_Changed;
     }
 }
