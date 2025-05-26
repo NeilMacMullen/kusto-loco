@@ -45,6 +45,6 @@ public static class IntellisenseServiceCollectionExtensions
         }
 
         services.AddScoped<IShareService, Win32ApiService>();
-        services.AddSingleton<Win32ApiResource>();
+        services.AddSingleton<ResourceManager>();
     }
 }

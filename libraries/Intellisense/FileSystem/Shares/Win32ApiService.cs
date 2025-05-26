@@ -9,12 +9,13 @@ using Vanara.PInvoke;
 
 namespace Intellisense.FileSystem.Shares;
 
-internal class Win32ApiResource(ILogger<Win32ApiResource> logger)
+// TODO: write tests
+internal class ResourceManager(ILogger<ResourceManager> logger)
 {
     private readonly SemaphoreSlim _semaphore = new(2, 2);
     private static readonly TimeSpan LockTimeout = TimeSpan.FromSeconds(3);
 
-    public async Task<SemaphoreLock> AcquireLockAsync(CancellationToken token)
+    public async Task<ResourceLock> AcquireLockAsync(CancellationToken token)
     {
         logger.LogTrace("Waiting for lock");
         var acquired = await _semaphore.WaitAsync(LockTimeout, token);
@@ -25,13 +26,13 @@ internal class Win32ApiResource(ILogger<Win32ApiResource> logger)
 
         logger.LogTrace("Acquired lock");
 
-        return new SemaphoreLock(_semaphore, OnDispose);
+        return new ResourceLock(_semaphore, OnDispose);
     }
 
     private void OnDispose(int count) => logger.LogTrace("Released lock {Count}", count);
 }
 
-internal readonly struct SemaphoreLock(SemaphoreSlim semaphore, Action<int> onDispose) : IDisposable
+internal readonly struct ResourceLock(SemaphoreSlim semaphore, Action<int> onDispose) : IDisposable
 {
     public void Dispose()
     {
@@ -45,7 +46,7 @@ internal class Win32ApiService(
     ILogger<Win32ApiService> logger,
     CancellationTokenSource cts,
     IPathFactory pathFactory,
-    Win32ApiResource resource
+    ResourceManager resourceManager
 )
     : IShareService
 {
@@ -62,7 +63,7 @@ internal class Win32ApiService(
 
 
         logger.LogDebug("Fetching shares");
-        using var _ = await resource.AcquireLockAsync(cts.Token);
+        using var _ = await resourceManager.AcquireLockAsync(cts.Token);
 
         var stopwatch = Stopwatch.StartNew();
         try
