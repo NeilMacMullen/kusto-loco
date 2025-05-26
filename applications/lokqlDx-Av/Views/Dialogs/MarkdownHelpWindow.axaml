@@ -21,15 +21,7 @@
         </Button>
         
         <ScrollViewer Margin="4" DockPanel.Dock="Top">
-            <md:MarkdownViewer Name="MarkdownViewer" MarkdownText="{Binding MarkdownText}" LayoutUpdated="MarkdownViewer_LayoutUpdated" >
-                <md:MarkdownViewer.Styles>
-                    <Styles>
-                        <Style Selector="Border">
-                            <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
-                        </Style>
-                    </Styles>
-                </md:MarkdownViewer.Styles>
-            </md:MarkdownViewer>
+            <md:MarkdownViewer Name="MarkdownViewer" MarkdownText="{Binding MarkdownText}" LayoutUpdated="MarkdownViewer_LayoutUpdated" />
         </ScrollViewer>
     </DockPanel>
 </UserControl>
