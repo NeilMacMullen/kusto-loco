@@ -1,39 +1,31 @@
-﻿using Avalonia.Collections;
+﻿using System.Collections.ObjectModel;
+using System.Data;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LokqlDx.ViewModels;
+
 public partial class RenderingSurfaceViewModel : ObservableObject, IResultRenderingSurface
 {
-    private KustoSettingsProvider _kustoSettings;
+    [ObservableProperty] private List<string> _columns = [];
+
+    [ObservableProperty] private string? _dataGridSizeWarning;
+    [ObservableProperty] private double _fontSize = 20;
+    private readonly KustoSettingsProvider _kustoSettings;
+    [ObservableProperty] private ObservableCollection<Row>? _results;
+    [ObservableProperty] private bool _showDataGridSizeWarning;
 
     public RenderingSurfaceViewModel(KustoSettingsProvider kustoSettings)
     {
         _kustoSettings = kustoSettings;
     }
 
-    [ObservableProperty] string? _dataGridSizeWarning;
-    [ObservableProperty] bool _showDataGridSizeWarning;
-    [ObservableProperty] ObservableCollection<Row>? _results;
-    [ObservableProperty] List<string> _columns = [];
-    [ObservableProperty] double _fontSize = 20;
+    public async Task RenderToDisplay(KustoQueryResult result) => await RenderTable(result);
 
-    public async Task RenderToDisplay(KustoQueryResult result)
-    {
-        await RenderTable(result);
-    }
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight) => [];
 
     private Task RenderTable(KustoQueryResult result)
     {
@@ -53,7 +45,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 $"Warning: Displaying only the first {maxRows} rows of {result.RowCount} rows.  Set {settingName} to see more";
 
         ShowDataGridSizeWarning = result.RowCount > maxRows;
-        System.Data.DataTable? dt = result.ToDataTable(maxRows);
+        var dt = result.ToDataTable(maxRows);
 
         var columns = new List<string>();
         //prevent the column names from being interpreted as hotkeys
@@ -75,6 +67,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 var c = dt.Columns[i];
                 newRow[i] = row.ItemArray[i] ?? "";
             }
+
             results.Add(newRow);
         }
 
@@ -83,59 +76,35 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
         return Task.CompletedTask;
     }
-    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight) => [];
-    internal void SetUiPreferences(UIPreferences uiPreferences)
-    {
-        FontSize = uiPreferences.FontSize;
-    }
 
-    internal void Clear()
-    {
-        Results?.Clear();
-    }
+    internal void SetUiPreferences(UIPreferences uiPreferences) => FontSize = uiPreferences.FontSize;
+
+    internal void Clear() => Results?.Clear();
 
     /// <summary>
-    /// This thing is stupid.<br/>
-    /// Avalonia's DataGrid doesn't support binding to a DataTable.<br/>
-    /// Untill someone comes up with a better idea, I'm converting DataTable to list of this abominations, and creating rows in CodeBehind, it works for now
+    ///     This thing is stupid.<br />
+    ///     Avalonia's DataGrid doesn't support binding to a DataTable.<br />
+    ///     Untill someone comes up with a better idea, I'm converting DataTable to list of this abominations, and creating
+    ///     rows in CodeBehind, it works for now
     /// </summary>
     public class Row
     {
-        public static string GetPath(int i)
-        {
-            if (i < 10)
-            {
-                return $"Value{i}";
-            }
-            else
-            {
-                return $"{nameof(Next)}.{GetPath(i - 10)}";
-            }
-        }
+        private Row? _next;
 
         public object? this[int index]
         {
             set
             {
                 if (index < 10)
-                {
                     Prop(index)?.SetValue(this, value);
-                }
                 else
-                {
                     Next[index - 10] = value;
-                }
             }
             get => index switch
             {
                 < 10 => Prop(index)?.GetValue(this),
                 _ => Next[index - 10]
             };
-        }
-
-        private static PropertyInfo? Prop(int index)
-        {
-            return typeof(Row).GetProperty($"Value{index}");
         }
 
         public object? Value0 { get; set; }
@@ -149,16 +118,24 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         public object? Value8 { get; set; }
         public object? Value9 { get; set; }
 
-        private Row? _next;
         public Row Next
         {
             get
             {
                 if (_next is null)
-                    _next = new();
+                    _next = new Row();
 
                 return _next;
             }
         }
+
+        public static string GetPath(int i)
+        {
+            if (i < 10) return $"Value{i}";
+
+            return $"{nameof(Next)}.{GetPath(i - 10)}";
+        }
+
+        private static PropertyInfo? Prop(int index) => typeof(Row).GetProperty($"Value{index}");
     }
 }

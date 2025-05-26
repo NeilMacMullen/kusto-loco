@@ -2,19 +2,20 @@
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LokqlDx.ViewModels.Dialogs;
+
 public partial class WorkspacePreferencesViewModel : ObservableObject, IDialogViewModel
 {
     private readonly TaskCompletionSource _completionSource;
-    private readonly WorkspaceManager _workspaceManager;
     private readonly UIPreferences _uiPreferences;
-    public Task Result { get; private set; }
+    private readonly WorkspaceManager _workspaceManager;
+
+    [ObservableProperty] private TextDocument _document = new();
+    [ObservableProperty] private double _fontSize;
+    [ObservableProperty] private FontFamily _selectedFont;
+    [ObservableProperty] private bool _showLineNumbers;
+    [ObservableProperty] private bool _wordWrap;
 
     public WorkspacePreferencesViewModel(WorkspaceManager workspaceManager, UIPreferences uiPreferences)
     {
@@ -32,13 +33,10 @@ public partial class WorkspacePreferencesViewModel : ObservableObject, IDialogVi
         Result = _completionSource.Task;
     }
 
-    [ObservableProperty] TextDocument _document = new();
-    [ObservableProperty] FontFamily _selectedFont;
-    [ObservableProperty] double _fontSize;
-    [ObservableProperty] bool _wordWrap;
-    [ObservableProperty] bool _showLineNumbers;
+    public Task Result { get; }
 
-    [RelayCommand] void Save()
+    [RelayCommand]
+    private void Save()
     {
         _workspaceManager.Workspace.StartupScript = Document.Text;
 
@@ -48,8 +46,6 @@ public partial class WorkspacePreferencesViewModel : ObservableObject, IDialogVi
         _completionSource.SetResult();
     }
 
-    [RelayCommand] void Cancel()
-    {
-        _completionSource.SetResult();
-    }
+    [RelayCommand]
+    private void Cancel() => _completionSource.SetResult();
 }

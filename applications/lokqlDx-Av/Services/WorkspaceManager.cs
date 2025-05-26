@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.IO;
 using System.Text.Json;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
@@ -17,18 +16,18 @@ namespace LokqlDx.Services;
 public class WorkspaceManager
 {
     public const string Extension = "lokql";
-    private Workspace _workspace = new();
+    private readonly JsonSerializerOptions _options = new() { WriteIndented = true };
     public string Path = string.Empty;
-    public Workspace Workspace => _workspace;
+    public Workspace Workspace { get; private set; } = new();
 
     public static string GlobPattern => $"*.{Extension}";
 
     public bool IsNewWorkspace => Path.IsBlank();
     public KustoSettingsProvider Settings { get; } = new();
-    private JsonSerializerOptions _options = new() { WriteIndented = true };
+
     private void EnsureWorkspacePopulated()
     {
-        var UserText = _workspace.Text;
+        var UserText = Workspace.Text;
         if (!UserText.IsBlank()) return;
         UserText = @"
 # move the cursor over a block of lines and press SHIFT-ENTER to run
@@ -54,9 +53,9 @@ data
         Path = path;
         try
         {
-            var json = JsonSerializer.Serialize(workspace,_options);
+            var json = JsonSerializer.Serialize(workspace, _options);
             File.WriteAllText(Path, json);
-            _workspace = workspace;
+            Workspace = workspace;
         }
         catch (Exception e)
         {
@@ -79,7 +78,7 @@ data
         if (!Directory.Exists(rootSettingFolderPath))
             Directory.CreateDirectory(rootSettingFolderPath);
 
-        _workspace = new Workspace();
+        Workspace = new Workspace();
         ResetSettings();
         Path = path;
         SetWorkingPaths();
@@ -87,7 +86,7 @@ data
             try
             {
                 var json = File.ReadAllText(Path);
-                _workspace = JsonSerializer.Deserialize<Workspace>(json)!;
+                Workspace = JsonSerializer.Deserialize<Workspace>(json)!;
             }
             catch (Exception e)
             {
@@ -103,31 +102,27 @@ data
         Settings.Reset();
         //now add in settings from env...
         var env = Environment.GetEnvironmentVariables();
-        foreach (DictionaryEntry  e in env)
+        foreach (DictionaryEntry e in env)
         {
             var v = e.Value?.ToString();
             if (v is null) continue;
-            Settings.Set($"env.{e.Key}",v);
+            Settings.Set($"env.{e.Key}", v);
         }
+
         if (Path.IsNotBlank())
             Settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, System.IO.Path.GetDirectoryName(Path)!);
     }
+
     public void CreateNew()
     {
-        _workspace = new Workspace();
+        Workspace = new Workspace();
         ResetSettings();
         Path = string.Empty;
     }
 
-    public bool IsDirty(Workspace wkspc)
-    {
-        return wkspc != _workspace;
-    }
+    public bool IsDirty(Workspace wkspc) => wkspc != Workspace;
 
-    public string ContainingFolder()
-    {
-        return System.IO.Path.GetDirectoryName(Path).NullToEmpty();
-    }
+    public string ContainingFolder() => System.IO.Path.GetDirectoryName(Path).NullToEmpty();
 
     public void SetWorkingPaths()
     {

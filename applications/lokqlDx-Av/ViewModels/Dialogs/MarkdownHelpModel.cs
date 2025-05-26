@@ -1,0 +1,63 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using LokqlDx.Services;
+
+namespace LokqlDx.ViewModels.Dialogs;
+
+public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
+{
+    private const string BrowserPrefix = @"https://github.com/NeilMacMullen/kusto-loco/wiki";
+    private const string RawPrefix = @"https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco";
+    private readonly BrowserServices _browser;
+    private readonly TaskCompletionSource _completionSource;
+
+    private readonly string _link;
+
+    [ObservableProperty] public string _markdownText;
+
+    public MarkDownHelpModel(string link, BrowserServices browser)
+    {
+        _link = link;
+        _browser = browser;
+        _completionSource = new TaskCompletionSource();
+        Result = _completionSource.Task;
+        _markdownText = string.Empty;
+    }
+
+
+    public Task Result { get; }
+
+    [RelayCommand]
+    private void Save()
+    {
+    }
+
+    private string MakeUri(string prefix)
+    {
+        var escaped = Uri.EscapeDataString(_link);
+        return $"{prefix}/{escaped}";
+    }
+
+    [RelayCommand]
+    public async Task FetchMarkdown()
+    {
+        try
+        {
+            var rawLink = MakeUri(RawPrefix) + ".md";
+            using var client = new HttpClient();
+            var text = await client.GetStringAsync(rawLink);
+            MarkdownText = text;
+        }
+        catch
+        {
+            MarkdownText = "Error loading page";
+        }
+    }
+
+    [RelayCommand]
+    public void ShowInBrowser()
+    {
+        var link = MakeUri(BrowserPrefix);
+        _browser.OpenUriInBrowser(link);
+    }
+}

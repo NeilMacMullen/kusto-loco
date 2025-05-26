@@ -4,21 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
              xmlns:views="using:LokqlDx.Views"
-             xmlns:labs="using:Avalonia.Labs.Controls"
-             xmlns:avaloniaEdit="using:AvaloniaEdit"
              xmlns:system="using:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
-    
+        <vm:MainViewModel />
+    </Design.DataContext>
+
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
-            <InvokeCommandAction Command="{Binding InitializeCommand}"/>
+            <InvokeCommandAction Command="{Binding InitializeCommand}" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
 
@@ -26,24 +24,25 @@
         <Menu DockPanel.Dock="Top" Name="MainMenu">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
-                <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" /> <!--Click="OnOpenWorkSpace"-->
+                <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
+                <!--Click="OnOpenWorkSpace"-->
                 <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
                           ItemsSource="{Binding RecentWorkspaces}"
                           Command="{Binding OpenRecentWorkspaceCommand}"
                           CommandParameter="{Binding SelectedItem, ElementName=RecentlyUsed}">
                     <MenuItem.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="{Binding Name}" />
                         </DataTemplate>
                     </MenuItem.ItemTemplate>
                 </MenuItem>
 
-                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" HotKey="Ctrl+S"/>
+                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" HotKey="Ctrl+S" />
                 <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" HotKey="Ctrl+Shift+S" />
             </MenuItem>
             <MenuItem Header="_Preferences">
                 <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
-                <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" /> 
+                <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
                 <Separator />
                 <MenuItem Header="Decrease FontSize" HotKey="Ctrl+9" Command="{Binding ChangeFontSizeCommand}">
                     <MenuItem.CommandParameter>
@@ -60,28 +59,33 @@
 
             </MenuItem>
             <MenuItem Header="Misc">
-                <MenuItem Header="Register file association" Command="{Binding RegisterFileAssociationCommand}" />
+                <MenuItem Header="Register file association"
+                          Command="{Binding RegisterFileAssociationCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="LokqlDx intro"  Tag="LokqlDX" /> <!--Click="NavigateToWiki"-->
-            <MenuItem Header="Quick start"  Tag="LokqlDx-tutorial-‐-quick-start" />
-                    <!--Click="NavigateToWiki"-->
-                <MenuItem Header="Chart customisation"  Tag="ScottPlot-Chart-customisation" /> <!--Click="NavigateToWiki"-->
+                <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX" Command="{Binding NavigateToWikiCommand}" />
+                <MenuItem Header="Quick start"
+                          CommandParameter="LokqlDx-tutorial-‐-quick-start"
+                          Command="{Binding NavigateToWikiCommand}" />
+                <MenuItem Header="Chart customisation"
+                          Command="{Binding NavigateToWikiCommand}"
+                          CommandParameter="ScottPlot-Chart-customisation" />
                 <Separator />
-                <MenuItem Header="Kusto-loco Project Page" 
-                          Tag="https://github.com/NeilMacMullen/kusto-loco" />
-                    <!--Click="NavigateToUri"-->
-                <MenuItem Header="Github Discussion Forum" 
-                          Tag="https://github.com/NeilMacMullen/kusto-loco/discussions" /> <!--Click="NavigateToUri"-->
+                <MenuItem Header="Kusto-loco Project Page"
+                          Command="{Binding NavigateToUriCommand}"
+                          CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
+                <MenuItem Header="Github Discussion Forum"
+                          Command="{Binding NavigateToUriCommand}"
+                          CommandParameter="https://github.com/NeilMacMullen/kusto-loco/discussions" />
                 <Separator />
-                <MenuItem Header="KQL Introduction" 
-                          Tag="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
-                    <!--Click="NavigateToUri"-->
+                <MenuItem Header="KQL Introduction"
+                          Command="{Binding NavigateToUriCommand}"
+                          CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
                 <Separator />
 
 
-                <MenuItem Header="About"  />
-    <!--Click="AboutBox"-->
+                <MenuItem Header="About" />
+                <!--Click="AboutBox"-->
 
             </MenuItem>
         </Menu>
@@ -91,12 +95,12 @@
                 x:Name="MainGrid"
                 ColumnDefinitions="400,auto,*"
                 RowDefinitions="*,auto,*">
-                
+
                 <TabControl
                     Grid.Row="0"
                     Grid.Column="0">
                     <TabItem Header="Edit">
-                        <views:QueryEditorView DataContext="{Binding QueryEditorViewModel}"/>
+                        <views:QueryEditorView DataContext="{Binding QueryEditorViewModel}" />
                     </TabItem>
                     <TabItem Header="Copilot">
                         <views:CopilotChatView />
@@ -108,25 +112,25 @@
                     Grid.Column="0"
                     Height="5"
                     Background="#227F7F7F"
-                    DragCompleted="RowGridSplitter_DragCompleted"/>
+                    DragCompleted="RowGridSplitter_DragCompleted" />
 
                 <views:ConsoleView
                     Background="{DynamicResource SystemAltLowColor}"
                     Grid.Row="2"
                     Grid.Column="0"
-                    DataContext="{Binding ConsoleViewModel}"/>
+                    DataContext="{Binding ConsoleViewModel}" />
 
                 <GridSplitter
                     Grid.RowSpan="3"
                     Grid.Column="1"
                     Width="5"
                     Background="#227F7F7F"
-                    DragCompleted="ColumnGridSplitter_DragCompleted"/>
+                    DragCompleted="ColumnGridSplitter_DragCompleted" />
 
                 <views:RenderingSurfaceView
                     DataContext="{Binding RenderingSurfaceViewModel}"
                     Grid.RowSpan="3"
-                    Grid.Column="2"/>
+                    Grid.Column="2" />
 
             </Grid>
 
@@ -135,7 +139,7 @@
                 Background="{DynamicResource SystemAltMediumColor}"
                 Grid.Row="1"
                 Grid.ColumnSpan="3">
-                <TextBlock Text="{Binding UpdateInfo}"/>
+                <TextBlock Text="{Binding UpdateInfo}" />
             </StackPanel>
         </Grid>
     </DockPanel>
