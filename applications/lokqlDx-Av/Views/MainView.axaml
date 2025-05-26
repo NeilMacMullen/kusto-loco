@@ -63,10 +63,10 @@
                 <MenuItem Header="Register file association" Command="{Binding RegisterFileAssociationCommand}" />
             </MenuItem>
             <MenuItem Header="Help">
-                <MenuItem Header="LokqlDx intro"  Tag="LokqlDX" /> <!--Click="NavigateToWiki"-->
-            <MenuItem Header="Quick start"  Tag="LokqlDx-tutorial-‐-quick-start" />
-                    <!--Click="NavigateToWiki"-->
-                <MenuItem Header="Chart customisation"  Tag="ScottPlot-Chart-customisation" /> <!--Click="NavigateToWiki"-->
+                <MenuItem Header="LokqlDx intro"  CommandParameter="LokqlDX" Command="{Binding NavigateToWikiCommand}"/>
+            <MenuItem Header="Quick start"  CommandParameter="LokqlDx-tutorial-‐-quick-start" Command="{Binding NavigateToWikiCommand}"/>
+                <MenuItem Header="Chart customisation"  
+                          Command="{Binding NavigateToWikiCommand}" CommandParameter="ScottPlot-Chart-customisation"/>
                 <Separator />
                 <MenuItem Header="Kusto-loco Project Page" 
                           Tag="https://github.com/NeilMacMullen/kusto-loco" />
