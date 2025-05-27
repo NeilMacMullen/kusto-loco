@@ -25,7 +25,10 @@ public partial class MainViewModel : ObservableObject
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
-    [ObservableProperty] private ColumnDefinitions _columnDefinitions = [];
+
+    [ObservableProperty] private ColumnDefinitions? _columnDefinitions
+        = ColumnDefinitions.Parse("*,auto,*");
+
     private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
     [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
@@ -38,7 +41,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-    [ObservableProperty] private RowDefinitions _rowDefinitions = [];
+    [ObservableProperty] private RowDefinitions _rowDefinitions = RowDefinitions.Parse("*,auto,*");
     [ObservableProperty] private string _updateInfo = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
@@ -105,7 +108,6 @@ public partial class MainViewModel : ObservableObject
         //}
     }
 
-   
 
     [RelayCommand]
     private async Task Closing(WindowClosingEventArgs? cancelEventArgs)
@@ -409,20 +411,22 @@ public partial class MainViewModel : ObservableObject
         WindowSize = new Size(ui.WindowWidth, ui.WindowHeight);
         var columnDefs = ColumnDefinitions.Parse(
             ui.AvGridRowSerialization.JoinString());
-        ColumnDefinitions = columnDefs;
+        if (columnDefs.Count == ColumnDefinitions.Count)
+            ColumnDefinitions = columnDefs;
 
         var rowDefs = RowDefinitions.Parse(ui.AvGridRowSerialization.JoinString());
-        RowDefinitions = rowDefs;
+        if (rowDefs.Count == RowDefinitions.Count)
+            RowDefinitions = rowDefs;
     }
 
     /// <summary>
-    /// Allows the grid layout to be reset in case it ends up with off-screen values
+    ///     Allows the grid layout to be reset in case it ends up with off-screen values
     /// </summary>
     [RelayCommand]
     private void ResetGridLayout()
     {
-        ColumnDefinitions = ColumnDefinitions.Parse($"{WindowSize.Width*0.6},auto,*");
-        RowDefinitions = RowDefinitions.Parse($"{WindowSize.Height*0.6},auto,*");
+        ColumnDefinitions = ColumnDefinitions.Parse($"{WindowSize.Width * 0.6},auto,*");
+        RowDefinitions = RowDefinitions.Parse($"{WindowSize.Height * 0.6},auto,*");
     }
 
 
