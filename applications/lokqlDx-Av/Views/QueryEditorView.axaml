@@ -18,15 +18,12 @@
             FontFamily="{Binding FontFamily}"
             FontSize="{Binding FontSize}"
             ShowLineNumbers="{Binding ShowLineNumbers}"
-            WordWrap="{Binding WordWrap}">
+            WordWrap="{Binding WordWrap}"
+            DragDrop.AllowDrop="True"
+            >
 
-            <avaloniaEdit:TextEditor.KeyBindings>
-                <KeyBinding
-                    Gesture="Shift+Enter"
-                    Command="{Binding RunQueryCommand}"
-                    CommandParameter="{Binding QueryText}"/>
-            </avaloniaEdit:TextEditor.KeyBindings>
-        </avaloniaEdit:TextEditor>
+           
+		</avaloniaEdit:TextEditor>
         <ProgressBar
             IsIndeterminate="true"
             Height="8"

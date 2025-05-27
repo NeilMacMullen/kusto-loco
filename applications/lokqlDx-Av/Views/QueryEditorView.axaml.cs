@@ -1,86 +1,113 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using AvaloniaEdit.Editing;
-using AvaloniaEdit.Highlighting.Xshd;
+using Avalonia.Interactivity;
 using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
 using LokqlDx.ViewModels;
-using System.ComponentModel;
-using System.Text;
-using System.Reflection;
+using NotNullStrings;
 using System.Xml;
+using Avalonia.Platform.Storage;
+
+#pragma warning disable VSTHRD100
 
 namespace LokqlDx.Views;
 
-public partial class QueryEditorView : UserControl, IDisposable
+public partial class QueryEditorView : UserControl
 {
-    private EditorHelper _editorHelper;
+    private readonly EditorHelper _editorHelper;
 
     public QueryEditorView()
     {
         InitializeComponent();
         _editorHelper = new EditorHelper(TextEditor);
-        TextEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
-        //TextEditor.TextArea.SelectionChanged += TextArea_SelectionChanged;
-        //HotKeyManager.SetHotKey(TextEditor, new(Key.Enter, KeyModifiers.Shift));
     }
 
-    private void TextArea_SelectionChanged(object? sender, EventArgs e)
-    {
-        if (DataContext is QueryEditorViewModel vm)
-        {
-            vm.QueryText = GetTextAroundCursor();
-        }
-    }
+    private QueryEditorViewModel GetVm() =>
+        (DataContext as QueryEditorViewModel)!;
 
-    private void Caret_PositionChanged(object? sender, EventArgs e)
-    {
-        if (DataContext is QueryEditorViewModel vm)
-        {
-            vm.QueryText = GetTextAroundCursor();
-        }
-    }
 
-    /// <summary>
-    ///     searches for lines around the cursor that contain text
-    /// </summary>
-    /// <remarks>
-    ///     This allows us to easily run multi-line queries
-    /// </remarks>
-    private string GetTextAroundCursor()
-    {
-        //if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
-
-        if (_editorHelper is null)
-            return "";
-
-        var i = _editorHelper.LineAtCaret().LineNumber;
-
-        var sb = new StringBuilder();
-
-        while (i > 1 && _editorHelper.TextInLine(i - 1).Trim().Length > 0)
-            i--;
-        while (i <= TextEditor.LineCount && _editorHelper.TextInLine(i).Trim().Length > 0)
-        {
-            sb.AppendLine(_editorHelper.TextInLine(i));
-            i++;
-        }
-
-        return sb.ToString().Trim();
-    }
-
-    public void Dispose()
-    {
-        TextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
-        //TextEditor.TextArea.SelectionChanged -= TextArea_SelectionChanged;
-    }
-
-    private void UserControl_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void UserControl_Loaded(object? sender, RoutedEventArgs e)
     {
         using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
         using var reader = new XmlTextReader(s);
         TextEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        //Ensure we can intercept ENTER key
+        TextEditor.AddHandler(KeyDownEvent, InternalEditor_OnKeyDown, RoutingStrategies.Tunnel);
+        TextEditor.AddHandler(DragDrop.DragEnterEvent, DragEnter);
+        TextEditor.AddHandler(DragDrop.DragOverEvent, DragOver);
+
+        TextEditor.AddHandler(DragDrop.DropEvent, Drop);
+    }
+
+    private void DragOver(object? sender, DragEventArgs drgevent)
+    {
+        drgevent.Handled = true;
+        // Check that the data being dragged is a file
+        drgevent.DragEffects = drgevent.Data.Contains(DataFormats.Files)
+            ? DragDropEffects.Link
+            : DragDropEffects.None;
+    }
+
+    private void DragEnter(object? sender, DragEventArgs drgevent)
+    {
+        drgevent.Handled = true;
+        // Check that the data being dragged is a file
+        drgevent.DragEffects = drgevent.Data.Contains(DataFormats.Files)
+            ? DragDropEffects.Link
+            : DragDropEffects.None;
+    }
+
+    private void Drop(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            var newString = e.Data.GetFiles()!
+                .Select(s => s.TryGetLocalPath().NullToEmpty())
+                .Where(s => s.IsNotBlank())
+                .Select(f => $".{VerbFromExtension(f)} \"{f}\"")
+                .JoinAsLines();
+                 _editorHelper.InsertAtCursor(newString);
+        }
+
+        e.Handled = true;
+        return;
+
+        string VerbFromExtension(string f)
+        {
+            return f.EndsWith(".csl")
+                ? "run"
+                : "load";
+        }
+    }
+    
+
+    private async void InternalEditor_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        var isEnter = e.Key is Key.Enter;
+        var shiftDown = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+        var ctrlDown = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+
+        if (isEnter && shiftDown)
+        {
+            e.Handled = true;
+            var query = ctrlDown
+                ? _editorHelper.GetFullText()
+                : _editorHelper.GetTextAroundCursor();
+
+            await GetVm().RunQueryCommand.ExecuteAsync(query);
+        }
+
+        if (e.Key == Key.Down && ctrlDown)
+        {
+            e.Handled = true;
+            _editorHelper.ScrollDownToComment();
+        }
+
+        if (e.Key == Key.Up && ctrlDown)
+        {
+            e.Handled = true;
+            _editorHelper.ScrollUpToComment();
+        }
     }
 }

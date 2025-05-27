@@ -77,6 +77,8 @@
             <MenuItem Header="Misc">
                 <MenuItem Header="Register file association"
                           Command="{Binding RegisterFileAssociationCommand}" />
+                <MenuItem Header="Reset layout"
+                          Command ="{Binding ResetGridLayoutCommand}"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX" Command="{Binding NavigateToWikiCommand}" />
