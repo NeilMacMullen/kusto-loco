@@ -1,7 +1,7 @@
-﻿using AvaloniaEdit;
+﻿using System.Text;
+using AvaloniaEdit;
 using AvaloniaEdit.Document;
 using NotNullStrings;
-using System.Text;
 
 namespace lokqlDx;
 
@@ -13,15 +13,9 @@ public class EditorHelper(TextEditor query)
 
     public string GetCurrentLineText() => TextInLine(GetCurrentLineNumber);
 
-    public string GetText(DocumentLine line)
-    {
-        return Query.Document.GetText(line.Offset, line.Length);
-    }
+    public string GetText(DocumentLine line) => Query.Document.GetText(line.Offset, line.Length);
 
-    private bool LineNumberIsValid(int line)
-    {
-        return line >= 1 && line <= Query.Document.LineCount;
-    }
+    private bool LineNumberIsValid(int line) => line >= 1 && line <= Query.Document.LineCount;
 
     public string TextInLine(int line)
     {
@@ -30,15 +24,9 @@ public class EditorHelper(TextEditor query)
         return GetText(Query.Document.GetLineByNumber(line));
     }
 
-    public bool LineIsTopOfBlock(int line)
-    {
-        return TextInLine(line - 1).IsBlank() & TextInLine(line).IsNotBlank();
-    }
+    public bool LineIsTopOfBlock(int line) => TextInLine(line - 1).IsBlank() & TextInLine(line).IsNotBlank();
 
-    public DocumentLine LineAtCaret()
-    {
-        return Query.Document.GetLineByOffset(Query.CaretOffset);
-    }
+    public DocumentLine LineAtCaret() => Query.Document.GetLineByOffset(Query.CaretOffset);
 
     public string TextToLeftOfCaret()
     {
@@ -55,6 +43,8 @@ public class EditorHelper(TextEditor query)
             Query.Document.GetLineByNumber(line).Offset;
         Query.ScrollToLine(line);
     }
+
+    public string GetFullText() => Query.Text;
 
     public string GetTextAroundCursor()
     {
@@ -74,6 +64,7 @@ public class EditorHelper(TextEditor query)
 
         return sb.ToString().Trim();
     }
+
     public void ScrollDownToComment()
     {
         var i = GetCurrentLineNumber + 1;
@@ -91,4 +82,6 @@ public class EditorHelper(TextEditor query)
             i--;
         ScrollToLine(i);
     }
+
+    public void InsertAtCursor(string text) => Query.Document.Insert(Query.CaretOffset, text);
 }

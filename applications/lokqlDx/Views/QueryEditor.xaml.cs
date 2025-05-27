@@ -80,7 +80,7 @@ public partial class QueryEditor : UserControl
     public void ScrollDownToComment()
         => _editorHelper.ScrollDownToComment();
 
-
+    
     public void ScrollUpToComment()
         => _editorHelper.ScrollUpToComment();
 
