@@ -1,8 +1,4 @@
-﻿
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,8 +16,8 @@ using Lokql.Engine;
 using LokqlDx;
 using NotNullStrings;
 using FontFamily = System.Windows.Media.FontFamily;
-namespace lokqlDx;
 
+namespace lokqlDx;
 
 /// <summary>
 ///     Simple text editor for running queries
@@ -33,20 +29,15 @@ namespace lokqlDx;
 public partial class QueryEditor : UserControl
 {
     private readonly EditorHelper _editorHelper;
-    private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
     private readonly IntellisenseClient _intellisenseClient = App.Resolve<IntellisenseClient>();
-    private CommandParser? _parser;
-    private CommandParser Parser
-    {
-        get => _parser ?? throw new InvalidOperationException($"Did not expect {nameof(Parser)} to be uninitialized. Was this accessed before initialization in {nameof(AddInternalCommands)}?");
-        set => _parser = value;
-    }
+    private readonly SchemaIntellisenseProvider _schemaIntellisenseProvider = new();
 
     private CompletionWindow? _completionWindow;
 
     private IntellisenseEntry[] _internalCommands = [];
     private bool _isBusy;
     private IntellisenseEntry[] _kqlFunctionEntries = [];
+    private CommandParser? _parser;
 
 
     private IntellisenseEntry[] _settingNames = [];
@@ -58,9 +49,16 @@ public partial class QueryEditor : UserControl
         InitializeComponent();
         Query.TextArea.TextEntering += textEditor_TextArea_TextEntering;
         Query.TextArea.TextEntered += textEditor_TextArea_TextEntered;
-        Query.TextArea.Caret.PositionChanged += async (_,_) => await _intellisenseClient.CancelRequestAsync();
+        Query.TextArea.Caret.PositionChanged += async (_, _) => await _intellisenseClient.CancelRequestAsync();
 
         _editorHelper = new EditorHelper(Query);
+    }
+
+    private CommandParser Parser
+    {
+        get => _parser ?? throw new InvalidOperationException(
+            $"Did not expect {nameof(Parser)} to be uninitialized. Was this accessed before initialization in {nameof(AddInternalCommands)}?");
+        set => _parser = value;
     }
 
     #region public interface
@@ -77,62 +75,23 @@ public partial class QueryEditor : UserControl
     ///     This allows us to easily run multi-line queries
     /// </remarks>
     private string GetTextAroundCursor()
-    {
-        if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
-
-        var i = _editorHelper.LineAtCaret().LineNumber;
-
-        var sb = new StringBuilder();
-
-        while (i > 1 && _editorHelper.TextInLine(i - 1).Trim().Length > 0)
-            i--;
-        while (i <= Query.LineCount && _editorHelper.TextInLine(i).Trim().Length > 0)
-        {
-            sb.AppendLine(_editorHelper.TextInLine(i));
-            i++;
-        }
-
-        return sb.ToString().Trim();
-    }
-
+        => _editorHelper.GetTextAroundCursor();
 
     public void ScrollDownToComment()
-    {
-        var i = _editorHelper.GetCurrentLineNumber + 1;
+        => _editorHelper.ScrollDownToComment();
 
-        while (!_editorHelper.LineIsTopOfBlock(i) && i <= Query.LineCount)
-            i++;
-        _editorHelper.ScrollToLine(i);
-    }
 
     public void ScrollUpToComment()
-    {
-        var i = _editorHelper.GetCurrentLineNumber - 1;
+        => _editorHelper.ScrollUpToComment();
 
-        while (!_editorHelper.LineIsTopOfBlock(i) && i >= 1)
-            i--;
-        _editorHelper.ScrollToLine(i);
-    }
 
-    public void SetFontSize(double newSize)
-    {
-        Query.FontSize = newSize;
-    }
+    public void SetFontSize(double newSize) => Query.FontSize = newSize;
 
-    public void SetText(string text)
-    {
-        Query.Text = text;
-    }
+    public void SetText(string text) => Query.Text = text;
 
-    public void SetFont(string font)
-    {
-        Query.FontFamily = new FontFamily(font);
-    }
+    public void SetFont(string font) => Query.FontFamily = new FontFamily(font);
 
-    public string GetText()
-    {
-        return Query.Text;
-    }
+    public string GetText() => Query.Text;
 
     public void SetBusy(bool isBusy)
     {
@@ -153,10 +112,7 @@ public partial class QueryEditor : UserControl
             e.Handled = true;
     }
 
-    private void InsertAtCursor(string text)
-    {
-        Query.Document.Insert(Query.CaretOffset, text);
-    }
+    private void InsertAtCursor(string text) => Query.Document.Insert(Query.CaretOffset, text);
 
     private void TextBox_Drop(object sender, DragEventArgs e)
     {
@@ -197,15 +153,9 @@ public partial class QueryEditor : UserControl
         }
     }
 
-    public void SetWordWrap(bool wordWrap)
-    {
-        Query.WordWrap = wordWrap;
-    }
-    
-    public void ShowLineNumbers(bool show)
-    {
-        Query.ShowLineNumbers = show;
-    }
+    public void SetWordWrap(bool wordWrap) => Query.WordWrap = wordWrap;
+
+    public void ShowLineNumbers(bool show) => Query.ShowLineNumbers = show;
 
     private void InternalEditor_OnKeyDown(object sender, KeyEventArgs e)
     {
@@ -246,7 +196,8 @@ public partial class QueryEditor : UserControl
         SearchPanel.Install(Query);
     }
 
-    private void ShowCompletions(IReadOnlyList<IntellisenseEntry> completions, string prefix, int rewind, Action<CompletionWindow>? onCompletionWindowDataPopulated = null)
+    private void ShowCompletions(IReadOnlyList<IntellisenseEntry> completions, string prefix, int rewind,
+        Action<CompletionWindow>? onCompletionWindowDataPopulated = null)
     {
         if (!completions.Any())
             return;
@@ -267,23 +218,14 @@ public partial class QueryEditor : UserControl
     private async Task<bool> ShowPathCompletions()
     {
         // Avoid unnecessary IO calls
-        if (_completionWindow is not null)
-        {
-            return false;
-        }
+        if (_completionWindow is not null) return false;
 
         var path = Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
 
-        if (path.IsBlank())
-        {
-            return false;
-        }
+        if (path.IsBlank()) return false;
 
         var result = await _intellisenseClient.GetCompletionResultAsync(path);
-        if (result.IsEmpty())
-        {
-            return false;
-        }
+        if (result.IsEmpty()) return false;
 
         ShowCompletions(
             result.Entries,
@@ -293,10 +235,7 @@ public partial class QueryEditor : UserControl
             {
                 // when editor loses focus mid-path and user resumes typing, it won't require a second keypress to select the relevant result
                 completionWindow.CompletionList.SelectItem(result.Filter);
-                if (!completionWindow.CompletionList.ListBox.HasItems)
-                {
-                    completionWindow.Close();
-                }
+                if (!completionWindow.CompletionList.ListBox.HasItems) completionWindow.Close();
             });
 
         return true;
@@ -310,10 +249,7 @@ public partial class QueryEditor : UserControl
             return;
         }
 
-        if (await ShowPathCompletions())
-        {
-            return;
-        }
+        if (await ShowPathCompletions()) return;
 
         if (e.Text == ".")
         {
@@ -360,7 +296,7 @@ public partial class QueryEditor : UserControl
         _internalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        Parser = new CommandParser(verbs.Select(x => x.Name),".");
+        Parser = new CommandParser(verbs.Select(x => x.Name), ".");
     }
 
     private void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -379,22 +315,14 @@ public partial class QueryEditor : UserControl
         // We still want to insert the character that was typed.
     }
 
-    public void AddSettingsForIntellisense(KustoSettingsProvider settings)
-    {
+    public void AddSettingsForIntellisense(KustoSettingsProvider settings) =>
         _settingNames = settings.Enumerate()
             .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
             .ToArray();
-    }
 
-    public void SetSchema(SchemaLine[] getSchema)
-    {
-        _schemaIntellisenseProvider.SetSchema(getSchema);
-    }
+    public void SetSchema(SchemaLine[] getSchema) => _schemaIntellisenseProvider.SetSchema(getSchema);
 
-    public void SetFocus()
-    {
-        Query.Focus();
-    }
+    public void SetFocus() => Query.Focus();
 }
 
 public class QueryEditorRunEventArgs(string query) : EventArgs
@@ -434,41 +362,33 @@ Usage: {entry.Syntax}";
     }
 }
 
-
 public class SchemaIntellisenseProvider
 {
     private SchemaLine[] _schemaLines = [];
 
-    private IEnumerable<SchemaLine> AllSchemaLines()
-    {
-        return _schemaLines;
-    }
+    private IEnumerable<SchemaLine> AllSchemaLines() => _schemaLines;
 
 
-    private string[] TablesForCommand(string command)
-    {
-        return AllSchemaLines().Where(s => s.Command == command)
+    private string[] TablesForCommand(string command) =>
+        AllSchemaLines().Where(s => s.Command == command)
             .Select(s => s.Table)
             .Distinct()
             .ToArray();
-    }
 
-    private string[] AllCommands()
-    {
+    private string[] AllCommands() =>
         //it's important to order by length so that the longest commands
         //are matched first since the "dynamic" command have an empty string
         //as the command
-        return AllSchemaLines().Select(s => s.Command).Distinct()
+        AllSchemaLines().Select(s => s.Command).Distinct()
             .OrderByDescending(s => s.Length)
             .ToArray();
-    }
 
     public IntellisenseEntry[] GetTables(string blockText)
     {
         foreach (var command in AllCommands())
             if (blockText.Contains(command))
                 return TablesForCommand(command)
-                    .Select(t => new IntellisenseEntry(t, $"{command} table", ""))
+                    .Select(t => new IntellisenseEntry(t, $"{command} table"))
                     .ToArray();
 
         //no command found so return empty
@@ -486,7 +406,7 @@ public class SchemaIntellisenseProvider
                 var matchingTables = tables.Where(blockText.Contains).ToArray();
                 var columns = AllSchemaLines().Where(s => s.Command == command)
                     .Where(s => matchingTables.Contains(s.Table))
-                    .Select(c => new IntellisenseEntry(c.Column, $"{c.Command} column for {c.Table}", ""))
+                    .Select(c => new IntellisenseEntry(c.Column, $"{c.Command} column for {c.Table}"))
                     .ToArray();
                 return columns;
             }
@@ -495,8 +415,5 @@ public class SchemaIntellisenseProvider
         return [];
     }
 
-    public void SetSchema(SchemaLine[] schema)
-    {
-        _schemaLines = schema;
-    }
+    public void SetSchema(SchemaLine[] schema) => _schemaLines = schema;
 }

@@ -26,7 +26,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
 
-    [ObservableProperty] private ColumnDefinitions? _columnDefinitions
+    [ObservableProperty] private ColumnDefinitions _columnDefinitions
         = ColumnDefinitions.Parse("*,auto,*");
 
     private CommandProcessor _commandProcessor;
