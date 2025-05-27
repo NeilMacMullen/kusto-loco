@@ -5,7 +5,7 @@ namespace LokqlDx;
 public class PreferencesManager
 {
     private const string UIPreferencesFileName = "ui";
-    private const string ApplicationPreferencesFileName = "preferences";
+    private const string ApplicationPreferencesFileName = "preferences2";
     private const string MruFileName = "mru";
     private readonly JsonSerializerOptions _options = new() { WriteIndented = true };
     private ApplicationPreferences _cachedApplicationPreferences = new();

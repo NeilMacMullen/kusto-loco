@@ -7,7 +7,7 @@ namespace LokqlDx.Views;
 /// </summary>
 public static class DispatcherHelper
 {
-    public static async Task<T> SafeInvoke<T>(Func<Task<T>> func) => await Dispatcher.UIThread.Invoke(func);
+    public static async Task<T> SafeInvoke<T>(Func<Task<T>> func) => await Dispatcher.UIThread.InvokeAsync(func);
     public static T SafeInvoke<T>(Func<T> func) =>  Dispatcher.UIThread.Invoke(func);
     public static void SafeInvoke(Action func) => Dispatcher.UIThread.Invoke(func);
 

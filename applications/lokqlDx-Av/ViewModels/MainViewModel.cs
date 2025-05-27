@@ -25,21 +25,22 @@ public partial class MainViewModel : ObservableObject
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
-    [ObservableProperty] private ColumnDefinitions? _columnDefinitions;
     private CommandProcessor _commandProcessor;
+    private InteractiveTableExplorer _explorer;
+    private string? _initWorkspacePath;
+
+    [ObservableProperty] private ColumnDefinitions? _columnDefinitions;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
     [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
 
     [ObservableProperty] private Workspace? _currentWorkspace;
 
-    private InteractiveTableExplorer _explorer;
-
-    private string? _initWorkspacePath;
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
     [ObservableProperty] private RowDefinitions? _rowDefinitions;
     [ObservableProperty] private string? _updateInfo;
+    [ObservableProperty] private bool _showUpdateInfo;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
@@ -99,11 +100,11 @@ public partial class MainViewModel : ObservableObject
         await LoadWorkspace(_initWorkspacePath ?? "");
 
         var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
-        //if (isNewVersionAvailable)
-        //{
-        //    StatusBar.Visibility = Visibility.Visible;
-        //    UpdateInfo.Content = "New version available";
-        //}
+        if (isNewVersionAvailable)
+        {
+            ShowUpdateInfo = true;
+            UpdateInfo = "New version available";
+        }
     }
 
     [RelayCommand]
@@ -186,6 +187,7 @@ public partial class MainViewModel : ObservableObject
             _preferencesManager.UIPreferences.FontSize + by,
             6, 40);
         ApplyUiPreferences(true);
+        _preferencesManager.SaveUiPrefs();
     }
 
     [RelayCommand]
@@ -193,6 +195,7 @@ public partial class MainViewModel : ObservableObject
     {
         _preferencesManager.UIPreferences.WordWrap = !_preferencesManager.UIPreferences.WordWrap;
         ApplyUiPreferences(true);
+        _preferencesManager.SaveUiPrefs();
     }
 
     [RelayCommand]
@@ -200,6 +203,7 @@ public partial class MainViewModel : ObservableObject
     {
         _preferencesManager.UIPreferences.ShowLineNumbers = !_preferencesManager.UIPreferences.ShowLineNumbers;
         ApplyUiPreferences(true);
+        _preferencesManager.SaveUiPrefs();
     }
 
     [RelayCommand]
