@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using LokqlDx.ViewModels;
 using DependencyPropertyGenerator;
+using Avalonia.Media;
 
 namespace LokqlDx.Views;
 
@@ -22,6 +23,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Content = view;
+
+        if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
+        {
+            Background = Brushes.Transparent;
+        }
     }
 
     private void Window_PositionChanged(object? sender, PixelPointEventArgs e)

@@ -20,12 +20,28 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
 
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveWorkspaceCommand}"/>
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveWorkspaceAsCommand}"/>
+        <KeyBinding Gesture="Ctrl+D9" Command="{Binding ChangeFontSizeCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Int32>-1</system:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Gesture="Ctrl+D0" Command="{Binding ChangeFontSizeCommand}">
+            <KeyBinding.CommandParameter>
+                <system:Int32>1</system:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Gesture="Alt+Z" Command="{Binding ToggleWordWrapCommand}"/>
+        <KeyBinding Gesture="Alt+N" Command="{Binding ToggleLineNumbersCommand}"/>
+    </UserControl.KeyBindings>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" Name="MainMenu">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
                 <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
-                <!--Click="OnOpenWorkSpace"-->
                 <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
                           ItemsSource="{Binding RecentWorkspaces}"
                           Command="{Binding OpenRecentWorkspaceCommand}"
@@ -37,25 +53,25 @@
                     </MenuItem.ItemTemplate>
                 </MenuItem>
 
-                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" HotKey="Ctrl+S" />
-                <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" HotKey="Ctrl+Shift+S" />
+                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" />
+                <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" />
             </MenuItem>
             <MenuItem Header="_Preferences">
                 <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
                 <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
                 <Separator />
-                <MenuItem Header="Decrease FontSize" HotKey="Ctrl+9" Command="{Binding ChangeFontSizeCommand}">
+                <MenuItem Header="Decrease FontSize" Command="{Binding ChangeFontSizeCommand}">
                     <MenuItem.CommandParameter>
                         <system:Int32>-1</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Increase FontSize" HotKey="Ctrl+0" Command="{Binding ChangeFontSizeCommand}">
+                <MenuItem Header="Increase FontSize" Command="{Binding ChangeFontSizeCommand}">
                     <MenuItem.CommandParameter>
                         <system:Int32>1</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Toggle word-wrap" HotKey="Alt+Z" Command="{Binding ToggleWordWrapCommand}" />
-                <MenuItem Header="Toggle line-numbers" HotKey="Alt+N" Command="{Binding ToggleLineNumbersCommand}" />
+                <MenuItem Header="Toggle word-wrap" Command="{Binding ToggleWordWrapCommand}" />
+                <MenuItem Header="Toggle line-numbers" Command="{Binding ToggleLineNumbersCommand}" />
 
             </MenuItem>
             <MenuItem Header="Misc">
@@ -141,7 +157,10 @@
                 Background="{DynamicResource SystemAltMediumColor}"
                 Grid.Row="1"
                 Grid.ColumnSpan="3">
-                <TextBlock Text="{Binding UpdateInfo}" />
+                <TextBlock
+                    Text="{Binding UpdateInfo}"
+                    IsVisible="{Binding ShowUpdateInfo}"
+                    Margin="5"/>
             </StackPanel>
         </Grid>
     </DockPanel>

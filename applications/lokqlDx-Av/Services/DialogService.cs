@@ -1,5 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using LokqlDx.Models;
 using LokqlDx.ViewModels.Dialogs;
@@ -83,12 +85,21 @@ public class DialogService
                 DataContext = dataContext,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
-                Background = window.FindResource("SystemListLowColor") as IBrush,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
 
+            if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
+            {
+                dialog[!TemplatedControl.BackgroundProperty]
+                    = new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
+            }
+            else
+            {
+                dialog.Background = Brushes.Transparent;
+            }
+
 #if DEBUG
-            dialog.AttachDevTools();
+                dialog.AttachDevTools();
 #endif
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
