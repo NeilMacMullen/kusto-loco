@@ -17,10 +17,9 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     private readonly InteractiveTableExplorer _explorer;
     [ObservableProperty] private FontFamily? _fontFamily;
     [ObservableProperty] private double _fontSize = 20;
-    [ObservableProperty] private string? _queryText;
+    [ObservableProperty] private string _queryText=string.Empty;
     [ObservableProperty] private bool _showLineNumbers;
     [ObservableProperty] private bool _wordWrap;
-
     public QueryEditorViewModel(InteractiveTableExplorer explorer, ConsoleViewModel consoleViewModel)
     {
         _explorer = explorer;

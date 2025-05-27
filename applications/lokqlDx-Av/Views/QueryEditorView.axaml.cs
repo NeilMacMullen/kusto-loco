@@ -1,22 +1,17 @@
-using Avalonia;
+using System.Text;
+using System.Xml;
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using AvaloniaEdit.Editing;
-using AvaloniaEdit.Highlighting.Xshd;
+using Avalonia.Interactivity;
 using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
 using LokqlDx.ViewModels;
-using System.ComponentModel;
-using System.Text;
-using System.Reflection;
-using System.Xml;
 
 namespace LokqlDx.Views;
 
 public partial class QueryEditorView : UserControl, IDisposable
 {
-    private EditorHelper _editorHelper;
+    private readonly EditorHelper _editorHelper;
 
     public QueryEditorView()
     {
@@ -27,20 +22,17 @@ public partial class QueryEditorView : UserControl, IDisposable
         //HotKeyManager.SetHotKey(TextEditor, new(Key.Enter, KeyModifiers.Shift));
     }
 
+    public void Dispose() => TextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
+
+    //TextEditor.TextArea.SelectionChanged -= TextArea_SelectionChanged;
     private void TextArea_SelectionChanged(object? sender, EventArgs e)
     {
-        if (DataContext is QueryEditorViewModel vm)
-        {
-            vm.QueryText = GetTextAroundCursor();
-        }
+        if (DataContext is QueryEditorViewModel vm) vm.QueryText = GetTextAroundCursor();
     }
 
     private void Caret_PositionChanged(object? sender, EventArgs e)
     {
-        if (DataContext is QueryEditorViewModel vm)
-        {
-            vm.QueryText = GetTextAroundCursor();
-        }
+        if (DataContext is QueryEditorViewModel vm) vm.QueryText = GetTextAroundCursor();
     }
 
     /// <summary>
@@ -51,33 +43,10 @@ public partial class QueryEditorView : UserControl, IDisposable
     /// </remarks>
     private string GetTextAroundCursor()
     {
-        //if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
-
-        if (_editorHelper is null)
-            return "";
-
-        var i = _editorHelper.LineAtCaret().LineNumber;
-
-        var sb = new StringBuilder();
-
-        while (i > 1 && _editorHelper.TextInLine(i - 1).Trim().Length > 0)
-            i--;
-        while (i <= TextEditor.LineCount && _editorHelper.TextInLine(i).Trim().Length > 0)
-        {
-            sb.AppendLine(_editorHelper.TextInLine(i));
-            i++;
-        }
-
-        return sb.ToString().Trim();
+        return _editorHelper.GetTextAroundCursor();
     }
 
-    public void Dispose()
-    {
-        TextEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
-        //TextEditor.TextArea.SelectionChanged -= TextArea_SelectionChanged;
-    }
-
-    private void UserControl_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void UserControl_Loaded(object? sender, RoutedEventArgs e)
     {
         using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
         using var reader = new XmlTextReader(s);

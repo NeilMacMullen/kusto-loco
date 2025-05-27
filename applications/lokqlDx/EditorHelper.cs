@@ -1,4 +1,5 @@
-﻿using ICSharpCode.AvalonEdit;
+﻿using System.Text;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using NotNullStrings;
 
@@ -53,5 +54,41 @@ public class EditorHelper(TextEditor query)
         Query.CaretOffset =
             Query.Document.GetLineByNumber(line).Offset;
         Query.ScrollToLine(line);
+    }
+
+    public string GetTextAroundCursor()
+    {
+        if (Query.SelectionLength > 0) return Query.SelectedText.Trim();
+
+        var i = LineAtCaret().LineNumber;
+
+        var sb = new StringBuilder();
+
+        while (i > 1 && TextInLine(i - 1).Trim().Length > 0)
+            i--;
+        while (i <= Query.LineCount && TextInLine(i).Trim().Length > 0)
+        {
+            sb.AppendLine(TextInLine(i));
+            i++;
+        }
+
+        return sb.ToString().Trim();
+    }
+    public void ScrollDownToComment()
+    {
+        var i = GetCurrentLineNumber + 1;
+
+        while (!LineIsTopOfBlock(i) && i <= Query.LineCount)
+            i++;
+        ScrollToLine(i);
+    }
+
+    public void ScrollUpToComment()
+    {
+        var i = GetCurrentLineNumber - 1;
+
+        while (!LineIsTopOfBlock(i) && i >= 1)
+            i--;
+        ScrollToLine(i);
     }
 }
