@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using LokqlDx.Models;
 using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
@@ -12,12 +13,12 @@ namespace LokqlDx.Services;
 public class DialogService
 {
     private readonly TopLevel _topLevel;
-    private readonly BrowserServices _browserServices;
+    private readonly ILauncher _launcher;
 
-    public DialogService(TopLevel topLevel,BrowserServices browserServices)
+    public DialogService(TopLevel topLevel, ILauncher launcher)
     {
         _topLevel = topLevel;
-        _browserServices = browserServices;
+        _launcher = launcher;
     }
 
     public Task ShowMessageBox(string message)
@@ -53,7 +54,7 @@ public class DialogService
         await ShowDialog(
                 page,
                 new MarkdownHelpWindow(),
-                new MarkDownHelpModel(page,_browserServices))
+                new MarkDownHelpModel(page, _launcher))
             .ConfigureAwait(false);
 
 

@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using HotAvalonia;
 using Jab;
@@ -38,12 +39,12 @@ internal class Program
 [Transient<MainView>]
 [Transient<PreferencesManager>]
 [Transient<DialogService>]
-[Transient<BrowserServices>]
 [Transient<WorkspaceManager>]
 [Transient<RegistryOperations>]
 [Transient<CommandProcessorFactory>]
-[Transient<IStorageProvider>(Factory = nameof(GetStorageProvider))]
 [Transient<TopLevel>(Factory = nameof(GetTopLevel))]
+[Transient<IStorageProvider>(Factory = nameof(GetStorageProvider))]
+[Transient<ILauncher>(Factory = nameof(GetLauncher))]
 internal partial class DiContainer
 {
     private TopLevel? _topLevel;
@@ -53,6 +54,9 @@ internal partial class DiContainer
 
     internal IStorageProvider GetStorageProvider() =>
         _topLevel?.StorageProvider ?? throw new InvalidOperationException();
+
+    internal ILauncher GetLauncher() =>
+        _topLevel?.Launcher ?? throw new InvalidOperationException();
 }
 
 public class CommandProcessorFactory
