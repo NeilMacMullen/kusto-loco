@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Avalonia.Media;
-using SkiaSharp;
 
 namespace LokqlDx;
 
