@@ -5,6 +5,7 @@
              xmlns:vm="using:LokqlDx.ViewModels"
              xmlns:views="using:LokqlDx.Views"
              xmlns:system="using:System"
+             Background="{DynamicResource SystemAltMediumHighColor}"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MainView"
              x:DataType="vm:MainViewModel">

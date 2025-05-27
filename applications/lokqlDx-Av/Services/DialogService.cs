@@ -1,5 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using LokqlDx.Models;
 using LokqlDx.ViewModels.Dialogs;
@@ -83,9 +85,11 @@ public class DialogService
                 DataContext = dataContext,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
-                Background = window.FindResource("SystemListLowColor") as IBrush,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
+
+            dialog[!TemplatedControl.BackgroundProperty] =
+                new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
 
 #if DEBUG
             dialog.AttachDevTools();
