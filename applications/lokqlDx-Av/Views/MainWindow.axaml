@@ -9,7 +9,7 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding WindowTitle, FallbackValue='lokqlDx'}"
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
-        Background="{DynamicResource SystemListLowColor}"
+        Background="{DynamicResource SystemAltMediumHighColor}"
         x:DataType="vm:MainViewModel"
         PositionChanged="Window_PositionChanged"
         SizeChanged="Window_SizeChanged"

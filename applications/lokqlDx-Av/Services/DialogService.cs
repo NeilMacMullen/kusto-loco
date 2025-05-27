@@ -88,11 +88,18 @@ public class DialogService
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
 
-            dialog[!TemplatedControl.BackgroundProperty] =
-                new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
+            if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
+            {
+                dialog[!TemplatedControl.BackgroundProperty]
+                    = new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
+            }
+            else
+            {
+                dialog.Background = Brushes.Transparent;
+            }
 
 #if DEBUG
-            dialog.AttachDevTools();
+                dialog.AttachDevTools();
 #endif
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
