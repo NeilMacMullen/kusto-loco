@@ -86,7 +86,7 @@ public class PreferencesManager
             f.Name == "SF Mono" || f.Name == "Menlo" || f.Name == "Monaco" || // macOS defaults
             f.Name == "Noto Sans Mono" || f.Name == "DejaVu Sans Mono" || // some linux distros defaults
             f.Name.Contains("Mono", StringComparison.OrdinalIgnoreCase)) 
-            ?? PreferencesHelper.GetDefaultMonospaceFontFamily()
+            ?? PreferencesHelper.GetFirstMonospaceFontFamily()
             ?? FontManager.Current.DefaultFontFamily;
 
         UIPreferences.FontFamily = font.Name;

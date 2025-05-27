@@ -5,7 +5,7 @@ namespace LokqlDx;
 
 public static class PreferencesHelper
 {
-    public static FontFamily? GetDefaultMonospaceFontFamily()
+    public static FontFamily? GetFirstMonospaceFontFamily()
     {
         var fonts = FontManager.Current.SystemFonts
             .OrderBy(x => x.Name)
