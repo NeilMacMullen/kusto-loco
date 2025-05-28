@@ -108,9 +108,9 @@ public class ResultChartAccessor
         {
             var x = s.Select(r => _xLookup.AxisValueFor(r[_xColumn.Index])).ToArray();
             var y = s.Select(r => _valueLookup.AxisValueFor(r[_valueColumn.Index])).ToArray();
-            var legend = s.Key!.ToString().NullToEmpty();
+            var legend = (s.Key?.ToString()?? "_null").OrWhenBlank("_none");
             var c = colorIndex < 0
-                ? s.Select(r => index).ToArray()
+                ? s.Select(_ => index).ToArray()
                 : s.Select(r => (int) ((long?) r[colorIndex] ?? 0)).ToArray();
            
 
@@ -269,7 +269,7 @@ public class ResultChartAccessor
             for (var i = 1; i < Y.Length; i++)
                 accumulatedY[i] = accumulatedY[i - 1] + Y[i];
 
-            return new ChartSeries(Index, Legend, X, accumulatedY, Color);
+            return this with { Y = accumulatedY };
         }
     }
 }

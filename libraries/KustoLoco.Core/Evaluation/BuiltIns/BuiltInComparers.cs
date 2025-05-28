@@ -35,8 +35,7 @@ internal static class BuiltInComparers
 
         comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Decimal), new DecimalAscNullsFirstComparer());
         comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Decimal), new DecimalAscNullsLastComparer());
-        comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Decimal),
-            new DecimalDescNullsFirstComparer());
+        comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Decimal), new DecimalDescNullsFirstComparer());
         comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Decimal), new DecimalDescNullsLastComparer());
 
         comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Bool), new BoolAscNullsFirstComparer());
@@ -69,6 +68,11 @@ internal static class BuiltInComparers
             new DateTimeDescNullsFirstComparer());
         comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.DateTime),
             new DateTimeDescNullsLastComparer());
+
+        comparers.Add((SortDirections.Asc, NullsDirections.First, ScalarTypes.Guid), new GuidAscNullsFirstComparer());
+        comparers.Add((SortDirections.Asc, NullsDirections.Last, ScalarTypes.Guid), new GuidAscNullsLastComparer());
+        comparers.Add((SortDirections.Desc, NullsDirections.First, ScalarTypes.Guid), new GuidDescNullsFirstComparer());
+        comparers.Add((SortDirections.Desc, NullsDirections.Last, ScalarTypes.Guid), new GuidDescNullsLastComparer());
     }
 
     public static IComparer GetComparer(SortDirections direction, NullsDirections nullsDirections, TypeSymbol type)

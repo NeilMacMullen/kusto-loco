@@ -31,7 +31,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await RenderTable(result);
-        var plot = _plotter.GetPlot(false);
+        var plot = _plotter.GetPlot(true);
         plot.Clear();
         ScottPlotKustoResultRenderer.RenderToPlot(plot, result, _kustoSettings);
         _plotter.FinishUpdate();
