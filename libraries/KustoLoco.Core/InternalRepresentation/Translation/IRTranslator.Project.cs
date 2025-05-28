@@ -25,7 +25,7 @@ internal partial class IRTranslator
             columns.Add(new IROutputColumnNode(symbol, irExpression));
         }
 
-        return new IRProjectOperatorNode(IRListNode.From(columns), node.ResultType);
+        return new IRProjectOperatorNode(IRListNode.From(columns), node.ResultType, false);
     }
 
     public override IRNode VisitProjectRenameOperator(ProjectRenameOperator node)
@@ -59,7 +59,7 @@ internal partial class IRTranslator
                 new IRRowScopeNameReferenceNode(referencedSymbol, symbol.Type, referencedColumnIndex)));
         }
 
-        return new IRProjectOperatorNode(IRListNode.From(columns), node.ResultType);
+        return new IRProjectOperatorNode(IRListNode.From(columns), node.ResultType,false);
     }
 
     public override IRNode VisitProjectReorderOperator(ProjectReorderOperator node) =>
@@ -88,17 +88,19 @@ internal partial class IRTranslator
                 new IRRowScopeNameReferenceNode(symbol, symbol.Type, referencedColumnIndex)));
         }
 
-        return new IRProjectOperatorNode(IRListNode.From(columns), resultType);
+        return new IRProjectOperatorNode(IRListNode.From(columns), resultType,false);
     }
 
     public override IRNode VisitExtendOperator(ExtendOperator node) =>
         HandleExtendOperatorInternal(node.Expressions, node.ResultType);
 
-    public override IRNode VisitSerializeOperator(SerializeOperator node) =>
-        HandleExtendOperatorInternal(node.Expressions, node.ResultType);
+    public override IRNode VisitSerializeOperator(SerializeOperator node)
+    {
+        return  HandleExtendOperatorInternal(node.Expressions, node.ResultType,true) ;
+    }
 
     private IRNode HandleExtendOperatorInternal(SyntaxList<SeparatedElement<Expression>> expressions,
-        TypeSymbol resultType)
+        TypeSymbol resultType,bool requiresSerialization=false)
     {
         Debug.Assert(_rowScope != TableSymbol.Empty);
         var pendingExpressions = new LinkedList<IRExpressionNode>();
@@ -148,6 +150,6 @@ internal partial class IRTranslator
             columns.Add(new IROutputColumnNode(column, irExpression));
         }
 
-        return new IRProjectOperatorNode(IRListNode.From(columns), resultType);
+        return new IRProjectOperatorNode(IRListNode.From(columns), resultType,requiresSerialization);
     }
 }

@@ -18,6 +18,11 @@ public class NullColumn : BaseColumn
 
     public override BaseColumn Slice(int start, int end) => throw new InvalidOperationException();
 
+    public override BaseColumn Slide(int padAmount, object? defaultValue)
+    {
+        // A NullColumn doesn't change with sliding, it remains empty.
+        return this;
+    }
 
     public override void ForEach(Action<object?> action)
     {

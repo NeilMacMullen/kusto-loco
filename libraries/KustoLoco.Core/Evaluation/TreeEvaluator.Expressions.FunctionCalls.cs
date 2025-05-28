@@ -4,13 +4,12 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using KustoLoco.Core.Evaluation.BuiltIns;
-using KustoLoco.Core.InternalRepresentation;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Other;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -27,9 +26,8 @@ internal partial class TreeEvaluator
         if (isSelfGeneratingData)
             resultKind = EvaluatedExpressionKind.Columnar;
 
-        var impl = node.GetOrSetCache(
-            () => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
-                resultKind, node.ResultType, hints));
+        var impl = node.GetOrSetCache(() => BuiltInsHelper.GetScalarImplementation(node.OverloadInfo.ScalarImpl,
+            resultKind, node.ResultType, hints));
 
         var arguments = new EvaluationResult[node.Arguments.ChildCount];
         for (var i = 0; i < node.Arguments.ChildCount; i++)
@@ -61,10 +59,9 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node,
         EvaluationContext context)
     {
-        var impl = node.GetOrSetCache(
-            () => BuiltInsHelper.GetWindowImplementation(
-                node.OverloadInfo.Impl,
-                node.ResultKind, node.ResultType));
+        var impl = node.GetOrSetCache(() => BuiltInsHelper.GetWindowImplementation(
+            node.OverloadInfo.Impl,
+            node.ResultKind, node.ResultType));
 
         var arguments = new EvaluationResult[node.Arguments.ChildCount];
         for (var i = 0; i < node.Arguments.ChildCount; i++)
@@ -80,8 +77,7 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitAggregateCallNode(IRAggregateCallNode node, EvaluationContext context)
     {
         Debug.Assert(context.Chunk != TableChunk.Empty);
-        var impl = node.GetOrSetCache(
-            () => node.OverloadInfo.AggregateImpl);
+        var impl = node.GetOrSetCache(() => node.OverloadInfo.AggregateImpl);
 
         var rawArguments = new EvaluationResult[node.Arguments.ChildCount];
         var hasScalar = false;
@@ -102,27 +98,21 @@ internal partial class TreeEvaluator
     {
         var lookup = context.Scope.Lookup(node.Signature.Symbol.Name);
         if (lookup?.Symbol is not FunctionSymbol functionSymbol)
-        {
             throw new InvalidOperationException($"Function {node.Signature.Symbol.Name} not found.");
-        }
 
         // TODO: Signature matching, ideally from Kusto library
         var signature =
             functionSymbol.Signatures.FirstOrDefault(sig => sig.Parameters.Count == node.Arguments.ChildCount);
         if (signature == null)
-        {
             throw new InvalidOperationException(
                 $"No matching signature with {node.Arguments.ChildCount} arguments for function {functionSymbol.Name}.");
-        }
 
         var functionCallScope = new LocalScope(context.Scope);
         for (var i = 0; i < node.Arguments.ChildCount; i++)
         {
             if (signature.Parameters[i].DeclaredTypes.Count != 1)
-            {
                 throw new NotSupportedException(
                     $"Not sure how to deal with parameters having >1 DeclaredTypes (found {signature.Parameters[i].DeclaredTypes.Count} for function {functionSymbol.Name}.");
-            }
 
             var argValue = node.Arguments.GetChild(i).Accept(this, context);
             Debug.Assert(argValue != null);

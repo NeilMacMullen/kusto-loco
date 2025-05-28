@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Kusto.Language.Symbols;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 
@@ -43,7 +43,7 @@ internal static class BuiltInScalarFunctions
         IsNanFunction.Register(Functions);
         IsUtf8Function.Register(Functions);
         ReverseFunction.Register(Functions);
-      
+
         {
             var overloads = new List<ScalarOverloadInfo>();
 
@@ -100,7 +100,7 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String,
                     Enumerable.Range(0, n).Select(TypeSymbol (_) => ScalarTypes.String).ToArray()))
             .ToArray();
-       
+
         Functions.Add(Kusto.Language.Functions.StrcatDelim, new ScalarFunctionInfo(strcatDelimiterOverrides));
         AroundFunction.Register(Functions);
         StrlenFunction.Register(Functions);
@@ -114,7 +114,7 @@ internal static class BuiltInScalarFunctions
         IndexOfFunction.Register(Functions);
         ToLowerFunction.Register(Functions);
         ToUpperFunction.Register(Functions);
-       
+
         ReplaceStringFunction.Register(Functions);
         SubstringFunction.Register(Functions);
         ArrayRotateLeftFunction.Register(Functions);
@@ -170,7 +170,7 @@ internal static class BuiltInScalarFunctions
         DatetimeDiffFunction.Register(Functions);
         DatetimeAddFunction.Register(Functions);
         DatetimePartFunction.Register(Functions);
-      
+
 
         MakeDateTime.Register(Functions);
         MakeTimeSpan.Register(Functions);
@@ -200,7 +200,7 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.String, ScalarTypes.String));
         Functions.Add(Kusto.Language.Functions.Iff, iffFunctionInfo);
         Functions.Add(Kusto.Language.Functions.Iif, iffFunctionInfo);
-        
+
 
         ToIntFunction.Register(Functions);
         ToLongFunction.Register(Functions);
@@ -214,11 +214,54 @@ internal static class BuiltInScalarFunctions
         ToTimespanFunction.Register(Functions);
 
 
-       
         UrlDecodeFunction.Register(Functions);
         UrlEncodeComponentFunction.Register(Functions);
         ExtractFunction.Register(Functions);
-   
+
+        ScalarOverloadInfo[] MakePrevNextOverloads(IScalarFunctionImpl func, TypeSymbol type)
+        {
+            return
+            [
+                new ScalarOverloadInfo(func, type, type),
+                new ScalarOverloadInfo(func, type, type, ScalarTypes.Long),
+                new ScalarOverloadInfo(func, type, type, ScalarTypes.Long, type)
+            ];
+        }
+
+
+        Functions.Add(Kusto.Language.Functions.Prev,
+
+            new ScalarFunctionInfo(
+
+                MakePrevNextOverloads(new PrevFunctionIntImpl(), ScalarTypes.Int)
+                    .Concat(MakePrevNextOverloads(new PrevFunctionLongImpl(), ScalarTypes.Long))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionRealImpl(), ScalarTypes.Real))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionDecimalImpl(), ScalarTypes.Decimal))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionGuidImpl(), ScalarTypes.Guid))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionStringImpl(), ScalarTypes.String))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionDateTimeImpl(), ScalarTypes.DateTime))
+                    .Concat(MakePrevNextOverloads(new PrevFunctionTimespanImpl(), ScalarTypes.TimeSpan))
+                        .ToArray()
+                        )
+        );
+
+        Functions.Add(Kusto.Language.Functions.Next,
+
+            new ScalarFunctionInfo(
+
+                MakePrevNextOverloads(new NextFunctionIntImpl(), ScalarTypes.Int)
+                    .Concat(MakePrevNextOverloads(new NextFunctionLongImpl(), ScalarTypes.Long))
+                    .Concat(MakePrevNextOverloads(new NextFunctionRealImpl(), ScalarTypes.Real))
+                    .Concat(MakePrevNextOverloads(new NextFunctionDecimalImpl(), ScalarTypes.Decimal))
+                    .Concat(MakePrevNextOverloads(new NextFunctionGuidImpl(), ScalarTypes.Guid))
+                    .Concat(MakePrevNextOverloads(new NextFunctionStringImpl(), ScalarTypes.String))
+                    .Concat(MakePrevNextOverloads(new NextFunctionDateTimeImpl(), ScalarTypes.DateTime))
+                    .Concat(MakePrevNextOverloads(new NextFunctionTimespanImpl(), ScalarTypes.TimeSpan))
+                    .ToArray()
+            )
+        );
+
+
         var rowNumberHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
         Functions.Add(Kusto.Language.Functions.RowNumber,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new RowNumberFunctionImpl(),

@@ -8,9 +8,14 @@ namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators
 
 internal class IRProjectOperatorNode : IRQueryOperatorNode
 {
-    public IRProjectOperatorNode(IRListNode<IROutputColumnNode> columns, TypeSymbol resultType)
-        : base(resultType) =>
+    public readonly bool RequiresSerializatiom;
+
+    public IRProjectOperatorNode(IRListNode<IROutputColumnNode> columns, TypeSymbol resultType,bool requiresSerializatiom)
+        : base(resultType)
+    {
+        RequiresSerializatiom = requiresSerializatiom;
         Columns = columns ?? throw new ArgumentNullException(nameof(columns));
+    }
 
     public IRListNode<IROutputColumnNode> Columns { get; }
 
@@ -30,3 +35,4 @@ internal class IRProjectOperatorNode : IRQueryOperatorNode
 
     public override string ToString() => $"ProjectOperator: {SchemaDisplay.GetText(ResultType)}";
 }
+

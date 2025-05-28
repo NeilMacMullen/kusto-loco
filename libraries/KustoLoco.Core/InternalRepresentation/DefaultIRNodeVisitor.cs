@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.InternalRepresentation.Nodes.Other;
@@ -116,4 +117,7 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
     public override TResult
         VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context) =>
         DefaultVisit(node, context);
+
+
+
 }

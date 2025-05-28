@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-//TODO - The kusto docs suggest this can only be called on a _serialized_ table so
-//we probably need to extend the schema to detected when we're dealing with chunks
+//TODO - need to check this is only called on serialized table
 internal class RowNumberFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments) => new(ScalarTypes.Long, 0);
@@ -46,6 +45,3 @@ internal class RowNumberFunctionImpl : IScalarFunctionImpl
         return new ColumnarResult(ColumnFactory.Create(data));
     }
 }
-
-//TODO - The kusto docs suggest this can only be called on a _serialized_ table so
-//we probably need to extend the schema to detected when we're dealing with chunks

@@ -188,4 +188,25 @@ public class ChunkTests
         //we've used the same set of ids in each table so the count for each row should be 2.
         foreach (var row in result.EnumerateRows()) row[0].Should().Be(2);
     }
+
+
+    [TestMethod]
+    public async Task RowNumber()
+    {
+        var context = CreateContext();
+        var rows = Enumerable.Range(0, 20).Select(i => new Row(i.ToString(), i)).ToArray();
+
+        AddChunkedTableFromRecords(context, "data", rows, 10);
+        var result = await context.RunQuery(
+            """
+            data
+            | serialize
+            | extend r = row_number(0)
+            | extend same=Value==r
+            | where same
+            """);
+        result.RowCount.Should().Be(20);
+        //TODO - here compare tabulated output for more coverage
+    }
+
 }

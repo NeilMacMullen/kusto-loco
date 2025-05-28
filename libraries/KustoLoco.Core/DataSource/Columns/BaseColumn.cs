@@ -1,5 +1,6 @@
 ﻿using System;
 using Kusto.Language.Symbols;
+using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -24,4 +25,5 @@ public abstract class BaseColumn
 
     public abstract BaseColumn Slice(int start, int end);
     public abstract void ForEach(Action<object?> action);
+    public abstract BaseColumn Slide(int padAmount, object? defaultValue);
 }
