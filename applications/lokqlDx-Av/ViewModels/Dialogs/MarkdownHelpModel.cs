@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LokqlDx.Services;
 
@@ -8,17 +9,16 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
 {
     private const string BrowserPrefix = @"https://github.com/NeilMacMullen/kusto-loco/wiki";
     private const string RawPrefix = @"https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco";
-    private readonly BrowserServices _browser;
+    private readonly ILauncher _launcher;
     private readonly TaskCompletionSource _completionSource;
 
     private readonly string _link;
-
     [ObservableProperty] public string _markdownText;
 
-    public MarkDownHelpModel(string link, BrowserServices browser)
+    public MarkDownHelpModel(string link, ILauncher launcher)
     {
         _link = link;
-        _browser = browser;
+        _launcher = launcher;
         _completionSource = new TaskCompletionSource();
         Result = _completionSource.Task;
         _markdownText = string.Empty;
@@ -55,9 +55,9 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
     }
 
     [RelayCommand]
-    public void ShowInBrowser()
+    public async Task ShowInBrowser()
     {
         var link = MakeUri(BrowserPrefix);
-        _browser.OpenUriInBrowser(link);
+        await _launcher.LaunchUriAsync(new(link));
     }
 }

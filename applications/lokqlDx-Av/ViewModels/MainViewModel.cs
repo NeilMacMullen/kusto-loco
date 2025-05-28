@@ -16,7 +16,6 @@ namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly BrowserServices _browserServices;
     private readonly CommandProcessorFactory _commandProcessorFactory;
     private readonly DialogService _dialogService;
     private readonly KustoSettingsProvider _kustoSettings;
@@ -24,6 +23,7 @@ public partial class MainViewModel : ObservableObject
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
+    private readonly ILauncher _launcher;
     private readonly WorkspaceManager _workspaceManager;
 
     [ObservableProperty] private ColumnDefinitions _columnDefinitions
@@ -54,8 +54,8 @@ public partial class MainViewModel : ObservableObject
         CommandProcessorFactory commandProcessorFactory,
         WorkspaceManager workspaceManager,
         RegistryOperations registryOperations,
-        BrowserServices browserServices,
-        IStorageProvider storage)
+        IStorageProvider storage,
+        ILauncher launcher)
     {
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
@@ -63,8 +63,8 @@ public partial class MainViewModel : ObservableObject
         _commandProcessor = _commandProcessorFactory.GetCommandProcessor();
         _workspaceManager = workspaceManager;
         _registryOperations = registryOperations;
-        _browserServices = browserServices;
         _storage = storage;
+        _launcher = launcher;
         _kustoSettings = workspaceManager.Settings;
 
         ConsoleViewModel = new ConsoleViewModel();
@@ -221,7 +221,7 @@ public partial class MainViewModel : ObservableObject
     private async Task NavigateToWiki(string path) => await _dialogService.ShowHelp(path);
 
     [RelayCommand]
-    private void NavigateToUri(string path) => _browserServices.OpenUriInBrowser(path);
+    private async Task NavigateToUri(string path) => await _launcher.LaunchUriAsync(new Uri(path));
 
     private void ApplyUiPreferences(bool skipGrid)
     {
