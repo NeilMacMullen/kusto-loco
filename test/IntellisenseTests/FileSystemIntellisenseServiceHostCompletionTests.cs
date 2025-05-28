@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Intellisense.FileSystem;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;

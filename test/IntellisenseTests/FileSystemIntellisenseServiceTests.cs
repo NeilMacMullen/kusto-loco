@@ -2,8 +2,8 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using IntellisenseTests.Fixtures;
 using IntellisenseTests.Platforms;
 using Xunit;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Util;
 

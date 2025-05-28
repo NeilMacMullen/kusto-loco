@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using FluentAssertions.Execution;
+﻿using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Lokql.Engine.Commands;
 
 namespace LokqlEngineTests;

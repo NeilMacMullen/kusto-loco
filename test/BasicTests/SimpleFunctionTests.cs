@@ -1,5 +1,4 @@
-using FluentAssertions;
-using RTools_NTS.Util;
+using AwesomeAssertions;
 
 // ReSharper disable StringLiteralTypo
 
@@ -166,7 +165,6 @@ datatable(Size:int) [50]
         result.Should().Be(""); // KQL returns null for invalid datetime parse
     }
 
-   
 
     [TestMethod]
     public async Task ToInt_InvalidString_ShouldReturnNull()
@@ -176,7 +174,7 @@ datatable(Size:int) [50]
         result.Should().Be(""); // KQL returns null for invalid conversion
     }
 
-  
+
     [TestMethod]
     public async Task MakeDateTime_InvalidMonth_ShouldReturnNull()
     {
@@ -972,12 +970,10 @@ print toscalar(letters | summarize mx=min(bitmap));";
     }
 
     [TestMethod]
-    public async Task DatetimeAdd()
-    {
+    public async Task DatetimeAdd() =>
         (await LastLineOfResult("print datetime_add('year',-5,make_datetime(2017,1,1))"))
-            .Should().Be("2012-01-01 00:00:00Z");
-    }
-    
+        .Should().Be("2012-01-01 00:00:00Z");
+
     [TestMethod]
     public async Task DatetimeDiff()
     {
@@ -1078,7 +1074,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
     [TestMethod]
     public async Task MaxOf()
     {
-       var res = await LastLineOfResult("print max_of(10,20)");
+        var res = await LastLineOfResult("print max_of(10,20)");
         res.Should().Be("20");
     }
 
@@ -1324,7 +1320,4 @@ print toscalar(letters | summarize mx=min(bitmap));";
         var result = await LastLineOfResult(query);
         result.Should().Be("3.14");
     }
-
-  
-   
 }

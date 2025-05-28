@@ -2,9 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Execution;
-using FluentAssertions.Extensions;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
+using AwesomeAssertions.Extensions;
 using Intellisense.Concurrency;
 using Xunit;
 

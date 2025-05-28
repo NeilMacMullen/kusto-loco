@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using FluentAssertions;
+using AwesomeAssertions;
 using Kusto.Language.Symbols;
 using Xunit;
 

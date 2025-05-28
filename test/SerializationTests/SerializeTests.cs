@@ -1,5 +1,5 @@
 using System.Text;
-using FluentAssertions;
+using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
