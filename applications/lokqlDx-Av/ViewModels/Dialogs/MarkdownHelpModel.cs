@@ -1,7 +1,6 @@
 ﻿using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LokqlDx.Services;
 
 namespace LokqlDx.ViewModels.Dialogs;
 
@@ -9,8 +8,8 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
 {
     private const string BrowserPrefix = @"https://github.com/NeilMacMullen/kusto-loco/wiki";
     private const string RawPrefix = @"https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco";
-    private readonly ILauncher _launcher;
     private readonly TaskCompletionSource _completionSource;
+    private readonly ILauncher _launcher;
 
     private readonly string _link;
     [ObservableProperty] public string _markdownText;
@@ -26,11 +25,6 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
 
 
     public Task Result { get; }
-
-    [RelayCommand]
-    private void Save()
-    {
-    }
 
     private string MakeUri(string prefix)
     {
@@ -58,6 +52,6 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
     public async Task ShowInBrowser()
     {
         var link = MakeUri(BrowserPrefix);
-        await _launcher.LaunchUriAsync(new(link));
+        await _launcher.LaunchUriAsync(new Uri(link));
     }
 }

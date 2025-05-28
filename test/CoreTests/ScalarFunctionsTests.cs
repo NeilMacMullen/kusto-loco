@@ -1,9 +1,8 @@
 using System;
 using System.Diagnostics;
+using AwesomeAssertions;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
-using FluentAssertions;
-using KustoLoco.Core.Console;
 using Xunit;
 
 namespace KustoLoco.Core.Tests;
@@ -129,4 +128,3 @@ This string will be base64 encoded
         canonicalOutput.Should().Be(canonicalExpectedOutput);
     }
 }
-

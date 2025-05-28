@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Lokql.Engine;
 
 namespace LokqlEngineTests;

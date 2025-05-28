@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Extensions;
+using AwesomeAssertions;
+using AwesomeAssertions.Extensions;
 using Intellisense;
 using Intellisense.Concurrency;
 using Intellisense.FileSystem;

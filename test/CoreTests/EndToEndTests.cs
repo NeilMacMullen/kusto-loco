@@ -3,7 +3,7 @@
 
 using System;
 using System.Diagnostics;
-using FluentAssertions;
+using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;

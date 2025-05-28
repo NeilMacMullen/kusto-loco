@@ -1,5 +1,5 @@
 using System.Collections.Specialized;
-using FluentAssertions;
+using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
 // ReSharper disable StringLiteralTypo

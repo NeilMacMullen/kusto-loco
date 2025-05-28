@@ -1,6 +1,6 @@
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
-using FluentAssertions;
+using AwesomeAssertions;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource.Columns;
 using LogSetup;

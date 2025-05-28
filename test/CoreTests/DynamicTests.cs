@@ -6,7 +6,7 @@ using System.Diagnostics;
 using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
-using FluentAssertions;
+using AwesomeAssertions;
 using KustoLoco.Core.Console;
 using Xunit;
 

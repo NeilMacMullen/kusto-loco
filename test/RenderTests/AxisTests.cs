@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using KustoLoco.Rendering.ScottPlot;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
