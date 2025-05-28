@@ -50,13 +50,13 @@ Kusto-Loco even comes with a Powershell module that allows you use KQL queries i
 
 ## Status
 
-The current version is 1.2.0.  The project is still in active development and core APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
+The project is still in active development and APIs may change.  However, the core engine is stable and and is actively used in a production environment.  Some KQL operators and functions are not yet implemented. 
 
 ## Credits and Contributors
 
 KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
 
-Since then the engine has been heavily extended and optimised by [NeilMacMullen](https://github.com/NeilMacMullen) with additional contributions from [Vartika Gupta](https://github.com/vartika-jain-gupta) and [Kosta Demoore](https://github.com/konvolution).
+Since then the engine has been heavily extended and optimised by [NeilMacMullen](https://github.com/NeilMacMullen) with additional contributions from [Vartika Gupta](https://github.com/vartika-jain-gupta) and [Kosta Demoore](https://github.com/konvolution). 
 
 The project leans heavily on a number of open source libraries including:
 - [Benchmark.Net](https://github.com/dotnet/BenchmarkDotNet) used for performance testing
@@ -73,4 +73,4 @@ The project leans heavily on a number of open source libraries including:
 
 ## Contributing
 
-If you'd like to help with the project please see the [Contributing](https://github.com/NeilMacMullen/kusto-loco/wiki/Contributing) page.
+Contributors are always welcome, even if it's 'just' to improve the documentaion ! If you'd like to help with the project please see the [Contributing](https://github.com/NeilMacMullen/kusto-loco/wiki/Contributing) page.
