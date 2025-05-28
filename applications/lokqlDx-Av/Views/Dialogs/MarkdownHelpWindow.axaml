@@ -19,9 +19,9 @@
                 Command="{Binding ShowInBrowserCommand}">
             Show in browser...
         </Button>
-        
+
         <ScrollViewer Margin="4" DockPanel.Dock="Top">
-            <md:MarkdownViewer Name="MarkdownViewer" MarkdownText="{Binding MarkdownText}" LayoutUpdated="MarkdownViewer_LayoutUpdated" />
+            <md:MarkdownViewer Name="MarkdownViewer" MarkdownText="{Binding MarkdownText}" />
         </ScrollViewer>
     </DockPanel>
 </UserControl>
