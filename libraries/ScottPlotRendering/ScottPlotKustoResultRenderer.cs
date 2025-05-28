@@ -11,7 +11,7 @@ namespace KustoLoco.Rendering.ScottPlot;
 
 public static class ScottPlotKustoResultRenderer
 {
-    private const string StandardAxisPreferences = "tno|nno|ono|tn|nn|on|to";
+    private const string StandardAxisPreferences = "tno|too|nno|ttx|ono|xxx|tn|nn|on|to|xx";
 
 
     private static void SetColorFromSetting(KustoSettingsProvider settings, string settingName, Action<Color> setter,
@@ -347,7 +347,8 @@ public static class ScottPlotKustoResultRenderer
                     Position = x,
                     ValueBase = valBase,
                     Value = top,
-                    FillColor = plot.Add.Palette.GetColor(color)
+                    FillColor = plot.Add.Palette.GetColor(color),
+                    LineColor = plot.Add.Palette.GetColor(color)
                 };
                 if (barWidth > 0)
                     bar.Size = barWidth;
@@ -376,7 +377,8 @@ public static class ScottPlotKustoResultRenderer
                     Position = series.Index,
                     ValueBase = left,
                     Value = right,
-                    FillColor = plot.Add.Palette.GetColor(color)
+                    FillColor = plot.Add.Palette.GetColor(color),
+                    LineColor = plot.Add.Palette.GetColor(color),
                 };
             }).ToArray();
         var b = plot.Add.Bars(bars);
