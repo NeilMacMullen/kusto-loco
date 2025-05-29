@@ -14,6 +14,12 @@
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="IntellisenseFunctions.json" />
+    <None Remove="IntellisenseOperators.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IntellisenseFunctions.json" />
+    <EmbeddedResource Include="IntellisenseOperators.json" />
     <EmbeddedResource Include="SyntaxHighlighting.xml" />
   </ItemGroup>
 
@@ -49,6 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\Intellisense\Intellisense.csproj" />
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
     <ProjectReference Include="..\..\libraries\Rendering\Rendering.csproj" />

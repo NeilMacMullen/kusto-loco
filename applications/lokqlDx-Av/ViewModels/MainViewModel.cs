@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
@@ -55,7 +56,9 @@ public partial class MainViewModel : ObservableObject
         WorkspaceManager workspaceManager,
         RegistryOperations registryOperations,
         IStorageProvider storage,
-        ILauncher launcher)
+        ILauncher launcher
+        //IntellisenseClient intellisenseClient
+        )
     {
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
@@ -79,7 +82,9 @@ public partial class MainViewModel : ObservableObject
             _commandProcessor,
             RenderingSurfaceViewModel);
 
-        QueryEditorViewModel = new QueryEditorViewModel(_explorer, ConsoleViewModel);
+        QueryEditorViewModel = new QueryEditorViewModel(_explorer, ConsoleViewModel
+            //,intellisenseClient
+            );
         QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
     }
 
@@ -108,7 +113,6 @@ public partial class MainViewModel : ObservableObject
             UpdateInfo = "New version available";
         }
     }
-
 
     [RelayCommand]
     private async Task Closing(WindowClosingEventArgs? cancelEventArgs)
