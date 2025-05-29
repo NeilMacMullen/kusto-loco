@@ -6,7 +6,7 @@ internal static class NextPrevSlider
 {
     internal static ColumnarResult InvokeColumnar<T>(ColumnarResult[] arguments,bool negatePad)
     {
-        var column = (InMemoryColumn<T>)arguments[0].Column;
+        var column = (TypedBaseColumn<T?>)arguments[0].Column;
         if (column.RowCount == 0)
             return new ColumnarResult(column.Slice(0, 0)); // Return an empty column of the expected type
 
