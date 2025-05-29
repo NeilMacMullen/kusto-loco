@@ -1,7 +1,12 @@
-﻿using Avalonia.Media;
+﻿using System.Text.Json;
+using System.Xml;
+using Avalonia.Media;
 using AvaloniaEdit.Document;
+using AvaloniaEdit.Highlighting;
+using AvaloniaEdit.Highlighting.Xshd;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Intellisense;
 using Lokql.Engine;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
@@ -17,15 +22,18 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     private readonly InteractiveTableExplorer _explorer;
     [ObservableProperty] private FontFamily? _fontFamily;
     [ObservableProperty] private double _fontSize = 20;
-    [ObservableProperty] private string _queryText=string.Empty;
+    [ObservableProperty] private string _queryText = string.Empty;
     [ObservableProperty] private bool _showLineNumbers;
     [ObservableProperty] private bool _wordWrap;
+    public  IntellisenseEntry[] _kqlFunctionEntries=[];
+
     public QueryEditorViewModel(InteractiveTableExplorer explorer, ConsoleViewModel consoleViewModel)
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
+        LoadIntellisense();
     }
 
 
@@ -66,7 +74,18 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         //Editor.AddSettingsForIntellisense(_explorer.Settings);
     }
 
-    internal void AddInternalCommands(IEnumerable<VerbEntry> enumerable)
+    void LoadIntellisense()
+    {
+    
+    using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
+   
+    using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
+    _kqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions!)!;
+    using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
+    //KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
+}
+
+internal void AddInternalCommands(IEnumerable<VerbEntry> enumerable)
     {
     }
 
