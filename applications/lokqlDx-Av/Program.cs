@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using HotAvalonia;
+using Intellisense;
 using Jab;
 using Lokql.Engine.Commands;
 using LokqlDx.Services;

@@ -1,13 +1,12 @@
 ﻿using System.Text.Json;
-using System.Xml;
 using Avalonia.Media;
 using AvaloniaEdit.Document;
-using AvaloniaEdit.Highlighting;
-using AvaloniaEdit.Highlighting.Xshd;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intellisense;
+using KustoLoco.Core.Settings;
 using Lokql.Engine;
+using lokqlDx;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
@@ -16,25 +15,40 @@ namespace LokqlDx.ViewModels;
 public partial class QueryEditorViewModel : ObservableObject, IDisposable
 {
     private readonly ConsoleViewModel _consoleViewModel;
+    private readonly InteractiveTableExplorer _explorer;
+    public readonly IntellisenseClient? _intellisenseClient;
+
+    public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
     [ObservableProperty] private Workspace? _currentWorkspace;
 
     [ObservableProperty] private TextDocument _document = new();
-    private readonly InteractiveTableExplorer _explorer;
     [ObservableProperty] private FontFamily? _fontFamily;
     [ObservableProperty] private double _fontSize = 20;
+    public IntellisenseEntry[] InternalCommands = [];
+    public IntellisenseEntry[] KqlFunctionEntries = [];
     [ObservableProperty] private string _queryText = string.Empty;
+
+    public IntellisenseEntry[] SettingNames = [];
     [ObservableProperty] private bool _showLineNumbers;
     [ObservableProperty] private bool _wordWrap;
-    public  IntellisenseEntry[] _kqlFunctionEntries=[];
+    public IntellisenseEntry[] KqlOperatorEntries = [];
 
-    public QueryEditorViewModel(InteractiveTableExplorer explorer, ConsoleViewModel consoleViewModel)
+
+    public QueryEditorViewModel(InteractiveTableExplorer explorer,
+        ConsoleViewModel consoleViewModel
+        //,IntellisenseClient intellisenseClient
+    )
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
+        //_intellisenseClient = new IntellisenseClient();
+
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
     }
+
+    public CommandParser Parser { get; set; } = new([], string.Empty);
 
 
     public void Dispose()
@@ -70,23 +84,34 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         ////the engine
         await Task.Run(async () => await _explorer.RunInput(query));
 
-        //Editor.SetSchema(_explorer.GetSchema());
-        //Editor.AddSettingsForIntellisense(_explorer.Settings);
+        SetSchema(_explorer.GetSchema());
+        AddSettingsForIntellisense(_explorer.Settings);
     }
 
-    void LoadIntellisense()
-    {
-    
-    using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
-   
-    using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
-    _kqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions!)!;
-    using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
-    //KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops!)!;
-}
+    public void AddSettingsForIntellisense(KustoSettingsProvider settings) =>
+        SettingNames = settings.Enumerate()
+            .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
+            .ToArray();
 
-internal void AddInternalCommands(IEnumerable<VerbEntry> enumerable)
+    private void LoadIntellisense()
     {
+        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
+
+        using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
+        KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!;
+        using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
+        KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops)!;
+    }
+
+    public void SetSchema(SchemaLine[] getSchema) => SchemaIntellisenseProvider.SetSchema(getSchema);
+
+    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
+    {
+        var verbs = verbEntries.ToArray();
+        InternalCommands = verbs.Select(v =>
+                new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
+            .ToArray();
+        Parser = new CommandParser(verbs.Select(x => x.Name), ".");
     }
 
     internal void SetUiPreferences(UIPreferences uiPreferences)
