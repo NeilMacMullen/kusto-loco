@@ -8,7 +8,7 @@ public interface IFileSystemReader
     IEnumerable<IFileSystemInfo> GetChildren(string path);
 }
 
-internal class FileSystemReader(IFileSystem fileSystem) : IFileSystemReader
+public class FileSystemReader(IFileSystem fileSystem) : IFileSystemReader
 {
     private static readonly EnumerationOptions EnumerationOptions = new()
     {

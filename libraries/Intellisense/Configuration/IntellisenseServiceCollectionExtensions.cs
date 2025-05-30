@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Intellisense.Configuration;
 
+// TODO: deprecated?
 public static class IntellisenseServiceCollectionExtensions
 {
     public static IServiceCollection AddIntellisense(this IServiceCollection services)
