@@ -5,12 +5,14 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intellisense;
+using Intellisense.Configuration;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
+using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
@@ -82,8 +84,15 @@ public partial class MainViewModel : ObservableObject
             _commandProcessor,
             RenderingSurfaceViewModel);
 
+        // TODO: temp hack we want to properly integrate with the compile time DI container later
+        var intellisenseClient = new ServiceCollection()
+            .AddIntellisense()
+            .AddLogging()
+            .BuildServiceProvider()
+            .GetRequiredService<IntellisenseClient>();
+
         QueryEditorViewModel = new QueryEditorViewModel(_explorer, ConsoleViewModel
-            //,intellisenseClient
+            ,intellisenseClient
             );
         QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
     }

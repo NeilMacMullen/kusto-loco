@@ -27,7 +27,7 @@ internal class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp(IServiceProvider serviceProvider)
-        => AppBuilder.Configure<App>(() => serviceProvider.GetRequiredService<App>())
+        => AppBuilder.Configure(serviceProvider.GetRequiredService<App>)
             .UsePlatformDetect()
             .WithInterFont()
             .UseHotReload()
