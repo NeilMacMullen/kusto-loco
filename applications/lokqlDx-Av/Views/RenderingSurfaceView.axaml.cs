@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using ScottPlot;
+using ScottPlot.Avalonia;
 
 namespace LokqlDx.Views;
 
@@ -51,8 +52,7 @@ public partial class RenderingSurfaceView : UserControl, IDisposable, IScottPlot
                     DataGrid.Columns.Add(new DataGridTextColumn
                     {
                         Header = column,
-                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i),BindingMode.OneWay)
-                       
+                        Binding = new Binding(RenderingSurfaceViewModel.Row.GetPath(i), BindingMode.OneWay)
                     });
                 }
             });
@@ -66,29 +66,32 @@ public partial class RenderingSurfaceView : UserControl, IDisposable, IScottPlot
     /// <summary>
     ///     Scottplot doesn't support binding so we treat the view as a host
     /// </summary>
+    private AvaPlot Chart() => ChartView.GetPlotControl();
 
     #region IScottplotHost
 
-    public Plot GetPlot(bool reset)
-    {
-        return DispatcherHelper.SafeInvoke(() =>
+    public Plot GetPlot(bool reset) =>
+        DispatcherHelper.SafeInvoke(() =>
         {
             if (reset)
-                AvaPlot1.Reset();
-            return AvaPlot1.Plot;
+                Chart().Reset();
+            return Chart().Plot;
         });
-    }
 
     public void FinishUpdate() =>
         DispatcherHelper.SafeInvoke(() =>
-            AvaPlot1.Refresh());
+        {
+            //todo this is a quick hack = move all this stuff back to the chart control
+            ChartView.FinishUpdate();
+            Chart().Refresh();
+        });
 
     public void CopyToClipboard()
     {
         try
         {
-            var bytes = AvaPlot1.Plot.GetImageBytes((int)AvaPlot1.Width,
-                (int)AvaPlot1.Height, ImageFormat.Png);
+            var bytes = Chart().Plot.GetImageBytes((int)Chart().Width,
+                (int)Chart().Height, ImageFormat.Png);
             using var memoryStream = new MemoryStream(bytes);
             {
                 //TODO - not sure how to implement avalonia clipboard support
