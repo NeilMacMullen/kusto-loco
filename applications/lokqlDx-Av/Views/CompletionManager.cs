@@ -26,31 +26,47 @@ public class CompletionManager
         // Avoid unnecessary IO calls
         if (_completionWindow is not null) return false;
 
+
         var path = vm.Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
 
         if (path.IsBlank()) return false;
 
-#if true
-        return false;
-#else
-        var result = await vm._intellisenseClient.GetCompletionResultAsync(path);
-        if (result.IsEmpty())
 
 
-        ShowCompletions(
-            result.Entries,
-            string.Empty,
-            result.Filter.Length,
-            completionWindow =>
-            {
-                // when editor loses focus mid-path and user resumes typing,
-                // it won't require a second keypress to select the relevant result
-                completionWindow.CompletionList.SelectItem(result.Filter);
-                if (!completionWindow.CompletionList.CurrentList.Any())
-                    completionWindow.Close();
-            });
+
+        var result = CompletionResult.Empty;
+        try
+        {
+            // TODO: top level error handler or handle this properly with logger
+            // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
+            // and user profile app was started with if hosts don't show shares
+            result = await vm._intellisenseClient.GetCompletionResultAsync(path);
+
+        }
+        catch (Exception e) when (e is IntellisenseException or OperationCanceledException)
+        {
+            // ignored
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        if (!result.IsEmpty())
+            ShowCompletions(
+                result.Entries,
+                string.Empty,
+                result.Filter.Length,
+                completionWindow =>
+                {
+                    // when editor loses focus mid-path and user resumes typing,
+                    // it won't require a second keypress to select the relevant result
+                    completionWindow.CompletionList.SelectItem(result.Filter);
+                    if (!completionWindow.CompletionList.CurrentList.Any())
+                        completionWindow.Close();
+                });
         return true;
-#endif
+
 
     }
     private void ShowCompletions(IReadOnlyList<IntellisenseEntry> completions, string prefix, int rewind,
@@ -77,7 +93,7 @@ public class CompletionManager
         if (_completionWindow != null && !_completionWindow.CompletionList.CurrentList.Any())
         {
             _completionWindow.Close();
-            return;
+            // return;
         }
 
         if (await ShowPathCompletions(vm))

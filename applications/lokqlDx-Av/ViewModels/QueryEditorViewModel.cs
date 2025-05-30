@@ -16,7 +16,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
 {
     private readonly ConsoleViewModel _consoleViewModel;
     private readonly InteractiveTableExplorer _explorer;
-    public readonly IntellisenseClient? _intellisenseClient;
+    public readonly IntellisenseClient _intellisenseClient;
 
     public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
     [ObservableProperty] private Workspace? _currentWorkspace;
@@ -35,13 +35,13 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
 
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
-        ConsoleViewModel consoleViewModel
-        //,IntellisenseClient intellisenseClient
+        ConsoleViewModel consoleViewModel,
+        IntellisenseClient intellisenseClient
     )
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
-        //_intellisenseClient = new IntellisenseClient();
+        _intellisenseClient = intellisenseClient;
 
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
