@@ -2,7 +2,7 @@
 
 namespace Intellisense.FileSystem;
 
-internal interface IFileSystemPathCompletionResultRetriever
+public interface IFileSystemPathCompletionResultRetriever
 {
     Task<CompletionResult> GetSiblingsAsync(FileSystemPath path);
     Task<CompletionResult> GetChildrenAsync(FileSystemPath path);

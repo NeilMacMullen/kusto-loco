@@ -3,7 +3,7 @@ using Intellisense.FileSystem.Shares;
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-internal class HostPathCompletionResultRetriever(IShareService shareService)
+public class HostPathCompletionResultRetriever(IShareService shareService)
     : IFileSystemPathCompletionResultRetriever
 {
     public async Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)

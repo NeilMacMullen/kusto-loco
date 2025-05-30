@@ -6,7 +6,7 @@ namespace Intellisense.Concurrency;
 /// <summary>
 /// Wrapper around a cancellation token for use in scoped requests.
 /// </summary>
-internal class CancellationContext : IDisposable
+public class CancellationContext : IDisposable
 {
     public CancellationTokenSource TokenSource { get; private set; } = new();
 

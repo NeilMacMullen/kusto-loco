@@ -2,7 +2,7 @@
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-internal class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader)
+public class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader)
     : IFileSystemPathCompletionResultRetriever
 {
     public Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
