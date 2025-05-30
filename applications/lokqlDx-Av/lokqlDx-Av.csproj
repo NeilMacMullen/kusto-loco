@@ -66,6 +66,9 @@
     <Compile Update="Views\ConsoleView.axaml.cs">
       <DependentUpon>ConsoleView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ChartView.axaml.cs">
+      <DependentUpon>ChartView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\QueryEditorView.axaml.cs">
       <DependentUpon>QueryEditorView.axaml</DependentUpon>
     </Compile>

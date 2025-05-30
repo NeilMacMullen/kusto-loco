@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LokqlDx.Views.ChartView"
+             PointerMoved="InputElement_OnPointerMoved">
+    <Grid>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Bottom" Background="Black">
+                <StackPanel>
+                    <Label Name="DebugText" Foreground="White"></Label>
+                </StackPanel>
+            </StackPanel>
+
+            <avalonia:AvaPlot Name="PlotControl" DockPanel.Dock="Top"/>
+
+        </DockPanel>
+        <Popup Name="myPopup" Placement="Pointer">
+            <Border BorderThickness="1">
+                <TextBlock Name="myPopupText" Background="Black" Foreground="White" Padding="3">
+                    Popup Text
+                </TextBlock>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>
