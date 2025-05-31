@@ -40,6 +40,7 @@ public partial class QueryEditorView : UserControl
         TextEditor.AddHandler(DragDrop.DropEvent, Drop);
         TextEditor.TextArea.TextEntered += TextArea_TextEntered;
        
+
     }
 
     private async void TextArea_TextEntered(object? sender, TextInputEventArgs e)
@@ -57,10 +58,10 @@ public partial class QueryEditorView : UserControl
 
     private async void InternalEditor_OnKeyDown(object? sender, KeyEventArgs e)
         => await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, GetVm());
-    
 
-   
 
-   
-   
+    private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        TextEditor.TextArea.Focus();
+    }
 }

@@ -20,6 +20,7 @@
             ShowLineNumbers="{Binding ShowLineNumbers}"
             WordWrap="{Binding WordWrap}"
             DragDrop.AllowDrop="True"
+            Loaded="TextEditor_OnLoaded"
             >
 
            
