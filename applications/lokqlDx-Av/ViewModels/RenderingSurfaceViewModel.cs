@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
 using lokqlDx;
@@ -21,6 +22,8 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     [ObservableProperty] private ObservableCollection<Row> _results = [];
     [ObservableProperty] private bool _showDataGridSizeWarning;
 
+    [ObservableProperty] private int _activeTab;
+
     public RenderingSurfaceViewModel(KustoSettingsProvider kustoSettings)
     {
         _kustoSettings = kustoSettings;
@@ -30,6 +33,14 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     {
         await RenderTable(result);
         _plotter.RenderToDisplay(result, _kustoSettings);
+        if (result.Visualization != VisualizationState.Empty)
+        {
+            ActiveTab = 1; //show the plot tab
+        }
+        else
+        {
+            ActiveTab = 0; //show the table tab
+        }
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
