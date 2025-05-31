@@ -101,6 +101,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!;
         using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops)!;
+        AddSettingsForIntellisense(_explorer.Settings);
     }
 
     public void SetSchema(SchemaLine[] getSchema) => SchemaIntellisenseProvider.SetSchema(getSchema);
@@ -127,5 +128,6 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     public void SetExplorer(InteractiveTableExplorer explorer)
     {
         _explorer = explorer;
+        AddSettingsForIntellisense(_explorer.Settings);
     }
 }

@@ -264,12 +264,15 @@ public partial class MainViewModel : ObservableObject
             _workspaceManager.Settings,
             _commandProcessor,
             RenderingSurfaceViewModel);
-        //make sure we change the context
-        QueryEditorViewModel.SetExplorer(_explorer);
+      
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         _workspaceManager.Load(path);
         CurrentWorkspace = _workspaceManager.Workspace;
+
+        //make sure we change the context - note we do this after resetting settings
+        QueryEditorViewModel.SetExplorer(_explorer);
+
 
         // AsyncRelayCommand<T> has an IsRunning property
         await QueryEditorViewModel.RunQueryCommand.ExecuteAsync(appPrefs.StartupScript);
