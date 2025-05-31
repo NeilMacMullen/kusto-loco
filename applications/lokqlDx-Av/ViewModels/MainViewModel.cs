@@ -264,7 +264,8 @@ public partial class MainViewModel : ObservableObject
             _workspaceManager.Settings,
             _commandProcessor,
             RenderingSurfaceViewModel);
-
+        //make sure we change the context
+        QueryEditorViewModel.SetExplorer(_explorer);
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         _workspaceManager.Load(path);
@@ -446,6 +447,14 @@ public partial class MainViewModel : ObservableObject
         RowDefinitions = RowDefinitions.Parse($"{WindowSize.Height * 0.6},auto,*");
     }
 
+    [RelayCommand]
+    private async Task FlyoutCurrentResult()
+    {
+        var result = _explorer.GetPreviousResult();
+
+        await _dialogService.FlyoutResult(result,_explorer.Settings);
+
+    }
 
     private void PersistUiPreferencesToDisk()
     {

@@ -8,7 +8,6 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
 {
     private const string BrowserPrefix = @"https://github.com/NeilMacMullen/kusto-loco/wiki";
     private const string RawPrefix = @"https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco";
-    private readonly TaskCompletionSource _completionSource;
     private readonly ILauncher _launcher;
 
     private readonly string _link;
@@ -18,13 +17,11 @@ public partial class MarkDownHelpModel : ObservableObject, IDialogViewModel
     {
         _link = link;
         _launcher = launcher;
-        _completionSource = new TaskCompletionSource();
-        Result = _completionSource.Task;
         _markdownText = string.Empty;
     }
 
 
-    public Task Result { get; }
+    public Task Result { get; } = Task.CompletedTask;
 
     private string MakeUri(string prefix)
     {
