@@ -14,8 +14,8 @@ namespace LokqlDx.Services;
 
 public class DialogService
 {
-    private readonly TopLevel _topLevel;
     private readonly ILauncher _launcher;
+    private readonly TopLevel _topLevel;
 
     public DialogService(TopLevel topLevel, ILauncher launcher)
     {
@@ -56,7 +56,8 @@ public class DialogService
         await ShowDialog(
                 page,
                 new MarkdownHelpWindow(),
-                new MarkDownHelpModel(page, _launcher))
+                new MarkDownHelpModel(page, _launcher),
+                true)
             .ConfigureAwait(false);
 
 
@@ -75,7 +76,7 @@ public class DialogService
                 new WorkspacePreferencesViewModel(workspaceManager, uiPreferences))
             .ConfigureAwait(false);
 
-    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext)
+    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modeless = false)
     {
         if (_topLevel is Window window)
         {
@@ -90,25 +91,28 @@ public class DialogService
             };
 
             if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
-            {
                 dialog[!TemplatedControl.BackgroundProperty]
                     = new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
-            }
             else
-            {
                 dialog.Background = Brushes.Transparent;
-            }
 
 #if DEBUG
-                dialog.AttachDevTools();
+            dialog.AttachDevTools();
 #endif
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-            await Task.WhenAny(dialog.ShowDialog(window), dataContext.Result);
-#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
+            if (modeless)
+            {
+                dialog.Show(window);
+            }
+            else
+            {
+                await Task.WhenAny(dialog.ShowDialog(window), dataContext.Result);
+                if (dialog.IsVisible)
+                    dialog.Close();
+            }
 
-            if (dialog.IsVisible)
-                dialog.Close();
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }
 }
