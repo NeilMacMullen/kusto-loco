@@ -9,7 +9,7 @@
              x:Class="LokqlDx.Views.RenderingSurfaceView"
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded">
-    <TabControl>
+    <TabControl SelectedIndex="{Binding ActiveTab}">
         <TabItem Header="Data">
             <Grid RowDefinitions="auto,*">
                 <TextBlock
