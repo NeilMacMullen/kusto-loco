@@ -15,7 +15,7 @@ namespace LokqlDx.ViewModels;
 public partial class QueryEditorViewModel : ObservableObject, IDisposable
 {
     private readonly ConsoleViewModel _consoleViewModel;
-    private readonly InteractiveTableExplorer _explorer;
+    private InteractiveTableExplorer _explorer;
     public readonly IntellisenseClient _intellisenseClient;
 
     public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
@@ -123,4 +123,9 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     }
 
     internal void SetText(string text) => Document.Text = text;
+
+    public void SetExplorer(InteractiveTableExplorer explorer)
+    {
+        _explorer = explorer;
+    }
 }

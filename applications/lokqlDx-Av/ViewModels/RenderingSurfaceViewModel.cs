@@ -2,11 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
-using KustoLoco.Rendering.ScottPlot;
 using Lokql.Engine.Commands;
 using lokqlDx;
 using NotNullStrings;
-using ScottPlot;
 
 namespace LokqlDx.ViewModels;
 
@@ -15,7 +13,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     private readonly KustoSettingsProvider _kustoSettings;
     [ObservableProperty] private List<string> _columns = [];
 
-    [ObservableProperty] private string _dataGridSizeWarning=string.Empty;
+    [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
     [ObservableProperty] private double _fontSize = 20;
 
 
@@ -31,24 +29,14 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     public async Task RenderToDisplay(KustoQueryResult result)
     {
         await RenderTable(result);
-        var plot = _plotter.GetPlot(true);
-        plot.Clear();
-        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, _kustoSettings);
-        _plotter.FinishUpdate();
+        _plotter.RenderToDisplay(result, _kustoSettings);
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
-    {
-        using var plot = new Plot();
-        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, _kustoSettings);
-        plot.Axes.AutoScale();
-        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
-        return bytes;
-    }
+        => _plotter.RenderToImage(result, pWidth, pHeight, _kustoSettings);
 
     private Task RenderTable(KustoQueryResult result)
     {
-        
         //ensure that if there are no results we clear the data grid
         if (result.Error.IsNotBlank())
         {
@@ -71,7 +59,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             .Take(maxRows)
             .Select(row => new Row(row))
             .ToArray();
-        
+
         Results = new ObservableCollection<Row>(rows);
         //note that changing Columns is the trigger for the view to redraw
         //soi we need to do this after the results are created

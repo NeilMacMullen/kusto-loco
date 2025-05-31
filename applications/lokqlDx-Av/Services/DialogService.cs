@@ -4,11 +4,16 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using LokqlDx.Models;
+using LokqlDx.ViewModels;
 using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using NotNullStrings;
+using Flyout = LokqlDx.Views.Flyout;
 
 namespace LokqlDx.Services;
 
@@ -60,6 +65,19 @@ public class DialogService
                 true)
             .ConfigureAwait(false);
 
+
+
+    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings)
+    {
+        //use the first line of the query as the title
+        var title = result.Query.Tokenize("\r\n").FirstOrDefault("result");
+        await ShowDialog(
+               title,
+                new Flyout(),
+                new FlyoutViewModel(result, explorerSettings),
+                true)
+            .ConfigureAwait(false);
+    }
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
         await ShowDialog(
@@ -115,4 +133,5 @@ public class DialogService
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }
+
 }

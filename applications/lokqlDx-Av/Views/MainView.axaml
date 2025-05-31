@@ -74,11 +74,16 @@
                 <MenuItem Header="Toggle line-numbers" Command="{Binding ToggleLineNumbersCommand}" />
 
             </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Show current result in flyout"
+                          Command="{Binding FlyoutCurrentResultCommand}" />
+                <MenuItem Header="Reset layout"
+                          Command ="{Binding ResetGridLayoutCommand}"/>
+            </MenuItem>
+
             <MenuItem Header="Misc">
                 <MenuItem Header="Register file association"
                           Command="{Binding RegisterFileAssociationCommand}" />
-                <MenuItem Header="Reset layout"
-                          Command ="{Binding ResetGridLayoutCommand}"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX" Command="{Binding NavigateToWikiCommand}" />
