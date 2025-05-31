@@ -1,57 +1,30 @@
-using System.Text;
 using Avalonia.Controls;
 using Avalonia.Input;
+using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
-using NotNullStrings;
+using lokqlDx;
 using ScottPlot;
-using ScottPlot.Avalonia;
 using ScottPlot.Plottables;
 
 namespace LokqlDx.Views;
 
-public partial class ChartView : UserControl
+public partial class ChartView : UserControl, IScottPlotHost
 {
-    private Crosshair Crosshair;
+    private Crosshair _crosshair;
 
-    private string LastPopup = string.Empty;
+    private string _lastPopup = string.Empty;
 
     public ChartView()
     {
         InitializeComponent();
-        Crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
+        _crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
     }
 
-    public AvaPlot GetPlotControl() => PlotControl;
+    private PopupSupport PopupSupport => new(PlotControl.Plot);
 
-    public void FinishUpdate()
-    {
-        Crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
-        PlotControl.Refresh();
-    }
-    private PopupResult TryPopupFromScatter(Coordinates coordinates)
-    {
-        foreach (var scatter in PlotControl.Plot.GetPlottables<Scatter>())
-        {
-            var near = scatter.GetNearest(coordinates, PlotControl.Plot.LastRender);
-            if (near.IsReal) return new PopupResult(scatter.LegendText, near.X, near.Y, near.Y, false);
-        }
 
-        return PopupResult.None;
-    }
-
-    private string GetXLabel(double x)
-    {
-        if (PlotControl.Plot.Axes.Bottom.TickGenerator is FixedDateTimeAutomatic)
-            return DateTime.FromOADate(x).ToString();
-        return x.ToString();
-    }
-
-    private string GetYLabel(double y)
-    {
-        if (PlotControl.Plot.Axes.Left.TickGenerator is FixedDateTimeAutomatic)
-            return DateTime.FromOADate(y).ToString();
-        return y.ToString();
-    }
+    #region cursor/popup
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
     {
@@ -60,76 +33,62 @@ public partial class ChartView : UserControl
         var coordinates = PlotControl.Plot.GetCoordinates(mousePixel);
 
 
-        DebugText.Content = $"X:{GetXLabel(coordinates.X)} Y:{GetYLabel(coordinates.Y)}";
-        Crosshair.Position = coordinates;
+        DebugText.Content = PopupSupport.GetBasicPositionInfo(coordinates);
+        _crosshair.Position = coordinates;
 
-        var popup = TryPopupFromScatter(coordinates);
-        if (!popup.IsValid)
-            popup = TryPopupFromBar(coordinates);
+        var popup = PopupSupport.TryPopup(coordinates);
 
-
-        var sb = new StringBuilder();
-        sb.AppendLine(popup.Series);
-        if (popup.invertAxes)
-            sb.AppendLine(GetYLabel(popup.X));
-        else
-            sb.AppendLine(GetXLabel(popup.X));
-
-        if (popup.Y == popup.V)
-            sb.AppendLine(GetYLabel(popup.Y));
-        else
-            sb.AppendLine((popup.V - popup.Y).ToString());
-
-
-        myPopupText.Text = sb.ToString();
+        myPopupText.Text = PopupSupport.GetPopupContents(popup);
         //force pop up to move
-        if (LastPopup != myPopupText.Text)
+        if (_lastPopup != myPopupText.Text)
             myPopup.IsOpen = false;
-        LastPopup = myPopupText.Text;
+        _lastPopup = myPopupText.Text;
         myPopup.IsOpen = popup.IsValid;
         PlotControl.Refresh();
     }
 
+    #endregion
 
-    private PopupResult TryPopupFromBar(Coordinates rawcoordinates)
+
+    #region IScottplotHost
+
+    public void CopyToClipboard()
     {
-        var inverted = new Coordinates(rawcoordinates.Y, rawcoordinates.X);
-        var bestResult = PopupResult.None;
-        foreach (var bar in PlotControl.Plot.GetPlottables<BarPlot>())
+        try
         {
-            var bars = bar.Bars;
-            foreach (var b in bars)
+            var bytes = PlotControl.Plot.GetImageBytes((int)PlotControl.Width,
+                (int)PlotControl.Height, ImageFormat.Png);
+            using var memoryStream = new MemoryStream(bytes)
             {
-                var invert = b.Orientation == Orientation.Horizontal;
-                var coordinates = invert
-                    ? inverted
-                    : rawcoordinates;
-                var barLeft = b.Position - b.Size / 2;
-                var barright = b.Position + b.Size / 2;
-
-                if (coordinates.X < barLeft)
-                    continue;
-                if (coordinates.X > barright)
-                    continue;
-                if (coordinates.Y < b.ValueBase)
-                    continue;
-                if (coordinates.Y > b.Value)
-                    continue;
-
-                //we have a candidate
-                return new PopupResult(bar.LegendText, b.Position, b.ValueBase, b.Value, invert);
-            }
+                //TODO - not sure how to implement avalonia clipboard support
+            };
         }
-
-
-        return bestResult;
+        catch
+        {
+        }
     }
 
-    //private void Chart_OnLostFocus(object sender, RoutedEventArgs e) => myPopup.IsOpen = false;
-
-    private readonly record struct PopupResult(string Series, double X, double Y, double V, bool invertAxes)
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight,
+        KustoSettingsProvider kustoSettings)
     {
-        internal static readonly PopupResult None = new(string.Empty, 0, 0, 0, false);
-        public bool IsValid => Series.IsNotBlank();
+        using var plot = new Plot();
+        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
+        plot.Axes.AutoScale();
+        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
+        return bytes;
     }
+
+    public void RenderToDisplay(KustoQueryResult result, KustoSettingsProvider kustoSettings) =>
+        //important - this can be called from inside the engine so we need to dispatch it to the UI thread
+        DispatcherHelper.SafeInvoke(() =>
+        {
+            PlotControl.Reset();
+            var plot = PlotControl.Plot;
+            plot.Clear();
+            ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
+            _crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
+            PlotControl.Refresh();
+        });
+
+    #endregion
 }

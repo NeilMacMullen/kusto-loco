@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Presentation;
-using KustoLoco.Core;
-using NLog;
+﻿using KustoLoco.Core;
 using NotNullStrings;
 using ShapeCrawler;
 using Presentation = ShapeCrawler.Presentation;
@@ -13,7 +10,10 @@ public class PptReportTarget : IReportTarget
     private readonly Presentation _pres;
     private bool _isDisposed;
 
-    private PptReportTarget(Presentation pres) => _pres = pres;
+    private PptReportTarget(Presentation pres)
+    {
+        _pres = pres;
+    }
 
     public void UpdateOrAddImage(string name, InteractiveTableExplorer explorer, KustoQueryResult result)
     {
@@ -30,9 +30,8 @@ public class PptReportTarget : IReportTarget
         var matches = FindMatches<IShape>(name);
         if (matches.Any())
             foreach (var p in matches)
-            {
-                if (p.TextBox is { } tb) tb.SetText(text);
-            }
+                if (p.TextBox is { } tb)
+                    tb.SetText(text);
     }
 
     public void UpdateOrAddTable(string name, KustoQueryResult res)
@@ -93,7 +92,7 @@ public class PptReportTarget : IReportTarget
 
     public void SaveAs(string name)
     {
-        if(_isDisposed) return;
+        if (_isDisposed) return;
         _pres.Save(name);
         _pres.Dispose();
         _isDisposed = true;
@@ -133,20 +132,18 @@ public class PptReportTarget : IReportTarget
     }
 
     private T[] FindMatches<T>(string name)
-        where T : IShape
-    {
-        return name.IsBlank()
-                   ? []
+        where T : IShape =>
+        name.IsBlank()
+            ? []
             : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
                 .Where(p => p.Name == name)
                 .ToArray();
-    }
 
     public static PptReportTarget Create(string filename)
     {
         var pres = filename.IsBlank()
-                       ? new Presentation()
-                       : new Presentation(filename);
+            ? new Presentation()
+            : new Presentation(filename);
         return new PptReportTarget(pres);
     }
 }

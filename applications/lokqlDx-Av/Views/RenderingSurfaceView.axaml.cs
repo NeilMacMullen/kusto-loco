@@ -9,7 +9,7 @@ using ScottPlot.Avalonia;
 
 namespace LokqlDx.Views;
 
-public partial class RenderingSurfaceView : UserControl, IDisposable, IScottPlotHost
+public partial class RenderingSurfaceView : UserControl, IDisposable
 {
     private RenderingSurfaceViewModel? _vm;
 
@@ -58,49 +58,10 @@ public partial class RenderingSurfaceView : UserControl, IDisposable, IScottPlot
             });
     }
 
-    private void Control_OnLoaded(object? sender, RoutedEventArgs e) => GetContext().RegisterHost(this);
+    //TODO -bit of a hack to tell viewmodel layer that the inner control can be used for rendering charts
+    private void Control_OnLoaded(object? sender, RoutedEventArgs e) => GetContext().RegisterHost(ChartView);
 
 
     private RenderingSurfaceViewModel GetContext() => (DataContext as RenderingSurfaceViewModel)!;
-
-    /// <summary>
-    ///     Scottplot doesn't support binding so we treat the view as a host
-    /// </summary>
-    private AvaPlot Chart() => ChartView.GetPlotControl();
-
-    #region IScottplotHost
-
-    public Plot GetPlot(bool reset) =>
-        DispatcherHelper.SafeInvoke(() =>
-        {
-            if (reset)
-                Chart().Reset();
-            return Chart().Plot;
-        });
-
-    public void FinishUpdate() =>
-        DispatcherHelper.SafeInvoke(() =>
-        {
-            //todo this is a quick hack = move all this stuff back to the chart control
-            ChartView.FinishUpdate();
-            Chart().Refresh();
-        });
-
-    public void CopyToClipboard()
-    {
-        try
-        {
-            var bytes = Chart().Plot.GetImageBytes((int)Chart().Width,
-                (int)Chart().Height, ImageFormat.Png);
-            using var memoryStream = new MemoryStream(bytes);
-            {
-                //TODO - not sure how to implement avalonia clipboard support
-            }
-        }
-        catch
-        {
-        }
-    }
-
-    #endregion
+ 
 }
