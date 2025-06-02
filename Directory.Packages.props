@@ -41,7 +41,7 @@
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="NLog" Version="5.4.0" />
+    <PackageVersion Include="NLog" Version="5.5.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.9.1" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.9.1" />
@@ -52,7 +52,7 @@
     <PackageVersion Include="ScottPlot" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
-    <PackageVersion Include="ShapeCrawler" Version="0.68.1" />
+    <PackageVersion Include="ShapeCrawler" Version="0.69.0" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
