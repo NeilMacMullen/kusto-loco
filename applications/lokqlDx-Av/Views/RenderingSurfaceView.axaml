@@ -27,7 +27,9 @@
                     Foreground="GreenYellow"
                     ClipboardCopyMode="ExcludeHeader"
                     CanUserReorderColumns="True"
-                    CanUserResizeColumns="True">
+                    CanUserResizeColumns="True"
+                    CanUserSortColumns="True"
+                    CopyingRowClipboardContent="DataGrid_OnCopyingRowClipboardContent">
                 </DataGrid>
             </Grid>
         </TabItem>

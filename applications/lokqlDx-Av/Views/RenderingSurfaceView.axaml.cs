@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
+using Kusto.Language.Utils;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using ScottPlot;
@@ -63,5 +64,22 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
 
 
     private RenderingSurfaceViewModel GetContext() => (DataContext as RenderingSurfaceViewModel)!;
- 
+
+    private void DataGrid_OnCopyingRowClipboardContent(object? sender, DataGridRowClipboardEventArgs e)
+    {
+        //ugh - avalonia datagrid clipboard behaviour is horrible.
+        //this is the best I can come up with to allow copying individual cells
+        //but it's far from perfect
+        try
+        {
+            var col = DataGrid.CurrentColumn.DisplayIndex;
+            var currentCell = e.ClipboardRowContent[DataGrid.CurrentColumn.DisplayIndex];
+            e.ClipboardRowContent.Clear();
+            e.ClipboardRowContent.Add(currentCell);
+        }
+        catch
+        {
+            
+        }
+    }
 }
