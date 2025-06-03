@@ -396,7 +396,7 @@ public static class AppInsightsCommand
         //make sure we pick up any variable interpolation in case we are inside a function
         query = exp._interpolator.Interpolate(query);
         exp.Info("Running application insights query.  This may take a while....");
-        var result = await ai.LoadTable(o.Rid, query, t, DateTime.UtcNow);
+        var result = await ai.LoadTable(o.TenantId,o.Rid, query, t, DateTime.UtcNow);
         await exp.InjectResult(result);
     }
 
@@ -423,5 +423,10 @@ Examples:
         public string Rid { get; set; } = string.Empty;
 
         [Value(1, HelpText = "timespan ")] public string Timespan { get; set; } = "1d";
+
+
+        [Option(HelpText = "The tenant-id of the subscription that contains the application insights instance")]
+        public string TenantId { get; set; } = string.Empty;
+
     }
 }
