@@ -25,12 +25,19 @@ public class ApplicationInsightsLogLoader
         _console = console;
     }
 
-    public async Task<KustoQueryResult> LoadTable(string resourcePath,
+    public async Task<KustoQueryResult> LoadTable(string tenantId,string resourcePath,
         string query,
         DateTime start, DateTime end
     )
     {
-        var client = new LogsQueryClient(new DefaultAzureCredential());
+        var credentialOptions = tenantId.IsBlank()
+            ? new DefaultAzureCredentialOptions()
+            : new DefaultAzureCredentialOptions()
+            {
+                TenantId = tenantId
+            };
+
+        var client = new LogsQueryClient(new DefaultAzureCredential(credentialOptions));
 
         //try to lookup resource path from settings
         resourcePath = _settings.TrySubstitute(resourcePath);

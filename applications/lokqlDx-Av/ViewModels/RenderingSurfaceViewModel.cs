@@ -33,7 +33,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     {
         await RenderTable(result);
         _plotter.RenderToDisplay(result, _kustoSettings);
-        if (result.Visualization != VisualizationState.Empty)
+        if (result.IsChart)
         {
             ActiveTab = 1; //show the plot tab
         }
