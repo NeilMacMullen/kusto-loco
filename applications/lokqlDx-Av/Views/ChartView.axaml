@@ -8,6 +8,16 @@
              PointerMoved="InputElement_OnPointerMoved">
     <Grid>
         <DockPanel>
+            <StackPanel DockPanel.Dock="Top"  Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+
+           
+            <Button  Content="&#x1F4CB;" Click="Button_OnClick" ToolTip.Tip="Copy to clipboard">
+
+            </Button>
+            </StackPanel>
+
+            <DockPanel DockPanel.Dock="Bottom">
             <StackPanel DockPanel.Dock="Bottom" Background="Black">
                 <StackPanel>
                     <Label Name="DebugText" Foreground="White"></Label>
@@ -17,7 +27,10 @@
             <avalonia:AvaPlot Name="PlotControl" DockPanel.Dock="Top"/>
 
         </DockPanel>
-        <Popup Name="myPopup" Placement="Pointer">
+
+        </DockPanel>
+
+            <Popup Name="myPopup" Placement="Pointer">
             <Border BorderThickness="1">
                 <TextBlock Name="myPopupText" Background="Black" Foreground="White" Padding="3">
                     Popup Text

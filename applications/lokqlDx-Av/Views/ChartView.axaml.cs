@@ -1,5 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
+using Clowd.Clipboard;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
@@ -91,4 +94,23 @@ public partial class ChartView : UserControl, IScottPlotHost
         });
 
     #endregion
+
+    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            try
+            {
+                var width = (int)PlotControl.Bounds.Width;
+                var height = (int)PlotControl.Bounds.Height;
+                var bytes = PlotControl.Plot.GetImageBytes(width, height, ImageFormat.Png);
+
+                using var memoryStream = new MemoryStream(bytes);
+                Avalonia.Media.Imaging.Bitmap bitmap = new Bitmap(memoryStream);
+                ClipboardAvalonia.SetImage(bitmap);
+            }
+            catch { }
+        }
+
+    }
 }

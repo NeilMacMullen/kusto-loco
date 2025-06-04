@@ -38,6 +38,7 @@
     <PackageReference Include="Avalonia.Xaml.Behaviors" />
     <PackageReference Include="Avalonia.Xaml.Interactions.Events" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <PackageReference Include="Clowd.Clipboard.Avalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
