@@ -21,6 +21,9 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
 
     public void Write(string text)
     {
+        if (text.EndsWith(Environment.NewLine))
+            text = text[..^Environment.NewLine.Length];
+        
         var item = new ColoredText(GetColor(ForegroundColor), text);
         ConsoleContent.Add(item);
         SelectedItem = item;
