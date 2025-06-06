@@ -172,11 +172,11 @@ public partial class MainWindow : Window
             ? _args[0]
             : string.Empty;
         await LoadWorkspace(pathToLoad);
-        var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
-        if (isNewVersionAvailable)
+        var newVersion = await UpgradeManager.UpdateAvailable();
+        if (newVersion.IsNotBlank())
         {
             StatusBar.Visibility = Visibility.Visible;
-            UpdateInfo.Content = "New version available";
+            UpdateInfo.Content = $"New version available {newVersion}";
         }
 
         Editor.SetFocus();

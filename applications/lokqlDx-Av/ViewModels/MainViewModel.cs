@@ -115,11 +115,11 @@ public partial class MainViewModel : ObservableObject
 
         await LoadWorkspace(_initWorkspacePath);
 
-        var isNewVersionAvailable = await UpgradeManager.UpdateAvailable();
-        if (isNewVersionAvailable)
+        var newVersion = await UpgradeManager.UpdateAvailable();
+        if (newVersion.IsNotBlank())
         {
             ShowUpdateInfo = true;
-            UpdateInfo = "New version available";
+            UpdateInfo = $"New version available - {newVersion}";
         }
     }
 

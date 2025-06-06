@@ -13,18 +13,19 @@ public static class UpgradeManager
 {
     public const string VersionSite = "https://raw.githubusercontent.com/wiki/NeilMacMullen/kusto-loco/__version.md";
 
-    public static async Task<bool> UpdateAvailable()
+    public static async Task<string> UpdateAvailable()
     {
         try
         {
             using var client = new HttpClient();
             var remoteVersion = (await client.GetStringAsync(new Uri(VersionSite))).Trim();
             var thisVersion =Assembly.GetExecutingAssembly().GetName().Version?.ToString().NullToEmpty()!;
-            return CompareVersions(remoteVersion, thisVersion) >0;
+            return CompareVersions(remoteVersion, thisVersion) >0 ?
+                    remoteVersion : String.Empty;
         }
         catch
         {
-            return false;
+            return string.Empty;
         }
     }
 
