@@ -14,20 +14,10 @@ internal class FileSystemIntellisenseServiceTestFixture
     public FileSystemIntellisenseServiceTestFixture(
         Dictionary<string, MockFileData> fileData
     )
-        : this(
-            new FileSystemReader(
-                new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false })
-            )
-        )
     {
-    }
-
-    public FileSystemIntellisenseServiceTestFixture(IFileSystemReader reader)
-    {
-        var provider = new ServiceCollection()
-            .AddIntellisenseWithMockedIo()
-            .AddSingleton(reader)
-            .BuildServiceProvider();
+        var provider = new MockFileSystemTestContainer();
+        var reader = (ProxyReader)provider.GetRequiredService<IFileSystemReader>();
+        reader.FileSystem = new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false });
         _fileSystemIntellisenseService = provider.GetRequiredService<IFileSystemIntellisenseService>();
     }
 
