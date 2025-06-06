@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Intellisense.Configuration;
+namespace LogSetup;
 
 [ServiceProviderModule]
 [Singleton(typeof(IConfiguration), Factory = nameof(GetConfiguration))]

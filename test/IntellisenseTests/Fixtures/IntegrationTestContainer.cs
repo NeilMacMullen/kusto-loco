@@ -9,6 +9,7 @@ using Intellisense.Configuration;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.Shares;
 using Jab;
+using LogSetup;
 using Moq;
 
 namespace IntellisenseTests.Fixtures;
