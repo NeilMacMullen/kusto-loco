@@ -13,7 +13,7 @@ public interface IFileSystemIntellisenseService
     Task<CompletionResult> GetPathIntellisenseOptionsAsync(string path);
 }
 
-internal class FileSystemIntellisenseService(
+public class FileSystemIntellisenseService(
     IPathFactory pathFactory,
     IEnumerable<IFileSystemPathCompletionResultRetriever> retrievers
 )
