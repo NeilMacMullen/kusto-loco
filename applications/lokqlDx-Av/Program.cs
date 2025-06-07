@@ -35,8 +35,8 @@ internal class Program
 }
 
 [ServiceProvider]
-[Import(typeof(IIntellisenseModule))]
-[Import(typeof(ILoggingModule))]
+[Import<IIntellisenseModule>]
+[Import<ILoggingModule>]
 [Transient<App>]
 [Transient<MainViewModel>]
 [Transient<MainView>]

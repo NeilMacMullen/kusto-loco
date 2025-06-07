@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace LogSetup;
 
 [ServiceProviderModule]
-[Singleton(typeof(IConfiguration), Factory = nameof(GetConfiguration))]
-[Singleton(typeof(ILoggerFactory), Factory = nameof(GetLoggerFactory))]
+[Singleton<IConfiguration>(Factory = nameof(GetConfiguration))]
+[Singleton<ILoggerFactory>(Factory = nameof(GetLoggerFactory))]
 [Transient(typeof(ILogger<>), typeof(Logger<>))]
 public interface ILoggingModule
 {
