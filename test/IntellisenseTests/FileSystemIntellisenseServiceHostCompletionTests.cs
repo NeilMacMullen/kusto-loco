@@ -16,7 +16,7 @@ public class FileSystemIntellisenseServiceHostCompletionTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var provider = new ServiceCollection().AddDefaultIntellisense().BuildServiceProvider();
+        var provider = new IntegrationTestContainer();
         var service = provider.GetRequiredService<IFileSystemIntellisenseService>();
         var result = await service.GetPathIntellisenseOptionsAsync("//");
 

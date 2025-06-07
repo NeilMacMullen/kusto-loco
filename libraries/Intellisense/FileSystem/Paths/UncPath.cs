@@ -2,7 +2,7 @@ using NotNullStrings;
 
 namespace Intellisense.FileSystem.Paths;
 
-internal class UncPath(Uri uri) : FileSystemPath(uri.OriginalString)
+public class UncPath(Uri uri) : FileSystemPath(uri.OriginalString)
 {
     /// <summary>
     /// Checks if the UNC path only contains a host i.e. \\127.0.0.1\

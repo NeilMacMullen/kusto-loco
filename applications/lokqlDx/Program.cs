@@ -4,7 +4,9 @@ using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using HotAvalonia;
 using Intellisense;
+using Intellisense.Configuration;
 using Jab;
+using LogSetup;
 using Lokql.Engine.Commands;
 using LokqlDx.Services;
 using LokqlDx.ViewModels;
@@ -37,6 +39,8 @@ internal class Program
 [ServiceProvider]
 [Transient<App>]
 [Transient<MainViewModel>]
+[Import<IIntellisenseModule>]
+[Import<ILoggingModule>]
 [Transient<MainView>]
 [Transient<PreferencesManager>]
 [Transient<DialogService>]

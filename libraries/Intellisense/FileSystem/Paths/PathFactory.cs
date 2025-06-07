@@ -2,13 +2,13 @@
 
 namespace Intellisense.FileSystem.Paths;
 
-internal interface IPathFactory
+public interface IPathFactory
 {
     FileSystemPath Create(string path);
     T CreateOrThrow<T>(string path) where T : FileSystemPath;
 }
 
-internal class PathFactory : IPathFactory
+public class PathFactory : IPathFactory
 {
     public FileSystemPath Create(string path)
     {

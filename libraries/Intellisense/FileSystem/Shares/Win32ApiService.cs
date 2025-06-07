@@ -1,16 +1,14 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using Intellisense.FileSystem.Paths;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;
 
 namespace Intellisense.FileSystem.Shares;
 
 // TODO: write tests
-internal class ResourceManager(ILogger<ResourceManager> logger)
+public class ResourceManager(ILogger<ResourceManager> logger)
 {
     private readonly SemaphoreSlim _semaphore = new(2, 2);
     private static readonly TimeSpan LockTimeout = TimeSpan.FromSeconds(3);
@@ -32,7 +30,7 @@ internal class ResourceManager(ILogger<ResourceManager> logger)
     private void OnDispose(int count) => logger.LogTrace("Released lock {Count}", count);
 }
 
-internal readonly struct ResourceLock(SemaphoreSlim semaphore, Action<int> onDispose) : IDisposable
+public readonly struct ResourceLock(SemaphoreSlim semaphore, Action<int> onDispose) : IDisposable
 {
     public void Dispose()
     {
@@ -42,7 +40,7 @@ internal readonly struct ResourceLock(SemaphoreSlim semaphore, Action<int> onDis
 }
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
-internal class Win32ApiService(
+public class Win32ApiService(
     ILogger<Win32ApiService> logger,
     CancellationTokenSource cts,
     IPathFactory pathFactory,

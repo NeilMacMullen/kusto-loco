@@ -10,9 +10,7 @@ namespace IntellisenseTests;
 
 public class FileSystemIntellisenseServiceFileShareTests
 {
-    private readonly IFileSystemIntellisenseService _service = new ServiceCollection()
-        .AddDefaultIntellisense()
-        .BuildServiceProvider()
+    private readonly IFileSystemIntellisenseService _service = new IntegrationTestContainer()
         .GetRequiredService<IFileSystemIntellisenseService>();
 
     [WindowsAdminCiFact]
