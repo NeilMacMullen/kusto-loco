@@ -1,22 +1,36 @@
 ﻿using System.Diagnostics;
 using System.Security.Principal;
-using System.Windows;
 using Microsoft.Win32;
 
-namespace lokqlDx;
+namespace LokqlDx.Services;
 
-public static class RegistryOperations
+public class RegistryOperations
 {
-    public static bool IsAdmin()
+    private readonly DialogService _dialogService;
+
+    public RegistryOperations(DialogService dialogService)
     {
-        // Check if we are running as administrator
-        var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-        return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        _dialogService = dialogService;
     }
 
-    public static void AssociateFileType(bool quiet)
+    public bool IsAdmin()
     {
+        if (OperatingSystem.IsWindows())
+        {
+            // Check if we are running as administrator
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        return false;
+    }
+
+    public async Task AssociateFileType(bool quiet)
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
         //taken from https://stackoverflow.com/questions/1387769/create-registry-entry-to-associate-file-extension-with-application-in-c
         try
         {
@@ -29,12 +43,14 @@ public static class RegistryOperations
 
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\.{WorkspaceManager.Extension}", null, progId);
             if (!quiet)
-                MessageBox.Show($"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
+                await _dialogService.ShowMessageBox(
+                    $"Lokqldx now registered with .{WorkspaceManager.Extension} files ");
         }
         catch
         {
             if (!quiet)
-                MessageBox.Show("Unable to register file association - you may need to run the application as admin");
+                await _dialogService.ShowMessageBox(
+                    "Unable to register file association - you may need to run the application as admin");
         }
     }
 }

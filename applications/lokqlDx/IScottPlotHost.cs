@@ -1,10 +1,11 @@
-﻿using ScottPlot;
+﻿using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 
 namespace lokqlDx;
 
 public interface IScottPlotHost
 {
-    Plot GetPlot(bool reset);
-    void FinishUpdate();
     void CopyToClipboard();
+    void RenderToDisplay(KustoQueryResult result, KustoSettingsProvider settings);
+    public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight, KustoSettingsProvider settings);
 }
