@@ -1,4 +1,4 @@
-﻿namespace lokqlDx;
+﻿namespace LokqlDx;
 
 /// <summary>
 /// Global Preferences that are applied for every workspace

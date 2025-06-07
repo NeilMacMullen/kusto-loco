@@ -1,4 +1,4 @@
-﻿namespace lokqlDx;
+﻿namespace LokqlDx;
 
 public class MruEntry
 {
