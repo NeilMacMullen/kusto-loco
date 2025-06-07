@@ -38,6 +38,10 @@ if (-not $skipBuild) {
     dotnet publish  /p:Version="$version" /p:InformationalVersion="$version"  .\applications\lokql\lokql.csproj -r linux-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokql-linux -c:Release -p:PackageVersion=$version
 
     dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r win-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx  -p:PackageVersion=$version
+    dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r linux-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx-linux  -p:PackageVersion=$version
+    dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\lokqldx\lokqldx.csproj -r osx-x64 -p:PublishSingleFile=true --self-contained false --output .\publish\lokqldx-macos  -p:PackageVersion=$version
+  
+  
     dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\pskql\pskql.csproj -r win-x64 --self-contained false --output .\publish\pskql  -p:PackageVersion=$version
     dotnet publish  /p:Version="$version" /p:InformationalVersion="$version" .\applications\pskql\pskql.csproj -r linux-x64 --self-contained false --output .\publish\pskql-linux  -p:PackageVersion=$version
     

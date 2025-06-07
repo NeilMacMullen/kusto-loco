@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -10,38 +9,10 @@ namespace lokqlDx;
 
 public class Copilot
 {
-    public static class Roles
-    {
-        public const string User = "user";
-        public const string Assistant = "assistant";
-        public const string System = "system";
-        public const string Kql = "kql";
-    }
-    public void RenderResponses(IKustoConsole console,params string [] roles)
-    {
-        foreach(var message in context)
-        {
-            if (roles.Length > 0 && !roles.Contains(message.role))
-            {
-                continue;
-            }
-            var color = message.role switch
-            {
-                Roles.User => ConsoleColor.Green,
-                Roles.Assistant => ConsoleColor.White,
-                Roles.System => ConsoleColor.Red,
-                Roles.Kql => ConsoleColor.Yellow,
-                _ => ConsoleColor.White
-            };
-            console.ForegroundColor = color;
-            console.WriteLine(message.content);
-            console.WriteLine();
-        }
-    }
+    private readonly HttpClient _client;
 
-    private HttpClient _client;
+    private readonly List<ChatMessage> context = [];
 
-    List<ChatMessage> context = [];
     public Copilot(string apiToken)
     {
         Initialised = apiToken.IsNotBlank();
@@ -84,6 +55,27 @@ I will now give some some information about the schema of the tables that you wi
 ");
     }
 
+    public bool Initialised { get; private set; }
+
+    public void RenderResponses(IKustoConsole console, params string[] roles)
+    {
+        foreach (var message in context)
+        {
+            if (roles.Length > 0 && !roles.Contains(message.role)) continue;
+            var color = message.role switch
+            {
+                Roles.User => ConsoleColor.Green,
+                Roles.Assistant => ConsoleColor.White,
+                Roles.System => ConsoleColor.Red,
+                Roles.Kql => ConsoleColor.Yellow,
+                _ => ConsoleColor.White
+            };
+            console.ForegroundColor = color;
+            console.WriteLine(message.content);
+            console.WriteLine();
+        }
+    }
+
 
     public async Task<string> Issue(string question)
     {
@@ -92,7 +84,7 @@ I will now give some some information about the schema of the tables that you wi
         {
             model = "gpt-4",
             messages = context
-                .Where(m=> m.role!= Roles.Kql)
+                .Where(m => m.role != Roles.Kql)
                 .Select(x => new { x.role, x.content }).ToArray()
         };
 
@@ -114,6 +106,16 @@ I will now give some some information about the schema of the tables that you wi
     private void AddCopilotResponse(string content) => AddMessage(Roles.Assistant, content);
     public void AddSystemInstructions(string content) => AddMessage(Roles.System, content);
 
+    public void AddResponse(string response) => AddMessage(Roles.Kql, response);
+
+    public static class Roles
+    {
+        public const string User = "user";
+        public const string Assistant = "assistant";
+        public const string System = "system";
+        public const string Kql = "kql";
+    }
+
 
     public readonly record struct ChatMessage(string role, string content);
 
@@ -124,13 +126,6 @@ I will now give some some information about the schema of the tables that you wi
 
     public class ChatChoice
     {
-        public ChatMessage message { get; set; } = new ChatMessage();
-    }
-
-    public bool Initialised { get; private set; }
-
-    public void AddResponse(string response)
-    {
-       AddMessage(Roles.Kql,response);
+        public ChatMessage message { get; set; } = new();
     }
 }

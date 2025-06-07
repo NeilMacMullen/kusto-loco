@@ -1,4 +1,4 @@
-﻿namespace lokqlDx;
+﻿namespace LokqlDx.Models;
 
 public enum YesNoCancel
 {
