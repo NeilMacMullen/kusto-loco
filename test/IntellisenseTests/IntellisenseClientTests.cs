@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AwesomeAssertions;
 using AwesomeAssertions.Extensions;
 using Intellisense;
-using Intellisense.Concurrency;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.Shares;
 using IntellisenseTests.Fixtures;
@@ -22,16 +21,15 @@ public class IntellisenseClientTests
         // integration test
         var provider = new MockedIoTestContainer();
 
-        provider.GetShareService = () =>
+        provider.GetShareService = cts =>
         {
-            var context = provider.GetRequiredService<CancellationContext>();
             var mock = new Mock<IShareService>();
             mock
                 .Setup(x => x.GetSharesAsync(It.IsAny<string>()))
                 .Returns(async (string delayMs) =>
                     {
                         var delay = int.Parse(delayMs);
-                        await Task.Delay(delay.Milliseconds(), context.TokenSource.Token);
+                        await Task.Delay(delay.Milliseconds(), cts.Token);
                         return [delayMs];
                     }
                 );

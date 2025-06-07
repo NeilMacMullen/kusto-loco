@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Intellisense.FileSystem;
 using Intellisense.FileSystem.Shares;
 using Jab;
@@ -12,6 +13,6 @@ namespace IntellisenseTests.Fixtures;
 [Scoped<IShareService>(Factory = nameof(GetShareService))]
 public partial class MockedIoTestContainer
 {
-    public Func<IShareService> GetShareService = Mock.Of<IShareService>;
+    public Func<CancellationTokenSource, IShareService> GetShareService = _ => Mock.Of<IShareService>();
     public Func<IFileSystemReader> GetFileSystemReader = Mock.Of<IFileSystemReader>;
 }
