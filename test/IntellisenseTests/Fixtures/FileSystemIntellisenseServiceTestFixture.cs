@@ -15,9 +15,11 @@ internal class FileSystemIntellisenseServiceTestFixture
         Dictionary<string, MockFileData> fileData
     )
     {
-        var provider = new MockFileSystemTestContainer();
-        var reader = (ProxyReader)provider.GetRequiredService<IFileSystemReader>();
-        reader.FileSystem = new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false });
+        var fs = new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false });
+        var reader = new FileSystemReader(fs);
+        var provider = new MockedIoTestContainer();
+        provider.GetFileSystemReader = () => reader;
+
         _fileSystemIntellisenseService = provider.GetRequiredService<IFileSystemIntellisenseService>();
     }
 
