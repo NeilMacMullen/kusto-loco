@@ -14,8 +14,12 @@
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\kql.ico" />
     <None Remove="IntellisenseFunctions.json" />
     <None Remove="IntellisenseOperators.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\kql.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IntellisenseFunctions.json" />

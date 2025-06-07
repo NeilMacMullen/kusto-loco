@@ -6,7 +6,7 @@
         xmlns:views="using:LokqlDx.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="LokqlDx.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/kql.ico"
         Title="{Binding WindowTitle, FallbackValue='lokqlDx'}"
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
         Background="{DynamicResource SystemAltMediumHighColor}"
