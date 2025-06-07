@@ -7,6 +7,7 @@ using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDx;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
@@ -36,17 +37,21 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel,
-        IntellisenseClient intellisenseClient
+        IntellisenseClient intellisenseClient,
+        ILogger<QueryEditorViewModel> logger
     )
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
         _intellisenseClient = intellisenseClient;
+        _logger = logger;
 
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
     }
+
+    public ILogger<QueryEditorViewModel> _logger { get; set; }
 
     public CommandParser Parser { get; set; } = new([], string.Empty);
 

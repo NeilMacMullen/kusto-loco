@@ -5,6 +5,7 @@ using AvaloniaEdit.CodeCompletion;
 using Intellisense;
 using lokqlDx;
 using LokqlDx.ViewModels;
+using Microsoft.Extensions.Logging;
 using NotNullStrings;
 
 namespace LokqlDx.Views;
@@ -28,15 +29,20 @@ public class CompletionManager : IDisposable
     }
 
     [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods")]
-    private async void Caret_PositionChanged(object? sender, EventArgs e)
+    // ReSharper disable once AsyncVoidMethod
+    private async void Caret_PositionChanged(object? sender, EventArgs eventArgs)
     {
         try
         {
             await _vm._intellisenseClient.CancelRequestAsync();
         }
-        catch (Exception)
+        catch (IntellisenseException exc)
         {
-            // ignored
+            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
+        }
+        catch (OperationCanceledException exc)
+        {
+            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
         }
     }
 
@@ -58,19 +64,18 @@ public class CompletionManager : IDisposable
         var result = CompletionResult.Empty;
         try
         {
-            // TODO: top level error handler or handle this properly with logger
             // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
             // and user profile app was started with if hosts don't show shares
             result = await _vm._intellisenseClient.GetCompletionResultAsync(path);
 
         }
-        catch (Exception e) when (e is IntellisenseException or OperationCanceledException)
+        catch (IntellisenseException exc)
         {
-            // ignored
+            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
         }
-        catch (Exception)
+        catch (OperationCanceledException exc)
         {
-            // ignored
+            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
         }
 
         if (!result.IsEmpty())
