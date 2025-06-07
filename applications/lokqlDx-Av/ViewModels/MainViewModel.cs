@@ -58,8 +58,8 @@ public partial class MainViewModel : ObservableObject
         WorkspaceManager workspaceManager,
         RegistryOperations registryOperations,
         IStorageProvider storage,
-        ILauncher launcher,
-        IntellisenseClient intellisenseClient
+        ILauncher launcher
+        //IntellisenseClient intellisenseClient
         )
     {
         _dialogService = dialogService;
@@ -83,6 +83,13 @@ public partial class MainViewModel : ObservableObject
             _kustoSettings,
             _commandProcessor,
             RenderingSurfaceViewModel);
+
+        // TODO: temp hack we want to properly integrate with the compile time DI container later
+        var intellisenseClient = new ServiceCollection()
+            .AddIntellisense()
+            .AddLogging()
+            .BuildServiceProvider()
+            .GetRequiredService<IntellisenseClient>();
 
         QueryEditorViewModel = new QueryEditorViewModel(_explorer, ConsoleViewModel
             ,intellisenseClient

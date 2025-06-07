@@ -13,12 +13,11 @@ public class CompletionManager
     private readonly TextEditor TextEditor;
     private readonly EditorHelper _editorHelper;
 
-    public CompletionManager(TextEditor editor,
+    public CompletionManager(AvaloniaEdit.TextEditor editor,
         EditorHelper editorHelper)
     {
         TextEditor = editor;
         _editorHelper = editorHelper;
-
     }
     private CompletionWindow? _completionWindow;
     private async Task<bool> ShowPathCompletions(QueryEditorViewModel vm)
@@ -41,7 +40,6 @@ public class CompletionManager
             // TODO: top level error handler or handle this properly with logger
             // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
             // and user profile app was started with if hosts don't show shares
-            // TODO: hook up IntellisenseClient.CancelAsync() to TextEditor.TextArea.Caret.PositionChanged (+ unsubscribe if necessary)
             result = await vm._intellisenseClient.GetCompletionResultAsync(path);
 
         }
@@ -148,6 +146,7 @@ public class CompletionManager
             ShowCompletions(
                 vm.KqlFunctionEntries,
                 string.Empty, 1);
+            return;
         }
     }
 
