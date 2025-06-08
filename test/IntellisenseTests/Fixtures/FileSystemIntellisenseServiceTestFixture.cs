@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
 using System.Threading.Tasks;
 using Intellisense;
 using Intellisense.FileSystem;
@@ -12,10 +13,12 @@ internal class FileSystemIntellisenseServiceTestFixture
     private readonly IFileSystemIntellisenseService _fileSystemIntellisenseService;
 
     public FileSystemIntellisenseServiceTestFixture(
-        Dictionary<string, MockFileData> fileData
+        List<string> data
     )
     {
-        var fs = new MockFileSystem(fileData, new MockFileSystemOptions { CreateDefaultTempDir = false });
+        // the type of MockData does not matter
+        var fsData = data.ToDictionary(x => x, _ => new MockFileData(""));
+        var fs = new MockFileSystem(fsData, new MockFileSystemOptions { CreateDefaultTempDir = false });
         var reader = new FileSystemReader(fs);
         var provider = new MockedIoTestContainer();
         provider.GetFileSystemReader = () => reader;

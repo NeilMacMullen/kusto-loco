@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using AwesomeAssertions;
@@ -16,10 +15,7 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_ExistentRootNonExistentChildDir_RetrievesSiblings()
     {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["/Folder1"] = new("")
-        };
+        var data = new List<string> { "/Folder1" };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
 
@@ -32,12 +28,12 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_ValidDirNoDirectorySeparator_RetrievesSiblings()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/File1.txt"] = new(""),
-            ["/Folder1/File1.txt"] = new(""),
-            ["/Folder1abc/File1.txt"] = new(""),
-            ["/Folder2/File1.txt"] = new("")
+            "/File1.txt",
+            "/Folder1/File1.txt",
+            "/Folder1abc/File1.txt",
+            "/Folder2/File1.txt"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -51,12 +47,12 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_RootWithDirSeparator_RetrievesChildren()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/File1.txt"] = new(""),
-            ["/File2.txt"] = new(""),
-            ["/Folder1/File1.txt"] = new(""),
-            ["/Folder2/File1.txt"] = new("")
+            "/File1.txt",
+            "/File2.txt",
+            "/Folder1/File1.txt",
+            "/Folder2/File1.txt"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -70,10 +66,10 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_PartialPathAtRoot_RetrievesRootChildren()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/File1.txt"] = new(""),
-            ["/Folder1"] = new("")
+            "/File1.txt",
+            "/Folder1"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -87,10 +83,7 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_NonexistentDirDirectorySeparatorSuffix_ReturnsEmptyResult()
     {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["/Folder1"] = new("")
-        };
+        var data = new List<string> { "/Folder1" };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
 
@@ -102,10 +95,10 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_ValidDirDirectorySeparatorSuffix_RetrievesChildren()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/Folder1/File1.txt"] = new(""),
-            ["/Folder2/File2.txt"] = new("")
+            "/Folder1/File1.txt",
+            "/Folder2/File2.txt"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -119,10 +112,10 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_PartialDir_RetrievesSiblings()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/Folder1"] = new(""),
-            ["/Folder2"] = new("")
+            "/Folder1",
+            "/Folder2"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -136,10 +129,10 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_PartialFile_RetrievesSiblings()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/Folder1/MyFile1.txt"] = new(""),
-            ["/Folder1/MyFile2.txt"] = new("")
+            "/Folder1/MyFile1.txt",
+            "/Folder1/MyFile2.txt"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -153,10 +146,10 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_PartialPath_RetrievesSiblings()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/File1.txt"] = new(""),
-            ["/Folder1"] = new("")
+            "/File1.txt",
+            "/Folder1"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
@@ -170,10 +163,7 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_NonexistentParent_ReturnsEmptyResult()
     {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["/Folder1"] = new("")
-        };
+        var data = new List<string> { "/Folder1" };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
         var result = await f.GetPathIntellisenseOptionsAsync("/Abc/Folder1");
@@ -184,10 +174,7 @@ public class FileSystemIntellisenseServiceTests
     [WindowsOnlyFact]
     public async Task GetPathIntellisenseOptions_NonexistentRootPath_ReturnsEmptyResult()
     {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["C:/Folder1"] = new("")
-        };
+        var data = new List<string> { "C:/Folder1" };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
         var result = await f.GetPathIntellisenseOptionsAsync("D:/");
@@ -198,10 +185,7 @@ public class FileSystemIntellisenseServiceTests
     [WindowsOnlyFact]
     public async Task GetPathIntellisenseOptions_NonexistentDirAndChild_ReturnsEmptyResult()
     {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["/Folder1"] = new("")
-        };
+        var data = new List<string> { "/Folder1" };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
         var result = await f.GetPathIntellisenseOptionsAsync("/Abc/def.txt");
@@ -212,12 +196,12 @@ public class FileSystemIntellisenseServiceTests
     [Fact]
     public async Task GetPathIntellisenseOptions_RootedRelativePath_RelativeChildren()
     {
-        var data = new Dictionary<string, MockFileData>
+        var data = new List<string>
         {
-            ["/File1.txt"] = new MockDirectoryData(),
-            ["/Folder2/File1.txt"] = new MockDirectoryData(),
-            ["/Folder1/Folder2/Folder3/Folder4"] = new MockDirectoryData(),
-            ["/Folder1/Folder2/File5.txt"] = new("")
+            "/File1.txt",
+            "/Folder2/File1.txt",
+            "/Folder1/Folder2/Folder3/Folder4",
+            "/Folder1/Folder2/File5.txt"
         };
 
         var f = new FileSystemIntellisenseServiceTestFixture(data);
