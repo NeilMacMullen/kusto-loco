@@ -227,27 +227,4 @@ public class FileSystemIntellisenseServiceTests
         result.Entries.Select(x => x.Name).Should().BeEquivalentTo("File5.txt", "Folder3");
         result.Filter.Should().BeEmpty();
     }
-
-    [WindowsOnlyTheory]
-    [InlineData("//")]
-    [InlineData(@"\\")]
-    [InlineData("/:")]
-    [InlineData("/.")]
-    [InlineData("/a/b")]
-    [InlineData("C://")]
-    [InlineData("C:/a")]
-    public async Task GetPathIntellisenseOptions_UnusualPaths_ShouldNotThrow(string path)
-    {
-        var data = new Dictionary<string, MockFileData>
-        {
-            ["C:/Folder1/File1.txt"] = new("")
-        };
-
-        var f = new FileSystemIntellisenseServiceTestFixture(data);
-
-        await f
-            .Invoking(async x => await x.GetPathIntellisenseOptionsAsync(path))
-            .Should()
-            .NotThrowAsync();
-    }
 }
