@@ -33,7 +33,8 @@ webview.NavigateToString(KustoResultRenderer.RenderToHtml(result)); //render cha
 ```
 
 If you just want to get started playing around with KQL on your own file-based data you can use the supplied [LokqlDX](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX) cross-platform application. 
-![image](https://github.com/user-attachments/assets/47060d5a-6f5a-440a-902c-8dc529d789b1)
+![image](https://github.com/user-attachments/assets/d9cd9dc7-e70e-40b7-b4fa-84f4b24488df)
+
 
 Kusto-Loco even comes with a Powershell module that allows you use KQL queries in a  Powershell pipeline.
 
