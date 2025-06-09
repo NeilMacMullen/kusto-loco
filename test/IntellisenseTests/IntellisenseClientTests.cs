@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using AwesomeAssertions;
 using AwesomeAssertions.Extensions;
 using Intellisense;
-using Intellisense.Concurrency;
 using Intellisense.FileSystem;
+using Intellisense.FileSystem.Shares;
 using IntellisenseTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -19,17 +19,29 @@ public class IntellisenseClientTests
     public async Task GetCompletionResults_BeforeRequestFinishes_IgnoresPreviousPendingRequest()
     {
         // integration test
-        var provider = new ServiceCollection()
-            .AddIntellisenseWithMockedIo()
-            .AddScoped<IFileSystemIntellisenseService, FakeFsIntellisense>()
-            .BuildServiceProvider();
+        var provider = new MockedIoTestContainer();
+
+        provider.GetShareService = cts =>
+        {
+            var mock = new Mock<IShareService>();
+            mock
+                .Setup(x => x.GetSharesAsync(It.IsAny<string>()))
+                .Returns(async (string delayMs) =>
+                    {
+                        var delay = int.Parse(delayMs);
+                        await Task.Delay(delay.Milliseconds(), cts.Token);
+                        return [delayMs];
+                    }
+                );
+            return mock.Object;
+        };
 
         var client = provider.GetRequiredService<IntellisenseClient>();
 
         var events = new ConcurrentQueue<string>();
 
-        var t1 = PushEvent("100");
-        var t2 = PushEvent("200");
+        var t1 = PushEvent("//100/");
+        var t2 = PushEvent("//200/");
 
         await FluentActions
             .Awaiting(async () => await Task.WhenAll(t1, t2))
@@ -50,17 +62,19 @@ public class IntellisenseClientTests
     [Fact]
     public async Task GetCompletionResultsAsync_WrapsGeneralExceptions()
     {
-        var mock = new Mock<IFileSystemIntellisenseService>();
-        mock.Setup(x => x.GetPathIntellisenseOptionsAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
-        var client = new ServiceCollection()
-            .AddIntellisenseWithMockedIo()
-            .AddScoped<IFileSystemIntellisenseService>(_ => mock.Object)
-            .BuildServiceProvider()
-            .GetRequiredService<IntellisenseClient>();
+        var container = new MockedIoTestContainer();
+        container.GetFileSystemReader = () =>
+        {
+            var mock = new Mock<IFileSystemReader>();
+            mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<Exception>();
+            return mock.Object;
+        };
+
+        var client = container.GetRequiredService<IntellisenseClient>();
 
 
         await client
-            .Awaiting(x => x.GetCompletionResultAsync("abcd"))
+            .Awaiting(x => x.GetCompletionResultAsync("/abcd"))
             .Should()
             .ThrowAsync<IntellisenseException>();
     }
@@ -68,34 +82,20 @@ public class IntellisenseClientTests
     [Fact]
     public async Task GetCompletionResultsAsync_DoesNotWrapOperationCanceledExceptions()
     {
-        var mock = new Mock<IFileSystemIntellisenseService>();
-        mock
-            .Setup(x => x.GetPathIntellisenseOptionsAsync(It.IsAny<string>()))
-            .ThrowsAsync(new OperationCanceledException());
-        var client = new ServiceCollection()
-            .AddIntellisenseWithMockedIo()
-            .AddScoped<IFileSystemIntellisenseService>(_ => mock.Object)
-            .BuildServiceProvider()
-            .GetRequiredService<IntellisenseClient>();
+        var container = new MockedIoTestContainer();
+        container.GetFileSystemReader = () =>
+        {
+            var mock = new Mock<IFileSystemReader>();
+            mock.Setup(x => x.GetChildren(It.IsAny<string>())).Throws<OperationCanceledException>();
+            return mock.Object;
+        };
+
+        var client = container.GetRequiredService<IntellisenseClient>();
 
 
         await client
-            .Awaiting(x => x.GetCompletionResultAsync("abcd"))
+            .Awaiting(x => x.GetCompletionResultAsync("/abcd"))
             .Should()
             .ThrowAsync<OperationCanceledException>();
-    }
-}
-
-file class FakeFsIntellisense(CancellationContext context) : IFileSystemIntellisenseService
-{
-    public async Task<CompletionResult> GetPathIntellisenseOptionsAsync(string delayMs)
-    {
-        var delay = int.Parse(delayMs);
-        await Task.Delay(delay.Milliseconds(), context.TokenSource.Token);
-
-        return new CompletionResult()
-        {
-            Entries = [new IntellisenseEntry() { Name = delayMs }]
-        };
     }
 }

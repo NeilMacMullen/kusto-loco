@@ -1,6 +1,6 @@
 ﻿namespace Intellisense.FileSystem.Paths;
 
-internal abstract class FileSystemPath(string value)
+public abstract class FileSystemPath(string value)
 {
     public virtual string Value => value;
     public abstract bool IsRootDirectory { get; }

@@ -10,7 +10,7 @@ public interface IIntellisenseService
     Task<CompletionResult> GetCompletionResultAsync(string input, CancellationToken cancellationToken);
 }
 
-internal class IntellisenseService(IServiceScopeFactory scopeFactory, ILogger<IntellisenseClient> logger)
+public class IntellisenseService(IServiceScopeFactory scopeFactory, ILogger<IntellisenseClient> logger)
     : IIntellisenseService
 {
     public async Task<CompletionResult> GetCompletionResultAsync(string input, CancellationToken cancellationToken)

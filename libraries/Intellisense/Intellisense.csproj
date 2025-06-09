@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Jab" />
       <PackageReference Include="Microsoft.Extensions.Hosting" />
       <PackageReference Include="Microsoft.Extensions.Logging" />
       <PackageReference Include="NotNullStrings" />
@@ -18,17 +19,6 @@
       <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
       <PackageReference Include="Vanara.Core" />
       <PackageReference Include="Vanara.PInvoke.NetApi32" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-        <_Parameter1>IntellisenseTests</_Parameter1>
-      </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <!-- Allow Moq to access internal methods -->
-            <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
-        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="Jab" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
@@ -29,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Intellisense\Intellisense.csproj" />
+    <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
   </ItemGroup>
 
 </Project>
