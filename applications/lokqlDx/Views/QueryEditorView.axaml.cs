@@ -2,6 +2,7 @@ using System.Xml;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Logging;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
@@ -14,14 +15,13 @@ namespace LokqlDx.Views;
 public partial class QueryEditorView : UserControl
 {
     private readonly EditorHelper _editorHelper;
-    private readonly CompletionManager _completionManager;
+    private CompletionManager? _completionManager;
 
 
     public QueryEditorView()
     {
         InitializeComponent();
         _editorHelper = new EditorHelper(TextEditor);
-        _completionManager = new CompletionManager(TextEditor, _editorHelper);
     }
 
     private QueryEditorViewModel GetVm() =>
@@ -44,7 +44,12 @@ public partial class QueryEditorView : UserControl
     }
 
     private async void TextArea_TextEntered(object? sender, TextInputEventArgs e)
-        => await _completionManager.HandleKeyDown(e, GetVm());
+    {
+        if (_completionManager is not null)
+        {
+            await _completionManager.HandleKeyDown(e);
+        }
+    }
 
     private void DragOver(object? sender, DragEventArgs drgevent)
         => DragDropManager.DragOver(drgevent);
@@ -62,6 +67,7 @@ public partial class QueryEditorView : UserControl
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm());
         TextEditor.TextArea.Focus();
     }
 }

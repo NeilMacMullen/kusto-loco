@@ -13,6 +13,7 @@ using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
@@ -59,8 +60,9 @@ public partial class MainViewModel : ObservableObject
         RegistryOperations registryOperations,
         IStorageProvider storage,
         ILauncher launcher,
-        IntellisenseClient intellisenseClient
-        )
+        IntellisenseClient intellisenseClient,
+        ILogger<QueryEditorViewModel> queryEditorLogger
+    )
     {
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
@@ -86,7 +88,7 @@ public partial class MainViewModel : ObservableObject
 
 
         QueryEditorViewModel = new QueryEditorViewModel(_explorer, ConsoleViewModel
-            ,intellisenseClient
+            ,intellisenseClient, queryEditorLogger
             );
         QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
     }

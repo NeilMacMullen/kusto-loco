@@ -1,33 +1,60 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Input;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using Intellisense;
 using lokqlDx;
 using LokqlDx.ViewModels;
+using Microsoft.Extensions.Logging;
 using NotNullStrings;
 
 namespace LokqlDx.Views;
 
-public class CompletionManager
+public class CompletionManager : IDisposable
 {
-    private readonly TextEditor TextEditor;
+    private readonly TextEditor _textEditor;
     private readonly EditorHelper _editorHelper;
-
-    public CompletionManager(AvaloniaEdit.TextEditor editor,
-        EditorHelper editorHelper)
-    {
-        TextEditor = editor;
-        _editorHelper = editorHelper;
-    }
+    private readonly QueryEditorViewModel _vm;
     private CompletionWindow? _completionWindow;
-    private async Task<bool> ShowPathCompletions(QueryEditorViewModel vm)
+
+    public CompletionManager(TextEditor editor,
+        EditorHelper editorHelper,
+        QueryEditorViewModel vm
+        )
     {
-        await Task.CompletedTask;
+        _textEditor = editor;
+        _editorHelper = editorHelper;
+        _vm = vm;
+        _textEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+    }
+
+    [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods")]
+    // ReSharper disable once AsyncVoidMethod
+    private async void Caret_PositionChanged(object? sender, EventArgs eventArgs)
+    {
+        try
+        {
+            await _vm._intellisenseClient.CancelRequestAsync();
+        }
+        catch (IntellisenseException exc)
+        {
+            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
+        }
+        catch (OperationCanceledException exc)
+        {
+            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
+        }
+    }
+
+
+
+    private async Task<bool> ShowPathCompletions()
+    {
         // Avoid unnecessary IO calls
         if (_completionWindow is not null) return false;
 
 
-        var path = vm.Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
+        var path = _vm.Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
 
         if (path.IsBlank()) return false;
 
@@ -37,19 +64,18 @@ public class CompletionManager
         var result = CompletionResult.Empty;
         try
         {
-            // TODO: top level error handler or handle this properly with logger
             // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
             // and user profile app was started with if hosts don't show shares
-            result = await vm._intellisenseClient.GetCompletionResultAsync(path);
+            result = await _vm._intellisenseClient.GetCompletionResultAsync(path);
 
         }
-        catch (Exception e) when (e is IntellisenseException or OperationCanceledException)
+        catch (IntellisenseException exc)
         {
-            // ignored
+            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
         }
-        catch (Exception)
+        catch (OperationCanceledException exc)
         {
-            // ignored
+            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
         }
 
         if (!result.IsEmpty())
@@ -75,7 +101,7 @@ public class CompletionManager
         if (!completions.Any())
             return;
 
-        _completionWindow = new CompletionWindow(TextEditor.TextArea)
+        _completionWindow = new CompletionWindow(_textEditor.TextArea)
         {
             CloseWhenCaretAtBeginning = true,
             MaxWidth = 200
@@ -88,7 +114,7 @@ public class CompletionManager
         onCompletionWindowDataPopulated?.Invoke(_completionWindow);
         _completionWindow?.Show();
     }
-    public async Task HandleKeyDown(TextInputEventArgs e,QueryEditorViewModel vm)
+    public async Task HandleKeyDown(TextInputEventArgs e)
     {
         if (_completionWindow != null && !_completionWindow.CompletionList.CurrentList.Any())
         {
@@ -96,7 +122,7 @@ public class CompletionManager
             // return;
         }
 
-        if (await ShowPathCompletions(vm))
+        if (await ShowPathCompletions())
             return;
 
         if (e.Text == ".")
@@ -105,7 +131,7 @@ public class CompletionManager
             var textToLeft = _editorHelper.TextToLeftOfCaret();
             if (textToLeft.TrimStart() == ".")
                 ShowCompletions(
-                    vm.InternalCommands,
+                    _vm.InternalCommands,
                     string.Empty, 0);
             return;
         }
@@ -113,8 +139,8 @@ public class CompletionManager
         if (e.Text == "|")
         {
             ShowCompletions(
-              
-                vm.KqlOperatorEntries,
+
+                _vm.KqlOperatorEntries,
                 " ", 0);
             return;
         }
@@ -122,7 +148,7 @@ public class CompletionManager
         if (e.Text == "@")
         {
             var blockText = _editorHelper.GetTextAroundCursor();
-              var columns = vm.SchemaIntellisenseProvider.GetColumns(blockText);
+              var columns = _vm.SchemaIntellisenseProvider.GetColumns(blockText);
               ShowCompletions(columns, string.Empty, 1);
             return;
         }
@@ -130,25 +156,30 @@ public class CompletionManager
         if (e.Text == "[")
         {
               var blockText = _editorHelper. GetTextAroundCursor();
-               var tables = vm.SchemaIntellisenseProvider.GetTables(blockText);
+               var tables = _vm.SchemaIntellisenseProvider.GetTables(blockText);
                ShowCompletions(tables, string.Empty, 1);
             return;
         }
 
         if (e.Text == "$")
         {
-            ShowCompletions(vm.SettingNames, string.Empty, 0);
+            ShowCompletions(_vm.SettingNames, string.Empty, 0);
             return;
         }
 
         if (e.Text == "?")
         {
             ShowCompletions(
-                vm.KqlFunctionEntries,
+                _vm.KqlFunctionEntries,
                 string.Empty, 1);
-            return;
         }
     }
 
 
+    public void Dispose()
+    {
+        _textEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
+        _completionWindow?.Close();
+
+    }
 }
