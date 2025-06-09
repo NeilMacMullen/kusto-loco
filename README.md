@@ -32,8 +32,8 @@ var datatable = result.ToDataTable(); // create a datatable to dump into a datag
 webview.NavigateToString(KustoResultRenderer.RenderToHtml(result)); //render chart
 ```
 
-If you just want to get started playing around with KQL on your own file-based data you can use the supplied [LokqlDX](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX) application. 
-![image](https://github.com/user-attachments/assets/5c1fd23c-a07a-4580-8695-79e45f301134)
+If you just want to get started playing around with KQL on your own file-based data you can use the supplied [LokqlDX](https://github.com/NeilMacMullen/kusto-loco/wiki/LokqlDX) cross-platform application. 
+![image](https://github.com/user-attachments/assets/47060d5a-6f5a-440a-902c-8dc529d789b1)
 
 Kusto-Loco even comes with a Powershell module that allows you use KQL queries in a  Powershell pipeline.
 
