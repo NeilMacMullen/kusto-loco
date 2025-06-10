@@ -90,6 +90,10 @@
                 <MenuItem Header="Quick start"
                           CommandParameter="LokqlDx-tutorial-‐-quick-start"
                           Command="{Binding NavigateToWikiCommand}" />
+                <MenuItem Header="Keyboard shortcuts"
+                          CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
+                          Command="{Binding NavigateToWikiCommand}" />
+
                 <MenuItem Header="Chart customisation"
                           Command="{Binding NavigateToWikiCommand}"
                           CommandParameter="ScottPlot-Chart-customisation" />
