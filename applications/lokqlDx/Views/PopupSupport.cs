@@ -1,8 +1,9 @@
-using System.Globalization;
-using System.Text;
+using DocumentFormat.OpenXml.Linq;
 using KustoLoco.Rendering.ScottPlot;
 using ScottPlot;
 using ScottPlot.Plottables;
+using System.Globalization;
+using System.Text;
 
 namespace LokqlDx.Views;
 
@@ -56,25 +57,27 @@ public class PopupSupport
         return PopupResult.None;
     }
 
-    private string GetXLabel(double x)
+    private string GetLabel(IAxis axis, double v)
     {
         //TODO - temporary implementation until fixed in ScottPlot
-        if (_plot.Axes.Bottom.TickGenerator is FixedDateTimeAutomatic)
-            return DateTime.FromOADate(x).ToString(); //TODO - get string format from kusto settings
-        //TODO - realy this needs to lookup the original value from the data source
-        //so that we can get non-numeric values like strings
-        return x.ToString(CultureInfo.InvariantCulture);
-    }
+        try
+        {
+            if (axis.TickGenerator is FixedDateTimeAutomatic)
+                return DateTime.FromOADate(v).ToString(); //TODO - get string format from kusto settings
+        }
+        catch 
+        {
+            //It's possible that the value is not a valid OLE Automation date
+        }
 
-    private string GetYLabel(double y)
-    {
-        //TODO - temporary implementation until fixed in ScottPlot
-        if (_plot.Axes.Left.TickGenerator is FixedDateTimeAutomatic)
-            return DateTime.FromOADate(y).ToString();//TODO - get string format from kusto settings
         //TODO - realy this needs to lookup the original value from the data source
         //so that we can get non-numeric values like strings
-        return y.ToString(CultureInfo.InvariantCulture);
+        return v.ToString(CultureInfo.InvariantCulture);
     }
+    
+    private string GetXLabel(double x) => GetLabel(_plot.Axes.Bottom, x);
+
+    private string GetYLabel(double y) => GetLabel(_plot.Axes.Left, y);
 
     internal PopupResult TryPopup(Coordinates coordinates)
     {
