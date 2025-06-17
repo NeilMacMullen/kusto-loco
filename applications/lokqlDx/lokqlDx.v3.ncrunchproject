@@ -1,0 +1,10 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <AdditionalFilesToIncludeForProject>
+      <Value>Assets\kql.ico</Value>
+      <Value>Views\*.axaml</Value>
+      <Value>*.xaml</Value>
+      <Value>Views\Dialogs\*.axaml</Value>
+    </AdditionalFilesToIncludeForProject>
+  </Settings>
+</ProjectConfiguration>

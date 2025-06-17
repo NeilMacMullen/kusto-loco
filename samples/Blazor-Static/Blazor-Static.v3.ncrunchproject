@@ -1,0 +1,7 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <CustomBuildProperties>
+      <Value>SelfContained = True</Value>
+    </CustomBuildProperties>
+  </Settings>
+</ProjectConfiguration>
