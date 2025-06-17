@@ -10,5 +10,5 @@ internal partial class UnaryMinusFunction
     private static long LongImpl(long a) => -a;
     private static double DoubleImpl(double a) => -a;
     private static decimal DecimalImpl(decimal a) => -a;
-    private static TimeSpan TsImp(TimeSpan a) => -a;
+    private static TimeSpan TsImpl(TimeSpan a) => -a;
 }

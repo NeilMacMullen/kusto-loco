@@ -126,7 +126,7 @@ internal static class BuiltInOperators
     {
         if (!TryGetOverload(symbol,resultType, arguments, out var overload))
             throw new NotImplementedException(
-                $"Operator {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
+                $"Operator {SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
 
         return overload!;
     }

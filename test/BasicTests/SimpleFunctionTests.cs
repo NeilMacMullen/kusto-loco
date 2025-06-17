@@ -1320,4 +1320,13 @@ print toscalar(letters | summarize mx=min(bitmap));";
         var result = await LastLineOfResult(query);
         result.Should().Be("3.14");
     }
+    
+    [TestMethod]
+    public async Task NegativeTimespan()
+    {
+        var query = "print result = -10d";
+        var result = await LastLineOfResult(query);
+        result.Should().StartWith("-10");
+    }
+
 }

@@ -15,5 +15,5 @@ internal partial class NotEqualFunction
     private static bool DtImpl(DateTime a, DateTime b) => a != b;
     private static bool StrImpl(string a, string b) => a != b;
     private static bool BoolImpl(bool a, bool b) => a != b;
-    private static bool GuilImpl(Guid a, Guid b) => a != b;
+    private static bool GuidImpl(Guid a, Guid b) => a != b;
 }
