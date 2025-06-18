@@ -7,11 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Kusto.Language" />
+  
     <PackageReference Include="Microsoft.PowerShell.SDK" />
-    <PackageReference Include="ScottPlot" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
     <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />

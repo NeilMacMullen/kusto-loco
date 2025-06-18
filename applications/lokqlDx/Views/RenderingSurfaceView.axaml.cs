@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
-using Kusto.Language.Utils;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using ScottPlot;
