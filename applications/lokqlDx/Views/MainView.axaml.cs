@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using LokqlDx.ViewModels;
-using SkiaSharp;
 using DependencyPropertyGenerator;
 
 namespace LokqlDx.Views;

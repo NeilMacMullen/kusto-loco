@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Linq;
 using KustoLoco.Rendering.ScottPlot;
 using ScottPlot;
 using ScottPlot.Plottables;

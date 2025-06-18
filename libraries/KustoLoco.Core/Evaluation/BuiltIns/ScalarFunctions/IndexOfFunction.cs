@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Tracing;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

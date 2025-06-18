@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
+    <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

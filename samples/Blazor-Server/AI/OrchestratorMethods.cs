@@ -2,7 +2,6 @@ using Microsoft.Extensions.AI;
 using Newtonsoft.Json;
 using OpenAI;
 using Azure.AI.OpenAI;
-using Azure.Identity;
 using KustoLoco.Services;
 using System.ClientModel;
 using System.Collections.Generic;

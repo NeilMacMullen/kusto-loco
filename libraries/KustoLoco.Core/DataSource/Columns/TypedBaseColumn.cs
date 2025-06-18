@@ -1,6 +1,5 @@
 ﻿using Kusto.Language.Syntax;
 using KustoLoco.Core.Util;
-using NetTopologySuite.Index.HPRtree;
 using System;
 
 namespace KustoLoco.Core.DataSource.Columns;

@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using DocumentFormat.OpenXml.Linq;
 using KustoLoco.Core.Settings;
 
 namespace Lokql.Engine.Commands;
