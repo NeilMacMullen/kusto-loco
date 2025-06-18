@@ -37,10 +37,6 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="AvaloniaEdit.TextMate" />
-    <PackageReference Include="Avalonia.Xaml.Interactivity" />
-    <PackageReference Include="Avalonia.Xaml.Interactions" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" />
-    <PackageReference Include="Avalonia.Xaml.Interactions.Events" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="Clowd.Clipboard.Avalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
@@ -57,6 +53,7 @@
     <PackageReference Include="MessageBox.Avalonia" />
     <PackageReference Include="DependencyPropertyGenerator" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Xaml.Behaviors.Avalonia" />
   </ItemGroup>
 
   <ItemGroup>
