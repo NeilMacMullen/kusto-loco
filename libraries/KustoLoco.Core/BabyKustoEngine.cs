@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;
@@ -86,7 +85,7 @@ public class BabyKustoEngine
         var state = GlobalState.Default
             .WithFunctions(allSupported);
 
-        var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).ToArray());
+        var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).Cast<Symbol>().ToArray());
 
         var globals = state.WithDatabase(db);
 

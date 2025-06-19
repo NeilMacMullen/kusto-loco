@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;

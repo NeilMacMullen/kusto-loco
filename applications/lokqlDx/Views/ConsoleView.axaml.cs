@@ -1,10 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Xaml.Interactions.Custom;
-using CommunityToolkit.Mvvm.ComponentModel;
-using LokqlDx.ViewModels;
 using System.Globalization;
 
 namespace LokqlDx.Views;

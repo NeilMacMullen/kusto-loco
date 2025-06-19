@@ -50,7 +50,7 @@ public class JsonObjectArraySerializer : ITableSerializer
         {
             var s = new OrderedDictionary();
             foreach (var k in d.Keys)
-                if (d[k] is JsonElement e && e.ValueKind == JsonValueKind.Array)
+                if (d[k] is JsonElement { ValueKind: JsonValueKind.Array } e)
                     s[k] = string.Join(";", e.EnumerateArray().Select(i => i.ToString()));
                 else
                     s[k] = d[k]?.ToString() ?? string.Empty;

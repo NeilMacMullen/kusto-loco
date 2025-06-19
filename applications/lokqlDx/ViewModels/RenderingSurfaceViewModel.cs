@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
 using lokqlDx;
@@ -12,6 +11,8 @@ namespace LokqlDx.ViewModels;
 public partial class RenderingSurfaceViewModel : ObservableObject, IResultRenderingSurface
 {
     private readonly KustoSettingsProvider _kustoSettings;
+
+    [ObservableProperty] private int _activeTab;
     [ObservableProperty] private List<string> _columns = [];
 
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
@@ -22,8 +23,6 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     [ObservableProperty] private ObservableCollection<Row> _results = [];
     [ObservableProperty] private bool _showDataGridSizeWarning;
 
-    [ObservableProperty] private int _activeTab;
-
     public RenderingSurfaceViewModel(KustoSettingsProvider kustoSettings)
     {
         _kustoSettings = kustoSettings;
@@ -33,14 +32,9 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     {
         await RenderTable(result);
         _plotter.RenderToDisplay(result, _kustoSettings);
-        if (result.IsChart)
-        {
-            ActiveTab = 1; //show the plot tab
-        }
-        else
-        {
-            ActiveTab = 0; //show the table tab
-        }
+        ActiveTab = result.IsChart
+            ? 1 //show the plot tab
+            : 0; //show the table tab
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
@@ -81,7 +75,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
     internal void SetUiPreferences(UIPreferences uiPreferences) => FontSize = uiPreferences.FontSize;
 
-    internal void Clear() => Results?.Clear();
+    internal void Clear() => Results.Clear();
 
     public void RegisterHost(IScottPlotHost plotter) => _plotter = plotter;
 

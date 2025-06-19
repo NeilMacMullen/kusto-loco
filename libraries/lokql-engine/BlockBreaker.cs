@@ -12,7 +12,7 @@ namespace Lokql.Engine;
 /// </remarks>
 public class BlockBreaker
 {
-    public string[] Blocks = [];
+    public string[] Blocks;
 
     public BlockBreaker(string block)
     {

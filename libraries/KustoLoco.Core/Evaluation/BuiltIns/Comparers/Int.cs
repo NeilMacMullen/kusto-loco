@@ -8,47 +8,23 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal class IntAscNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((int)a).CompareTo((int)b);
+        GenericComparer.CompareT<int>(a, b, true, true);
 }
 
 internal class IntAscNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((int)a).CompareTo((int)b);
+        GenericComparer.CompareT<int>(a, b, true, false);
 }
 
 internal class IntDescNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((int)b).CompareTo((int)a);
+        GenericComparer.CompareT<int>(a, b, false, true);
 }
 
 internal class IntDescNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((int)b).CompareTo((int)a);
+        GenericComparer.CompareT<int>(a, b, false, false);
 }

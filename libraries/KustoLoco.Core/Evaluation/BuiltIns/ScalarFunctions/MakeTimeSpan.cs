@@ -6,7 +6,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal partial class MakeTimeSpan
 {
     internal static TimeSpan Impl(long day, long hour, long minute, double second)
-        => new TimeSpan((int)day, (int)hour,
+        => new((int)day, (int)hour,
             (int)minute, (int)second);
 
     internal static TimeSpan AImpl(long hour, long minute,double second)

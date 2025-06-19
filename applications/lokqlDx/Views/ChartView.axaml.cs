@@ -106,7 +106,7 @@ public partial class ChartView : UserControl, IScottPlotHost
                 var bytes = PlotControl.Plot.GetImageBytes(width, height, ImageFormat.Png);
 
                 using var memoryStream = new MemoryStream(bytes);
-                Avalonia.Media.Imaging.Bitmap bitmap = new Bitmap(memoryStream);
+                var bitmap = new Bitmap(memoryStream);
                 ClipboardAvalonia.SetImage(bitmap);
             }
             catch { }

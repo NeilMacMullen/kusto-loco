@@ -17,7 +17,7 @@ public class NullTableSource : ITableSource
 {
     public static readonly NullTableSource Instance = new();
     public TableSymbol Type { get; } = TableSymbol.Empty;
-    public IEnumerable<ITableChunk> GetData() => Array.Empty<ITableChunk>();
+    public IEnumerable<ITableChunk> GetData() => [];
 
     public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
         => AsyncEnumerable.Empty<ITableChunk>();

@@ -3829,7 +3829,7 @@ aaathis is a test";
     {
         var engine = BabyKustoEngine.CreateForTest();
         var result = (TabularResult)engine.Evaluate(
-            Array.Empty<ITableSource>(), query);
+            [], query);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
@@ -4048,7 +4048,7 @@ aaathis is a test";
     {
         var engine = BabyKustoEngine.CreateForTest();
         var query = "print X=1 | render barchart with (legend=visible,ymax=100)";
-        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query);
+        var result = (TabularResult)engine.Evaluate([], query);
         var vis = result.VisualizationState;
         vis.ChartType.Should().Be("barchart");
         vis.Properties["legend"].Should().Be("visible");
@@ -4060,7 +4060,7 @@ aaathis is a test";
     {
         var engine = BabyKustoEngine.CreateForTest();
         var query = "print X=1";
-        var result = (TabularResult)engine.Evaluate(Array.Empty<ITableSource>(), query);
+        var result = (TabularResult)engine.Evaluate([], query);
         var vis = result.VisualizationState;
         vis.Should().Be(VisualizationState.Empty);
     }

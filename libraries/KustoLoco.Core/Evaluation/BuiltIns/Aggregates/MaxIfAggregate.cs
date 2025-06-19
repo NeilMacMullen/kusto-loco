@@ -29,7 +29,7 @@ internal partial class MaxIfAggregate
     }
 
     internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (long)context.LongValue;
+        => context.Count == 0 ? null : context.LongValue;
 
     internal static double DoubleImpl(NumericAggregate context, double n, bool t)
     {
@@ -65,7 +65,7 @@ internal partial class MaxIfAggregate
     }
 
     internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan((long)context.LongValue);
+        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
 
     internal static DateTime DtImpl(NumericAggregate context, TimeSpan n, bool t)
     {
@@ -77,5 +77,5 @@ internal partial class MaxIfAggregate
     }
 
     internal static DateTime? DtImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new DateTime((long)context.LongValue, DateTimeKind.Utc);
+        => context.Count == 0 ? null : new DateTime(context.LongValue, DateTimeKind.Utc);
 }

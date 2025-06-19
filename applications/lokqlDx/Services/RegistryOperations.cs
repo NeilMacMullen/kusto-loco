@@ -35,7 +35,7 @@ public class RegistryOperations
         try
         {
             const string progId = "kustoloco.lokqldx";
-            var exe = Process.GetCurrentProcess()?.MainModule?.FileName ?? string.Empty;
+            var exe = Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty;
 
             Registry.SetValue($@"HKEY_CURRENT_USER\Software\Classes\{progId}\shell\open\command",
                 null,

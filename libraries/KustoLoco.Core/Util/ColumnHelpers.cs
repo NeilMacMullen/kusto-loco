@@ -211,7 +211,7 @@ public static class ColumnHelpers
     {
         //TODO - packing the offset and length into a mapping array is just a bit of 
         //a hack to make the internal API easier
-        return MapColumn([other], [..new[] { offset, length }],
+        return MapColumn([other], [offset, length],
             MappingType.Chunk);
     }
 

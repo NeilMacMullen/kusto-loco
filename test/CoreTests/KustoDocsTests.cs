@@ -94,7 +94,7 @@ d
     {
         var engine = BabyKustoEngine.CreateForTest();
         var result = (TabularResult?)engine.Evaluate(
-            Array.Empty<ITableSource>(),
+            [],
             query);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();

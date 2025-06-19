@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using AvaloniaEdit.Highlighting.Xshd;
 using AvaloniaEdit.Highlighting;
 using System.Xml;

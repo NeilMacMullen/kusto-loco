@@ -18,7 +18,7 @@ public static class Tabulator
             .JoinString(" | ");
         sb.AppendLine(header);
         sb.AppendLine(headerArray.Select((_, n) => "".PadRight(colWidths[n],'-'))
-            .JoinString("-|-")); ;
+            .JoinString("-|-"));
         foreach (var i in items)
         {
             var line =columns.Select((c,n)=> c(i).PadRight(colWidths[n]))

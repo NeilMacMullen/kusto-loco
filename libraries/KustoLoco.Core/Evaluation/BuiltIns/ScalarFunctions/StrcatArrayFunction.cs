@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;

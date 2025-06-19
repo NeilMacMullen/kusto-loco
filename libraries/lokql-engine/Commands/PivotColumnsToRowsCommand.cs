@@ -11,7 +11,7 @@ public static class PivotColumnsToRowsCommand
     {
         var exp = econtext.Explorer;
         var result = exp._resultHistory.Fetch(o.ResultName);
-        var specialColumns = o.Columns.Select(GetColumnIndex).ToArray()!;
+        var specialColumns = o.Columns.Select(GetColumnIndex).ToArray();
         var boringColumns = Enumerable.Range(0, result.ColumnCount).Except(specialColumns)
             .ToArray();
         if (specialColumns.Any(i => i < 0))

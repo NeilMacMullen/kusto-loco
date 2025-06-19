@@ -94,7 +94,7 @@ I will now give some some information about the schema of the tables that you wi
         var responseString = await response.Content.ReadAsStringAsync();
         var responseDto = JsonSerializer.Deserialize<ChatResponse>(responseString);
         await response.Content.ReadFromJsonAsync<ChatResponse>();
-        var assistanceResponse = responseDto?.choices?.FirstOrDefault()?.message.content ?? string.Empty;
+        var assistanceResponse = responseDto?.choices.FirstOrDefault()?.message.content ?? string.Empty;
         AddCopilotResponse(assistanceResponse);
         return assistanceResponse;
     }

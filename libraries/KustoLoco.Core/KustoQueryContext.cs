@@ -38,7 +38,7 @@ public class KustoQueryContext
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
 
     private List<ITableSource> _tables = [];
-    private KustoSettingsProvider _settings=new KustoSettingsProvider();
+    private KustoSettingsProvider _settings=new();
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
 

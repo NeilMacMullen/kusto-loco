@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+﻿namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation(Keyword = "Functions.ToHex")]
 internal partial class ToHexFunction

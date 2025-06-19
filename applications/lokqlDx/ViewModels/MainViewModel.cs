@@ -5,14 +5,12 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intellisense;
-using Intellisense.Configuration;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NotNullStrings;
 
@@ -390,7 +388,7 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveWorkspace(string path)
     {
-        _workspaceManager.Save(path, CurrentWorkspace!);
+        _workspaceManager.Save(path, CurrentWorkspace);
         UpdateMostRecentlyUsed(path);
     }
 
@@ -462,8 +460,8 @@ public partial class MainViewModel : ObservableObject
         ui.WindowTop = WindowPosition.Y;
         ui.WindowWidth = WindowSize.Width;
         ui.WindowHeight = WindowSize.Height;
-        ui.AvGridRowSerialization = ColumnDefinitions!.ToString().Tokenize(",");
-        ui.AvGridColumnSerialization = RowDefinitions!.ToString().Tokenize(",");
+        ui.AvGridRowSerialization = ColumnDefinitions.ToString().Tokenize(",");
+        ui.AvGridColumnSerialization = RowDefinitions.ToString().Tokenize(",");
         _preferencesManager.SaveUiPrefs();
     }
 }

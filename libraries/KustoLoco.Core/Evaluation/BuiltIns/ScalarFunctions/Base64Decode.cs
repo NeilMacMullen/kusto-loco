@@ -9,7 +9,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl
         {
             try
             {
-                return System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(base64));
+                return System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64));
             }
             catch (Exception)
             {

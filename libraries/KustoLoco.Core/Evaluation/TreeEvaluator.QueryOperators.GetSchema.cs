@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Linq;
-using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;

@@ -169,7 +169,7 @@ tr:nth-child(odd) {
         //check for case where we are trying to draw "true" barchart oriented horizontally
         var ytype =b._builder.Get("encoding.y.type","");
         if (ytype != "nominal")
-            b._builder.Set($"encoding.x.type", "ordinal");
+            b._builder.Set("encoding.x.type", "ordinal");
     }
 
     private static void MakeColumnChart(KustoQueryResult result, VegaChart b)

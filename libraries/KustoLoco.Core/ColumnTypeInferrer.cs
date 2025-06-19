@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Globalization;
-using KustoLoco.Core;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource.Columns;
-using NLog;
 
 namespace KustoLoco.Core;
 
 
 /// <summary>
-/// Tries to infer the type of a column based on its contents
+/// Tries to infer the type of the column based on its contents
 /// </summary>
 /// <remarks>
 /// Inferring the type is error-prone. Excel is infamous for example, for turning things that look like
@@ -18,17 +16,16 @@ namespace KustoLoco.Core;
 /// </remarks>
 public static class ColumnTypeInferrer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private static readonly TypeTrier [] TypeTriers =
     [
         //don't bother with int .... Kusto is natively "long"
         //so this would just lead to excessive casts
-        new TypeTrier(typeof(long), s => (long.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
-        new TypeTrier(typeof(double), s => (s.Length <=17 || s.Contains('.')) && double.TryParse(s, CultureInfo.InvariantCulture, out var i) ? (true,i) :(false,0)),
-        new TypeTrier(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
-        new TypeTrier(typeof(Guid), s => (Guid.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
-        new TypeTrier(typeof(TimeSpan), s => (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
-        new TypeTrier(typeof(bool), s => (bool.TryParse(s, out var i), i))
+        new(typeof(long), s => (long.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new(typeof(double), s => (s.Length <=17 || s.Contains('.')) && double.TryParse(s, CultureInfo.InvariantCulture, out var i) ? (true,i) :(false,0)),
+        new(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new(typeof(Guid), s => (Guid.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new(typeof(TimeSpan), s => (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new(typeof(bool), s => (bool.TryParse(s, out var i), i))
     ];
     
     public static BaseColumn AutoInfer(BaseColumn source)

@@ -43,7 +43,7 @@ internal class IRPreEvaluatedScalarExpressionNode : IRExpressionNode
         _data = data;
     }
 
-    private object? _data;
+    private readonly object? _data;
 
     public override int ChildCount => 0;
 

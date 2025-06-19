@@ -64,5 +64,5 @@ internal partial class SumIfAggregate
     }
 
     internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan((long)context.LongValue);
+        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
 }
