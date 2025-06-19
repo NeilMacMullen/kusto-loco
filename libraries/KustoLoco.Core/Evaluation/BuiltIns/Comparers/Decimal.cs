@@ -8,47 +8,23 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal class DecimalAscNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((decimal)a).CompareTo((decimal)b);
+        GenericComparer.CompareT<decimal>(a, b, true, true);
 }
 
 internal class DecimalAscNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((decimal)a).CompareTo((decimal)b);
+        GenericComparer.CompareT<decimal>(a, b, true, false);
 }
 
 internal class DecimalDescNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((decimal)b).CompareTo((decimal)a);
+        GenericComparer.CompareT<decimal>(a, b, false, true);
 }
 
 internal class DecimalDescNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((decimal)b).CompareTo((decimal)a);
+        GenericComparer.CompareT<decimal>(a, b, false, false);
 }

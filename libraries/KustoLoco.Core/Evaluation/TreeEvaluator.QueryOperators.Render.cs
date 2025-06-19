@@ -1,10 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
-using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 namespace KustoLoco.Core.Evaluation;

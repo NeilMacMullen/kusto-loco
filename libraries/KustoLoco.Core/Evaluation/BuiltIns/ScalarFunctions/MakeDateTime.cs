@@ -7,7 +7,7 @@ internal partial class MakeDateTime
 {
 
     internal static DateTime Impl(long year,long month,long day,long hour,long minute,double second)
-        => new DateTime((int)year,(int)month,(int)day, (int)hour,
+        => new((int)year,(int)month,(int)day, (int)hour,
             (int)minute,(int)second, DateTimeKind.Utc);
 
     internal static DateTime AImpl(long year, long month, long day, long hour, long minute)

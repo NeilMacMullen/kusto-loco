@@ -14,7 +14,6 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KustoLoco.Core;
 

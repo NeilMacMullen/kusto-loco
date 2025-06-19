@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;

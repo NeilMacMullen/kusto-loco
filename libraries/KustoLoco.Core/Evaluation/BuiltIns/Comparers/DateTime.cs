@@ -9,47 +9,23 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal class DateTimeAscNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((DateTime)a).CompareTo((DateTime)b);
+        GenericComparer.CompareT<DateTime>(a, b, true, true);
 }
 
 internal class DateTimeAscNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((DateTime)a).CompareTo((DateTime)b);
+        GenericComparer.CompareT<DateTime>(a, b, true, false);
 }
 
 internal class DateTimeDescNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((DateTime)b).CompareTo((DateTime)a);
+        GenericComparer.CompareT<DateTime>(a, b, false, true);
 }
 
 internal class DateTimeDescNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((DateTime)b).CompareTo((DateTime)a);
+        GenericComparer.CompareT<DateTime>(a, b, false, false);
 }

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Text;
-using System.Text.Unicode;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 // ReSharper disable PartialTypeWithSinglePart
@@ -15,7 +14,7 @@ internal partial class IsAsciiFunction
 [KustoImplementation(Keyword = "Functions.Reverse")]
 internal partial class ReverseFunction
 {
-    internal static string Impl(string s) => new string(s.Reverse().ToArray());
+    internal static string Impl(string s) => new(s.Reverse().ToArray());
 }
 
 [KustoImplementation(Keyword = "Functions.IsUtf8")]

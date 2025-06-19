@@ -1,6 +1,5 @@
 ﻿using System;
 using Kusto.Language.Symbols;
-using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.DataSource.Columns;
 

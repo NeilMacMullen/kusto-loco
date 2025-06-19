@@ -1,6 +1,4 @@
-﻿using Kusto.Language.Syntax;
-using KustoLoco.Core.Util;
-using System;
+﻿using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.DataSource.Columns;
 

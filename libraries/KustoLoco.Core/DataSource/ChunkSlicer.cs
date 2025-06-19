@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using KustoLoco.Core.Util;
-using NLog;
 
 namespace KustoLoco.Core.DataSource;
 

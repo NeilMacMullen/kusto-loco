@@ -9,47 +9,23 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal class TimeSpanAscNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((TimeSpan)a).CompareTo((TimeSpan)b);
+        GenericComparer.CompareT<TimeSpan>(a, b, true, true);
 }
 
 internal class TimeSpanAscNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((TimeSpan)a).CompareTo((TimeSpan)b);
+        GenericComparer.CompareT<TimeSpan>(a, b, true, false);
 }
 
 internal class TimeSpanDescNullsFirstComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? -1
-                : b == null
-                    ? 1
-                    : ((TimeSpan)b).CompareTo((TimeSpan)a);
+        GenericComparer.CompareT<TimeSpan>(a, b, false, true);
 }
 
 internal class TimeSpanDescNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        (a == null && b == null)
-            ? 0
-            : a == null
-                ? 1
-                : b == null
-                    ? -1
-                    : ((TimeSpan)b).CompareTo((TimeSpan)a);
+        GenericComparer.CompareT<TimeSpan>(a, b, true, false);
 }
