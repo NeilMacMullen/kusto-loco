@@ -5,10 +5,10 @@ namespace KustoLoco.Models
     public class KustoLocoSettingsModel
     {
         [JsonPropertyName("OpenAIServiceOptions")]
-        public OpenAIServiceOptions OpenAIServiceOptions { get; set; } = new OpenAIServiceOptions();
+        public OpenAIServiceOptions OpenAIServiceOptions { get; set; } = new();
 
         [JsonPropertyName("ApplicationSettings")]
-        public ApplicationSettings ApplicationSettings { get; set; } = new ApplicationSettings();
+        public ApplicationSettings ApplicationSettings { get; set; } = new();
     }
 
     public class OpenAIServiceOptions

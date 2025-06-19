@@ -186,11 +186,11 @@ but you can change this and rerun the query or use the CoPilot button for assist
             string schema = "";
             var sb = new StringBuilder();
 
-            foreach (var table in kustoContext.Tables())
+            foreach (var contextTable in kustoContext.Tables())
             {
-                sb.AppendLine($"The table named '{table.Name}' has the following columns");
+                sb.AppendLine($"The table named '{contextTable.Name}' has the following columns");
 
-                var cols = table.ColumnNames.Zip(table.Type.Columns)
+                var cols = contextTable.ColumnNames.Zip(contextTable.Type.Columns)
                     .Select(z => $"  {z.First} is of type {z.Second.Type.Name}")
                     .ToArray();
 

@@ -8,7 +8,6 @@ internal class ColumnIfExistsFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var columnName = arguments[0];
         throw new NotImplementedException();
     }
 }

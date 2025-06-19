@@ -68,7 +68,7 @@ internal class IrNodeVisualizer(IKustoConsole console)
                 _ => ConsoleColor.Gray
             };
             console.ForegroundColor = c;
-            console.WriteLine(node.ToString().NullToEmpty()!);
+            console.WriteLine(node.ToString().NullToEmpty());
         }
         finally
         {
@@ -77,7 +77,7 @@ internal class IrNodeVisualizer(IKustoConsole console)
 
         indent += isLast ? "   " : " | ";
 
-        for (var i = 0; i < node!.ChildCount; i++)
+        for (var i = 0; i < node.ChildCount; i++)
         {
             var child = node.GetChild(i);
             DumpTreeInternal(child, indent, i == node.ChildCount - 1);

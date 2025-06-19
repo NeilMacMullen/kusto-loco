@@ -31,31 +31,27 @@ public class AdxLoader
             .WithAadUserPromptAuthentication();
 
 
-        using (var kustoClient = KustoClientFactory.CreateCslQueryProvider(kcsb))
+        using var kustoClient = KustoClientFactory.CreateCslQueryProvider(kcsb);
+        using var response = kustoClient.ExecuteQuery(database, query, null);
+        var table = TableLoaderFromIDataReader.LoadTable("result", response)
+            as InMemoryTableSource;
+        var vs = VisualizationState.Empty;
+        if (response.NextResult())
         {
-            using (var response = kustoClient.ExecuteQuery(database, query, null))
-            {
-                var table = TableLoaderFromIDataReader.LoadTable("result", response)
-                    as InMemoryTableSource;
-                var vs = VisualizationState.Empty;
-                if (response.NextResult())
-                {
-                    response.Read();
+            response.Read();
 
-                    var data = response.GetString(0);
-                    var d = JsonSerializer.Deserialize<Dictionary<string, object>>(data)!;
-                    var ct = d.GetValueOrDefault("Visualization", "");
-                    var v = ct.ToString().NullToEmpty();
-                    var id = d.ToImmutableDictionary(kv => kv.Key, kv => kv.Value.ToString().NullToEmpty()!);
-                    vs = new VisualizationState(v, id);
-                }
-
-                var res = new KustoQueryResult(query, table!,
-                    vs,
-                    TimeSpan.Zero, string.Empty);
-                return await Task.FromResult(res);
-            }
+            var data = response.GetString(0);
+            var d = JsonSerializer.Deserialize<Dictionary<string, object>>(data)!;
+            var ct = d.GetValueOrDefault("Visualization", "");
+            var v = ct.ToString().NullToEmpty();
+            var id = d.ToImmutableDictionary(kv => kv.Key, kv => kv.Value.ToString().NullToEmpty()!);
+            vs = new VisualizationState(v, id);
         }
+
+        var res = new KustoQueryResult(query, table!,
+            vs,
+            TimeSpan.Zero, string.Empty);
+        return await Task.FromResult(res);
     }
 
     private static VisualizationState StateFromBinaryData(BinaryData viz)

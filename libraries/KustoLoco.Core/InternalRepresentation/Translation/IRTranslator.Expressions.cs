@@ -76,7 +76,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var str1 = new IRPreEvaluatedScalarExpressionNode(ja, DynamicArraySymbol.From("dynamic"));
-        var irArguments = new[] { parameterExpression!, str1! };
+        var irArguments = new[] { parameterExpression, str1 };
         var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
             node.ResultType,irArguments);
         return new IRBuiltInScalarFunctionCallNode(signature,

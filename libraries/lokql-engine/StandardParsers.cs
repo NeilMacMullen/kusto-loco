@@ -27,7 +27,7 @@ public static class ParserExtensions
         Func<T, Task> action)
     {
         var result = await resultTask;
-        if (result is Parsed<object> parsed && parsed.Value is T value)
+        if (result is Parsed<object> { Value: T value })
         {
             await action(value);
         }

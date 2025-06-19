@@ -54,9 +54,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
 
     private static string GetResult(Regex regex, long? captureGroup, string? input)
     {
-        if (captureGroup.HasValue &&
-            captureGroup.Value >= int.MinValue &&
-            captureGroup.Value <= int.MaxValue)
+        if (captureGroup is >= int.MinValue and <= int.MaxValue)
         {
             var captureGroupVal = (int)captureGroup.Value;
             var match = regex.Match(input ?? string.Empty);

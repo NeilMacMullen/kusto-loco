@@ -55,7 +55,7 @@ public class IndirectTests
     public void MappedIndirectionFlattens()
     {
         var backing = MakeDecimatedColumn(100);
-        var flattened = ColumnHelpers.MapColumn(backing, [..new[] { 0, 1 }]) as MappedColumn<string>;
+        var flattened = ColumnHelpers.MapColumn(backing, [0, 1]) as MappedColumn<string>;
         flattened!.RowCount.Should().Be(2);
         flattened.IndirectIndex(0).Should().Be(backing.IndirectIndex(0));
         flattened.IndirectIndex(1).Should().Be(backing.IndirectIndex(1));
@@ -65,7 +65,7 @@ public class IndirectTests
     public void IndirectingSingleValueColumnReturnsSingleValue()
     {
         var sv = new SingleValueColumn<string>("HELLO", 100);
-        var second = ColumnHelpers.MapColumn(sv, [..new[] { 0, 1 }]);
+        var second = ColumnHelpers.MapColumn(sv, [0, 1]);
         second.GetType().Should().Be(typeof(SingleValueColumn<string>));
         second.RowCount.Should().Be(2);
         second.GetRawDataValue(0).Should().Be("HELLO");

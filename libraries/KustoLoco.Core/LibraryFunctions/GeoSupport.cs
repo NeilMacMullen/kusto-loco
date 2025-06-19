@@ -6,8 +6,8 @@ namespace KustoLoco.Core.LibraryFunctions;
 public static class GeoSupport
 {
     private static bool CheckValid(double? lon1, double? lat1)
-        => lon1.HasValue && lon1.Value >= -180 && lon1.Value <= 180 &&
-           lat1.HasValue && lat1.Value >= -90 && lat1.Value <= 90;
+        => lon1 is >= -180 and <= 180 &&
+           lat1 is >= -90 and <= 90;
 
     private static double ToRadians(double degrees)
         => degrees * Math.PI / 180;
@@ -45,7 +45,7 @@ public static class GeoSupport
         var geohasher = new Geohasher();
 
         // Encode latitude and longitude into a geohash string
-        return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution!.Value);
+        return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution.Value);
     }
 
     public static (double Latitude, double Longitude) GeoHashCentralPoint(string point)

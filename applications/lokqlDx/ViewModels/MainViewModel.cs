@@ -388,7 +388,7 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveWorkspace(string path)
     {
-        _workspaceManager.Save(path, CurrentWorkspace!);
+        _workspaceManager.Save(path, CurrentWorkspace);
         UpdateMostRecentlyUsed(path);
     }
 
@@ -460,8 +460,8 @@ public partial class MainViewModel : ObservableObject
         ui.WindowTop = WindowPosition.Y;
         ui.WindowWidth = WindowSize.Width;
         ui.WindowHeight = WindowSize.Height;
-        ui.AvGridRowSerialization = ColumnDefinitions!.ToString().Tokenize(",");
-        ui.AvGridColumnSerialization = RowDefinitions!.ToString().Tokenize(",");
+        ui.AvGridRowSerialization = ColumnDefinitions.ToString().Tokenize(",");
+        ui.AvGridColumnSerialization = RowDefinitions.ToString().Tokenize(",");
         _preferencesManager.SaveUiPrefs();
     }
 }

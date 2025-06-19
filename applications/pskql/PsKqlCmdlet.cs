@@ -86,7 +86,7 @@ public class PsKqlCmdlet : Cmdlet
             //TODO we currently assume non-primitive Values are expensive
             //but we could be more sophisticated here and attempt to time accesses
             WriteDebug(
-                $"name:{rowIndex} {pName} valueTypeName:{pTypeNameOfValue} pType:{p.GetType().Name} valType:{pValue?.GetType()?.Name ?? "null"}");
+                $"name:{rowIndex} {pName} valueTypeName:{pTypeNameOfValue} pType:{p.GetType().Name} valType:{pValue?.GetType().Name ?? "null"}");
             // it's possible that not all rows have the same properties, for
             //example if we've done an 'ls' and have a mix of files and directories
             //therefore we have to be careful to insert cells at the appropriate row
