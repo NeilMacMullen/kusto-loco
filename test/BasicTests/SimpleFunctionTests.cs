@@ -1329,4 +1329,32 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().StartWith("-10");
     }
 
+
+    [TestMethod]
+    public async Task BoolSort()
+    {
+        var dataPrefix = "datatable(b: bool)[true,false,bool(null) ] |";
+
+        async Task Check(string query, string results)
+        {
+            query = dataPrefix+query;
+            var result = await ResultAsString(query);
+            result.Should().Be(results);
+        }
+        await Check("take 2 | order by b asc", "False,True");
+        await Check("take 2 | order by b desc", "True,False");
+        await Check("take 2 | order by b asc nulls first", "False,True");
+        await Check("take 2 | order by b desc nulls first", "True,False");
+        await Check("take 2 | order by b asc nulls last", "False,True");
+        await Check("take 2 | order by b desc nulls last", "True,False");
+
+        await Check("order by b asc", "null,False,True");
+        await Check("order by b desc", "True,False,null");
+      
+        await Check("order by b desc nulls first", "null,True,False");
+        await Check("order by b asc nulls last", "False,True,null");
+        await Check("order by b desc nulls last", "True,False,null");
+        await Check("order by b asc nulls first", "null,False,True");
+    }
+
 }
