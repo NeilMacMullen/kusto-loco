@@ -90,7 +90,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
     <div class="modal-backdrop fade show"></div>
 }
 @code {
-    OrchestratorMethods OrchestratorMethods;
+    public required OrchestratorMethods OrchestratorMethods;
     private bool isFirstRender = true;
     private bool IsSettingsEntered = false;
     private string ApiKey = "";
@@ -110,7 +110,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
             isFirstRender = false;
             await SettingsService.InitializeAsync();
 
-            OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods));
+            OrchestratorMethods = (OrchestratorMethods)ScopedServices.GetService(typeof(OrchestratorMethods))!;
 
             ApiKey = SettingsService.ApiKey ?? "";
 

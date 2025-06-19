@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>KustoLoco.Rendering.SixelSupport</RootNamespace>
     <Title>Sixel support for  KustoLoco </Title>
     <Version>1.0.0</Version>
