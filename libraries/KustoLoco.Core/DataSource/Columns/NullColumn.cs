@@ -14,7 +14,7 @@ public class NullColumn : BaseColumn
     public override int RowCount => 0;
 
 
-    public override object? GetRawDataValue(int index) => throw new InvalidOperationException();
+    public override object GetRawDataValue(int index) => throw new InvalidOperationException();
 
     public override BaseColumn Slice(int start, int end) => throw new InvalidOperationException();
 

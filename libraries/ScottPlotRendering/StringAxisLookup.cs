@@ -1,6 +1,4 @@
-﻿using NotNullStrings;
-
-namespace KustoLoco.Rendering.ScottPlot;
+﻿namespace KustoLoco.Rendering.ScottPlot;
 
 /// <summary>
 /// Axis Lookup for string values

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using KustoLoco.Models;
 
 namespace KustoLoco.Services

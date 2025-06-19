@@ -4,9 +4,6 @@ using OpenAI;
 using Azure.AI.OpenAI;
 using KustoLoco.Services;
 using System.ClientModel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Azure;
 using NotNullStrings;
 
 namespace KustoLoco.AI

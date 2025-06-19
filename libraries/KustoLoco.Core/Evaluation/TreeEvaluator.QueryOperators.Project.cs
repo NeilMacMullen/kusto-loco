@@ -29,38 +29,6 @@ internal partial class TreeEvaluator
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
-
-    private class SerializeTableResult : DerivedTableSourceBase<NoContext>
-    {
-        private readonly List<IROutputColumnNode> _columns;
-        private readonly EvaluationContext _context;
-        private readonly TreeEvaluator _owner;
-
-        public SerializeTableResult(TreeEvaluator owner, ITableSource source, EvaluationContext context,
-            List<IROutputColumnNode> columns, TableSymbol resultType)
-            : base(source)
-        {
-            _owner = owner;
-            _context = context;
-            _columns = columns;
-            Type = resultType;
-        }
-
-        public override TableSymbol Type { get; }
-
-        protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
-            ITableChunk chunk)
-        {
-            var chunkContext = _context with { Chunk = chunk };
-            var results =
-                _columns.Select(c => c.Expression.Accept(_owner, chunkContext)).ToArray();
-            var outputColumns =
-                BuiltInsHelper.CreateResultArray(results)
-                    .Select(cr => cr.Column).ToArray();
-            return (default, new TableChunk(this, outputColumns), false);
-        }
-    }
-
     private class ProjectTableResult : DerivedTableSourceBase<NoContext>
     {
         private readonly List<IROutputColumnNode> _columns;

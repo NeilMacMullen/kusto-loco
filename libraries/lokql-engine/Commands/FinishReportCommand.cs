@@ -16,7 +16,7 @@ public static class FinishReportCommand
         return Task.CompletedTask;
     }
 
-    [Verb("finishreport", HelpText = @"finish a report by saving it out as a file")]
+    [Verb("finishreport", HelpText = "finish a report by saving it out as a file")]
     internal class Options : IFileCommandOption
     {
         [Value(0, HelpText = "Name of file to save report to ", Required = true)]

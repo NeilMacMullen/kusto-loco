@@ -32,7 +32,7 @@ public class DynamicTests : TestMethods
     [TestMethod]
     public async Task NegativeNumber()
     {
-        var query = @"print -1 *5";
+        var query = "print -1 *5";
         var result = await LastLineOfResult(query);
         result.Should().Be("-5");
     }
@@ -41,7 +41,7 @@ public class DynamicTests : TestMethods
     [TestMethod]
     public async Task NegativeExpression()
     {
-        var query = @"print -(1+5)";
+        var query = "print -(1+5)";
         var result = await LastLineOfResult(query);
         result.Should().Be("-6");
     }
@@ -57,7 +57,7 @@ public class DynamicTests : TestMethods
     [TestMethod]
     public async Task DynamicArray()
     {
-        var query = @"print geo_geohash_to_central_point('sunny')";
+        var query = "print geo_geohash_to_central_point('sunny')";
 
         var result = await LastLineOfResult(query);
         result.Should().Contain("coordinates");

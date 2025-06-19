@@ -7,9 +7,9 @@ namespace Lokql.Engine;
 public abstract class TableAdaptorBase(ITableSerializer serializer,string name,string description,string extensions)
     : IFileBasedTableAccess
 {
-    public async Task<TableLoadResult> TryLoad(string path,string name)
+    public async Task<TableLoadResult> TryLoad(string path,string tableName)
     {
-        var result = await serializer.LoadTable(path, name);
+        var result = await serializer.LoadTable(path, tableName);
         return result;
     }
 

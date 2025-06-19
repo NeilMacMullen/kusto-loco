@@ -20,7 +20,7 @@ internal abstract class IRExpressionNode : IRNode
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private ImmutableDictionary<Type, object> _cache = ImmutableDictionary<Type, object>.Empty;
 
-    public IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
+    protected IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)
     {
         ResultType = resultType ?? throw new ArgumentNullException(nameof(resultType));
         ResultKind = resultKind;

@@ -7,7 +7,6 @@ using KustoLoco.Core;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Extensions;
 using AwesomeAssertions;
-using KustoLoco.Core.Console;
 using Xunit;
 
 namespace KustoExecutionEngine.Core.Tests;

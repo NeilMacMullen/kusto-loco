@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using CsvHelper.Configuration.Attributes;
 
 namespace Lokql.Engine.Commands;
 

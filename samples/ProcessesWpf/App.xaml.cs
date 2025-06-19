@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using System.Configuration;
-using System.Data;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Wpf.Ui;
@@ -11,7 +8,6 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ProcessesWpf.Services;
-using ProcessesWpf.ViewModels;
 using ProcessesWpf.Views.Windows;
 using ProcessesWpf.ViewModels.Windows;
 using ProcessesWpf.Views.Pages;

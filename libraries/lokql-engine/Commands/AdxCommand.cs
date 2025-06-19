@@ -5,8 +5,6 @@ namespace Lokql.Engine.Commands;
 
 public static class AdxCommand
 {
-    public const string SchemaCsv = "";
-
     internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
     {
         var exp = econtext.Explorer;

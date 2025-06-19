@@ -21,7 +21,7 @@ public class ConvertingColumn<T> : TypedBaseColumn<T>
         BackingColumn = backing;
     }
 
-    public override T? this[int index] => _converter(BackingColumn.GetRawDataValue(index));
+    public override T this[int index] => _converter(BackingColumn.GetRawDataValue(index));
 
     public override int RowCount =>BackingColumn.RowCount;
 
