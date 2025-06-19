@@ -11,7 +11,7 @@ public class ChatSession
     {
         _chatClient = chatClient;
     }
-    private List<ChatMessage> _history = [];
+    private readonly List<ChatMessage> _history = [];
     public static ChatSession Create(AISettings settings,string systemInstructions)
     {
         var chatClient = OrchestratorMethods.CreateAIChatClient(settings);

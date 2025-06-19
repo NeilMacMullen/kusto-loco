@@ -201,7 +201,7 @@ public class PsKqlCmdlet : Cmdlet
 
                 if (value is PSObject ps)
                 {
-                    typeName = ps.BaseObject?.GetType()?.ToString() ?? "null";
+                    typeName = ps.BaseObject?.GetType().ToString() ?? "null";
                     if (IsSimpleType(typeName))
                     {
                         value = ps.BaseObject;

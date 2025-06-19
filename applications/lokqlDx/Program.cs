@@ -1,9 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using HotAvalonia;
-using Intellisense;
 using Intellisense.Configuration;
 using Jab;
 using LogSetup;

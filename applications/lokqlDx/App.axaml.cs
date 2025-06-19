@@ -7,7 +7,6 @@ using LokqlDx.Desktop;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 
 namespace LokqlDx;
 

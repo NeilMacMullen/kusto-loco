@@ -2,10 +2,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
-using lokqlDx;
 using LokqlDx.ViewModels;
-using ScottPlot;
-using ScottPlot.Avalonia;
 
 namespace LokqlDx.Views;
 

@@ -211,7 +211,7 @@ a:dynamic
     private static void Test(string query, string expectedOutput)
     {
         var engine = BabyKustoEngine.CreateForTest();
-        var result = (TabularResult?)engine.Evaluate(Array.Empty<ITableSource>(), query);
+        var result = (TabularResult?)engine.Evaluate([], query);
         Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 

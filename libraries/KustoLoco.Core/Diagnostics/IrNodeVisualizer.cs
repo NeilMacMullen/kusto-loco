@@ -68,7 +68,7 @@ internal class IrNodeVisualizer(IKustoConsole console)
                 _ => ConsoleColor.Gray
             };
             console.ForegroundColor = c;
-            console.WriteLine(node?.ToString().NullToEmpty()!);
+            console.WriteLine(node.ToString().NullToEmpty()!);
         }
         finally
         {

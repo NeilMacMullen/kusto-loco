@@ -58,7 +58,7 @@ public class CsvSerializer : ITableSerializer
             csv.Read();
             csv.ReadHeader();
             keys = csv.Context.Reader?.HeaderRecord.Select(TrimIfRequired)
-                .ToArray(); ;
+                .ToArray();
             builders = keys
                 .Select(_ => new ColumnBuilder<string>())
                 .ToArray();

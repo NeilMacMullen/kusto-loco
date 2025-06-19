@@ -85,7 +85,7 @@ public class BabyKustoEngine
         var state = GlobalState.Default
             .WithFunctions(allSupported);
 
-        var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).ToArray());
+        var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).Cast<Symbol>().ToArray());
 
         var globals = state.WithDatabase(db);
 

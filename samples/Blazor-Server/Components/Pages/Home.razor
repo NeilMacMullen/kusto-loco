@@ -7,6 +7,7 @@
 @using KustoLoco.Rendering
 @using KustoLoco.Services
 @using System.Text
+@using NotNullStrings
 @inherits OwningComponentBase
 @inject SettingsService SettingsService
 @inject IJSRuntime JSRuntime
@@ -114,14 +115,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
 
             ApiKey = SettingsService.ApiKey ?? "";
 
-            if (ApiKey.Length > 1)
-            {
-                IsSettingsEntered = true;
-            }
-            else
-            {
-                IsSettingsEntered = false;
-            }
+            IsSettingsEntered = ApiKey.Length > 1;
 
             StateHasChanged();
         }
@@ -172,7 +166,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
             return;
         }
 
-        if (table.Value == null)
+        if (table.Value.IsBlank())
         {
             Message = "Must load a file first";
             return;

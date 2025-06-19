@@ -38,6 +38,6 @@ public static class RunMacroCommand
         [Value(0, HelpText = "macro name", Required = true)]
         public string Name { get; set; } = string.Empty;
         [Value(1, HelpText = "parameter Values ")]
-        public IEnumerable<string> ParameterValues { get; set; } = Array.Empty<string>();
+        public IEnumerable<string> ParameterValues { get; set; } = [];
     }
 }

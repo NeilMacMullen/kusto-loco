@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Threading;
-using LokqlDx.ViewModels;
+﻿using Avalonia.Controls;
 using DependencyPropertyGenerator;
 
 namespace LokqlDx.Views;

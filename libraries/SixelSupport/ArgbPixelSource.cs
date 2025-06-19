@@ -10,7 +10,7 @@ namespace KustoLoco.Rendering.SixelSupport;
 public class ArgbPixelSource : IPixelSource
 
 {
-    private int _bytesPerPixel;
+    private readonly int _bytesPerPixel;
     private readonly byte[] _bytes;
     private readonly bool _invert;
     private readonly int _headerSize;

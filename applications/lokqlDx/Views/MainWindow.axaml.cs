@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using LokqlDx.ViewModels;
 using DependencyPropertyGenerator;
 using Avalonia.Media;
 

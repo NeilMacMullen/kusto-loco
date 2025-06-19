@@ -93,10 +93,9 @@ public class PopupSupport
         sb.AppendLine(popup.Series);
         sb.AppendLine(popup.InvertAxes ? GetYLabel(popup.X) : GetXLabel(popup.X));
 
-        if (popup.Y == popup.V)
-            sb.AppendLine(GetYLabel(popup.Y));
-        else
-            sb.AppendLine((popup.V - popup.Y).ToString(CultureInfo.InvariantCulture));
+        sb.AppendLine(popup.Y == popup.V
+            ? GetYLabel(popup.Y)
+            : (popup.V - popup.Y).ToString(CultureInfo.InvariantCulture));
         return sb.ToString();
 
     }

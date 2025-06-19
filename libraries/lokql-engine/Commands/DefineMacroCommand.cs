@@ -41,6 +41,6 @@ public static class DefineMacroCommand
         [Value(0, HelpText = "Macro name", Required = true)]
         public string Name { get; set; } = string.Empty;
         [Value(1, HelpText = "parameter names ")]
-        public IEnumerable<string> ParameterNames { get; set; } = Array.Empty<string>();
+        public IEnumerable<string> ParameterNames { get; set; } = [];
     }
 }
