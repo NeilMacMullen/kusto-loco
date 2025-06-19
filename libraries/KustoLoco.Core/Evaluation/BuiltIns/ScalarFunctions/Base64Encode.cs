@@ -1,20 +1,19 @@
 ﻿using System;
 
-namespace KustoLoco.Core.Evaluation.BuiltIns.Impl
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+
+[KustoImplementation(Keyword = "base64_encode_tostring")]
+internal partial class Base64Encode
 {
-    [KustoImplementation(Keyword = "base64_encode_tostring")]
-    internal partial class Base64Encode
+    private static string Impl(string plainText)
     {
-        private static string Impl(string plainText)
+        try
         {
-            try
-            {
-                return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(plainText));
-            }
-            catch (Exception)
-            {
-                return "";
-            }
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(plainText));
+        }
+        catch (Exception)
+        {
+            return "";
         }
     }
 }

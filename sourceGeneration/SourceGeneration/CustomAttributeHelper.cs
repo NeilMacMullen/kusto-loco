@@ -10,15 +10,17 @@ namespace KustoLoco.SourceGeneration
         private readonly Dictionary<string, string> _attributes;
 
         public CustomAttributeHelper(Dictionary<string, string> attributes)
-            => _attributes = attributes;
+        {
+            _attributes = attributes;
+        }
 
 
         public static string Name()
         {
             var fullName = typeof(T).Name;
-            if (fullName.EndsWith("Attribute"))
-                return fullName.Substring(0, fullName.Length - "Attribute".Length);
-            return fullName;
+            return fullName.EndsWith("Attribute")
+                ? fullName.Substring(0, fullName.Length - "Attribute".Length)
+                : fullName;
         }
 
         public string Unquote(string other)
@@ -36,10 +38,7 @@ namespace KustoLoco.SourceGeneration
         public string Dump()
         {
             var sb = new StringBuilder();
-            foreach (var a in _attributes)
-            {
-                sb.AppendLine($"'{a.Key}' => '{a.Value}'");
-            }
+            foreach (var a in _attributes) sb.AppendLine($"'{a.Key}' => '{a.Value}'");
 
             return sb.ToString();
         }

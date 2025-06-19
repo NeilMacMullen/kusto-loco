@@ -63,7 +63,7 @@ public class SerializeTests
     [TestMethod]
     public async Task SerializeError()
     {
-        var result = await Query(@"errrror");
+        var result = await Query("errrror");
         var dto = await _kustoResultSerializer.Serialize(result);
         var roundTripped = await _kustoResultSerializer.Deserialize(dto);
         CheckResultEquivalency(roundTripped, result);
@@ -73,7 +73,7 @@ public class SerializeTests
     [TestMethod]
     public async Task SerialiseChart()
     {
-        var result = await Query(@"let T = datatable(A:int)[1,2,3,]; T| project X=A,Y=A | render linechart");
+        var result = await Query("let T = datatable(A:int)[1,2,3,]; T| project X=A,Y=A | render linechart");
         result.Visualization.ChartType.Should().Be("linechart");
         var dto = await _kustoResultSerializer.Serialize(result);
         var roundTripped = await _kustoResultSerializer.Deserialize(dto);

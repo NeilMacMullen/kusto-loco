@@ -16,7 +16,7 @@ internal class ArrayLengthFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var value = (JsonNode?)arguments[0].Value;
         var array = value as JsonArray;
-        return new ScalarResult(ScalarTypes.Long, array == null ? null : array.Count);
+        return new ScalarResult(ScalarTypes.Long, array?.Count);
     }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
@@ -28,7 +28,7 @@ internal class ArrayLengthFunctionImpl : IScalarFunctionImpl
         for (var i = 0; i < column.RowCount; i++)
         {
             var array = column[i] as JsonArray;
-            data[i] = array == null ? null : array.Count;
+            data[i] = array?.Count;
         }
 
         return new ColumnarResult(ColumnFactory.Create(data));

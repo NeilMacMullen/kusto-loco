@@ -7,7 +7,7 @@ namespace BasicTests;
 
 public abstract class TestMethods
 {
-    public TestMethods()
+    protected TestMethods()
     {
         LoggingExtensions.SetupLoggingForTest(LogLevel.Trace);
     }

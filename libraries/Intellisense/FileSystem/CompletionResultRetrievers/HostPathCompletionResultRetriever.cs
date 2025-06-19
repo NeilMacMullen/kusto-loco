@@ -8,10 +8,7 @@ public class HostPathCompletionResultRetriever(IShareService shareService)
 {
     public async Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
     {
-        if (path is not UncPath { IsOnlyHost: true } p)
-        {
-            return CompletionResult.Empty;
-        }
+        if (path is not UncPath { IsOnlyHost: true } p) return CompletionResult.Empty;
 
         return (await shareService.GetHostsAsync()).ToCompletionResult() with
         {
@@ -20,12 +17,7 @@ public class HostPathCompletionResultRetriever(IShareService shareService)
     }
 
     public async Task<CompletionResult> GetChildrenAsync(FileSystemPath path)
-    {
-        if (path.Value is not ("//" or @"\\"))
-        {
-            return CompletionResult.Empty;
-        }
-
-        return (await shareService.GetHostsAsync()).ToCompletionResult();
-    }
+        => path.Value is not ("//" or @"\\")
+        ? CompletionResult.Empty
+        : (await shareService.GetHostsAsync()).ToCompletionResult();
 }

@@ -5,7 +5,6 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intellisense;
-using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
@@ -20,8 +19,6 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly CommandProcessorFactory _commandProcessorFactory;
     private readonly DialogService _dialogService;
-    private readonly KustoSettingsProvider _kustoSettings;
-    private readonly StandardFormatAdaptor _loader;
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
@@ -70,17 +67,17 @@ public partial class MainViewModel : ObservableObject
         _registryOperations = registryOperations;
         _storage = storage;
         _launcher = launcher;
-        _kustoSettings = workspaceManager.Settings;
+        var kustoSettings = workspaceManager.Settings;
 
         ConsoleViewModel = new ConsoleViewModel();
-        RenderingSurfaceViewModel = new RenderingSurfaceViewModel(_kustoSettings);
+        RenderingSurfaceViewModel = new RenderingSurfaceViewModel(kustoSettings);
         CopilotChatViewModel = new CopilotChatViewModel();
 
-        _loader = new StandardFormatAdaptor(_kustoSettings, ConsoleViewModel);
+        var loader = new StandardFormatAdaptor(kustoSettings, ConsoleViewModel);
         _explorer = new InteractiveTableExplorer(
             ConsoleViewModel,
-            _loader,
-            _kustoSettings,
+            loader,
+            kustoSettings,
             _commandProcessor,
             RenderingSurfaceViewModel);
 
@@ -351,7 +348,7 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>
     ///     Save the current workspace to a new file
-    /// </summary
+    /// </summary>
     /// <returns>
     ///     true if the user went ahead with the save
     /// </returns>
@@ -371,7 +368,7 @@ public partial class MainViewModel : ObservableObject
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path)
         });
 
-        if (result is not null && result.TryGetLocalPath() is string path)
+        if (result?.TryGetLocalPath() is string  path)
         {
             SaveWorkspace(path);
             //make sure we update title bar

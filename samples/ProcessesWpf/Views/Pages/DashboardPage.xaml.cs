@@ -1,6 +1,4 @@
-﻿using KustoLoco.Core;
-using ProcessesWpf.ViewModels.Pages;
-using System.Diagnostics;
+﻿using ProcessesWpf.ViewModels.Pages;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace ProcessesWpf.Views.Pages;

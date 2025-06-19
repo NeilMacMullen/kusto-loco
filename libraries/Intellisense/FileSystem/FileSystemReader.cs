@@ -25,11 +25,8 @@ public class FileSystemReader(IFileSystem fileSystem) : IFileSystemReader
         // will throw with null or whitespace
         var dir = fileSystem.DirectoryInfo.New(path);
 
-        if (!dir.Exists)
-        {
-            return [];
-        }
-
-        return dir.EnumerateFileSystemInfos("*", EnumerationOptions);
+        return !dir.Exists
+            ? []
+            : dir.EnumerateFileSystemInfos("*", EnumerationOptions);
     }
 }

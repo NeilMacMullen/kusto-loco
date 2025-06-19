@@ -183,7 +183,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
             var AIQuery = OrchestratorMethods.GetTemplate();
 
             // Get Table Schema
-            string schema = "";
+            var schema = "";
             var sb = new StringBuilder();
 
             foreach (var contextTable in kustoContext.Tables())
@@ -208,7 +208,7 @@ but you can change this and rerun the query or use the CoPilot button for assist
             AIQuery = AIQuery.Replace("## CURRENT CODE ##", query);
             AIQuery = AIQuery.Replace("## CURRENT REQUEST ##", AIMessage);
 
-            AIResponse result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
+            var result = await OrchestratorMethods.CallOpenAI(SettingsService, AIQuery);
 
             if (result.Error != "")
             {

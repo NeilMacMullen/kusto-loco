@@ -2,7 +2,6 @@
 using System.Management.Automation;
 using System.Runtime.InteropServices;
 using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using KustoLoco.Rendering.ScottPlot;
@@ -179,7 +178,7 @@ public class PsKqlCmdlet : Cmdlet
     private BaseColumnBuilder GetOrCreateBuilder(string name, string typeName)
     {
         var type = TypeNameHelper.GetTypeFromName(typeName);
-        if (_columnBuilders!.TryGetValue(name, out var b))
+        if (_columnBuilders.TryGetValue(name, out var b))
             return b;
         b = ColumnHelpers.CreateBuilder(type, string.Empty);
         _columnBuilders[name] = b;

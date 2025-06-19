@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Diagnostics;
 using AwesomeAssertions;
 using KustoLoco.Core;
@@ -3785,7 +3784,7 @@ Key:int; a:string; aIsNull:bool; aIsEmpty:bool; aLen:long
     public void TrimWorksAsExpected()
     {
         // Arrange
-        var query = @"print trim('a*','aaathis is a testaaaa')";
+        var query = "print trim('a*','aaathis is a testaaaa')";
 
         var expected = @"print_0:string
 ------------------
@@ -3800,7 +3799,7 @@ this is a test";
     public void TrimStartWorksAsExpected()
     {
         // Arrange
-        var query = @"print trim_start('a*','aaathis is a testaaaa')";
+        var query = "print trim_start('a*','aaathis is a testaaaa')";
 
         var expected = @"print_0:string
 ------------------
@@ -3815,7 +3814,7 @@ this is a testaaaa";
     public void TrimEndWorksAsExpected()
     {
         // Arrange
-        var query = @"print trim_end('a*','aaathis is a testaaaa')";
+        var query = "print trim_end('a*','aaathis is a testaaaa')";
 
         var expected = @"print_0:string
 ------------------

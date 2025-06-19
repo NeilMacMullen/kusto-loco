@@ -36,7 +36,7 @@ public partial class MainWindow : Window
 
     partial void OnWindowPositionChanged(Point newValue)
     {
-        this.Position = new PixelPoint((int)newValue.X, (int)newValue.Y);
+        Position = new PixelPoint((int)newValue.X, (int)newValue.Y);
     }
 
     private void Window_SizeChanged(object? sender, SizeChangedEventArgs e)

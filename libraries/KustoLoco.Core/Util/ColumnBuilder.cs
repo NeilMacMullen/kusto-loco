@@ -43,7 +43,6 @@ public class ColumnBuilder<T> : BaseColumnBuilder
         _data.Capacity = _data.Count + n;
 
     public override void TrimExcess() =>
-      
         _data.TrimExcess();
 
     public override void Add(object? value)
@@ -51,7 +50,7 @@ public class ColumnBuilder<T> : BaseColumnBuilder
         //prevent null strings being added
         if (typeof(T) == typeof(string) && value is null)
             value = string.Empty;
-        
+
         if (typeof(T) == typeof(JsonNode))
         {
             _data.Add((T?)value);
@@ -60,7 +59,7 @@ public class ColumnBuilder<T> : BaseColumnBuilder
             typeof(T) == typeof(DateTime?) &&
             value is DateTime dt)
         {
-           if (dt.Kind == DateTimeKind.Unspecified)
+            if (dt.Kind == DateTimeKind.Unspecified)
                 dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
             if (dt.Kind == DateTimeKind.Local) dt = dt.ToUniversalTime();
             _data.Add(TypeMapping.CastOrConvertToNullable<T>(dt));
@@ -74,14 +73,14 @@ public class ColumnBuilder<T> : BaseColumnBuilder
     public override BaseColumn ToColumn()
     {
         TrimExcess();
-        if (typeof(T) == typeof(string) && _data.Count>10000)
+        if (typeof(T) == typeof(string) && _data.Count > 10000)
         {
             var pool = new StringPool(1000);
             var c = _data.Select(d => pool.GetOrAdd((d as string).NullToEmpty()))
                 .ToArray();
             return ColumnFactory.Create(c);
-           
         }
+
         return ColumnFactory.Create(_data.ToArray());
     }
 

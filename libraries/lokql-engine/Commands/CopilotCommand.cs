@@ -29,7 +29,7 @@ public static class CopilotCommand
     }
 
     [Verb("copilot",
-        HelpText = @"start/run copilot")]
+        HelpText = "start/run copilot")]
     internal class Options
     {
     }

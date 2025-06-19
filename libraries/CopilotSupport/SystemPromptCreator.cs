@@ -6,7 +6,7 @@ namespace KustoLoco.CopilotSupport;
 
 /// <summary>
 /// Manages creation of CoPilot system prompt
-/// </summary
+/// </summary>
 /// <remarks>
 /// The general prompt is loaded from an embedded resource then
 /// schema information about available tables is provided

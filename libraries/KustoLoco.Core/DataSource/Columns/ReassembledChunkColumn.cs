@@ -52,13 +52,11 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
         {
             _lastHitSection = Section.Empty;
             foreach (var section in BackingColumns)
-            {
                 if (IndexInSection(section, index))
                 {
                     _lastHitSection = section;
                     break;
                 }
-            }
         }
 
         if (_lastHitSection == Section.Empty)
@@ -66,29 +64,25 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
                 $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
 
         return (index - _lastHitSection.Offset, _lastHitSection.BackingColumn);
+    }
 
-          }
-    static bool IndexInSection(Section s, int i) => i >= s.Offset && i < (s.Offset + s.Length);
+    private static bool IndexInSection(Section s, int i) => i >= s.Offset && i < s.Offset + s.Length;
 
     public override void ForEach(Action<object?> action)
     {
-        for (var i = 0; i < RowCount; i++)
-        {
-            action(this[i]);
-        }
+        for (var i = 0; i < RowCount; i++) action(this[i]);
     }
 
     public override BaseColumn Slice(int start, int length)
     {
         var slicedColumns = new List<TypedBaseColumn<T>>();
         foreach (var s in BackingColumns)
-        {
-            if (IndexInSection(s,start))
+            if (IndexInSection(s, start))
             {
-               var top = start+ length;
-               if (top <= s.Offset + s.Length)
+                var top = start + length;
+                if (top <= s.Offset + s.Length)
                 {
-                    var col= s.BackingColumn.Slice(start - s.Offset, length)
+                    var col = s.BackingColumn.Slice(start - s.Offset, length)
                         as TypedBaseColumn<T>;
                     slicedColumns.Add(col!);
                     break;
@@ -97,22 +91,21 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
                 {
                     var sliceLength = s.Offset + s.Length - start;
                     var col = s.BackingColumn.Slice(start - s.Offset, sliceLength)
-                        as TypedBaseColumn<T>; 
+                        as TypedBaseColumn<T>;
                     slicedColumns.Add(col!);
                     length -= sliceLength;
                     start = s.Offset + s.Length;
                 }
             }
-        }
+
         return new ReassembledChunkColumn<T>(slicedColumns);
     }
-    public static TypedBaseColumn<T> Create(IReadOnlyCollection<TypedBaseColumn<T>> backing)
-    {
+
+    public static TypedBaseColumn<T> Create(IReadOnlyCollection<TypedBaseColumn<T>> backing) =>
         //If there's only one column, just return it since no reassembly is needed
-        return backing.Count == 1
+        backing.Count == 1
             ? backing.First()
             : new ReassembledChunkColumn<T>(backing);
-    }
 
     public override object? GetRawDataValue(int index)
     {

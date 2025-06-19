@@ -44,7 +44,7 @@ public class AdxLoader
             var d = JsonSerializer.Deserialize<Dictionary<string, object>>(data)!;
             var ct = d.GetValueOrDefault("Visualization", "");
             var v = ct.ToString().NullToEmpty();
-            var id = d.ToImmutableDictionary(kv => kv.Key, kv => kv.Value.ToString().NullToEmpty()!);
+            var id = d.ToImmutableDictionary(kv => kv.Key, kv => kv.Value.ToString().NullToEmpty());
             vs = new VisualizationState(v, id);
         }
 

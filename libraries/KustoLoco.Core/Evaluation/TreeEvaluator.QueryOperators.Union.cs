@@ -59,7 +59,7 @@ internal partial class TreeEvaluator
 
 
             var i = 0;
-            foreach (ColumnSymbol columnSymbol in resultType.Members)
+            foreach (var columnSymbol in resultType.Members.OfType<ColumnSymbol>())
             {
                 _columnMappings.TryAdd(columnSymbol, i);
                 foreach (var originalColumn in columnSymbol.OriginalColumns)
@@ -104,8 +104,7 @@ internal partial class TreeEvaluator
             for (var i = 0; i < chunk.Columns.Length; i++)
             {
                 var symbol = (ColumnSymbol)table.Type.Members[i];
-                int destinationColumnIndex;
-                if (!_columnMappings.TryGetValue(symbol, out destinationColumnIndex))
+                if (!_columnMappings.TryGetValue(symbol, out var destinationColumnIndex))
                 {
                     throw new InvalidOperationException(
                         $"Couldn't find source column to match to output column {SchemaDisplay.GetText(symbol)}");

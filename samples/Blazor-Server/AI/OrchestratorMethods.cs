@@ -4,9 +4,6 @@ using OpenAI;
 using Azure.AI.OpenAI;
 using KustoLoco.Services;
 using System.ClientModel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Azure;
 using NotNullStrings;
 
 namespace KustoLoco.AI
@@ -32,19 +29,21 @@ namespace KustoLoco.AI
         #region public IChatClient CreateAIChatClient(SettingsService objSettings)
         public IChatClient CreateAIChatClient(SettingsService objSettings)
         {
-            string Organization = objSettings.Organization;
-            string ApiKey = objSettings.ApiKey;
-            string Endpoint = objSettings.Endpoint;
-            string ApiVersion = objSettings.ApiVersion;
-            string AIEmbeddingModel = objSettings.AIEmbeddingModel;
-            string AIModel = objSettings.AIModel;
+            var Organization = objSettings.Organization;
+            var ApiKey = objSettings.ApiKey;
+            var Endpoint = objSettings.Endpoint;
+            var ApiVersion = objSettings.ApiVersion;
+            var AIEmbeddingModel = objSettings.AIEmbeddingModel;
+            var AIModel = objSettings.AIModel;
 
-            ApiKeyCredential apiKeyCredential = new ApiKeyCredential(ApiKey);
+            var apiKeyCredential = new ApiKeyCredential(ApiKey);
 
             if (objSettings.AIType == "OpenAI")
             {
-                OpenAIClientOptions options = new OpenAIClientOptions();
-                options.NetworkTimeout = TimeSpan.FromSeconds(520);
+                var options = new OpenAIClientOptions
+                {
+                    NetworkTimeout = TimeSpan.FromSeconds(520)
+                };
 
                 return new OpenAIClient(
                     apiKeyCredential, options)
@@ -52,8 +51,10 @@ namespace KustoLoco.AI
             }
             else if (objSettings.AIType == "Azure OpenAI") 
             {
-                AzureOpenAIClientOptions options = new AzureOpenAIClientOptions();
-                options.NetworkTimeout = TimeSpan.FromSeconds(520);
+                var options = new AzureOpenAIClientOptions
+                {
+                    NetworkTimeout = TimeSpan.FromSeconds(520)
+                };
 
                 return new AzureOpenAIClient(
                     new Uri(Endpoint),
@@ -73,15 +74,10 @@ namespace KustoLoco.AI
         public async Task<bool> TestAccess(SettingsService objSettings, string GPTModel)
         {
             var chatClient = CreateAIChatClient(objSettings);
-            string SystemMessage = "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
+            var SystemMessage = "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
             var response = await chatClient.GetResponseAsync(SystemMessage);
 
-            if (response.Text.IsBlank())
-            {
-                return false;
-            }
-
-            return true;
+            return !response.Text.IsBlank();
         }
         #endregion
 
@@ -89,7 +85,7 @@ namespace KustoLoco.AI
         public string GetTemplate()
         {
             // Load template from Templates\AITemplate.txt
-            string Template = File.ReadAllText("Templates\\AITemplate.txt");
+            var Template = File.ReadAllText("Templates\\AITemplate.txt");
             return Template;
         }
         #endregion
@@ -119,7 +115,7 @@ namespace KustoLoco.AI
                 }
 
                 // Extract the text from the first choice
-                string jsonResponse = response.Text.Trim();
+                var jsonResponse = response.Text.Trim();
 
                 jsonResponse = ExtractJsonFromResponse(jsonResponse);
 
@@ -155,8 +151,8 @@ namespace KustoLoco.AI
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            int startIndex = input.IndexOf('{');
-            int endIndex = input.LastIndexOf('}');
+            var startIndex = input.IndexOf('{');
+            var endIndex = input.LastIndexOf('}');
 
             // Validate positions
             if (startIndex == -1 || endIndex == -1 || endIndex < startIndex)

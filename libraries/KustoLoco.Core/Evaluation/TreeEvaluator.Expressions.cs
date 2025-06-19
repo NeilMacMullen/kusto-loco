@@ -45,8 +45,9 @@ internal partial class TreeEvaluator
 
         if (index < 0) index = obj.Count + index;
         if (index < 0) return null;
-        if (index >= obj.Count) return null;
-        return obj[index];
+        return index >= obj.Count
+            ? null
+            : obj[index];
     }
 
     public override EvaluationResult VisitMemberAccess(IRArrayAccessNode node, EvaluationContext context)

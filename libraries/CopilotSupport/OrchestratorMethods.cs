@@ -1,8 +1,4 @@
 using System.ClientModel;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.AI;
 using NotNullStrings;
@@ -68,8 +64,6 @@ public class OrchestratorMethods
     /// <summary>
     ///     Sends a system message to the AI chat client and returns the JSON response.
     /// </summary>
-    /// <param name="objSettings">The settings containing LLM configuration details.</param>
-    /// <param name="AIQuery">The query to use to call the LLM</param>
     /// <returns>A JSON string containing the response message, or null if no response is received.</returns>
 
     #region public async Task<AIResponse> CallOpenAI(SettingsService objSettings, string AIQuery)

@@ -10,7 +10,7 @@ internal static class JsonArrayHelpers
 
     internal static JsonArray Reverse(JsonArray array) => new(ClonedItems(array).Reverse().ToArray());
 
-    public static JsonNode? RotateLeft(JsonArray array, long shift)
+    public static JsonNode RotateLeft(JsonArray array, long shift)
     {
         var count = array.Count;
         if (count == 0)
