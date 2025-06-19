@@ -2,7 +2,6 @@
 using System.Management.Automation;
 using System.Runtime.InteropServices;
 using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using KustoLoco.Rendering.ScottPlot;

@@ -19,7 +19,8 @@ public sealed class AxisTests
     [TestMethod]
     public void StringAxisReturnsExpectedValues()
     {
-        object?[] strings = "abc def ghi jkl mno pqr stu vwxyz".Split(' ');
+        object?[] strings = "abc def ghi jkl mno pqr stu vwxyz".Split(' ').Cast<object>()
+            .ToArray();
         var axis = new StringAxisLookup(strings);
 
         axis.AxisValueFor(null).Should().Be(0);

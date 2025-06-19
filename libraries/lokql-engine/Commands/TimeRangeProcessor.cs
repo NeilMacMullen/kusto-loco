@@ -11,13 +11,9 @@ public static class TimeRangeProcessor
     public static bool ParseTime(string time, out DateTime t)
     {
         t= DateTime.UtcNow;
-        if (RawParseTime(time,out t))
-            return true;
-        //try wrapping in "datetime()"
-        if (RawParseTime($"datetime({time})", out t))
-            return true;
-        //other formulations?
-        return false;
+        //try wrapping in "datetime()" if the raw value is not recognised
+        return RawParseTime(time,out t) ||
+               RawParseTime($"datetime({time})", out t);
     }
 
     public static bool RawParseTime(string time,out DateTime t)

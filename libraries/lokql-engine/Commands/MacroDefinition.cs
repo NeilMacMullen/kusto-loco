@@ -16,5 +16,5 @@ public class MacroDefinition
 
     public readonly string Name;
     public readonly IEnumerable<string> ParameterNames;
-    public BlockSequence Sequence() => new BlockSequence(_blocks);
+    public BlockSequence Sequence() => new(_blocks);
 }

@@ -67,8 +67,6 @@ public static class UpgradeManager
         d = av.minor - bv.minor;
         if (d != 0) return d;
         d = av.patch - bv.patch;
-        if (d != 0) return d;
-
-        return 0;
+        return d != 0 ? d : 0;
     }
 }

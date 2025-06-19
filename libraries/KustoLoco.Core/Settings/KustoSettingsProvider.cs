@@ -40,14 +40,13 @@ public class KustoSettingsProvider
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) => _settingsStack.Push(layer);
+    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) =>
+        _settingsStack.Push(layer);
 
-    public ImmutableDictionary<string, RawKustoSetting> Pop()
-    {
-        if (_settingsStack.Any())
-            return _settingsStack.Pop();
-        return ImmutableDictionary<string, RawKustoSetting>.Empty;
-    }
+    public ImmutableDictionary<string, RawKustoSetting> Pop() =>
+        _settingsStack.Any()
+            ? _settingsStack.Pop()
+            : ImmutableDictionary<string, RawKustoSetting>.Empty;
 
     public void Set(string setting, string value)
     {
@@ -132,9 +131,7 @@ public class KustoSettingsProvider
         var trueValues = new[] { "true", "yes", "on", "1" };
         var falseValues = new[] { "false", "no", "off", "0" };
         var s = Get(setting).ToLowerInvariant();
-        if (trueValues.Contains(s)) return true;
-        //if (falseValues.Contains(s)) return false;
-        return false;
+        return trueValues.Contains(s);
     }
 
     public IEnumerable<RawKustoSetting> Enumerate() => GetFlattened().Values;

@@ -17,12 +17,10 @@ public class EditorHelper(TextEditor query)
 
     private bool LineNumberIsValid(int line) => line >= 1 && line <= Query.Document.LineCount;
 
-    public string TextInLine(int line)
-    {
-        if (!LineNumberIsValid(line))
-            return string.Empty;
-        return GetText(Query.Document.GetLineByNumber(line));
-    }
+    public string TextInLine(int line) =>
+        !LineNumberIsValid(line)
+            ? string.Empty
+            : GetText(Query.Document.GetLineByNumber(line));
 
     public bool LineIsTopOfBlock(int line) => TextInLine(line - 1).IsBlank() & TextInLine(line).IsNotBlank();
 

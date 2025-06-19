@@ -368,7 +368,7 @@ public partial class MainViewModel : ObservableObject
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path)
         });
 
-        if (result is not null && result.TryGetLocalPath() is string path)
+        if (result?.TryGetLocalPath() is string  path)
         {
             SaveWorkspace(path);
             //make sure we update title bar

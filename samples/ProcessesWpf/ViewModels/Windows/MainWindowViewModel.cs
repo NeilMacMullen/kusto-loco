@@ -32,6 +32,6 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<MenuItem> _trayMenuItems =
     [
-        new MenuItem { Header = "Home", Tag = "tray_home" }
+        new() { Header = "Home", Tag = "tray_home" }
     ];
 }
