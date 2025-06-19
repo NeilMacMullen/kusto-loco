@@ -91,10 +91,7 @@ public class PopupSupport
     {
         var sb = new StringBuilder();
         sb.AppendLine(popup.Series);
-        if (popup.InvertAxes)
-            sb.AppendLine(GetYLabel(popup.X));
-        else
-            sb.AppendLine(GetXLabel(popup.X));
+        sb.AppendLine(popup.InvertAxes ? GetYLabel(popup.X) : GetXLabel(popup.X));
 
         if (popup.Y == popup.V)
             sb.AppendLine(GetYLabel(popup.Y));

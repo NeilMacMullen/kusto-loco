@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>12</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

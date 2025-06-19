@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <RootNamespace>KustoLoco.SourceGeneration</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

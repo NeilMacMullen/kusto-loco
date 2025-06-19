@@ -13,6 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>https://github.com/NeilMacMullen/kusto-loco</RepositoryType>
     <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/wiki/Release-Notes</PackageReleaseNotes>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
