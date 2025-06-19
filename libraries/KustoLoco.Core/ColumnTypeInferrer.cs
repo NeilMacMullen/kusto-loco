@@ -3,13 +3,12 @@ using System.Globalization;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource.Columns;
-using NLog;
 
 namespace KustoLoco.Core;
 
 
 /// <summary>
-/// Tries to infer the type of a column based on its contents
+/// Tries to infer the type of the column based on its contents
 /// </summary>
 /// <remarks>
 /// Inferring the type is error-prone. Excel is infamous for example, for turning things that look like
@@ -17,7 +16,6 @@ namespace KustoLoco.Core;
 /// </remarks>
 public static class ColumnTypeInferrer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private static readonly TypeTrier [] TypeTriers =
     [
         //don't bother with int .... Kusto is natively "long"
