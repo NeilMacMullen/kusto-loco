@@ -13,6 +13,7 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
 | order by TotalThreads";
 
     [ObservableProperty] private ObservableCollection<object> _resultData = [];
+    [ObservableProperty] private KustoQueryResult _result = KustoQueryResult.Empty;
 
     public Task OnNavigatedFromAsync()
     {
@@ -41,10 +42,10 @@ public partial class DashboardViewModel : ObservableObject, INavigationAware
 
         //run query
         var query = Query.Trim();
-        var result = await context.RunQuery(query);
+        Result = await context.RunQuery(query);
 
         //render results
         ResultData.Clear();
-        foreach (var item in result.ToDataTableOrError().DefaultView) ResultData.Add(item);
+        foreach (var item in Result.ToDataTableOrError().DefaultView) ResultData.Add(item);
     }
 }

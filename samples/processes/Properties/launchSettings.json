@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "processes": {
+      "commandName": "Project",
+      "commandLineArgs": " browser \"processes | take 5 | render piechart\""
+    }
+  }
+}

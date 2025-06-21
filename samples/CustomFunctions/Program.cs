@@ -25,10 +25,13 @@ internal class Program
 
         //run a query using our custom function
         var query = "numbers | extend FizzBuzz = fizz(N)";
-        var results = await context.RunQuery(query);
 
+
+        Console.WriteLine($"Running query: {query}");
+        var results = await context.RunQuery(query);
+        Console.WriteLine("Results:");
         foreach (var fb in results.ToRecords<Number>())
-            Console.WriteLine(fb);
+            Console.WriteLine("   "+fb);
     }
 
     private readonly record struct Number(int N, string FizzBuzz);

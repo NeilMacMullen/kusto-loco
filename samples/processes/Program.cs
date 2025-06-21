@@ -1,62 +1,36 @@
 ﻿using System.Reflection;
+using CliRendering;
 using KustoLoco.Core;
 using KustoLoco.Rendering;
+using KustoLoco.Rendering.ScottPlot;
+using NLog.LayoutRenderers;
 using NotNullStrings;
 using Spectre.Console;
 
-ShowHelpIfAppropriate();
+//validate arguments
+ShowHelpIfAppropriate(false);
+var renderingPreference = CliRenderer.GetValidatedRenderingPreference(args, 2);
+if (renderingPreference.IsBlank())
+        ShowHelpIfAppropriate(true);
+var renderer = new CliRenderer(renderingPreference);
 
+var query = "processes |" +args.Last();  //add the table name to make querying easier
 
+//get the proceseses, turn them into a table and then run the query
 var processes = ProcessReader.GetProcesses();
-var query = args.First();
 var context = new KustoQueryContext();
 context.WrapDataIntoTable("processes", processes);
 var result = await context.RunQuery(query);
 
-DisplayQueryResult(result);
+//display the results
+renderer.DisplayQueryResult(result);
 
-//end of program
+return;
 
 
-void DisplayQueryResult(KustoQueryResult queryResult)
+void ShowHelpIfAppropriate(bool force)
 {
-    // if we got an error display it and skip rendering an empty table
-    if (queryResult.Error.IsNotBlank())
-    {
-        AnsiConsole.MarkupLineInterpolated($"[red]{queryResult.Error}[/]");
-        return;
-    }
-
-    //display the results as a pretty Spectre.Console table
-    var table = new Table();
-
-    // Add columns with header names
-    foreach (var column in queryResult.ColumnDefinitions()) table.AddColumn(column.Name);
-
-    // Add rows.  Note that cells could contain nulls in the general case
-    foreach (var row in queryResult.EnumerateRows())
-    {
-        var rowCells = row.Select(CellToString).ToArray();
-        table.AddRow(rowCells);
-    }
-
-    AnsiConsole.Write(table);
-
-    //render the results as a chart if we were asked to do that
-    KustoResultRenderer.RenderChartInBrowser(queryResult);
-
-    return;
-
-    string CellToString(object? cell)
-    {
-        return cell?.ToString() ?? "<null>";
-    }
-}
-
-
-void ShowHelpIfAppropriate()
-{
-    if (args.Length != 0) return;
+    if (!force && (args.Length is > 0 and < 3)) return;
 
     var programName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
     var help = $"""
@@ -65,8 +39,12 @@ void ShowHelpIfAppropriate()
                  {programName} "take 5"
                  {programName} "where Name contains 'dotnet'"
                  {programName} "summarize TotalThreads=sum(NumThreads) by Name | order by TotalThreads | take 10"
-                 {programName} "summarize Instances=count() by Name | order by Instances | take 10 | render piechart with (title='process hogs')"
+                 {programName} png "summarize Instances=count() by Name | order by Instances | take 10 | render piechart with (title='process hogs')"
+                 
+                 If two arguments are specified the first is interpreted as directive to control chart rendering.
+                   
                 """;
+    help += CliRenderer.PreferencesHelp;
     AnsiConsole.MarkupLineInterpolated($"[yellow]{help}[/]");
     Environment.Exit(0);
 }
