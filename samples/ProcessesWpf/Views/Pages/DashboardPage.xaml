@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:ProcessesWpf.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
     Title="DashboardPage"
     d:DataContext="{d:DesignInstance local:DashboardPage,
                                      IsDesignTimeCreatable=False}"
@@ -28,7 +29,16 @@
     <DockPanel Grid.Row="1">
       <ui:Button DockPanel.Dock="Top" Command="{Binding ViewModel.RunCommand}" Content="Run"
                  ToolTip="Run" Width="100" HorizontalAlignment="Right" />
-      <ui:DataGrid ItemsSource="{Binding ViewModel.ResultData}"/>
+      <TabControl>
+        <TabItem Header="Results">
+          <ui:DataGrid ItemsSource="{Binding ViewModel.ResultData}" />
+        </TabItem>
+        <TabItem Header="Chart">
+          <ScottPlot:WpfPlot x:Name="WpfPlot1" />
+        </TabItem>
+        
+
+      </TabControl>
 
     </DockPanel>
 

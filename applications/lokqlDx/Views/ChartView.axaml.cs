@@ -73,13 +73,7 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight,
         KustoSettingsProvider kustoSettings)
-    {
-        using var plot = new Plot();
-        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
-        plot.Axes.AutoScale();
-        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, ImageFormat.Png);
-        return bytes;
-    }
+        => ScottPlotKustoResultRenderer.RenderToImage(result,ImageFormat.Png,(int)pWidth, (int)pHeight,kustoSettings);
 
     public void RenderToDisplay(KustoQueryResult result, KustoSettingsProvider kustoSettings) =>
         //important - this can be called from inside the engine so we need to dispatch it to the UI thread

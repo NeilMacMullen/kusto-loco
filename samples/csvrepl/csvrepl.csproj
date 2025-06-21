@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
+    <ProjectReference Include="..\CliRendering\CliRendering.csproj" />
   </ItemGroup>
 
 </Project>

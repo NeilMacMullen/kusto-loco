@@ -29,33 +29,33 @@ public static class ScottPlotKustoResultRenderer
         }
     }
 
-    public static void SetInitialUiPreferences(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
+    private static void SetInitialUiPreferences(KustoQueryResult result, Plot plot, KustoSettingsProvider settings)
     {
         var paletteName = settings.GetOr("scottplot.palette", "");
 
         //look for a palette by name
-        var ipallette = Palette.GetPalettes()
+        var iPalette = Palette.GetPalettes()
             .FirstOrDefault(f => f.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
 
         //alternatively try a colormap
-        if (ipallette == null)
+        if (iPalette == null)
         {
             var map = Colormap.GetColormaps()
                 .FirstOrDefault(c => c.Name.Equals(paletteName, StringComparison.InvariantCultureIgnoreCase));
             if (map != null)
-                ipallette = new HeatmapPalette(256, map);
+                iPalette = new HeatmapPalette(256, map);
         }
 
         //finally, allow palettes to be defined as lists of hex colors
-        if (ipallette == null)
+        if (iPalette == null)
         {
             var custom = paletteName.Tokenize(" ,;");
-            ipallette = custom.Length > 1
+            iPalette = custom.Length > 1
                 ? Palette.FromColors(custom)
-                : new Penumbra();
+                : new Tsitsulin();
         }
 
-        plot.Add.Palette = ipallette;
+        plot.Add.Palette = iPalette;
         SetColorFromSetting(settings, "scottplot.figurebackground.color", c => plot.FigureBackground.Color = c,
             "#181818");
         SetColorFromSetting(settings, "scottplot.databackground.color", c => plot.DataBackground.Color = c, "#1f1f1f");
@@ -168,7 +168,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Column && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2,true);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -180,7 +180,7 @@ public static class ScottPlotKustoResultRenderer
 
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Bar && result.ColumnCount >= 2)
         {
-            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2);
+            StandardAxisAssignment(settings, accessor, StandardAxisPreferences, 0, 1, 2,true);
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
@@ -200,7 +200,7 @@ public static class ScottPlotKustoResultRenderer
             FixupAxisForLadder(plot, accessor);
         }
 
-        FinishUIPreferences(plot, settings);
+        FinishUiPreferences(plot, settings);
     }
 
     private static ResultChartAccessor.ChartSeries AccumulateIfRequired(KustoQueryResult result,
@@ -210,7 +210,7 @@ public static class ScottPlotKustoResultRenderer
             ? ordered.AccumulateY()
             : ordered;
 
-    private static void FinishUIPreferences(Plot plot, KustoSettingsProvider settings)
+    private static void FinishUiPreferences(Plot plot, KustoSettingsProvider settings)
     {
         plot.Axes.Bottom.Label.FontSize = settings.GetIntOr("scottplot.axes.bottom.label.fontsize", 12);
         plot.Axes.Left.Label.FontSize = settings.GetIntOr("scottplot.axes.left.label.fontsize", 12);
@@ -227,7 +227,7 @@ public static class ScottPlotKustoResultRenderer
     }
 
     private static void StandardAxisAssignment(KustoSettingsProvider settings, ResultChartAccessor accessor,
-        string preferences, int x, int y, int s)
+        string preferences, int x, int y, int s,bool allowSeriesInference=false)
     {
         var cols = settings.GetOr("scottplot.axisorder", "automatic") == "explicit"
             ? accessor.TryOrdering("xxx")
@@ -237,6 +237,14 @@ public static class ScottPlotKustoResultRenderer
         accessor.AssignValueColumn(cols[y].Index);
         if (s < cols.Length)
             accessor.AssignSeriesNameColumn(cols[s].Index);
+        else if (allowSeriesInference)
+        {
+            //if we have only 2 columns, and one of this is ordinal we  can infer a series name column
+            if (accessor.IsNominal(cols[x]))
+                accessor.AssignSeriesNameColumn(cols[x].Index);
+            if (accessor.IsNominal(cols[y]))
+                accessor.AssignSeriesNameColumn(cols[y].Index);
+        }
     }
 
 
@@ -397,11 +405,8 @@ public static class ScottPlotKustoResultRenderer
         int widthInPixels,
         int heightInPixels)
     {
-        using var plot = new Plot();
-        RenderToPlot(plot, result, settings);
-        var bytes = plot.GetImageBytes(widthInPixels, heightInPixels);
+        var bytes = RenderToImage(result, ImageFormat.Bmp, widthInPixels, heightInPixels, settings);
         var src = ArgbPixelSource.FromScottPlotBmp(bytes);
-
         return SixelMaker.FrameToSixelString(src);
     }
 
@@ -419,11 +424,30 @@ public static class ScottPlotKustoResultRenderer
     /// <summary>
     ///     Attempts to generate a sixel that fits the current screen
     /// </summary>
+    /// <remarks>
+    /// linesAtEnd can be specified to ensure there is room at the end
+    /// of the screen after the chart
+    /// </remarks>
     public static string RenderToSixelWithPad(
         KustoQueryResult result,
-        KustoSettingsProvider settings, int linesAtEnd)
+        KustoSettingsProvider settings,
+        int linesAtEnd)
     {
         var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
         return RenderToSixel(result, settings, width, height);
     }
+
+    /// <summary>
+    /// Renders a KustoQueryResult to an image in the specified format
+    /// </summary>
+    public static byte[] RenderToImage(KustoQueryResult result, ImageFormat format,  double pWidth, double pHeight,
+        KustoSettingsProvider kustoSettings)
+    {
+        using var plot = new Plot();
+        ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
+        plot.Axes.AutoScale();
+        var bytes = plot.GetImageBytes((int)pWidth, (int)pHeight, format);
+        return bytes;
+    }
+
 }

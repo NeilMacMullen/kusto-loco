@@ -18,11 +18,13 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="ScottPlot.WPF" />
     <PackageReference Include="WPF-UI" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
+    <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
   </ItemGroup>
 
   <ItemGroup>
