@@ -28,8 +28,8 @@
                     <StackPanel
                         Orientation="Horizontal"
                         Spacing="5">
-                        <TextBlock Text="{Binding Name}"/>
-                        <TextBlock Text="(ABC 123)" FontFamily="{Binding}"/>
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="(ABC 123)" FontFamily="{Binding}" />
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
@@ -44,29 +44,29 @@
             VerticalContentAlignment="Center"
             Minimum="8" Maximum="40"
             FormatString="0"
-            Value="{Binding FontSize}"/>
+            Value="{Binding FontSize}" />
 
         <CheckBox
             Grid.Column="1"
             Grid.Row="2"
             Content="Word wrap"
-            IsChecked="{Binding WordWrap}"/>
+            IsChecked="{Binding WordWrap}" />
 
         <CheckBox
             Grid.Column="2"
             Grid.Row="2"
             Content="Show line numbers"
-            IsChecked="{Binding ShowLineNumbers}"/>
+            IsChecked="{Binding ShowLineNumbers}" />
 
         <CheckBox
             Grid.Row="2"
             Content="Automatically save workspace before running query"
-            IsChecked="{Binding SaveBeforeQuery}"/>
+            IsChecked="{Binding SaveBeforeQuery}" />
 
         <TextBlock
             Grid.Row="3"
             Grid.ColumnSpan="5"
-            Text="Application pre-script (run every time a workspace is loaded)"/>
+            Text="Application pre-script (run every time a workspace is loaded)" />
 
         <Border
             Grid.ColumnSpan="6"
@@ -80,20 +80,20 @@
                 FontSize="{Binding FontSize}"
                 WordWrap="{Binding WordWrap}"
                 ShowLineNumbers="{Binding ShowLineNumbers}"
-                Document="{Binding Document}">
-            </avaloniaEdit:TextEditor>
+                Document="{Binding Document}"
+                MinHeight="100" />
         </Border>
 
         <Button
             Grid.Column="4"
             Grid.Row="5"
             Content="Cancel"
-            Command="{Binding CancelCommand}"/>
-        
+            Command="{Binding CancelCommand}" />
+
         <Button
             Grid.Column="5"
             Grid.Row="5"
             Content="Save"
-            Command="{Binding SaveCommand}"/>
+            Command="{Binding SaveCommand}" />
     </Grid>
 </UserControl>

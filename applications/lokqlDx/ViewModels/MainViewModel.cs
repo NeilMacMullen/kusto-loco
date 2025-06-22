@@ -133,7 +133,12 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void RenameQuery(QueryItemViewModel model) => Console.WriteLine("Here");
+    private async Task RenameQuery(QueryItemViewModel model)
+    {
+        var text = new RenamableText(model.Header);
+        await _dialogService.ShowRenameDialogs(text);
+        model.Header = text.NewText;
+    }
 
     [RelayCommand]
     private async Task Initialize()
@@ -494,3 +499,14 @@ public partial class MainViewModel : ObservableObject
 }
 
 public record PersistedQuery(string Name, string Text);
+
+public class RenamableText
+{
+    public RenamableText(string initialText)
+    {
+        InitialText = initialText;
+        NewText = initialText;
+    }
+    public string InitialText =string.Empty;
+    public string NewText;
+}

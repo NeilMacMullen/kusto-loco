@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using DependencyPropertyGenerator;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using LokqlDx.Models;
@@ -86,6 +87,14 @@ public class DialogService
                 new ApplicationPreferencesViewModel(preferencesManager))
             .ConfigureAwait(false);
 
+
+    public async Task ShowRenameDialogs(RenamableText initialText) =>
+        await ShowDialog(
+                "Rename",
+                new RenameDialog(),
+                new RenameDialogModel(initialText))
+            .ConfigureAwait(false);
+
     public async Task
         ShowWorkspacePreferences(LokqlDx.WorkspaceManager workspaceManager, UIPreferences uiPreferences) =>
         await ShowDialog(
@@ -103,6 +112,7 @@ public class DialogService
                 Title = title,
                 Content = content,
                 DataContext = dataContext,
+                SizeToContent = SizeToContent.WidthAndHeight,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
