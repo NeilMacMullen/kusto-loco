@@ -67,14 +67,14 @@ public class DialogService
 
 
 
-    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings)
+    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings,DisplayPreferencesViewModel displayPreferences)
     {
         //use the first line of the query as the title
         var title = result.Query.Tokenize("\r\n").FirstOrDefault("result");
         await ShowDialog(
                title,
                 new Flyout(),
-                new FlyoutViewModel(result, explorerSettings),
+                new FlyoutViewModel(result, explorerSettings,displayPreferences),
                 true)
             .ConfigureAwait(false);
     }

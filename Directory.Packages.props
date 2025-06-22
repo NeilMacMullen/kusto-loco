@@ -5,6 +5,7 @@
   <ItemGroup>
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.1.1" />
     <PackageVersion Include="Avalonia.Labs.Controls" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Skia" Version="11.3.1" />
@@ -68,7 +69,7 @@
     <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.1.4" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.0.11" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />

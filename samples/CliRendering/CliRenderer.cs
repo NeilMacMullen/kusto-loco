@@ -35,7 +35,7 @@ public class CliRenderer
     /// <remarks>
     ///     return true if there was an error
     /// </remarks>
-    private static bool DisplayError(string error)
+    public static bool DisplayError(string error)
     {
         if (error.IsBlank()) return false;
         AnsiConsole.MarkupLineInterpolated($"[red]{error}[/]");
@@ -161,4 +161,9 @@ public class CliRenderer
         
         The default value is 'sixel';
         """;
+
+    public static void DisplayPrompt(string prompt)
+    {
+        AnsiConsole.MarkupInterpolated($"[green]{prompt}[/]");
+    }
 }

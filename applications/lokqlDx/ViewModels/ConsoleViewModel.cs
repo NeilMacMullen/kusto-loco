@@ -7,11 +7,20 @@ namespace LokqlDx.ViewModels;
 
 public partial class ConsoleViewModel : ObservableObject, IKustoConsole
 {
+    
     [ObservableProperty] private ObservableCollection<ColoredText> _consoleContent = [];
     [ObservableProperty] private double _consoleWidth;
-    [ObservableProperty] private FontFamily? _fontFamily;
-    [ObservableProperty] private double _fontSize = 20;
     [ObservableProperty] private ColoredText? _selectedItem;
+    [ObservableProperty] private DisplayPreferencesViewModel _displayPreferencesPreferences;
+
+    public ConsoleViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
+    {
+        ConsoleContent = new ObservableCollection<ColoredText>();
+        ForegroundColor = ConsoleColor.White;
+        WindowWidth = 80; // Default width
+        DisplayPreferencesPreferences = displayPreferencesPreferences;
+        
+    }
 
     public int WindowWidth { get; private set; } = 80;
 
@@ -53,11 +62,6 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
             _ => Brushes.Black
         };
 
-    internal void SetUiPreferences(UIPreferences uiPreferences)
-    {
-        FontFamily = new FontFamily(uiPreferences.FontFamily);
-        FontSize = uiPreferences.FontSize;
-    }
 
     internal void PrepareForOutput() => ConsoleContent.Clear();
 

@@ -77,8 +77,6 @@
             <MenuItem Header="View">
                 <MenuItem Header="Show current result in flyout"
                           Command="{Binding FlyoutCurrentResultCommand}" />
-                <MenuItem Header="Reset layout"
-                          Command ="{Binding ResetGridLayoutCommand}"/>
             </MenuItem>
 
             <MenuItem Header="Misc">
@@ -120,45 +118,21 @@
         <Grid RowDefinitions="*,30">
             <Grid
                 x:Name="MainGrid"
-                ColumnDefinitions="400,auto,*"
                 RowDefinitions="*,auto,*">
 
-                <TabControl
-                    Grid.Row="0"
-                    Grid.Column="0">
-                    <TabItem Header="Edit">
-                        <views:QueryEditorView DataContext="{Binding QueryEditorViewModel}" />
-                    </TabItem>
-                    <TabItem Header="Copilot">
-                        <views:CopilotChatView />
-                    </TabItem>
-                </TabControl>
+				<views:QueryView Grid.Row="0" DataContext="{Binding QueryModel}">
+				</views:QueryView>
 
                 <GridSplitter
                     Grid.Row="1"
-                    Grid.Column="0"
                     Height="5"
                     Background="#227F7F7F"
-                    DragCompleted="RowGridSplitter_DragCompleted" />
+                    />
 
                 <views:ConsoleView
                     Background="{DynamicResource SystemAltLowColor}"
                     Grid.Row="2"
-                    Grid.Column="0"
                     DataContext="{Binding ConsoleViewModel}" />
-
-                <GridSplitter
-                    Grid.RowSpan="3"
-                    Grid.Column="1"
-                    Width="5"
-                    Background="#227F7F7F"
-                    DragCompleted="ColumnGridSplitter_DragCompleted" />
-
-                <views:RenderingSurfaceView
-                    DataContext="{Binding RenderingSurfaceViewModel}"
-                    Grid.RowSpan="3"
-                    Grid.Column="2" />
-
             </Grid>
 
             <StackPanel

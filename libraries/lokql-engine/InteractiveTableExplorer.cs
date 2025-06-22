@@ -2,6 +2,7 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
+using NetTopologySuite.Utilities;
 using NotNullStrings;
 
 namespace Lokql.Engine;
@@ -24,27 +25,49 @@ public class InteractiveTableExplorer
     public readonly CommandProcessor _commandProcessor;
     private readonly KustoQueryContext _context;
     public readonly BlockInterpolator _interpolator;
-    public readonly ITableAdaptor _loader;
-    private readonly MacroRegistry _macros = new();
+    private readonly MacroRegistry _macros ;
     public readonly IKustoConsole _outputConsole;
     private readonly IResultRenderingSurface _renderingSurface;
     public readonly KustoSettingsProvider Settings;
-    public DisplayOptions _currentDisplayOptions = new(10);
-    public ResultHistory _resultHistory = new();
+    public readonly ResultHistory _resultHistory;
+    public readonly ITableAdaptor _loader;
+
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
         CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface)
     {
         _outputConsole = outputConsole;
-        _loader = loader;
         Settings = settings;
         _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
-        _context.SetTableLoader(_loader);
+        _loader = loader;
+        _context.SetTableLoader(loader);
+        _resultHistory = new ResultHistory();
+        _macros=new MacroRegistry();        
         LokqlSettings.Register(Settings);
     }
+
+
+    /// <summary>
+    /// Used to create a clone
+    /// </summary>
+    private InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
+        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface,ResultHistory history,MacroRegistry macros,
+        ITableAdaptor loader)
+    {
+        _outputConsole = outputConsole;
+        Settings = settings;
+        _loader=loader;
+        _interpolator = new BlockInterpolator(settings);
+        _commandProcessor = commandProcessor;
+        _renderingSurface = renderingSurface;
+        _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
+        _macros = macros;
+        _resultHistory = history;
+    }
+
 
     public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
@@ -104,7 +127,7 @@ public class InteractiveTableExplorer
             }
             else
             {
-                var max = _currentDisplayOptions.MaxToDisplay;
+                var max = 10; //_currentDisplayOptions.MaxToDisplay;
                 ShowResultsToConsole(result, 0, max);
             }
 
@@ -232,8 +255,11 @@ public class InteractiveTableExplorer
         return _resultHistory.Fetch(name);
     }
 
+    public InteractiveTableExplorer ShareWithNewSurface(IResultRenderingSurface renderingSurface)
+    {
+        return new InteractiveTableExplorer(_outputConsole, Settings, _commandProcessor, renderingSurface,
+            _resultHistory,_macros,_loader);
 
-
-    public readonly record struct DisplayOptions(int MaxToDisplay);
+    }
 }
 public readonly record struct SchemaLine(string Command, string Table, string Column);

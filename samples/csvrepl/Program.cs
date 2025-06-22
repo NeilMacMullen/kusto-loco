@@ -18,18 +18,20 @@ var renderer = new CliRenderer(renderingPreference);
 var result = await CsvSerializer.Default(new KustoSettingsProvider(), new SystemConsole())
     .LoadTable(args.First(), "data");
 
-if (result.Error.IsNotBlank())
-{
-    Console.WriteLine(result.Error);
-    return;
-}
 
+//fail if we couldn't load the file
+if (CliRenderer.DisplayError(result.Error))
+    return;
+
+
+//set up the context for querying
 var context = new KustoQueryContext()
     .AddTable(result.Table);
 
+//repl loop
 while (true)
 {
-    Console.Write(">");
+    CliRenderer.DisplayPrompt(">");
     var query = "data | " + Console.ReadLine()!.Trim();
     var res = await context.RunQuery(query);
     renderer.DisplayQueryResult(res);
