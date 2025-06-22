@@ -121,7 +121,7 @@
             <Grid
                 x:Name="MainGrid"
                 RowDefinitions="*,auto,*">
-                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}">
+                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}" SelectedIndex="{Binding ActiveQueryIndex}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Header}">

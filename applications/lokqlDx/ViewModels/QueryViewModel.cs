@@ -19,9 +19,17 @@ public partial class QueryViewModel : ObservableObject
         _explorer = explorer.ShareWithNewSurface(RenderingSurfaceViewModel);
         CopilotChatViewModel = new CopilotChatViewModel();
        
-        QueryEditorViewModel = new QueryEditorViewModel(_explorer,console,intellisenseClient,logger,displayPreferences);
-        QueryEditorViewModel.AddInternalCommands(_explorer._commandProcessor.GetVerbs());
-        //QueryEditorViewModel.ExecutingQuery += QueryEditorViewModel_ExecutingQuery;
-        QueryEditorViewModel.SetText(initialText);
+        QueryEditorViewModel = new QueryEditorViewModel(_explorer,console,intellisenseClient,logger,displayPreferences,initialText);
+       
+    }
+
+    public bool IsDirty()
+    {
+       return QueryEditorViewModel.IsDirty;
+    }
+
+    public string GetText()
+    {
+        return QueryEditorViewModel.GetText();
     }
 }

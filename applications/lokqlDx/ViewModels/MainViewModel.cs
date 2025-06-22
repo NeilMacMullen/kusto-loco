@@ -17,38 +17,37 @@ namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    private readonly CommandProcessor _commandProcessor;
     private readonly CommandProcessorFactory _commandProcessorFactory;
     private readonly DialogService _dialogService;
-    private readonly PreferencesManager _preferencesManager;
-    private readonly RegistryOperations _registryOperations;
-    private readonly IStorageProvider _storage;
-    private readonly ILauncher _launcher;
-    private readonly IntellisenseClient _intellisenseClient;
-    private readonly ILogger<QueryEditorViewModel> _queryEditorLogger;
-    private readonly WorkspaceManager _workspaceManager;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
-    
-   
-
-    private readonly CommandProcessor _commandProcessor;
+    private readonly IntellisenseClient _intellisenseClient;
+    private readonly ILauncher _launcher;
+    private readonly PreferencesManager _preferencesManager;
+    private readonly ILogger<QueryEditorViewModel> _queryEditorLogger;
+    private readonly RegistryOperations _registryOperations;
+    private readonly IStorageProvider _storage;
+    private readonly WorkspaceManager _workspaceManager;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
-   
+
     [ObservableProperty] private Workspace _currentWorkspace = new();
 
     private InteractiveTableExplorer _explorer;
 
     private string _initWorkspacePath = string.Empty;
+
+    [ObservableProperty] private bool _isDirty;
+
+    [ObservableProperty] private ObservableCollection<QueryItemViewModel> _queries = new();
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
-    [ObservableProperty] private string _updateInfo = string.Empty;
     [ObservableProperty] private bool _showUpdateInfo;
+    [ObservableProperty] private string _updateInfo = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
+    [ObservableProperty] private int _activeQueryIndex = 0;
 
-    [ObservableProperty] private  ObservableCollection<QueryItemViewModel> _queries  = new();
-
-    [ObservableProperty] private QueryViewModel? _queryModel ;
 
     public MainViewModel(
         DialogService dialogService,
@@ -62,7 +61,7 @@ public partial class MainViewModel : ObservableObject
         ILogger<QueryEditorViewModel> queryEditorLogger
     )
     {
-        _displayPreferences= new DisplayPreferencesViewModel();
+        _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
         _commandProcessorFactory = commandProcessorFactory;
@@ -94,49 +93,60 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void AddQuery()
     {
-        QueryModel = new QueryViewModel(
+        AddQuery("new query",string.Empty);
+        ActiveQueryIndex= Queries.Count - 1;
+    }
+    private void AddQuery(string name, string content)
+    {
+        var queryModel = new QueryViewModel(
             ConsoleViewModel,
             _explorer,
             _intellisenseClient,
             _queryEditorLogger,
-            string.Empty, _displayPreferences
-
+            content, _displayPreferences
         );
 
-        Queries.Add(new QueryItemViewModel("new query", QueryModel));
+        Queries.Add(new QueryItemViewModel(name, queryModel));
     }
 
     [RelayCommand]
     private void DeleteQuery(QueryItemViewModel model)
     {
-        Console.WriteLine("Here");
+        if (Queries.Count <= 1)
+        {
+            //can't delete the last query
+            return;
+        }
+
+        var prevActiveIndex = ActiveQueryIndex;
+        var indexOfThis = Queries.IndexOf(model);
+        Queries.RemoveAt(indexOfThis);
+        if (prevActiveIndex > indexOfThis)
+        {
+            ActiveQueryIndex = prevActiveIndex - 1;
+        }
+        else if (prevActiveIndex == indexOfThis)
+        {
+            ActiveQueryIndex =Math.Clamp(prevActiveIndex ,0,Queries.Count-1);
+        }
+
     }
+
     [RelayCommand]
-    private void RenameQuery(QueryItemViewModel model)
-    {
-        Console.WriteLine("Here");
-    }
+    private void RenameQuery(QueryItemViewModel model) => Console.WriteLine("Here");
 
     [RelayCommand]
     private async Task Initialize()
     {
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.RetrieveUiPreferencesFromDisk();
-        QueryModel = new QueryViewModel(
-            ConsoleViewModel,
-            _explorer,
-            _intellisenseClient,
-            _queryEditorLogger,
-            string.Empty, _displayPreferences
+        AddQuery("new query", string.Empty);
 
-            );
 
-        Queries = new ObservableCollection<QueryItemViewModel>(
-            new QueryItemViewModel[] { new QueryItemViewModel("query", QueryModel) });
         _preferencesManager.EnsureDefaultFolderExists();
         ApplyUiPreferences(false);
         RebuildRecentFilesList();
-    
+
         await LoadWorkspace(_initWorkspacePath);
 
         var newVersion = await UpgradeManager.UpdateAvailable();
@@ -263,7 +273,7 @@ public partial class MainViewModel : ObservableObject
     private void ApplyUiPreferences(bool skipGrid)
     {
         var uiPreferences = _preferencesManager.UIPreferences;
-        _displayPreferences.FontFamily=uiPreferences.FontFamily;
+        _displayPreferences.FontFamily = uiPreferences.FontFamily;
         _displayPreferences.FontSize = uiPreferences.FontSize;
         _displayPreferences.WordWrap = uiPreferences.WordWrap;
         _displayPreferences.ShowLineNumbers = uiPreferences.ShowLineNumbers;
@@ -273,7 +283,6 @@ public partial class MainViewModel : ObservableObject
 
     private InteractiveTableExplorer CreateExplorer()
     {
-
         //create a new explorer context
         var loader = new StandardFormatAdaptor(
             _workspaceManager.Settings, ConsoleViewModel);
@@ -286,7 +295,7 @@ public partial class MainViewModel : ObservableObject
             _commandProcessor,
             new NullResultRenderingSurface());
     }
-    
+
     private async Task LoadWorkspace(string path)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
@@ -298,16 +307,20 @@ public partial class MainViewModel : ObservableObject
         _workspaceManager.Load(path);
         CurrentWorkspace = _workspaceManager.Workspace;
 
-        //make sure we change the context - note we do this after resetting settings
-        QueryModel = new QueryViewModel(ConsoleViewModel, _explorer, _intellisenseClient, _queryEditorLogger,
-            CurrentWorkspace.Text,_displayPreferences);
+        //reset the list of queries
+        Queries = [];
 
-        Queries = new ObservableCollection<QueryItemViewModel>(
-            new QueryItemViewModel[] { new QueryItemViewModel("query", QueryModel) });
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
         await _explorer.RunInput(_workspaceManager.Workspace.StartupScript);
-      
+
+        if (CurrentWorkspace.Queries.Any())
+            foreach (var p in CurrentWorkspace.Queries)
+                AddQuery(p.Name, p.Text);
+        else
+            AddQuery("query", CurrentWorkspace.Text);
+        ActiveQueryIndex = 0;
+
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
@@ -335,6 +348,12 @@ public partial class MainViewModel : ObservableObject
         WindowTitle = title;
     }
 
+    private bool RecheckDirty()
+    {
+        IsDirty = Queries.Any(q => q.QueryModel.IsDirty());
+        return IsDirty;
+    }
+
     /// <summary>
     ///     Allow the user to save any pending changes
     /// </summary>
@@ -343,14 +362,14 @@ public partial class MainViewModel : ObservableObject
     /// </returns>
     private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
-        if (!_workspaceManager.IsDirty(CurrentWorkspace))
+        if (!RecheckDirty())
             return YesNoCancel.Yes;
 
         var shouldSave = _preferencesManager.FetchCachedApplicationSettings().AutoSave;
         //always show the dialog if this is a new workspace
         //because otherwise it's a little disconcerting to click close
         //and immediately find yourself in the save-as dialog
-        if (!shouldSave || _workspaceManager.IsNewWorkspace)
+        if (!shouldSave || _workspaceManager.IsNewWorkspace || IsDirty)
         {
             var result = await _dialogService.ShowConfirmCancelBox("Warning",
                 "You have have unsaved changes. Do you want to save them?");
@@ -371,7 +390,7 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private async Task<YesNoCancel> Save()
     {
-        if (!_workspaceManager.IsDirty(CurrentWorkspace))
+        if (!RecheckDirty())
             return YesNoCancel.Yes;
 
         if (_workspaceManager.IsNewWorkspace) return await SaveAs();
@@ -402,7 +421,7 @@ public partial class MainViewModel : ObservableObject
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path)
         });
 
-        if (result?.TryGetLocalPath() is string  path)
+        if (result?.TryGetLocalPath() is string path)
         {
             SaveWorkspace(path);
             //make sure we update title bar
@@ -419,6 +438,10 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveWorkspace(string path)
     {
+        var queries = Queries
+            .Select(q => new PersistedQuery(q.Header, q.QueryModel.GetText()))
+            .ToArray();
+        CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
         UpdateMostRecentlyUsed(path);
     }
@@ -450,16 +473,13 @@ public partial class MainViewModel : ObservableObject
                 path));
     }
 
-   
 
-   
     [RelayCommand]
     private async Task FlyoutCurrentResult()
     {
         var result = _explorer.GetPreviousResult();
 
-        await _dialogService.FlyoutResult(result,_explorer.Settings,_displayPreferences);
-
+        await _dialogService.FlyoutResult(result, _explorer.Settings, _displayPreferences);
     }
 
     private void PersistUiPreferencesToDisk()
@@ -472,3 +492,5 @@ public partial class MainViewModel : ObservableObject
         _preferencesManager.SaveUiPrefs();
     }
 }
+
+public record PersistedQuery(string Name, string Text);
