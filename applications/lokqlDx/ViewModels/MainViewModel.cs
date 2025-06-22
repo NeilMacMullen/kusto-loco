@@ -46,6 +46,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
 
+    [ObservableProperty] private  ObservableCollection<QueryItemViewModel> _queries  = new();
+
     [ObservableProperty] private QueryViewModel? _queryModel ;
 
     public MainViewModel(
@@ -79,12 +81,7 @@ public partial class MainViewModel : ObservableObject
             _workspaceManager.Settings, ConsoleViewModel);
 
 
-        _explorer = new InteractiveTableExplorer(
-            ConsoleViewModel,
-            loader,
-            _workspaceManager.Settings,
-            _commandProcessor,
-            new NullResultRenderingSurface());
+        _explorer = CreateExplorer();
     }
 
     partial void OnCurrentWorkspaceChanged(Workspace value)
@@ -93,6 +90,32 @@ public partial class MainViewModel : ObservableObject
     }
 
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
+
+    [RelayCommand]
+    private void AddQuery()
+    {
+        QueryModel = new QueryViewModel(
+            ConsoleViewModel,
+            _explorer,
+            _intellisenseClient,
+            _queryEditorLogger,
+            string.Empty, _displayPreferences
+
+        );
+
+        Queries.Add(new QueryItemViewModel("new query", QueryModel));
+    }
+
+    [RelayCommand]
+    private void DeleteQuery(QueryItemViewModel model)
+    {
+        Console.WriteLine("Here");
+    }
+    [RelayCommand]
+    private void RenameQuery(QueryItemViewModel model)
+    {
+        Console.WriteLine("Here");
+    }
 
     [RelayCommand]
     private async Task Initialize()
@@ -107,8 +130,9 @@ public partial class MainViewModel : ObservableObject
             string.Empty, _displayPreferences
 
             );
-        
-       
+
+        Queries = new ObservableCollection<QueryItemViewModel>(
+            new QueryItemViewModel[] { new QueryItemViewModel("query", QueryModel) });
         _preferencesManager.EnsureDefaultFolderExists();
         ApplyUiPreferences(false);
         RebuildRecentFilesList();
@@ -247,25 +271,28 @@ public partial class MainViewModel : ObservableObject
             return;
     }
 
-    
+    private InteractiveTableExplorer CreateExplorer()
+    {
+
+        //create a new explorer context
+        var loader = new StandardFormatAdaptor(
+            _workspaceManager.Settings, ConsoleViewModel);
+
+
+        return new InteractiveTableExplorer(
+            ConsoleViewModel,
+            loader,
+            _workspaceManager.Settings,
+            _commandProcessor,
+            new NullResultRenderingSurface());
+    }
     
     private async Task LoadWorkspace(string path)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
 
-        //create a new explorer context
-        var loader = new StandardFormatAdaptor(
-            _workspaceManager.Settings, ConsoleViewModel);
-
-       
-        _explorer = new InteractiveTableExplorer(
-            ConsoleViewModel,
-            loader,
-            _workspaceManager.Settings,
-            _commandProcessor,
-            new NullResultRenderingSurface());
-      
+        _explorer = CreateExplorer();
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         _workspaceManager.Load(path);
@@ -275,11 +302,12 @@ public partial class MainViewModel : ObservableObject
         QueryModel = new QueryViewModel(ConsoleViewModel, _explorer, _intellisenseClient, _queryEditorLogger,
             CurrentWorkspace.Text,_displayPreferences);
 
-
+        Queries = new ObservableCollection<QueryItemViewModel>(
+            new QueryItemViewModel[] { new QueryItemViewModel("query", QueryModel) });
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
         await _explorer.RunInput(_workspaceManager.Workspace.StartupScript);
-        //UpdateMostRecentlyUsed(path);
+      
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {

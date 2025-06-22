@@ -55,7 +55,7 @@ public class InteractiveTableExplorer
     /// </summary>
     private InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
         CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface,ResultHistory history,MacroRegistry macros,
-        ITableAdaptor loader)
+        ITableAdaptor loader,KustoQueryContext context)
     {
         _outputConsole = outputConsole;
         Settings = settings;
@@ -63,7 +63,7 @@ public class InteractiveTableExplorer
         _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
-        _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
+        _context = context;
         _macros = macros;
         _resultHistory = history;
     }
@@ -258,7 +258,7 @@ public class InteractiveTableExplorer
     public InteractiveTableExplorer ShareWithNewSurface(IResultRenderingSurface renderingSurface)
     {
         return new InteractiveTableExplorer(_outputConsole, Settings, _commandProcessor, renderingSurface,
-            _resultHistory,_macros,_loader);
+            _resultHistory,_macros,_loader,_context);
 
     }
 }

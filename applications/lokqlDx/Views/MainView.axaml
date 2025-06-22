@@ -21,8 +21,8 @@
     </Interaction.Behaviors>
 
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveWorkspaceCommand}"/>
-        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveWorkspaceAsCommand}"/>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveWorkspaceCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveWorkspaceAsCommand}" />
         <KeyBinding Gesture="Ctrl+D9" Command="{Binding ChangeFontSizeCommand}">
             <KeyBinding.CommandParameter>
                 <system:Int32>-1</system:Int32>
@@ -33,8 +33,8 @@
                 <system:Int32>1</system:Int32>
             </KeyBinding.CommandParameter>
         </KeyBinding>
-        <KeyBinding Gesture="Alt+Z" Command="{Binding ToggleWordWrapCommand}"/>
-        <KeyBinding Gesture="Alt+N" Command="{Binding ToggleLineNumbersCommand}"/>
+        <KeyBinding Gesture="Alt+Z" Command="{Binding ToggleWordWrapCommand}" />
+        <KeyBinding Gesture="Alt+N" Command="{Binding ToggleLineNumbersCommand}" />
     </UserControl.KeyBindings>
 
     <DockPanel>
@@ -77,6 +77,8 @@
             <MenuItem Header="View">
                 <MenuItem Header="Show current result in flyout"
                           Command="{Binding FlyoutCurrentResultCommand}" />
+                <MenuItem Header="Add query"
+                          Command="{Binding AddQueryCommand}" />
             </MenuItem>
 
             <MenuItem Header="Misc">
@@ -119,15 +121,39 @@
             <Grid
                 x:Name="MainGrid"
                 RowDefinitions="*,auto,*">
+                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Header}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Rename"
+                                                  Command="{Binding $parent[UserControl].DataContext.RenameQueryCommand}"
+CommandParameter="{Binding}"
+                                                  />
+                                        <MenuItem Header="Delete"
+                                                  Command="{Binding $parent[UserControl].DataContext.DeleteQueryCommand}"
+                                                  CommandParameter="{Binding}"
+                                                  />
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
 
-				<views:QueryView Grid.Row="0" DataContext="{Binding QueryModel}">
-				</views:QueryView>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+
+                        <DataTemplate DataType="vm:QueryItemViewModel">
+                            <views:QueryView DataContext="{Binding QueryModel}" />
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+
 
                 <GridSplitter
                     Grid.Row="1"
                     Height="5"
-                    Background="#227F7F7F"
-                    />
+                    Background="#227F7F7F" />
 
                 <views:ConsoleView
                     Background="{DynamicResource SystemAltLowColor}"
@@ -143,7 +169,7 @@
                 <TextBlock
                     Text="{Binding UpdateInfo}"
                     IsVisible="{Binding ShowUpdateInfo}"
-                    Margin="5"/>
+                    Margin="5" />
             </StackPanel>
         </Grid>
     </DockPanel>
