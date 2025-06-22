@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using DependencyPropertyGenerator;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using LokqlDx.Models;
@@ -67,14 +68,14 @@ public class DialogService
 
 
 
-    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings)
+    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings,DisplayPreferencesViewModel displayPreferences)
     {
         //use the first line of the query as the title
         var title = result.Query.Tokenize("\r\n").FirstOrDefault("result");
         await ShowDialog(
                title,
                 new Flyout(),
-                new FlyoutViewModel(result, explorerSettings),
+                new FlyoutViewModel(result, explorerSettings,displayPreferences),
                 true)
             .ConfigureAwait(false);
     }
@@ -84,6 +85,14 @@ public class DialogService
                 "LokqlDX - Application Options",
                 new ApplicationPreferencesView(),
                 new ApplicationPreferencesViewModel(preferencesManager))
+            .ConfigureAwait(false);
+
+
+    public async Task ShowRenameDialogs(RenamableText initialText) =>
+        await ShowDialog(
+                "Rename",
+                new RenameDialog(),
+                new RenameDialogModel(initialText))
             .ConfigureAwait(false);
 
     public async Task
@@ -103,6 +112,7 @@ public class DialogService
                 Title = title,
                 Content = content,
                 DataContext = dataContext,
+                SizeToContent = SizeToContent.WidthAndHeight,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner

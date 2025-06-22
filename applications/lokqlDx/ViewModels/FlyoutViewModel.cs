@@ -11,11 +11,11 @@ public partial class FlyoutViewModel : ObservableObject,IDialogViewModel
     private readonly KustoQueryResult _result;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurface;
 
-    public FlyoutViewModel(KustoQueryResult result, KustoSettingsProvider settings)
+    public FlyoutViewModel(KustoQueryResult result, KustoSettingsProvider settings,DisplayPreferencesViewModel displayPreferences)
     {
         _result = result;
         var settings1 = settings.Snapshot();
-        _renderingSurface = new RenderingSurfaceViewModel(settings1);
+        _renderingSurface = new RenderingSurfaceViewModel(settings1,displayPreferences);
     }
 
     public async Task InitialRender()

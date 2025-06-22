@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using LokqlDx.ViewModels;
 
 namespace LokqlDx;
 
@@ -9,8 +10,8 @@ public partial class Workspace : ObservableObject
 {
     [ObservableProperty] string _text = "";
     [ObservableProperty] string _startupScript = "";
+    [ObservableProperty] PersistedQuery [] _queries =[];
     [ObservableProperty] bool _isDirty = false;
 
-    partial void OnTextChanged(string value) => IsDirty = true;
     partial void OnStartupScriptChanged(string value) => IsDirty = true;
 }

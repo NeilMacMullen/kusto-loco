@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Avalonia.Media;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -20,35 +19,36 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     public readonly IntellisenseClient _intellisenseClient;
 
     public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
-    [ObservableProperty] private Workspace? _currentWorkspace;
-
     [ObservableProperty] private TextDocument _document = new();
-    [ObservableProperty] private FontFamily? _fontFamily;
-    [ObservableProperty] private double _fontSize = 20;
     public IntellisenseEntry[] InternalCommands = [];
     public IntellisenseEntry[] KqlFunctionEntries = [];
-    [ObservableProperty] private string _queryText = string.Empty;
-
+  
     public IntellisenseEntry[] SettingNames = [];
-    [ObservableProperty] private bool _showLineNumbers;
-    [ObservableProperty] private bool _wordWrap;
     public IntellisenseEntry[] KqlOperatorEntries = [];
 
+    [ObservableProperty] private bool _isDirty;
+
+    [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel,
         IntellisenseClient intellisenseClient,
-        ILogger<QueryEditorViewModel> logger
+        ILogger<QueryEditorViewModel> logger,DisplayPreferencesViewModel displayPreferences,
+        string initialText
     )
     {
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
         _intellisenseClient = intellisenseClient;
         _logger = logger;
-
+        DisplayPreferences = displayPreferences;
+     
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
+        AddInternalCommands(_explorer._commandProcessor.GetVerbs());
+        SetText(initialText);
+        _isDirty = false;
     }
 
     public ILogger<QueryEditorViewModel> _logger { get; set; }
@@ -69,7 +69,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     private void Document_Changed(object? sender, DocumentChangeEventArgs e)
     {
         OnPropertyChanged(nameof(Document));
-        if (CurrentWorkspace is not null) CurrentWorkspace.Text = Document.Text;
+        IsDirty = true;
+
     }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
@@ -119,14 +120,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
             .ToArray();
         Parser = new CommandParser(verbs.Select(x => x.Name), ".");
     }
-
-    internal void SetUiPreferences(UIPreferences uiPreferences)
-    {
-        FontFamily = new FontFamily(uiPreferences.FontFamily);
-        FontSize = uiPreferences.FontSize;
-        ShowLineNumbers = uiPreferences.ShowLineNumbers;
-        WordWrap = uiPreferences.WordWrap;
-    }
+    public string GetText() => Document.Text;
 
     internal void SetText(string text) => Document.Text = text;
 

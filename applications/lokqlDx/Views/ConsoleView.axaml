@@ -6,8 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.ConsoleView"
              x:DataType="vm:ConsoleViewModel"
-             FontFamily="{Binding FontFamily}"
-             FontSize="{Binding FontSize}">
+             FontFamily="{Binding DisplayPreferencesPreferences.FontFamily}"
+             FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
     <ScrollViewer>
         <ItemsControl
             ItemsSource="{Binding ConsoleContent}"

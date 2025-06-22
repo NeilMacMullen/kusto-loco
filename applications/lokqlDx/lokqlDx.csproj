@@ -31,6 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
+    <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Labs.Controls" />
     <PackageReference Include="Avalonia.Labs.Panels" />
@@ -66,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\ConsoleView.axaml.cs">
+    <Compile Update="Views\QueryView.axaml.cs">
       <DependentUpon>ConsoleView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\ChartView.axaml.cs">

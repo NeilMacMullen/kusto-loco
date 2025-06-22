@@ -7,35 +7,50 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.RenderingSurfaceView"
              x:DataType="vm:RenderingSurfaceViewModel"
-             Loaded="Control_OnLoaded">
-    <TabControl SelectedIndex="{Binding ActiveTab}">
-        <TabItem Header="Data">
-            <Grid RowDefinitions="auto,*">
-                <TextBlock
-                    Text="{Binding DataGridSizeWarning}"
-                    IsVisible="{Binding ShowDataGridSizeWarning}" />
-                
-                <DataGrid
-                    Grid.Row="1"
-                    x:Name="DataGrid"
-                    ItemsSource="{Binding Results}"
-                    FontSize="{Binding FontSize}"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    GridLinesVisibility="All"
-                    Foreground="GreenYellow"
-                    ClipboardCopyMode="ExcludeHeader"
-                    CanUserReorderColumns="True"
-                    CanUserResizeColumns="True"
-                    CanUserSortColumns="True"
-                    CopyingRowClipboardContent="DataGrid_OnCopyingRowClipboardContent">
-                </DataGrid>
-            </Grid>
-        </TabItem>
-        <TabItem Header="Chart">
-            <views:ChartView
-                x:Name="ChartView"
-                />
-        </TabItem>
-    </TabControl>
+             Loaded="Control_OnLoaded"
+             DataContextChanged="StyledElement_OnDataContextChanged">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Label Content="{Binding QuerySummary}" FontSize="8"/>
+        </StackPanel>
+        <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
+            <TabItem Header="Data">
+                <Grid RowDefinitions="auto,*">
+                    <TextBlock
+                        Text="{Binding DataGridSizeWarning}"
+                        IsVisible="{Binding ShowDataGridSizeWarning}" />
+
+					<TreeDataGrid
+                        Grid.Row="1"
+                        x:Name="DataGrid"
+                        Source="{Binding TreeSource}"
+                        FontFamily="{Binding DisplayPreferences.FontFamily}"
+                        FontSize="{Binding DisplayPreferences.FontSize}"
+                        Foreground="GreenYellow"
+                        CanUserResizeColumns="True"
+                        CanUserSortColumns="True"
+                        >
+                        <TreeDataGrid.Styles>
+                            <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
+                                <Setter Property="Background"  Value="#20808080"/>
+                            </Style>
+                        </TreeDataGrid.Styles>
+                        <TreeDataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Copy cell" Command="{Binding DatagridCopyCommand}" CommandParameter="cell"/>
+                                <MenuItem Header="Copy column" Command="{Binding DatagridCopyCommand}" CommandParameter="column"/>
+                                <MenuItem Header="Copy row" Command="{Binding DatagridCopyCommand}" CommandParameter="row"/>
+                                <MenuItem Header="Copy table" Command="{Binding DatagridCopyCommand}" CommandParameter="table"/>
+							</ContextMenu>
+                        </TreeDataGrid.ContextMenu>
+                    </TreeDataGrid> 
+                </Grid>
+            </TabItem>
+            <TabItem Header="Chart">
+                <views:ChartView
+                    x:Name="ChartView" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+
 </UserControl>

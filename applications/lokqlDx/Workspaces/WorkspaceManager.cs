@@ -120,6 +120,7 @@ data
         Workspace = new Workspace();
         ResetSettings();
         Path = string.Empty;
+        Path = string.Empty;
     }
 
     public bool IsDirty(Workspace? wkspc) => wkspc?.IsDirty ?? false;
