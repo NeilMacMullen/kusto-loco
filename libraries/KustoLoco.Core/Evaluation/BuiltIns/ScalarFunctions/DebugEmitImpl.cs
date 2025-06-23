@@ -15,7 +15,7 @@ internal class DebugEmitImpl : IScalarFunctionImpl
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
         var left = (string?)arguments[0].Value;
-        Logger.Warn(left);
+        Logger.Warn(left ?? "<null>");
         return new ScalarResult(ScalarTypes.Int, 0);
     }
 
