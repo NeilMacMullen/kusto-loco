@@ -141,9 +141,16 @@ public class PptReportTarget : IReportTarget
 
     public static PptReportTarget Create(string filename)
     {
-        var pres = filename.IsBlank()
+        using var source = filename.IsBlank()
             ? new Presentation()
             : new Presentation(filename);
-        return new PptReportTarget(pres);
+       
+        var blank = new Presentation();
+       
+        foreach (var slide in source.Slides)
+        {
+            blank.Slides.Add(slide);
+        }
+        return new PptReportTarget(blank);
     }
 }
