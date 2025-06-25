@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Xaml.Interactivity;
+using LokqlDx.ViewModels;
 using System.Globalization;
 
 namespace LokqlDx.Views;
@@ -56,3 +58,32 @@ public partial class ConsoleView : UserControl
         console.ConsoleWidth = (int)(width * n * 0.9 / formattedText.WidthIncludingTrailingWhitespace);
     }
 }
+
+
+
+public class ScrollToEndBehavior : Behavior<ScrollViewer>
+{
+    public static readonly StyledProperty<int> ScrollToEndProperty =
+        AvaloniaProperty.Register<ScrollToEndBehavior, int>(nameof(ScrollToEnd));
+
+    public int ScrollToEnd
+    {
+        get => GetValue(ScrollToEndProperty);
+        set => SetValue(ScrollToEndProperty, value);
+    }
+
+    protected override void OnAttached()
+    {
+        base.OnAttached();
+        this.GetObservable(ScrollToEndProperty).Subscribe(OnScrollToEndChanged);
+    }
+
+    private void OnScrollToEndChanged(int scrollToEnd)
+    {
+        if (scrollToEnd!=0 && AssociatedObject != null)
+        {
+            AssociatedObject.ScrollToEnd();
+        }
+    }
+}
+

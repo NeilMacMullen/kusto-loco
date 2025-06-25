@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core.Console;
+using System.Collections.ObjectModel;
+using System.Text;
 
 namespace LokqlDx.ViewModels;
 
@@ -12,6 +14,7 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
     [ObservableProperty] private double _consoleWidth;
     [ObservableProperty] private ColoredText? _selectedItem;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferencesPreferences;
+    [ObservableProperty] private int _triggerScroll;
 
     public ConsoleViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
     {
@@ -22,20 +25,38 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         
     }
 
+    [RelayCommand]
+    private void Clear()
+    {
+        ConsoleContent.Clear();
+    }
+
     public int WindowWidth { get; private set; } = 80;
 
     public ConsoleColor ForegroundColor { get; set; }
 
     public string ReadLine() => string.Empty;
 
+    private StringBuilder _buffer = new StringBuilder();
     public void Write(string text)
     {
+        var flush = false;
         if (text.EndsWith(Environment.NewLine))
+        {
             text = text[..^Environment.NewLine.Length];
-        
-        var item = new ColoredText(GetColor(ForegroundColor), text);
-        ConsoleContent.Add(item);
-        SelectedItem = item;
+            flush = true;
+        }
+
+        _buffer.Append(text);
+
+        if (flush)
+        {
+            var item = new ColoredText(GetColor(ForegroundColor), _buffer.ToString());
+            ConsoleContent.Add(item);
+            SelectedItem = item;
+            TriggerScroll = TriggerScroll + 1;
+            _buffer.Clear();
+        }
     }
 
     partial void OnConsoleWidthChanged(double value) => WindowWidth = (int)value;
@@ -63,7 +84,10 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         };
 
 
-    internal void PrepareForOutput() => ConsoleContent.Clear();
+    internal void PrepareForOutput()
+    {
+        //ConsoleContent.Clear();
+    }
 
     public record ColoredText(IImmutableBrush Color, string Text);
 }

@@ -3,13 +3,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
+             xmlns:v="using:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.ConsoleView"
              x:DataType="vm:ConsoleViewModel"
              FontFamily="{Binding DisplayPreferencesPreferences.FontFamily}"
-             FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
-    <ScrollViewer>
-        <ItemsControl
+             FontSize="{Binding DisplayPreferencesPreferences.FontSize}"
+            >
+    <DockPanel>
+<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+<Button Command="{Binding ClearCommand}" HorizontalAlignment="Right">Clear</Button>
+</StackPanel>
+        <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
+            <Interaction.Behaviors>
+                <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
+            </Interaction.Behaviors>
+            <ItemsControl
             ItemsSource="{Binding ConsoleContent}"
             Background="Transparent"
             x:Name="ItemList">
@@ -23,4 +32,7 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>
+        
+    </DockPanel>
+
 </UserControl>
