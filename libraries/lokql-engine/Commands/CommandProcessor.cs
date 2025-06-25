@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using CommandLine;
 using CsvHelper;
+using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
@@ -11,7 +12,9 @@ public readonly record struct CommandProcessorContext(InteractiveTableExplorer E
 
 public class CommandProcessor
 {
-    private ImmutableList<RegisteredCommand>  _registrations
+    private SchemaLine[] _registeredSchema = [];
+
+    private ImmutableList<RegisteredCommand> _registrations
         = [];
 
     private CommandProcessor()
@@ -20,7 +23,7 @@ public class CommandProcessor
 
     public static CommandProcessor Default()
     {
-        var cp= new CommandProcessor()
+        var cp = new CommandProcessor()
                 .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
                 .WithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
                 .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
@@ -42,11 +45,8 @@ public class CommandProcessor
                 .WithAdditionalCommand<EchoCommand.Options>(EchoCommand.RunAsync)
                 .WithAdditionalCommand<PivotColumnsToRowsCommand.Options>(PivotColumnsToRowsCommand.RunAsync)
                 .WithAdditionalCommand<PivotRowsToColumnsCommand.Options>(PivotRowsToColumnsCommand.RunAsync)
-
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
                 .WithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
-
-
                 .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)
                 .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
                 .WithAdditionalCommand<FormatCommand.Options>(FormatCommand.RunAsync)
@@ -65,14 +65,12 @@ public class CommandProcessor
 
     public void AddAdditionalCommandSchema(string schemaCsv)
     {
-            var stream = new StringReader(schemaCsv);
-            using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
-            var schema= csv.GetRecords<SchemaLine>().ToArray();
-            _registeredSchema = _registeredSchema.Concat(schema).ToArray();
+        var stream = new StringReader(schemaCsv);
+        using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
+        var schema = csv.GetRecords<SchemaLine>().ToArray();
+        _registeredSchema = _registeredSchema.Concat(schema).ToArray();
     }
 
-
-    private SchemaLine[] _registeredSchema = [];
     public CommandProcessor WithAdditionalCommand<T>(Func<CommandProcessorContext, T, Task> registration)
     {
         _registrations = _registrations.Add(
@@ -80,12 +78,9 @@ public class CommandProcessor
         return this;
     }
 
-    public SchemaLine [] GetRegisteredSchema()
-    {
-        return _registeredSchema;
-    }
+    public SchemaLine[] GetRegisteredSchema() => _registeredSchema;
 
-  
+
     public async Task RunInternalCommand(InteractiveTableExplorer exp, string currentLine, BlockSequence sequence)
     {
         var splitter = CommandLineStringSplitter.Instance;
@@ -97,7 +92,7 @@ public class CommandProcessor
 
         var textWriter = new StringWriter();
 
-        var typeTable = _registrations.Select(r=>r.OptionType).ToArray();
+        var typeTable = _registrations.Select(r => r.OptionType).ToArray();
 
         var parserResult = StandardParsers
             .CreateWithHelpWriter(textWriter)
@@ -114,14 +109,17 @@ public class CommandProcessor
             await parserResult.TryAsync(registration.OptionType, Func);
         }
 
-        exp.Info(textWriter.ToString());
+        var error = textWriter.ToString();
+        if (error.IsNotBlank())
+            exp.Warn(error);
     }
 
     public IEnumerable<VerbEntry> GetVerbs()
     {
         var verbs = from type in _registrations.Select(x => x.OptionType)
             let attribute = type.GetTypeInfo().GetCustomAttribute<VerbAttribute>()
-                            ?? throw new InvalidOperationException($"All registered command options should have a {nameof(VerbAttribute)}. {type.FullName ?? type.Name} does not.")
+                            ?? throw new InvalidOperationException(
+                                $"All registered command options should have a {nameof(VerbAttribute)}. {type.FullName ?? type.Name} does not.")
             let supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption))
             select new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles);
 
