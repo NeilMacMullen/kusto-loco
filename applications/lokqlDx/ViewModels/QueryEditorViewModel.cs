@@ -118,7 +118,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         InternalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        Parser = new CommandParser(verbs.Select(x => x.Name), ".");
+        var fileIoCommands = verbs.Where(x => x.SupportsFiles).Select(x => x.Name);
+        Parser = new CommandParser(fileIoCommands, ".");
     }
     public string GetText() => Document.Text;
 
