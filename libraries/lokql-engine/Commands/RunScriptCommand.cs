@@ -18,9 +18,10 @@ public static class RunScriptCommand
 
     [Verb("run", aliases: ["script", "r"],
         HelpText = "run a script")]
-    internal class Options : IFileCommandOption
+    internal class Options
     {
         [Value(0, HelpText = "Name of script", Required = true)]
+        [FileOptions(Extensions = [".dfr"])]
         public string File { get; set; } = string.Empty;
     }
 }

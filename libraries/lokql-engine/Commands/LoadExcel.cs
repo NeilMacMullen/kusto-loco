@@ -48,9 +48,10 @@ public static class LoadExcel
         HelpText = @"loads multiple tables from an excel spreadsheet.
 Tables are named after the worksheet that contains them, with an optional prefix.
 ")]
-    internal class Options : IFileCommandOption
+    internal class Options
     {
         [Value(0, HelpText = "Name of file", Required = true)]
+        [FileOptions(Extensions = [".xlsx", ".xls", ".xlsb"])]
         public string File { get; set; } = string.Empty;
 
         [Value(1, HelpText = "Prefix for loaded tables (defaults to name of file)")]

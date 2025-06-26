@@ -31,9 +31,10 @@ Examples:
   .save c:\temp\data.csv #saves the most recent result to a csv file
   .save d.parquet abc    #saves a named result called 'abc' to a parquet file
 ")]
-    internal class Options : IFileCommandOption
+    internal class Options
     {
         [Value(0, HelpText = "Name of file", Required = true)]
+        [FileOptions(IncludeStandardFormatterExtensions = true)]
         public string File { get; set; } = string.Empty;
         [Value(1, HelpText = "Name of result (or most recent result if left blank)")]
         public string ResultName { get; set; } = string.Empty;

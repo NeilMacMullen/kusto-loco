@@ -52,6 +52,9 @@ Examples:
         public string Type { get; set; } = string.Empty;
       
         [Value(1,HelpText = "Template file",Required = true)]
+        [FileOptions(Extensions = [".pptx"])]
         public string Template { get; set; } = string.Empty;
+
+
     }
 }

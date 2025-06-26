@@ -114,14 +114,38 @@ public class CommandProcessor
             exp.Warn(error);
     }
 
-    public IEnumerable<VerbEntry> GetVerbs()
+    public IEnumerable<VerbEntry> GetVerbs(ITableAdaptor loader)
     {
-        var verbs = from type in _registrations.Select(x => x.OptionType)
-            let attribute = type.GetTypeInfo().GetCustomAttribute<VerbAttribute>()
-                            ?? throw new InvalidOperationException(
-                                $"All registered command options should have a {nameof(VerbAttribute)}. {type.FullName ?? type.Name} does not.")
-            let supportsFiles = type.IsAssignableTo(typeof(IFileCommandOption))
-            select new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles);
+        var extensions = loader.GetSupportedAdaptors().SelectMany(x => x.Extensions).ToList();
+        var verbs = _registrations.Select(x =>
+            {
+                var attribute = x.OptionType.GetTypeInfo()
+                    .GetCustomAttribute<VerbAttribute>()
+                                ?? throw new InvalidOperationException($"All registered command options should have a {nameof(VerbAttribute)}. {x.OptionType.FullName ?? x.OptionType.Name} does not.");
+
+                // for now we are only expecting one field, if we need to support multiple, we can change this
+                var fileAttribute = x.OptionType
+                    .GetProperties()
+                    .Select(p => p.GetCustomAttribute<FileOptionsAttribute>())
+                    .OfType<FileOptionsAttribute>()
+                    .SingleOrDefault();
+
+                var supportsFiles = false;
+
+                IReadOnlyList<string> supportedExtensions = [];
+                if (fileAttribute is not null)
+                {
+                    supportsFiles = true;
+                    supportedExtensions = fileAttribute.Extensions;
+                    if (fileAttribute.IncludeStandardFormatterExtensions)
+                    {
+                        supportedExtensions = supportedExtensions.Concat(extensions).ToList();
+                    }
+                }
+
+                return new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles, supportedExtensions);
+            }
+        );
 
         return verbs.Append(CreateHelpEntry());
 
@@ -131,7 +155,7 @@ public class CommandProcessor
             const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
-            return new VerbEntry("help", helpText, false);
+            return new VerbEntry("help", helpText, false, []);
         }
     }
 
