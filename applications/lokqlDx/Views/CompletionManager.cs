@@ -4,7 +4,6 @@ using Avalonia.Input;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using Intellisense;
-using lokqlDx;
 using lokqlDxComponents;
 using Microsoft.Extensions.Logging;
 
@@ -13,12 +12,12 @@ namespace LokqlDx.Views;
 public class CompletionManager : IDisposable
 {
     private readonly TextEditor _textEditor;
-    private readonly EditorHelper _editorHelper;
+    private readonly IEditorCursorViewModel _editorHelper;
     private readonly ICompletionManagerServiceLocator _vm;
     private CompletionWindow? _completionWindow;
 
     public CompletionManager(TextEditor editor,
-        EditorHelper editorHelper,
+        IEditorCursorViewModel editorHelper,
         ICompletionManagerServiceLocator vm
         )
     {
