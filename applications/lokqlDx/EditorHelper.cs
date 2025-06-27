@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
+using lokqlDxComponents;
 using NotNullStrings;
 
 namespace lokqlDx;
 
-public class EditorHelper(TextEditor query)
+public class EditorHelper(TextEditor query) : IEditorCursorViewModel
 {
     public TextEditor Query { get; set; } = query;
 
