@@ -5,7 +5,7 @@ using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using Intellisense;
 using lokqlDx;
-using LokqlDx.ViewModels;
+using lokqlDxComponents;
 using Microsoft.Extensions.Logging;
 
 namespace LokqlDx.Views;
@@ -14,12 +14,12 @@ public class CompletionManager : IDisposable
 {
     private readonly TextEditor _textEditor;
     private readonly EditorHelper _editorHelper;
-    private readonly QueryEditorViewModel _vm;
+    private readonly ICompletionManagerServiceLocator _vm;
     private CompletionWindow? _completionWindow;
 
     public CompletionManager(TextEditor editor,
         EditorHelper editorHelper,
-        QueryEditorViewModel vm
+        ICompletionManagerServiceLocator vm
         )
     {
         _textEditor = editor;
@@ -175,7 +175,7 @@ public class CompletionManager : IDisposable
         if (e.Text == "@")
         {
             var blockText = _editorHelper.GetTextAroundCursor();
-              var columns = _vm.SchemaIntellisenseProvider.GetColumns(blockText);
+              var columns = _vm.GetColumns(blockText);
               ShowCompletions(columns, string.Empty, 1);
             return;
         }
@@ -183,7 +183,7 @@ public class CompletionManager : IDisposable
         if (e.Text == "[")
         {
               var blockText = _editorHelper. GetTextAroundCursor();
-               var tables = _vm.SchemaIntellisenseProvider.GetTables(blockText);
+               var tables = _vm.GetTables(blockText);
                ShowCompletions(tables, string.Empty, 1);
             return;
         }
