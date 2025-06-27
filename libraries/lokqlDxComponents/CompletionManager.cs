@@ -4,10 +4,9 @@ using Avalonia.Input;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using Intellisense;
-using lokqlDxComponents;
 using Microsoft.Extensions.Logging;
 
-namespace LokqlDx.Views;
+namespace lokqlDxComponents;
 
 public class CompletionManager : IDisposable
 {
