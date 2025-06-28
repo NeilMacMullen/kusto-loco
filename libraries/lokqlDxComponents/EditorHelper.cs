@@ -1,10 +1,9 @@
 ﻿using System.Text;
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
-using lokqlDxComponents;
 using NotNullStrings;
 
-namespace lokqlDx;
+namespace lokqlDxComponents;
 
 public class EditorHelper(TextEditor query) : IEditorCursorViewModel
 {

@@ -1,6 +1,7 @@
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using lokqlDx;
+using lokqlDxComponents;
 using NotNullStrings;
 
 namespace LokqlDx.Views;

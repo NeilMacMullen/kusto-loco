@@ -1,6 +1,7 @@
 using Avalonia.Input;
 using lokqlDx;
 using LokqlDx.ViewModels;
+using lokqlDxComponents;
 
 namespace LokqlDx.Views;
 
