@@ -13,7 +13,7 @@ public class CompletionManager : IDisposable
     private readonly TextEditor _textEditor;
     private readonly IEditorCursorViewModel _editorHelper;
     private readonly ICompletionManagerServiceLocator _vm;
-    private CompletionWindow? _completionWindow;
+    public CompletionWindow? _completionWindow;
 
     public CompletionManager(TextEditor editor,
         IEditorCursorViewModel editorHelper,
