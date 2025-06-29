@@ -24,7 +24,7 @@ public class AutocompletionTest
 
 
             f.Editor.TextArea.Type(".xyz");
-            f.CompletionManager._completionWindow.Should().BeNull();
+            f.CompletionWindow.IsOpen.Should().BeFalse();
         }
 
         [AvaloniaTheory]
@@ -38,14 +38,10 @@ public class AutocompletionTest
 
 
             f.Editor.TextArea.Type(input);
+            var entries = f.CompletionWindow.GetCurrentCompletionListEntries();
 
-            f.CompletionManager._completionWindow.Should().NotBeNull();
-            f.CompletionManager._completionWindow.CompletionList.CompletionData.Should().HaveCount(2);
-            f
-                .CompletionManager
-                ._completionWindow.CompletionList.CurrentList.Select(x => (string)x.Content)
-                .Should()
-                .BeEquivalentTo(expected);
+            entries.Should().BeEquivalentTo(expected);
+
         }
 
     }
@@ -67,14 +63,18 @@ public class AutocompletionTestFixture
             _intellisenseClient = provider.GetRequiredService<IntellisenseClient>(),
             _logger = provider.GetRequiredService<ILogger<IntellisenseClient>>(),
         };
-        var completionManager = new CompletionManager(editor, editorHelper, resourceProvider);
+        var windowWrapper = new CompletionWindowWrapper(editor.TextArea);
+        var completionManager = new CompletionManager(editor, editorHelper, resourceProvider, windowWrapper);
         editor.TextArea.TextEntered += async (_, args) => await completionManager.HandleKeyDown(args);
         Editor = editor;
         EditorHelper = editorHelper;
         CompletionManager = completionManager;
         Provider = provider;
         ResourceProvider = resourceProvider;
+        CompletionWindow = windowWrapper;
     }
+
+    public CompletionWindowWrapper CompletionWindow { get; set; }
 
     public CompletionManagerTestContainer Provider { get; set; }
 
