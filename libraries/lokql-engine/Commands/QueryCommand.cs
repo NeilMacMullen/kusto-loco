@@ -16,9 +16,10 @@ public static class QueryCommand
 
     [Verb("query", aliases: ["q"],
         HelpText = "run a multi-line query from a file")]
-    internal class Options : IFileCommandOption
+    internal class Options
     {
         [Value(0, HelpText = "Name of queryFile", Required = true)]
+        [FileOptions(Extensions = [".csl"])]
         public string File { get; set; } = string.Empty;
 
         [Option('p', HelpText = "prefix to add to script before running")]

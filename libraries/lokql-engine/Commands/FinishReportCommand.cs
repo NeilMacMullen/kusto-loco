@@ -17,10 +17,10 @@ public static class FinishReportCommand
     }
 
     [Verb("finishreport", HelpText = "finish a report by saving it out as a file")]
-    internal class Options : IFileCommandOption
+    internal class Options
     {
         [Value(0, HelpText = "Name of file to save report to ", Required = true)]
+        [FileOptions(Extensions = [".html", ".ppt", ".pptx"])]
         public string File { get; set; } = string.Empty;
-
     }
 }

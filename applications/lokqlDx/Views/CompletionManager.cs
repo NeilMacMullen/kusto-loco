@@ -1,3 +1,4 @@
+using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Input;
 using AvaloniaEdit;
@@ -6,7 +7,6 @@ using Intellisense;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using Microsoft.Extensions.Logging;
-using NotNullStrings;
 
 namespace LokqlDx.Views;
 
@@ -46,19 +46,28 @@ public class CompletionManager : IDisposable
         }
     }
 
-
-
     private async Task<bool> ShowPathCompletions()
     {
         // Avoid unnecessary IO calls
         if (_completionWindow is not null) return false;
 
+        var currentLineText = _editorHelper.GetCurrentLineText();
 
-        var path = _vm.Parser.GetLastArgument(_editorHelper.GetCurrentLineText());
+        var args = CommandLineStringSplitter.Instance.Split(currentLineText).ToArray();
 
-        if (path.IsBlank()) return false;
+        if (args.Length < 2)
+        {
+            return false;
+        }
 
+        var lastArg = args[^1];
+        var command = args[0];
 
+        // check if it starts with a valid file IO command like ".save"
+        if (!_vm._allowedCommandsAndExtensions.TryGetValue(command, out var extensions))
+        {
+            return false;
+        }
 
 
         var result = CompletionResult.Empty;
@@ -66,7 +75,7 @@ public class CompletionManager : IDisposable
         {
             // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
             // and user profile app was started with if hosts don't show shares
-            result = await _vm._intellisenseClient.GetCompletionResultAsync(path);
+            result = await _vm._intellisenseClient.GetCompletionResultAsync(lastArg);
 
         }
         catch (IntellisenseException exc)
@@ -78,19 +87,37 @@ public class CompletionManager : IDisposable
             _vm._logger.LogDebug(exc, "Intellisense request cancelled");
         }
 
-        if (!result.IsEmpty())
-            ShowCompletions(
-                result.Entries,
-                string.Empty,
-                result.Filter.Length,
-                completionWindow =>
+        if (result.IsEmpty()) return false;
+
+        // filter out files without valid extensions
+        // permit all file types if allowlist is empty
+
+        if (extensions.Count > 0)
+        {
+            result = result with
+            {
+                Entries = result.Entries.Where(x =>
                 {
-                    // when editor loses focus mid-path and user resumes typing,
-                    // it won't require a second keypress to select the relevant result
-                    completionWindow.CompletionList.SelectItem(result.Filter);
-                    if (!completionWindow.CompletionList.CurrentList.Any())
-                        completionWindow.Close();
-                });
+                    // permit folders (which do not have extensions). note that files without extensions will still be allowed
+                    var ext = Path.GetExtension(x.Name);
+                    return ext == string.Empty || extensions.Contains(ext);
+                }).ToList()
+            };
+        }
+
+        ShowCompletions(
+            result.Entries,
+            string.Empty,
+            result.Filter.Length,
+            completionWindow =>
+            {
+                // when editor loses focus mid-path and user resumes typing,
+                // it won't require a second keypress to select the relevant result
+                completionWindow.CompletionList.SelectItem(result.Filter);
+                if (!completionWindow.CompletionList.CurrentList.Any())
+                    completionWindow.Close();
+            });
+
         return true;
 
 

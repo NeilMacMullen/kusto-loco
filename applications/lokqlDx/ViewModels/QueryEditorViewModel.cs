@@ -22,9 +22,10 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
     [ObservableProperty] private TextDocument _document = new();
     public IntellisenseEntry[] InternalCommands = [];
     public IntellisenseEntry[] KqlFunctionEntries = [];
-  
+
     public IntellisenseEntry[] SettingNames = [];
     public IntellisenseEntry[] KqlOperatorEntries = [];
+    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions = [];
 
     [ObservableProperty] private bool _isDirty;
 
@@ -42,18 +43,16 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         _intellisenseClient = intellisenseClient;
         _logger = logger;
         DisplayPreferences = displayPreferences;
-     
+
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
-        AddInternalCommands(_explorer._commandProcessor.GetVerbs());
+        AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
         SetText(initialText);
         _isDirty = false;
     }
 
     public ILogger<QueryEditorViewModel> _logger { get; set; }
-
-    public CommandParser Parser { get; set; } = new([], string.Empty);
 
 
     public void Dispose()
@@ -118,8 +117,13 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         InternalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        var fileIoCommands = verbs.Where(x => x.SupportsFiles).Select(x => x.Name);
-        Parser = new CommandParser(fileIoCommands, ".");
+        var fileIoCommands = verbs.Where(x => x.SupportsFiles);
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        _allowedCommandsAndExtensions = fileIoCommands.ToDictionary(
+            x => "." + x.Name,
+            x => x.SupportedExtensions.ToHashSet(comparer),
+            comparer
+        );
     }
     public string GetText() => Document.Text;
 
