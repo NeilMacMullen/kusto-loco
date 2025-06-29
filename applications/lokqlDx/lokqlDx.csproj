@@ -63,6 +63,7 @@
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
     <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\lokqlDxComponents\lokqlDxComponents.csproj" />
     <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
   </ItemGroup>
 

@@ -3,9 +3,9 @@ using AvaloniaEdit;
 using AvaloniaEdit.Document;
 using NotNullStrings;
 
-namespace lokqlDx;
+namespace lokqlDxComponents;
 
-public class EditorHelper(TextEditor query)
+public class EditorHelper(TextEditor query) : IEditorCursorViewModel
 {
     public TextEditor Query { get; set; } = query;
 

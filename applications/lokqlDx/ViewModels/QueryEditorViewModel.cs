@@ -6,26 +6,30 @@ using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDx;
+using lokqlDxComponents;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-public partial class QueryEditorViewModel : ObservableObject, IDisposable
+
+
+public partial class QueryEditorViewModel : ObservableObject, IDisposable, IIntellisenseResourceManager, ICompletionManagerServiceLocator
 {
     private readonly ConsoleViewModel _consoleViewModel;
     private InteractiveTableExplorer _explorer;
-    public readonly IntellisenseClient _intellisenseClient;
+    public IntellisenseClient _intellisenseClient { get; }
 
-    public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
+    public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
     [ObservableProperty] private TextDocument _document = new();
-    public IntellisenseEntry[] InternalCommands = [];
-    public IntellisenseEntry[] KqlFunctionEntries = [];
-
-    public IntellisenseEntry[] SettingNames = [];
-    public IntellisenseEntry[] KqlOperatorEntries = [];
-    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions = [];
+    public IntellisenseEntry[] InternalCommands { get; set; } = [];
+    public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
+    public IntellisenseEntry[] SettingNames { get; set; } = [];
+    public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
+    public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
+    public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
+    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions { get; set; } = [];
 
     [ObservableProperty] private bool _isDirty;
 
@@ -52,7 +56,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         _isDirty = false;
     }
 
-    public ILogger<QueryEditorViewModel> _logger { get; set; }
+    public ILogger _logger { get; }
 
 
     public void Dispose()
