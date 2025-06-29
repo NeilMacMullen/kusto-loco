@@ -1,7 +1,7 @@
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.Services;
 
 public interface IIntellisenseResourceManager : IIntellisenseResourceProvider
 {

@@ -5,7 +5,7 @@ using AvaloniaEdit.Editing;
 using Intellisense;
 using NotNullStrings;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.Models;
 
 /// Implements AvalonEdit ICompletionData interface to provide the entries in the
 /// completion drop down.

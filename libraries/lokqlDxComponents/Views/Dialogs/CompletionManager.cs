@@ -1,14 +1,14 @@
-using System.Collections.Immutable;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Input;
 using AvaloniaEdit;
-using AvaloniaEdit.CodeCompletion;
-using AvaloniaEdit.Editing;
 using Intellisense;
+using lokqlDxComponents.Models;
+using lokqlDxComponents.Services;
+using lokqlDxComponents.ViewModels;
 using Microsoft.Extensions.Logging;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.Views.Dialogs;
 
 public class CompletionManager : IDisposable
 {
@@ -178,67 +178,4 @@ public class CompletionManager : IDisposable
         _completionWindow.Close();
 
     }
-}
-
-public class CompletionWindowWrapper(TextArea textArea)
-{
-    private CompletionWindow? _completionWindow;
-
-    public bool IsOpen => _completionWindow?.IsOpen ?? false;
-
-    public IEnumerable<string> GetCurrentCompletionListEntries()
-    {
-        return _completionWindow?.CompletionList.CurrentList.Select(x => x.Text) ?? ImmutableArray<string>.Empty;
-    }
-
-    public void CloseIfEmpty()
-    {
-        if (_completionWindow != null && !GetCurrentCompletionListEntries().Any())
-        {
-            _completionWindow.Close();
-            // return;
-        }
-    }
-
-    public void Close()
-    {
-        if (_completionWindow is not { IsOpen:false } c) return;
-        c.Close();
-
-        _completionWindow = null;
-    }
-
-    public void ShowCompletions(ShowCompletionOptions options)
-    {
-        var completions = options.Completions;
-        var prefix = options.Prefix;
-        var rewind = options.Rewind;
-        var onCompletionWindowDataPopulated = options.OnCompletionWindowDataPopulated;
-        if (!completions.Any())
-            return;
-
-        _completionWindow = new CompletionWindow(textArea)
-        {
-            CloseWhenCaretAtBeginning = true,
-            MaxWidth = 200
-        };
-        IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
-        foreach (var k in completions.OrderBy(k => k.Name))
-            data.Add(new QueryEditorCompletionData(k, prefix, rewind));
-
-        _completionWindow.Closed += delegate { _completionWindow = null; };
-        onCompletionWindowDataPopulated.Invoke(_completionWindow);
-        _completionWindow?.Show();
-    }
-
-}
-
-public readonly record struct ShowCompletionOptions()
-{
-    public IReadOnlyCollection<IntellisenseEntry> Completions { get; init; } = [];
-    public string Prefix { get; init; } = string.Empty;
-    public int Rewind { get; init; }
-    public Action<CompletionWindow> OnCompletionWindowDataPopulated { get; init; } = EmptyAction;
-    private static readonly Action<CompletionWindow> EmptyAction = _ => { };
-    public static ShowCompletionOptions Empty => new();
 }

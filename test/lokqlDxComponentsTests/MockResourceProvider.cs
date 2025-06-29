@@ -1,5 +1,6 @@
 using Intellisense;
 using lokqlDxComponents;
+using lokqlDxComponents.Services;
 using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponentsTests;

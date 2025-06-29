@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
+using lokqlDxComponents.ViewModels;
 using NotNullStrings;
 
 namespace lokqlDxComponents;

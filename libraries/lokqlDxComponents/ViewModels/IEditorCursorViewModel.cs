@@ -1,7 +1,7 @@
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.ViewModels;
 
 public interface IEditorCursorViewModel
 {

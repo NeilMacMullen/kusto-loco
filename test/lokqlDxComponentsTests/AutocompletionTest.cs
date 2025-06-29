@@ -6,6 +6,7 @@ using Intellisense.Configuration;
 using Jab;
 using LogSetup;
 using lokqlDxComponents;
+using lokqlDxComponents.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

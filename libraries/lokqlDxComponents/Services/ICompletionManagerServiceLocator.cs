@@ -1,7 +1,7 @@
 using Intellisense;
 using Microsoft.Extensions.Logging;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.Services;
 
 public interface ICompletionManagerServiceLocator : IIntellisenseResourceProvider
 {

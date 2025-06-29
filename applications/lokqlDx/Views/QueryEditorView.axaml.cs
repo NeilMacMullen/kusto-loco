@@ -8,6 +8,7 @@ using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
+using lokqlDxComponents.Views.Dialogs;
 
 #pragma warning disable VSTHRD100
 

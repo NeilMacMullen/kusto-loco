@@ -7,6 +7,7 @@ using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDx;
 using lokqlDxComponents;
+using lokqlDxComponents.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
