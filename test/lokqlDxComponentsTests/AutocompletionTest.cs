@@ -17,7 +17,7 @@ public class AutocompletionTest
     public class Commands
     {
         [AvaloniaFact]
-        public void CompletionWindow_NonMatch_ShouldNotBeShown()
+        public async Task CompletionWindow_NonMatch_ShouldNotBeShown()
         {
             var f = new AutocompletionTestFixture();
 
@@ -25,13 +25,14 @@ public class AutocompletionTest
 
 
             f.Editor.TextArea.Type(".xyz");
-            f.CompletionWindow.IsOpen.Should().BeFalse();
+            
+            await f.CompletionWindow.ShouldEventuallySatisfy(x => x.IsOpen.Should().BeFalse());
         }
 
         [AvaloniaTheory]
         [InlineData(".ab", new[] { "abc" })]
         [InlineData(".de", new[] { "def" })]
-        public void CurrentList_PartialMatch_ShouldFilterOutIrrelevantResults(string input, string[] expected)
+        public async Task CurrentList_PartialMatch_ShouldFilterOutIrrelevantResults(string input, string[] expected)
         {
             var f = new AutocompletionTestFixture();
 
@@ -39,12 +40,34 @@ public class AutocompletionTest
 
 
             f.Editor.TextArea.Type(input);
-            var entries = f.CompletionWindow.GetCurrentCompletionListEntries();
 
-            entries.Should().BeEquivalentTo(expected);
+            await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+                x.GetCurrentCompletionListEntries().Should().BeEquivalentTo(expected)
+            );
 
         }
 
+    }
+
+    public class Paths
+    {
+        [AvaloniaFact]
+        public async Task CurrentList_RootDir_ShouldNotBeEmpty()
+        {
+            var f = new AutocompletionTestFixture();
+
+            f.ResourceProvider._allowedCommandsAndExtensions = new()
+            {
+                [".load"] = []
+            };
+
+
+            f.Editor.TextArea.Type(".load /");
+
+            await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+                x.GetCurrentCompletionListEntries().Should().NotBeEmpty()
+            );
+        }
     }
 
 }
