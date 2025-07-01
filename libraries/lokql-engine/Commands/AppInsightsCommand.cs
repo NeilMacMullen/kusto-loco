@@ -394,7 +394,7 @@ public static class AppInsightsCommand
 
         var query = blocks.Next();
         //make sure we pick up any variable interpolation in case we are inside a function
-        query = exp._interpolator.Interpolate(query);
+        query = exp.Interpolate(query);
         exp.Info("Running application insights query.  This may take a while....");
         var result = await ai.LoadTable(o.TenantId,o.Rid, query, t, DateTime.UtcNow);
         await exp.InjectResult(result);

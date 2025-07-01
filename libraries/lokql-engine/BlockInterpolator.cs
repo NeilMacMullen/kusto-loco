@@ -3,20 +3,16 @@ using KustoLoco.Core.Settings;
 
 namespace Lokql.Engine;
 
-public class BlockInterpolator
+/// <summary>
+///     Provides interpolation of setting values
+/// </summary>
+/// <remarks>
+///     Strings such as "abc $s $(val)prefix can be interpolated using
+///     this class
+/// </remarks>
+public static class BlockInterpolator
 {
-    private readonly KustoSettingsProvider _coreSettings;
-
-    public BlockInterpolator(KustoSettingsProvider coreSettings)
-    {
-        _coreSettings = coreSettings;
-    }
-
-    public void AddLayer(KustoSettingsProvider newSettings) => _coreSettings.AddLayer(newSettings);
-
-    public void PopSettings() => _coreSettings.Pop();
-
-    public string Interpolate(string query)
+    public static string Interpolate(string query, KustoSettingsProvider settings)
     {
         return Regex.Replace(query, @"\$?\$(\(?)([a-zA-Z0-9_\.]+)(\)?)", ReplaceVar);
 
@@ -26,10 +22,9 @@ public class BlockInterpolator
             if (fullMatch.StartsWith("$$"))
                 return fullMatch.Substring(1);
             var term = m.Groups[2].Value;
-            var settings = _coreSettings;
 
             //cope with unbalance brackets such as bin($abcd) where we want to prevent the
-            //losing bracket being lost.
+            //closing bracket being lost.
             var variableHasLeadingBracket = m.Groups[1].Value == "(";
             if (settings.HasSetting(term))
                 return

@@ -288,14 +288,8 @@ public partial class MainViewModel : ObservableObject
 
     private InteractiveTableExplorer CreateExplorer()
     {
-        //create a new explorer context
-        var loader = new StandardFormatAdaptor(
-            _workspaceManager.Settings, ConsoleViewModel);
-
-
         return new InteractiveTableExplorer(
             ConsoleViewModel,
-            loader,
             _workspaceManager.Settings,
             _commandProcessor,
             new NullResultRenderingSurface());
