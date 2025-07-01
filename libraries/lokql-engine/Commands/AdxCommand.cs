@@ -1,5 +1,6 @@
 ﻿using AppInsightsSupport;
 using CommandLine;
+using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
@@ -18,34 +19,56 @@ public static class AdxCommand
         var query = blocks.Next();
         //make sure we pick up any variable interpolation in case we are inside a function
         query = exp.Interpolate(query);
-        exp.Info("Running application insights query.  This may take a while....");
-        var result = await ai.LoadTable(o.Rid,o.Database, query);
+
+        var connection = o.ConnectionString;
+        var database = o.Database;
+        if (database.IsBlank())
+        {
+            var i = connection.IndexOf('@');
+            if (i >= 0 && i < (connection.Length - 1))
+            {
+                database = connection[..i];
+                connection = connection[(i + 1)..];
+            }
+        }
+
+        exp.Info("Running ADX query.  This may take a while....");
+        var result = await ai.LoadTable(connection,database, query);
         await exp.InjectResult(result);
     }
 
     [Verb("adx", 
-        HelpText = @"Runs a query against adx
-The resourceId is the full resourceId of the application insights instance which can be obtained
-from the JSON View of the Insights resource in the Azure portal.
-The timespan is a duration string which can be in the format of '7d', '30d', '1h' etc.
-If not specified, the default is 24 hours.
+        HelpText =
+            """
+            Runs a query against adx
+            The connection-string is the full connection string to the ADX cluster, which can
+            be found in the Azure portal.
 
-Examples:
- .set appservice /subscriptions/12a.... 
- .appinsights $appservice 7d
- traces | where message contains 'error'
+            The database is the name of the database.
 
- .appinsights $appservice 30d
- exceptions
- | summarize count() by outerMessage
- | render piechart
-")]
+            The database and connection-string can be combined into a single string
+            in the format database@connection-string, 
+            e.g. mydb@https://myadx.cluster.kusto.windows.net
+
+
+            Examples:
+             .set cluster https://help.kusto.windows.net/ 
+             .set database SampleLogs
+             .set path $database@$cluster
+             
+             .adx $path
+             RawSysLogs
+             | extend Cpu=tostring(tags.cpu_id)
+             | summarize N=count() by Day = bin(timestamp,1d),Cpu
+             | render linechart
+             "
+            """)]
     internal class Options
     {
-        [Value(0, HelpText = "resourceId", Required = true)]
-        public string Rid { get; set; } = string.Empty;
+        [Value(0, HelpText = "connection-string", Required = true)]
+        public string ConnectionString { get; set; } = string.Empty;
 
-        [Value(1, HelpText = "database ",Required = true)]
+        [Value(1, HelpText = "database ",Required = false)]
         public string Database { get; set; } = "";
         
     }

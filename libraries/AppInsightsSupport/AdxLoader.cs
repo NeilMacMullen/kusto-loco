@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Data;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Kusto.Data;
 using Kusto.Data.Net.Client;
 using KustoLoco.Core;
@@ -41,11 +42,17 @@ public class AdxLoader
             response.Read();
 
             var data = response.GetString(0);
-            var d = JsonSerializer.Deserialize<Dictionary<string, object>>(data)!;
+            var d =  JsonSerializer.Deserialize<Dictionary<string, object?>>(data)!;
             var ct = d.GetValueOrDefault("Visualization", "");
-            var v = ct.ToString().NullToEmpty();
-            var id = d.ToImmutableDictionary(kv => kv.Key, kv => kv.Value.ToString().NullToEmpty());
-            vs = new VisualizationState(v, id);
+            if (ct != null)
+            {
+
+                var v = ct.ToString().NullToEmpty();
+                var id = d
+                    .Where(kv=>kv.Value!=null)
+                    .ToImmutableDictionary(kv => kv.Key, kv => kv.Value!.ToString().NullToEmpty());
+                vs = new VisualizationState(v, id);
+            }
         }
 
         var res = new KustoQueryResult(query, table!,
@@ -73,7 +80,7 @@ public static class TableLoaderFromIDataReader
     public static ITableSource LoadTable(string tableName, IDataReader reader)
     {
         var columns = Enumerable.Range(0, reader.FieldCount)
-            .Select(i => new ColumnResult(reader.GetName(i), i, reader.GetFieldType(i)))
+            .Select(i => new ColumnResult(reader.GetName(i), i,BodgeGetFieldType(i)))
             .ToArray();
         var columnBuilders
             = columns.Select(c => ColumnHelpers.CreateBuilder(c.UnderlyingType, c.Name))
@@ -83,7 +90,31 @@ public static class TableLoaderFromIDataReader
         {
             var row = new object[reader.FieldCount];
             reader.GetValues(row);
-            foreach (var bld in columns) columnBuilders[bld.Index].Add(row[bld.Index]);
+            foreach (var bld in columns)
+            {
+                //special handling of dynamic types which are represented as BinaryData here
+                var data = row[bld.Index];
+                if (bld.UnderlyingType == typeof(JsonNode) && data is Newtonsoft.Json.Linq.JToken obj) 
+                {
+                    try
+                    {
+
+                        var str = Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+                        data = System.Text.Json.JsonSerializer.Deserialize<JsonNode>(str);
+                    }
+                    catch
+                    {
+                        data = null;
+                    }
+                }
+
+                if (data is DBNull n)
+                {
+                    data = null;
+                }
+
+                columnBuilders[bld.Index].Add(data);
+            }
         }
 
         var rowCount = columnBuilders[0].RowCount;
@@ -94,5 +125,13 @@ public static class TableLoaderFromIDataReader
 
         var table = builder.ToTableSource();
         return table;
+
+        Type BodgeGetFieldType(int n)
+        {
+            var t = reader.GetFieldType(n);
+            if (t == typeof(object))
+                t = typeof(JsonNode);
+            return t;
+        }
     }
 }
