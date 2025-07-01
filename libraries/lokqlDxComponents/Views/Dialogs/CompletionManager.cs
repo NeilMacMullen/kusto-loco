@@ -72,6 +72,7 @@ public class CompletionManager : IDisposable
 
         var options = e.Text switch
         {
+            // only show completions if we are at the start of a line
             "." when _editorHelper.TextToLeftOfCaret().TrimStart() is "." => new()
             {
                 Completions = _vm.InternalCommands
