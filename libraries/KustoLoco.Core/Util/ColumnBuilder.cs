@@ -53,7 +53,10 @@ public class ColumnBuilder<T> : BaseColumnBuilder
 
         if (typeof(T) == typeof(JsonNode))
         {
-            _data.Add((T?)value);
+            if (value is T jn)
+                _data.Add(jn);
+            else 
+                _data.Add(default);
         }
         else if (
             typeof(T) == typeof(DateTime?) &&
