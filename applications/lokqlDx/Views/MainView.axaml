@@ -98,6 +98,13 @@
                           Command="{Binding NavigateToWikiCommand}"
                           CommandParameter="ScottPlot-Chart-customisation" />
                 <Separator />
+                <MenuItem Header="Querying ApplicationInsights"
+                          Command="{Binding NavigateToWikiCommand}"
+                          CommandParameter="Accessing-Application-Insights-data-with-Lokqldx" />
+                <MenuItem Header="Querying ADX clusters"
+                          Command="{Binding NavigateToWikiCommand}"
+                          CommandParameter="Querying-ADX-clusters-with-lokqldx" />
+                <Separator />
                 <MenuItem Header="Kusto-loco Project Page"
                           Command="{Binding NavigateToUriCommand}"
                           CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
