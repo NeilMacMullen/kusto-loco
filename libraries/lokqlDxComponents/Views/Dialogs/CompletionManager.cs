@@ -43,14 +43,17 @@ public class CompletionManager : IDisposable
 
 
 
+
         _completionWindow.ShowCompletions(new ShowCompletionOptions
         {
             Completions = result.Entries,
-            Rewind = result.Filter.Length,
+            Rewind = 0,
             OnCompletionWindowDataPopulated = completionWindow =>
             {
-                // when editor loses focus mid-path and user resumes typing,
-                // it won't require a second keypress to select the relevant result
+                // since we could be starting in the middle of a path name, we need to adjust the start offset to account for the extant fragment of the name
+                completionWindow.StartOffset = _textEditor.CaretOffset - result.Filter.Length;
+
+                // when editor loses focus mid-path and user resumes typing, it won't require a second keypress to select the relevant result
                 completionWindow.CompletionList.SelectItem(result.Filter);
                 if (!completionWindow.CompletionList.CurrentList.Any())
                     completionWindow.Close();
