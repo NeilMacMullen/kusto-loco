@@ -1,4 +1,3 @@
-using AvaloniaEdit.Editing;
 using AwesomeAssertions.Execution;
 using NotNullStrings;
 
@@ -6,14 +5,6 @@ namespace lokqlDxComponentsTests;
 
 public static class TestExtensions
 {
-    public static void Type(this TextArea textArea, string text)
-    {
-        foreach (var c in text.Select(x => x.ToString()))
-        {
-            textArea.PerformTextInput(c);
-        }
-    }
-
     // it's really not worth making a FluentAssertion style extension with an unconstrained generic
     /// <summary>
     /// Continually retries the FluentAssertion delegate until either success or timeout. If this times out, this fails with the message of the most recently failed assertion.
