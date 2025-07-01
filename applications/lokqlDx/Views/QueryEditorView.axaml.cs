@@ -2,6 +2,7 @@ using System.Xml;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
@@ -39,7 +40,10 @@ public partial class QueryEditorView : UserControl
         TextEditor.AddHandler(DragDrop.DragOverEvent, DragOver);
         TextEditor.AddHandler(DragDrop.DropEvent, Drop);
         TextEditor.TextArea.TextEntered += TextArea_TextEntered;
-       
+        TextEditor.TextArea.TextView.LinkTextUnderline = true;
+        TextEditor.TextArea.TextView.LinkTextForegroundBrush = Brushes.LightGreen;
+
+
 
     }
 

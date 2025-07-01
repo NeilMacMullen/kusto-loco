@@ -1,7 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using Azure.Core;
+﻿using Azure.Core;
 using Azure.Identity;
 using Azure.Monitor.Query;
 using KustoLoco.Core;
@@ -11,6 +8,10 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NotNullStrings;
+using System.Collections.Immutable;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
 
 namespace AppInsightsSupport;
 
@@ -69,18 +70,18 @@ public class ApplicationInsightsLogLoader
                 .Cast<object?>()
                 .ToArray();
             var type = TypeMapping.TypeFromName(column.Type.ToString());
+            
             if (type == typeof(JsonNode))
             {
-                _console.Warn($"Column:'{column.Name}' Dynamic currently not supported for ApplicationInsights");
-                continue;
+                objects = objects.Select(JsonNodeFromBinaryData).ToArray();
             }
-
+            
             if (type == typeof(DateTime))
-                //grr - got to love the inconsistency - 'dateTime' is used for colums of DateTimeOffset
+                //grr - got to love the inconsistency - 'dateTime' is used for columns of DateTimeOffset
                 objects = objects.Select(o => o is DateTimeOffset offset ? (DateTime?)offset.DateTime : null)
                     .Cast<object?>()
                     .ToArray();
-
+           
             var columnBuilder = ColumnHelpers.CreateFromObjectArray(objects, TypeMapping.SymbolForType(type));
 
             builder.WithColumn(column.Name, columnBuilder);
@@ -95,6 +96,16 @@ public class ApplicationInsightsLogLoader
             TimeSpan.Zero, string.Empty);
     }
 
+    private object? JsonNodeFromBinaryData(object? data)
+    {
+        return data switch
+        {
+            JsonNode node => node,
+            BinaryData bd =>  JsonSerializer.Deserialize<JsonNode>(bd),
+            _ => null
+        };
+    }
+
     private static VisualizationState StateFromBinaryData(BinaryData viz)
     {
         using var vizDoc = JsonDocument.Parse(viz);
@@ -104,7 +115,6 @@ public class ApplicationInsightsLogLoader
             el => el.Name,
             el => el.Value.ToString().NullToEmpty()
         );
-        //TODO - accept other properties
         return new VisualizationState(visState, props);
     }
 }

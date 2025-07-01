@@ -395,28 +395,50 @@ public static class AppInsightsCommand
         var query = blocks.Next();
         //make sure we pick up any variable interpolation in case we are inside a function
         query = exp.Interpolate(query);
+        var rid = o.Rid;
+        var tenant = o.TenantId;
+        var i = rid.IndexOf(':');
+        if (i >= 0 && i < (rid.Length-1))
+        {
+            tenant = rid[..i];
+            rid = rid[(i + 1)..];
+        }
+
         exp.Info("Running application insights query.  This may take a while....");
-        var result = await ai.LoadTable(o.TenantId,o.Rid, query, t, DateTime.UtcNow);
+        var result = await ai.LoadTable(tenant, rid, query, t, DateTime.UtcNow);
         await exp.InjectResult(result);
     }
 
     [Verb("appinsights", aliases: ["ai"],
-        HelpText = @"Runs a query against application insights
-The resourceId is the full resourceId of the application insights instance which can be obtained
-from the JSON View of the Insights resource in the Azure portal.
-The timespan is a duration string which can be in the format of '7d', '30d', '1h' etc.
-If not specified, the default is 24 hours.
+        HelpText = """
+                   Runs a query against application insights
+                   The resourceId is the full resourceId of the application insights instance which can be obtained
+                   from the JSON View of the Insights resource in the Azure portal.
 
-Examples:
- .set appservice /subscriptions/12a.... 
- .appinsights $appservice 7d
- traces | where message contains 'error'
+                   The timespan is a duration string which can be in the format of '7d', '30d', '1h' etc.
+                   If not specified, the default is 24 hours.
 
- .appinsights $appservice 30d
- exceptions
- | summarize count() by outerMessage
- | render piechart
-")]
+                   The TenantId is the tenant-id of the subscription that contains the application insights instance.
+                   This is optional but may be required if you have multiple tenants or if the application insights
+                   instance is in a different tenant than the one you are currently logged into.
+                   The tenant id can be specified as a prefix to the resourceId separated with a colon.
+
+                   Examples:
+                   .set appservice /subscriptions/12a.... 
+                   .appinsights $appservice 7d
+                   traces | where message contains 'error'
+
+                   .appinsights $appservice 30d
+                   exceptions
+                   | summarize count() by outerMessage
+                   | render piechart
+
+                   .set tenantid "ae...."
+                   .set svc  "$tenantid:$appservice" 
+                   .appinsights $svc 1d
+                   traces | order by timestamp | take 100
+
+                   """)]
     internal class Options
     {
         [Value(0, HelpText = "resourceId", Required = true)]
@@ -427,6 +449,5 @@ Examples:
 
         [Option(HelpText = "The tenant-id of the subscription that contains the application insights instance")]
         public string TenantId { get; set; } = string.Empty;
-
     }
 }

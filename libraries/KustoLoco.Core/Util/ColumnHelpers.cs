@@ -65,7 +65,7 @@ public static class ColumnHelpers
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return CreateFromObjectArray<JsonNode?>(data);
+            return CreateFroDynamicObjectArray(data);
         }
 
         // TODO: Support all data types
@@ -373,6 +373,22 @@ public static class ColumnHelpers
             columnData[i] = item == null
                                 ? null
                                 : Convert.ToBoolean(item);
+        }
+
+        return ColumnFactory.Create(columnData);
+    }
+
+    private static TypedBaseColumn<JsonNode?> CreateFroDynamicObjectArray(object?[] data)
+    {
+        var columnData = new JsonNode?[data.Length];
+        for (var i = 0; i < data.Length; i++)
+        {
+            var item = data[i];
+            columnData[i] = item == null
+                ? null
+                : item is JsonNode jsonNode
+                    ? jsonNode
+                    : null;
         }
 
         return ColumnFactory.Create(columnData);
