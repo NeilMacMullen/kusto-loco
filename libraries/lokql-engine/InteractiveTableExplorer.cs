@@ -2,7 +2,6 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine.Commands;
-using NetTopologySuite.Utilities;
 using NotNullStrings;
 
 namespace Lokql.Engine;
@@ -14,53 +13,50 @@ namespace Lokql.Engine;
 ///     A repl for exploring kusto tables
 /// </summary>
 /// <remarks>
-///     This class is used as the heart of the CLI and UI version of "lokql"  As well as providing demand-based loading of
-///     tables,
-///     it also provides a number of commands to interact with the data, such as saving, loading, rendering and
-///     materializing tables.
-///     Query results can also be rendered as html charts using the "render" command.
+///     This class is used as the heart of the CLI and UI version of "lokql"
+///     As well as providing demand-based loading of tables, it also provides
+///     a number of commands to interact with the data, such as saving,
+///     loading, rendering and materializing tables.
 /// </remarks>
 public class InteractiveTableExplorer
 {
     public readonly CommandProcessor _commandProcessor;
     private readonly KustoQueryContext _context;
-    public readonly BlockInterpolator _interpolator;
-    private readonly MacroRegistry _macros ;
+    public readonly ITableAdaptor _loader;
+    private readonly MacroRegistry _macros;
     public readonly IKustoConsole _outputConsole;
     private readonly IResultRenderingSurface _renderingSurface;
-    public readonly KustoSettingsProvider Settings;
     public readonly ResultHistory _resultHistory;
-    public readonly ITableAdaptor _loader;
+    public readonly KustoSettingsProvider Settings;
 
 
-    public InteractiveTableExplorer(IKustoConsole outputConsole, ITableAdaptor loader, KustoSettingsProvider settings,
+    public InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
         CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface)
     {
         _outputConsole = outputConsole;
         Settings = settings;
-        _interpolator = new BlockInterpolator(settings);
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
-        _loader = loader;
-        _context.SetTableLoader(loader);
+        _loader = new StandardFormatAdaptor(settings, _outputConsole);
+        _context.SetTableLoader(_loader);
         _resultHistory = new ResultHistory();
-        _macros=new MacroRegistry();        
+        _macros = new MacroRegistry();
         LokqlSettings.Register(Settings);
     }
 
 
     /// <summary>
-    /// Used to create a clone
+    ///     Used to create a clone
     /// </summary>
     private InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
-        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface,ResultHistory history,MacroRegistry macros,
-        ITableAdaptor loader,KustoQueryContext context)
+        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface, ResultHistory history,
+        MacroRegistry macros,
+        ITableAdaptor loader, KustoQueryContext context)
     {
         _outputConsole = outputConsole;
         Settings = settings;
-        _loader=loader;
-        _interpolator = new BlockInterpolator(settings);
+        _loader = new StandardFormatAdaptor(settings, _outputConsole);
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
         _context = context;
@@ -71,29 +67,20 @@ public class InteractiveTableExplorer
 
     public IReportTarget ActiveReport { get; private set; } = new HtmlReport(string.Empty);
 
-    public IResultRenderingSurface GetRenderingSurface()
-    {
-        return _renderingSurface;
-    }
+    public IResultRenderingSurface GetRenderingSurface() => _renderingSurface;
 
-    public void AddMacro(MacroDefinition macro)
-    {
-        _macros.AddMacro(macro);
-    }
+    public void AddMacro(MacroDefinition macro) => _macros.AddMacro(macro);
 
-    public KustoQueryContext GetCurrentContext()
-    {
-        return _context;
-    }
+    public KustoQueryContext GetCurrentContext() => _context;
 
     public SchemaLine[] GetSchema()
     {
         var commandSchema = _commandProcessor.GetRegisteredSchema();
-        
-        var dynamicSchema= _context
+
+        var dynamicSchema = _context
             .Tables()
-            .SelectMany(t => t.ColumnNames.Select(c=>
-                new SchemaLine(string.Empty,NameEscaper.EscapeIfNecessary(t.Name),
+            .SelectMany(t => t.ColumnNames.Select(c =>
+                new SchemaLine(string.Empty, NameEscaper.EscapeIfNecessary(t.Name),
                     NameEscaper.EscapeIfNecessary(c))));
 
         return commandSchema.Concat(dynamicSchema).ToArray();
@@ -151,11 +138,10 @@ public class InteractiveTableExplorer
     public async Task RunNextBlock(BlockSequence blocks)
     {
         var query = blocks.Next();
-        query = _interpolator.Interpolate(query)
-            .Trim();
+        query = Interpolate(query).Trim();
 
         //support comments
-        if (query.StartsWith("#")  || query.IsBlank()) return;
+        if (query.StartsWith("#") || query.IsBlank()) return;
 
         try
         {
@@ -184,11 +170,13 @@ public class InteractiveTableExplorer
         DisplayResults(result);
     }
 
+    /// <summary>
+    /// Print an error to the console
+    /// </summary>
     private void ShowError(string message)
     {
-        _outputConsole.ForegroundColor = ConsoleColor.Red;
-        _outputConsole.WriteLine("Error:");
-        _outputConsole.WriteLine(message);
+        
+        _outputConsole.Error(message);
     }
 
     public static string ToFullPath(string file, string folder, string extension)
@@ -201,18 +189,20 @@ public class InteractiveTableExplorer
         return path;
     }
 
+    /// <summary>
+    /// Print info to the console
+    /// </summary>
     public void Info(string s)
     {
-        _outputConsole.ForegroundColor = ConsoleColor.Yellow;
-        _outputConsole.WriteLine(s);
+        _outputConsole.Info(s);
     }
 
     #region internal commands
 
-    public void Warn(string s)
-    {
-        _outputConsole.Warn(s);
-    }
+    /// <summary>
+    /// Print a warning to the console
+    /// </summary>
+    public void Warn(string s) => _outputConsole.Warn(s);
 
     #endregion
 
@@ -222,44 +212,35 @@ public class InteractiveTableExplorer
     /// <remarks>
     ///     Primarily used by the Macro mechanism to avoid name-clashes for parameters
     /// </remarks>
-    public void PushSettingLayer(KustoSettingsProvider settings)
-    {
-        _interpolator.AddLayer(settings);
-    }
+    public void PushSettingLayer(KustoSettingsProvider settings) => Settings.AddLayer(settings);
 
     /// <summary>
     ///     Pops the top layer of settings from the setting interpolation stack
     /// </summary>
-    public void PopSettingLayer()
-    {
-        _interpolator.PopSettings();
-    }
+    /// <remarks>
+    /// Inverse of PushSettingsLayer
+    /// </remarks>
+    public void PopSettingLayer() => Settings.Pop();
 
-    public MacroDefinition GetMacro(string oName)
-    {
-        return _macros.GetMacro(oName);
-    }
+    public MacroDefinition GetMacro(string oName) => _macros.GetMacro(oName);
 
-    public void StartNewReport(IReportTarget report)
-    {
-        ActiveReport = report;
-    }
+    public void StartNewReport(IReportTarget report) => ActiveReport = report;
 
-    public KustoQueryResult GetPreviousResult()
-    {
-        return _resultHistory.MostRecent;
-    }
+    public KustoQueryResult GetPreviousResult() => _resultHistory.MostRecent;
 
-    public KustoQueryResult GetResult(string name)
-    {
-        return _resultHistory.Fetch(name);
-    }
+    public KustoQueryResult GetResult(string name) => _resultHistory.Fetch(name);
 
-    public InteractiveTableExplorer ShareWithNewSurface(IResultRenderingSurface renderingSurface)
-    {
-        return new InteractiveTableExplorer(_outputConsole, Settings, _commandProcessor, renderingSurface,
-            _resultHistory,_macros,_loader,_context);
+    public InteractiveTableExplorer ShareWithNewSurface(IResultRenderingSurface renderingSurface) =>
+        new(_outputConsole, Settings, _commandProcessor, renderingSurface,
+            _resultHistory, _macros, _loader, _context);
 
-    }
+    /// <summary>
+    ///     Interpolates settings in the supplied text
+    /// </summary>
+    /// <remarks>
+    ///     a query such as "project $col" can be transformed into "project Id"
+    /// </remarks>
+    public string Interpolate(string query) => BlockInterpolator.Interpolate(query, Settings);
 }
+
 public readonly record struct SchemaLine(string Command, string Table, string Column);

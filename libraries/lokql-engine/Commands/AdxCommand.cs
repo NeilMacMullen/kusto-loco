@@ -17,7 +17,7 @@ public static class AdxCommand
 
         var query = blocks.Next();
         //make sure we pick up any variable interpolation in case we are inside a function
-        query = exp._interpolator.Interpolate(query);
+        query = exp.Interpolate(query);
         exp.Info("Running application insights query.  This may take a while....");
         var result = await ai.LoadTable(o.Rid,o.Database, query);
         await exp.InjectResult(result);

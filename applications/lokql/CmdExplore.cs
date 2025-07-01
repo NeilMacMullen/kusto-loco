@@ -17,11 +17,11 @@ internal class CmdExplore
     {
         var console = new SystemConsole();
         var settings = new KustoSettingsProvider();
-        var loader = new StandardFormatAdaptor(settings, console);
-        loader.SetDataPaths(options.Data);
+        settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name,options.Data);
+      
         var processor = CommandProcessorProvider.GetCommandProcessor();
         var renderer = new NullResultRenderingSurface();
-        var explorer = new InteractiveTableExplorer(console, loader, settings, processor, renderer);
+        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer);
         await RunInteractive(console, explorer);
     }
 
