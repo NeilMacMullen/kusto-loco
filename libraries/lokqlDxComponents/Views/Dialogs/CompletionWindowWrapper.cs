@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Editing;
 using lokqlDxComponents.Models;
@@ -11,9 +10,9 @@ public class CompletionWindowWrapper(TextArea textArea)
 
     public bool IsOpen => _completionWindow?.IsOpen ?? false;
 
-    public IEnumerable<string> GetCurrentCompletionListEntries()
+    public IReadOnlyList<ICompletionData> GetCurrentCompletionListEntries()
     {
-        return _completionWindow?.CompletionList.CurrentList.Select(x => x.Text) ?? ImmutableArray<string>.Empty;
+        return _completionWindow?.CompletionList.CurrentList ?? [];
     }
 
     public void CloseIfEmpty()

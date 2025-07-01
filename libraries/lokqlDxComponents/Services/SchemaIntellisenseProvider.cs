@@ -1,7 +1,7 @@
 ﻿using Intellisense;
 using Lokql.Engine;
 
-namespace lokqlDx;
+namespace lokqlDxComponents.Services;
 
 public class SchemaIntellisenseProvider
 {

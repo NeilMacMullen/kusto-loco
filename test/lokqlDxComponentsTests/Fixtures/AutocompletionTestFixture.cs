@@ -20,7 +20,8 @@ public class AutocompletionTestFixture
         var editorHelper = new EditorHelper(editor);
         var resourceProvider = new MockResourceProvider
         {
-            _intellisenseClient = provider.GetRequiredService<IntellisenseClientAdapter>()
+            _intellisenseClient = provider.GetRequiredService<IntellisenseClientAdapter>(),
+            _schemaIntellisenseProvider = new()
         };
         var windowWrapper = new CompletionWindowWrapper(editor.TextArea);
         var completionManager = new CompletionManager(editor, editorHelper, resourceProvider, windowWrapper);
