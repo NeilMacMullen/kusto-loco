@@ -40,11 +40,11 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.6.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.6" />
-    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.1" />
+    <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.2" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="NLog" Version="6.0.0" />
+    <PackageVersion Include="NLog" Version="6.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.9.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.9.3" />
