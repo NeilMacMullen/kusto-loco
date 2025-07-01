@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.AvaloniaEdit" />
+        <PackageReference Include="NotNullStrings" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Intellisense\Intellisense.csproj" />
+        <ProjectReference Include="..\lokql-engine\lokql-engine.csproj" />
+    </ItemGroup>
+</Project>

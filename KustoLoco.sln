@@ -104,6 +104,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SixelSupport", "libraries\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliRendering", "samples\CliRendering\CliRendering.csproj", "{E3F0084D-E510-41B1-ACF5-2A649CD4B88C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlDxComponents", "libraries\lokqlDxComponents\lokqlDxComponents.csproj", "{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlDxComponentsTests", "test\lokqlDxComponentsTests\lokqlDxComponentsTests.csproj", "{E3F2D499-2001-4170-8F5B-EAD6B7098393}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +254,14 @@ Global
 		{E3F0084D-E510-41B1-ACF5-2A649CD4B88C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3F0084D-E510-41B1-ACF5-2A649CD4B88C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3F0084D-E510-41B1-ACF5-2A649CD4B88C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -291,6 +303,8 @@ Global
 		{0CE04FD8-ED41-4F30-AF15-11BA7548E428} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{5FD03395-D208-4CD8-A7B6-2CFDB50FB0A4} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{E3F0084D-E510-41B1-ACF5-2A649CD4B88C} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
+		{E3F2D499-2001-4170-8F5B-EAD6B7098393} = {932C804C-F6B7-4361-8360-E5238938E464}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}

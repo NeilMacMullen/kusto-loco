@@ -6,25 +6,30 @@ using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDx;
+using lokqlDxComponents;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-public partial class QueryEditorViewModel : ObservableObject, IDisposable
+
+
+public partial class QueryEditorViewModel : ObservableObject, IDisposable, IIntellisenseResourceManager, ICompletionManagerServiceLocator
 {
     private readonly ConsoleViewModel _consoleViewModel;
     private InteractiveTableExplorer _explorer;
-    public readonly IntellisenseClient _intellisenseClient;
+    public IntellisenseClient _intellisenseClient { get; }
 
-    public readonly SchemaIntellisenseProvider SchemaIntellisenseProvider = new();
+    public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
     [ObservableProperty] private TextDocument _document = new();
-    public IntellisenseEntry[] InternalCommands = [];
-    public IntellisenseEntry[] KqlFunctionEntries = [];
-  
-    public IntellisenseEntry[] SettingNames = [];
-    public IntellisenseEntry[] KqlOperatorEntries = [];
+    public IntellisenseEntry[] InternalCommands { get; set; } = [];
+    public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
+    public IntellisenseEntry[] SettingNames { get; set; } = [];
+    public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
+    public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
+    public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
+    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions { get; set; } = [];
 
     [ObservableProperty] private bool _isDirty;
 
@@ -42,18 +47,16 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         _intellisenseClient = intellisenseClient;
         _logger = logger;
         DisplayPreferences = displayPreferences;
-     
+
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
-        AddInternalCommands(_explorer._commandProcessor.GetVerbs());
+        AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
         SetText(initialText);
         _isDirty = false;
     }
 
-    public ILogger<QueryEditorViewModel> _logger { get; set; }
-
-    public CommandParser Parser { get; set; } = new([], string.Empty);
+    public ILogger _logger { get; }
 
 
     public void Dispose()
@@ -118,8 +121,13 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable
         InternalCommands = verbs.Select(v =>
                 new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
             .ToArray();
-        var fileIoCommands = verbs.Where(x => x.SupportsFiles).Select(x => x.Name);
-        Parser = new CommandParser(fileIoCommands, ".");
+        var fileIoCommands = verbs.Where(x => x.SupportsFiles);
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        _allowedCommandsAndExtensions = fileIoCommands.ToDictionary(
+            x => "." + x.Name,
+            x => x.SupportedExtensions.ToHashSet(comparer),
+            comparer
+        );
     }
     public string GetText() => Document.Text;
 

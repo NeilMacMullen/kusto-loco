@@ -1,5 +1,8 @@
 ﻿using AwesomeAssertions;
 using AwesomeAssertions.Execution;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.Settings;
+using Lokql.Engine;
 using Lokql.Engine.Commands;
 
 namespace LokqlEngineTests;
@@ -12,7 +15,12 @@ public class CommandProcessorTests
     {
         var processor = CommandProcessor.Default();
 
-        var result = processor.GetVerbs().ToArray();
+        var settingsProvider = new KustoSettingsProvider();
+        var console = new NullConsole();
+        var loader = new StandardFormatAdaptor(settingsProvider, console);
+
+
+        var result = processor.GetVerbs(loader).ToArray();
 
         using var _ = new AssertionScope();
 

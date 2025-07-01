@@ -24,7 +24,9 @@ public static class RenderCommand
     [Verb("render", aliases: ["ren"], HelpText = "render last results as html and opens with browser")]
     internal class Options
     {
-        [Value(0, HelpText = "Name of file")] public string File { get; set; } = string.Empty;
+        [Value(0, HelpText = "Name of file")]
+        [FileOptions(Extensions = [".html"])]
+        public string File { get; set; } = string.Empty;
 
         [Option("saveOnly", HelpText = "just save the file without opening in the browser")]
         public bool SaveOnly { get; set; }
