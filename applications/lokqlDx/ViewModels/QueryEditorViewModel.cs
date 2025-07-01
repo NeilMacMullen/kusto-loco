@@ -6,9 +6,7 @@ using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDx;
-using lokqlDxComponents;
 using lokqlDxComponents.Services;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
@@ -20,33 +18,32 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 {
     private readonly ConsoleViewModel _consoleViewModel;
     private InteractiveTableExplorer _explorer;
-    public IntellisenseClient _intellisenseClient { get; }
+
+    public IntellisenseClientAdapter _intellisenseClient { get; }
 
     public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
     [ObservableProperty] private TextDocument _document = new();
-    public IntellisenseEntry[] InternalCommands { get; set; } = [];
+    public IntellisenseEntry[] InternalCommands => _intellisenseClient.InternalCommands;
     public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
     public IntellisenseEntry[] SettingNames { get; set; } = [];
     public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
     public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
     public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
-    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions { get; set; } = [];
 
     [ObservableProperty] private bool _isDirty;
 
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
 
+
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
-        ConsoleViewModel consoleViewModel,
-        IntellisenseClient intellisenseClient,
-        ILogger<QueryEditorViewModel> logger,DisplayPreferencesViewModel displayPreferences,
-        string initialText
+        ConsoleViewModel consoleViewModel, DisplayPreferencesViewModel displayPreferences,
+        string initialText,
+        IntellisenseClientAdapter adapter
     )
     {
+        _intellisenseClient = adapter;
         _explorer = explorer;
         _consoleViewModel = consoleViewModel;
-        _intellisenseClient = intellisenseClient;
-        _logger = logger;
         DisplayPreferences = displayPreferences;
 
         Document.Changing += Document_Changing;
@@ -57,7 +54,6 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         _isDirty = false;
     }
 
-    public ILogger _logger { get; }
 
 
     public void Dispose()
@@ -103,6 +99,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
             .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
             .ToArray();
 
+
     private void LoadIntellisense()
     {
         using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
@@ -116,20 +113,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
     public void SetSchema(SchemaLine[] getSchema) => SchemaIntellisenseProvider.SetSchema(getSchema);
 
-    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
-    {
-        var verbs = verbEntries.ToArray();
-        InternalCommands = verbs.Select(v =>
-                new IntellisenseEntry(v.Name, v.HelpText, string.Empty))
-            .ToArray();
-        var fileIoCommands = verbs.Where(x => x.SupportsFiles);
-        var comparer = StringComparer.OrdinalIgnoreCase;
-        _allowedCommandsAndExtensions = fileIoCommands.ToDictionary(
-            x => "." + x.Name,
-            x => x.SupportedExtensions.ToHashSet(comparer),
-            comparer
-        );
-    }
+    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries) => _intellisenseClient.AddInternalCommands(verbEntries);
+
     public string GetText() => Document.Text;
 
     internal void SetText(string text) => Document.Text = text;

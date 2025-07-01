@@ -1,12 +1,9 @@
-using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Input;
 using AvaloniaEdit;
-using Intellisense;
 using lokqlDxComponents.Models;
 using lokqlDxComponents.Services;
 using lokqlDxComponents.ViewModels;
-using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Views.Dialogs;
 
@@ -32,21 +29,7 @@ public class CompletionManager : IDisposable
 
     [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods")]
     // ReSharper disable once AsyncVoidMethod
-    private async void Caret_PositionChanged(object? sender, EventArgs eventArgs)
-    {
-        try
-        {
-            await _vm._intellisenseClient.CancelRequestAsync();
-        }
-        catch (IntellisenseException exc)
-        {
-            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
-        }
-        catch (OperationCanceledException exc)
-        {
-            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
-        }
-    }
+    private async void Caret_PositionChanged(object? sender, EventArgs eventArgs) => await _vm._intellisenseClient.OnCaretPositionChanged();
 
     private async Task<bool> ShowPathCompletions()
     {
@@ -55,57 +38,10 @@ public class CompletionManager : IDisposable
 
         var currentLineText = _editorHelper.GetCurrentLineText();
 
-        var args = CommandLineStringSplitter.Instance.Split(currentLineText).ToArray();
-
-        if (args.Length < 2)
-        {
-            return false;
-        }
-
-        var lastArg = args[^1];
-        var command = args[0];
-
-        // check if it starts with a valid file IO command like ".save"
-        if (!_vm._allowedCommandsAndExtensions.TryGetValue(command, out var extensions))
-        {
-            return false;
-        }
-
-
-        var result = CompletionResult.Empty;
-        try
-        {
-            // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
-            // and user profile app was started with if hosts don't show shares
-            result = await _vm._intellisenseClient.GetCompletionResultAsync(lastArg);
-
-        }
-        catch (IntellisenseException exc)
-        {
-            _vm._logger.LogWarning(exc, "Intellisense exception occurred");
-        }
-        catch (OperationCanceledException exc)
-        {
-            _vm._logger.LogDebug(exc, "Intellisense request cancelled");
-        }
-
+        var result = await _vm._intellisenseClient.GetPathCompletions(currentLineText);
         if (result.IsEmpty()) return false;
 
-        // filter out files without valid extensions
-        // permit all file types if allowlist is empty
 
-        if (extensions.Count > 0)
-        {
-            result = result with
-            {
-                Entries = result.Entries.Where(x =>
-                {
-                    // permit folders (which do not have extensions). note that files without extensions will still be allowed
-                    var ext = Path.GetExtension(x.Name);
-                    return ext == string.Empty || extensions.Contains(ext);
-                }).ToList()
-            };
-        }
 
         _completionWindow.ShowCompletions(new ShowCompletionOptions
         {
@@ -176,6 +112,5 @@ public class CompletionManager : IDisposable
     {
         _textEditor.TextArea.Caret.PositionChanged -= Caret_PositionChanged;
         _completionWindow.Close();
-
     }
 }

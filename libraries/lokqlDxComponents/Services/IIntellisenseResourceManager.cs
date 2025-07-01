@@ -6,6 +6,5 @@ namespace lokqlDxComponents.Services;
 public interface IIntellisenseResourceManager : IIntellisenseResourceProvider
 {
     void AddSettingsForIntellisense(KustoSettingsProvider settings);
-    void AddInternalCommands(IEnumerable<VerbEntry> verbEntries);
     void SetSchema(SchemaLine[] getSchema);
 }

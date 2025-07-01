@@ -1,14 +1,13 @@
 using Avalonia.Headless.XUnit;
 using AvaloniaEdit;
 using AwesomeAssertions;
-using Intellisense;
-using Intellisense.Configuration;
 using Jab;
 using LogSetup;
 using lokqlDxComponents;
+using lokqlDxComponents.Configuration;
+using lokqlDxComponents.Services;
 using lokqlDxComponents.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponentsTests;
 
@@ -25,7 +24,7 @@ public class AutocompletionTest
 
 
             f.Editor.TextArea.Type(".xyz");
-            
+
             await f.CompletionWindow.ShouldEventuallySatisfy(x => x.IsOpen.Should().BeFalse());
         }
 
@@ -44,9 +43,7 @@ public class AutocompletionTest
             await f.CompletionWindow.ShouldEventuallySatisfy(x =>
                 x.GetCurrentCompletionListEntries().Should().BeEquivalentTo(expected)
             );
-
         }
-
     }
 
     public class Paths
@@ -56,10 +53,15 @@ public class AutocompletionTest
         {
             var f = new AutocompletionTestFixture();
 
-            f.ResourceProvider._allowedCommandsAndExtensions = new()
-            {
-                [".load"] = []
-            };
+            f.ResourceProvider._intellisenseClient.AddInternalCommands([
+                    new()
+                    {
+                        Name = "load",
+                        SupportedExtensions = [],
+                        SupportsFiles = true
+                    }
+                ]
+            );
 
 
             f.Editor.TextArea.Type(".load /");
@@ -69,7 +71,6 @@ public class AutocompletionTest
             );
         }
     }
-
 }
 
 public class AutocompletionTestFixture
@@ -84,8 +85,7 @@ public class AutocompletionTestFixture
         var editorHelper = new EditorHelper(editor);
         var resourceProvider = new MockResourceProvider
         {
-            _intellisenseClient = provider.GetRequiredService<IntellisenseClient>(),
-            _logger = provider.GetRequiredService<ILogger<IntellisenseClient>>(),
+            _intellisenseClient = provider.GetRequiredService<IntellisenseClientAdapter>()
         };
         var windowWrapper = new CompletionWindowWrapper(editor.TextArea);
         var completionManager = new CompletionManager(editor, editorHelper, resourceProvider, windowWrapper);
@@ -112,6 +112,6 @@ public class AutocompletionTestFixture
 }
 
 [ServiceProvider]
-[Import<IIntellisenseModule>]
+[Import<IAutocompletionModule>]
 [Import<ILoggingModule>]
 public partial class CompletionManagerTestContainer;

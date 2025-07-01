@@ -15,7 +15,5 @@ public class MockResourceProvider : ICompletionManagerServiceLocator
 
     public IntellisenseEntry[] GetColumns(string blockText) => throw new NotImplementedException();
 
-    public required IntellisenseClient _intellisenseClient { get; set; }
-    public required ILogger _logger { get; set; }
-    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions { get; set; } = [];
+    public required IntellisenseClientAdapter _intellisenseClient { get; set; }
 }
