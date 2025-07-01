@@ -176,5 +176,5 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     }
 
     private static string ObjectToString(object? item)
-        => item?.ToString() ?? "<null";
+        => item?.ToString() ?? "<null>";
 }
