@@ -9,7 +9,7 @@
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="11.3.2" />
     <PackageVersion Include="Avalonia.Labs.Controls" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="11.3.0" />
-    <PackageVersion Include="Avalonia.Skia" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.2" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0" />
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="AwesomeAssertions" Version="9.0.0" />
@@ -83,14 +83,14 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="geohash-dotnet" Version="2.2.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
-    <PackageVersion Include="Avalonia" Version="11.3.1" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.3.1" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.1" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.1" />
-    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.1" />
+    <PackageVersion Include="Avalonia" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.2" />
     <PackageVersion Include="Jab" Version="0.11.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.1" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.2" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.2.0" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
