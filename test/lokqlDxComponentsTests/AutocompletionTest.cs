@@ -240,8 +240,8 @@ public class AutocompletionTest
         );
     }
 
-          [AvaloniaFact]
-    public async Task CompletionWindow_EraseWithinWord_RemainsOpen()
+    [AvaloniaFact]
+    public async Task PathCompletion_EraseWithinWord_WindowRemainsOpen()
     {
         var f = new AutocompletionTestFixture();
         var data = new List<string>
@@ -273,7 +273,7 @@ public class AutocompletionTest
     }
 
     [AvaloniaFact]
-    public async Task CompletionWindow_EraseUntilSecondSeparator_RemainsOpen()
+    public async Task PathCompletion_EraseUntilSecondSeparator_RemainsOpen()
     {
         var f = new AutocompletionTestFixture();
         var data = new List<string>
@@ -307,7 +307,7 @@ public class AutocompletionTest
     }
 
     [AvaloniaFact]
-    public async Task CompletionWindow_Defocus_ProducesSameOutputAsUninterrupted()
+    public async Task PathCompletion_Defocus_ProducesSameOutputAsUninterrupted()
     {
         var res1 = await SubTest(false);
         var res2 = await SubTest(true);
