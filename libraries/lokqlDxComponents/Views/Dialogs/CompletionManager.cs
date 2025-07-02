@@ -65,6 +65,7 @@ public class CompletionManager : IDisposable
 
     public async Task HandleKeyDown(TextInputEventArgs e)
     {
+        // don't return early here if it successfully closes, will break nested dir autocompletion i.e. /abc/d/...
         _completionWindow.CloseIfEmpty();
 
         if (await ShowPathCompletions())

@@ -20,7 +20,6 @@ public class CompletionWindowWrapper(TextArea textArea)
         if (_completionWindow != null && !GetCurrentCompletionListEntries().Any())
         {
             _completionWindow.Close();
-            // return;
         }
     }
 
