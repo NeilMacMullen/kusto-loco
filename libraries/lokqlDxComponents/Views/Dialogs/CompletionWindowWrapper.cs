@@ -1,6 +1,7 @@
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Editing;
 using lokqlDxComponents.Models;
+using lokqlDxComponents.Services;
 
 namespace lokqlDxComponents.Views.Dialogs;
 
@@ -47,7 +48,10 @@ public class CompletionWindowWrapper(TextArea textArea)
         };
         IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
         foreach (var k in completions.OrderBy(k => k.Name))
-            data.Add(new QueryEditorCompletionData(k, prefix, rewind));
+            data.Add(new QueryEditorCompletionData(k, prefix, rewind)
+            {
+                Image = ImageService.Instance.GetImage(k.FileType)
+            });
 
         _completionWindow.Closed += delegate { _completionWindow = null; };
         onCompletionWindowDataPopulated.Invoke(_completionWindow);
