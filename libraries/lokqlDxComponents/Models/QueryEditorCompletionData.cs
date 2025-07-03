@@ -1,4 +1,6 @@
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
@@ -36,5 +38,5 @@ Usage: {entry.Syntax}";
         textArea.Document.Replace(seg, prefix + Text);
     }
 
-    public IImage? Image { get; } = null;
+    public IImage? Image { get; init; }
 }

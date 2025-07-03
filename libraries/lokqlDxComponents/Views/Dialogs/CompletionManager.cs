@@ -41,9 +41,6 @@ public class CompletionManager : IDisposable
         var result = await _vm._intellisenseClient.GetPathCompletions(currentLineText);
         if (result.IsEmpty()) return false;
 
-
-
-
         _completionWindow.ShowCompletions(new ShowCompletionOptions
         {
             Completions = result.Entries,
