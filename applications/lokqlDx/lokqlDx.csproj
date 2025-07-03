@@ -78,4 +78,8 @@
       <DependentUpon>QueryEditorView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\FileIcons\" />
+  </ItemGroup>
 </Project>
