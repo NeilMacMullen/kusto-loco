@@ -9,6 +9,7 @@ using Lokql.Engine.Commands;
 using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
+using lokqlDxComponents.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LokqlDx.Desktop;
@@ -37,7 +38,7 @@ internal class Program
 [ServiceProvider]
 [Transient<App>]
 [Transient<MainViewModel>]
-[Import<IIntellisenseModule>]
+[Import<IAutocompletionModule>]
 [Import<ILoggingModule>]
 [Transient<MainView>]
 [Transient<PreferencesManager>]

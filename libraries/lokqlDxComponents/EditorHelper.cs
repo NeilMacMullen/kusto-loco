@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
+using lokqlDxComponents.ViewModels;
 using NotNullStrings;
 
 namespace lokqlDxComponents;
@@ -9,11 +10,11 @@ public class EditorHelper(TextEditor query) : IEditorCursorViewModel
 {
     public TextEditor Query { get; set; } = query;
 
-    public int GetCurrentLineNumber => LineAtCaret().LineNumber;
+    private int GetCurrentLineNumber => LineAtCaret().LineNumber;
 
     public string GetCurrentLineText() => TextInLine(GetCurrentLineNumber);
 
-    public string GetText(DocumentLine line) => Query.Document.GetText(line.Offset, line.Length);
+    private string GetText(DocumentLine line) => Query.Document.GetText(line.Offset, line.Length);
 
     private bool LineNumberIsValid(int line) => line >= 1 && line <= Query.Document.LineCount;
 
@@ -22,7 +23,7 @@ public class EditorHelper(TextEditor query) : IEditorCursorViewModel
             ? string.Empty
             : GetText(Query.Document.GetLineByNumber(line));
 
-    public bool LineIsTopOfBlock(int line) => TextInLine(line - 1).IsBlank() & TextInLine(line).IsNotBlank();
+    private bool LineIsTopOfBlock(int line) => TextInLine(line - 1).IsBlank() & TextInLine(line).IsNotBlank();
 
     public DocumentLine LineAtCaret() => Query.Document.GetLineByOffset(Query.CaretOffset);
 

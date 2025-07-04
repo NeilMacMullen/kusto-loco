@@ -1,93 +1,239 @@
 using Avalonia.Headless.XUnit;
-using AvaloniaEdit;
+using Avalonia.Input;
 using AwesomeAssertions;
-using Intellisense;
-using Intellisense.Configuration;
-using Jab;
-using LogSetup;
-using lokqlDxComponents;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using lokqlDxComponentsTests.Fixtures;
 
 namespace lokqlDxComponentsTests;
 
 public class AutocompletionTest
 {
-    public class Commands
+    [AvaloniaFact]
+    public async Task GeneralCompletionBehavior_ObviousNonmatch_ClosesWindow()
     {
-        [AvaloniaFact]
-        public void CompletionWindow_NonMatch_ShouldNotBeShown()
-        {
-            var f = new AutocompletionTestFixture();
+        var f = new AutocompletionTestFixture();
 
-            f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
 
 
-            f.Editor.TextArea.Type(".xyz");
-            f.CompletionManager._completionWindow.Should().BeNull();
-        }
+        await f.Editor.TextArea.Type(".xyz");
 
-        [AvaloniaTheory]
-        [InlineData(".ab", new[] { "abc" })]
-        [InlineData(".de", new[] { "def" })]
-        public void CurrentList_PartialMatch_ShouldFilterOutIrrelevantResults(string input, string[] expected)
-        {
-            var f = new AutocompletionTestFixture();
-
-            f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
-
-
-            f.Editor.TextArea.Type(input);
-
-            f.CompletionManager._completionWindow.Should().NotBeNull();
-            f.CompletionManager._completionWindow.CompletionList.CompletionData.Should().HaveCount(2);
-            f
-                .CompletionManager
-                ._completionWindow.CompletionList.CurrentList.Select(x => (string)x.Content)
-                .Should()
-                .BeEquivalentTo(expected);
-        }
-
+        await f.CompletionWindow.ShouldEventuallySatisfy(x => x.IsOpen.Should().BeFalse());
     }
 
-}
-
-public class AutocompletionTestFixture
-{
-    public AutocompletionTestFixture()
+    [AvaloniaTheory]
+    [InlineData(".ab", new[] { "abc" })]
+    [InlineData(".de", new[] { "def" })]
+    public async Task GeneralCompletionBehavior_PartialMatch_RemovesIrrelevantResults(string input, string[] expected)
     {
-        var provider = new CompletionManagerTestContainer();
-        var window = new TestTextEditorWindow();
-        window.Show();
-        // we need to obtain the editor from a view because editor internals assume it is attached to the logical tree (null exceptions)
-        var editor = window.TextEditor;
-        var editorHelper = new EditorHelper(editor);
-        var resourceProvider = new MockResourceProvider
+        var f = new AutocompletionTestFixture();
+
+        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+
+
+        await f.Editor.TextArea.Type(input);
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(c => c
+            .GetCurrentCompletionListEntries()
+            .Select(x => x.Text)
+            .Should()
+            .BeEquivalentTo(expected)
+        );
+    }
+
+    [AvaloniaFact]
+    public async Task Commands_PreservesPrefixOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+
+        f.ResourceProvider.InternalCommands = [new("abc")];
+
+
+        await f.Editor.TextArea.Type(".ab");
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(".abc"));
+    }
+
+
+    [AvaloniaFact]
+    public async Task KqlOperators_PrependsSpaceOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+
+        f.ResourceProvider.KqlOperatorEntries =
+        [
+            new("summarize")
+        ];
+
+
+        await f.Editor.TextArea.Type("traffic |sum");
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be("traffic | summarize"));
+    }
+
+    [AvaloniaFact]
+    public async Task KqlFunctions_RemovesPrefixOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+
+        f.ResourceProvider.KqlFunctionEntries =
+        [
+            new("setting1")
+        ];
+
+
+        await f.Editor.TextArea.Type("?sett");
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be("setting1"));
+    }
+
+    [AvaloniaFact]
+    public async Task TableCompletion_RemovesPrefixOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+        f.ResourceProvider.SetSchema([
+                new()
+                {
+                    Table = "abc",
+                    Command = "",
+                    Column = "ghi"
+                }
+            ]
+        );
+
+
+        await f.Editor.TextArea.Type("[ab");
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be("abc"));
+    }
+
+    [AvaloniaFact]
+    public async Task ColumnCompletion_RemovesPrefixOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+        f.ResourceProvider.SetSchema([
+                new()
+                {
+                    Table = "abc",
+                    Command = "",
+                    Column = "ghi"
+                }
+            ]
+        );
+
+
+        await f.Editor.TextArea.Type("abc @gh");
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be("abc ghi"));
+    }
+
+    [AvaloniaTheory]
+    [InlineData("table1 @", new[] { "t1_o1" })]
+    [InlineData("table2 @", new[] { "t2_o1", "t2_o2" })]
+    public async Task ColumnCompletion_ConstrainsColumnOptionsToMatchingTable(string input, string[] expected)
+    {
+        var f = new AutocompletionTestFixture();
+        f.ResourceProvider.SetSchema([
+                new()
+                {
+                    Table = "table1",
+                    Command = "",
+                    Column = "t1_o1"
+                },
+                new()
+                {
+                    Table = "table2",
+                    Command = "",
+                    Column = "t2_o1"
+                },
+                new()
+                {
+                    Table = "table2",
+                    Command = "",
+                    Column = "t2_o2"
+                }
+            ]
+        );
+
+
+        await f.Editor.TextArea.Type(input);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(input));
+        await f.CompletionWindow.ShouldEventuallySatisfy(c => c
+            .GetCurrentCompletionListEntries()
+            .Select(x => x.Text)
+            .Should()
+            .BeEquivalentTo(expected)
+        );
+    }
+
+    [AvaloniaFact]
+    public async Task Settings_PreservesPrefixOnInsertion()
+    {
+        var f = new AutocompletionTestFixture();
+        f.ResourceProvider.SettingNames = [new("abc")];
+
+
+
+        await f.Editor.TextArea.Type("$ab");
+        await f.CompletionWindow.ShouldEventuallySatisfy(x =>
+            x.IsOpen.Should().BeTrue()
+        );
+        await f.Editor.TextArea.Press(PhysicalKey.Enter);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be("$abc"));
+    }
+
+    [AvaloniaFact]
+    public async Task PathCompletion_ExcludesUnsupportedExtensionsButAlwaysIncludesDirectories()
+    {
+        var f = new AutocompletionTestFixture();
+        var data = new List<string>
         {
-            _intellisenseClient = provider.GetRequiredService<IntellisenseClient>(),
-            _logger = provider.GetRequiredService<ILogger<IntellisenseClient>>(),
+            "/folder1",
+            "/file1.txt",
+            "/file2.json",
         };
-        var completionManager = new CompletionManager(editor, editorHelper, resourceProvider);
-        editor.TextArea.TextEntered += async (_, args) => await completionManager.HandleKeyDown(args);
-        Editor = editor;
-        EditorHelper = editorHelper;
-        CompletionManager = completionManager;
-        Provider = provider;
-        ResourceProvider = resourceProvider;
+        f.SetFileSystemData(data);
+
+        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+                new()
+                {
+                    Name = "load",
+                    SupportedExtensions = [".json"],
+                    SupportsFiles = true
+                }
+            ]
+        );
+
+
+        await f.Editor.TextArea.Type(".load /");
+
+        await f.CompletionWindow.ShouldEventuallySatisfy(c => c
+            .GetCurrentCompletionListEntries()
+            .Select(x => x.Text)
+            .Should()
+            .BeEquivalentTo("folder1", "file2.json")
+        );
     }
-
-    public CompletionManagerTestContainer Provider { get; set; }
-
-    public CompletionManager CompletionManager { get; set; }
-
-    public EditorHelper EditorHelper { get; set; }
-
-    public TextEditor Editor { get; set; }
-
-    public MockResourceProvider ResourceProvider { get; set; }
 }
-
-[ServiceProvider]
-[Import<IIntellisenseModule>]
-[Import<ILoggingModule>]
-public partial class CompletionManagerTestContainer;

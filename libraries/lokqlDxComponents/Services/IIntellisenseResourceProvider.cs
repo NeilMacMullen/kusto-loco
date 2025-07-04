@@ -1,6 +1,6 @@
 using Intellisense;
 
-namespace lokqlDxComponents;
+namespace lokqlDxComponents.Services;
 
 public interface IIntellisenseResourceProvider
 {

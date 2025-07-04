@@ -1,20 +1,24 @@
 using Intellisense;
+using KustoLoco.Core.Settings;
+using Lokql.Engine;
 using lokqlDxComponents;
+using lokqlDxComponents.Services;
 using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponentsTests;
 
-public class MockResourceProvider : ICompletionManagerServiceLocator
+public class MockResourceProvider : ICompletionManagerServiceLocator, IIntellisenseResourceManager
 {
     public IntellisenseEntry[] InternalCommands { get; set; } = [];
     public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
     public IntellisenseEntry[] SettingNames { get; set; } = [];
     public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
-    public IntellisenseEntry[] GetTables(string blockText) => throw new NotImplementedException();
+    public IntellisenseEntry[] GetTables(string blockText) => _schemaIntellisenseProvider.GetTables(blockText);
+    public IntellisenseEntry[] GetColumns(string blockText) => _schemaIntellisenseProvider.GetColumns(blockText);
 
-    public IntellisenseEntry[] GetColumns(string blockText) => throw new NotImplementedException();
+    public required IntellisenseClientAdapter _intellisenseClient { get; set; }
+    public required SchemaIntellisenseProvider _schemaIntellisenseProvider { get; set; }
+    public void AddSettingsForIntellisense(KustoSettingsProvider settings) => throw new NotImplementedException();
 
-    public required IntellisenseClient _intellisenseClient { get; set; }
-    public required ILogger _logger { get; set; }
-    public Dictionary<string, HashSet<string>> _allowedCommandsAndExtensions { get; set; } = [];
+    public void SetSchema(SchemaLine[] getSchema) => _schemaIntellisenseProvider.SetSchema(getSchema);
 }

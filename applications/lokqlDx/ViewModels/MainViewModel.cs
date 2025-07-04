@@ -10,6 +10,8 @@ using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
+using lokqlDxComponents.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NotNullStrings;
 
@@ -22,10 +24,8 @@ public partial class MainViewModel : ObservableObject
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
-    private readonly IntellisenseClient _intellisenseClient;
     private readonly ILauncher _launcher;
     private readonly PreferencesManager _preferencesManager;
-    private readonly ILogger<QueryEditorViewModel> _queryEditorLogger;
     private readonly RegistryOperations _registryOperations;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
@@ -47,6 +47,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
     [ObservableProperty] private int _activeQueryIndex = 0;
+    private readonly IServiceProvider _serviceProvider;
 
 
     public MainViewModel(
@@ -57,10 +58,10 @@ public partial class MainViewModel : ObservableObject
         RegistryOperations registryOperations,
         IStorageProvider storage,
         ILauncher launcher,
-        IntellisenseClient intellisenseClient,
-        ILogger<QueryEditorViewModel> queryEditorLogger
+        IServiceProvider serviceProvider
     )
     {
+        _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
@@ -70,8 +71,6 @@ public partial class MainViewModel : ObservableObject
         _registryOperations = registryOperations;
         _storage = storage;
         _launcher = launcher;
-        _intellisenseClient = intellisenseClient;
-        _queryEditorLogger = queryEditorLogger;
         var kustoSettings = workspaceManager.Settings;
 
         ConsoleViewModel = new ConsoleViewModel(_displayPreferences);
@@ -98,13 +97,19 @@ public partial class MainViewModel : ObservableObject
     }
     private void AddQuery(string name, string content)
     {
-        var queryModel = new QueryViewModel(
+        var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
+        var renderingSurfaceViewModel = new RenderingSurfaceViewModel(_explorer.Settings, _displayPreferences);
+        var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
+        var copilotChatViewModel = new CopilotChatViewModel();
+        var queryEditorViewModel = new QueryEditorViewModel(sharedExplorer,
             ConsoleViewModel,
-            _explorer,
-            _intellisenseClient,
-            _queryEditorLogger,
-            content, _displayPreferences
-        );
+            _displayPreferences,
+            content,
+            adapter);
+
+        var queryModel = new QueryViewModel(queryEditorViewModel,
+            renderingSurfaceViewModel,
+            copilotChatViewModel);
 
         Queries.Add(new QueryItemViewModel(name, queryModel));
     }

@@ -1,7 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Intellisense;
-using Lokql.Engine;
-using Microsoft.Extensions.Logging;
 
 namespace LokqlDx.ViewModels;
 
@@ -9,23 +6,21 @@ public partial class QueryViewModel : ObservableObject
 {
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-    [ObservableProperty] CopilotChatViewModel _copilotChatViewModel;
-    private readonly InteractiveTableExplorer _explorer;
+    [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
 
-    public QueryViewModel(ConsoleViewModel console,InteractiveTableExplorer explorer,IntellisenseClient intellisenseClient,
-        ILogger<QueryEditorViewModel> logger,string initialText,DisplayPreferencesViewModel displayPreferences)
+    public QueryViewModel(
+        QueryEditorViewModel queryEditorViewModel,
+        RenderingSurfaceViewModel renderingSurfaceViewModel,
+        CopilotChatViewModel copilotChatViewModel)
     {
-        RenderingSurfaceViewModel = new RenderingSurfaceViewModel(explorer.Settings,displayPreferences);
-        _explorer = explorer.ShareWithNewSurface(RenderingSurfaceViewModel);
-        CopilotChatViewModel = new CopilotChatViewModel();
-       
-        QueryEditorViewModel = new QueryEditorViewModel(_explorer,console,intellisenseClient,logger,displayPreferences,initialText);
-       
+        QueryEditorViewModel = queryEditorViewModel;
+        RenderingSurfaceViewModel = renderingSurfaceViewModel;
+        CopilotChatViewModel = copilotChatViewModel;
     }
 
     public bool IsDirty()
     {
-       return QueryEditorViewModel.IsDirty;
+        return QueryEditorViewModel.IsDirty;
     }
 
     public string GetText()

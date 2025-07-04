@@ -8,6 +8,7 @@ using AvaloniaEdit.Highlighting.Xshd;
 using lokqlDx;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
+using lokqlDxComponents.Views.Dialogs;
 
 #pragma warning disable VSTHRD100
 
@@ -71,7 +72,7 @@ public partial class QueryEditorView : UserControl
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm());
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(), new CompletionWindowWrapper(TextEditor.TextArea));
         TextEditor.TextArea.Focus();
     }
 }
