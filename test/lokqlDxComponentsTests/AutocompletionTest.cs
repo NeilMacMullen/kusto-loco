@@ -1,5 +1,8 @@
+using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using AwesomeAssertions;
 using lokqlDxComponentsTests.Fixtures;
 
@@ -235,5 +238,102 @@ public class AutocompletionTest
             .Should()
             .BeEquivalentTo("folder1", "file2.json")
         );
+    }
+
+    [AvaloniaFact]
+    public async Task PathCompletion_EraseWithinWord_WindowRemainsOpen()
+    {
+        var f = new AutocompletionTestFixture();
+        var data = new List<string>
+        {
+            "/folder1/myFolder11"
+        };
+        f.SetFileSystemData(data);
+
+        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+                new()
+                {
+                    Name = "load",
+                    SupportedExtensions = [],
+                    SupportsFiles = true
+                }
+            ]
+        );
+
+        var initialText = ".load /folder1";
+        var numCharsToErase = "er1".Length;
+        var afterErase = ".load /fold";
+
+
+        await f.Editor.TextArea.Type(initialText);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(initialText));
+        await f.Editor.TextArea.Erase(numCharsToErase);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(afterErase));
+        f.CompletionWindow.IsOpen.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public async Task PathCompletion_EraseUntilSecondSeparator_RemainsOpen()
+    {
+        var f = new AutocompletionTestFixture();
+        var data = new List<string>
+        {
+            "/tmp/rag_s1.json"
+        };
+        f.SetFileSystemData(data);
+
+        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+                new()
+                {
+                    Name = "load",
+                    SupportedExtensions = [],
+                    SupportsFiles = true
+                }
+            ]
+        );
+
+
+
+        var initialText = ".load /tmp/rag_s1.json";
+        var numCharsToErase = "ag_s1.json".Length;
+        var afterErase = ".load /tmp/r";
+
+
+        await f.Editor.TextArea.Type(initialText);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(initialText));
+        await f.Editor.TextArea.Erase(numCharsToErase);
+        await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(afterErase));
+        f.CompletionWindow.IsOpen.Should().BeTrue();
+    }
+
+    [AvaloniaFact]
+    public async Task PathCompletion_Defocus_ProducesSameOutputAsUninterrupted()
+    {
+        var res1 = await SubTest(false);
+        var res2 = await SubTest(true);
+
+        res1.Should().BeEquivalentTo(res2);
+        return;
+
+        async Task<IEnumerable<string>> SubTest(bool loseFocus)
+        {
+            var f = new AutocompletionTestFixture();
+            var data = new List<string> { "/tmp/rag_s1.json", "/tmp/log_wpf.txt" };
+            f.SetFileSystemData(data);
+
+            f.ResourceProvider._intellisenseClient.AddInternalCommands([new() { Name = "load", SupportedExtensions = [], SupportsFiles = true }]);
+
+            await f.Editor.TextArea.Type(".load /tmp/ra");
+            await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(".load /tmp/ra"));
+            if (loseFocus)
+            {
+                f.Editor.TextArea.FindLogicalAncestorOfType<Window>()!.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+                f.CompletionWindow.IsOpen.Should().BeFalse();
+            }
+
+            await f.Editor.TextArea.Type("g_");
+            await f.CompletionWindow.ShouldEventuallySatisfy(x => x.IsOpen.Should().BeTrue());
+            return f.CompletionWindow.GetCurrentCompletionListEntries().Select(x => x.Text);
+        }
     }
 }
