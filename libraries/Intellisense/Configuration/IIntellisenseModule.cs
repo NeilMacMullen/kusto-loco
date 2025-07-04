@@ -16,7 +16,7 @@ namespace Intellisense.Configuration;
 [Scoped<IFileSystemIntellisenseService, FileSystemIntellisenseService>()]
 [Scoped<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()]
 [Scoped<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>()]
-[Scoped<IFileSystemPathCompletionResultRetriever, LocalFileSystemCompletionResultRetriever>()]
+[Scoped<IFileSystemPathCompletionResultRetriever, FileSystemCompletionResultRetriever>()]
 [Scoped<CancellationContext>()]
 [Scoped<CancellationTokenSource>(Factory = nameof(GetCancellationTokenSource))]
 [Singleton<IPathFactory, PathFactory>()]
