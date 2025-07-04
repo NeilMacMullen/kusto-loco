@@ -3,7 +3,7 @@ using Intellisense.FileSystem.Paths;
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-public class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader, IImageSourceLocator imageSourceLocator)
+public class FileSystemCompletionResultRetriever(IFileSystemReader reader, IImageSourceLocator imageSourceLocator)
     : IFileSystemPathCompletionResultRetriever
 {
     public Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
