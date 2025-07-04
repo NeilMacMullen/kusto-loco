@@ -17,9 +17,9 @@ ls | edit-kql
 ```
 
 ### 2. Select and Sort Files
-Get the 3 smallest files by size:
+Get the 3 largest files by size:
 ```powershell
-ls | edit-kql "project Name,Length | order by Length | take 3"
+ls | edit-kql "project Name,Length | order by Length desc | take 3"
 ```
 
 ### 3. Filter Files
@@ -99,13 +99,13 @@ ls | edit-kql -noqueryprefix "let sz = (s:long) {case (isnull(s),'-',s < 1000,'s
 ### 14. Generate Date Range
 Create folders for the last 10 days:
 ```powershell
-edit-kql -noqueryprefix "range N from 1d to 10d step 1d | extend D=now()-N | project T=format_datetime(D,'yyyy-MM-dd')" -NoQueryPrefix $true | % {New-Item $_.T -Type Directory }
+edit-kql -noqueryprefix "range N from 1d to 10d step 1d | extend D=now()-N | project T=format_datetime(D,'yyyy-MM-dd')" | % {New-Item $_.T -Type Directory }
 ```
 
-### 15. Network Connections
-Analyze network connections:
+### 15. Registry Keys
+Analyze registry keys in HKCU:
 ```powershell
-Get-NetTCPConnection | edit-kql "where State == 'Established' | summarize count() by RemoteAddress"
+Get-ChildItem HKCU:\Software | edit-kql "take 10"
 ```
 
 ## Visualization Examples
