@@ -1,20 +1,24 @@
-﻿using Intellisense.FileSystem.Paths;
+﻿using System.IO.Abstractions;
+using Intellisense.FileSystem.Paths;
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-public class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader)
+public class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader, IImageSourceLocator imageSourceLocator)
     : IFileSystemPathCompletionResultRetriever
 {
     public Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
     {
         var pair = ParentChildPathPair.Create(path.Value);
 
-        var result = reader
+
+        var result = new CompletionResult
+        {
+            Entries = reader
                 .GetChildren(pair.ParentPath)
-                .ToCompletionResult() with
-            {
-                Filter = pair.CurrentPath
-            };
+                .Select(CreateIntellisenseEntry)
+                .ToList(),
+            Filter = pair.CurrentPath
+        };
 
         return Task.FromResult(result);
     }
@@ -23,8 +27,21 @@ public class LocalFileSystemCompletionResultRetriever(IFileSystemReader reader)
     {
         var input = path.IsRootDirectory ? path.Value : path.ParentPath;
 
-        var result = reader.GetChildren(input).ToCompletionResult();
+        var result = new CompletionResult
+        {
+            Entries = reader
+                .GetChildren(input)
+                .Select(CreateIntellisenseEntry)
+                .ToList()
+        };
 
         return Task.FromResult(result);
     }
+
+    private IntellisenseEntry CreateIntellisenseEntry(IFileSystemInfo info) =>
+        new()
+        {
+            Name = info.Name,
+            Source = imageSourceLocator.GetImageSource(info)
+        };
 }

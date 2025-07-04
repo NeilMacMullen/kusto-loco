@@ -26,6 +26,7 @@ namespace Intellisense.Configuration;
 [Scoped<Win32ApiService>()]
 [Singleton<NullShareService>()]
 [Scoped<IShareService>(Factory = nameof(GetShareService))]
+[Singleton<IImageSourceLocator,NullImageSourceLocator>]
 public interface IIntellisenseModule
 {
     public static CancellationTokenSource GetCancellationTokenSource(CancellationContext ctx) => ctx.TokenSource;

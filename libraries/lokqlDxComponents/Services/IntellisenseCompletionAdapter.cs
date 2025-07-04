@@ -7,10 +7,14 @@ namespace lokqlDxComponents.Services;
 
 public class IntellisenseClientAdapter(
     IntellisenseClient intellisenseClient,
-    ILogger<IntellisenseClientAdapter> logger)
+    ILogger<IntellisenseClientAdapter> logger,
+    IImageProvider imageProvider
+    )
 {
     private Dictionary<string, HashSet<string>> AllowedCommandsAndExtensions { get; set; } = [];
     public IntellisenseEntry[] InternalCommands { get; private set; } = [];
+
+    public IImageProvider _imageProvider => imageProvider;
 
     public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
     {
@@ -72,7 +76,6 @@ public class IntellisenseClientAdapter(
                             return ext == string.Empty || extensions.Contains(ext);
                         }
                     )
-                    .Select(x => x with { FileType = Path.GetExtension(x.Name) })
                     .ToList()
             };
         }

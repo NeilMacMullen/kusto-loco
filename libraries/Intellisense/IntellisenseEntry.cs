@@ -1,3 +1,5 @@
-﻿namespace Intellisense;
+﻿
 
-public readonly record struct IntellisenseEntry(string Name = "", string Description = "", string Syntax = "", string FileType = "");
+namespace Intellisense;
+
+public record struct IntellisenseEntry(string Name = "", string Description = "", string Syntax = "", string Source = "");
