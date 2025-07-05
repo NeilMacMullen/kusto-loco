@@ -89,12 +89,13 @@ public partial class MainViewModel : ObservableObject
         //QueryEditorViewModel.CurrentWorkspace = value;
     }
 
+    private const string NewQueryName = "new";
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
     [RelayCommand]
     private void AddQuery()
     {
-        AddQuery("new query",string.Empty);
+        AddQuery(NewQueryName,string.Empty);
     }
     private void AddQuery(string name, string content)
     => AddQuery(name, content, Queries.Count);
@@ -123,7 +124,7 @@ public partial class MainViewModel : ObservableObject
     private void AddQueryHere(QueryItemViewModel model)
     {
         var indexOfThis = Queries.IndexOf(model);
-        AddQuery("new query", string.Empty,indexOfThis+1);
+        AddQuery(NewQueryName, string.Empty,indexOfThis+1);
     }
 
     [RelayCommand]
@@ -168,7 +169,7 @@ public partial class MainViewModel : ObservableObject
     {
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.RetrieveUiPreferencesFromDisk();
-        AddQuery("new query", string.Empty);
+        AddQuery(NewQueryName, string.Empty);
 
 
         _preferencesManager.EnsureDefaultFolderExists();
