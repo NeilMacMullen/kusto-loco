@@ -14,7 +14,7 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <Interaction.Behaviors>
+	<Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
             <InvokeCommandAction Command="{Binding InitializeCommand}" />
         </EventTriggerBehavior>
@@ -127,7 +127,7 @@
         <Grid RowDefinitions="*,30">
             <Grid
                 x:Name="MainGrid"
-                RowDefinitions="*,auto,*">
+                RowDefinitions="*,auto,0.25*">
                 <TabControl Grid.Row="0" ItemsSource="{Binding Queries}" SelectedIndex="{Binding ActiveQueryIndex}"
 TabStripPlacement="{Binding TabStripPlacement}" >
                     <TabControl.ItemTemplate>

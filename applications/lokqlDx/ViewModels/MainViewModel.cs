@@ -103,7 +103,8 @@ public partial class MainViewModel : ObservableObject
     private void AddQuery(string name, string content,int desiredIndex)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
-        var renderingSurfaceViewModel = new RenderingSurfaceViewModel(_explorer.Settings, _displayPreferences);
+        var renderingSurfaceViewModel = new RenderingSurfaceViewModel(name,_explorer.Settings, _displayPreferences);
+        renderingSurfaceViewModel.Name = name;
         var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
         var copilotChatViewModel = new CopilotChatViewModel();
         var queryEditorViewModel = new QueryEditorViewModel(sharedExplorer,

@@ -15,7 +15,7 @@ public partial class FlyoutViewModel : ObservableObject,IDialogViewModel
     {
         _result = result;
         var settings1 = settings.Snapshot();
-        _renderingSurface = new RenderingSurfaceViewModel(settings1,displayPreferences);
+        _renderingSurface = new RenderingSurfaceViewModel("flyout",settings1,displayPreferences);
     }
 
     public async Task InitialRender()

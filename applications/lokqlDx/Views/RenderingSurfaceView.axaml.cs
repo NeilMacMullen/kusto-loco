@@ -26,7 +26,10 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
     //TODO -bit of a hack to tell viewmodel layer that the inner control can be used for rendering charts
     private void RegisterHost()
     {
-        if (DataContext is RenderingSurfaceViewModel vm) vm.RegisterHost(ChartView);
+        if (DataContext is RenderingSurfaceViewModel vm)
+        {
+            vm.RegisterHost(ChartView);
+        }
     }
 
     private void StyledElement_OnDataContextChanged(object? sender, EventArgs e) => RegisterHost();

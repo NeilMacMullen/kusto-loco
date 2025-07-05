@@ -12,5 +12,10 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude
             Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
-    </Application.Styles>
+		<Style Selector="TabItem > TextBlock">
+            <Setter Property="FontSize" Value="12 "/>
+            <Setter Property="Height" Value="12 "/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+	</Application.Styles>
 </Application>

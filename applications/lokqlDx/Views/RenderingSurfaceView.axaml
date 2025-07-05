@@ -37,10 +37,10 @@
                         </TreeDataGrid.Styles>
                         <TreeDataGrid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Copy cell" Command="{Binding DatagridCopyCommand}" CommandParameter="cell"/>
-                                <MenuItem Header="Copy column" Command="{Binding DatagridCopyCommand}" CommandParameter="column"/>
-                                <MenuItem Header="Copy row" Command="{Binding DatagridCopyCommand}" CommandParameter="row"/>
-                                <MenuItem Header="Copy table" Command="{Binding DatagridCopyCommand}" CommandParameter="table"/>
+                                <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}" CommandParameter="cell"/>
+                                <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}" CommandParameter="column"/>
+                                <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}" CommandParameter="row"/>
+                                <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}" CommandParameter="table"/>
 							</ContextMenu>
                         </TreeDataGrid.ContextMenu>
                     </TreeDataGrid> 
