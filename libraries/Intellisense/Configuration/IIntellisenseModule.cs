@@ -16,7 +16,7 @@ namespace Intellisense.Configuration;
 [Scoped<IFileSystemIntellisenseService, FileSystemIntellisenseService>()]
 [Scoped<IFileSystemPathCompletionResultRetriever, HostPathCompletionResultRetriever>()]
 [Scoped<IFileSystemPathCompletionResultRetriever, SharePathCompletionResultRetriever>()]
-[Scoped<IFileSystemPathCompletionResultRetriever, LocalFileSystemCompletionResultRetriever>()]
+[Scoped<IFileSystemPathCompletionResultRetriever, FileSystemCompletionResultRetriever>()]
 [Scoped<CancellationContext>()]
 [Scoped<CancellationTokenSource>(Factory = nameof(GetCancellationTokenSource))]
 [Singleton<IPathFactory, PathFactory>()]
@@ -26,6 +26,7 @@ namespace Intellisense.Configuration;
 [Scoped<Win32ApiService>()]
 [Singleton<NullShareService>()]
 [Scoped<IShareService>(Factory = nameof(GetShareService))]
+[Singleton<IImageSourceLocator,NullImageSourceLocator>]
 public interface IIntellisenseModule
 {
     public static CancellationTokenSource GetCancellationTokenSource(CancellationContext ctx) => ctx.TokenSource;
