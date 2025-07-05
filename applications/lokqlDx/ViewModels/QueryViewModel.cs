@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace LokqlDx.ViewModels;
 
@@ -30,6 +31,10 @@ public partial class QueryViewModel : ObservableObject
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
         CopilotChatViewModel = copilotChatViewModel;
+        WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) =>
+        {
+           FlipArrangement();
+        });
     }
 
     /// <summary>
@@ -97,4 +102,6 @@ public partial class QueryViewModel : ObservableObject
             ArrangeInColumns(false);
         n = (n + 1) % 4;
     }
+
+   
 }

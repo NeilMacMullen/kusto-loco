@@ -3,7 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Intellisense;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
@@ -155,6 +158,16 @@ public partial class MainViewModel : ObservableObject
             ActiveQueryIndex =Math.Clamp(prevActiveIndex ,0,Queries.Count-1);
         }
 
+    }
+
+    private int _placementIndex = 0;
+    [RelayCommand]
+    private void ChangeTab()
+    {
+        var choices = "Left,Top,Right,Bottom".Split(',');
+        _placementIndex = (_placementIndex + 1) % choices.Length;
+        var placement = choices[_placementIndex];
+        TabStripPlacement = placement;
     }
 
     [RelayCommand]
@@ -521,7 +534,22 @@ public partial class MainViewModel : ObservableObject
         ui.WindowWidth = WindowSize.Width;
         ui.WindowHeight = WindowSize.Height;
         _preferencesManager.SaveUiPrefs();
+        
     }
+
+
+    [RelayCommand]
+    private void ChangeLayout()
+    {
+        WeakReferenceMessenger.Default.Send(new LayoutChangedMessage(0));
+    }
+
+    [RelayCommand]
+    private void ClearConsole()
+    {
+        WeakReferenceMessenger.Default.Send(new ClearConsoleMessage(0));
+    }
+
 }
 
 public record PersistedQuery(string Name, string Text);
@@ -536,3 +564,9 @@ public class RenamableText
     public string InitialText =string.Empty;
     public string NewText;
 }
+
+
+// Create a message
+public class LayoutChangedMessage(int layout) : ValueChangedMessage<int>(layout);
+public class TabChangedMessage(int layout) : ValueChangedMessage<int>(layout);
+public class ClearConsoleMessage(int layout) : ValueChangedMessage<int>(layout);

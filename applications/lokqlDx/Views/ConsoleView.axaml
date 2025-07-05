@@ -8,35 +8,31 @@
              x:Class="LokqlDx.Views.ConsoleView"
              x:DataType="vm:ConsoleViewModel"
              FontFamily="{Binding DisplayPreferencesPreferences.FontFamily}"
-             FontSize="{Binding DisplayPreferencesPreferences.FontSize}"
-            >
-    <DockPanel>
-<StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-<Button Command="{Binding ClearCommand}" HorizontalAlignment="Right" FontSize="8" >Clear</Button>
-</StackPanel>
-      
-        <Border  BorderThickness="7" Background="Black" Margin="2">
+             FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
+    <Grid>
 
-			<ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
-            <Interaction.Behaviors>
-                <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
-            </Interaction.Behaviors>
-            <ItemsControl
-            ItemsSource="{Binding ConsoleContent}"
-            Background="Black"
-            x:Name="ItemList">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <SelectableTextBlock
-                        Foreground="{Binding Color}"
-                        Text="{Binding Text}"
-                        HorizontalAlignment="Stretch"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+        <Border BorderThickness="7" Background="Black" Margin="2">
+
+            <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
+                <Interaction.Behaviors>
+                    <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
+                </Interaction.Behaviors>
+                <ItemsControl
+                    ItemsSource="{Binding ConsoleContent}"
+                    Background="Black"
+                    x:Name="ItemList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <SelectableTextBlock
+                                Foreground="{Binding Color}"
+                                Text="{Binding Text}"
+                                HorizontalAlignment="Stretch" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Border>
-       
-	</DockPanel>
+
+    </Grid>
 
 </UserControl>

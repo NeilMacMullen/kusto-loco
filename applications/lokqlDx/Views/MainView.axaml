@@ -38,7 +38,8 @@
     </UserControl.KeyBindings>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Name="MainMenu">
+        <DockPanel DockPanel.Dock="Top">
+        <Menu  Name="MainMenu" DockPanel.Dock="Left">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
                 <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
@@ -79,6 +80,8 @@
                           Command="{Binding FlyoutCurrentResultCommand}" />
                 <MenuItem Header="Add query"
                           Command="{Binding AddQueryCommand}" />
+                <MenuItem Header="Layout"
+                          Command="{Binding ChangeLayoutCommand}" />
             </MenuItem>
 
             <MenuItem Header="Misc">
@@ -123,7 +126,17 @@
 
             </MenuItem>
         </Menu>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                <Button Command="{Binding ClearConsoleCommand}"
+                        ToolTip.Tip="Clear console" FontSize="12">X</Button>
+                <Button Command="{Binding ChangeTabCommand}" 
+                        ToolTip.Tip="Change Query-tab placment" FontSize="12">T</Button>
 
+                <Button Command="{Binding ChangeLayoutCommand}" 
+                        ToolTip.Tip="Change Layout" FontSize="12">&#x25a6;</Button>
+           
+            </StackPanel>
+        </DockPanel>
         <Grid RowDefinitions="*,20">
             <Grid
                 x:Name="MainGrid"

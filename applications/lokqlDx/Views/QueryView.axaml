@@ -8,11 +8,7 @@
              x:Class="LokqlDx.Views.QueryView"
              x:DataType="vm:QueryViewModel">
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-            <Button Command="{Binding FlipArrangementCommand}" VerticalContentAlignment="Top"
-ToolTip.Tip="Change Layout" FontSize="12">&#x25a6;</Button>
-           
-        </StackPanel>
+        
         <Grid ColumnDefinitions="*,auto,*"
               RowDefinitions="*,auto,*"
               DockPanel.Dock="Bottom">
