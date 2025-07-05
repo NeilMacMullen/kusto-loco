@@ -47,6 +47,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
     [ObservableProperty] private int _activeQueryIndex = 0;
+    [ObservableProperty] private string _tabStripPlacement = "Left";
     private readonly IServiceProvider _serviceProvider;
 
 
@@ -135,6 +136,12 @@ public partial class MainViewModel : ObservableObject
             ActiveQueryIndex =Math.Clamp(prevActiveIndex ,0,Queries.Count-1);
         }
 
+    }
+
+    [RelayCommand]
+    private void ChangeTabPlacement(string placement)
+    {
+        TabStripPlacement = placement;
     }
 
     [RelayCommand]
