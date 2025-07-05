@@ -85,6 +85,22 @@ public partial class MainViewModel : ObservableObject
 
 
         _explorer = CreateExplorer();
+        // Register a message in some module
+        WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this, (r, m) =>
+        {
+           m.Reply(HandleQueryRunning(m));
+        });
+
+    }
+
+    private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
+    {
+      if (message.IsRunning)
+      {
+          await SaveBeforeQuery();
+      }
+
+      return false;
     }
 
     partial void OnCurrentWorkspaceChanged(Workspace value)
@@ -436,10 +452,21 @@ public partial class MainViewModel : ObservableObject
         if (!RecheckDirty())
             return YesNoCancel.Yes;
 
-        if (_workspaceManager.IsNewWorkspace) return await SaveAs();
+        if (_workspaceManager.IsNewWorkspace)
+            return await SaveAs();
 
         SaveWorkspace(_workspaceManager.Path);
         return YesNoCancel.Yes;
+    }
+
+    private async Task  SaveBeforeQuery()
+    {
+        if (!_preferencesManager.FetchCachedApplicationSettings().AutoSave)
+            return;
+        if (_workspaceManager.IsNewWorkspace)
+            return ;
+
+        await Save();
     }
 
     /// <summary>
@@ -486,6 +513,10 @@ public partial class MainViewModel : ObservableObject
             .ToArray();
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
+        foreach (var queryItemViewModel in Queries)
+        {
+            queryItemViewModel.QueryModel.Clean();
+        }
         UpdateMostRecentlyUsed(path);
     }
 
@@ -570,3 +601,8 @@ public class RenamableText
 public class LayoutChangedMessage(int layout) : ValueChangedMessage<int>(layout);
 public class TabChangedMessage(int layout) : ValueChangedMessage<int>(layout);
 public class ClearConsoleMessage(int layout) : ValueChangedMessage<int>(layout);
+
+public class RunningQueryMessage(bool isRunning) : AsyncRequestMessage<bool>
+{
+    public bool IsRunning { get; } = isRunning;
+}

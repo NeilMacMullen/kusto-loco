@@ -103,5 +103,9 @@ public partial class QueryViewModel : ObservableObject
         n = (n + 1) % 4;
     }
 
-   
+
+    public void Clean()
+    {
+        QueryEditorViewModel.IsDirty = false;
+    }
 }

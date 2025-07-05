@@ -1,7 +1,8 @@
-﻿using System.Text.Json;
-using AvaloniaEdit.Document;
+﻿using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
@@ -9,6 +10,7 @@ using lokqlDx;
 using lokqlDxComponents.Services;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
+using System.Text.Json;
 
 namespace LokqlDx.ViewModels;
 
@@ -73,13 +75,14 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         IsDirty = true;
 
     }
-
+   
     [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task RunQuery(string query)
     {
+      
         if (query.IsBlank())
             return;
-
+        var saved = await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(true));
         if (ExecutingQuery is not null)
             await ExecutingQuery.InvokeAsync(this, EventArgs.Empty);
 
@@ -93,6 +96,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         SetSchema(_explorer.GetSchema());
         AddSettingsForIntellisense(_explorer.Settings);
+        //WeakReferenceMessenger.Default.Send(new RunningQueryMessage(false));
     }
 
     public void AddSettingsForIntellisense(KustoSettingsProvider settings) =>
