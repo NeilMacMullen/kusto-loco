@@ -127,7 +127,9 @@
         <Grid RowDefinitions="*,20">
             <Grid
                 x:Name="MainGrid"
-                RowDefinitions="*,auto,0.25*">
+                RowDefinitions="*,auto,0.15*"
+
+>
                 <TabControl Grid.Row="0" ItemsSource="{Binding Queries}" SelectedIndex="{Binding ActiveQueryIndex}"
 TabStripPlacement="{Binding TabStripPlacement}" >
                     <TabControl.ItemTemplate>

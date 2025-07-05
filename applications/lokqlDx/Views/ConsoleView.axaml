@@ -14,8 +14,8 @@
 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
 <Button Command="{Binding ClearCommand}" HorizontalAlignment="Right" FontSize="8" >Clear</Button>
 </StackPanel>
-        <StackPanel Background="Black" Margin="3">
-        <Border  BorderThickness="4" >
+      
+        <Border  BorderThickness="7" Background="Black" Margin="2">
 
 			<ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
             <Interaction.Behaviors>
@@ -36,7 +36,7 @@
         </ItemsControl>
     </ScrollViewer>
         </Border>
-        </StackPanel>
+       
 	</DockPanel>
 
 </UserControl>
