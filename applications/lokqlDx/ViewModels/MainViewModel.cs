@@ -176,13 +176,14 @@ public partial class MainViewModel : ObservableObject
 
     }
 
-    private int _placementIndex = 0;
+   
     [RelayCommand]
     private void ChangeTab()
     {
         var choices = "Left,Top,Right,Bottom".Split(',');
-        _placementIndex = (_placementIndex + 1) % choices.Length;
-        var placement = choices[_placementIndex];
+        var currentIndex =   Array.IndexOf(choices,TabStripPlacement);
+        var placementIndex = (currentIndex + 1) % choices.Length;
+        var placement = choices[placementIndex];
         TabStripPlacement = placement;
     }
 

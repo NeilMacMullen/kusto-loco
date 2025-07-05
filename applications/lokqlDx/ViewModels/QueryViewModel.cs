@@ -88,19 +88,21 @@ public partial class QueryViewModel : ObservableObject
         return QueryEditorViewModel.GetText();
     }
 
-    private int n = 1;
+    private int n = 0;
     [RelayCommand]
     private void FlipArrangement()
     {
+        n = (n + 1) % 4;
+        if (n == 0)
+            ArrangeInColumns(true);
         if (n==1)
             ArrangeInRows(true);
         if (n == 2)
-            ArrangeInRows(false);
-        if (n == 3)
-            ArrangeInColumns(true);
-        if (n == 0)
             ArrangeInColumns(false);
-        n = (n + 1) % 4;
+        if (n == 3)
+            ArrangeInRows(false);
+       
+       
     }
 
 
