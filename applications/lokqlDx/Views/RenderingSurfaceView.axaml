@@ -9,13 +9,13 @@
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
              DataContextChanged="StyledElement_OnDataContextChanged">
-    <DockPanel>
+    <DockPanel >
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8"/>
         </StackPanel>
         <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
-            <TabItem Header="Data">
-                <Grid RowDefinitions="auto,*">
+            <TabItem Header="Data" >
+                <Grid RowDefinitions="auto,*"  Background="{DynamicResource SystemAltLowColor}">
                     <TextBlock
                         Text="{Binding DataGridSizeWarning}"
                         IsVisible="{Binding ShowDataGridSizeWarning}" />

@@ -9,16 +9,24 @@
              x:DataType="vm:QueryViewModel"
             >
     <Grid ColumnDefinitions="*,auto,*">
-		<views:QueryEditorView Grid.Column="0"
+        <Border  Grid.Column="0" BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1" >
+        <views:QueryEditorView Grid.Column="0"
+                               Padding="4"
+                               Background="{DynamicResource SystemAltLowColor}"
                                DataContext="{Binding QueryEditorViewModel}"></views:QueryEditorView>
+
+        </Border>
 
 		<GridSplitter
             Grid.Column="1"
             Width="5"
             Background="#227F7F7F"
         />
-        <views:RenderingSurfaceView Grid.Column="2"
+        <Border  Grid.Column="2" BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1" >
+
+			<views:RenderingSurfaceView 
 DataContext="{Binding RenderingSurfaceViewModel}"
                                     ></views:RenderingSurfaceView>
+        </Border>
     </Grid>
 </UserControl>

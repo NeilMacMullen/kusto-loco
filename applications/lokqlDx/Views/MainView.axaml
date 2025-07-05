@@ -124,15 +124,15 @@
             </MenuItem>
         </Menu>
 
-        <Grid RowDefinitions="*,30">
+        <Grid RowDefinitions="*,20">
             <Grid
                 x:Name="MainGrid"
                 RowDefinitions="*,auto,0.25*">
                 <TabControl Grid.Row="0" ItemsSource="{Binding Queries}" SelectedIndex="{Binding ActiveQueryIndex}"
 TabStripPlacement="{Binding TabStripPlacement}" >
                     <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Header}">
+                        <DataTemplate >
+                            <TextBlock Text="{Binding Header}" FontSize="12">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Rename"
@@ -194,9 +194,10 @@ CommandParameter="{Binding}"
                 Grid.Row="1"
                 Grid.ColumnSpan="3">
                 <TextBlock
+                    FontSize="12"
                     Text="{Binding UpdateInfo}"
                     IsVisible="{Binding ShowUpdateInfo}"
-                    Margin="5" />
+                    Margin="2" />
             </StackPanel>
         </Grid>
     </DockPanel>

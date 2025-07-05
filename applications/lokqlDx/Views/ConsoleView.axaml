@@ -12,15 +12,18 @@
             >
     <DockPanel>
 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
-<Button Command="{Binding ClearCommand}" HorizontalAlignment="Right">Clear</Button>
+<Button Command="{Binding ClearCommand}" HorizontalAlignment="Right" FontSize="8" >Clear</Button>
 </StackPanel>
-        <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
+        <StackPanel Background="Black" Margin="3">
+        <Border  BorderThickness="4" >
+
+			<ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
             <Interaction.Behaviors>
                 <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
             </Interaction.Behaviors>
             <ItemsControl
             ItemsSource="{Binding ConsoleContent}"
-            Background="Transparent"
+            Background="Black"
             x:Name="ItemList">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -32,7 +35,8 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>
-        
-    </DockPanel>
+        </Border>
+        </StackPanel>
+	</DockPanel>
 
 </UserControl>
