@@ -144,6 +144,11 @@ CommandParameter="{Binding}"
                                                   CommandParameter="{Binding}"
                                                   />
 										<Separator />
+                                        <MenuItem Header="Add query"
+                                                  Command="{Binding $parent[UserControl].DataContext.AddQueryHereCommand}"
+                                                  CommandParameter="{Binding}"
+                                        />
+                                        <Separator />
                                         <MenuItem Header="Tabs on top"
                                                   Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
                                                   CommandParameter="Top" />

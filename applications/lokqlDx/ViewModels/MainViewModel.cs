@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DocumentFormat.OpenXml.EMMA;
 using Intellisense;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
@@ -14,6 +14,7 @@ using lokqlDxComponents.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NotNullStrings;
+using System.Collections.ObjectModel;
 
 namespace LokqlDx.ViewModels;
 
@@ -94,9 +95,11 @@ public partial class MainViewModel : ObservableObject
     private void AddQuery()
     {
         AddQuery("new query",string.Empty);
-        ActiveQueryIndex= Queries.Count - 1;
     }
     private void AddQuery(string name, string content)
+    => AddQuery(name, content, Queries.Count);
+    
+    private void AddQuery(string name, string content,int desiredIndex)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
         var renderingSurfaceViewModel = new RenderingSurfaceViewModel(_explorer.Settings, _displayPreferences);
@@ -112,7 +115,15 @@ public partial class MainViewModel : ObservableObject
             renderingSurfaceViewModel,
             copilotChatViewModel);
 
-        Queries.Add(new QueryItemViewModel(name, queryModel));
+        Queries.Insert(desiredIndex,new QueryItemViewModel(name, queryModel));
+        ActiveQueryIndex = desiredIndex;
+    }
+
+    [RelayCommand]
+    private void AddQueryHere(QueryItemViewModel model)
+    {
+        var indexOfThis = Queries.IndexOf(model);
+        AddQuery("new query", string.Empty,indexOfThis+1);
     }
 
     [RelayCommand]
