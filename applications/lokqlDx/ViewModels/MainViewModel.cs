@@ -121,6 +121,12 @@ public partial class MainViewModel : ObservableObject
         ActiveQueryIndex = desiredIndex;
     }
 
+    private QueryItemViewModel GetSelectedQuery()
+    {
+        return Queries.ElementAt(ActiveQueryIndex);
+      
+    }
+
     [RelayCommand]
     private void AddQueryHere(QueryItemViewModel model)
     {
@@ -501,9 +507,10 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task FlyoutCurrentResult()
     {
-        var result = _explorer.GetPreviousResult();
-
-        await _dialogService.FlyoutResult(result, _explorer.Settings, _displayPreferences);
+        var model = GetSelectedQuery();
+        
+        var result = model.QueryModel.RenderingSurfaceViewModel.Result;
+        await _dialogService.FlyoutResult(model.Header,result, _explorer.Settings, _displayPreferences);
     }
 
     private void PersistUiPreferencesToDisk()
