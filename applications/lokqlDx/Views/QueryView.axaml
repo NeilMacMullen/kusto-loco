@@ -6,27 +6,48 @@
              xmlns:views="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryView"
-             x:DataType="vm:QueryViewModel"
-            >
-    <Grid ColumnDefinitions="*,auto,*">
-        <Border  Grid.Column="0" BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1" >
-        <views:QueryEditorView Grid.Column="0"
-                               Padding="4"
-                               Background="{DynamicResource SystemAltLowColor}"
-                               DataContext="{Binding QueryEditorViewModel}"></views:QueryEditorView>
+             x:DataType="vm:QueryViewModel">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" HorizontalAlignment="Right">
+            <Button Command="{Binding FlipArrangementCommand}" VerticalContentAlignment="Top"
+ToolTip.Tip="Change Layout" FontSize="12">&#x25a6;</Button>
+           
+        </StackPanel>
+        <Grid ColumnDefinitions="*,auto,*"
+              RowDefinitions="*,auto,*"
+              DockPanel.Dock="Bottom">
+            <Border Grid.Column="{Binding EditorViewColumn}"
+                    Grid.Row="{Binding EditorViewRow}"
+                    Grid.RowSpan="{Binding RowSpan}"
+                    Grid.ColumnSpan="{Binding ColumnSpan}"
+                    BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
+                <views:QueryEditorView
+                    Padding="4"
+                    Background="{DynamicResource SystemAltLowColor}"
+                    DataContext="{Binding QueryEditorViewModel}" />
 
-        </Border>
+            </Border>
 
-		<GridSplitter
-            Grid.Column="1"
-            Width="5"
-            Background="#227F7F7F"
-        />
-        <Border  Grid.Column="2" BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1" >
+            <GridSplitter
+                Grid.Row="{Binding GridSplitterRow}"
+                Grid.Column="{Binding GridSplitterColumn}"
+                Grid.RowSpan="{Binding RowSpan}"
+                Grid.ColumnSpan="{Binding ColumnSpan}"
+                Width="{Binding GridSplitterWidth}"
+                Height="{Binding GridSplitterHeight}"
+                Background="#227F7F7F" />
+            <Border Grid.Column="{Binding ChartColumn}"
+                    Grid.Row="{Binding ChartRow}"
+                    Grid.RowSpan="{Binding RowSpan}"
+                    Grid.ColumnSpan="{Binding ColumnSpan}"
 
-			<views:RenderingSurfaceView 
-DataContext="{Binding RenderingSurfaceViewModel}"
-                                    ></views:RenderingSurfaceView>
-        </Border>
-    </Grid>
+                    BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
+
+                <views:RenderingSurfaceView
+                    DataContext="{Binding RenderingSurfaceViewModel}" />
+            </Border>
+        </Grid>
+
+
+    </DockPanel>
 </UserControl>

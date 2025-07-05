@@ -30,6 +30,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
     public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
 
+   
     [ObservableProperty] private bool _isDirty;
 
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
