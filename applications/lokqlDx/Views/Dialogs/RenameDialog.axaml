@@ -11,15 +11,15 @@
     <StackPanel
         Margin="10">
 
-        <TextBox VerticalAlignment="Center" Text="{Binding Text}" HorizontalAlignment="Stretch"/>
-        <Rectangle Height="20"></Rectangle>
+        <TextBox VerticalAlignment="Center" Text="{Binding Text}" HorizontalAlignment="Stretch" />
+        <Rectangle Height="20" />
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
 
 
             <Button
                 Content="Cancel"
                 Command="{Binding CancelCommand}" />
-            <Rectangle Width="20"/>
+            <Rectangle Width="20" />
 
             <Button
                 Content="Save"

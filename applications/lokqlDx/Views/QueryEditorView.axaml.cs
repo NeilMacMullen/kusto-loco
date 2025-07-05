@@ -5,7 +5,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
-using lokqlDx;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 using lokqlDxComponents.Views.Dialogs;
@@ -43,17 +42,11 @@ public partial class QueryEditorView : UserControl
         TextEditor.TextArea.TextEntered += TextArea_TextEntered;
         TextEditor.TextArea.TextView.LinkTextUnderline = true;
         TextEditor.TextArea.TextView.LinkTextForegroundBrush = Brushes.LightGreen;
-
-
-
     }
 
     private async void TextArea_TextEntered(object? sender, TextInputEventArgs e)
     {
-        if (_completionManager is not null)
-        {
-            await _completionManager.HandleKeyDown(e);
-        }
+        if (_completionManager is not null) await _completionManager.HandleKeyDown(e);
     }
 
     private void DragOver(object? sender, DragEventArgs drgevent)
@@ -72,7 +65,8 @@ public partial class QueryEditorView : UserControl
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(), new CompletionWindowWrapper(TextEditor.TextArea));
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(),
+            new CompletionWindowWrapper(TextEditor.TextArea));
         TextEditor.TextArea.Focus();
     }
 }

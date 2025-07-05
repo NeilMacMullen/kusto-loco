@@ -1,5 +1,4 @@
 using Avalonia.Input;
-using lokqlDx;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 
@@ -7,7 +6,7 @@ namespace LokqlDx.Views;
 
 public static class QueryExecutionHelper
 {
-    public static async Task  HandleKeyCombo(KeyEventArgs e,
+    public static async Task HandleKeyCombo(KeyEventArgs e,
         EditorHelper _editorHelper,
         QueryEditorViewModel vm)
     {

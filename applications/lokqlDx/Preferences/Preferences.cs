@@ -5,23 +5,24 @@ public class MruEntry
     public string Path { get; set; } = string.Empty;
     public DateTime LastAccessed { get; set; } = DateTime.MinValue;
 }
+
 /// <summary>
-/// The list of recently used files/projects
+///     The list of recently used files/projects
 /// </summary>
 /// <remarks>
-/// This may be quite contended if the user has multiple copies of the application
-/// open
+///     This may be quite contended if the user has multiple copies of the application
+///     open
 /// </remarks>
 public class PersistedMruList
 {
-    public MruEntry [] RecentProjects { get; set; } = [];
+    public MruEntry[] RecentProjects { get; set; } = [];
 }
 
 /// <summary>
-/// User preferences that affect the UI
+///     User preferences that affect the UI
 /// </summary>
 /// <remarks>
-/// These are persisted to disk on application close and loaded at startup
+///     These are persisted to disk on application close and loaded at startup
 /// </remarks>
 public class UIPreferences
 {
@@ -38,4 +39,3 @@ public class UIPreferences
     public string[] AvGridRowSerialization { get; set; } = [];
     public string[] AvGridColumnSerialization { get; set; } = [];
 }
-

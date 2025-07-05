@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Input;
 using DependencyPropertyGenerator;
 
 namespace LokqlDx.Views;
@@ -18,27 +19,17 @@ public partial class MainView : UserControl
 
     partial void OnColumnDefinitionsChanged(ColumnDefinitions? newValue)
     {
-        if (newValue is not null)
-        {
-            MainGrid.ColumnDefinitions = newValue;
-        }
+        if (newValue is not null) MainGrid.ColumnDefinitions = newValue;
     }
 
-    private void ColumnGridSplitter_DragCompleted(object? sender, Avalonia.Input.VectorEventArgs e)
-    {
+    private void ColumnGridSplitter_DragCompleted(object? sender, VectorEventArgs e) =>
         ColumnDefinitions = MainGrid.ColumnDefinitions;
-    }
 
     partial void OnRowDefinitionsChanged(RowDefinitions? newValue)
     {
-        if (newValue is not null)
-        {
-            MainGrid.RowDefinitions = newValue;
-        }
+        if (newValue is not null) MainGrid.RowDefinitions = newValue;
     }
 
-    private void RowGridSplitter_DragCompleted(object? sender, Avalonia.Input.VectorEventArgs e)
-    {
+    private void RowGridSplitter_DragCompleted(object? sender, VectorEventArgs e) =>
         RowDefinitions = MainGrid.RowDefinitions;
-    }
 }

@@ -77,16 +77,16 @@ public class PreferencesManager
         var fonts = FontManager.Current.SystemFonts
             .OrderBy(x => x.Name)
             .ToList();
-        
+
         // in case Consolas is not found, or user uninstalls a font they installed
-        var font = fonts.FirstOrDefault(f => 
-            f.Name == UIPreferences.FontFamily || 
-            f.Name == "Consolas" ||
-            f.Name == "SF Mono" || f.Name == "Menlo" || f.Name == "Monaco" || // macOS defaults
-            f.Name == "Noto Sans Mono" || f.Name == "DejaVu Sans Mono" || // some linux distros defaults
-            f.Name.Contains("Mono", StringComparison.OrdinalIgnoreCase)) 
-            ?? PreferencesHelper.GetFirstMonospaceFontFamily()
-            ?? FontManager.Current.DefaultFontFamily;
+        var font = fonts.FirstOrDefault(f =>
+                       f.Name == UIPreferences.FontFamily ||
+                       f.Name == "Consolas" ||
+                       f.Name == "SF Mono" || f.Name == "Menlo" || f.Name == "Monaco" || // macOS defaults
+                       f.Name == "Noto Sans Mono" || f.Name == "DejaVu Sans Mono" || // some linux distros defaults
+                       f.Name.Contains("Mono", StringComparison.OrdinalIgnoreCase))
+                   ?? PreferencesHelper.GetFirstMonospaceFontFamily()
+                   ?? FontManager.Current.DefaultFontFamily;
 
         UIPreferences.FontFamily = font.Name;
     }

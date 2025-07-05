@@ -17,7 +17,7 @@
         WindowSize="{Binding WindowSize}">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Closing" SourceObject="RootControl">
-            <InvokeCommandAction Command="{Binding ClosingCommand}" PassEventArgsToCommand="True"/>
+            <InvokeCommandAction Command="{Binding ClosingCommand}" PassEventArgsToCommand="True" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <views:MainView x:Name="MainView" />

@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LokqlDx;
 
-public partial class App : Application
+public class App : Application
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -19,10 +19,7 @@ public partial class App : Application
         _serviceProvider = serviceProvider;
     }
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -31,11 +28,10 @@ public partial class App : Application
         BindingPlugins.DataValidators.RemoveAt(0);
 
         var mainView = _serviceProvider.GetRequiredService<MainView>();
-        
+
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            
             var mainWindow = new MainWindow(mainView);
             desktop.MainWindow = mainWindow;
 
@@ -52,7 +48,7 @@ public partial class App : Application
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = mainView;
-            
+
             if (_serviceProvider is DiContainer di)
                 di.SetTopLevel(TopLevel.GetTopLevel(singleViewPlatform.MainView));
 

@@ -6,7 +6,6 @@ namespace LokqlDx.Views;
 
 public partial class RenderingSurfaceView : UserControl, IDisposable
 {
-   
     public RenderingSurfaceView()
     {
         InitializeComponent();
@@ -14,7 +13,6 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
 
     public void Dispose()
     {
-       
     }
 
 

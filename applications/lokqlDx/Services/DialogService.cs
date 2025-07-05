@@ -4,7 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using DependencyPropertyGenerator;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using LokqlDx.Models;
@@ -13,7 +12,6 @@ using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using NotNullStrings;
 using Flyout = LokqlDx.Views.Flyout;
 
 namespace LokqlDx.Services;
@@ -63,28 +61,28 @@ public class DialogService
                 page,
                 new MarkdownHelpWindow(),
                 new MarkDownHelpModel(page, _launcher),
-                true)
+                false,
+                0)
             .ConfigureAwait(false);
 
 
-
-    public async Task FlyoutResult(KustoQueryResult result, KustoSettingsProvider explorerSettings,DisplayPreferencesViewModel displayPreferences)
-    {
-        //use the first line of the query as the title
-        var title = result.Query.Tokenize("\r\n").FirstOrDefault("result");
+    public async Task FlyoutResult(string title, KustoQueryResult result, KustoSettingsProvider explorerSettings,
+        DisplayPreferencesViewModel displayPreferences) =>
         await ShowDialog(
-               title,
+                title,
                 new Flyout(),
-                new FlyoutViewModel(result, explorerSettings,displayPreferences),
-                true)
+                new FlyoutViewModel(result, explorerSettings, displayPreferences),
+                false,
+                400)
             .ConfigureAwait(false);
-    }
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
         await ShowDialog(
                 "LokqlDX - Application Options",
                 new ApplicationPreferencesView(),
-                new ApplicationPreferencesViewModel(preferencesManager))
+                new ApplicationPreferencesViewModel(preferencesManager),
+                true, 0
+            )
             .ConfigureAwait(false);
 
 
@@ -92,7 +90,8 @@ public class DialogService
         await ShowDialog(
                 "Rename",
                 new RenameDialog(),
-                new RenameDialogModel(initialText))
+                new RenameDialogModel(initialText),
+                true, 0)
             .ConfigureAwait(false);
 
     public async Task
@@ -100,10 +99,11 @@ public class DialogService
         await ShowDialog(
                 "LokqlDX - Workspace Options",
                 new WorkspacePreferencesView(),
-                new WorkspacePreferencesViewModel(workspaceManager, uiPreferences))
+                new WorkspacePreferencesViewModel(workspaceManager, uiPreferences),
+                true, 0)
             .ConfigureAwait(false);
 
-    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modeless = false)
+    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modal, int minSize)
     {
         if (_topLevel is Window window)
         {
@@ -117,6 +117,11 @@ public class DialogService
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
+            if (minSize > 0)
+            {
+                dialog.Width = minSize;
+                dialog.Height = minSize;
+            }
 
             if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
                 dialog[!TemplatedControl.BackgroundProperty]
@@ -129,7 +134,7 @@ public class DialogService
 #endif
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-            if (modeless)
+            if (!modal)
             {
                 dialog.Show(window);
             }
@@ -143,5 +148,4 @@ public class DialogService
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }
-
 }

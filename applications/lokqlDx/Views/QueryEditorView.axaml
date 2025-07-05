@@ -19,17 +19,13 @@
             ShowLineNumbers="{Binding DisplayPreferences.ShowLineNumbers}"
             WordWrap="{Binding DisplayPreferences.WordWrap}"
             DragDrop.AllowDrop="True"
-            Loaded="TextEditor_OnLoaded"
-            >
-
-           
-		</avaloniaEdit:TextEditor>
+            Loaded="TextEditor_OnLoaded" />
         <ProgressBar
             IsIndeterminate="true"
             Height="8"
             Margin="30"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Stretch"
-            IsVisible="{Binding RunQueryCommand.IsRunning, Mode=OneWay, FallbackValue=False}"/>
+            IsVisible="{Binding RunQueryCommand.IsRunning, Mode=OneWay, FallbackValue=False}" />
     </Grid>
 </UserControl>

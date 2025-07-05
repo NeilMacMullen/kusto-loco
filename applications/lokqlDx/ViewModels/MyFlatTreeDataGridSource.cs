@@ -12,14 +12,14 @@ public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
     IDisposable
     where TModel : class
 {
+    private IComparer<TModel>? _comparer;
+    private bool _isSelectionSet;
     private IEnumerable<TModel> _items;
     private TreeDataGridItemsSourceView<TModel> _itemsView;
     private AnonymousSortableRows<TModel>? _rows;
-    private IComparer<TModel>? _comparer;
     private ITreeDataGridSelection? _selection;
-    private bool _isSelectionSet;
 
-    public MyFlatTreeDataGridSource(IEnumerable<TModel> items,ColumnList<TModel> columns)
+    public MyFlatTreeDataGridSource(IEnumerable<TModel> items, ColumnList<TModel> columns)
     {
         _items = items;
         _itemsView = TreeDataGridItemsSourceView<TModel>.GetOrCreate(items);
@@ -27,6 +27,18 @@ public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
     }
 
     public ColumnList<TModel> Columns { get; }
+
+    public ITreeDataGridCellSelectionModel<TModel>? CellSelection =>
+        Selection as ITreeDataGridCellSelectionModel<TModel>;
+
+    public ITreeDataGridRowSelectionModel<TModel>? RowSelection => Selection as ITreeDataGridRowSelectionModel<TModel>;
+
+    public void Dispose()
+    {
+        _rows?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
     public IRows Rows => _rows ??= CreateRows();
     IColumns ITreeDataGridSource.Columns => Columns;
 
@@ -69,19 +81,10 @@ public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
     }
 
     IEnumerable<object> ITreeDataGridSource.Items => Items;
-
-    public ITreeDataGridCellSelectionModel<TModel>? CellSelection => Selection as ITreeDataGridCellSelectionModel<TModel>;
-    public ITreeDataGridRowSelectionModel<TModel>? RowSelection => Selection as ITreeDataGridRowSelectionModel<TModel>;
     public bool IsHierarchical => false;
     public bool IsSorted => _comparer is not null;
 
     public event Action? Sorted;
-
-    public void Dispose()
-    {
-        _rows?.Dispose();
-        GC.SuppressFinalize(this);
-    }
 
     void ITreeDataGridSource.DragDropRows(
         ITreeDataGridSource source,
@@ -123,10 +126,7 @@ public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
                 --ti;
         }
 
-        for (var si = sourceItems.Count - 1; si >= 0; --si)
-        {
-            items.Insert(ti++, sourceItems[si]);
-        }
+        for (var si = sourceItems.Count - 1; si >= 0; --si) items.Insert(ti++, sourceItems[si]);
     }
 
     bool ITreeDataGridSource.SortBy(IColumn? column, ListSortDirection direction)
@@ -146,25 +146,26 @@ public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
                 foreach (var c in Columns)
                     c.SortDirection = c == column ? direction : null;
             }
+
             return true;
         }
 
         return false;
     }
 
-    IEnumerable<object> ITreeDataGridSource.GetModelChildren(object model)
-    {
-        return Enumerable.Empty<object>();
-    }
+    IEnumerable<object> ITreeDataGridSource.GetModelChildren(object model) => Enumerable.Empty<object>();
 
-    private AnonymousSortableRows<TModel> CreateRows()
-    {
-        return new AnonymousSortableRows<TModel>(_itemsView, _comparer);
-    }
+    private AnonymousSortableRows<TModel> CreateRows() => new(_itemsView, _comparer);
+
     internal class FuncComparer<T> : IComparer<T>
     {
         private readonly Comparison<T?> _func;
-        public FuncComparer(Comparison<T?> func) => _func = func;
+
+        public FuncComparer(Comparison<T?> func)
+        {
+            _func = func;
+        }
+
         public int Compare(T? x, T? y) => _func(x, y);
     }
 }

@@ -1,12 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace LokqlDx.ViewModels;
 
 public partial class QueryViewModel : ObservableObject
 {
+    [ObservableProperty] private int _chartColumn = 2;
+    [ObservableProperty] private int _chartRow;
+    [ObservableProperty] private int _columnSpan = 1;
+
+    [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
+
+    // Add observable properties for grid positions
+    [ObservableProperty] private int _editorViewColumn;
+    [ObservableProperty] private int _editorViewRow;
+    [ObservableProperty] private int _gridSplitterColumn = 1;
+    [ObservableProperty] private int _gridSplitterHeight = int.MaxValue;
+    [ObservableProperty] private int _gridSplitterRow;
+    [ObservableProperty] private int _gridSplitterWidth = 5;
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-    [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
+
+    [ObservableProperty] private int _rowSpan = 3;
+
+    private int n;
 
     public QueryViewModel(
         QueryEditorViewModel queryEditorViewModel,
@@ -16,15 +34,68 @@ public partial class QueryViewModel : ObservableObject
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
         CopilotChatViewModel = copilotChatViewModel;
+        WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) => { FlipArrangement(); });
     }
 
-    public bool IsDirty()
+    /// <summary>
+    ///     Arrange the view so that items are stacked in rows (vertically).
+    /// </summary>
+    public void ArrangeInRows(bool editorFirst)
     {
-        return QueryEditorViewModel.IsDirty;
+        RowSpan = 1;
+        ColumnSpan = 3;
+
+        EditorViewColumn = 0;
+        EditorViewRow = editorFirst ? 0 : 2;
+
+        GridSplitterColumn = 0;
+        GridSplitterRow = 1;
+        GridSplitterHeight = 5;
+        GridSplitterWidth = int.MaxValue;
+
+
+        ChartColumn = 0;
+        ChartRow = editorFirst ? 2 : 0;
     }
 
-    public string GetText()
+    /// <summary>
+    ///     Arrange the view so that items are arranged in columns (horizontally).
+    /// </summary>
+    public void ArrangeInColumns(bool editorFirst)
     {
-        return QueryEditorViewModel.GetText();
+        RowSpan = 3;
+        ColumnSpan = 1;
+
+        EditorViewColumn = editorFirst ? 0 : 2;
+        EditorViewRow = 0;
+
+        GridSplitterColumn = 1;
+        GridSplitterRow = 0;
+        GridSplitterWidth = 5;
+        GridSplitterHeight = int.MaxValue;
+
+        ChartColumn = editorFirst ? 2 : 0;
+        ChartRow = 0;
     }
+
+    public bool IsDirty() => QueryEditorViewModel.IsDirty;
+
+    public string GetText() => QueryEditorViewModel.GetText();
+
+    [RelayCommand]
+    private void FlipArrangement()
+    {
+        n = (n + 1) % 4;
+        if (n == 0)
+            ArrangeInColumns(true);
+        if (n == 1)
+            ArrangeInRows(true);
+        if (n == 2)
+            ArrangeInColumns(false);
+        if (n == 3)
+            ArrangeInRows(false);
+    }
+
+
+    public void Clean() => QueryEditorViewModel.IsDirty = false;
 }

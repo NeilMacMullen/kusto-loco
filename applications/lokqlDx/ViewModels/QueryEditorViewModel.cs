@@ -2,37 +2,27 @@
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
-using lokqlDx;
 using lokqlDxComponents.Services;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-
-
-public partial class QueryEditorViewModel : ObservableObject, IDisposable, IIntellisenseResourceManager, ICompletionManagerServiceLocator
+public partial class QueryEditorViewModel : ObservableObject, IDisposable, IIntellisenseResourceManager,
+    ICompletionManagerServiceLocator
 {
     private readonly ConsoleViewModel _consoleViewModel;
-    private InteractiveTableExplorer _explorer;
-
-    public IntellisenseClientAdapter _intellisenseClient { get; }
-
-    public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
-    [ObservableProperty] private TextDocument _document = new();
-    public IntellisenseEntry[] InternalCommands => _intellisenseClient.InternalCommands;
-    public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
-    public IntellisenseEntry[] SettingNames { get; set; } = [];
-    public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
-    public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
-    public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
-
-    [ObservableProperty] private bool _isDirty;
 
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
+    [ObservableProperty] private TextDocument _document = new();
+    private InteractiveTableExplorer _explorer;
+
+
+    [ObservableProperty] private bool _isDirty;
 
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
@@ -54,6 +44,9 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         _isDirty = false;
     }
 
+    public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
+
+    public IntellisenseClientAdapter _intellisenseClient { get; }
 
 
     public void Dispose()
@@ -61,6 +54,20 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         Document.Changing -= Document_Changing;
         Document.Changed -= Document_Changed;
     }
+
+    public IntellisenseEntry[] InternalCommands => _intellisenseClient.InternalCommands;
+    public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
+    public IntellisenseEntry[] SettingNames { get; set; } = [];
+    public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
+    public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
+    public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
+
+    public void AddSettingsForIntellisense(KustoSettingsProvider settings) =>
+        SettingNames = settings.Enumerate()
+            .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
+            .ToArray();
+
+    public void SetSchema(SchemaLine[] getSchema) => SchemaIntellisenseProvider.SetSchema(getSchema);
 
     public event AsyncEventHandler? ExecutingQuery;
 
@@ -70,7 +77,6 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     {
         OnPropertyChanged(nameof(Document));
         IsDirty = true;
-
     }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
@@ -78,7 +84,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     {
         if (query.IsBlank())
             return;
-
+        var saved = await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(true));
         if (ExecutingQuery is not null)
             await ExecutingQuery.InvokeAsync(this, EventArgs.Empty);
 
@@ -92,12 +98,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         SetSchema(_explorer.GetSchema());
         AddSettingsForIntellisense(_explorer.Settings);
+        //WeakReferenceMessenger.Default.Send(new RunningQueryMessage(false));
     }
-
-    public void AddSettingsForIntellisense(KustoSettingsProvider settings) =>
-        SettingNames = settings.Enumerate()
-            .Select(s => new IntellisenseEntry(s.Name, s.Value, string.Empty))
-            .ToArray();
 
 
     private void LoadIntellisense()
@@ -111,9 +113,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         AddSettingsForIntellisense(_explorer.Settings);
     }
 
-    public void SetSchema(SchemaLine[] getSchema) => SchemaIntellisenseProvider.SetSchema(getSchema);
-
-    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries) => _intellisenseClient.AddInternalCommands(verbEntries);
+    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries) =>
+        _intellisenseClient.AddInternalCommands(verbEntries);
 
     public string GetText() => Document.Text;
 
