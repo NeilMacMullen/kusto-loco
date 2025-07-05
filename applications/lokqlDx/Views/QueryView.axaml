@@ -8,7 +8,7 @@
              x:Class="LokqlDx.Views.QueryView"
              x:DataType="vm:QueryViewModel">
     <DockPanel>
-        
+
         <Grid ColumnDefinitions="*,auto,*"
               RowDefinitions="*,auto,*"
               DockPanel.Dock="Bottom">

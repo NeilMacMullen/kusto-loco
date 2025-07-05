@@ -15,9 +15,6 @@ public partial class Flyout : UserControl
 
     private async void SurfaceView_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is FlyoutViewModel viewModel)
-        {
-            await viewModel.InitialRender();
-        }
+        if (DataContext is FlyoutViewModel viewModel) await viewModel.InitialRender();
     }
 }

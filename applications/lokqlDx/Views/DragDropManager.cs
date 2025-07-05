@@ -1,6 +1,5 @@
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
-using lokqlDx;
 using lokqlDxComponents;
 using NotNullStrings;
 
@@ -8,7 +7,7 @@ namespace LokqlDx.Views;
 
 public static class DragDropManager
 {
-    public static  void DragOver(DragEventArgs drgevent)
+    public static void DragOver(DragEventArgs drgevent)
     {
         drgevent.Handled = true;
         // Check that the data being dragged is a file
@@ -26,7 +25,7 @@ public static class DragDropManager
             : DragDropEffects.None;
     }
 
-    public static void Drop(DragEventArgs e,EditorHelper editorHelper)
+    public static void Drop(DragEventArgs e, EditorHelper editorHelper)
     {
         if (e.Data.Contains(DataFormats.Files))
         {

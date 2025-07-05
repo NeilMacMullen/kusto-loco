@@ -1,8 +1,8 @@
+using System.Globalization;
+using System.Text;
 using KustoLoco.Rendering.ScottPlot;
 using ScottPlot;
 using ScottPlot.Plottables;
-using System.Globalization;
-using System.Text;
 
 namespace LokqlDx.Views;
 
@@ -14,6 +14,7 @@ public class PopupSupport
     {
         _plot = plot;
     }
+
     private PopupResult TryPopupFromBar(Coordinates rawCoordinates)
     {
         var inverted = new Coordinates(rawCoordinates.Y, rawCoordinates.X);
@@ -43,8 +44,10 @@ public class PopupSupport
                 return new PopupResult(bar.LegendText, b.Position, b.ValueBase, b.Value, invert);
             }
         }
+
         return bestResult;
     }
+
     private PopupResult TryPopupFromScatter(Coordinates coordinates)
     {
         foreach (var scatter in _plot.GetPlottables<Scatter>())
@@ -64,7 +67,7 @@ public class PopupSupport
             if (axis.TickGenerator is FixedDateTimeAutomatic)
                 return DateTime.FromOADate(v).ToString(); //TODO - get string format from kusto settings
         }
-        catch 
+        catch
         {
             //It's possible that the value is not a valid OLE Automation date
         }
@@ -73,7 +76,7 @@ public class PopupSupport
         //so that we can get non-numeric values like strings
         return v.ToString(CultureInfo.InvariantCulture);
     }
-    
+
     private string GetXLabel(double x) => GetLabel(_plot.Axes.Bottom, x);
 
     private string GetYLabel(double y) => GetLabel(_plot.Axes.Left, y);
@@ -84,7 +87,6 @@ public class PopupSupport
         if (!popup.IsValid)
             popup = TryPopupFromBar(coordinates);
         return popup;
-
     }
 
     internal string GetPopupContents(PopupResult popup)
@@ -97,11 +99,8 @@ public class PopupSupport
             ? GetYLabel(popup.Y)
             : (popup.V - popup.Y).ToString(CultureInfo.InvariantCulture));
         return sb.ToString();
-
     }
 
-    public string GetBasicPositionInfo(Coordinates coordinates)
-    {
-        return $"X:{GetXLabel(coordinates.X)} Y:{GetYLabel(coordinates.Y)}";
-    }
+    public string GetBasicPositionInfo(Coordinates coordinates) =>
+        $"X:{GetXLabel(coordinates.X)} Y:{GetYLabel(coordinates.Y)}";
 }

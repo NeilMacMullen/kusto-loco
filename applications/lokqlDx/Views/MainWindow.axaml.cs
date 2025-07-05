@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using DependencyPropertyGenerator;
 using Avalonia.Media;
+using DependencyPropertyGenerator;
 
 namespace LokqlDx.Views;
 
@@ -23,26 +23,16 @@ public partial class MainWindow : Window
         InitializeComponent();
         Content = view;
 
-        if (ActualTransparencyLevel == WindowTransparencyLevel.Mica)
-        {
-            Background = Brushes.Transparent;
-        }
+        if (ActualTransparencyLevel == WindowTransparencyLevel.Mica) Background = Brushes.Transparent;
     }
 
-    private void Window_PositionChanged(object? sender, PixelPointEventArgs e)
-    {
+    private void Window_PositionChanged(object? sender, PixelPointEventArgs e) =>
         WindowPosition = new Point(e.Point.X, e.Point.Y);
-    }
 
-    partial void OnWindowPositionChanged(Point newValue)
-    {
-        Position = new PixelPoint((int)newValue.X, (int)newValue.Y);
-    }
+    partial void OnWindowPositionChanged(Point newValue) => Position = new PixelPoint((int)newValue.X, (int)newValue.Y);
 
-    private void Window_SizeChanged(object? sender, SizeChangedEventArgs e)
-    {
+    private void Window_SizeChanged(object? sender, SizeChangedEventArgs e) =>
         WindowSize = new Size(e.NewSize.Width, e.NewSize.Height);
-    }
 
     partial void OnWindowSizeChanged(Size newValue)
     {

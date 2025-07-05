@@ -3,15 +3,15 @@
              x:Class="LokqlDx.App"
              xmlns:labs="using:Avalonia.Labs.Controls"
              RequestedThemeVariant="Dark">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
         <FluentTheme DensityStyle="Compact" />
-        <labs:ControlThemes/>
+        <labs:ControlThemes />
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude
-            Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
-		
-	</Application.Styles>
+            Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
+
+    </Application.Styles>
 </Application>

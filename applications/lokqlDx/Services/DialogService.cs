@@ -4,8 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using DependencyPropertyGenerator;
-using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using LokqlDx.Models;
@@ -14,7 +12,6 @@ using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using NotNullStrings;
 using Flyout = LokqlDx.Views.Flyout;
 
 namespace LokqlDx.Services;
@@ -69,26 +66,23 @@ public class DialogService
             .ConfigureAwait(false);
 
 
-
-    public async Task FlyoutResult(string title,KustoQueryResult result, KustoSettingsProvider explorerSettings,DisplayPreferencesViewModel displayPreferences)
-    {
-       
+    public async Task FlyoutResult(string title, KustoQueryResult result, KustoSettingsProvider explorerSettings,
+        DisplayPreferencesViewModel displayPreferences) =>
         await ShowDialog(
-               title,
-                new Flyout() ,
-                new FlyoutViewModel(result, explorerSettings,displayPreferences),
+                title,
+                new Flyout(),
+                new FlyoutViewModel(result, explorerSettings, displayPreferences),
                 false,
-               400)
+                400)
             .ConfigureAwait(false);
-    }
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
         await ShowDialog(
                 "LokqlDX - Application Options",
                 new ApplicationPreferencesView(),
                 new ApplicationPreferencesViewModel(preferencesManager),
-                true,0
-                )
+                true, 0
+            )
             .ConfigureAwait(false);
 
 
@@ -97,7 +91,7 @@ public class DialogService
                 "Rename",
                 new RenameDialog(),
                 new RenameDialogModel(initialText),
-                true,0)
+                true, 0)
             .ConfigureAwait(false);
 
     public async Task
@@ -109,7 +103,7 @@ public class DialogService
                 true, 0)
             .ConfigureAwait(false);
 
-    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modal,int minSize)
+    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modal, int minSize)
     {
         if (_topLevel is Window window)
         {
@@ -121,13 +115,12 @@ public class DialogService
                 SizeToContent = SizeToContent.WidthAndHeight,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
             if (minSize > 0)
             {
-                dialog.Width=minSize;
-                dialog.Height=minSize;
+                dialog.Width = minSize;
+                dialog.Height = minSize;
             }
 
             if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
@@ -155,5 +148,4 @@ public class DialogService
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }
-
 }

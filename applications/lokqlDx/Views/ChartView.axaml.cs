@@ -52,6 +52,24 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     #endregion
 
+    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (OperatingSystem.IsWindows())
+            try
+            {
+                var width = (int)PlotControl.Bounds.Width;
+                var height = (int)PlotControl.Bounds.Height;
+                var bytes = PlotControl.Plot.GetImageBytes(width, height, ImageFormat.Png);
+
+                using var memoryStream = new MemoryStream(bytes);
+                var bitmap = new Bitmap(memoryStream);
+                ClipboardAvalonia.SetImage(bitmap);
+            }
+            catch
+            {
+            }
+    }
+
 
     #region IScottplotHost
 
@@ -73,7 +91,8 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight,
         KustoSettingsProvider kustoSettings)
-        => ScottPlotKustoResultRenderer.RenderToImage(result,ImageFormat.Png,(int)pWidth, (int)pHeight,kustoSettings);
+        => ScottPlotKustoResultRenderer.RenderToImage(result, ImageFormat.Png, (int)pWidth, (int)pHeight,
+            kustoSettings);
 
     public void RenderToDisplay(KustoQueryResult result, KustoSettingsProvider kustoSettings) =>
         //important - this can be called from inside the engine so we need to dispatch it to the UI thread
@@ -88,23 +107,4 @@ public partial class ChartView : UserControl, IScottPlotHost
         });
 
     #endregion
-
-    private void Button_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            try
-            {
-                var width = (int)PlotControl.Bounds.Width;
-                var height = (int)PlotControl.Bounds.Height;
-                var bytes = PlotControl.Plot.GetImageBytes(width, height, ImageFormat.Png);
-
-                using var memoryStream = new MemoryStream(bytes);
-                var bitmap = new Bitmap(memoryStream);
-                ClipboardAvalonia.SetImage(bitmap);
-            }
-            catch { }
-        }
-
-    }
 }

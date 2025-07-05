@@ -1,9 +1,9 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Xaml.Interactivity;
 using LokqlDx.ViewModels;
-using System.Globalization;
 
 namespace LokqlDx.Views;
 
@@ -18,11 +18,7 @@ public partial class ConsoleView : UserControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == UserControl.FontFamilyProperty || change.Property == UserControl.FontSizeProperty)
-        {
-            UpdateSize(Bounds.Width);
-        }
-
+        if (change.Property == FontFamilyProperty || change.Property == FontSizeProperty) UpdateSize(Bounds.Width);
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
@@ -37,7 +33,7 @@ public partial class ConsoleView : UserControl
 
     private void UpdateSize(double width)
     {
-        if (DataContext is not ViewModels.ConsoleViewModel console)
+        if (DataContext is not ConsoleViewModel console)
             return;
 
         if (FontSize == 0)
@@ -59,8 +55,6 @@ public partial class ConsoleView : UserControl
     }
 }
 
-
-
 public class ScrollToEndBehavior : Behavior<ScrollViewer>
 {
     public static readonly StyledProperty<int> ScrollToEndProperty =
@@ -80,10 +74,6 @@ public class ScrollToEndBehavior : Behavior<ScrollViewer>
 
     private void OnScrollToEndChanged(int scrollToEnd)
     {
-        if (scrollToEnd!=0 && AssociatedObject != null)
-        {
-            AssociatedObject.ScrollToEnd();
-        }
+        if (scrollToEnd != 0 && AssociatedObject != null) AssociatedObject.ScrollToEnd();
     }
 }
-

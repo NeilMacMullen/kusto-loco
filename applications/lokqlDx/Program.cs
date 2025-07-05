@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using HotAvalonia;
-using Intellisense.Configuration;
 using Jab;
 using LogSetup;
 using Lokql.Engine.Commands;

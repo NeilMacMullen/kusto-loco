@@ -1,18 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using Avalonia.Media;
-using AvaloniaEdit.Document;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DocumentFormat.OpenXml.Drawing;
 
 namespace LokqlDx.ViewModels.Dialogs;
 
 public partial class RenameDialogModel : ObservableObject, IDialogViewModel
 {
-    private readonly RenamableText _initialText;
-
     private readonly TaskCompletionSource _completionSource;
-    [ObservableProperty] private string  _text;
+    private readonly RenamableText _initialText;
+    [ObservableProperty] private string _text;
 
     public RenameDialogModel(RenamableText initialText)
     {

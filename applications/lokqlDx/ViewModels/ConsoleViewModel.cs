@@ -1,20 +1,21 @@
-﻿using Avalonia.Media;
+﻿using System.Collections.ObjectModel;
+using System.Text;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using KustoLoco.Core.Console;
-using System.Collections.ObjectModel;
-using System.Text;
 
 namespace LokqlDx.ViewModels;
 
 public partial class ConsoleViewModel : ObservableObject, IKustoConsole
 {
-    
+    private readonly StringBuilder _buffer = new();
+
     [ObservableProperty] private ObservableCollection<ColoredText> _consoleContent = [];
     [ObservableProperty] private double _consoleWidth;
-    [ObservableProperty] private ColoredText? _selectedItem;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferencesPreferences;
+    [ObservableProperty] private ColoredText? _selectedItem;
     [ObservableProperty] private int _triggerScroll;
 
     public ConsoleViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
@@ -23,17 +24,7 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         ForegroundColor = ConsoleColor.White;
         WindowWidth = 80; // Default width
         DisplayPreferencesPreferences = displayPreferencesPreferences;
-        WeakReferenceMessenger.Default.Register<ClearConsoleMessage>(this, (r, m) =>
-        {
-          Clear();
-        });
-
-    }
-
-    [RelayCommand]
-    private void Clear()
-    {
-        ConsoleContent.Clear();
+        WeakReferenceMessenger.Default.Register<ClearConsoleMessage>(this, (r, m) => { Clear(); });
     }
 
     public int WindowWidth { get; private set; } = 80;
@@ -42,7 +33,6 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
 
     public string ReadLine() => string.Empty;
 
-    private StringBuilder _buffer = new StringBuilder();
     public void Write(string text)
     {
         var flush = false;
@@ -63,6 +53,9 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
             _buffer.Clear();
         }
     }
+
+    [RelayCommand]
+    private void Clear() => ConsoleContent.Clear();
 
     partial void OnConsoleWidthChanged(double value) => WindowWidth = (int)value;
 

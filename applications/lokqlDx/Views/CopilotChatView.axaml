@@ -16,6 +16,6 @@
             HorizontalAlignment="Stretch"
             Background="#227F7F7F" />
 
-        <avaloniaEdit:TextEditor Grid.Row="2"/>
+        <avaloniaEdit:TextEditor Grid.Row="2" />
     </Grid>
 </UserControl>

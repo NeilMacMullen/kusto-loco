@@ -9,18 +9,18 @@
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
              DataContextChanged="StyledElement_OnDataContextChanged">
-    <DockPanel >
+    <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
-            <Label Content="{Binding QuerySummary}" FontSize="8"/>
+            <Label Content="{Binding QuerySummary}" FontSize="8" />
         </StackPanel>
         <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
-            <TabItem Header="Data" >
-                <Grid RowDefinitions="auto,*"  Background="{DynamicResource SystemAltLowColor}">
+            <TabItem Header="Data">
+                <Grid RowDefinitions="auto,*" Background="{DynamicResource SystemAltLowColor}">
                     <TextBlock
                         Text="{Binding DataGridSizeWarning}"
                         IsVisible="{Binding ShowDataGridSizeWarning}" />
 
-					<TreeDataGrid
+                    <TreeDataGrid
                         Grid.Row="1"
                         x:Name="DataGrid"
                         Source="{Binding TreeSource}"
@@ -28,22 +28,25 @@
                         FontSize="{Binding DisplayPreferences.FontSize}"
                         Foreground="GreenYellow"
                         CanUserResizeColumns="True"
-                        CanUserSortColumns="True"
-                        >
+                        CanUserSortColumns="True">
                         <TreeDataGrid.Styles>
                             <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
-                                <Setter Property="Background"  Value="#20808080"/>
+                                <Setter Property="Background" Value="#20808080" />
                             </Style>
                         </TreeDataGrid.Styles>
                         <TreeDataGrid.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}" CommandParameter="cell"/>
-                                <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}" CommandParameter="column"/>
-                                <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}" CommandParameter="row"/>
-                                <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}" CommandParameter="table"/>
-							</ContextMenu>
+                                <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}"
+                                          CommandParameter="cell" />
+                                <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}"
+                                          CommandParameter="column" />
+                                <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}"
+                                          CommandParameter="row" />
+                                <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
+                                          CommandParameter="table" />
+                            </ContextMenu>
                         </TreeDataGrid.ContextMenu>
-                    </TreeDataGrid> 
+                    </TreeDataGrid>
                 </Grid>
             </TabItem>
             <TabItem Header="Chart">

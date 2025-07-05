@@ -12,6 +12,5 @@ public partial class QueryView : UserControl
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        
     }
 }
