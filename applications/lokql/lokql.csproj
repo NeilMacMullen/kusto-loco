@@ -15,6 +15,7 @@
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="NLog" />
     <PackageReference Include="ShapeCrawler" />
+    <PackageReference Include="Spectre.Console" />
     <PackageReference Include="System.CommandLine" />
   
   </ItemGroup>
@@ -23,6 +24,7 @@
     <ProjectReference Include="..\..\libraries\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
+    <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
   </ItemGroup>
 
 </Project>

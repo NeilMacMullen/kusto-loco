@@ -2,7 +2,6 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
-using Lokql.Engine.Commands;
 using NLog;
 using NotNullStrings;
 
@@ -20,8 +19,8 @@ internal class CmdRun
         var settings = new KustoSettingsProvider();
         settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, options.Data);
         var processor = CommandProcessorProvider.GetCommandProcessor();
-        var renderer = new NullResultRenderingSurface();
-        var explorer = new InteractiveTableExplorer(console,  settings, processor,renderer);
+        var renderer = new SixelRenderingSurface(settings);
+        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer);
         var block = options.File.IsBlank() ? options.Command : File.ReadAllText(options.File);
         await explorer.RunInput(block);
     }
@@ -40,16 +39,16 @@ internal class CmdRun
         }
     }
 
-    [Verb("run", isDefault:true,  HelpText = "runs a lokqldx workspace in its entirety")]
+    [Verb("run", true, HelpText = "runs a lokqldx workspace in its entirety")]
     public class Options
     {
         [Option(HelpText = "Default folder to load/save data/results to")]
         public string Data { get; set; } = string.Empty;
 
-        [Option(shortName: 'f', HelpText = "Runs a script at startup", Required = true, SetName = nameof(File))]
+        [Option('f', HelpText = "Runs a script at startup", Required = true, SetName = nameof(File))]
         public string File { get; set; } = string.Empty;
 
-        [Option(shortName:'c', HelpText = "Runs a script provided as a string",   Required = true, SetName = nameof(Command))]
+        [Option('c', HelpText = "Runs a script provided as a string", Required = true, SetName = nameof(Command))]
         public string Command { get; set; } = string.Empty;
     }
 }

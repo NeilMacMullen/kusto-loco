@@ -88,6 +88,8 @@ public class InteractiveTableExplorer
 
     public void ShowResultsToConsole(KustoQueryResult result, int start, int maxToDisplay)
     {
+        if (maxToDisplay == 0)
+            return;
         _outputConsole.ForegroundColor = ConsoleColor.Green;
 
 
@@ -114,11 +116,11 @@ public class InteractiveTableExplorer
             }
             else
             {
-                var max = 10; //_currentDisplayOptions.MaxToDisplay;
+                var max = Settings.GetIntOr("console.maxrows", 0);
                 ShowResultsToConsole(result, 0, max);
             }
 
-            Warn($"Query took {(int)result.QueryDuration.TotalMilliseconds}ms");
+            Warn($"{result.RowCount} rows in {(int)result.QueryDuration.TotalMilliseconds}ms");
         }
     }
 
@@ -166,7 +168,7 @@ public class InteractiveTableExplorer
     public async Task InjectResult(KustoQueryResult result)
     {
         _resultHistory.Push(result);
-        if (result.Error.Length == 0) await _renderingSurface.RenderToDisplay(result);
+        await _renderingSurface.RenderToDisplay(result);
         DisplayResults(result);
     }
 
