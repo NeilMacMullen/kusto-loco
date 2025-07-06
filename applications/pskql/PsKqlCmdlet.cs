@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
-using System.Runtime.InteropServices;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
@@ -20,14 +19,19 @@ public class PsKqlCmdlet : Cmdlet
 
     private readonly List<string> badProperties = [];
 
+    private TimeSpan PropertyTimeout = TimeSpan.FromMilliseconds(10);
+
     // Declare the parameters for the cmdlet.
     [Parameter(ValueFromPipeline = true)] public PSObject Item { get; set; } = new(string.Empty);
 
     [Parameter(Position = 0, HelpMessage = "KQL query string fragment. Default value is 'getschema'")]
     public string Query { get; set; } = "getschema";
 
-    [Parameter(HelpMessage = "Evaluate PSScriptProperty members (may cause slow operation)")]
-    public SwitchParameter EvaluateScriptProperties { get; set; }
+    [Parameter(HelpMessage = "Skip PSScriptProperty members (may avoid some issues)")]
+    public SwitchParameter SkipScriptProperties { get; set; }
+
+    [Parameter(HelpMessage = "Skip PSScriptProperty members (may avoid some issues)")]
+    public int Timeout { get; set; } = 10;
 
     [Parameter(HelpMessage =
         "Queries are usually implicitly prefixed with 'data |' but this can be disabled with this switch"
@@ -35,7 +39,6 @@ public class PsKqlCmdlet : Cmdlet
     public SwitchParameter NoQueryPrefix { get; set; }
 
     protected override void ProcessRecord() => _objects.Add(Item);
-
 
     private void AddPropertyInfo(string prefix, PSPropertyInfo p, int rowIndex)
     {
@@ -48,12 +51,6 @@ public class PsKqlCmdlet : Cmdlet
             return;
         try
         {
-            /*  if (p is PSScriptProperty)
-              {
-                  WriteDebug("Returning because script");
-                  return;
-              }
-            */
             switch (p)
             {
                 case PSProperty psProperty:
@@ -63,7 +60,7 @@ public class PsKqlCmdlet : Cmdlet
                 case PSCodeProperty psCode:
                     break;
                 case PSScriptProperty psScript:
-                    if (!EvaluateScriptProperties)
+                    if (SkipScriptProperties)
                         return;
                     break;
                 case PSNoteProperty psNote:
@@ -96,6 +93,8 @@ public class PsKqlCmdlet : Cmdlet
 
             AddValue(pName, pTypeNameOfValue, pValue, rowIndex);
             addedProperties.Add(pName);
+            if (timer.Elapsed > PropertyTimeout)
+                badProperties.Add(pName);
         }
         catch (Exception e)
         {
@@ -120,7 +119,7 @@ public class PsKqlCmdlet : Cmdlet
     protected override void EndProcessing()
     {
         var builder = TableBuilder.CreateEmpty(TableName, _objects.Count);
-
+        PropertyTimeout = TimeSpan.FromMilliseconds(Timeout);
         WriteDebug($"Adding {_objects.Count} items");
         var rowIndex = 0;
         foreach (var item in _objects)
@@ -168,7 +167,7 @@ public class PsKqlCmdlet : Cmdlet
             else
             {
                 var str = ScottPlotKustoResultRenderer.RenderToSixelWithPad(result,
-                    new KustoSettingsProvider(),3);
+                    new KustoSettingsProvider(), 3);
                 WriteObject(str);
             }
         }
@@ -195,14 +194,31 @@ public class PsKqlCmdlet : Cmdlet
             {
                 WriteDebug($"property '{columnName}'  is object so trying to derive type from value");
                 typeName = value.GetType().ToString();
-                WriteDebug($"prop {columnName} typeof '{value}' is {typeName}");
+                var isPsObject = value is PSObject;
+                WriteDebug($"prop {columnName} typeof '{value}' is {typeName} IsObject ? {isPsObject}");
 
 
                 if (value is PSObject ps)
                 {
-                    typeName = ps.BaseObject?.GetType().ToString() ?? "null";
-                    if (IsSimpleType(typeName))
+                    if (ps.BaseObject is null)
                     {
+                        value = "null";
+                        return;
+                    }
+
+                    var baseType = ps.BaseObject.GetType();
+
+                    typeName = baseType.ToString() ?? "null";
+                    WriteDebug($"prop {columnName} baseobj type {typeName}");
+
+                    if (baseType.IsEnum)
+                    {
+                        WriteDebug($"{typeName} is enum");
+                        value = ps.BaseObject!.ToString();
+                    }
+                    else if (IsSimpleType(typeName))
+                    {
+                        WriteDebug($"{typeName} is known type");
                         value = ps.BaseObject;
                     }
                     else
@@ -234,4 +250,3 @@ public class PsKqlCmdlet : Cmdlet
         colBuilder.AddAt(value, rowIndex);
     }
 }
-
