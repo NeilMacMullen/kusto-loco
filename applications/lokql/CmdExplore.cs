@@ -2,7 +2,6 @@
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
-using Lokql.Engine.Commands;
 using NLog;
 
 /// <summary>
@@ -17,10 +16,10 @@ internal class CmdExplore
     {
         var console = new SystemConsole();
         var settings = new KustoSettingsProvider();
-        settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name,options.Data);
-      
+        settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, options.Data);
+
         var processor = CommandProcessorProvider.GetCommandProcessor();
-        var renderer = new NullResultRenderingSurface();
+        var renderer = new SixelRenderingSurface(settings);
         var explorer = new InteractiveTableExplorer(console, settings, processor, renderer);
         await RunInteractive(console, explorer);
     }
@@ -39,7 +38,7 @@ internal class CmdExplore
         }
     }
 
-    [Verb("explore",HelpText = "explore data source(s)")]
+    [Verb("explore", HelpText = "explore data source(s)")]
     public class Options
     {
         [Option(HelpText = "Folder containing '.dfr' scripts")]
