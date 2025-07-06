@@ -73,7 +73,11 @@ public static class ScottPlotKustoResultRenderer
         plot.Legend.FontSize = legendFontSize;
         plot.Title(result.Visualization.PropertyOr("title", string.Empty));
 
-        if (result.Visualization.PropertyOr("legend", "") == "hidden")
+        var userLegend = result.Visualization.PropertyOr("legend", "");
+
+        var inferLegendHidden = (result.ColumnCount <3) && userLegend!="visible";
+
+        if (userLegend  == "hidden" || inferLegendHidden )
         {
             plot.Legend.IsVisible = false;
         }
