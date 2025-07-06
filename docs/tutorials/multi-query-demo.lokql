@@ -1,0 +1,23 @@
+{
+  "IsDirty": false,
+  "Queries": [
+    {
+      "Name": "adx cluster",
+      "Text": "\r\n# Querying an ADX cluster\r\n\r\n.set server https://help.kusto.windows.net/\r\n.set database SampleLogs\r\n\r\n.adx $database@$server\r\nRawSysLogs \r\n| extend cpu = tostring(tags.cpu_id)\r\n| where  cpu != \u0022\u0022\r\n| summarize N=count() by Day=bin(timestamp,1d),cpu\r\n| project Day,N,cpu \r\n| render linechart\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n"
+    },
+    {
+      "Name": "local csv",
+      "Text": "\r\n.load traffic.csv\r\n\r\ntraffic \r\n| summarize Total=sum(Distance) by Year,Vehicle\r\n| render linechart"
+    },
+    {
+      "Name": "math",
+      "Text": "\r\nlet xvals=range x from 0 to 10 step 0.1;\r\nlet sins=xvals | extend y=sin(x),Name=\u0022sin\u0022;\r\nlet coss=xvals | extend y=cos(x),Name=\u0022cos\u0022;\r\nsins | union coss\r\n| render scatterchart"
+    },
+    {
+      "Name": "application insights",
+      "Text": "\r\n\r\n# get these from Azure\r\n.set tenantid 1eb4...\r\n.set rid /subscriptions/3f57a...\r\n\r\n\r\n.set svc \u0022$tenantid:$rid\u0022\r\n.set timescale 14d\r\n\r\n\r\n#get the number of exceptions by day \r\n.appinsights $svc $timescale\r\nexceptions\r\n| summarize count() by bin(timestamp,1d)\r\n| render columnchart\r\n\r\n\r\n#save to excel spreadsheet\r\n.save exceptioncount.xlsx"
+    }
+  ],
+  "StartupScript": "",
+  "Text": ""
+}

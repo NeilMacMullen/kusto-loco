@@ -107,16 +107,21 @@ public class DialogService
     {
         if (_topLevel is Window window)
         {
+            var sizing = (minSize > 0)
+                ? SizeToContent.Manual
+                :SizeToContent.WidthAndHeight;
             var dialog = new Window
             {
                 Title = title,
                 Content = content,
                 DataContext = dataContext,
-                SizeToContent = SizeToContent.WidthAndHeight,
+                SizeToContent = sizing,
+               
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
+            
             if (minSize > 0)
             {
                 dialog.Width = minSize;
