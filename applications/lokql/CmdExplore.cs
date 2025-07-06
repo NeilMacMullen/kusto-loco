@@ -1,4 +1,7 @@
-﻿using CommandLine;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Quic;
+using System.Text;
+using CommandLine;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
@@ -29,12 +32,25 @@ internal class CmdExplore
     {
         exp.Warn("Use '.help' to list commands");
 
+        var isContinuation = false;
+        var query = new StringBuilder();
         while (true)
         {
             _outputConsole.ForegroundColor = ConsoleColor.Blue;
-            _outputConsole.Write("KQL> ");
-            var query = _outputConsole.ReadLine();
-            await exp.RunInput(query);
+            var prompt = isContinuation ? "   > " : "KQL> ";
+            _outputConsole.Write(prompt);
+            var queryPart = _outputConsole.ReadLine().Trim();
+            var isSlashContinuation = queryPart.EndsWith(@"\");
+            isContinuation = isSlashContinuation
+                             || queryPart.EndsWith("|");
+            if (isSlashContinuation)
+                queryPart = queryPart.Substring(0, queryPart.Length - 1);
+            query.Append(queryPart);
+            if (!isContinuation)
+            {
+                await exp.RunInput(query.ToString());
+                query.Clear();
+            }
         }
     }
 
