@@ -4,5 +4,5 @@ namespace lokqlDxComponents.Services;
 
 public interface IImageProvider
 {
-    IImage GetImage(string imageSource);
+    IImage GetImage(Uri imageSource);
 }

@@ -1,20 +1,30 @@
-
 using Intellisense.Configuration;
 using Intellisense.FileSystem;
 using Jab;
-
 using lokqlDxComponents.Services;
+
 namespace lokqlDxComponents.Configuration;
 
 [ServiceProviderModule]
 [Import<IIntellisenseModule>]
+[Singleton<IImageLoader, SvgLoader>]
 [Transient<IntellisenseClientAdapter>]
-[Singleton<IImageProvider>(Factory = nameof(GetImageProvider))]
-[Singleton<AvaloniaImageService>]
-[Singleton<IImageSourceLocator>(Factory = nameof(GetImageSourceLocator))]
+[Singleton<IImageProvider>(Factory = nameof(GetAssetFolderSvgImageService))]
+[Singleton<IImageSourceLocator>(Factory = nameof(GetAssetFolderSvgImageService))]
+[Singleton<AssetFolderImageService>]
+[Singleton<ImageServiceOptions>(Factory = nameof(GetImageServiceOptions))]
 public interface IAutocompletionModule
 {
-    public static IImageSourceLocator GetImageSourceLocator(AvaloniaImageService avaloniaImageService) => avaloniaImageService;
-    public static IImageProvider GetImageProvider(AvaloniaImageService avaloniaImageService) => avaloniaImageService;
+    public static AssetFolderImageService GetAssetFolderSvgImageService(AssetFolderImageService service) => service;
 
+    public static ImageServiceOptions GetImageServiceOptions()
+    {
+        var opts = new ImageServiceOptions
+        {
+            AssetsFolder = new("avares://lokqlDx/Assets/FileIcons/"),
+            Extension = ".svg"
+        };
+
+        return opts;
+    }
 }

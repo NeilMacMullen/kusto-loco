@@ -4,10 +4,10 @@ namespace Intellisense.FileSystem;
 
 public interface IImageSourceLocator
 {
-    string GetImageSource(IFileSystemInfo fileSystemInfo);
+    Uri GetImageSource(IFileSystemInfo fileSystemInfo);
 }
 
 public class NullImageSourceLocator : IImageSourceLocator
 {
-    public string GetImageSource(IFileSystemInfo fileSystemInfo) => string.Empty;
+    public Uri GetImageSource(IFileSystemInfo fileSystemInfo) => UriExtensions.EmptyUri;
 }

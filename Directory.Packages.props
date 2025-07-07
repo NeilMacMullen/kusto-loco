@@ -10,7 +10,6 @@
     <PackageVersion Include="Avalonia.Labs.Controls" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Skia" Version="11.3.2" />
-    <PackageVersion Include="Avalonia.Svg.Skia" Version="11.3.0" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0" />
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="AwesomeAssertions" Version="9.0.0" />
@@ -59,6 +58,7 @@
     <PackageVersion Include="ShapeCrawler" Version="0.70.0" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
+    <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.6" />
