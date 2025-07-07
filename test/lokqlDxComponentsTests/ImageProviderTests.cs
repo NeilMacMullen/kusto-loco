@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace lokqlDxComponentsTests;
 
-public class AssetFolderImageServiceTests
+public class ImageProviderTests
 {
     private const int Json = 10;
     private const int Csv = 20;
@@ -39,7 +39,7 @@ public class AssetFolderImageServiceTests
         );
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
-        var service = f.GetRequiredService<AssetFolderImageService>();
+        var service = f.GetRequiredService<IImageProvider>();
         var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
         var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
@@ -60,7 +60,7 @@ public class AssetFolderImageServiceTests
         );
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
-        var service = f.GetRequiredService<AssetFolderImageService>();
+        var service = f.GetRequiredService<IImageProvider>();
         var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
         var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
@@ -81,7 +81,7 @@ public class AssetFolderImageServiceTests
         );
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
-        var service = f.GetRequiredService<AssetFolderImageService>();
+        var service = f.GetRequiredService<IImageProvider>();
         var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
         var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
@@ -104,7 +104,7 @@ public class AssetFolderImageServiceTests
             .AllDirectories.Select(x => fileSystem.DirectoryInfo.New(x))
             .Single(x => x.Name is "someFolder");
 
-        var service = f.GetRequiredService<AssetFolderImageService>();
+        var service = f.GetRequiredService<IImageProvider>();
         var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
         var img = service.GetImage(fileExtensionService.GetIntellisenseHint(dir));
@@ -137,7 +137,7 @@ public class AssetFolderImageServiceTests
 [Import<IAutocompletionModule>]
 [Import<ILoggingModule>]
 [Singleton<ImageServiceOptions>(Instance = nameof(Options))]
-[Singleton<AssetFolderImageService>]
+[Singleton<AssetFolderImageProvider>]
 public partial class ImageProviderTestContainer
 {
     public ImageServiceOptions Options { get; set; } = null!;

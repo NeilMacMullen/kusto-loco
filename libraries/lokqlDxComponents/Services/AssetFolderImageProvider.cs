@@ -7,17 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Services;
 
-public class AssetFolderImageService : IImageProvider
+public class AssetFolderImageProvider : IImageProvider
 {
     private readonly Dictionary<IntellisenseHint, Uri> _hintToAssetUriMappings;
     private readonly Dictionary<Uri, IImage> _imageAssetCache = new();
-    private readonly ILogger<AssetFolderImageService> _logger;
+    private readonly ILogger<AssetFolderImageProvider> _logger;
     private readonly IImageLoader _imageLoader;
 
 
-    public AssetFolderImageService(
+    public AssetFolderImageProvider(
         ImageServiceOptions options,
-        ILogger<AssetFolderImageService> logger,
+        ILogger<AssetFolderImageProvider> logger,
         IImageLoader imageLoader,
         IFileExtensionService fileExtensionService
     )

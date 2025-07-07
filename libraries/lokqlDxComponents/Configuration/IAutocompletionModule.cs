@@ -9,11 +9,11 @@ namespace lokqlDxComponents.Configuration;
 [Singleton<IImageLoader, SvgLoader>]
 [Transient<IntellisenseClientAdapter>]
 [Singleton<IImageProvider>(Factory = nameof(GetAssetFolderSvgImageService))]
-[Singleton<AssetFolderImageService>]
+[Singleton<AssetFolderImageProvider>]
 [Singleton<ImageServiceOptions>(Factory = nameof(GetImageServiceOptions))]
 public interface IAutocompletionModule
 {
-    public static AssetFolderImageService GetAssetFolderSvgImageService(AssetFolderImageService service) => service;
+    public static AssetFolderImageProvider GetAssetFolderSvgImageService(AssetFolderImageProvider provider) => provider;
 
     public static ImageServiceOptions GetImageServiceOptions()
     {
