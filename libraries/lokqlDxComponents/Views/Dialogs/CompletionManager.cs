@@ -38,7 +38,7 @@ public class CompletionManager : IDisposable
             .Select(entry =>
                 new QueryEditorCompletionData(entry, completionRequest.Prefix, completionRequest.Rewind)
                 {
-                    Image = _vm._intellisenseClient._imageProvider.GetImage(entry.Source)
+                    Image = _vm._intellisenseClient._imageProvider.GetImage(entry.Hint)
                 }
             )
             .ToList(),

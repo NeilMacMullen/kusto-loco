@@ -3,7 +3,7 @@ using Intellisense.FileSystem.Paths;
 
 namespace Intellisense.FileSystem.CompletionResultRetrievers;
 
-public class FileSystemCompletionResultRetriever(IFileSystemReader reader, IImageSourceLocator imageSourceLocator)
+public class FileSystemCompletionResultRetriever(IFileSystemReader reader, IFileExtensionService service)
     : IFileSystemPathCompletionResultRetriever
 {
     public Task<CompletionResult> GetSiblingsAsync(FileSystemPath path)
@@ -42,6 +42,6 @@ public class FileSystemCompletionResultRetriever(IFileSystemReader reader, IImag
         new()
         {
             Name = info.Name,
-            Source = imageSourceLocator.GetImageSource(info)
+            Hint = service.GetIntellisenseHint(info)
         };
 }

@@ -2,6 +2,7 @@ using System.IO.Abstractions.TestingHelpers;
 using Avalonia.Headless.XUnit;
 using Avalonia.Svg;
 using AwesomeAssertions;
+using Intellisense;
 using Jab;
 using LogSetup;
 using lokqlDxComponents.Configuration;
@@ -12,7 +13,6 @@ namespace lokqlDxComponentsTests;
 
 public class AssetFolderImageServiceTests
 {
-
     private const int Json = 10;
     private const int Csv = 20;
     private const int File = 30;
@@ -40,9 +40,11 @@ public class AssetFolderImageServiceTests
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
         var service = f.GetRequiredService<AssetFolderImageService>();
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
-        var imgSource = service.GetImageSource(file);
-        var img = service.GetImage(imgSource);
+        var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
+
+
         img.Should().BeOfType<SvgImage>().Which.Source.Picture!.CullRect.Width.Should().Be(expectedWidth);
     }
 
@@ -59,13 +61,34 @@ public class AssetFolderImageServiceTests
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
         var service = f.GetRequiredService<AssetFolderImageService>();
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
-        var imgSource = service.GetImageSource(file);
-        var img = service.GetImage(imgSource);
+        var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
+
+
         img.Should().BeOfType<SvgImage>().Which.Source.Picture!.CullRect.Width.Should().Be(File);
     }
 
-    
+    [AvaloniaFact]
+    public void GetImage_UnsupportedExtension_GetsDefaultFileImage()
+    {
+        var f = new ImageProviderTestContainer();
+        f.Options = Opts;
+        var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                ["/someFolder/aFile.ext23"] = new("")
+            }
+        );
+        var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
+
+        var service = f.GetRequiredService<AssetFolderImageService>();
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
+
+        var img = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
+
+
+        img.Should().BeOfType<SvgImage>().Which.Source.Picture!.CullRect.Width.Should().Be(File);
+    }
 
     [AvaloniaFact]
     public void GetImage_Directory_GetsFolderImage()
@@ -82,9 +105,11 @@ public class AssetFolderImageServiceTests
             .Single(x => x.Name is "someFolder");
 
         var service = f.GetRequiredService<AssetFolderImageService>();
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
-        var imgSource = service.GetImageSource(dir);
-        var img = service.GetImage(imgSource);
+        var img = service.GetImage(fileExtensionService.GetIntellisenseHint(dir));
+
+
         img.Should().BeOfType<SvgImage>().Which.Source.Picture!.CullRect.Width.Should().Be(Folder);
     }
 
@@ -100,9 +125,11 @@ public class AssetFolderImageServiceTests
         );
         var file = fileSystem.AllFiles.Select(x => fileSystem.FileInfo.New(x)).Single();
 
-        var service = f.GetRequiredService<AssetFolderImageService>();
-        var imgSource = service.GetImageSource(file);
-        imgSource.Segments[^1].Should().Be("csv.svg");
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
+
+        var source = fileExtensionService.GetIntellisenseHint(file);
+
+        source.Should().Be(IntellisenseHint.Csv);
     }
 }
 

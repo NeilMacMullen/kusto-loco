@@ -1,5 +1,4 @@
 using Intellisense.Configuration;
-using Intellisense.FileSystem;
 using Jab;
 using lokqlDxComponents.Services;
 
@@ -10,7 +9,6 @@ namespace lokqlDxComponents.Configuration;
 [Singleton<IImageLoader, SvgLoader>]
 [Transient<IntellisenseClientAdapter>]
 [Singleton<IImageProvider>(Factory = nameof(GetAssetFolderSvgImageService))]
-[Singleton<IImageSourceLocator>(Factory = nameof(GetAssetFolderSvgImageService))]
 [Singleton<AssetFolderImageService>]
 [Singleton<ImageServiceOptions>(Factory = nameof(GetImageServiceOptions))]
 public interface IAutocompletionModule
