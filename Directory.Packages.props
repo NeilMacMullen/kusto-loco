@@ -49,16 +49,16 @@
     <PackageVersion Include="MSTest.TestFramework" Version="3.9.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.9.3" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
-    <PackageVersion Include="OpenAI" Version="2.1.0" />
+    <PackageVersion Include="OpenAI" Version="2.2.0" />
     <PackageVersion Include="Parquet.Net" Version="5.1.1" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
-    <PackageVersion Include="ShapeCrawler" Version="0.70.0" />
+    <PackageVersion Include="ShapeCrawler" Version="0.71.0" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta5.25306.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.6" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
