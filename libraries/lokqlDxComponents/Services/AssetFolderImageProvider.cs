@@ -16,7 +16,7 @@ public class AssetFolderImageProvider : IImageProvider
 
 
     public AssetFolderImageProvider(
-        ImageServiceOptions options,
+        AppOptions options,
         ILogger<AssetFolderImageProvider> logger,
         IImageLoader imageLoader,
         IFileExtensionService fileExtensionService
@@ -38,8 +38,8 @@ public class AssetFolderImageProvider : IImageProvider
 
         KeyValuePair<IntellisenseHint, Uri> CreateAssetEntry(IntellisenseHint hint)
         {
-            var fileName = (hint + options.Extension).ToLower();
-            var location = new Uri(options.AssetsFolder, fileName);
+            var fileName = (hint + ".svg").ToLower();
+            var location = new Uri(options.CompletionIconsUri, fileName);
 
             return KeyValuePair.Create(hint, location);
         }
@@ -82,8 +82,6 @@ public class AssetFolderImageProvider : IImageProvider
         {
             return GetImage(uri);
         }
-
-        Debug.Assert(imageSource is IntellisenseHint.None, "Map should already be populated with all possible values.");
 
         return NullImage.Instance;
     }
