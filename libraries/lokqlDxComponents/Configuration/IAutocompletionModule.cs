@@ -19,7 +19,7 @@ public interface IAutocompletionModule
     {
         var opts = new ImageServiceOptions
         {
-            AssetsFolder = new("avares://lokqlDx/Assets/FileIcons/"),
+            AssetsFolder = new("avares://lokqlDx/Assets/CompletionIcons/"),
             Extension = ".svg"
         };
 

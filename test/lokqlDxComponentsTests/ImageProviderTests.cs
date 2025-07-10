@@ -21,7 +21,7 @@ public class ImageProviderTests
 
     private static readonly ImageServiceOptions Opts = new()
     {
-        AssetsFolder = new($"avares://{nameof(lokqlDxComponentsTests)}/Assets/FileIcons/"),
+        AssetsFolder = new($"avares://{nameof(lokqlDxComponentsTests)}/Assets/CompletionIcons/"),
         Extension = ".svg"
     };
 
