@@ -65,8 +65,15 @@ public class AssetFolderImageProvider(
             )
             .ToDictionary();
 
+        // prepopulate cache
+        foreach (var hintToAssetUriMapping in _hintToAssetUriMappings)
+        {
+            internalAssetLoader.LoadImage(hintToAssetUriMapping.Value);
+        }
+
         logger.LogInformation("Loaded mappings with {ItemCount} items", _hintToAssetUriMappings.Count);
         _initialized = true;
+
     }
 }
 

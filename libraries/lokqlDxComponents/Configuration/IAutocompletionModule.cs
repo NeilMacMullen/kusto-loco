@@ -8,6 +8,10 @@ namespace lokqlDxComponents.Configuration;
 [Import<IIntellisenseModule>]
 [Import<IAppConfigurationModule>]
 [Transient<IntellisenseClientAdapter>]
-[Singleton<IImageProvider, AssetFolderImageProvider>]
+[Singleton<IImageProvider>(Factory = nameof(GetAssetFolderImageProvider))]
+[Singleton<AssetFolderImageProvider>]
 [Singleton<IInternalAssetLoader, InternalAssetLoader>]
-public interface IAutocompletionModule;
+public interface IAutocompletionModule
+{
+    public static IImageProvider GetAssetFolderImageProvider(AssetFolderImageProvider assetFolderImageProvider) => assetFolderImageProvider;
+}

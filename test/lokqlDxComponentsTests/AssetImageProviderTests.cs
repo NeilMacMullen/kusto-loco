@@ -173,6 +173,18 @@ public class AssetImageProviderTests
     }
 
     [AvaloniaFact]
+    public void GetImage_GetsDefaultImage()
+    {
+        var f = new ImageProviderTestContainer();
+        f.Options = new AppOptions { AssemblyName = "NonExistentAssembly" };
+        var service = f.GetRequiredService<AssetFolderImageProvider>();
+
+        var result = service.GetImage(IntellisenseHint.Csv);
+
+        result.Should().BeOfType<NullImage>();
+    }
+
+    [AvaloniaFact]
     public void Init_Failed_DisablesImageLoading()
     {
         var f = new ImageProviderTestContainer();
