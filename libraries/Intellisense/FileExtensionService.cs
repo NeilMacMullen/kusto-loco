@@ -5,7 +5,6 @@ namespace Intellisense;
 public interface IFileExtensionService
 {
     IntellisenseHint GetIntellisenseHint(IFileSystemInfo fileSystemInfo);
-    IEnumerable<IntellisenseHint> GetFileExtensions();
 
 }
 
@@ -24,7 +23,7 @@ public class FileExtensionService : IFileExtensionService
         : _fileExtensionMapping.GetValueOrDefault(fileSystemInfo.Extension, IntellisenseHint.File);
 
 
-    public IEnumerable<IntellisenseHint> GetFileExtensions() =>
+    private static IEnumerable<IntellisenseHint> GetFileExtensions() =>
         Enum
             .GetValues<IntellisenseHint>()
             .SkipWhile(x => x <= IntellisenseHint.Folder);
