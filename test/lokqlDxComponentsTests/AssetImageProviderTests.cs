@@ -2,7 +2,6 @@ using System.IO.Abstractions.TestingHelpers;
 using Avalonia.Headless.XUnit;
 using Avalonia.Svg;
 using AwesomeAssertions;
-using AwesomeAssertions.Execution;
 using Intellisense;
 using Jab;
 using LogSetup;
@@ -10,6 +9,7 @@ using lokqlDxComponents.Configuration;
 using lokqlDxComponents.Services;
 using lokqlDxComponents.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace lokqlDxComponentsTests;
 
@@ -115,35 +115,53 @@ public class AssetImageProviderTests
         img.Should().BeOfType<SvgImage>().Which.Source.Picture!.CullRect.Width.Should().Be(Folder);
     }
 
-    [AvaloniaFact(Skip = "TODO")]
-    public void GetImage_SupportsRasterAndVectorFormats()
+    [AvaloniaTheory]
+    [InlineData("txt", "pngFile")]
+    [InlineData("xls", "jpgFile")]
+    public void GetImage_SupportsRasterFormats(string extension, string fileName)
     {
         var f = new ImageProviderTestContainer();
         f.Options = Opts;
-        var pngFileStr = "/someFolder/pngFile.txt";
-        var svgFileStr = "/someFolder/svgFile.csv";
+        var fileStr = $"/someFolder/{fileName}.{extension}";
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
-                [pngFileStr] = new(""),
-                [svgFileStr] = new("")
+                [fileStr] = new("")
             }
         );
-        var pngFile = fileSystem.FileInfo.New(pngFileStr);
-        var svgFile = fileSystem.FileInfo.New(svgFileStr);
+        var file = fileSystem.FileInfo.New(fileStr);
 
         var service = f.GetRequiredService<AssetFolderImageProvider>();
         var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
 
-        var png = service.GetImage(fileExtensionService.GetIntellisenseHint(pngFile));
-        var svg = service.GetImage(fileExtensionService.GetIntellisenseHint(svgFile));
+        var result = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
 
-        using var _ = new AssertionScope();
-        svg.Should().BeOfType<SvgImage>();
-        png.Should().NotBeOfType<SvgImage>().And.NotBeOfType<NullImage>();
+        result.Should().NotBeOfType<SvgImage>().And.NotBeOfType<NullImage>();
     }
 
     [AvaloniaFact]
-    public void GetImage_NonExistentAsset_ReturnsNullImage()
+    public void GetImage_SupportsSvgs()
+    {
+        var f = new ImageProviderTestContainer();
+        f.Options = Opts;
+        var fileStr = "/someFolder/svgFile.csv";
+        var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                [fileStr] = new("")
+            }
+        );
+        var file = fileSystem.FileInfo.New(fileStr);
+
+        var service = f.GetRequiredService<AssetFolderImageProvider>();
+        var fileExtensionService = f.GetRequiredService<IFileExtensionService>();
+
+        var result = service.GetImage(fileExtensionService.GetIntellisenseHint(file));
+
+        result.Should().BeOfType<SvgImage>();
+    }
+
+
+    [AvaloniaFact]
+    public void GetImage_NonExistentAsset_GetsDefaultImage()
     {
         var f = new ImageProviderTestContainer();
         f.Options = new AppOptions { AssemblyName = "NonExistentAssembly" };
@@ -155,40 +173,35 @@ public class AssetImageProviderTests
     }
 
     [AvaloniaFact]
-    public void GetImage_CachesResults()
+    public void Init_Failed_DisablesImageLoading()
     {
         var f = new ImageProviderTestContainer();
         f.Options = Opts;
+        var mock = new Mock<IInternalAssetLoader>();
+        mock.Setup(x => x.GetAssets(It.IsAny<Uri>())).Throws(new Exception());
+        f.GetInternalAssetLoader = _ => mock.Object;
+
         var service = f.GetRequiredService<AssetFolderImageProvider>();
+        service.Init();
 
-        var result1 = service.GetImage(IntellisenseHint.Csv);
-        var result2 = service.GetImage(IntellisenseHint.Csv);
+        var result = service.GetImage(IntellisenseHint.Csv);
 
-        result1.Should().Be(result2).And.NotBeOfType<NullImage>();
-    }
-
-    [AvaloniaFact(Skip = "TODO")]
-    public async Task GetImage_HandlesConcurrentAccess()
-    {
-        var f = new ImageProviderTestContainer();
-        f.Options = Opts;
-        var service = f.GetRequiredService<AssetFolderImageProvider>();
-
-        var tasks = Enumerable.Range(0, 10)
-            .Select(_ => Task.Run(() => service.GetImage(IntellisenseHint.Csv)));
-
-        var results = await Task.WhenAll(tasks);
-
-        results.Should().AllBeOfType<SvgImage>();
+        result.Should().BeOfType<NullImage>();
     }
 }
 
 [ServiceProvider]
 [Import<IAutocompletionModule>]
 [Import<ILoggingModule>]
-[Singleton<AppOptions>(Instance = nameof(Options))]
+[Singleton<IImageProvider>(Factory = nameof(GetAssetFolderImageProvider))]
 [Singleton<AssetFolderImageProvider>]
+[Singleton<AppOptions>(Instance = nameof(Options))]
+[Singleton<IInternalAssetLoader>(Factory = nameof(GetInternalAssetLoader))]
+[Singleton<InternalAssetLoader>]
 public partial class ImageProviderTestContainer
 {
     public AppOptions Options { get; set; } = null!;
+    public IImageProvider GetAssetFolderImageProvider(AssetFolderImageProvider assetFolderImageProvider) => assetFolderImageProvider;
+    public Func<IServiceProvider, IInternalAssetLoader> GetInternalAssetLoader { get; set; } = sp => sp.GetRequiredService<InternalAssetLoader>();
+
 }

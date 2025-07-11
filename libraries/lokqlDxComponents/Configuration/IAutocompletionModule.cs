@@ -7,8 +7,7 @@ namespace lokqlDxComponents.Configuration;
 [ServiceProviderModule]
 [Import<IIntellisenseModule>]
 [Import<IAppConfigurationModule>]
-[Singleton<IImageLoader, SvgLoader>]
 [Transient<IntellisenseClientAdapter>]
 [Singleton<IImageProvider, AssetFolderImageProvider>]
-[Singleton<AssetFolderImageProvider>]
+[Singleton<IInternalAssetLoader, InternalAssetLoader>]
 public interface IAutocompletionModule;
