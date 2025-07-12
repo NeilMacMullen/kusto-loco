@@ -107,9 +107,11 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
 
         using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
-        KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!;
+        KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!
+            .Select(i => i with { Hint = IntellisenseHint.Function }).ToArray(); 
         using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
-        KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops)!;
+        KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops)!
+            .Select(i=> i with{Hint = IntellisenseHint.Operator}).ToArray();
         AddSettingsForIntellisense(_explorer.Settings);
     }
 

@@ -1,3 +1,8 @@
 ﻿namespace Intellisense;
 
-public readonly record struct IntellisenseEntry(string Name = "", string Description = "", string Syntax = "");
+public record struct IntellisenseEntry(
+    string Name = "",
+    string Description = "",
+    string Syntax = "",
+    IntellisenseHint Hint = IntellisenseHint.None
+);
