@@ -41,6 +41,12 @@ public class TableBuilderTests
 
             ["float"] = (float)1,
             ["nfloat"] = (float?)1,
+            ["double"] = (double)1,
+            ["ndouble"] = (double?)1,
+            ["decimal"] = (decimal)1,
+            ["ndecimal"] = (decimal?)1,
+
+            ["string"] = "abc",
 
             ["guid"] = Guid.NewGuid(),
             ["nguid"] = (Guid?)Guid.NewGuid(),

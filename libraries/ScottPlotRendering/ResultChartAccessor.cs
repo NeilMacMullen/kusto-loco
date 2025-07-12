@@ -37,7 +37,7 @@ public class ResultChartAccessor
     public bool IsTemporal(ColumnResult column) => column.UnderlyingType == typeof(DateTime);
 
     public bool IsNumeric(ColumnResult column) =>
-        new[] { typeof(double), typeof(long), typeof(float), typeof(int) }.Contains(column.UnderlyingType);
+        new[] { typeof(decimal),typeof(double), typeof(long), typeof(float), typeof(int) }.Contains(column.UnderlyingType);
 
     public ChartKind Kind()
     {

@@ -170,6 +170,8 @@ public class TableBuilder
                 builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (float?)p.GetValue(o)));
             if (propertyType == typeof(double))
                 builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (double?)p.GetValue(o)));
+            if (propertyType == typeof(decimal))
+                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, decimal?>(records, o => (decimal?)p.GetValue(o)));
             if (propertyType == typeof(string))
                 builder.WithColumn(p.Name, new LambdaWrappedColumn<T, string?>(records, o => (string?)p.GetValue(o)));
             if (propertyType == typeof(DateTime))
