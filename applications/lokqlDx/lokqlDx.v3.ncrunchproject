@@ -4,6 +4,7 @@
       <Value>Assets\kql.ico</Value>
       <Value>Views\*.axaml</Value>
       <Value>Views\Dialogs\*.axaml</Value>
+      <Value>Assets\CompletionIcons\*</Value>
     </AdditionalFilesToIncludeForProject>
   </Settings>
 </ProjectConfiguration>

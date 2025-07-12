@@ -14,7 +14,7 @@ internal static class ResourceHelper
     /// </remarks>
     public static Stream SafeGetResourceStream(string substring)
     {
-        var assembly = Assembly.GetExecutingAssembly();
+        var assembly = Assembly.GetEntryAssembly()!;
         var availableResources = assembly.GetManifestResourceNames();
         var wanted =
             availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
