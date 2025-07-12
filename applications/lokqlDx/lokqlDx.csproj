@@ -13,6 +13,7 @@
   <PropertyGroup Label="Avalonia">
     <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
+    <ApplicationIcon>Assets\kql.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\CompletionIcons\column.svg" />
@@ -55,6 +56,9 @@
     <AvaloniaResource Include="Assets\CompletionIcons\xls.svg" />
     <AvaloniaResource Include="Assets\CompletionIcons\xlsx.svg" />
     <AvaloniaResource Include="Assets\kql.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\kql.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IntellisenseFunctions.json" />
