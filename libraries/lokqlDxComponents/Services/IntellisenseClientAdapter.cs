@@ -5,16 +5,23 @@ using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Services;
 
-public class IntellisenseClientAdapter(IntellisenseClient intellisenseClient, ILogger<IntellisenseClientAdapter> logger)
+public class IntellisenseClientAdapter(
+    IntellisenseClient intellisenseClient,
+    ILogger<IntellisenseClientAdapter> logger,
+    IImageProvider imageProvider
+    )
 {
     private Dictionary<string, HashSet<string>> AllowedCommandsAndExtensions { get; set; } = [];
     public IntellisenseEntry[] InternalCommands { get; private set; } = [];
+
+    public IImageProvider _imageProvider => imageProvider;
 
     public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
     {
         var verbs = verbEntries.ToArray();
         var lookup = CreateLookup(verbs);
-        var internalCommands = verbs.Select(x => new IntellisenseEntry(x.Name, x.HelpText, string.Empty)).ToArray();
+        var internalCommands = verbs.Select(x => new IntellisenseEntry(x.Name, x.HelpText, string.Empty,
+            IntellisenseHint.Command)).ToArray();
         AllowedCommandsAndExtensions = lookup;
         InternalCommands = internalCommands;
     }
@@ -47,7 +54,6 @@ public class IntellisenseClientAdapter(IntellisenseClient intellisenseClient, IL
             // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
             // and user profile app was started with if hosts don't show shares
             result = await intellisenseClient.GetCompletionResultAsync(lastArg);
-
         }
         catch (IntellisenseException exc)
         {
@@ -62,17 +68,20 @@ public class IntellisenseClientAdapter(IntellisenseClient intellisenseClient, IL
         {
             return result with
             {
-                Entries = result.Entries.Where(x =>
-                {
-                    // permit folders (which do not have extensions). note that files without extensions will still be allowed
-                    var ext = Path.GetExtension(x.Name);
-                    return ext == string.Empty || extensions.Contains(ext);
-                }).ToList()
+                Entries = result
+                    .Entries
+                    .Where(x =>
+                        {
+                            // permit folders (which do not have extensions). note that files without extensions will still be allowed
+                            var ext = Path.GetExtension(x.Name);
+                            return ext == string.Empty || extensions.Contains(ext);
+                        }
+                    )
+                    .ToList()
             };
         }
 
         return result;
-
     }
 
     private static Dictionary<string, HashSet<string>> CreateLookup(IEnumerable<VerbEntry> verbs)

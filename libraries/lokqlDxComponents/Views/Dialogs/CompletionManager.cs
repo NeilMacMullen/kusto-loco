@@ -31,6 +31,23 @@ public class CompletionManager : IDisposable
     // ReSharper disable once AsyncVoidMethod
     private async void Caret_PositionChanged(object? sender, EventArgs eventArgs) => await _vm._intellisenseClient.OnCaretPositionChanged();
 
+    private ShowCompletionOptions CreateShowCompletionOptions(CompletionRequest completionRequest) => new()
+    {
+        Completions = completionRequest
+            .Completions.OrderBy(x => x.Name)
+            .Select(entry =>
+                new QueryEditorCompletionData(entry, completionRequest.Prefix, completionRequest.Rewind)
+                {
+                    Image = _vm._intellisenseClient._imageProvider.GetImage(entry.Hint)
+                }
+            )
+            .ToList(),
+        OnCompletionWindowDataPopulated = completionRequest.OnCompletionWindowDataPopulated
+    };
+
+    private void ShowCompletions(CompletionRequest request) => ShowCompletions(CreateShowCompletionOptions(request));
+    private void ShowCompletions(ShowCompletionOptions options) => _completionWindow.ShowCompletions(options);
+
     private async Task<bool> ShowPathCompletions()
     {
         // Avoid unnecessary IO calls
@@ -41,10 +58,7 @@ public class CompletionManager : IDisposable
         var result = await _vm._intellisenseClient.GetPathCompletions(currentLineText);
         if (result.IsEmpty()) return false;
 
-
-
-
-        _completionWindow.ShowCompletions(new ShowCompletionOptions
+        var opts = new CompletionRequest
         {
             Completions = result.Entries,
             Rewind = 0,
@@ -74,7 +88,9 @@ public class CompletionManager : IDisposable
                 if (!completionWindow.CompletionList.CurrentList.Any())
                     completionWindow.Close();
             }
-        });
+        };
+
+        ShowCompletions(opts);
 
 
         return true;
@@ -121,10 +137,10 @@ public class CompletionManager : IDisposable
                 Completions = _vm.KqlFunctionEntries,
                 Rewind = 1
             },
-            _ => ShowCompletionOptions.Empty
+            _ => CompletionRequest.Empty
         };
 
-        _completionWindow.ShowCompletions(options);
+        ShowCompletions(options);
 
     }
 

@@ -133,7 +133,6 @@ public class DialogService
                     = new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
             else
                 dialog.Background = Brushes.Transparent;
-
 #if DEBUG
             dialog.AttachDevTools();
 #endif

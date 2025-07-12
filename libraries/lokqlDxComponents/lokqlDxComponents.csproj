@@ -8,8 +8,10 @@
     <ItemGroup>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.AvaloniaEdit" />
+        <PackageReference Include="Avalonia.Skia" />
         <PackageReference Include="Jab" />
         <PackageReference Include="NotNullStrings" />
+        <PackageReference Include="Svg.Controls.Avalonia" />
     </ItemGroup>
 
     <ItemGroup>

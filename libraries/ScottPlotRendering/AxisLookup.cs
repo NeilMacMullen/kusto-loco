@@ -7,6 +7,7 @@ public class AxisLookup
     public static IAxisLookup From(ColumnResult col, object?[] data) =>
         col.UnderlyingType switch
         {
+            { } type when type == typeof(decimal) => new NumericAxisLookup<decimal>(),
             { } type when type == typeof(double) => new NumericAxisLookup<double>(),
             { } type when type == typeof(long) => new NumericAxisLookup<long>(),
             { } type when type == typeof(float) => new NumericAxisLookup<float>(),

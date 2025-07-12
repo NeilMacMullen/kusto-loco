@@ -1,5 +1,6 @@
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Editing;
+using AvaloniaEdit.Utils;
 using lokqlDxComponents.Models;
 
 namespace lokqlDxComponents.Views.Dialogs;
@@ -10,10 +11,7 @@ public class CompletionWindowWrapper(TextArea textArea)
 
     public bool IsOpen => _completionWindow?.IsOpen ?? false;
 
-    public IReadOnlyList<ICompletionData> GetCurrentCompletionListEntries()
-    {
-        return _completionWindow?.CompletionList.CurrentList ?? [];
-    }
+    public IReadOnlyList<ICompletionData> GetCurrentCompletionListEntries() => _completionWindow?.CompletionList.CurrentList ?? [];
 
     public void CloseIfEmpty()
     {
@@ -34,8 +32,6 @@ public class CompletionWindowWrapper(TextArea textArea)
     public void ShowCompletions(ShowCompletionOptions options)
     {
         var completions = options.Completions;
-        var prefix = options.Prefix;
-        var rewind = options.Rewind;
         var onCompletionWindowDataPopulated = options.OnCompletionWindowDataPopulated;
         if (!completions.Any())
             return;
@@ -46,8 +42,7 @@ public class CompletionWindowWrapper(TextArea textArea)
             MaxWidth = 200
         };
         IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
-        foreach (var k in completions.OrderBy(k => k.Name))
-            data.Add(new QueryEditorCompletionData(k, prefix, rewind));
+        data.AddRange(options.Completions);
 
         _completionWindow.Closed += delegate { _completionWindow = null; };
         onCompletionWindowDataPopulated.Invoke(_completionWindow);

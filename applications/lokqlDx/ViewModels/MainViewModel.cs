@@ -50,6 +50,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
+    private readonly AssetFolderImageProvider _imageProvider;
 
 
     public MainViewModel(
@@ -60,9 +61,11 @@ public partial class MainViewModel : ObservableObject
         RegistryOperations registryOperations,
         IStorageProvider storage,
         ILauncher launcher,
-        IServiceProvider serviceProvider
+        IServiceProvider serviceProvider,
+        AssetFolderImageProvider imageProvider
     )
     {
+        _imageProvider = imageProvider;
         _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
@@ -194,6 +197,8 @@ public partial class MainViewModel : ObservableObject
             ShowUpdateInfo = true;
             UpdateInfo = $"New version available - {newVersion}";
         }
+
+        await Task.Run(_imageProvider.Init);
     }
 
     [RelayCommand]
