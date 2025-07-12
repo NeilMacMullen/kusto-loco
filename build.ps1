@@ -14,6 +14,7 @@ param(
     [switch] $skipZip
 
 )
+  $versionString=$version.replace('.','-')
 
 if (-not $skipBuild) {
     #force rebuild
@@ -71,13 +72,17 @@ if (-not ($api -like '') ) {
 
 get-ChildItem -r *.nupkg | % FullName
 
+
+& "C:\Users\User\AppData\Local\Programs\Inno Setup 6\iscc.exe"   /DMyAppVersion="8.8.8" /DSuffix="8_8_8" .\lokqldx.iss
+
+iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" .\setup\lokqldx.iss
 if (-not $skipZip)
 {
-    $v=$version.replace('.','-')
+  
     $compress = @{
     Path = ".\publish"
     CompressionLevel = "Fastest"
-    DestinationPath = "uploads\kustoloco-$v.zip"
+    DestinationPath = "uploads\kustoloco-$versionString.zip"
 }
 Compress-Archive @compress
 }

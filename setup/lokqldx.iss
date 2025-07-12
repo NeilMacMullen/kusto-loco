@@ -2,11 +2,17 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LokqlDX"
-#ifndef myarg
+
+#ifndef MyAppVersion
 #define MyAppVersion "9.9.9"
-#ifndef myarg
-# define myarg "mydefault"
 #endif
+
+#ifndef Suffix
+#define Suffix ""
+#endif
+
+
+
 #define MyAppPublisher "Neil MacMullen"
 #define MyAppURL "https://github.com/NeilMacMullen/kusto-loco"
 #define MyAppExeName "lokqldx.exe"
@@ -42,7 +48,7 @@ LicenseFile="..\LICENSE"
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir="..\setup"
-OutputBaseFilename=lokqldx_setup
+OutputBaseFilename="lokqldx_setup_{#Suffix}"
 SetupIconFile="..\applications\lokqlDx\Assets\kql.ico"
 SolidCompression=yes
 WizardStyle=modern
@@ -61,6 +67,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\publish\lokqldx\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\publish\lokqldx\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\publish\tutorials\*"; DestDir: "{app}\tutorials"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
@@ -72,6 +79,7 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; Value
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\Lokqldx Tutorials"; Filename: "{app}\tutorials"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
