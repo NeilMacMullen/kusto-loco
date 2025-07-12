@@ -29,7 +29,7 @@ public class SchemaIntellisenseProvider
         foreach (var command in AllCommands())
             if (blockText.Contains(command))
                 return TablesForCommand(command)
-                    .Select(t => new IntellisenseEntry(t, $"{command} table"))
+                    .Select(t => new IntellisenseEntry(t, $"{command} table","",IntellisenseHint.Table))
                     .ToArray();
 
         //no command found so return empty
@@ -47,7 +47,7 @@ public class SchemaIntellisenseProvider
                 var matchingTables = tables.Where(blockText.Contains).ToArray();
                 var columns = AllSchemaLines().Where(s => s.Command == command)
                     .Where(s => matchingTables.Contains(s.Table))
-                    .Select(c => new IntellisenseEntry(c.Column, $"{c.Command} column for {c.Table}"))
+                    .Select(c => new IntellisenseEntry(c.Column, $"{c.Command} column for {c.Table}","", IntellisenseHint.Column))
                     .ToArray();
                 return columns;
             }

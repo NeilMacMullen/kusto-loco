@@ -20,7 +20,8 @@ public class IntellisenseClientAdapter(
     {
         var verbs = verbEntries.ToArray();
         var lookup = CreateLookup(verbs);
-        var internalCommands = verbs.Select(x => new IntellisenseEntry(x.Name, x.HelpText, string.Empty)).ToArray();
+        var internalCommands = verbs.Select(x => new IntellisenseEntry(x.Name, x.HelpText, string.Empty,
+            IntellisenseHint.Command)).ToArray();
         AllowedCommandsAndExtensions = lookup;
         InternalCommands = internalCommands;
     }
