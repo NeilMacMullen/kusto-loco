@@ -13,6 +13,7 @@
   <PropertyGroup Label="Avalonia">
     <AvaloniaUseCompiledBindingsByDefault>True</AvaloniaUseCompiledBindingsByDefault>
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
+    <ApplicationIcon>Assets\kql.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\kql.ico" />
@@ -21,6 +22,9 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\kql.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\kql.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IntellisenseFunctions.json" />
