@@ -1,6 +1,8 @@
 ﻿using NLog;
 using NLog.Config;
 using NLog.Targets;
+using LogLevel = NLog.LogLevel;
+
 
 namespace LogSetup;
 
