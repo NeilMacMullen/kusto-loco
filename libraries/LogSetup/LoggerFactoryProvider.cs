@@ -1,15 +1,148 @@
+using System.Text;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Extensions.Logging;
+using NLog.Layouts;
+using NLog.Targets;
+using NLogLevel = NLog.LogLevel;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogSetup;
 
 public class LoggerFactoryProvider
 {
-    public NLogLoggerFactory Get()
+    public static NLogLoggerFactory GetFactory(IConfiguration configuration)
     {
-        return new NLogLoggerFactory(new NLogLoggerProvider(new NLogProviderOptions(),
-                LoggingExtensions.NLogFactoryBuilder(LogLevel.Trace, LoggingTarget.Console, LoggingTarget.Debugger)
+        // callsite: does not work because of logging extension wrapper methods ("LoggingExtensions.Log")
+        var firstLine = """
+                           ${time}
+                           ${level:uppercase=true}
+                           [32m${logger:shortName=true}[0m
+                           | ${message:raw=true:withException=true:exceptionSeparator=|}
+                           """.ReplaceLineEndings(" ");
+
+
+        var compoundLayout = new CompoundLayout
+        {
+            Layouts =
+            {
+                firstLine,
+                new InternalJsonLayout()
+            }
+        };
+
+        var defaultLevel = GetLogLevel(configuration, "Logging:LogLevel:Default", LogLevel.Information);
+
+        var consoleLevel = GetLogLevel(configuration, "Console:LogLevel:Default", defaultLevel);
+        var debugLevel = GetLogLevel(configuration, "Debug:LogLevel:Default", defaultLevel);
+        var consoleNLogLevel = ToNLogLevel(consoleLevel);
+        var debugNLogLevel = ToNLogLevel(debugLevel);
+
+        var factory = LogManager
+            .Setup()
+            .LoadConfiguration(b =>
+                {
+                    b
+                        .ForLogger()
+                        .FilterMinLevel(consoleNLogLevel)
+                        .WriteTo(new ColoredConsoleTarget
+                            {
+                                Layout = compoundLayout,
+                                UseDefaultRowHighlightingRules = false,
+                                Encoding = Encoding.UTF8,
+                                EnableAnsiOutput = true,
+                                WordHighlightingRules =
+                                {
+                                    new(NLogLevel.Trace.ToString().ToUpper(),
+                                        ConsoleOutputColor.Gray,
+                                        ConsoleOutputColor.NoChange
+                                    ),
+                                    new(NLogLevel.Debug.ToString().ToUpper(),
+                                        ConsoleOutputColor.White,
+                                        ConsoleOutputColor.NoChange
+                                    ),
+                                    new(NLogLevel.Info.ToString().ToUpper(),
+                                        ConsoleOutputColor.Cyan,
+                                        ConsoleOutputColor.NoChange
+                                    ),
+                                    new(NLogLevel.Warn.ToString().ToUpper(),
+                                        ConsoleOutputColor.Yellow,
+                                        ConsoleOutputColor.NoChange
+                                    ),
+                                    new(NLogLevel.Error.ToString().ToUpper(),
+                                        ConsoleOutputColor.Red,
+                                        ConsoleOutputColor.NoChange
+                                    ),
+                                    new(NLogLevel.Fatal.ToString().ToUpper(),
+                                        ConsoleOutputColor.DarkRed,
+                                        ConsoleOutputColor.White
+                                    )
+                                }
+                            }
+                        );
+                    b
+                        .ForLogger()
+                        .FilterMinLevel(debugNLogLevel)
+                        .WriteToDebugConditional(compoundLayout);
+                }
+            )
+            .LogFactory;
+
+
+        return new NLogLoggerFactory(new NLogLoggerProvider(
+                new NLogProviderOptions
+                {
+                    IncludeScopes = true,
+                    CaptureMessageProperties = true,
+                    CaptureMessageTemplates = true,
+                    CaptureMessageParameters = true
+                },
+                factory
             )
         );
+    }
+
+    private static LogLevel GetLogLevel(IConfiguration configuration, string configSection, LogLevel defaultLogLevel)
+    {
+        var logLevel = configuration[configSection] ?? "";
+        var level = defaultLogLevel;
+        if (Enum.TryParse<LogLevel>(logLevel, true, out var level2))
+        {
+            level = level2;
+        }
+
+        return level;
+    }
+
+    private static NLogLevel ToNLogLevel(LogLevel level)
+    {
+        var nlogLevel = level switch
+        {
+            LogLevel.None => NLogLevel.Off,
+            LogLevel.Trace => NLogLevel.Trace,
+            LogLevel.Debug => NLogLevel.Debug,
+            LogLevel.Information => NLogLevel.Info,
+            LogLevel.Warning => NLogLevel.Warn,
+            LogLevel.Error => NLogLevel.Error,
+            LogLevel.Critical => NLogLevel.Fatal,
+            _ => NLogLevel.Off
+        };
+        return nlogLevel;
+    }
+}
+
+file class InternalJsonLayout : Layout
+{
+    private readonly JsonLayout _layout = new()
+    {
+        IncludeEventProperties = true,
+        IncludeScopeProperties = true,
+        RenderEmptyObject = false
+    };
+
+    protected override string GetFormattedMessage(LogEventInfo logEvent)
+    {
+        var res = _layout.Render(logEvent);
+        return res is "" ? "" : Environment.NewLine + res;
     }
 }

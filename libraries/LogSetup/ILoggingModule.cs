@@ -13,5 +13,5 @@ public interface ILoggingModule
 {
     public static IConfiguration GetConfiguration() => Host.CreateApplicationBuilder().Configuration;
 
-    public static ILoggerFactory GetLoggerFactory(IConfiguration configuration) => new LoggerFactoryProvider().Get();
+    public static ILoggerFactory GetLoggerFactory(IConfiguration configuration) => LoggerFactoryProvider.GetFactory(configuration);
 }
