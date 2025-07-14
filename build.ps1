@@ -73,6 +73,8 @@ if (-not ($api -like '') ) {
 get-ChildItem -r *.nupkg | % FullName
 
 iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" .\setup\lokqldx.iss
+iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" .\setup\pskql.iss
+
 if (-not $skipZip)
 {
   

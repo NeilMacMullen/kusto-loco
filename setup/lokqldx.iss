@@ -48,14 +48,14 @@ LicenseFile="..\LICENSE"
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir="..\setup"
-OutputBaseFilename="lokqldx_setup_{#Suffix}"
+OutputBaseFilename="lokqldx_setup-{#Suffix}"
 SetupIconFile="..\applications\lokqlDx\Assets\kql.ico"
 SolidCompression=yes
 WizardStyle=modern
 ; max size 164x314
-WizardImageFile="..\setup\small.bmp"
+WizardImageFile="..\setup\lokqldx-large.bmp"
 ; max size 55x58
-WizardSmallImageFile="..\setup\small.bmp"
+WizardSmallImageFile="..\setup\kql-small.bmp"
 
 
 [Languages]
