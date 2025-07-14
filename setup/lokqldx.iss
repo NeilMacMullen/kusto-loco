@@ -13,6 +13,12 @@
 
 
 
+#ifndef OutputDir
+#define OutputDir "setup"
+#endif
+
+
+
 #define MyAppPublisher "Neil MacMullen"
 #define MyAppURL "https://github.com/NeilMacMullen/kusto-loco"
 #define MyAppExeName "lokqldx.exe"
@@ -47,8 +53,8 @@ LicenseFile="..\LICENSE"
 ; Remove the following line to run in administrative install mode (install for all users).
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir="..\setup"
-OutputBaseFilename="lokqldx_setup-{#Suffix}"
+OutputDir="..\{#OutputDir}"
+OutputBaseFilename="lokqldx-windows-setup-{#Suffix}"
 SetupIconFile="..\applications\lokqlDx\Assets\kql.ico"
 SolidCompression=yes
 WizardStyle=modern

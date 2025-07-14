@@ -11,6 +11,12 @@
 #define Suffix ""
 #endif
 
+
+#ifndef OutputDir
+#define OutputDir "setup"
+#endif
+
+
 #define MyAppPublisher "Neil MacMullen"
 #define MyAppURL "https://github.com/NeilMacMullen/kusto-loco/wiki/Powershell-Integration"
 
@@ -30,14 +36,16 @@ DefaultGroupName={#MyAppName}
 ; Remove the following line to run in administrative install mode (install for all users).
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=..\setup
-OutputBaseFilename=pskql-setup-{#Suffix}
+OutputDir="..\{#OutputDir}"
+OutputBaseFilename=pskql-windows-setup-{#Suffix}
 SolidCompression=yes
 WizardStyle=modern
 ; max size 164x314
 WizardImageFile="..\setup\pskql-large.bmp"
 ; max size 55x58
 WizardSmallImageFile="..\setup\kql-small.bmp"
+LicenseFile="..\LICENSE"
+SetupIconFile="..\applications\lokqlDx\Assets\kql.ico"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

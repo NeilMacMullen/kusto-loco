@@ -14,7 +14,8 @@ param(
     [switch] $skipZip
 
 )
-  $versionString=$version.replace('.','-')
+$versionString=$version.replace('.','-')
+$uploadsFolder ="uploads-$versionstring"
 
 if (-not $skipBuild) {
     #force rebuild
@@ -72,16 +73,23 @@ if (-not ($api -like '') ) {
 
 get-ChildItem -r *.nupkg | % FullName
 
-iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" .\setup\lokqldx.iss
-iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" .\setup\pskql.iss
+new-item -ItemType directory -name "$uploadsFolder"
+
+iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\lokqldx.iss
+iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\pskql.iss
+
+
 
 if (-not $skipZip)
 {
-  
-    $compress = @{
-    Path = ".\publish"
-    CompressionLevel = "Fastest"
-    DestinationPath = "uploads\kustoloco-$versionString.zip"
-}
-Compress-Archive @compress
+
+    $folders = @("lokql-linux", "lokqldx-linux", "lokqldx-macos", "pskql-linux","tutorials")  
+    foreach ($folder in $folders) {
+        $compress = @{
+            Path = ".\publish\$folder"
+            CompressionLevel = "Fastest"
+            DestinationPath = "$uploadsFolder\$folder-$versionString.zip"
+        }
+        Compress-Archive @compress
+    }
 }
