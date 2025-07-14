@@ -14,8 +14,9 @@ param(
     [switch] $skipZip
 
 )
-$versionString=$version.replace('.','-')
-$uploadsFolder ="uploads-$versionstring"
+$versionString = $version.replace('.', '-')
+$uploadsFolder = "uploads-$versionstring"
+$packages = @("KustoLoco.Core", "FileFormats", "Rendering", "ScottPlotRendering", "SixelSupport")
 
 if (-not $skipBuild) {
     #force rebuild
@@ -26,12 +27,11 @@ if (-not $skipBuild) {
     Get-ChildItem -r *.nupkg | Remove-Item -r
     
     #make nuget packages
-    dotnet pack   -p:PackageVersion=$version .\libraries\KustoLoco.Core\KustoLoco.Core.csproj
-    dotnet pack   -p:PackageVersion=$version .\libraries\FileFormats\FileFormats.csproj
-    dotnet pack   -p:PackageVersion=$version .\libraries\Rendering\Rendering.csproj
-    dotnet pack   -p:PackageVersion=$version .\libraries\ScottPlotRendering\ScottPlotRendering.csproj
-    dotnet pack   -p:PackageVersion=$version .\libraries\SixelSupport\SixelSupport.csproj
-
+    
+    foreach ($package in $packages) {
+        dotnet pack -p:PackageVersion=$version .\libraries\$package\$package.csproj
+    }
+   
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
 
     #build application exes
@@ -51,11 +51,11 @@ if (-not $skipBuild) {
     get-ChildItem -recurse -path .\publish\ -include *.pdb | remove-item
 
     #clean up pskql....
-     get-ChildItem -recurse -path .\publish\pskql -include Microsoft.*.dll | remove-item
-     get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
+    get-ChildItem -recurse -path .\publish\pskql -include Microsoft.*.dll | remove-item
+    get-ChildItem -recurse -path .\publish\pskql -include System.*.dll | remove-item
     #clean up pskql linux....
-     get-ChildItem -recurse -path .\publish\pskql-linux -include Microsoft.*.dll | remove-item
-     get-ChildItem -recurse -path .\publish\pskql-linux -include System.*.dll | remove-item
+    get-ChildItem -recurse -path .\publish\pskql-linux -include Microsoft.*.dll | remove-item
+    get-ChildItem -recurse -path .\publish\pskql-linux -include System.*.dll | remove-item
 
     #copy tutorials to publish folder
     New-Item -ItemType Directory -Path .\publish\tutorials -Force
@@ -63,11 +63,9 @@ if (-not $skipBuild) {
 }
 
 if (-not ($api -like '') ) {
-    dotnet nuget push libraries\KustoLoco.Core\bin\Release\KustoLoco.Core.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
-    dotnet nuget push libraries\FileFormats\bin\Release\KustoLoco.FileFormats.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
-    dotnet nuget push libraries\Rendering\bin\Release\KustoLoco.Rendering.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
-    dotnet nuget push libraries\ScottPlotRendering\bin\Release\KustoLoco.Rendering.ScottPlot.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
-    dotnet nuget push libraries\SixelSupport\bin\Release\KustoLoco.Rendering.SixelSupport.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
+    foreach ($package in $packages) {
+        dotnet nuget push libraries\$package\bin\Release\$package.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
+    }
     dotnet nuget push sourceGeneration\SourceGenDependencies\bin\Release\KustoLoco.SourceGeneration.Attributes.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
 }
 
@@ -75,20 +73,22 @@ get-ChildItem -r *.nupkg | % FullName
 
 new-item -ItemType directory -name "$uploadsFolder"
 
-iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\lokqldx.iss
-iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\pskql.iss
 
+# Build the installers for windows
+$installers = @("lokql", "lokqldx", "pskql")
+foreach ($installer in $installers) { 
+    iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\$installer.iss
+}
 
+# copy other platforms as individual archives
+if (-not $skipZip) {
 
-if (-not $skipZip)
-{
-
-    $folders = @("lokql-linux", "lokqldx-linux", "lokqldx-macos", "pskql-linux","tutorials")  
+    $folders = @("lokql-linux", "lokqldx-linux", "lokqldx-macos", "pskql-linux", "tutorials")  
     foreach ($folder in $folders) {
         $compress = @{
-            Path = ".\publish\$folder"
+            Path             = ".\publish\$folder"
             CompressionLevel = "Fastest"
-            DestinationPath = "$uploadsFolder\$folder-$versionString.zip"
+            DestinationPath  = "$uploadsFolder\$folder-$versionString.zip"
         }
         Compress-Archive @compress
     }
