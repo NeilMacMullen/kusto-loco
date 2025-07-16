@@ -11,6 +11,7 @@
     <PackageReference Include="Jab" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="NLog"  />
+    <PackageReference Include="NLog.Extensions.Logging" />
   </ItemGroup>
 
 </Project>
