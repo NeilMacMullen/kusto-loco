@@ -1023,6 +1023,25 @@ print toscalar(letters | summarize mx=min(bitmap));";
         res.Should().Be("apple,orange,grapes");
     }
 
+
+    [TestMethod]
+    public async Task array_concat()
+    {
+        var query = """
+                    datatable(id:int, values:dynamic)
+                    [
+                        1, dynamic([1, 2, 3]),
+                        2, dynamic([4, 5]),
+                        3, dynamic([6, 7, 8])
+                    ]
+                    | summarize cat =(array_concat(make_list(values)))
+                    | extend t =strcat_array(cat,",")
+                    | project t
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("1,2,3,4,5,6,7,8");
+    }
+
     [TestMethod]
     public async Task Strcmp()
     {

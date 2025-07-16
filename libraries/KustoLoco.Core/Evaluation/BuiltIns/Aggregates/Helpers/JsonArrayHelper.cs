@@ -14,7 +14,14 @@ public static class JsonArrayHelper
         var i = 0;
         foreach (var item in source)
         {
-            array[i++] = item == null ? null : JsonValue.Create(item);
+            if (item is JsonNode node)
+                array[i++] =  node;
+            else
+            {
+                array[i++] = item == null
+                    ? null
+                    : JsonValue.Create(item);
+            }
         }
 
         return new JsonArray(array);

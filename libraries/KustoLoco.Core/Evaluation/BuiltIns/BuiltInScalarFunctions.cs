@@ -106,6 +106,7 @@ internal static class BuiltInScalarFunctions
         StrlenFunction.Register(Functions);
         StrcmpFunction.Register(Functions);
         StrcatArrayFunction.Register(Functions);
+        ArrayConcatFunction.Register(Functions);
         ArrayReverseFunction.Register(Functions);
         StrRepFunction.Register(Functions);
         MaxOfFunction.Register(Functions);
