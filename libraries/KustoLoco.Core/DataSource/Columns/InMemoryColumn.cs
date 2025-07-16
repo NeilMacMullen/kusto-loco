@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -6,9 +7,15 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
 {
     private readonly T?[] _data;
 
-    public InMemoryColumn(T?[] data) =>
+    public InMemoryColumn(T?[] data) 
+    {
         _data = data ?? throw new ArgumentNullException(nameof(data));
-
+        if (typeof(T)== typeof(JsonArray))
+        {
+            throw new InvalidOperationException(
+                "InMemoryColumn cannot be used for JsonArray data. Use JsonNode instead");
+        }
+    }
 
     public override T? this[int index] => _data[index];
 
