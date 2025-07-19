@@ -14,7 +14,7 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-	<Interaction.Behaviors>
+    <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
             <InvokeCommandAction Command="{Binding InitializeCommand}" />
         </EventTriggerBehavior>
@@ -39,128 +39,136 @@
 
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-        <Menu  Name="MainMenu" DockPanel.Dock="Left">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
-                <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
-                <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
-                          ItemsSource="{Binding RecentWorkspaces}"
-                          Command="{Binding OpenRecentWorkspaceCommand}"
-                          CommandParameter="{Binding SelectedItem, ElementName=RecentlyUsed}">
-                    <MenuItem.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </MenuItem.ItemTemplate>
+            <Menu Name="MainMenu" DockPanel.Dock="Left">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
+                    <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
+                    <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
+                              ItemsSource="{Binding RecentWorkspaces}"
+                              Command="{Binding OpenRecentWorkspaceCommand}"
+                              CommandParameter="{Binding SelectedItem, ElementName=RecentlyUsed}">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+
+                    <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" />
+                    <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" />
+
                 </MenuItem>
-
-                <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" />
-                <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" />
-            </MenuItem>
-            <MenuItem Header="_Preferences">
-                <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
-                <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
-                <Separator />
-                <MenuItem Header="Decrease FontSize" Command="{Binding ChangeFontSizeCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>-1</system:Int32>
-                    </MenuItem.CommandParameter>
+                <MenuItem Header="_Preferences">
+                    <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
+                    <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
+                    <Separator />
+                    <MenuItem Header="Decrease FontSize" Command="{Binding ChangeFontSizeCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>-1</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="Increase FontSize" Command="{Binding ChangeFontSizeCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>1</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="Toggle _word-wrap" Command="{Binding ToggleWordWrapCommand}" />
+                    <MenuItem Header="Toggle line-_numbers" Command="{Binding ToggleLineNumbersCommand}" />
                 </MenuItem>
-                <MenuItem Header="Increase FontSize" Command="{Binding ChangeFontSizeCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>1</system:Int32>
-                    </MenuItem.CommandParameter>
+                <MenuItem Header="_Data">
+                    <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
+                    <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
+
+				</MenuItem>
+                <MenuItem Header="_View">
+                    <MenuItem Header="Add _query"
+                              Command="{Binding AddQueryCommand}" />
+                    <MenuItem Header="Show current result in _flyout"
+                              Command="{Binding FlyoutCurrentResultCommand}" />
                 </MenuItem>
-                <MenuItem Header="Toggle word-wrap" Command="{Binding ToggleWordWrapCommand}" />
-                <MenuItem Header="Toggle line-numbers" Command="{Binding ToggleLineNumbersCommand}" />
+                <MenuItem Header="Help">
+                    <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
+                              Command="{Binding NavigateToWikiCommand}" />
+                    <MenuItem Header="Quick start"
+                              CommandParameter="LokqlDx-tutorial-‐-quick-start"
+                              Command="{Binding NavigateToWikiCommand}" />
+                    <MenuItem Header="Keyboard shortcuts"
+                              CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
+                              Command="{Binding NavigateToWikiCommand}" />
 
-            </MenuItem>
-            <MenuItem Header="View">
-                <MenuItem Header="Add query"
-                          Command="{Binding AddQueryCommand}" />
-                <MenuItem Header="Show current result in flyout"
-                          Command="{Binding FlyoutCurrentResultCommand}" />
-            </MenuItem>
-
-            <MenuItem Header="Misc">
-                <MenuItem Header="Register file association"
-                          Command="{Binding RegisterFileAssociationCommand}" />
-            </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX" Command="{Binding NavigateToWikiCommand}" />
-                <MenuItem Header="Quick start"
-                          CommandParameter="LokqlDx-tutorial-‐-quick-start"
-                          Command="{Binding NavigateToWikiCommand}" />
-                <MenuItem Header="Keyboard shortcuts"
-                          CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
-                          Command="{Binding NavigateToWikiCommand}" />
-
-                <MenuItem Header="Chart customisation"
-                          Command="{Binding NavigateToWikiCommand}"
-                          CommandParameter="ScottPlot-Chart-customisation" />
-                <Separator />
-                <MenuItem Header="Querying ApplicationInsights"
-                          Command="{Binding NavigateToWikiCommand}"
-                          CommandParameter="Accessing-Application-Insights-data-with-Lokqldx" />
-                <MenuItem Header="Querying ADX clusters"
-                          Command="{Binding NavigateToWikiCommand}"
-                          CommandParameter="Querying-ADX-clusters-with-lokqldx" />
-                <Separator />
-                <MenuItem Header="Kusto-loco Project Page"
-                          Command="{Binding NavigateToUriCommand}"
-                          CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
-                <MenuItem Header="Github Discussion Forum"
-                          Command="{Binding NavigateToUriCommand}"
-                          CommandParameter="https://github.com/NeilMacMullen/kusto-loco/discussions" />
-                <Separator />
-                <MenuItem Header="KQL Introduction"
-                          Command="{Binding NavigateToUriCommand}"
-                          CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
-                <Separator />
+                    <MenuItem Header="Chart customisation"
+                              Command="{Binding NavigateToWikiCommand}"
+                              CommandParameter="ScottPlot-Chart-customisation" />
+                    <Separator />
+                    <MenuItem Header="Querying ApplicationInsights"
+                              Command="{Binding NavigateToWikiCommand}"
+                              CommandParameter="Accessing-Application-Insights-data-with-Lokqldx" />
+                    <MenuItem Header="Querying ADX clusters"
+                              Command="{Binding NavigateToWikiCommand}"
+                              CommandParameter="Querying-ADX-clusters-with-lokqldx" />
+                    <Separator />
+                    <MenuItem Header="Kusto-loco Project Page"
+                              Command="{Binding NavigateToUriCommand}"
+                              CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
+                    <MenuItem Header="Github Discussion Forum"
+                              Command="{Binding NavigateToUriCommand}"
+                              CommandParameter="https://github.com/NeilMacMullen/kusto-loco/discussions" />
+                    <Separator />
+                    <MenuItem Header="KQL Introduction"
+                              Command="{Binding NavigateToUriCommand}"
+                              CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
+                    <Separator />
 
 
-                <MenuItem Header="About" />
-                <!--Click="AboutBox"-->
+                    <MenuItem Header="About" />
+                    <!--Click="AboutBox"-->
 
-            </MenuItem>
-        </Menu>
+                </MenuItem>
+            </Menu>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
                 <Button Command="{Binding ClearConsoleCommand}"
-                        ToolTip.Tip="Clear console" FontSize="12">X</Button>
-                <Button Command="{Binding ChangeTabCommand}" 
-                        ToolTip.Tip="Change Query-tab placement" FontSize="12">T</Button>
+                        ToolTip.Tip="Clear console" FontSize="12">
+                    X
+                </Button>
+                <Button Command="{Binding ChangeTabCommand}"
+                        ToolTip.Tip="Change Query-tab placement" FontSize="12">
+                    T
+                </Button>
 
-                <Button Command="{Binding ChangeLayoutCommand}" 
-                        ToolTip.Tip="Change Layout" FontSize="12">&#x25a6;</Button>
-           
+                <Button Command="{Binding ChangeLayoutCommand}"
+                        ToolTip.Tip="Change Layout" FontSize="12">
+                    &#x25a6;
+                </Button>
+                <Button Command="{Binding CopyChartToClipboardCommand}"
+                        ToolTip.Tip="Copy chart to clipboard" FontSize="12">
+                    &#x1f4cb;
+                </Button>
+
+
             </StackPanel>
         </DockPanel>
         <Grid RowDefinitions="*,20">
             <Grid
                 x:Name="MainGrid"
-                RowDefinitions="*,auto,0.15*"
-
->
-                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}" SelectedIndex="{Binding ActiveQueryIndex}"
-TabStripPlacement="{Binding TabStripPlacement}" >
+                RowDefinitions="*,auto,0.15*">
+                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}"
+                            SelectedIndex="{Binding ActiveQueryIndex}"
+                            TabStripPlacement="{Binding TabStripPlacement}">
                     <TabControl.ItemTemplate>
-                        <DataTemplate >
+                        <DataTemplate>
                             <TextBlock Text="{Binding Header}" FontSize="12">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Rename"
                                                   Command="{Binding $parent[UserControl].DataContext.RenameQueryCommand}"
-CommandParameter="{Binding}"
-                                                  />
+                                                  CommandParameter="{Binding}" />
                                         <MenuItem Header="Delete"
                                                   Command="{Binding $parent[UserControl].DataContext.DeleteQueryCommand}"
-                                                  CommandParameter="{Binding}"
-                                                  />
-										<Separator />
+                                                  CommandParameter="{Binding}" />
+                                        <Separator />
                                         <MenuItem Header="Add query"
                                                   Command="{Binding $parent[UserControl].DataContext.AddQueryHereCommand}"
-                                                  CommandParameter="{Binding}"
-                                        />
+                                                  CommandParameter="{Binding}" />
                                         <Separator />
                                         <MenuItem Header="Tabs on top"
                                                   Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
@@ -174,7 +182,7 @@ CommandParameter="{Binding}"
                                         <MenuItem Header="Tabs on bottom"
                                                   Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
                                                   CommandParameter="Bottom" />
-                                       
+
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>
