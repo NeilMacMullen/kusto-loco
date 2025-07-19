@@ -27,6 +27,71 @@ public class DialogService
         _launcher = launcher;
     }
 
+    public static FilePickerFileType All { get; } = new("All data types")
+    {
+        Patterns = ["*.csv", "*.tsv", "*.parquet", "*.xlsx", "*.json", "*.txt"]
+    };
+
+    public static FilePickerFileType CsvFiles { get; } = new("Csv (*.csv)")
+    {
+        Patterns = ["*.csv"]
+    };
+    public static FilePickerFileType TsvFiles { get; } = new("Tsv (*.tsv)")
+    {
+        Patterns = [ "*.tsv"]
+    };
+    public static FilePickerFileType ParquetFiles { get; } = new("Parquet (*.parquet")
+    {
+        Patterns = ["*.parquet"]
+    };
+    public static FilePickerFileType ExcelFiles { get; } = new("Excel (*.xlsx)")
+    {
+        Patterns = ["*.xlsx"]
+    };
+    public static FilePickerFileType JsonFiles { get; } = new("Json array (*.json)")
+    {
+        Patterns = ["*.json"]
+    };
+
+    public static FilePickerFileType TextFiles { get; } = new("Text (*.txt)")
+    {
+        Patterns = ["*.txt"]
+    };
+
+    public static FilePickerFileType[] DataTypesForRead { get; } =
+    [
+        All,
+        TsvFiles,CsvFiles, ParquetFiles, ExcelFiles, JsonFiles, TextFiles
+    ];
+
+    public static FilePickerFileType[] DataTypesForWrite { get; } =
+        DataTypesForRead.Append(All).ToArray();
+    
+    public async Task<IReadOnlyList<IStorageFile>> OpenDataFiles()
+    {
+        // Start async operation to open the dialog.
+        var files = await _topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open File",
+            AllowMultiple = true,
+            FileTypeFilter = DataTypesForRead
+        });
+        return files;
+    }
+
+    public async Task<IStorageFile?> SaveDataFiles()
+    {
+        // Start async operation to open the dialog.
+        var files = await _topLevel.StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+        {
+            Title = "Save File",
+            FileTypeChoices = DataTypesForWrite,
+            ShowOverwritePrompt = true
+        });
+        return files;
+    }
+
     public Task ShowMessageBox(string message)
     {
         var mb = MessageBoxManager.GetMessageBoxStandard("lokqlDx", message);

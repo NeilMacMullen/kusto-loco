@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace LokqlDx.ViewModels;
 
@@ -12,5 +13,9 @@ public partial class QueryItemViewModel : ObservableObject
     {
         _header = header;
         _queryModel = content;
+        WeakReferenceMessenger.Default.Register<TabChangedMessage>(this, (r, m) =>
+        {
+            _queryModel.IsActive = m.Value == this;
+        });
     }
 }

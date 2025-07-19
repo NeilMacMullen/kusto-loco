@@ -82,6 +82,11 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task RunQuery(string query)
     {
+        await RunQueryString(query);
+    }
+
+    public async Task RunQueryString(string query)
+    {
         if (query.IsBlank())
             return;
         var saved = await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(true));

@@ -8,13 +8,6 @@
              PointerMoved="InputElement_OnPointerMoved">
     <Grid>
         <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-
-
-                <Button Content="&#x1F4CB;" Click="Button_OnClick" ToolTip.Tip="Copy to clipboard" />
-            </StackPanel>
-
             <DockPanel DockPanel.Dock="Bottom">
                 <StackPanel DockPanel.Dock="Bottom" Background="Black">
                     <StackPanel>
