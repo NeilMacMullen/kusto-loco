@@ -80,4 +80,12 @@ public class IndirectTests
         sliced.RowCount.Should().Be(20);
         sliced.GetRawDataValue(0).Should().Be("HELLO");
     }
+    [TestMethod] public void  InMemoryCanBeCast()
+    {
+        var data = new int[]{1, 2, 3};
+        var col = new InMemoryColumn<int>(data);
+        var baseCol = (TypedBaseColumn<int>)col;
+        
+    }
+
 }

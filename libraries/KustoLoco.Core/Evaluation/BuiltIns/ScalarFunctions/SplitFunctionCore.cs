@@ -29,7 +29,7 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
         }
 
         var rowCount = columns[0].RowCount;
-        var data = new JsonArray?[rowCount];
+        var data = new JsonNode?[rowCount];
         for (var i = 0; i < rowCount; i++)
         {
             data[i] = Evaluate(columns[0][i], columns[1][i]);

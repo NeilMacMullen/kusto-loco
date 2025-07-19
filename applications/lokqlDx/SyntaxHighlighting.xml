@@ -78,6 +78,8 @@
 			<Word>join</Word>
 			<Word>union</Word>
 			<Word>getschema</Word>
+			<Word>datatable</Word>
+			<Word>dynamic</Word>
 		</Keywords>
 
 		<Keywords color="Function">
@@ -99,6 +101,7 @@
 			<Word>array_length</Word>
 			<Word>array_sort_asc</Word>
 			<Word>array_sort_desc</Word>
+			<Word>array_concat</Word>
 			<Word>bin</Word>
 			<Word>case</Word>
 			<Word>coalesce</Word>
@@ -191,6 +194,9 @@
 			<Word>binary_shift_right</Word>
 			<Word>make_datetime</Word>
 			<Word>make_timespan</Word>
+			<Word>make_list</Word>
+			<Word>make_listif</Word>
+
 		</Keywords>
 		<!-- Digits -->
 		<Rule foreground="#31d793">
