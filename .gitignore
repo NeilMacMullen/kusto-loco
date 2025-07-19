@@ -38,3 +38,5 @@ _NCrunch_BabyKusto
 
 #IntelliJ (Rider) temp files
 .idea
+/uploads-*
+

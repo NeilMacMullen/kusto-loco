@@ -52,11 +52,13 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "..\publish\pskql\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\setup\pskql-shell.ps1*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\setup\pskql-readme.txt*"; DestDir: "{app}"; Flags: ignoreversion isreadme
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\pskql README"; Filename:  "{app}\pskql-readme.txt" 
+Name: "{group}\pskql Powershell"; Filename:  "pwsh" 
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
