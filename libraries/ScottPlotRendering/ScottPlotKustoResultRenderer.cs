@@ -119,6 +119,7 @@ public static class ScottPlotKustoResultRenderer
                 .Select(ser => new PieSlice
                 {
                     Label = ser.Legend,
+                    LabelFontColor = Colors.White,
                     LegendText = ser.Legend,
                     Value = ser.Y[0],
                     FillColor = plot.Add.Palette.GetColor(ser.Color[0])
