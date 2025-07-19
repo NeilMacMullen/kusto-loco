@@ -19,6 +19,7 @@ $uploadsFolder = "uploads-$versionstring"
 $packages = @("KustoLoco.Core", "FileFormats", "Rendering", "ScottPlotRendering", "SixelSupport")
 
 if (-not $skipBuild) {
+    Get-ChildItem -Path publish -File | Remove-Item -Force
     #force rebuild
     Get-ChildItem -r bin | Remove-Item -r
     Get-ChildItem -r obj | Remove-Item -r
@@ -71,6 +72,7 @@ if (-not ($api -like '') ) {
 
 get-ChildItem -r *.nupkg | % FullName
 
+remove-item $uploadsFolder -recurse -force
 new-item -ItemType directory -name "$uploadsFolder"
 
 
