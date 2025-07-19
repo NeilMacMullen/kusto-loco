@@ -5,7 +5,6 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
@@ -25,6 +24,7 @@ public partial class MainViewModel : ObservableObject
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
+    private readonly AssetFolderImageProvider _imageProvider;
     private readonly ILauncher _launcher;
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
@@ -50,7 +50,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
-    private readonly AssetFolderImageProvider _imageProvider;
 
 
     public MainViewModel(
@@ -89,6 +88,7 @@ public partial class MainViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
     }
+
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
@@ -155,6 +155,36 @@ public partial class MainViewModel : ObservableObject
         else if (prevActiveIndex == indexOfThis) ActiveQueryIndex = Math.Clamp(prevActiveIndex, 0, Queries.Count - 1);
     }
 
+    partial void OnActiveQueryIndexChanged(int value) => ActiveQueryChanged();
+
+    private void ActiveQueryChanged()
+    {
+        var activeTab = GetSelectedQuery();
+        WeakReferenceMessenger.Default.Send(new TabChangedMessage(activeTab));
+    }
+
+    [RelayCommand]
+    private async Task LoadData()
+    {
+        var files = await _dialogService.OpenDataFiles();
+        foreach (var storageFile in files)
+        {
+            var path = storageFile.TryGetLocalPath()!;
+            if (path.IsNotBlank())
+                await WeakReferenceMessenger.Default.Send(new LoadFileMessage(path));
+        }
+    }
+    [RelayCommand]
+    private async Task SaveData()
+    {
+        var file = await _dialogService.SaveDataFiles();
+        if (file == null)
+            return;
+            var path = file.TryGetLocalPath()!;
+            if (path.IsNotBlank())
+                await WeakReferenceMessenger.Default.Send(new SaveFileMessage(path));
+        
+    }
 
     [RelayCommand]
     private void ChangeTab()
@@ -390,6 +420,16 @@ public partial class MainViewModel : ObservableObject
         return IsDirty;
     }
 
+    private void ResetDirty()
+    {
+        foreach (var queryItemViewModel in Queries)
+        {
+            queryItemViewModel.QueryModel.Clean();
+        }
+        
+    }
+
+
     /// <summary>
     ///     Allow the user to save any pending changes
     /// </summary>
@@ -411,7 +451,9 @@ public partial class MainViewModel : ObservableObject
                 "You have have unsaved changes. Do you want to save them?");
             if (result == YesNoCancel.Cancel)
                 return YesNoCancel.Cancel;
-
+            if (result ==YesNoCancel.No)
+                ResetDirty();
+                
             shouldSave = result == YesNoCancel.Yes;
         }
 
@@ -490,7 +532,7 @@ public partial class MainViewModel : ObservableObject
             .ToArray();
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
-        foreach (var queryItemViewModel in Queries) queryItemViewModel.QueryModel.Clean();
+        ResetDirty();
         UpdateMostRecentlyUsed(path);
     }
 
@@ -547,30 +589,10 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void ClearConsole() => WeakReferenceMessenger.Default.Send(new ClearConsoleMessage(0));
-}
 
-public record PersistedQuery(string Name, string Text);
+    [RelayCommand]
+    private void CopyChartToClipboard()
+        => WeakReferenceMessenger.Default.Send(new CopyChartMessage());
 
-public class RenamableText
-{
-    public string InitialText = string.Empty;
-    public string NewText;
 
-    public RenamableText(string initialText)
-    {
-        InitialText = initialText;
-        NewText = initialText;
-    }
-}
-
-// Create a message
-public class LayoutChangedMessage(int layout) : ValueChangedMessage<int>(layout);
-
-public class TabChangedMessage(int layout) : ValueChangedMessage<int>(layout);
-
-public class ClearConsoleMessage(int layout) : ValueChangedMessage<int>(layout);
-
-public class RunningQueryMessage(bool isRunning) : AsyncRequestMessage<bool>
-{
-    public bool IsRunning { get; } = isRunning;
 }

@@ -110,6 +110,11 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         }
     }
 
+
+    public void CopyToClipboard()
+    {
+        _plotter.CopyToClipboard();
+    }
     private Task RenderTable(KustoQueryResult result)
     {
         //ensure that if there are no results we clear the data grid

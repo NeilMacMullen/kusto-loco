@@ -35,7 +35,37 @@ public partial class QueryViewModel : ObservableObject
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
         CopilotChatViewModel = copilotChatViewModel;
         WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) => { FlipArrangement(); });
+        WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
+            (r, m) =>
+            {
+                if (IsActive)
+                    m.Reply(LoadFile(m));
+            });
+        WeakReferenceMessenger.Default.Register<SaveFileMessage>(this,
+            (r, m) =>
+            {
+                if (IsActive)
+                    m.Reply(SaveFile(m));
+            });
+
+        WeakReferenceMessenger.Default.Register<CopyChartMessage>(this,
+            (r, m) =>
+            {
+                if (IsActive)
+                    CopyChartToClipboard();
+            });
     }
+
+    public bool IsActive { get; set; }
+
+    private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();
+
+    private async Task LoadFile(LoadFileMessage msg)
+    {
+        await QueryEditorViewModel.RunQueryString($".load {msg.Path}");
+    }
+
+    private async Task SaveFile(SaveFileMessage msg) => await QueryEditorViewModel.RunQueryString($".save {msg.Path}");
 
     /// <summary>
     ///     Arrange the view so that items are stacked in rows (vertically).

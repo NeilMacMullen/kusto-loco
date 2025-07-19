@@ -52,7 +52,10 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     #endregion
 
-    private void Button_OnClick(object? sender, RoutedEventArgs e)
+
+    #region IScottplotHost
+
+    public void CopyToClipboard()
     {
         if (OperatingSystem.IsWindows())
             try
@@ -68,25 +71,6 @@ public partial class ChartView : UserControl, IScottPlotHost
             catch
             {
             }
-    }
-
-
-    #region IScottplotHost
-
-    public void CopyToClipboard()
-    {
-        try
-        {
-            var bytes = PlotControl.Plot.GetImageBytes((int)PlotControl.Width,
-                (int)PlotControl.Height, ImageFormat.Png);
-            using var memoryStream = new MemoryStream(bytes)
-            {
-                //TODO - not sure how to implement avalonia clipboard support
-            };
-        }
-        catch
-        {
-        }
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight,
