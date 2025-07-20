@@ -11,4 +11,5 @@ public readonly record struct CompletionRequest()
     public Action<CompletionWindow> OnCompletionWindowDataPopulated { get; init; } = EmptyAction;
     private static readonly Action<CompletionWindow> EmptyAction = _ => { };
     public static CompletionRequest Empty => new();
+    public bool IsEmpty => Completions.Count is 0;
 }

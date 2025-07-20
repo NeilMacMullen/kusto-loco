@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using AwesomeAssertions;
+using Lokql.Engine;
 using lokqlDxComponentsTests.Fixtures;
 
 namespace lokqlDxComponentsTests;
@@ -15,7 +16,9 @@ public class AutocompletionTest
     {
         var f = new AutocompletionTestFixture();
 
-        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+
+        f.SetInternalCommands("abc", "def");
+        f.SendInitEvent();
 
 
         await f.Editor.TextArea.Type(".xyz");
@@ -30,7 +33,8 @@ public class AutocompletionTest
     {
         var f = new AutocompletionTestFixture();
 
-        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+        f.SetInternalCommands("abc", "def");
+        f.SendInitEvent();
 
 
         await f.Editor.TextArea.Type(input);
@@ -48,8 +52,8 @@ public class AutocompletionTest
     {
         var f = new AutocompletionTestFixture();
 
-        f.ResourceProvider.InternalCommands = [new("abc")];
-
+        f.SetInternalCommands("abc");
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type(".ab");
         await f.CompletionWindow.ShouldEventuallySatisfy(x =>
@@ -65,11 +69,8 @@ public class AutocompletionTest
     {
         var f = new AutocompletionTestFixture();
 
-        f.ResourceProvider.KqlOperatorEntries =
-        [
-            new("summarize")
-        ];
-
+        f.SetKqlOperators("summarize");
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type("traffic |sum");
 
@@ -86,11 +87,8 @@ public class AutocompletionTest
     {
         var f = new AutocompletionTestFixture();
 
-        f.ResourceProvider.KqlFunctionEntries =
-        [
-            new("setting1")
-        ];
-
+        f.SetKqlFunctions("setting1");
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type("?sett");
 
@@ -106,8 +104,8 @@ public class AutocompletionTest
     public async Task TableCompletion_RemovesPrefixOnInsertion()
     {
         var f = new AutocompletionTestFixture();
-        f.ResourceProvider.SetSchema([
-                new()
+        f.SetKqlTables([
+                new SchemaLine
                 {
                     Table = "abc",
                     Command = "",
@@ -115,7 +113,7 @@ public class AutocompletionTest
                 }
             ]
         );
-
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type("[ab");
 
@@ -131,8 +129,8 @@ public class AutocompletionTest
     public async Task ColumnCompletion_RemovesPrefixOnInsertion()
     {
         var f = new AutocompletionTestFixture();
-        f.ResourceProvider.SetSchema([
-                new()
+        f.SetKqlTables([
+                new SchemaLine
                 {
                     Table = "abc",
                     Command = "",
@@ -140,7 +138,7 @@ public class AutocompletionTest
                 }
             ]
         );
-
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type("abc @gh");
 
@@ -158,20 +156,20 @@ public class AutocompletionTest
     public async Task ColumnCompletion_ConstrainsColumnOptionsToMatchingTable(string input, string[] expected)
     {
         var f = new AutocompletionTestFixture();
-        f.ResourceProvider.SetSchema([
-                new()
+        f.SetKqlTables([
+                new SchemaLine
                 {
                     Table = "table1",
                     Command = "",
                     Column = "t1_o1"
                 },
-                new()
+                new SchemaLine
                 {
                     Table = "table2",
                     Command = "",
                     Column = "t2_o1"
                 },
-                new()
+                new SchemaLine
                 {
                     Table = "table2",
                     Command = "",
@@ -179,7 +177,7 @@ public class AutocompletionTest
                 }
             ]
         );
-
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type(input);
         await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(input));
@@ -195,9 +193,9 @@ public class AutocompletionTest
     public async Task Settings_PreservesPrefixOnInsertion()
     {
         var f = new AutocompletionTestFixture();
-        f.ResourceProvider.SettingNames = [new("abc")];
 
-
+        f.SetSettings("abc");
+        f.SendInitEvent();
 
         await f.Editor.TextArea.Type("$ab");
         await f.CompletionWindow.ShouldEventuallySatisfy(x =>
@@ -219,7 +217,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.SetVerbs([
                 new()
                 {
                     Name = "load",
@@ -228,6 +226,7 @@ public class AutocompletionTest
                 }
             ]
         );
+        f.SendInitEvent();
 
 
         await f.Editor.TextArea.Type(".load /");
@@ -250,7 +249,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.SetVerbs([
                 new()
                 {
                     Name = "load",
@@ -259,6 +258,8 @@ public class AutocompletionTest
                 }
             ]
         );
+        f.SendInitEvent();
+
 
         var initialText = ".load /folder1";
         var numCharsToErase = "er1".Length;
@@ -282,7 +283,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.SetVerbs([
                 new()
                 {
                     Name = "load",
@@ -291,7 +292,7 @@ public class AutocompletionTest
                 }
             ]
         );
-
+        f.SendInitEvent();
 
 
         var initialText = ".load /tmp/rag_s1.json";
@@ -321,13 +322,17 @@ public class AutocompletionTest
             var data = new List<string> { "/tmp/rag_s1.json", "/tmp/log_wpf.txt" };
             f.SetFileSystemData(data);
 
-            f.ResourceProvider._intellisenseClient.AddInternalCommands([new() { Name = "load", SupportedExtensions = [], SupportsFiles = true }]);
+            f.SetVerbs([new() { Name = "load", SupportedExtensions = [], SupportsFiles = true }]);
+            f.SendInitEvent();
+
 
             await f.Editor.TextArea.Type(".load /tmp/ra");
             await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(".load /tmp/ra"));
             if (loseFocus)
             {
-                f.Editor.TextArea.FindLogicalAncestorOfType<Window>()!.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+                f.Editor.TextArea.FindLogicalAncestorOfType<Window>()!.KeyPressQwerty(PhysicalKey.Escape,
+                    RawInputModifiers.None
+                );
                 f.CompletionWindow.IsOpen.Should().BeFalse();
             }
 

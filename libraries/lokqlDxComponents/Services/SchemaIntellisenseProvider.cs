@@ -1,13 +1,11 @@
 ﻿using Intellisense;
 using Lokql.Engine;
-
+using lokqlDxComponents.Contexts;
 namespace lokqlDxComponents.Services;
 
-public class SchemaIntellisenseProvider
+public class SchemaIntellisenseProvider(IQueryEditorContext ctx)
 {
-    private SchemaLine[] _schemaLines = [];
-
-    private IEnumerable<SchemaLine> AllSchemaLines() => _schemaLines;
+    private IEnumerable<SchemaLine> AllSchemaLines() => ctx.QueryEngineContext.GetSchema();
 
 
     private string[] TablesForCommand(string command) =>
@@ -55,6 +53,4 @@ public class SchemaIntellisenseProvider
         //no command found so return empty
         return [];
     }
-
-    public void SetSchema(SchemaLine[] schema) => _schemaLines = schema;
 }

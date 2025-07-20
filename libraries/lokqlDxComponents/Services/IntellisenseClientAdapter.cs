@@ -1,97 +1,79 @@
-using System.CommandLine.Parsing;
+using CommunityToolkit.Mvvm.Messaging;
 using Intellisense;
-using Lokql.Engine;
+using lokqlDxComponents.Contexts;
+using lokqlDxComponents.Events;
+using lokqlDxComponents.Handlers;
+using lokqlDxComponents.Models;
+using lokqlDxComponents.Views.Dialogs;
 using Microsoft.Extensions.Logging;
+using CompletionRequest = lokqlDxComponents.Models.CompletionRequest;
 
 namespace lokqlDxComponents.Services;
 
-public class IntellisenseClientAdapter(
-    IntellisenseClient intellisenseClient,
-    ILogger<IntellisenseClientAdapter> logger,
-    IImageProvider imageProvider
-    )
+public class IntellisenseClientAdapter : IRecipient<HandleKeyDownMessage>, IRecipient<CaretPositionChangedMessage>
 {
-    private Dictionary<string, HashSet<string>> AllowedCommandsAndExtensions { get; set; } = [];
-    public IntellisenseEntry[] InternalCommands { get; private set; } = [];
+    private readonly IntellisenseClient _intellisenseClient;
+    private readonly IEnumerable<IIntellisenseHandler> _handlers;
+    private readonly IImageProvider _imageProvider;
+    private readonly ILogger<IntellisenseClientAdapter> _logger;
 
-    public IImageProvider _imageProvider => imageProvider;
-
-    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
+    public IntellisenseClientAdapter(
+        IntellisenseClient intellisenseClient,
+        IQueryEditorContext queryEditorContext,
+        IEnumerable<IIntellisenseHandler> handlers,
+        IImageProvider imageProvider,
+        ILogger<IntellisenseClientAdapter> logger
+    )
     {
-        var verbs = verbEntries.ToArray();
-        var lookup = CreateLookup(verbs);
-        var internalCommands = verbs.Select(x => new IntellisenseEntry(x.Name, x.HelpText, string.Empty,
-            IntellisenseHint.Command)).ToArray();
-        AllowedCommandsAndExtensions = lookup;
-        InternalCommands = internalCommands;
+        _intellisenseClient = intellisenseClient;
+        _handlers = handlers.OrderBy(x => x.Priority).ToList();
+        _imageProvider = imageProvider;
+        _logger = logger;
+        queryEditorContext.Messenger.RegisterAll(this);
     }
 
+    private async Task OnCaretPositionChanged() => await _intellisenseClient.CancelRequestAsync();
 
-    public async Task OnCaretPositionChanged() => await intellisenseClient.CancelRequestAsync();
-
-    public async Task<CompletionResult> GetPathCompletions(string currentLineText)
+    private async Task<ShowCompletionOptions> HandleKeyDown(HandleKeyDownMessage message)
     {
-        var args = CommandLineStringSplitter.Instance.Split(currentLineText).ToArray();
-
-        if (args.Length < 2)
-        {
-            return CompletionResult.Empty;
-        }
-
-        var lastArg = args[^1];
-        var command = args[0];
-
-        // check if it starts with a valid file IO command like ".save"
-        if (!AllowedCommandsAndExtensions.TryGetValue(command, out var extensions))
-        {
-            return CompletionResult.Empty;
-        }
-
-
-        var result = CompletionResult.Empty;
+        _logger.LogTrace("Received {HandleKeyDownMessage}", message);
         try
         {
-            // TODO: discreetly notify user (status bar? notifications inbox?) to check connection status of saved connections
-            // and user profile app was started with if hosts don't show shares
-            result = await intellisenseClient.GetCompletionResultAsync(lastArg);
-        }
-        catch (IntellisenseException exc)
-        {
-            logger.LogWarning(exc, "Intellisense exception occurred");
-        }
-        catch (OperationCanceledException exc)
-        {
-            logger.LogDebug(exc, "Intellisense request cancelled");
-        }
-
-        if (extensions.Count > 0 && !result.IsEmpty())
-        {
-            return result with
+            foreach (var handler in _handlers)
             {
-                Entries = result
-                    .Entries
-                    .Where(x =>
-                        {
-                            // permit folders (which do not have extensions). note that files without extensions will still be allowed
-                            var ext = Path.GetExtension(x.Name);
-                            return ext == string.Empty || extensions.Contains(ext);
-                        }
-                    )
-                    .ToList()
-            };
+                var result = await handler.GetCompletionRequest(message);
+                if (result.IsEmpty)
+                {
+                    continue;
+                }
+
+                return CreateShowCompletionOptions(result);
+            }
+
+            return ShowCompletionOptions.Empty;
         }
-
-        return result;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception in intellisense");
+            return ShowCompletionOptions.Empty;
+        }
     }
 
-    private static Dictionary<string, HashSet<string>> CreateLookup(IEnumerable<VerbEntry> verbs)
+    private ShowCompletionOptions CreateShowCompletionOptions(CompletionRequest completionRequest) => new()
     {
-        var fileIoCommands = verbs.Where(x => x.SupportsFiles);
-        var comparer = StringComparer.OrdinalIgnoreCase;
-        return fileIoCommands.ToDictionary(
-            x => "." + x.Name,
-            x => x.SupportedExtensions.ToHashSet(comparer),
-            comparer
-        );
-    }
+        Completions = completionRequest
+            .Completions.OrderBy(x => x.Name)
+            .Select(entry =>
+                new QueryEditorCompletionData(entry, completionRequest.Prefix, completionRequest.Rewind)
+                {
+                    Image = _imageProvider.GetImage(entry.Hint)
+                }
+            )
+            .ToList(),
+        OnCompletionWindowDataPopulated = completionRequest.OnCompletionWindowDataPopulated
+    };
+
+    public void Receive(HandleKeyDownMessage message) => message.Reply(HandleKeyDown(message));
+
+    public void Receive(CaretPositionChangedMessage message) => _ = OnCaretPositionChanged();
 }

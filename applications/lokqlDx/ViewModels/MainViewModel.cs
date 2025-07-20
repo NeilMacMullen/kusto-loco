@@ -11,8 +11,8 @@ using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
+using lokqlDxComponents.Events;
 using lokqlDxComponents.Services;
-using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
@@ -28,7 +28,6 @@ public partial class MainViewModel : ObservableObject
     private readonly ILauncher _launcher;
     private readonly PreferencesManager _preferencesManager;
     private readonly RegistryOperations _registryOperations;
-    private readonly IServiceProvider _serviceProvider;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     [ObservableProperty] private int _activeQueryIndex;
@@ -51,6 +50,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
     private readonly AssetFolderImageProvider _imageProvider;
+    private readonly QueryEditorScopedContextFactory _queryEditorScopedContextFactory;
 
 
     public MainViewModel(
@@ -61,12 +61,12 @@ public partial class MainViewModel : ObservableObject
         RegistryOperations registryOperations,
         IStorageProvider storage,
         ILauncher launcher,
-        IServiceProvider serviceProvider,
-        AssetFolderImageProvider imageProvider
+        AssetFolderImageProvider imageProvider,
+        QueryEditorScopedContextFactory queryEditorScopedContextFactory
     )
     {
+        _queryEditorScopedContextFactory = queryEditorScopedContextFactory;
         _imageProvider = imageProvider;
-        _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
@@ -112,16 +112,17 @@ public partial class MainViewModel : ObservableObject
 
     private void AddQuery(string name, string content, int desiredIndex)
     {
-        var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
+
         var renderingSurfaceViewModel = new RenderingSurfaceViewModel(name, _explorer.Settings, _displayPreferences);
         renderingSurfaceViewModel.Name = name;
         var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
         var copilotChatViewModel = new CopilotChatViewModel();
+        var scopedContext = _queryEditorScopedContextFactory.Create(sharedExplorer);
         var queryEditorViewModel = new QueryEditorViewModel(sharedExplorer,
             ConsoleViewModel,
             _displayPreferences,
             content,
-            adapter);
+            scopedContext);
 
         var queryModel = new QueryViewModel(queryEditorViewModel,
             renderingSurfaceViewModel,
@@ -129,6 +130,7 @@ public partial class MainViewModel : ObservableObject
 
         Queries.Insert(desiredIndex, new QueryItemViewModel(name, queryModel));
         ActiveQueryIndex = desiredIndex;
+        scopedContext.Messenger.Send<InitMessage>();
     }
 
     private QueryItemViewModel GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);

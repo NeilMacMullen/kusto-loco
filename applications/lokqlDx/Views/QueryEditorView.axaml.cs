@@ -65,7 +65,7 @@ public partial class QueryEditorView : UserControl
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(),
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, () => GetVm().Messenger,
             new CompletionWindowWrapper(TextEditor.TextArea));
         TextEditor.TextArea.Focus();
     }

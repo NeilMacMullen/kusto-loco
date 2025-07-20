@@ -7,4 +7,5 @@ public readonly record struct ShowCompletionOptions()
     public IReadOnlyCollection<QueryEditorCompletionData> Completions { get; init; } = [];
     public Action<CompletionWindow> OnCompletionWindowDataPopulated { get; init; } = EmptyAction;
     private static readonly Action<CompletionWindow> EmptyAction = _ => { };
+    public static readonly ShowCompletionOptions Empty = new();
 }
