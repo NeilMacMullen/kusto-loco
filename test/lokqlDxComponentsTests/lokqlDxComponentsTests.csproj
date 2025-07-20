@@ -21,10 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Using Include="Xunit"/>
     </ItemGroup>
 

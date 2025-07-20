@@ -1,6 +1,6 @@
 ﻿namespace Intellisense.FileSystem.Paths;
 
-internal static class PathExtensions
+public static class PathExtensions
 {
     public static bool EndsWithDirectorySeparator(this string path)
     {
@@ -17,9 +17,11 @@ internal static class PathExtensions
         return path == Path.DirectorySeparatorChar || path == Path.AltDirectorySeparatorChar;
     }
 
-    public static bool IsValidDriveChar(this char value)
+    public static string NormalizePath(this string path)
     {
-        // copied from Path internals
-        return (uint)((value | 0x20) - 'a') <= 'z' - 'a';
+        ReadOnlySpan<char> separators = new([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]);
+        var span = new Span<char>(new char[path.Length]);
+        path.AsSpan().Replace(span, Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        return span.TrimEnd(separators).ToString();
     }
 }

@@ -18,4 +18,8 @@
         <ProjectReference Include="..\Intellisense\Intellisense.csproj" />
         <ProjectReference Include="..\lokql-engine\lokql-engine.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Assets\SyntaxHighlighting.xml" />
+    </ItemGroup>
 </Project>

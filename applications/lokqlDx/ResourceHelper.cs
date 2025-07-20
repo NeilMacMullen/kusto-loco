@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using lokqlDxComponents;
+using lokqlDxComponents.Services;
 
 namespace LokqlDx;
 
@@ -14,10 +15,6 @@ internal static class ResourceHelper
     /// </remarks>
     public static Stream SafeGetResourceStream(string substring)
     {
-        var assembly = Assembly.GetEntryAssembly()!;
-        var availableResources = assembly.GetManifestResourceNames();
-        var wanted =
-            availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
-        return assembly.GetManifestResourceStream(wanted)!;
+        return App.Resolve<IAssetService>().Open("/Assets/" + substring);
     }
 }

@@ -13,10 +13,13 @@ namespace LokqlDx;
 public class App : Application
 {
     private readonly IServiceProvider _serviceProvider;
+    private static IServiceProvider? _provider;
+    public static T Resolve<T>() where T : notnull => _provider!.GetRequiredService<T>();
 
     public App(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
+        _provider = _serviceProvider;
     }
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
