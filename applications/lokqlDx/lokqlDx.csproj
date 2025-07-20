@@ -15,6 +15,7 @@
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
   </PropertyGroup>
   <ItemGroup>
+    <None CopyToOutputDirectory="Always" Update="appsettings.Development.json" />
     <None Remove="Assets\CompletionIcons\column.svg" />
     <None Remove="Assets\CompletionIcons\command.svg" />
     <None Remove="Assets\CompletionIcons\csv.svg" />
@@ -112,4 +113,5 @@
       <DependentUpon>QueryEditorView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
 </Project>
