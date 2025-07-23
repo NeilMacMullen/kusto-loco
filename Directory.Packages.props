@@ -48,6 +48,8 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.9.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.9.3" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.1" />
+    <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.3" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.2.0" />
     <PackageVersion Include="Parquet.Net" Version="5.1.1" />
