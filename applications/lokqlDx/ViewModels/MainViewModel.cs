@@ -155,7 +155,11 @@ public partial class MainViewModel : ObservableObject
         else if (prevActiveIndex == indexOfThis) ActiveQueryIndex = Math.Clamp(prevActiveIndex, 0, Queries.Count - 1);
     }
 
-    partial void OnActiveQueryIndexChanged(int value) => ActiveQueryChanged();
+    partial void OnActiveQueryIndexChanged(int value)
+    {
+        if (value >=0)
+            ActiveQueryChanged();
+    }
 
     private void ActiveQueryChanged()
     {
