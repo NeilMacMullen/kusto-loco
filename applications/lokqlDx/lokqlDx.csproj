@@ -17,54 +17,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None CopyToOutputDirectory="Always" Update="appsettings.Development.json" />
-    <None Remove="Assets\CompletionIcons\column.svg" />
-    <None Remove="Assets\CompletionIcons\command.svg" />
-    <None Remove="Assets\CompletionIcons\csv.svg" />
-    <None Remove="Assets\CompletionIcons\file.svg" />
-    <None Remove="Assets\CompletionIcons\folder.svg" />
-    <None Remove="Assets\CompletionIcons\function.svg" />
-    <None Remove="Assets\CompletionIcons\html.svg" />
-    <None Remove="Assets\CompletionIcons\json.svg" />
-    <None Remove="Assets\CompletionIcons\operator.svg" />
-    <None Remove="Assets\CompletionIcons\parquet.svg" />
-    <None Remove="Assets\CompletionIcons\ppt.svg" />
-    <None Remove="Assets\CompletionIcons\pptx.svg" />
-    <None Remove="Assets\CompletionIcons\table.svg" />
-    <None Remove="Assets\CompletionIcons\tsv.svg" />
-    <None Remove="Assets\CompletionIcons\txt.svg" />
-    <None Remove="Assets\CompletionIcons\xls.svg" />
-    <None Remove="Assets\CompletionIcons\xlsx.svg" />
-    <None Remove="Assets\kql.ico" />
-    <None Remove="IntellisenseFunctions.json" />
-    <None Remove="IntellisenseOperators.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\CompletionIcons\column.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\command.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\csv.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\file.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\folder.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\function.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\html.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\json.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\operator.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\parquet.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\ppt.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\pptx.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\table.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\tsv.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\txt.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\xls.svg" />
-    <AvaloniaResource Include="Assets\CompletionIcons\xlsx.svg" />
-    <AvaloniaResource Include="Assets\kql.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\kql.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="IntellisenseFunctions.json" />
-    <EmbeddedResource Include="IntellisenseOperators.json" />
-    <EmbeddedResource Include="SyntaxHighlighting.xml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,121 +1,98 @@
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Svg;
 using Avalonia.Threading;
 using Intellisense;
-using lokqlDxComponents.Configuration;
 using lokqlDxComponents.Views;
 using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Services;
 
 public class AssetFolderImageProvider(
-    AppOptions options,
     ILogger<AssetFolderImageProvider> logger,
-    IInternalAssetLoader internalAssetLoader
-    )
+    IAssetService assetService
+)
     : IImageProvider
 {
-    private bool _initialized;
-    private Dictionary<IntellisenseHint, Uri> _hintToAssetUriMappings = [];
+    private Dictionary<IntellisenseHint, string>? _hintToAssetPathMappings;
+    private Dictionary<string, IImage> _imageCache = [];
 
     public IImage GetImage(IntellisenseHint imageSource)
     {
-        if (!_initialized)
+        if (_hintToAssetPathMappings is null)
         {
+            logger.LogInformation("Service has not been initialized yet. Initializing.");
             Init();
+            ArgumentNullException.ThrowIfNull(_hintToAssetPathMappings);
         }
 
-        return _hintToAssetUriMappings.TryGetValue(imageSource, out var uri)
-            ? internalAssetLoader.LoadImage(uri)
+        var image = _hintToAssetPathMappings.TryGetValue(imageSource, out var uri)
+            ? LoadImage(uri)
             : NullImage.Instance;
+        return image;
     }
 
     public void Init()
     {
+        logger.LogInformation("Using {CompletionIconsPath} for assets.", AssetLocations.CompletionIcons);
         // reinitialize state
-        _initialized = false;
-        _hintToAssetUriMappings = [];
+        _hintToAssetPathMappings = null;
+        _imageCache = [];
 
-        List<Uri> assets;
-        try
-        {
-            assets = internalAssetLoader.GetAssets(options.CompletionIconsUri).ToList();
-        }
-        catch (Exception e)
-        {
-            // AssetLoader retrieves assets from compiled binary.
-            // If that fails, there is either a fundamental issue at compilation or incorrect URI configured, which we cannot recover from.
-            // So gracefully degrade and disable image loading
-            logger.LogCritical(e, "Failed to retrieve assets.");
-            _hintToAssetUriMappings = [];
-            _initialized = true;
-            return;
-        }
+        var assets = assetService.GetAssetPathsByFolder(AssetLocations.CompletionIcons);
 
         // only include enum members that have an associated image to reduce unnecessary checks
-        _hintToAssetUriMappings = Enum
+        _hintToAssetPathMappings = Enum
             .GetValues<IntellisenseHint>()
             .Join(assets,
                 x => x.ToString(),
-                x => Path.GetFileNameWithoutExtension(x.AbsolutePath),
+                Path.GetFileNameWithoutExtension,
                 KeyValuePair.Create,
                 StringComparer.OrdinalIgnoreCase
             )
             .ToDictionary();
 
         // prepopulate cache
-        foreach (var hintToAssetUriMapping in _hintToAssetUriMappings)
+        foreach (var hintToAssetUriMapping in _hintToAssetPathMappings)
         {
-            internalAssetLoader.LoadImage(hintToAssetUriMapping.Value);
+            LoadImage(hintToAssetUriMapping.Value);
         }
 
-        logger.LogInformation("Loaded mappings with {ItemCount} items", _hintToAssetUriMappings.Count);
-        _initialized = true;
-
+        logger.LogInformation("Loaded mappings with {ItemCount} items", _hintToAssetPathMappings.Count);
+        logger.LogInformation("Populated image cache with {ItemCount} items", _imageCache.Count);
     }
-}
 
-public class InternalAssetLoader(ILogger<InternalAssetLoader> logger) : IInternalAssetLoader
-{
-    private readonly Dictionary<Uri, IImage> _imageAssetCache = [];
-
-    private static IImage CreateImage(Uri uri, Stream stream)
+    private static IImage CreateImage(string path, Stream stream)
     {
-        if (uri.AbsolutePath.EndsWith(".svg"))
+        if (path.EndsWith(".svg"))
         {
             return new SvgImage { Source = SvgSource.Load(stream) };
         }
-
-
         return new Bitmap(stream);
     }
 
-    public IEnumerable<Uri> GetAssets(Uri uri) => AssetLoader.GetAssets(uri, null);
-
-    public IImage LoadImage(Uri uri)
+    private IImage LoadImage(string path)
     {
-        if (_imageAssetCache.TryGetValue(uri, out var image))
+        using var _ = logger.BeginScope(new Dictionary<string, object> { ["AssetPath"] = path });
+        if (_imageCache.TryGetValue(path, out var image))
         {
             logger.LogTrace("Found image in cache");
             return image;
         }
 
+        if (!assetService.Exists(path))
+        {
+            logger.LogTrace("Asset does not exist");
+            return NullImage.Instance;
+        }
 
         try
         {
-            if (!AssetLoader.Exists(uri))
-            {
-                logger.LogTrace("Asset not found");
-                return NullImage.Instance;
-            }
-
-            var stream = AssetLoader.Open(uri);
+            var stream = assetService.Open(path);
             logger.LogTrace("Loaded asset");
-            var res = Dispatcher.UIThread.Invoke(() => CreateImage(uri, stream));
+            var res = Dispatcher.UIThread.Invoke(() => CreateImage(path, stream));
             logger.LogTrace("Created image");
-            _imageAssetCache[uri] = res;
+            _imageCache[path] = res;
             return res;
         }
         catch (Exception e)

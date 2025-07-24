@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using lokqlDxComponents;
+using lokqlDxComponents.Services;
 
 namespace LokqlDx;
 
@@ -12,12 +13,5 @@ internal static class ResourceHelper
     ///     namespace in the resource name. In any case, we really don't want to trust
     ///     that the namespace won't change so do a match against the filename
     /// </remarks>
-    public static Stream SafeGetResourceStream(string substring)
-    {
-        var assembly = Assembly.GetEntryAssembly()!;
-        var availableResources = assembly.GetManifestResourceNames();
-        var wanted =
-            availableResources.Single(name => name.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
-        return assembly.GetManifestResourceStream(wanted)!;
-    }
+    public static Stream SafeGetResourceStream(string substring) => App.Resolve<IAssetService>().Open(substring);
 }
