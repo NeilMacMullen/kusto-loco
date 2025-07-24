@@ -2,6 +2,7 @@ using Avalonia.Headless.XUnit;
 using AwesomeAssertions;
 using Jab;
 using lokqlDxComponents.Services;
+using lokqlDxComponents.Services.Assets;
 using lokqlDxComponentsTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,6 +1,6 @@
-using lokqlDxComponents.Services;
+using lokqlDxComponents.Models;
 
-namespace lokqlDxComponents.Models;
+namespace lokqlDxComponents.Services.Assets;
 
 public class AssetCatalog
 {

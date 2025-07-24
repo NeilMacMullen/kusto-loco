@@ -1,6 +1,6 @@
 using Avalonia.Platform;
 
-namespace lokqlDxComponents.Services;
+namespace lokqlDxComponents.Services.Assets;
 
 public interface IInternalAssetLoader
 {

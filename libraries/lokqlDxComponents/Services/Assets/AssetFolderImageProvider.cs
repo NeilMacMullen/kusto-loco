@@ -6,7 +6,7 @@ using Intellisense;
 using lokqlDxComponents.Views;
 using Microsoft.Extensions.Logging;
 
-namespace lokqlDxComponents.Services;
+namespace lokqlDxComponents.Services.Assets;
 
 public class AssetFolderImageProvider(
     ILogger<AssetFolderImageProvider> logger,

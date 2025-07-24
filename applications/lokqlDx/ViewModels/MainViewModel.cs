@@ -11,6 +11,7 @@ using LokqlDx.Desktop;
 using LokqlDx.Models;
 using LokqlDx.Services;
 using lokqlDxComponents.Services;
+using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
 

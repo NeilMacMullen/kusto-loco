@@ -7,6 +7,7 @@ using Jab;
 using LogSetup;
 using lokqlDxComponents.Configuration;
 using lokqlDxComponents.Services;
+using lokqlDxComponents.Services.Assets;
 using lokqlDxComponents.Views;
 using Microsoft.Extensions.DependencyInjection;
 

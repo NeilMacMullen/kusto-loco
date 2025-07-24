@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
 using lokqlDxComponents.Models;
+using lokqlDxComponents.Services.Assets;
 
 namespace lokqlDxComponentsTests;
 

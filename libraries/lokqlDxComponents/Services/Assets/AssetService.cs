@@ -2,7 +2,7 @@ using System.Text.Json;
 using lokqlDxComponents.Models;
 using Microsoft.Extensions.Logging;
 
-namespace lokqlDxComponents.Services;
+namespace lokqlDxComponents.Services.Assets;
 
 public interface IAssetService
 {
