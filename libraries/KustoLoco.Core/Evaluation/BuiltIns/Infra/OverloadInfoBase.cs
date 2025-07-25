@@ -12,8 +12,19 @@ public abstract class OverloadInfoBase
     {
         ReturnType = returnType;
         ParameterTypes = parameterTypes;
+        NumParametersToMatch= int.MaxValue;
     }
-
+    protected OverloadInfoBase(TypeSymbol returnType, int numParametersToMatch,params TypeSymbol[] parameterTypes)
+    {
+        ReturnType = returnType;
+        ParameterTypes = parameterTypes;
+        NumParametersToMatch = numParametersToMatch;
+    }
     public TypeSymbol ReturnType { get; }
     public IReadOnlyList<TypeSymbol> ParameterTypes { get; }
+    public int NumParametersToMatch
+    {
+        get;
+    }
+
 }

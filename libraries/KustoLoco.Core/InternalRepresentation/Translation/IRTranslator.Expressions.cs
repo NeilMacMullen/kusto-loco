@@ -332,26 +332,11 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 out var aggregateOverload))
         {
             Debug.Assert(aggregateOverload != null);
-
+            irArguments = irArguments.Take(aggregateOverload.NumParametersToMatch).ToArray();
+            parameters = parameters.Take(aggregateOverload.NumParametersToMatch).ToList();
             ApplyTypeCoercions(irArguments, aggregateOverload);
             return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments),
                 node.ResultType);
-        }
-
-        //horrible hack for arg_max and co...
-        if (returnType is TupleSymbol)
-        {
-            var reducedirArguments = irArguments.Take(1).ToArray();
-            var reducedparameters = parameters.Take(1).ToList();
-            if (BuiltInAggregates.TryGetOverload(functionSymbol, returnType, reducedirArguments, reducedparameters,
-                    out var aggregateOverload2))
-            {
-                Debug.Assert(aggregateOverload2 != null);
-
-                ApplyTypeCoercions(reducedirArguments, aggregateOverload2);
-                return new IRAggregateCallNode(signature, aggregateOverload2, reducedparameters, IRListNode.From(reducedirArguments),
-                    node.ResultType);
-            }
         }
 
         if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
