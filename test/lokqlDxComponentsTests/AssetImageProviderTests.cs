@@ -4,12 +4,14 @@ using Avalonia.Svg;
 using AwesomeAssertions;
 using Intellisense;
 using Jab;
-using LogSetup;
-using lokqlDxComponents.Configuration;
+using lokqlDxComponents;
 using lokqlDxComponents.Services;
 using lokqlDxComponents.Services.Assets;
 using lokqlDxComponents.Views;
+using lokqlDxComponentsTests.Fixtures;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace lokqlDxComponentsTests;
 
@@ -172,12 +174,20 @@ public class AssetImageProviderTests
 }
 
 [ServiceProvider]
-[Import<IAutocompletionModule>]
-[Import<ILoggingModule>]
+[Import<IBaseTestModule>]
 [Singleton<IImageProvider>(Factory = nameof(GetAssetFolderImageProvider))]
 [Singleton<AssetFolderImageProvider>]
+[Singleton<IConfiguration>(Instance = nameof(Config))]
 public partial class ImageProviderTestContainer
 {
+    public ConfigurationManager Config { get; set; } = Host.CreateApplicationBuilder().Configuration;
     public IImageProvider GetAssetFolderImageProvider(AssetFolderImageProvider assetFolderImageProvider) => assetFolderImageProvider;
+
+    public ImageProviderTestContainer()
+    {
+        Config.AddInMemoryCollection([
+            new(nameof(AssetLocations.CompletionIcons),"CompletionIcons2")
+        ]);
+    }
 
 }

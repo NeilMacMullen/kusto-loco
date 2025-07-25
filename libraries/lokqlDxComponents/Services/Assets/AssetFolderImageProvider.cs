@@ -4,13 +4,15 @@ using Avalonia.Svg;
 using Avalonia.Threading;
 using Intellisense;
 using lokqlDxComponents.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Services.Assets;
 
 public class AssetFolderImageProvider(
     ILogger<AssetFolderImageProvider> logger,
-    IAssetService assetService
+    IAssetService assetService,
+    IConfiguration configuration
 )
     : IImageProvider
 {
@@ -34,12 +36,14 @@ public class AssetFolderImageProvider(
 
     public void Init()
     {
-        logger.LogInformation("Using {CompletionIconsPath} for assets.", AssetLocations.CompletionIcons);
+        var completionIconsPath = configuration[nameof(AssetLocations.CompletionIcons)] ?? AssetLocations.CompletionIcons;
+        logger.LogInformation("Using {CompletionIconsPath} for assets.", completionIconsPath);
         // reinitialize state
         _hintToAssetPathMappings = null;
         _imageCache = [];
 
-        var assets = assetService.GetAssetPathsByFolder(AssetLocations.CompletionIcons);
+
+        var assets = assetService.GetAssetPathsByFolder(completionIconsPath);
 
         // only include enum members that have an associated image to reduce unnecessary checks
         _hintToAssetPathMappings = Enum

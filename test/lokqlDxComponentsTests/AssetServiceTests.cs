@@ -24,15 +24,6 @@ public class AssetServiceTests
     }
 
     [AvaloniaFact]
-    public void Open_ResourceFoundInCurrentAndUpstreamAssembly_PrioritizesDownstreamAssembly()
-    {
-        var f = new AssetServiceTestContainer();
-        var locator = f.GetRequiredService<IAssetService>();
-        var res = locator.Open("dummy_file.txt");
-        new StreamReader(res).ReadToEnd().Should().Be("MyTestVal1");
-    }
-
-    [AvaloniaFact]
     public void Open_ResourceNotFound_Throws()
     {
         var f = new AssetServiceTestContainer();

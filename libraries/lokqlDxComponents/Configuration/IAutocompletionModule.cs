@@ -34,23 +34,16 @@ public interface IAutocompletionModule
         logger.LogDebug("Retrieved {@Assemblies} for asset catalog construction.", assemblies);
 
 
-        var allAssets = assemblies
+        var assets = assemblies
             .Select(x => new Uri($"avares://{x}"))
             .SelectMany(assetLoader.GetAssets)
             .Select(Asset.Create)
             // AssetLoader returns URIs of other assets other than our own which are located under the root folder.
             // These are of no concern to us at this time so we filter for those that are in the folder we designate for holding assets.
-            .Where(x => PathComparer.Instance.Equals(x.BaseDirectory, AssetLocations.Assets))
-            .ToList();
+            .Where(x => PathComparer.Instance.Equals(x.BaseDirectory, AssetLocations.Assets));
 
 
-        // override duplicates from different assemblies (downstream prioritized for preservation)
-        // this is nondeterministic if 2 direct dependencies have duplicated assets
-        var assets = allAssets
-            .DistinctBy(x => x.AbsolutePath)
-            .ToList();
 
-        logger.LogInformation("{AssetCount} upstream assets overridden", allAssets.Count - assets.Count);
 
         var catalog = new AssetCatalog(assets);
 
