@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Kusto.Language.Syntax;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Other;
@@ -20,6 +21,12 @@ internal partial class TreeEvaluator : DefaultIRNodeVisitor<EvaluationResult, Ev
         }
 
         return lastResult;
+    }
+
+    public override EvaluationResult VisitStarExpression(IRStarExpression node, EvaluationContext context)
+    {
+        System.Console.WriteLine("Star expression");
+        throw new System.NotImplementedException();
     }
 
     public override EvaluationResult VisitLetStatement(IRLetStatementNode node, EvaluationContext context)

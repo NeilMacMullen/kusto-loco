@@ -146,7 +146,11 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new PercentileAggregateDoubleImpl(),
                     ScalarTypes.Real, ScalarTypes.Real,
                     ScalarTypes.Real)));
-
+        
+        aggregates.Add(Aggregates.ArgMax,new AggregateInfo(
+            new AggregateOverloadInfo(new ArgMaxFunctionImpl(),ScalarTypes.Dynamic,ScalarTypes.Long,
+                ScalarTypes.String)));
+        
         aggregates.Add(
             Aggregates.MakeSet,
             new AggregateInfo(

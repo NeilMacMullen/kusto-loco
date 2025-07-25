@@ -14,6 +14,8 @@ using KustoLoco.Core.InternalRepresentation.Nodes.Statements;
 
 namespace KustoLoco.Core.InternalRepresentation;
 
+
+
 internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 {
     private readonly Dictionary<FunctionSymbol, ScalarFunctionInfo> _functions;
@@ -34,7 +36,8 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
             var keyword = queryOp.Kind.ToString().Replace("Operator", "").ToLowerInvariant();
             throw new NotImplementedException($"Query operator '{keyword}' not supported");
         }
-        throw new NotImplementedException(TypeNameHelper.GetTypeDisplayName(node));
+        
+        throw new NotImplementedException($"Unrecognised token type {node.Kind}");
     }
 
     public override IRNode VisitQueryBlock(QueryBlock node)
