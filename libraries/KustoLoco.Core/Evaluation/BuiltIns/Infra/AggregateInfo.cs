@@ -9,5 +9,6 @@ internal class AggregateInfo
 {
     public AggregateInfo(params AggregateOverloadInfo[] overloads) => Overloads = overloads;
 
+
     public IReadOnlyList<AggregateOverloadInfo> Overloads { get; }
 }

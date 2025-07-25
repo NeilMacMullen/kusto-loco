@@ -43,6 +43,7 @@ public class ArgMinMaxTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("-1,Apple,Red");
     }
+   
 
     [TestMethod]
     public async Task ArgMaxMultiple()
