@@ -13,7 +13,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class PercentileAggregateIntImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesCol = (TypedBaseColumn<int?>)arguments[0].Column;
@@ -41,7 +41,7 @@ internal class PercentileAggregateIntImpl : IAggregateImpl
 
 internal class PercentileAggregateLongImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesCol = (TypedBaseColumn<long?>)arguments[0].Column;
@@ -69,7 +69,7 @@ internal class PercentileAggregateLongImpl : IAggregateImpl
 
 internal class PercentileAggregateDoubleImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesCol = (TypedBaseColumn<double?>)arguments[0].Column;

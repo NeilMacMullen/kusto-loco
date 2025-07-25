@@ -8,7 +8,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class TakeAnyFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var column = arguments[0].Column;

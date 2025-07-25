@@ -12,7 +12,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class MakeListWithNullsIntFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
@@ -29,7 +29,7 @@ internal class MakeListWithNullsIntFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsLongFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
@@ -46,7 +46,7 @@ internal class MakeListWithNullsLongFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsDoubleFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
@@ -63,7 +63,7 @@ internal class MakeListWithNullsDoubleFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsDecimalFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
@@ -80,7 +80,7 @@ internal class MakeListWithNullsDecimalFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsTimeSpanFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
@@ -97,7 +97,7 @@ internal class MakeListWithNullsTimeSpanFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsDateTimeFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
@@ -114,7 +114,7 @@ internal class MakeListWithNullsDateTimeFunctionImpl : IAggregateImpl
 
 internal class MakeListWithNullsStringFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+   public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;

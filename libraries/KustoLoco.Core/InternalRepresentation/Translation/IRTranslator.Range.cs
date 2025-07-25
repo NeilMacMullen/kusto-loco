@@ -40,7 +40,6 @@ internal partial class IRTranslator
 {
     public override IRNode VisitStarExpression(StarExpression node)
     {
-        System.Console.WriteLine("here");
         return new IRStarExpression();
     }
 }

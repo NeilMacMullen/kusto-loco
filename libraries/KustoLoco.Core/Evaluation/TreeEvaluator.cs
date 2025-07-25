@@ -25,7 +25,6 @@ internal partial class TreeEvaluator : DefaultIRNodeVisitor<EvaluationResult, Ev
 
     public override EvaluationResult VisitStarExpression(IRStarExpression node, EvaluationContext context)
     {
-        System.Console.WriteLine("Star expression");
         throw new System.NotImplementedException();
     }
 

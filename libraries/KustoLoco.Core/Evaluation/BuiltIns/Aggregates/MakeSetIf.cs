@@ -12,7 +12,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class MakeSetIfIntFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
@@ -54,7 +54,7 @@ internal class MakeSetIfIntFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfLongFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
@@ -96,7 +96,7 @@ internal class MakeSetIfLongFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfDoubleFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
@@ -138,7 +138,7 @@ internal class MakeSetIfDoubleFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfDecimalFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
@@ -180,7 +180,7 @@ internal class MakeSetIfDecimalFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfTimeSpanFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
@@ -222,7 +222,7 @@ internal class MakeSetIfTimeSpanFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfDateTimeFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
@@ -264,7 +264,7 @@ internal class MakeSetIfDateTimeFunctionImpl : IAggregateImpl
 
 internal class MakeSetIfStringFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
         var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
