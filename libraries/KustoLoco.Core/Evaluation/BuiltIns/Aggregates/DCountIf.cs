@@ -12,7 +12,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class DCountIfAggregateIntImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
@@ -23,7 +23,7 @@ internal class DCountIfAggregateIntImpl : IAggregateImpl
 
 internal class DCountIfAggregateLongImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
@@ -34,7 +34,7 @@ internal class DCountIfAggregateLongImpl : IAggregateImpl
 
 internal class DCountIfAggregateDoubleImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
@@ -45,7 +45,7 @@ internal class DCountIfAggregateDoubleImpl : IAggregateImpl
 
 internal class DCountIfAggregateDecimalImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
@@ -56,7 +56,7 @@ internal class DCountIfAggregateDecimalImpl : IAggregateImpl
 
 internal class DCountIfAggregateDateTimeImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
@@ -67,7 +67,7 @@ internal class DCountIfAggregateDateTimeImpl : IAggregateImpl
 
 internal class DCountIfAggregateTimeSpanImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
@@ -78,7 +78,7 @@ internal class DCountIfAggregateTimeSpanImpl : IAggregateImpl
 
 internal class DCountIfAggregateStringImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 2);
         var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;

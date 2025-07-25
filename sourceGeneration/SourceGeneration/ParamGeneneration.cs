@@ -97,7 +97,7 @@ namespace KustoLoco.SourceGeneration
         {
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
-            dbg.AppendLine("public ScalarResult Invoke(ITableChunk chunk,ColumnarResult[] arguments)");
+            dbg.AppendLine("public EvaluationResult Invoke(ITableChunk chunk,ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);

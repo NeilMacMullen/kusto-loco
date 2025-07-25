@@ -196,6 +196,8 @@
 			<Word>make_timespan</Word>
 			<Word>make_list</Word>
 			<Word>make_listif</Word>
+			<Word>arg_min</Word>
+			<Word>arg_max</Word>
 
 		</Keywords>
 		<!-- Digits -->

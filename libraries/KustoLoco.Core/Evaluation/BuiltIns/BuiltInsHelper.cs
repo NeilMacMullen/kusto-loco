@@ -62,7 +62,9 @@ internal static class BuiltInsHelper
         foreach (var overload in overloads)
         {
             var returnType = overload.ReturnType;
-            if (returnType.Simplify() != expectedReturnType.Simplify()) continue;
+            if ((returnType != ScalarTypes.Dynamic) &&
+              (returnType.Simplify() != expectedReturnType.Simplify()))
+                continue;
 
             if (overload.ParameterTypes.Count != arguments.Length) continue;
 
