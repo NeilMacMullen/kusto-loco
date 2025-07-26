@@ -450,7 +450,7 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
     [TestMethod]
     public async Task ToDateTime3()
     {
-        var query = "print todatetime('12-02-2022') == datetime(12-02-2022)";
+        var query = "print todatetime('13-02-2022') == datetime(13-02-2022)";
         var result = await LastLineOfResult(query);
         result.Should().Be("True");
     }
