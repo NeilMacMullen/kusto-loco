@@ -448,6 +448,21 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
     }
 
     [TestMethod]
+    public async Task ToDateTime3()
+    {
+        var query = "print todatetime('12-02-2022') == datetime(12-02-2022)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("True");
+    }
+    [TestMethod]
+    public async Task DateTime4()
+    {
+        var query = "print datetime(2022-02-12)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2022");
+    }
+
+    [TestMethod]
     public async Task ToDateTime2()
     {
         var query = "print D=todatetime('2024/01/15 12:35:35')";
