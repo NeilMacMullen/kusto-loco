@@ -67,15 +67,17 @@ internal static class BuiltInsHelper
                 continue;
 
             var argumentsToConsider = Math.Min(arguments.Length, overload.NumParametersToMatch);
-
-            if (overload.ParameterTypes.Count != argumentsToConsider) continue;
+            var arbitraryCOunt = overload.RepeatParams;
+            if (!arbitraryCOunt &&  overload.ParameterTypes.Count != argumentsToConsider) continue;
 
             var compatible = true;
           
             for (var i = 0; i < argumentsToConsider; i++)
             {
                 var argument = arguments[i];
-                var parameterType = overload.ParameterTypes[i];
+                var parameterType = arbitraryCOunt ?
+                    overload.ParameterTypes[0]:
+                overload.ParameterTypes[i];
 
                 var simplifiedArgType = argument.ResultType.Simplify();
                 var simplifiedParamType = parameterType.Simplify();

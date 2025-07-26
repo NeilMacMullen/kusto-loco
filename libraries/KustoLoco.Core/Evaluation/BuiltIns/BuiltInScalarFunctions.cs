@@ -43,36 +43,8 @@ internal static class BuiltInScalarFunctions
         IsNanFunction.Register(Functions);
         IsUtf8Function.Register(Functions);
         ReverseFunction.Register(Functions);
-
-        {
-            var overloads = new List<ScalarOverloadInfo>();
-
-            AddCoalesce(overloads, () => new CoalesceBoolFunctionImpl(), ScalarTypes.Bool);
-            AddCoalesce(overloads, () => new CoalesceIntFunctionImpl(), ScalarTypes.Int);
-            AddCoalesce(overloads, () => new CoalesceLongFunctionImpl(), ScalarTypes.Long);
-            AddCoalesce(overloads, () => new CoalesceDoubleFunctionImpl(), ScalarTypes.Real);
-            AddCoalesce(overloads, () => new CoalesceDecimalFunctionImpl(), ScalarTypes.Decimal);
-            AddCoalesce(overloads, () => new CoalesceDateTimeFunctionImpl(), ScalarTypes.DateTime);
-            AddCoalesce(overloads, () => new CoalesceTimeSpanFunctionImpl(), ScalarTypes.TimeSpan);
-            AddCoalesce(overloads, () => new CoalesceStringFunctionImpl(), ScalarTypes.String);
-
-            Functions.Add(Kusto.Language.Functions.Coalesce, new ScalarFunctionInfo(overloads.ToArray()));
-
-            static void AddCoalesce(List<ScalarOverloadInfo> overloads, Func<IScalarFunctionImpl> factory,
-                ScalarSymbol type)
-            {
-                var impl = factory();
-                // Coalesce can take up to 64 arguments but we limit it to 16 here
-                for (var numArgs = 2; numArgs <= 16; numArgs++)
-                {
-                    var argTypes = new TypeSymbol[numArgs];
-                    for (var i = 0; i < numArgs; i++) argTypes[i] = type;
-
-                    overloads.Add(new ScalarOverloadInfo(impl, type, argTypes));
-                }
-            }
-        }
-
+       
+        Coalesce.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         Functions.Add(Kusto.Language.Functions.PI,
@@ -82,16 +54,12 @@ internal static class BuiltInScalarFunctions
 
         AgoFunction.Register(Functions);
         FormatDateTime.Register(Functions);
+        
+        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrcatFunctionImpl(), true,
+            ScalarTypes.String, ScalarTypes.String)));
 
-        //add multiple overloads for strcat
-        var strcatOverrides = Enumerable.Range(1, 64)
-            .Select(n =>
-                new ScalarOverloadInfo(new StrcatFunctionImpl(),
-                    ScalarTypes.String,
-                    Enumerable.Range(0, n).Select(_ => (TypeSymbol)ScalarTypes.String).ToArray()))
-            .ToArray();
-
-        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(strcatOverrides));
+        MinOfRegister.Register(Functions);
+        MaxOfRegister.Register(Functions);
 
         //add multiple overloads for strcat_delim
         var strcatDelimiterOverrides = Enumerable.Range(2, 64)
@@ -109,8 +77,6 @@ internal static class BuiltInScalarFunctions
         ArrayConcatFunction.Register(Functions);
         ArrayReverseFunction.Register(Functions);
         StrRepFunction.Register(Functions);
-        MaxOfFunction.Register(Functions);
-        MinOfFunction.Register(Functions);
         CountOfFunction.Register(Functions);
         IndexOfFunction.Register(Functions);
         ToLowerFunction.Register(Functions);

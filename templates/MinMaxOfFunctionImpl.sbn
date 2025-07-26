@@ -1,0 +1,73 @@
+{{include "funcs.sbn"
+include "lib/warnings.sbn"}}
+using System;
+using System.Linq;
+using System.Text;
+using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
+using System.Collections.Generic;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+{{autogenwarning}}
+
+{{for m in ["Min","Max"]}}
+{{ for line in comparable
+   t=line.Type 
+   tName = (t | string.capitalize)
+   s=line.Scalar
+}}
+internal class {{m}}OfFunction{{tName}}Impl : IScalarFunctionImpl
+{
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        {{t}}? ret = null;
+        foreach (var t in arguments) ret = TypeComparison.{{m}}Of{{tName}}(ret, ({{t}}?)t.Value);
+        return new ScalarResult(ScalarTypes.{{s}}, ret);
+    }
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        var columns = arguments
+            .Select(a => a.Column)
+            .Cast<TypedBaseColumn<{{t}}?>>().ToArray();
+
+        var data = new {{t}}?[columns[0].RowCount];
+        var builder = new StringBuilder();
+        for (var row = 0; row < columns[0].RowCount; row++)
+        {
+            {{t}}? ret = null;
+            foreach (var t in columns) ret = TypeComparison.{{m}}Of{{tName}}(ret, t[row]);
+            data[row] = ret;
+        }
+        return new ColumnarResult(ColumnFactory.Create(data));
+    }
+}
+{{end}}
+{{end}}
+
+{{for m in ["Min","Max"]}}
+
+public static class {{m}}OfRegister
+{
+  public static void Register(Dictionary<FunctionSymbol, ScalarFunctionInfo> functions)
+  {
+      functions.Add(Kusto.Language.Functions.{{m}}Of,
+         new ScalarFunctionInfo(
+
+
+{{ 
+    for line in comparable
+    t=line.Type 
+   s=line.Scalar
+   tName = (t | string.capitalize)
+}}
+            new ScalarOverloadInfo(new {{m}}OfFunction{{tName}}Impl(),true, ScalarTypes.{{s}}, ScalarTypes.{{s}})
+{{if (!for.last) 
+"           ,"
+end}}
+{{end}}
+         )
+      );
+  }
+}
+{{end}}

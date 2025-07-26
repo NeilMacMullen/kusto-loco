@@ -1,6 +1,15 @@
 
-textrude.exe render --models Csv!model=types.csv --template IndexFinder.tpl --output output=..\libraries\KustoLoco.Core\Evaluation\BuiltIns\Aggregates\IndexFinder.cs --verbose
+function extrude($sbn,$path)
+{
+write-host "building '$sbn.cs' in '$path'"
+$cmd ="textrude.exe render --models Csv!model=Types.csv --template $sbn.sbn --output output=..\libraries\KustoLoco.Core\Evaluation\BuiltIns\$path\$sbn.cs --verbose"
+write-host "Executing '$cmd'"
+invoke-expression  $cmd
+}
 
-textrude.exe render --models Csv!model=types.csv --template argmaxmin.tpl --output output=..\libraries\KustoLoco.Core\Evaluation\BuiltIns\Aggregates\ArgMinMaxFunctionImpl.cs --verbose
-
- textrude.exe render --models Csv!model=allTypes.csv --template takeAny.tpl --output output=..\libraries\KustoLoco.Core\Evaluation\BuiltIns\Aggregates\TakeAny.cs --verbose
+extrude IndexFinder Aggregates
+extrude ArgMinMaxFunctionImpl Aggregates
+extrude TakeAny Aggregates
+extrude TypeComparison ScalarFunctions
+extrude MinMaxOfFunctionImpl ScalarFunctions
+extrude CoalesceFunctionImpl ScalarFunctions

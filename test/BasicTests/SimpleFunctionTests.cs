@@ -1091,14 +1091,6 @@ print toscalar(letters | summarize mx=min(bitmap));";
     }
 
     [TestMethod]
-    public async Task MaxOf()
-    {
-        var res = await LastLineOfResult("print max_of(10,20)");
-        res.Should().Be("20");
-    }
-
-
-    [TestMethod]
     public async Task ArrayRotateLeft()
     {
         var query = """

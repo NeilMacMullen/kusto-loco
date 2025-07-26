@@ -1,0 +1,6 @@
+{{ 
+func ic(l)
+    ret l.IsComparable =="yes"
+end
+comparable =  model | array.filter @ic
+}}
