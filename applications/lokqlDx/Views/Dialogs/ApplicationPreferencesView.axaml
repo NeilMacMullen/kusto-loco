@@ -7,7 +7,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.Dialogs.ApplicationPreferencesView"
              x:DataType="vm:ApplicationPreferencesViewModel"
-             Loaded="UserControl_Loaded">
+             Loaded="UserControl_Loaded" 
+             >
     <Grid
         Margin="10"
         ColumnDefinitions="auto,auto,auto,*,auto,auto"
@@ -74,14 +75,14 @@
             Background="{DynamicResource SystemListLowColor}"
             Padding="10"
             CornerRadius="10">
-            <avaloniaEdit:TextEditor
+            <avaloniaEdit:TextEditor Height="300" HorizontalAlignment="Stretch"
                 x:Name="TextEditor"
                 FontFamily="{Binding SelectedFont}"
                 FontSize="{Binding FontSize}"
                 WordWrap="{Binding WordWrap}"
                 ShowLineNumbers="{Binding ShowLineNumbers}"
                 Document="{Binding Document}"
-                MinHeight="100" />
+               />
         </Border>
 
         <Button

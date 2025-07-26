@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Kusto.Language.Symbols;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using LokqlDx.Models;
@@ -126,8 +127,7 @@ public class DialogService
                 page,
                 new MarkdownHelpWindow(),
                 new MarkDownHelpModel(page, _launcher),
-                false,
-                0)
+                new ShowOptions(true,new Size(600,400),false))
             .ConfigureAwait(false);
 
 
@@ -137,8 +137,8 @@ public class DialogService
                 title,
                 new Flyout(),
                 new FlyoutViewModel(result, explorerSettings, displayPreferences),
-                false,
-                400)
+                new ShowOptions(true,new Size(600,400),false)
+                )
             .ConfigureAwait(false);
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
@@ -146,7 +146,7 @@ public class DialogService
                 "LokqlDX - Application Options",
                 new ApplicationPreferencesView(),
                 new ApplicationPreferencesViewModel(preferencesManager),
-                true, 0
+                _modalNonResizable
             )
             .ConfigureAwait(false);
 
@@ -156,7 +156,7 @@ public class DialogService
                 "Rename",
                 new RenameDialog(),
                 new RenameDialogModel(initialText),
-                true, 0)
+                _modalNonResizable)
             .ConfigureAwait(false);
 
     public async Task
@@ -165,32 +165,38 @@ public class DialogService
                 "LokqlDX - Workspace Options",
                 new WorkspacePreferencesView(),
                 new WorkspacePreferencesViewModel(workspaceManager, uiPreferences),
-                true, 0)
+                _modalNonResizable)
             .ConfigureAwait(false);
 
-    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, bool modal, int minSize)
+    private readonly ShowOptions _modalNonResizable = new ShowOptions(false, new Size(0, 0), true);
+    private readonly ShowOptions _nonModalResizable = new ShowOptions(false, new Size(0, 0), true);
+    private readonly record struct ShowOptions(bool CanResize, Size InitialSize,bool Modal);
+    
+    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext,ShowOptions options)
     {
         if (_topLevel is Window window)
         {
-            var sizing = (minSize > 0)
+            
+            var sizing = options.InitialSize.Height!=0 
                 ? SizeToContent.Manual
                 :SizeToContent.WidthAndHeight;
+            
             var dialog = new Window
             {
                 Title = title,
                 Content = content,
                 DataContext = dataContext,
                 SizeToContent = sizing,
-               
+                CanResize = options.CanResize,
                 TransparencyLevelHint =
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
             
-            if (minSize > 0)
+            if (options.InitialSize.Width > 0)
             {
-                dialog.Width = minSize;
-                dialog.Height = minSize;
+                dialog.Width = options.InitialSize.Width;
+                dialog.Height = options.InitialSize.Height;
             }
 
             if (window.ActualTransparencyLevel != WindowTransparencyLevel.Mica)
@@ -203,7 +209,7 @@ public class DialogService
 #endif
 
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-            if (!modal)
+            if (!options.Modal)
             {
                 dialog.Show(window);
             }
