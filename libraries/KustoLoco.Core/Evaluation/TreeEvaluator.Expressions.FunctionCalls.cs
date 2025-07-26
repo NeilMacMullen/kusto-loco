@@ -20,8 +20,11 @@ internal partial class TreeEvaluator
         EvaluationContext context)
     {
         var hints = node.OverloadInfo.EvaluationHints;
+        //check the context in case we've been invoked in a scalar context
+        //such as "print rand()"
         var isSelfGeneratingData =
-            hints.HasFlag(EvaluationHints.ForceColumnarEvaluation);
+            hints.HasFlag(EvaluationHints.ForceColumnarEvaluation)
+            && context.Chunk.RowCount > 0;
 
         var resultKind = node.ResultKind;
         if (isSelfGeneratingData)
@@ -40,7 +43,7 @@ internal partial class TreeEvaluator
 
         if (isSelfGeneratingData)
         {
-            //if the function "self generates" data we need to insert a 
+            //if the function "self generates" data Twe need to insert a 
             //'dummy' column that defines the length so that the 
             //function knows how many rows to generate for if that's 
             //not apparent from the other arguments.
@@ -89,10 +92,10 @@ internal partial class TreeEvaluator
             rawArguments[i] = argResult;
             hasScalar = hasScalar || argResult.IsScalar;
         }
+
         var arguments = BuiltInsHelper.CreateResultArray(rawArguments);
 
         if (node.ResultType is TupleSymbol tuple)
-        {
             foreach (var sym in tuple.Columns)
             {
                 var index = context.Chunk.Table.Type.Columns.IndexOf(sym);
@@ -100,7 +103,6 @@ internal partial class TreeEvaluator
                 var res = new ColumnarResult(col);
                 arguments = arguments.Append(res).ToArray();
             }
-        }
 
         return impl.Invoke(context.Chunk, arguments);
     }

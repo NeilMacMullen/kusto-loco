@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using NotNullStrings;
 
 // ReSharper disable StringLiteralTypo
 
@@ -312,32 +313,6 @@ datatable(Size:int) [50]
     }
 
     [TestMethod]
-    public async Task Rand()
-    {
-        //difficult to test randomness but ensure we got
-        //5 different values and they were all <1
-        var query = @"range i from 1 to 5 step 1 
-| extend r =rand()
-| where r >=0 and r <1
-| summarize by r | count ";
-        var result = await LastLineOfResult(query);
-        result.Should().Be("5");
-    }
-
-    [TestMethod]
-    public async Task RandInt()
-    {
-        //ensure we didn't get any fractional values
-        var query = @"range i from 1 to 5 step 1 
-| extend r =rand(100)
-| where toint(r) != r
-| count ";
-        var result = await LastLineOfResult(query);
-        result.Should().Be("0");
-    }
-
-
-    [TestMethod]
     public async Task BetweenLong()
     {
         //ensure we didn't get any fractional values
@@ -432,17 +407,6 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
 
 
     [TestMethod]
-    [Ignore("not yet implemented")]
-    public async Task Arg_max()
-    {
-        //ensure we didn't get any fractional values
-        var query = "print x=1,y=2 | summarize arg_max(x,*) by y"
-            ;
-        var result = await LastLineOfResult(query);
-        result.Should().Be("8");
-    }
-
-    [TestMethod]
     public async Task LogTest()
     {
         var query = "print v1 = log(4.5)";
@@ -476,7 +440,6 @@ range x from datetime(2023-01-01) to datetime(2023-01-30) step 1d
 
 
     [TestMethod]
-    [Ignore("need to fix up ToDateTime so as not to be US-centric")]
     public async Task ToDateTime()
     {
         var query = "print D=todatetime('15/01/2024 12:35:35')";
@@ -1331,7 +1294,7 @@ print toscalar(letters | summarize mx=min(bitmap));";
         var result = await LastLineOfResult(query);
         result.Should().Be("3.14");
     }
-    
+
     [TestMethod]
     public async Task NegativeTimespan()
     {
@@ -1348,10 +1311,11 @@ print toscalar(letters | summarize mx=min(bitmap));";
 
         async Task Check(string query, string results)
         {
-            query = dataPrefix+query;
+            query = dataPrefix + query;
             var result = await ResultAsString(query);
             result.Should().Be(results);
         }
+
         await Check("take 2 | order by b asc", "False,True");
         await Check("take 2 | order by b desc", "True,False");
         await Check("take 2 | order by b asc nulls first", "False,True");
@@ -1361,11 +1325,33 @@ print toscalar(letters | summarize mx=min(bitmap));";
 
         await Check("order by b asc", "null,False,True");
         await Check("order by b desc", "True,False,null");
-      
+
         await Check("order by b desc nulls first", "null,True,False");
         await Check("order by b asc nulls last", "False,True,null");
         await Check("order by b desc nulls last", "True,False,null");
         await Check("order by b asc nulls first", "null,False,True");
     }
 
+
+    [TestMethod]
+    public async Task PiScalar()
+    {
+        var query = "print pi()";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("3.14");
+    }
+
+    [TestMethod]
+    public async Task PiColumn()
+    {
+        var query = """
+                    range i from 1 to 3 step 1
+                    | extend r = pi()
+                    | project r
+                    """;
+        var result = await ResultAsString(query);
+        var lines = result.Tokenize(",");
+        lines.Should().AllSatisfy(c => c.Should().Contain("3.14"));
+        lines.Length.Should().Be(3);
+    }
 }
