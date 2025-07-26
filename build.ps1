@@ -16,7 +16,13 @@ param(
 )
 $versionString = $version.replace('.', '-')
 $uploadsFolder = "uploads-$versionstring"
-$packages = @("KustoLoco.Core", "FileFormats", "Rendering", "ScottPlotRendering", "SixelSupport")
+$packages = @( ("KustoLoco.Core","KustoLoco.Core"), 
+               ("KustoLoco.FileFormats", "KustoLoco.FileFormats"),
+               ("Rendering", "KustoLoco.Rendering"),
+               ("ScottPlotRendering","KustoLoco.Rendering.ScottPlot"), 
+               ("SixelSupport","KustoLoco.Rendering.SixelSupport")
+             )
+
 
 if (-not $skipBuild) {
     Get-ChildItem -Path publish -File | Remove-Item -Force
@@ -30,7 +36,8 @@ if (-not $skipBuild) {
     #make nuget packages
     
     foreach ($package in $packages) {
-        dotnet pack -p:PackageVersion=$version .\libraries\$package\$package.csproj
+        $project=$package[0]
+        dotnet pack -p:PackageVersion=$version .\libraries\$project\$project.csproj
     }
    
     dotnet pack   -p:PackageVersion=$version .\sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj
@@ -65,7 +72,9 @@ if (-not $skipBuild) {
 
 if (-not ($api -like '') ) {
     foreach ($package in $packages) {
-        dotnet nuget push libraries\$package\bin\Release\$package.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
+        $project=$package[0]
+        $nuget=$package[1]
+        dotnet nuget push libraries\$project\bin\Release\$nuget.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
     }
     dotnet nuget push sourceGeneration\SourceGenDependencies\bin\Release\KustoLoco.SourceGeneration.Attributes.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
 }
