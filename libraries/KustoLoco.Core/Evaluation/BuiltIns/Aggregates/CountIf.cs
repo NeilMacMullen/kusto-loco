@@ -10,7 +10,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class CountIfFunctionImpl : IAggregateImpl
 {
-    public ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
         var column = (TypedBaseColumn<bool?>)arguments[0].Column;

@@ -18,6 +18,8 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
     {
+
+        
         Debug.Assert(context.Left != TabularResult.Empty);
         var byExpressions = new List<IRExpressionNode>();
         for (var i = 0; i < node.ByColumns.ChildCount; i++) byExpressions.Add(node.ByColumns.GetTypedChild(i));
@@ -144,10 +146,24 @@ internal partial class TreeEvaluator
                 for (var i = 0; i < _aggregationExpressions.Count; i++)
                 {
                     var aggregationExpression = _aggregationExpressions[i];
-                    var aggregationResult = (ScalarResult)aggregationExpression.Accept(_owner, chunkContext);
-                    Debug.Assert(aggregationResult.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
-                        $"Aggregation expression produced wrong type {SchemaDisplay.GetText(aggregationResult.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
-                    resultColumns[summarySet.ByValues.Length + i].Add(aggregationResult.Value);
+                    var aggregationResult = aggregationExpression.Accept(_owner, chunkContext);
+                    if (aggregationResult is ScalarResult scalar)
+                    {
+
+                        Debug.Assert(scalar.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
+                            $"Aggregation expression produced wrong type {SchemaDisplay.GetText(scalar.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
+                        resultColumns[summarySet.ByValues.Length + i].Add(scalar.Value);
+                    }
+
+                    if (aggregationResult is RowResult rowResult)
+                    {
+                        var offset = 0;
+                        foreach (var v in rowResult.Values)
+                        {
+                            resultColumns[summarySet.ByValues.Length + offset].Add(v);
+                            offset++;
+                        }
+                    }
                 }
             }
 

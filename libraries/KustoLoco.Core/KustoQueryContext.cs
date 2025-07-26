@@ -181,7 +181,12 @@ public class KustoQueryContext
         catch (Exception ex)
         {
             var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
-            return new KustoQueryResult(query, table, vis, TimeSpan.Zero, ex.Message);
+            var errorMessage = ex.Message;
+            if (_settings.HasSetting("kusto.stacktrace"))
+            {
+                errorMessage += $"\n\n{ex.StackTrace}";
+            }
+            return new KustoQueryResult(query, table, vis, TimeSpan.Zero, errorMessage);
         }
     }
 
@@ -277,7 +282,12 @@ public class KustoQueryContext
         catch (Exception ex)
         {
             var (table, visualizationState) = TableFromEvaluationResult(EvaluationResult.Null);
-            return new KustoQueryResult(query, table, visualizationState, TimeSpan.Zero, ex.Message);
+            var errorMessage = ex.Message;
+            if (_settings.HasSetting("kusto.stacktrace"))
+            {
+                errorMessage += $"\n\n{ex.StackTrace}";
+            }
+            return new KustoQueryResult(query, table, visualizationState, TimeSpan.Zero, errorMessage);
         }
     }
 

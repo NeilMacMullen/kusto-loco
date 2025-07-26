@@ -7,6 +7,7 @@ using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
+using KustoLoco.Core.InternalRepresentation.Nodes.Other;
 
 namespace KustoLoco.Core.InternalRepresentation;
 
@@ -33,3 +34,13 @@ internal partial class IRTranslator
             resultType);
     }
 }
+
+
+internal partial class IRTranslator
+{
+    public override IRNode VisitStarExpression(StarExpression node)
+    {
+        return new IRStarExpression();
+    }
+}
+

@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using Kusto.Language.Symbols;
+using Kusto.Language.Utils;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
@@ -88,8 +89,18 @@ internal partial class TreeEvaluator
             rawArguments[i] = argResult;
             hasScalar = hasScalar || argResult.IsScalar;
         }
-
         var arguments = BuiltInsHelper.CreateResultArray(rawArguments);
+
+        if (node.ResultType is TupleSymbol tuple)
+        {
+            foreach (var sym in tuple.Columns)
+            {
+                var index = context.Chunk.Table.Type.Columns.IndexOf(sym);
+                var col = context.Chunk.Columns[index];
+                var res = new ColumnarResult(col);
+                arguments = arguments.Append(res).ToArray();
+            }
+        }
 
         return impl.Invoke(context.Chunk, arguments);
     }

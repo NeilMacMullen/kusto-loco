@@ -7,5 +7,6 @@ namespace KustoLoco.Core.Evaluation.BuiltIns;
 
 internal interface IAggregateImpl
 {
-    ScalarResult Invoke(ITableChunk chunk, ColumnarResult[] arguments);
+    EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments);
+
 }

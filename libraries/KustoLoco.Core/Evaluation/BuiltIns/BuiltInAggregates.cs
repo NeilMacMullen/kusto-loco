@@ -115,24 +115,7 @@ internal static class BuiltInAggregates
         MaxAggregate.Register(aggregates);
         MaxIfAggregate.Register(aggregates);
 
-
-        var takeAnyOverloads = new AggregateInfo(
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Bool,
-                ScalarTypes.Bool),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Int,
-                ScalarTypes.Int),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Long,
-                ScalarTypes.Long),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Real,
-                ScalarTypes.Real),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(),
-                ScalarTypes.DateTime, ScalarTypes.DateTime),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(),
-                ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
-            new AggregateOverloadInfo(new TakeAnyFunctionImpl(),
-                ScalarTypes.String, ScalarTypes.String));
-        aggregates.Add(Aggregates.TakeAny, takeAnyOverloads);
-        aggregates.Add(Aggregates.Any, takeAnyOverloads);
+        TakeAny.Register(aggregates);
 
         aggregates.Add(
             Aggregates.Percentile,
@@ -146,6 +129,24 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new PercentileAggregateDoubleImpl(),
                     ScalarTypes.Real, ScalarTypes.Real,
                     ScalarTypes.Real)));
+        
+        aggregates.Add(Aggregates.ArgMax,new AggregateInfo(
+            new AggregateOverloadInfo(new ArgMaxFunctionIntImpl(),ScalarTypes.Dynamic,1,ScalarTypes.Int),
+                new AggregateOverloadInfo(new ArgMaxFunctionLongImpl(), ScalarTypes.Dynamic,1, ScalarTypes.Long),
+        new AggregateOverloadInfo(new ArgMaxFunctionDecimalImpl(), ScalarTypes.Dynamic,1, ScalarTypes.Decimal),
+        new AggregateOverloadInfo(new ArgMaxFunctionDoubleImpl(), ScalarTypes.Dynamic,1, ScalarTypes.Real),
+        new AggregateOverloadInfo(new ArgMaxFunctionDateTimeImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.DateTime),
+        new AggregateOverloadInfo(new ArgMaxFunctionTimeSpanImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.TimeSpan)
+            ));
+
+        aggregates.Add(Aggregates.ArgMin, new AggregateInfo(
+            new AggregateOverloadInfo(new ArgMinFunctionIntImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Int),
+            new AggregateOverloadInfo(new ArgMinFunctionLongImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Long),
+            new AggregateOverloadInfo(new ArgMinFunctionDecimalImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Decimal),
+            new AggregateOverloadInfo(new ArgMinFunctionDoubleImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Real),
+            new AggregateOverloadInfo(new ArgMinFunctionDateTimeImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.DateTime),
+            new AggregateOverloadInfo(new ArgMinFunctionTimeSpanImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.TimeSpan)
+        ));
 
         aggregates.Add(
             Aggregates.MakeSet,
@@ -384,7 +385,6 @@ internal static class BuiltInAggregates
             overload = null;
             return false;
         }
-
         overload = BuiltInsHelper.PickOverload(returnType, aggregateInfo.Overloads, arguments);
         return overload != null;
     }

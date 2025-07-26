@@ -44,6 +44,7 @@ public class BabyKustoEngine
         var settings = new KustoSettingsProvider();
         settings.Set(CoreSettings.DumpIr.Name, "true");
         settings.Set(CoreSettings.DumpParseTree.Name, "true");
+        settings.Set("kusto.stacktrace", "true");
         return settings;
     }
 

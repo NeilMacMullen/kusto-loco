@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Kusto.Language.Syntax;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.InternalRepresentation.Nodes.Other;
@@ -46,5 +47,6 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitUserFunctionCall(IRUserFunctionCallNode node, TContext context);
     public abstract TResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context);
     public abstract TResult VisitRangeOperator(IRRangeOperatorNode node, TContext context);
+    public abstract TResult VisitStarExpression(IRStarExpression node, TContext context);
 
 }

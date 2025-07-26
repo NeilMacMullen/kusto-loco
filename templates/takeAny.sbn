@@ -1,0 +1,55 @@
+{{include "lib/warnings.sbn"}}
+using System.Diagnostics;
+using System.Linq;
+using Kusto.Language.Symbols;
+using KustoLoco.Core.DataSource;
+using System.Collections.Generic;
+using Kusto.Language;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+
+{{autogenwarning}} 
+
+internal sealed class TakeAnyFunctionImpl : IAggregateImpl
+{
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments) => new RowResult(arguments.Select(a => a.Column.GetRawDataValue(0)));
+}
+
+{{ for line in model 
+   t=line.Type 
+   s=line.Scalar
+   tName = (t | string.capitalize)
+}}
+internal sealed class TakeAny{{tName}}Impl : IAggregateImpl
+{
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+        => new ScalarResult(ScalarTypes.{{s}},arguments[0].Column.GetRawDataValue(0));
+}
+  
+{{end}}
+
+
+internal static class TakeAny
+{
+
+    internal static void Register(Dictionary<FunctionSymbol, AggregateInfo> aggregates)
+    {
+        
+        var takeAnyOverloads = new AggregateInfo(
+{{ for line in model 
+   t=line.Type 
+   s=line.Scalar
+   tName = (t | string.capitalize)
+}}
+
+            new AggregateOverloadInfo(new TakeAny{{tName}}Impl(), ScalarTypes.{{s}}, ScalarTypes.{{s}}),
+
+{{end}}
+            new AggregateOverloadInfo(new TakeAnyFunctionImpl(), ScalarTypes.Dynamic,0)
+
+            );
+        aggregates.Add(Aggregates.TakeAny, takeAnyOverloads);
+        aggregates.Add(Aggregates.Any, takeAnyOverloads);
+    }
+
+}

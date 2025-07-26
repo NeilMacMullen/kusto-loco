@@ -1,0 +1,48 @@
+{{include "funcs.sbn"}}
+
+using Kusto.Language.Symbols;
+using Kusto.Language.Syntax;
+using KustoLoco.Core.DataSource;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+
+{{include "lib/warnings.sbn"
+autogenwarning
+}} 
+
+{{ for line in comparable
+   t=line.Type 
+   tName = (t | string.capitalize)
+   s=line.Scalar
+}}
+   
+internal class ArgMaxFunction{{tName}}Impl : IAggregateImpl
+{
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+
+        var maxIndex = IndexFinder.FindIndexOf{{tName}}(arguments[0].Column, true);
+        //the first argument is repeated
+        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        return new RowResult(o);
+    }
+}
+
+  
+internal class ArgMinFunction{{tName}}Impl : IAggregateImpl
+{
+    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
+    {
+
+        var maxIndex = IndexFinder.FindIndexOf{{tName}}(arguments[0].Column, false);
+        //the first argument is repeated
+        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        return new RowResult(o);
+    }
+}
+{{end}}

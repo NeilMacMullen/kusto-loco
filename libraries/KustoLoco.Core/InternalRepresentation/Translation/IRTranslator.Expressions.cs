@@ -37,7 +37,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         //between used after datetime range thinks type is unknown...
         var irArguments = new[] { parameterExpression!, leftRange, rightRange };
         var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
-            node.ResultType,irArguments);
+            node.ResultType, irArguments);
 
         //ApplyTypeCoercions(irArguments, overloadInfo);
 
@@ -45,12 +45,12 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
             overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
     }
 
-    public  IRNode VisitExpressionWithArray(Expression node,Expression left,ExpressionList right)
+    public IRNode VisitExpressionWithArray(Expression node, Expression left, ExpressionList right)
     {
         var signature = node.ReferencedSignature;
         var parameterExpression = left.Accept(this) as IRExpressionNode;
         var ja = new JsonArray();
-        var expresions =right.Expressions
+        var expresions = right.Expressions
             .OfType<SeparatedElement>()
             .Select(e => e.Element)
             .OfType<LiteralExpression>()
@@ -78,26 +78,20 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         var str1 = new IRPreEvaluatedScalarExpressionNode(ja, DynamicArraySymbol.From("dynamic"));
         var irArguments = new[] { parameterExpression, str1 };
         var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
-            node.ResultType,irArguments);
+            node.ResultType, irArguments);
         return new IRBuiltInScalarFunctionCallNode(signature,
             overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
     }
 
-    public override IRNode VisitInExpression(InExpression node)
-    {
-        return VisitExpressionWithArray(node, node.Left, node.Right);
-    }
+    public override IRNode VisitInExpression(InExpression node) =>
+        VisitExpressionWithArray(node, node.Left, node.Right);
 
 
-    public override IRNode VisitHasAnyExpression(HasAnyExpression node)
-    {
-        return VisitExpressionWithArray(node, node.Left, node.Right);
-    }
+    public override IRNode VisitHasAnyExpression(HasAnyExpression node) =>
+        VisitExpressionWithArray(node, node.Left, node.Right);
 
-    public override IRNode VisitHasAllExpression(HasAllExpression node)
-    {
-        return VisitExpressionWithArray(node, node.Left, node.Right);
-    }
+    public override IRNode VisitHasAllExpression(HasAllExpression node) =>
+        VisitExpressionWithArray(node, node.Left, node.Right);
 
     public override IRNode VisitSimpleNamedExpression(SimpleNamedExpression node) => node.Expression.Accept(this);
 
@@ -241,7 +235,7 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
         var irArguments = new[] { irLeft, irRight };
         var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
-            node.ResultType,irArguments);
+            node.ResultType, irArguments);
 
         ApplyTypeCoercions(irArguments, overloadInfo);
         return new IRBinaryExpressionNode(signature, overloadInfo, irArguments[0], irArguments[1], node.ResultType);
@@ -333,9 +327,13 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 IRListNode.From(irArguments), node.ResultType);
         }
 
-        if (BuiltInAggregates.TryGetOverload(functionSymbol,returnType, irArguments, parameters, out var aggregateOverload))
+
+        if (BuiltInAggregates.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
+                out var aggregateOverload))
         {
             Debug.Assert(aggregateOverload != null);
+            irArguments = irArguments.Take(aggregateOverload.NumParametersToMatch).ToArray();
+            parameters = parameters.Take(aggregateOverload.NumParametersToMatch).ToList();
             ApplyTypeCoercions(irArguments, aggregateOverload);
             return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments),
                 node.ResultType);
@@ -355,14 +353,17 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     }
 
     private static void ApplyTypeCoercions(IRExpressionNode[] irArguments, OverloadInfoBase overloadInfo)
+
     {
+        var loop = overloadInfo.RepeatParams;
         for (var i = 0; i < irArguments.Length; i++)
-            if (overloadInfo.ParameterTypes[i].Simplify() != irArguments[i].ResultType.Simplify())
-            {
+        {
+            var p = loop ? 0 : i;
+            if (overloadInfo.ParameterTypes[p].Simplify() != irArguments[i].ResultType.Simplify())
                 //ideally we would never need to do type coercions since we'd generate
                 //all possible overload variants
-                irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[i]);
-            }
+                irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[p]);
+        }
     }
 
     public override IRNode VisitMaterializeExpression(MaterializeExpression node)

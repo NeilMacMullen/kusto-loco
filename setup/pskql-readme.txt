@@ -8,7 +8,7 @@ Setup
 
 First import the pskql module using:
 
-    import-module $env:LOCALAPPDATA/programs/edit-kql/pskql.dll
+    import-module $env:LOCALAPPDATA/programs/pskql/pskql.dll
 
 Alternatively open a shell  using the "pskql Powershell" option from the Start-menu.
 

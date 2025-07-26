@@ -1,0 +1,13 @@
+Type,Scalar,IsComparable
+int,Int,yes
+long,Long,yes
+decimal,Decimal,yes
+double,Real,yes
+DateTime,DateTime,yes
+TimeSpan,TimeSpan,yes
+Guid,Guid,no
+bool,Bool,no
+string,String,no
+JsonNode,Dynamic,no
+
+
