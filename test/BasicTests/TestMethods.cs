@@ -32,9 +32,15 @@ public abstract class TestMethods
             .Select(KustoFormatter.ObjectToKustoString)
             .JoinString();
     }
-    protected async Task<string> ResultAsString(string query)
+
+    protected  Task<string> ResultAsLines(string query)
+        => ResultAsString(query, Environment.NewLine);
+    protected async Task<string> ResultAsString(string query,string lineSeparator=",")
     {
         var result = await Result(query);
-       return  result.EnumerateRows().Select(r => r[0]?.ToString()??"null").JoinString(",");
+        return result.EnumerateRows().Select(RowString).JoinString(lineSeparator);
     }
+
+    public string RowString(object?[] args)
+        => args.Select(r => r?.ToString() ?? "null").JoinString(",");
 }

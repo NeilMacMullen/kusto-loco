@@ -27,8 +27,11 @@ internal class ArgMaxFunction{{tName}}Impl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOf{{tName}}(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
