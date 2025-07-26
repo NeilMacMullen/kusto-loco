@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
@@ -7,11 +8,17 @@ using KustoLoco.Core.DataSource.Columns;
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class RandFunctionImpl : IScalarFunctionImpl
-
 {
     private readonly Random _random = new();
 
-    public ScalarResult InvokeScalar(ScalarResult[] arguments) => new(ScalarTypes.Real, _random.NextDouble());
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        var scale = arguments.Any()
+            ? arguments[0].Value as double?
+            : 1.0;
+        var r = GetRand(scale);
+        return new ScalarResult(ScalarTypes.Real, r);
+    }
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
@@ -22,26 +29,32 @@ internal class RandFunctionImpl : IScalarFunctionImpl
         var data = new double?[column.RowCount];
         if (arguments.Length > 1)
         {
-            var nColumn = (TypedBaseColumn<long?>)arguments[1].Column;
-            for (var i = 0; i < column.RowCount; i++)
+            var nColumn = (TypedBaseColumn<double?>)arguments[1].Column;
+            var length = nColumn.RowCount;
+            data = new double?[length];
+
+            for (var i = 0; i < length; i++)
             {
-                //the behaviour of adx seems to be that invalid values
-                //give Real results 0..1
                 var max = nColumn[i];
-                data[i] = max is > 1
-                    ? _random.Next((int)max.Value)
-                    : _random.NextDouble();
+                data[i] = GetRand(max);
             }
         }
         else
         {
-            for (var i = 0; i < column.RowCount; i++)
-            {
-                data[i] = _random.NextDouble();
-            }
+            for (var i = 0; i < column.RowCount; i++) data[i] = GetRand(0);
         }
 
 
         return new ColumnarResult(ColumnFactory.Create(data));
     }
+
+    private double? GetRand(double? scale) =>
+        //the behaviour of adx seems to be that invalid values
+        //give Real results 0..1
+        scale switch
+        {
+            null => null,
+            <= 1.0 => _random.NextDouble(),
+            _ => _random.Next((int)scale)
+        };
 }

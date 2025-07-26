@@ -29,10 +29,10 @@ public class ArgMinMaxTests : TestMethods
                     | summarize arg_max(A) by B
                     """;
         var result = await ResultAsLines(query);
-        result.Should().Be( """
-                            2,1
-                            3,3
-                            """);
+        result.Should().Be("""
+                           2,1
+                           3,3
+                           """);
     }
 
     [TestMethod]
@@ -48,6 +48,7 @@ public class ArgMinMaxTests : TestMethods
         var result = await ResultAsString(query);
         result.Should().Be("3");
     }
+
     [TestMethod]
     public async Task Small2()
     {
@@ -120,7 +121,7 @@ public class ArgMinMaxTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("-1,Apple,Red");
     }
-   
+
 
     [TestMethod]
     public async Task ArgMaxMultiple()
@@ -137,7 +138,6 @@ public class ArgMinMaxTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("300,Pear,Green");
     }
-
 
 
     [TestMethod]
@@ -158,5 +158,13 @@ public class ArgMinMaxTests : TestMethods
 
         var result = await LastLineOfResult(query);
         result.Should().Be("Banana,7,Green");
+    }
+
+    [TestMethod]
+    public async Task Arg_max()
+    {
+        var query = "print x=1,y=2 | summarize arg_max(x,*) by y";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("2,1");
     }
 }

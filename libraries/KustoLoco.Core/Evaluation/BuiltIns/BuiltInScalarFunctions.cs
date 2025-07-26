@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Kusto.Language.Symbols;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 
@@ -43,7 +43,7 @@ internal static class BuiltInScalarFunctions
         IsNanFunction.Register(Functions);
         IsUtf8Function.Register(Functions);
         ReverseFunction.Register(Functions);
-       
+
         Coalesce.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
@@ -54,8 +54,9 @@ internal static class BuiltInScalarFunctions
 
         AgoFunction.Register(Functions);
         FormatDateTime.Register(Functions);
-        
-        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrcatFunctionImpl(), true,
+
+        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(
+            new StrcatFunctionImpl(), true,
             ScalarTypes.String, ScalarTypes.String)));
 
         MinOfRegister.Register(Functions);
@@ -197,9 +198,7 @@ internal static class BuiltInScalarFunctions
 
 
         Functions.Add(Kusto.Language.Functions.Prev,
-
             new ScalarFunctionInfo(
-
                 MakePrevNextOverloads(new PrevFunctionIntImpl(), ScalarTypes.Int)
                     .Concat(MakePrevNextOverloads(new PrevFunctionLongImpl(), ScalarTypes.Long))
                     .Concat(MakePrevNextOverloads(new PrevFunctionRealImpl(), ScalarTypes.Real))
@@ -208,14 +207,12 @@ internal static class BuiltInScalarFunctions
                     .Concat(MakePrevNextOverloads(new PrevFunctionStringImpl(), ScalarTypes.String))
                     .Concat(MakePrevNextOverloads(new PrevFunctionDateTimeImpl(), ScalarTypes.DateTime))
                     .Concat(MakePrevNextOverloads(new PrevFunctionTimespanImpl(), ScalarTypes.TimeSpan))
-                        .ToArray()
-                        )
+                    .ToArray()
+            )
         );
 
         Functions.Add(Kusto.Language.Functions.Next,
-
             new ScalarFunctionInfo(
-
                 MakePrevNextOverloads(new NextFunctionIntImpl(), ScalarTypes.Int)
                     .Concat(MakePrevNextOverloads(new NextFunctionLongImpl(), ScalarTypes.Long))
                     .Concat(MakePrevNextOverloads(new NextFunctionRealImpl(), ScalarTypes.Real))
@@ -257,7 +254,7 @@ internal static class BuiltInScalarFunctions
                 new ScalarOverloadInfo(new RandFunctionImpl(),
                     randHints,
                     ScalarTypes.Real,
-                    ScalarTypes.Long)
+                    ScalarTypes.Real)
             )
         );
 
