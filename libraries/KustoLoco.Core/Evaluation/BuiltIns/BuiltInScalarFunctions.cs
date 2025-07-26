@@ -82,23 +82,13 @@ internal static class BuiltInScalarFunctions
 
         AgoFunction.Register(Functions);
         FormatDateTime.Register(Functions);
-
-        //add multiple overloads for strcat
-        var strcatOverrides = Enumerable.Range(1, 64)
-            .Select(n =>
-                new ScalarOverloadInfo(new StrcatFunctionImpl(),
-                    ScalarTypes.String,
-                    Enumerable.Range(0, n).Select(_ => (TypeSymbol)ScalarTypes.String).ToArray()))
-            .ToArray();
-
-        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(strcatOverrides));
-
-        Functions.Add(Kusto.Language.Functions.MaxOf,
-
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new MyMaxOfFunctionImpl(),true, ScalarTypes.Long, ScalarTypes.Long)));
         
-        
+        Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(new StrcatFunctionImpl(), true,
+            ScalarTypes.String, ScalarTypes.String)));
+
+        MinOfRegister.Register(Functions);
+        MaxOfRegister.Register(Functions);
+
         //add multiple overloads for strcat_delim
         var strcatDelimiterOverrides = Enumerable.Range(2, 64)
             .Select(n =>
@@ -115,8 +105,6 @@ internal static class BuiltInScalarFunctions
         ArrayConcatFunction.Register(Functions);
         ArrayReverseFunction.Register(Functions);
         StrRepFunction.Register(Functions);
-        //MaxOfFunction.Register(Functions);
-        MinOfFunction.Register(Functions);
         CountOfFunction.Register(Functions);
         IndexOfFunction.Register(Functions);
         ToLowerFunction.Register(Functions);

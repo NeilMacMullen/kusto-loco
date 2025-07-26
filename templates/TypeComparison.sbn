@@ -1,0 +1,43 @@
+{{include "funcs.sbn"
+include "lib/warnings.sbn"}}
+using System;
+using System.Runtime.CompilerServices;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+
+{{autogenwarning}} 
+
+public static class TypeComparison
+{
+{{ for line in comparable
+   t=line.Type 
+   tName = (t | string.capitalize)
+   s=line.Scalar
+}}
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static {{t}}? MaxOf{{tName}}({{t}}? a, {{t}}? b)
+    {
+        if (b is not { } bValue) return a;
+
+        return a == null
+            ? b
+            : a.Value > b.Value
+                ? a
+                : b;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static {{t}}? MinOf{{tName}}({{t}}? a, {{t}}? b)
+    {
+        if (b is not { } bValue) return a;
+
+        return a == null
+            ? b
+            : a.Value < b.Value
+                ? a
+                : b;
+    }
+
+
+{{end}}
+}

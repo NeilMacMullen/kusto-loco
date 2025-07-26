@@ -5,8 +5,3 @@ decimal,Decimal
 double,Real
 DateTime,DateTime
 TimeSpan,TimeSpan
-Guid,Guid
-bool,Bool
-string,String
-
-
