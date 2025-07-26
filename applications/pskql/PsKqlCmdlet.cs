@@ -30,13 +30,20 @@ public class PsKqlCmdlet : Cmdlet
     [Parameter(HelpMessage = "Skip PSScriptProperty members (may avoid some issues)")]
     public SwitchParameter SkipScriptProperties { get; set; }
 
-    [Parameter(HelpMessage = "Skip PSScriptProperty members (may avoid some issues)")]
+    [Parameter(HelpMessage = "Number of milliseconds before timing out on a property evaluation (default 10)")]
     public int Timeout { get; set; } = 10;
 
     [Parameter(HelpMessage =
         "Queries are usually implicitly prefixed with 'data |' but this can be disabled with this switch"
     )]
     public SwitchParameter NoQueryPrefix { get; set; }
+
+    [Parameter(HelpMessage =
+        "Queries such as \"project Name\" that result in a single column normally just emit the" +
+        "values but setting this parameter means that objects with a Name property are emitted." +
+        "This can be useful for consistency in automation"
+    )]
+    public SwitchParameter EmitObjectsForValues { get; set; }
 
     protected override void ProcessRecord() => _objects.Add(Item);
 
@@ -156,13 +163,19 @@ public class PsKqlCmdlet : Cmdlet
             if (!result.IsChart)
             {
                 var columns = result.ColumnDefinitions();
+
                 foreach (var row in result.EnumerateRows())
-                {
-                    var o = new PSObject();
-                    foreach (var k in columns)
-                        o.Properties.Add(new PSVariableProperty(new PSVariable(k.Name, row[k.Index])));
-                    WriteObject(o);
-                }
+                    if (EmitObjectsForValues || result.ColumnCount != 1)
+                    {
+                        var o = new PSObject();
+                        foreach (var k in columns)
+                            o.Properties.Add(new PSVariableProperty(new PSVariable(k.Name, row[k.Index])));
+                        WriteObject(o);
+                    }
+                    else
+                    {
+                        WriteObject(row[0]);
+                    }
             }
             else
             {
