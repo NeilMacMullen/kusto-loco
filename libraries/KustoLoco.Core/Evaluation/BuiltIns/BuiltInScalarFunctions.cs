@@ -43,36 +43,8 @@ internal static class BuiltInScalarFunctions
         IsNanFunction.Register(Functions);
         IsUtf8Function.Register(Functions);
         ReverseFunction.Register(Functions);
-
-        {
-            var overloads = new List<ScalarOverloadInfo>();
-
-            AddCoalesce(overloads, () => new CoalesceBoolFunctionImpl(), ScalarTypes.Bool);
-            AddCoalesce(overloads, () => new CoalesceIntFunctionImpl(), ScalarTypes.Int);
-            AddCoalesce(overloads, () => new CoalesceLongFunctionImpl(), ScalarTypes.Long);
-            AddCoalesce(overloads, () => new CoalesceDoubleFunctionImpl(), ScalarTypes.Real);
-            AddCoalesce(overloads, () => new CoalesceDecimalFunctionImpl(), ScalarTypes.Decimal);
-            AddCoalesce(overloads, () => new CoalesceDateTimeFunctionImpl(), ScalarTypes.DateTime);
-            AddCoalesce(overloads, () => new CoalesceTimeSpanFunctionImpl(), ScalarTypes.TimeSpan);
-            AddCoalesce(overloads, () => new CoalesceStringFunctionImpl(), ScalarTypes.String);
-
-            Functions.Add(Kusto.Language.Functions.Coalesce, new ScalarFunctionInfo(overloads.ToArray()));
-
-            static void AddCoalesce(List<ScalarOverloadInfo> overloads, Func<IScalarFunctionImpl> factory,
-                ScalarSymbol type)
-            {
-                var impl = factory();
-                // Coalesce can take up to 64 arguments but we limit it to 16 here
-                for (var numArgs = 2; numArgs <= 16; numArgs++)
-                {
-                    var argTypes = new TypeSymbol[numArgs];
-                    for (var i = 0; i < numArgs; i++) argTypes[i] = type;
-
-                    overloads.Add(new ScalarOverloadInfo(impl, type, argTypes));
-                }
-            }
-        }
-
+       
+        Coalesce.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         Functions.Add(Kusto.Language.Functions.PI,

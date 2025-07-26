@@ -12,3 +12,4 @@ extrude ArgMinMaxFunctionImpl Aggregates
 extrude TakeAny Aggregates
 extrude TypeComparison ScalarFunctions
 extrude MinMaxOfFunctionImpl ScalarFunctions
+extrude CoalesceFunctionImpl ScalarFunctions

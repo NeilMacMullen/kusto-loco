@@ -1,7 +1,0 @@
-Type,Scalar
-int,Int
-long,Long
-decimal,Decimal
-double,Real
-DateTime,DateTime
-TimeSpan,TimeSpan

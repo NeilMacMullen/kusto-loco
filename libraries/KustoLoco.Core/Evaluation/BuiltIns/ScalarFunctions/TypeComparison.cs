@@ -14,7 +14,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
    Do not modify by hand - your changes will be lost .
     
 
-   Built:  01:02:38 PM on Saturday, 26 Jul 2025
+   Built:  02:02:24 PM on Saturday, 26 Jul 2025
    Machine: BEAST
    User:  User
 
