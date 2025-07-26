@@ -5,6 +5,83 @@ namespace BasicTests;
 [TestClass]
 public class ArgMinMaxTests : TestMethods
 {
+    [TestMethod]
+    public async Task Small()
+    {
+        var query = """
+                    datatable(A: int, B:int) [
+                    1,2,
+                    3,3,
+                    ]
+                    | summarize arg_max(A) by B
+                    """;
+        var result = await ResultAsString(query);
+        result.Should().Be("2,1,3,3");
+    }
+
+    public async Task SmallStar()
+    {
+        var query = """
+                    datatable(A: int, B:int) [
+                    1,2,
+                    3,3,
+                    ]
+                    | summarize arg_max(A) by B
+                    """;
+        var result = await ResultAsLines(query);
+        result.Should().Be( """
+                            2,1
+                            3,3
+                            """);
+    }
+
+    [TestMethod]
+    public async Task SmallA()
+    {
+        var query = """
+                    datatable(A: int, B:int) [
+                    1,2,
+                    3,3,
+                    ]
+                    | summarize arg_max(A)
+                    """;
+        var result = await ResultAsString(query);
+        result.Should().Be("3");
+    }
+    [TestMethod]
+    public async Task Small2()
+    {
+        var query = """
+                    datatable(A: int, B:int,C:int) [
+                    1,2,7,
+                    3,3,7,
+                    ]
+                    | summarize arg_max(A,C) by B
+                    """;
+        var result = await ResultAsLines(query);
+        result.Should().Be("""
+                           2,1,7
+                           3,3,7
+                           """);
+    }
+
+    [TestMethod]
+    public async Task MultiColumns()
+    {
+        var query = """
+                    datatable(A: int, B:int,C:int,D:int) [
+                    1,2,7,10,
+                    1,10,5,5,
+                    3,3,7,10,
+                    ]
+                    | summarize arg_max(B,C,D) by A
+                    """;
+        var result = await ResultAsLines(query);
+        result.Should().Be("""
+                           1,10,5,5
+                           3,3,7,10
+                           """);
+    }
 
     [TestMethod]
     public async Task ArgMaxStar()

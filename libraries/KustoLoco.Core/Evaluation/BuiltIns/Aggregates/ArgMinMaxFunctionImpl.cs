@@ -21,9 +21,9 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
    Do not modify by hand - your changes will be lost .
     
 
-   Built:  02:02:24 PM on Saturday, 26 Jul 2025
-   Machine: BEAST
-   User:  User
+   Built:  03:56:33 PM on Saturday, 26 Jul 2025
+   Machine: NPM-LENOVO
+   User:  neilm
 
 */ 
  
@@ -36,8 +36,11 @@ internal class ArgMaxFunctionIntImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfInt(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
@@ -62,8 +65,11 @@ internal class ArgMaxFunctionLongImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfLong(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
@@ -88,8 +94,11 @@ internal class ArgMaxFunctionDecimalImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfDecimal(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
@@ -114,8 +123,11 @@ internal class ArgMaxFunctionDoubleImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfDouble(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
@@ -140,8 +152,11 @@ internal class ArgMaxFunctionDateTimeImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfDateTime(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
@@ -166,8 +181,11 @@ internal class ArgMaxFunctionTimeSpanImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfTimeSpan(arguments[0].Column, true);
-        //the first argument is repeated
-        var o = arguments.Skip(1).Select(a => a.Column.GetRawDataValue(maxIndex));
+        //the first argument the column used to calculate maxIndex
+        //so we normally skip it but if the call was of the form arg_max(A)
+        //then we need in include it
+        var skip = arguments.Length > 1 ? 1 : 0;
+        var o = arguments.Skip(skip).Select(a => a.Column.GetRawDataValue(maxIndex));
         return new RowResult(o);
     }
 }
