@@ -4,12 +4,14 @@ using Avalonia.Svg;
 using AwesomeAssertions;
 using Intellisense;
 using Jab;
-using LogSetup;
-using lokqlDxComponents.Configuration;
+using lokqlDxComponents;
 using lokqlDxComponents.Services;
+using lokqlDxComponents.Services.Assets;
 using lokqlDxComponents.Views;
+using lokqlDxComponentsTests.Fixtures;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using Microsoft.Extensions.Hosting;
 
 namespace lokqlDxComponentsTests;
 
@@ -22,10 +24,7 @@ public class AssetImageProviderTests
     private const int Folder = 40;
 
 
-    private static readonly AppOptions Opts = new()
-    {
-        AssemblyName = nameof(lokqlDxComponentsTests)
-    };
+
 
     [AvaloniaTheory]
     [InlineData("json", Json)]
@@ -33,7 +32,7 @@ public class AssetImageProviderTests
     public void GetImage_File_GetsImageAssociatedWithFileExtension(string fileExtension, int expectedWidth)
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 [$"/someFolder/myFolder/aFile.{fileExtension}"] = new("")
@@ -54,7 +53,7 @@ public class AssetImageProviderTests
     public void GetImage_FileWithNoExtension_GetsDefaultFileImage()
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 ["/someFolder/myFolder/aFile"] = new("")
@@ -75,7 +74,7 @@ public class AssetImageProviderTests
     public void GetImage_UnsupportedExtension_GetsDefaultFileImage()
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 ["/someFolder/aFile.ext23"] = new("")
@@ -96,7 +95,7 @@ public class AssetImageProviderTests
     public void GetImage_Directory_GetsFolderImage()
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 ["/someFolder/aFile.txt"] = new("")
@@ -121,7 +120,7 @@ public class AssetImageProviderTests
     public void GetImage_SupportsRasterFormats(string extension, string fileName)
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileStr = $"/someFolder/{fileName}.{extension}";
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -142,7 +141,7 @@ public class AssetImageProviderTests
     public void GetImage_SupportsSvgs()
     {
         var f = new ImageProviderTestContainer();
-        f.Options = Opts;
+
         var fileStr = "/someFolder/svgFile.csv";
         var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -164,56 +163,31 @@ public class AssetImageProviderTests
     public void GetImage_NonExistentAsset_GetsDefaultImage()
     {
         var f = new ImageProviderTestContainer();
-        f.Options = new AppOptions { AssemblyName = "NonExistentAssembly" };
         var service = f.GetRequiredService<AssetFolderImageProvider>();
 
-        var result = service.GetImage(IntellisenseHint.Csv);
+        var result = service.GetImage(IntellisenseHint.Ppt);
 
         result.Should().BeOfType<NullImage>();
     }
 
-    [AvaloniaFact]
-    public void GetImage_GetsDefaultImage()
-    {
-        var f = new ImageProviderTestContainer();
-        f.Options = new AppOptions { AssemblyName = "NonExistentAssembly" };
-        var service = f.GetRequiredService<AssetFolderImageProvider>();
 
-        var result = service.GetImage(IntellisenseHint.Csv);
-
-        result.Should().BeOfType<NullImage>();
-    }
-
-    [AvaloniaFact]
-    public void Init_Failed_DisablesImageLoading()
-    {
-        var f = new ImageProviderTestContainer();
-        f.Options = Opts;
-        var mock = new Mock<IInternalAssetLoader>();
-        mock.Setup(x => x.GetAssets(It.IsAny<Uri>())).Throws(new Exception());
-        f.GetInternalAssetLoader = _ => mock.Object;
-
-        var service = f.GetRequiredService<AssetFolderImageProvider>();
-        service.Init();
-
-        var result = service.GetImage(IntellisenseHint.Csv);
-
-        result.Should().BeOfType<NullImage>();
-    }
 }
 
 [ServiceProvider]
-[Import<IAutocompletionModule>]
-[Import<ILoggingModule>]
+[Import<IBaseTestModule>]
 [Singleton<IImageProvider>(Factory = nameof(GetAssetFolderImageProvider))]
 [Singleton<AssetFolderImageProvider>]
-[Singleton<AppOptions>(Instance = nameof(Options))]
-[Singleton<IInternalAssetLoader>(Factory = nameof(GetInternalAssetLoader))]
-[Singleton<InternalAssetLoader>]
+[Singleton<IConfiguration>(Instance = nameof(Config))]
 public partial class ImageProviderTestContainer
 {
-    public AppOptions Options { get; set; } = null!;
+    public ConfigurationManager Config { get; set; } = Host.CreateApplicationBuilder().Configuration;
     public IImageProvider GetAssetFolderImageProvider(AssetFolderImageProvider assetFolderImageProvider) => assetFolderImageProvider;
-    public Func<IServiceProvider, IInternalAssetLoader> GetInternalAssetLoader { get; set; } = sp => sp.GetRequiredService<InternalAssetLoader>();
+
+    public ImageProviderTestContainer()
+    {
+        Config.AddInMemoryCollection([
+            new(nameof(AssetLocations.CompletionIcons),"CompletionIcons2")
+        ]);
+    }
 
 }

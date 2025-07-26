@@ -1,6 +1,7 @@
 using System.CommandLine.Parsing;
 using Intellisense;
 using Lokql.Engine;
+using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.Logging;
 
 namespace lokqlDxComponents.Services;

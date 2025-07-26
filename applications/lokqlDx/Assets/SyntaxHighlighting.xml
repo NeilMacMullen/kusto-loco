@@ -83,6 +83,7 @@
 		</Keywords>
 
 		<Keywords color="Function">
+			<Word>print</Word>
 			<Word>datetime</Word>
 			<Word>$left.</Word>
 			<Word>$right.</Word>
@@ -93,6 +94,8 @@
 			<Word>desc</Word>
 			<Word>max</Word>
 			<Word>min</Word>
+			<Word>max_of</Word>
+			<Word>min_of</Word>
 			<Word>sum</Word>
 			<Word>avg</Word>
 			<Word>by</Word>
