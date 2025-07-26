@@ -112,6 +112,6 @@ public class RandTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         //check good distribution
-        double.Parse(result).Should().BeInRange(10, 990);
+        double.Parse(result).Should().BeInRange(500, 1000);
     }
 }
