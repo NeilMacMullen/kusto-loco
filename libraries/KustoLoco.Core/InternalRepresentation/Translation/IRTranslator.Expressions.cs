@@ -353,12 +353,17 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     }
 
     private static void ApplyTypeCoercions(IRExpressionNode[] irArguments, OverloadInfoBase overloadInfo)
+
     {
+        var loop = overloadInfo.RepeatParams;
         for (var i = 0; i < irArguments.Length; i++)
-            if (overloadInfo.ParameterTypes[i].Simplify() != irArguments[i].ResultType.Simplify())
+        {
+            var p = loop ? 0 : i;
+            if (overloadInfo.ParameterTypes[p].Simplify() != irArguments[i].ResultType.Simplify())
                 //ideally we would never need to do type coercions since we'd generate
                 //all possible overload variants
-                irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[i]);
+                irArguments[i] = new IRCastExpressionNode(irArguments[i], overloadInfo.ParameterTypes[p]);
+        }
     }
 
     public override IRNode VisitMaterializeExpression(MaterializeExpression node)

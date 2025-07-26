@@ -93,6 +93,12 @@ internal static class BuiltInScalarFunctions
 
         Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(strcatOverrides));
 
+        Functions.Add(Kusto.Language.Functions.MaxOf,
+
+            new ScalarFunctionInfo(
+                new ScalarOverloadInfo(new MyMaxOfFunctionImpl(),true, ScalarTypes.Long, ScalarTypes.Long)));
+        
+        
         //add multiple overloads for strcat_delim
         var strcatDelimiterOverrides = Enumerable.Range(2, 64)
             .Select(n =>
@@ -109,7 +115,7 @@ internal static class BuiltInScalarFunctions
         ArrayConcatFunction.Register(Functions);
         ArrayReverseFunction.Register(Functions);
         StrRepFunction.Register(Functions);
-        MaxOfFunction.Register(Functions);
+        //MaxOfFunction.Register(Functions);
         MinOfFunction.Register(Functions);
         CountOfFunction.Register(Functions);
         IndexOfFunction.Register(Functions);
