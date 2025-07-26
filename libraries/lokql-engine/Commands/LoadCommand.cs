@@ -4,7 +4,7 @@ using NotNullStrings;
 namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Load a data file
+///     Load a data file
 /// </summary>
 public static class LoadCommand
 {
@@ -26,12 +26,19 @@ public static class LoadCommand
             }
         }
 
-
         var success = await exp._loader.LoadTable(exp.GetCurrentContext(), o.File, tableName);
         if (!success)
+        {
             exp.Warn($"Unable to load '{o.File}'");
-        else exp.Info($"Table {NameEscaper.EscapeIfNecessary(tableName)} now available");
+        }
+        else
+        {
+            var escapedName = NameEscaper.EscapeIfNecessary(tableName);
+            exp.Info($"Table {escapedName} now available");
+            await exp.RunInput(escapedName);
+        }
     }
+
 
     [Verb("load", aliases: ["ld"],
         HelpText = @"loads a data file.  Supported formats are csv, tsv, json, parquet and text.
