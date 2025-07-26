@@ -17,7 +17,7 @@
         <TextBlock
             Grid.Row="0"
             Grid.ColumnSpan="4"
-            Text="Workspace pre-script (run every time a workspace is loaded)" />
+            Text="Workspace pre-script (run every time this workspace is loaded)" />
 
         <Border
             Grid.ColumnSpan="6"
@@ -32,7 +32,7 @@
                 WordWrap="{Binding WordWrap}"
                 ShowLineNumbers="{Binding ShowLineNumbers}"
                 Document="{Binding Document}"
-                MinHeight="100" />
+                Height="300" Width="600"/>
         </Border>
 
         <Button
