@@ -5,11 +5,21 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 public class InMemoryColumn<T> : TypedBaseColumn<T>
 {
-    private readonly IMaybeNullable _maybeNullable;
+    private readonly INullableSet _nullableSet;
+
+    public InMemoryColumn(INullableSet data)
+    {
+        _nullableSet = data;
+        if (typeof(T) == typeof(JsonArray))
+        {
+            throw new InvalidOperationException(
+                "InMemoryColumn cannot be used for JsonArray data. Use JsonNode instead");
+        }
+    }
 
     public InMemoryColumn(object?[] data)
     {
-        _maybeNullable = MaybeLocator.GetNullableForType(typeof(T), data);
+        _nullableSet = NullableSetLocator.GetNullableForType(typeof(T), data);
         if (typeof(T)== typeof(JsonArray))
         {
             throw new InvalidOperationException(
@@ -17,11 +27,11 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
         }
     }
 
-    public override T? this[int index] => (T?) _maybeNullable.NullableValue(index) ;
+    public override T? this[int index] => (T?) _nullableSet.NullableValue(index) ;
 
-    public override int RowCount => _maybeNullable.Length;
+    public override int RowCount => _nullableSet.Length;
 
-    public override object? GetRawDataValue(int index) => _maybeNullable.NullableValue(index);
+    public override object? GetRawDataValue(int index) => _nullableSet.NullableValue(index);
 
     public override BaseColumn Slice(int start, int length)
     {

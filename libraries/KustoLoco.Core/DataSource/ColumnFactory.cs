@@ -11,8 +11,16 @@ public static class ColumnFactory
             ? new SingleValueColumn<T>(data[0], 1)
             : new InMemoryColumn<T>(data);
 
+    public static TypedBaseColumn<T> CreateFromDataSet<T>(INullableSet data) =>
+        data.Length == 1
+            ? new SingleValueColumn<T>(data.NullableValue(0), 1)
+            : new InMemoryColumn<T>(data);
+
+
     public static TypedBaseColumn<T> Create<T>(T?[] data) =>
         CreateFromObjects<T>(data.Cast<object?>().ToArray());
+
+    
 
     public static BaseColumn Inflate(BaseColumn column, int logicalRowCount)
     {

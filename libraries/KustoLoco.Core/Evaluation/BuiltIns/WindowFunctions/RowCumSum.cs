@@ -28,7 +28,7 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new object?[termCol.RowCount];
+        var data = new NullableSetBuilderOfint(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -43,10 +43,10 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<int?>(data));
+        return new ColumnarResult(new InMemoryColumn<int?>(data.ToNullableSet()));
     }
 }
 
@@ -71,7 +71,7 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new object?[termCol.RowCount];
+        var data = new NullableSetBuilderOflong(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -86,10 +86,10 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<long?>(data));
+        return new ColumnarResult(new InMemoryColumn<long?>(data.ToNullableSet()));
     }
 }
 
@@ -114,7 +114,7 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new object?[termCol.RowCount];
+        var data = new NullableSetBuilderOfdouble(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -129,10 +129,10 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<double?>(data));
+        return new ColumnarResult(new InMemoryColumn<double?>(data.ToNullableSet()));
     }
 }
 
@@ -157,7 +157,7 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new object?[termCol.RowCount];
+        var data = new NullableSetBuilderOfdecimal(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -172,10 +172,10 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<decimal?>(data));
+        return new ColumnarResult(new InMemoryColumn<decimal?>(data.ToNullableSet()));
     }
 }
 
@@ -200,7 +200,7 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new object?[termCol.RowCount];
+        var data = new NullableSetBuilderOfTimeSpan(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -215,9 +215,9 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<TimeSpan?>(data));
+        return new ColumnarResult(new InMemoryColumn<TimeSpan?>(data.ToNullableSet()));
     }
 }

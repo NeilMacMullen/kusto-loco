@@ -305,72 +305,67 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data)
     {
-        var columnData = new object?[data.Length];
-        for (var i = 0; i < data.Length; i++)
+        var columnData = new NullableSetBuilderOfint(data.Length);
+        foreach (var item in data)
         {
-            var item = data[i];
-            columnData[i] = item == null
-                                ? null
-                                : Convert.ToInt32(item);
+            int? d  = item == null
+                ? null
+                : Convert.ToInt32(item);
+            columnData.Add(d);
         }
-
-        return ColumnFactory.CreateFromObjects<int?>(columnData);
+        return ColumnFactory.CreateFromDataSet<int?>(columnData.ToNullableSet());
     }
 
     private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data)
     {
-        var columnData = new object?[data.Length];
-        for (var i = 0; i < data.Length; i++)
+        var columnData = new NullableSetBuilderOflong(data.Length);
+        foreach (var item in data)
         {
-            var item = data[i];
-            columnData[i] = item == null
-                                ? null
-                                : Convert.ToInt64(item);
+            long? d = item == null
+                ? null
+                : Convert.ToInt64(item);
+            columnData.Add(d);
         }
-
-        return ColumnFactory.CreateFromObjects<long?>(columnData);
+        return ColumnFactory.CreateFromDataSet<long?>(columnData.ToNullableSet());
     }
 
     private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data)
     {
-        var columnData = new object?[data.Length];
-        for (var i = 0; i < data.Length; i++)
+        var columnData = new NullableSetBuilderOfdouble(data.Length);
+        foreach (var item in data)
         {
-            var item = data[i];
-            columnData[i] = item == null
-                                ? null
-                                : Convert.ToDouble(item);
+            double? d = item == null
+                ? null
+                : Convert.ToDouble(item);
+            columnData.Add(d);
         }
-
-        return ColumnFactory.CreateFromObjects<double?>(columnData);
+        return ColumnFactory.CreateFromDataSet<double?>(columnData.ToNullableSet());
     }
 
     private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
     {
-        var columnData = new object?[data.Length];
-        for (var i = 0; i < data.Length; i++)
+        var columnData = new NullableSetBuilderOfdecimal(data.Length);
+        foreach (var item in data)
         {
-            var item = data[i];
-            columnData[i] = item == null
+            decimal? d = item == null
                 ? null
                 : Convert.ToDecimal(item);
+            columnData.Add(d);
         }
-
-        return ColumnFactory.CreateFromObjects<decimal?>(columnData);
+        return ColumnFactory.CreateFromDataSet<decimal?>(columnData.ToNullableSet());
     }
 
     private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
     {
-        var columnData = new object?[data.Length];
-        for (var i = 0; i < data.Length; i++)
+        var columnData = new NullableSetBuilderOfbool(data.Length);
+        foreach (var item in data)
         {
-            var item = data[i];
-            columnData[i] = item == null
-                                ? null
-                                : Convert.ToBoolean(item);
+            bool? d = item == null
+                ? null
+                : Convert.ToBoolean(item);
+            columnData.Add(d);
         }
-
-        return ColumnFactory.CreateFromObjects<bool?>(columnData);
+        return ColumnFactory.CreateFromDataSet<bool?>(columnData.ToNullableSet());
     }
 
     private static TypedBaseColumn<JsonNode?> CreateFroDynamicObjectArray(object?[] data)
