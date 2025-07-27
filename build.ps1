@@ -17,7 +17,7 @@ param(
 $versionString = $version.replace('.', '-')
 $uploadsFolder = "uploads-$versionstring"
 $packages = @( ("KustoLoco.Core","KustoLoco.Core"), 
-               ("KustoLoco.FileFormats", "KustoLoco.FileFormats"),
+               ("FileFormats", "KustoLoco.FileFormats"),
                ("Rendering", "KustoLoco.Rendering"),
                ("ScottPlotRendering","KustoLoco.Rendering.ScottPlot"), 
                ("SixelSupport","KustoLoco.Rendering.SixelSupport")
