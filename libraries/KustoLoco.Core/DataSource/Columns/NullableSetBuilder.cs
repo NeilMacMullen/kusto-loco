@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -7,26 +8,38 @@ public sealed class NullableSetBuilder<T>
     where T : class
 {
     private readonly BitArray _isNull;
-    private readonly T[] _nonnull;
-    private int _index;
+    private  T[] _nonnull;
+    private int _occupied;
 
-    public NullableSetBuilder(int length)
+    public NullableSetBuilder(int initialLength)
     {
-        Length = length;
-        _isNull = new BitArray(Length);
-        _nonnull = new T[Length];
+        _isNull = new BitArray(initialLength);
+        _nonnull = new T[initialLength];
     }
 
-    private int Length { get; }
+    private int Length => _nonnull.Length;
 
     public void Add(T? value)
     {
+        var currentLength = Length;
+
+        if (_occupied >= currentLength)
+        {
+            //need to expand
+            Array.Resize(ref _nonnull, currentLength * 2);
+            _isNull.Length = currentLength * 2;
+        }
         if (value is not T data)
-            _isNull[_index] = true;
+            _isNull[_occupied] = true;
         else
-            _nonnull[_index] = data;
-        _index++;
+            _nonnull[_occupied] = data;
+        _occupied++;
     }
 
-    public INullableSet ToNullableSet() => new NullableSet<T>(_isNull, _nonnull);
+    public INullableSet ToNullableSet()
+    {
+        Array.Resize(ref _nonnull, _occupied);
+        _isNull.Length = _occupied;
+        return new NullableSet<T>(_isNull, _nonnull);
+    }
 }

@@ -12,7 +12,7 @@ using NotNullStrings;
 
 namespace KustoLoco.Core.Util;
 
-public class ColumnBuilder<T> : BaseColumnBuilder
+public sealed class ColumnBuilder<T> : BaseColumnBuilder
 {
     private readonly List<object?> _data = [];
 
