@@ -83,7 +83,7 @@ public class IndirectTests
     [TestMethod] public void  InMemoryCanBeCast()
     {
         var data = new int[]{1, 2, 3};
-        var col = new InMemoryColumn<int>(data);
+        var col = new InMemoryColumn<int>(data.Cast<object?>().ToArray());
         var baseCol = (TypedBaseColumn<int>)col;
         
     }

@@ -14,7 +14,7 @@ namespace KustoLoco.Core.Util;
 
 public class ColumnBuilder<T> : BaseColumnBuilder
 {
-    private readonly List<T?> _data = [];
+    private readonly List<object?> _data = [];
 
     public ColumnBuilder() : this(string.Empty)
     {
@@ -84,8 +84,8 @@ public class ColumnBuilder<T> : BaseColumnBuilder
             return ColumnFactory.Create(c);
         }
 
-        return ColumnFactory.Create(_data.ToArray());
+        return ColumnFactory.CreateFromObjects<T>(_data.ToArray());
     }
 
-    public override Array GetDataAsArray() => _data.ToArray();
+    public override Array GetDataAsArray() => _data.Cast<T>().ToArray();
 }

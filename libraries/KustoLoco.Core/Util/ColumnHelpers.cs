@@ -299,18 +299,13 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<T> CreateFromObjectArray<T>(object?[] data)
     {
-        var columnData = new T?[data.Length];
-        for (var i = 0; i < data.Length; i++)
-        {
-            columnData[i] = (T?)data[i];
-        }
 
-        return new InMemoryColumn<T>(columnData);
+        return new InMemoryColumn<T>(data);
     }
 
     private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data)
     {
-        var columnData = new int?[data.Length];
+        var columnData = new object?[data.Length];
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
@@ -319,12 +314,12 @@ public static class ColumnHelpers
                                 : Convert.ToInt32(item);
         }
 
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<int?>(columnData);
     }
 
     private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data)
     {
-        var columnData = new long?[data.Length];
+        var columnData = new object?[data.Length];
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
@@ -333,12 +328,12 @@ public static class ColumnHelpers
                                 : Convert.ToInt64(item);
         }
 
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<long?>(columnData);
     }
 
     private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data)
     {
-        var columnData = new double?[data.Length];
+        var columnData = new object?[data.Length];
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
@@ -347,12 +342,12 @@ public static class ColumnHelpers
                                 : Convert.ToDouble(item);
         }
 
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<double?>(columnData);
     }
 
     private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
     {
-        var columnData = new decimal?[data.Length];
+        var columnData = new object?[data.Length];
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
@@ -361,12 +356,12 @@ public static class ColumnHelpers
                 : Convert.ToDecimal(item);
         }
 
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<decimal?>(columnData);
     }
 
     private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
     {
-        var columnData = new bool?[data.Length];
+        var columnData = new object?[data.Length];
         for (var i = 0; i < data.Length; i++)
         {
             var item = data[i];
@@ -375,23 +370,12 @@ public static class ColumnHelpers
                                 : Convert.ToBoolean(item);
         }
 
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<bool?>(columnData);
     }
 
     private static TypedBaseColumn<JsonNode?> CreateFroDynamicObjectArray(object?[] data)
     {
-        var columnData = new JsonNode?[data.Length];
-        for (var i = 0; i < data.Length; i++)
-        {
-            var item = data[i];
-            columnData[i] = item == null
-                ? null
-                : item is JsonNode jsonNode
-                    ? jsonNode
-                    : null;
-        }
-
-        return ColumnFactory.Create(columnData);
+        return ColumnFactory.CreateFromObjects<JsonNode?>(data);
     }
 
     private static TypedBaseColumn<T> CreateFromScalar<T>(T value, int rowCount)

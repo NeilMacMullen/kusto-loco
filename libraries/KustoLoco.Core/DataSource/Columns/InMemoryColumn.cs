@@ -5,11 +5,11 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 public class InMemoryColumn<T> : TypedBaseColumn<T>
 {
-    private readonly T?[] _data;
+    private readonly IMaybeNullable _maybeNullable;
 
-    public InMemoryColumn(T?[] data) 
+    public InMemoryColumn(object?[] data)
     {
-        _data = data ?? throw new ArgumentNullException(nameof(data));
+        _maybeNullable = MaybeLocator.GetNullableForType(typeof(T), data);
         if (typeof(T)== typeof(JsonArray))
         {
             throw new InvalidOperationException(
@@ -17,11 +17,11 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
         }
     }
 
-    public override T? this[int index] => _data[index];
+    public override T? this[int index] => (T?) _maybeNullable.NullableValue(index) ;
 
-    public override int RowCount => _data.Length;
+    public override int RowCount => _maybeNullable.Length;
 
-    public override object? GetRawDataValue(int index) => _data[index];
+    public override object? GetRawDataValue(int index) => _maybeNullable.NullableValue(index);
 
     public override BaseColumn Slice(int start, int length)
     {
@@ -30,9 +30,6 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
 
     public override void ForEach(Action<object?> action)
     {
-        foreach (var item in _data)
-        {
-            action(item);
-        }
+        throw new NotImplementedException();
     }
 }

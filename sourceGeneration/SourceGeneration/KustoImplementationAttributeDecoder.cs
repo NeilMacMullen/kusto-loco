@@ -3,19 +3,20 @@
 
 namespace KustoLoco.SourceGeneration
 {
-
-    public class AttributeDecoder
+    /// <summary>
+    /// A helper specifically for the KustoImplementationAttribute
+    /// </summary>
+    public class KustoImplementationAttributeDecoder
     {
         public ImplementationType ImplementationType;
         public bool IsBuiltIn;
 
         public string SymbolName;
 
-        internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
+        internal KustoImplementationAttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
         {
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             SymbolName = funcSymbol;
-
             if (funcSymbol.Contains("Functions"))
             {
                 IsBuiltIn = true;
@@ -108,5 +109,6 @@ namespace KustoLoco.SourceGeneration
                     return "not yet implemented";
             }
         }
+
     }
 }

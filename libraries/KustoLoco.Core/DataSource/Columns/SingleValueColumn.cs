@@ -16,10 +16,10 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
 
     private readonly T? Value;
 
-    public SingleValueColumn(T? value, int nominalRowCount)
+    public SingleValueColumn(object? value, int nominalRowCount)
     {
         _rowCount = nominalRowCount;
-        Value = value;
+        Value = (T?) value;
         hints = ColumnHints.HoldsSingleValue;
     }
 

@@ -59,10 +59,9 @@ public class ParquetSerializer : ITableSerializer
                      .ColumnDefinitions())
         {
             _console.ShowProgress($"Writing column {columnDefinition.Name}...");
+            var data = CreateArrayFromRawObjects(columnDefinition, result);
             var dataColumn = new DataColumn(
-                dataFields[columnDefinition.Index],
-                CreateArrayFromRawObjects(columnDefinition, result)
-            );
+                dataFields[columnDefinition.Index],data);
             await groupWriter.WriteColumnAsync(dataColumn);
         }
 

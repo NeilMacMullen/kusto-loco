@@ -1,13 +1,13 @@
 using AwesomeAssertions;
 using NotNullStrings;
 
-// ReSharper disable StringLiteralTypo
-
 namespace BasicTests;
 
 [TestClass]
 public class SimpleFunctionTests : TestMethods
 {
+   
+
     [TestMethod]
     public async Task TrimStart()
     {

@@ -41,10 +41,12 @@ namespace KustoLoco.SourceGeneration
                 {
                     var wrapperClassName = classDeclaration.Identifier.ValueText;
 
-                    var kustoAttributes =
-                        new AttributeDecoder(
-                            AttributeAsHelper<KustoImplementationAttribute>(classDeclaration));
-
+                    var attributes =
+                        CustomAttributeHelper<KustoImplementationAttribute>.CreateFromNode(classDeclaration);
+                    if (!attributes.IsValid)
+                        continue;
+                    var kustoAttributes=
+                        new KustoImplementationAttributeDecoder(attributes);
 
                     var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
 
@@ -60,7 +62,6 @@ namespace KustoLoco.SourceGeneration
                     foreach (var implMethod in implementationMethods)
                     {
                         var code = new CodeEmitter();
-
                         var className = wrapperClassName + implMethod.Identifier.ValueText;
 
                         EmitHeader(code, classDeclaration);
@@ -120,68 +121,37 @@ namespace KustoLoco.SourceGeneration
             }
         }
 
-        private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
-        {
-            return node is ClassDeclarationSyntax m && m.AttributeLists.Count > 0;
-        }
+        private static bool IsSyntaxTargetForGeneration(SyntaxNode node) =>
+            node is ClassDeclarationSyntax m && m.AttributeLists.Count > 0;
 
-        private static ClassDeclarationSyntax GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-        {
-            return context.Node as ClassDeclarationSyntax;
-        }
+        private static ClassDeclarationSyntax GetSemanticTargetForGeneration(GeneratorSyntaxContext context) =>
+            context.Node as ClassDeclarationSyntax;
 
         private void EmitHeader(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
         {
             EmitUsings(code, classDeclaration);
-            code.AppendStatement($"namespace {GetNamespaceFrom(classDeclaration)}");
+            code.AppendStatement($"namespace {NodeHelpers.GetNamespaceFrom(classDeclaration)}");
             code.AppendLine("#nullable enable");
         }
 
         public void EmitUsings(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
         {
-            code.AppendStatement("using Kusto.Language");
-            code.AppendStatement("using Kusto.Language.Symbols");
-            code.AppendStatement("using KustoLoco.Core.Util");
-            code.AppendStatement("using KustoLoco.Core.Evaluation.BuiltIns");
-            code.AppendStatement("using KustoLoco.Core.Evaluation");
-            code.AppendStatement("using KustoLoco.Core.DataSource");
-            code.AppendStatement("using KustoLoco.Core");
-            code.AppendStatement("using KustoLoco.Core.DataSource.Columns");
-            code.AppendStatement("using System.Diagnostics");
-            code.AppendStatement("using System.Collections.Generic");
+            var usingManager = new UsingsManager();
+            usingManager.AddFromNode(classDeclaration);
+            usingManager.Add("Kusto.Language");
+            usingManager.Add("Kusto.Language.Symbols");
+            usingManager.Add("KustoLoco.Core.Util");
+            usingManager.Add("KustoLoco.Core.Evaluation.BuiltIns");
+            usingManager.Add("KustoLoco.Core.Evaluation");
+            usingManager.Add("KustoLoco.Core.DataSource");
+            usingManager.Add("KustoLoco.Core");
+            usingManager.Add("KustoLoco.Core.DataSource.Columns");
+            usingManager.Add("System.Diagnostics");
+            usingManager.Add("System.Collections.Generic");
 
-            foreach (var u in GetUsingList(classDeclaration)) code.AppendLine(u);
+            foreach (var u in usingManager.GetUsings()) code.AppendLine(u);
         }
 
-        private static CustomAttributeHelper<T> AttributeAsHelper<T>(ClassDeclarationSyntax classDeclaration)
-            where T : Attribute
-        {
-            var attributes = classDeclaration.AttributeLists
-                .SelectMany(e => e.Attributes)
-                .Where(e => e.Name.NormalizeWhitespace().ToFullString() ==
-                            CustomAttributeHelper<T>.Name())
-                .ToArray();
-
-            if (!attributes.Any())
-                return new CustomAttributeHelper<T>(new Dictionary<string, string>
-                {
-                    ["error"] = "no attributes"
-                });
-
-            var dict = new Dictionary<string, string>
-            {
-                ["error"] = "null ArgumentList"
-            };
-
-            var sa = attributes.First();
-            if (sa.ArgumentList != null)
-                dict = sa.ArgumentList.Arguments.ToDictionary(
-                    a => a.NameEquals.Name.Identifier.ValueText,
-                    a => a.Expression.ToString()
-                );
-
-            return new CustomAttributeHelper<T>(dict);
-        }
 
         private string Opt(int i, int numRequired)
         {
@@ -190,7 +160,7 @@ namespace KustoLoco.SourceGeneration
         }
 
         private void EmitFunctionSymbol(CodeEmitter code,
-            AttributeDecoder attr,
+            KustoImplementationAttributeDecoder attr,
             List<ImplementationMethod> implementationMethods)
         {
             if (attr.IsBuiltIn)
@@ -223,7 +193,7 @@ namespace KustoLoco.SourceGeneration
 
 
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
-            MethodDeclarationSyntax method, AttributeDecoder attr)
+            MethodDeclarationSyntax method, KustoImplementationAttributeDecoder attr)
         {
             var parameters = method.ParameterList.Parameters
                 .Select((p, i) => new Param(i, p.Identifier.ValueText, p.Type.ToFullString()))
@@ -237,33 +207,15 @@ namespace KustoLoco.SourceGeneration
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
                 ParamGeneneration.BuildColumnarMethod(dbg, m);
-            if (m.AttributeDecoder.ImplementationType == ImplementationType.Aggregate)
+            if (m.KustoImplementationAttributeDecoder.ImplementationType == ImplementationType.Aggregate)
                 ParamGeneneration.BuildInvokeMethod(dbg, m);
             return m;
         }
 
 
-        public static string GetNamespaceFrom(SyntaxNode s)
-        {
-            while (true)
-            {
-                if (s == null) return "No namespace found!";
-                if (s is BaseNamespaceDeclarationSyntax ns) return ns.Name.ToString();
-                s = s.Parent;
-            }
-        }
+       
 
-        public static string[] GetUsingList(SyntaxNode s)
-        {
-            var usings = new List<string>();
-            while (true)
-            {
-                if (s == null) return usings.ToArray();
-                if (s is CompilationUnitSyntax cu) usings.AddRange(cu.Usings.Select(c => c.ToString()));
-
-                s = s.Parent;
-            }
-        }
+        
     }
 }
 

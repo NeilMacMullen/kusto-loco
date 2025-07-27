@@ -28,7 +28,7 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new int?[termCol.RowCount];
+        var data = new object?[termCol.RowCount];
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -71,7 +71,7 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new long?[termCol.RowCount];
+        var data = new object?[termCol.RowCount];
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -114,7 +114,7 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new double?[termCol.RowCount];
+        var data = new object?[termCol.RowCount];
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -157,7 +157,7 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new decimal?[termCol.RowCount];
+        var data = new object?[termCol.RowCount];
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -200,7 +200,7 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new TimeSpan?[termCol.RowCount];
+        var data = new object?[termCol.RowCount];
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
