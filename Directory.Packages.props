@@ -48,7 +48,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.9.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.9.3" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.1" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.2" />
     <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.3" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.2.0" />
@@ -57,7 +57,7 @@
     <PackageVersion Include="ScottPlot" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
-    <PackageVersion Include="ShapeCrawler" Version="0.71.0" />
+    <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.2" />
