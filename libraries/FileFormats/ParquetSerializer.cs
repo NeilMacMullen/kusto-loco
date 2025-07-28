@@ -1,6 +1,8 @@
-﻿using KustoLoco.Core;
+﻿using System.Diagnostics;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
@@ -82,29 +84,40 @@ public class ParquetSerializer : ITableSerializer
 
         var totalRows = 0;
         BaseColumnBuilder[] columnBuilders = [];
-
+        INullableSet[] nullableSets = [];
         for (var rowGroupIndex = 0; rowGroupIndex < rowGroupCount; rowGroupIndex++)
         {
+            _console.Write("loading rowgroup..");
             var rowGroup = await fileReader.ReadEntireRowGroupAsync(rowGroupIndex);
 
+            var pqColumns = rowGroup.Select(d => d).ToArray();
             //populate column builders if this is the first row group
             if (!columnBuilders.Any())
                 columnBuilders = rowGroup
                     .Select(dataColumn => ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
                     .ToArray();
+            if (!nullableSets.Any())
+                nullableSets = new INullableSet[columnBuilders.Length];
+
 
             //add data from this row group
             var columnIndex = 0;
+            var stopwatch = Stopwatch.StartNew();
             foreach (var column in rowGroup)
             {
+                var dataColumn = rowGroup[columnIndex];
                 //lookup the builder for this column
-                var builderInfo = columnBuilders[columnIndex];
-                builderInfo.AddCapacity(column.Data.Length);
+                //var builderInfo = columnBuilders[columnIndex];
+                _console.ShowProgress($"{stopwatch.ElapsedMilliseconds} adding capacity ");
+                //builderInfo.AddCapacity(column.Data.Length);
                 _console.ShowProgress(
-                    $"Reading column {builderInfo.Name} from rowGroup {rowGroupIndex}");
-                //TODO - surely there is a more efficient way to do this by wrapping the original data?
-                foreach (var cellData in column.Data)
-                    builderInfo.Add(cellData);
+                    $"{stopwatch.ElapsedMilliseconds} Reading column {dataColumn.Field.Name} from rowGroup {rowGroupIndex}");
+                var set = NullableSetLocator.GetNullableForTypeAndBaseArray(dataColumn.Field.ClrType, column.Data);
+
+                nullableSets[columnIndex] = set;
+                
+                _console.ShowProgress(
+                    $"{stopwatch.ElapsedMilliseconds} Added {column.Data.Length} data for {dataColumn.Field.Name} from rowGroup {rowGroupIndex}");
                 columnIndex++;
             }
 
@@ -112,13 +125,17 @@ public class ParquetSerializer : ITableSerializer
         }
 
         //having read all the data, we can now create the table
-        foreach (var colBuilder in columnBuilders)
-            colBuilder.TrimExcess();
+       // foreach (var colBuilder in columnBuilders)
+        //    colBuilder.TrimExcess();
 
         var tableBuilder = TableBuilder.CreateEmpty(tableName, totalRows);
-        foreach (var colBuilder in columnBuilders)
-            tableBuilder = tableBuilder.WithColumn(colBuilder.Name, colBuilder.ToColumn());
-
+        for (var i = 0; i < columnBuilders.Length; i++)
+        {
+            var builder = columnBuilders[i];
+            var set = nullableSets[i];
+            builder.AddNullableSet(set);
+            tableBuilder = tableBuilder.WithColumn(builder.Name,builder.ToColumn());
+        }   
         _console.CompleteProgress("");
         return TableLoadResult.Success(tableBuilder.ToTableSource());
     }

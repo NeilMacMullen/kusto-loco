@@ -75,6 +75,9 @@ public sealed class ColumnBuilder<T> : BaseColumnBuilder
 
     public override BaseColumn ToColumn()
     {
+        if (_nullableSet is INullableSet set)
+            return ColumnFactory.CreateFromDataSet<T>(set);
+        
         TrimExcess();
         if (typeof(T) == typeof(string) && _data.Count > 10000)
         {

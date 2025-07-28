@@ -10,27 +10,51 @@ public static class NullableSetLocator
     {
         var u = TypeMapping.UnderlyingType(t);
         if (u == typeof(bool))
-            return new NullableSetOfbool(data);
+            return NullableSetOfbool.FromObjectsOfCorrectType(data);
         if (u == typeof(int))
-            return new NullableSetOfint(data);
+            return NullableSetOfint.FromObjectsOfCorrectType(data);
         if (u == typeof(long))
-            return new NullableSetOflong(data);
+            return NullableSetOflong.FromObjectsOfCorrectType(data);
         if (u == typeof(decimal))
-            return new NullableSetOfdecimal(data);
+            return NullableSetOfdecimal.FromObjectsOfCorrectType(data);
         if (u == typeof(double))
-            return new NullableSetOfdouble(data);
+            return NullableSetOfdouble.FromObjectsOfCorrectType(data);
         if (u == typeof(Guid))
-            return new NullableSetOfGuid(data);
+            return  NullableSetOfGuid.FromObjectsOfCorrectType(data);
         if (u == typeof(DateTime))
-            return new NullableSetOfDateTime(data);
+            return  NullableSetOfDateTime.FromObjectsOfCorrectType(data);
         if (u == typeof(TimeSpan))
-            return new NullableSetOfTimeSpan(data);
+            return  NullableSetOfTimeSpan.FromObjectsOfCorrectType(data);
         if (u == typeof(string))
-            return new NullableSetOfstring(data);
+            return  NullableSetOfstring.FromObjectsOfCorrectType(data);
         if (u == typeof(JsonNode))
-            return new NullableSetOfJsonNode(data);
-        
+            return  NullableSetOfJsonNode.FromObjectsOfCorrectType(data);
+        throw new InvalidOperationException($"Unable to create set of type {t.Name}");
+    }
 
+    public static INullableSet GetNullableForTypeAndBaseArray(Type t, Array data)
+    {
+        var u = TypeMapping.UnderlyingType(t);
+        if (u == typeof(bool))
+            return NullableSetOfbool.CreateFromBaseArray(data);
+        if (u == typeof(int))
+            return NullableSetOfint.CreateFromBaseArray(data);
+        if (u == typeof(long))
+            return NullableSetOflong.CreateFromBaseArray(data);
+        if (u == typeof(decimal))
+            return NullableSetOfdecimal.CreateFromBaseArray(data);
+        if (u == typeof(double))
+            return NullableSetOfdouble.CreateFromBaseArray(data);
+        if (u == typeof(Guid))
+            return NullableSetOfGuid.CreateFromBaseArray(data);
+        if (u == typeof(DateTime))
+            return NullableSetOfDateTime.CreateFromBaseArray(data);
+        if (u == typeof(TimeSpan))
+            return NullableSetOfTimeSpan.CreateFromBaseArray(data);
+        if (u == typeof(string))
+            return NullableSetOfstring.CreateFromBaseArray(data);
+        if (u == typeof(JsonNode))
+            return NullableSetOfJsonNode.CreateFromBaseArray(data);
         throw new InvalidOperationException($"Unable to create set of type {t.Name}");
     }
 }

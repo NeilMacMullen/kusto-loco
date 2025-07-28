@@ -5,6 +5,7 @@ namespace KustoLoco.Core.Util;
 
 public abstract class BaseColumnBuilder
 {
+    protected INullableSet? _nullableSet;
     public abstract int RowCount { get; }
     public abstract object? this[int index] { get; }
     public string Name { get; protected set; } = string.Empty;
@@ -27,4 +28,9 @@ public abstract class BaseColumnBuilder
 
     public abstract void AddCapacity(int n);
     public abstract void TrimExcess();
+
+    public void AddNullableSet(INullableSet set)
+    {
+        _nullableSet = set;
+    }
 }
