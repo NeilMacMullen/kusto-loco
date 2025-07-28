@@ -53,10 +53,10 @@ public sealed class ColumnBuilder<T> : BaseColumnBuilder
 
         if (typeof(T) == typeof(JsonNode))
         {
-            if (value is T jn)
-                _data.Add(jn);
-            else 
-                _data.Add(default);
+          //  if (value is T jn)
+                _data.Add(value);
+           // else 
+           //     _data.Add(default);
         }
         else if (
             typeof(T) == typeof(DateTime?) &&

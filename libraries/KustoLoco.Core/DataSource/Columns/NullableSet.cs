@@ -110,18 +110,18 @@ public sealed class NullableSet_Ref<T> : INullableSet
     {
         var nullableData = (T?[])baseArray;
         var length = nullableData.Length;
-        var values = new T[length];
         var noNulls = true;
         for (var i = 0; i < length; i++)
         {
             var d = nullableData[i];
             if (d is not T t)
+            {
                 noNulls = false;
-            else
-                values[i] = t;
+                break;
+            }
         }
-
-        return new NullableSet_Ref<T>(values, noNulls);
+        //todo - add special casing for Strings here to use stringpool
+        return new NullableSet_Ref<T>(nullableData, noNulls);
     }
 
     public NullableSet_Ref(T?[] values, bool noNulls)
