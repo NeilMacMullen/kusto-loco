@@ -95,7 +95,10 @@
                     <MenuItem Header="Keyboard shortcuts"
                               CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
                               Command="{Binding NavigateToWikiCommand}" />
-
+                    <MenuItem Header=".Commands"
+                              CommandParameter="LokqlDx-‐-commands"
+                              Command="{Binding NavigateToWikiCommand}" />
+                    <Separator/>
                     <MenuItem Header="Chart customisation"
                               Command="{Binding NavigateToWikiCommand}"
                               CommandParameter="ScottPlot-Chart-customisation" />
