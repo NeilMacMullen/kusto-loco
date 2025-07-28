@@ -31,6 +31,6 @@ internal class ArrayLengthFunctionImpl : IScalarFunctionImpl
             data.Add(array?.Count);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(long), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }

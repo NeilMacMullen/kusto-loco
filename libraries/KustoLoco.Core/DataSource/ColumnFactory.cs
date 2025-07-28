@@ -8,7 +8,13 @@ namespace KustoLoco.Core.DataSource;
 
 public static class ColumnFactory
 {
-    public static BaseColumn CreateFromDataSet(Type t, INullableSet set)
+
+    public static BaseColumn CreateFromDataSet(INullableSet set)
+    {
+        return CreateFromDataSet(set.UnderlyingType, set);
+    }
+
+    private static BaseColumn CreateFromDataSet(Type t, INullableSet set)
     {
         var u = TypeMapping.UnderlyingType(t);
         if (u == typeof(bool))

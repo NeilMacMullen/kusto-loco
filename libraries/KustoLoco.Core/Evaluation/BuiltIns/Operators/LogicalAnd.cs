@@ -38,7 +38,7 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
             data.Add(WeirdAnd(left[i], right[i]));
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(bool), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 
     // Nulls are treated as "unknown/any" for logical operations in Kusto.

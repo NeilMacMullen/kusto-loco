@@ -55,6 +55,6 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             data.Add(val);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(T),data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }

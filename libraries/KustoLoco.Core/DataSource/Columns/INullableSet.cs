@@ -9,4 +9,5 @@ public interface INullableSet
     public int Length { get; }
     public Array GetDataAsArray(bool allowNonNullReturn);
     public bool NoNulls { get; }
+    public Type UnderlyingType { get; }
 }

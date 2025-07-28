@@ -36,7 +36,7 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(bool), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -67,7 +67,7 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(int), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -98,7 +98,7 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(long), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -129,7 +129,7 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(double), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -160,7 +160,7 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(string), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -191,7 +191,7 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(DateTime), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -222,6 +222,6 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
             data.Add(predicateCol[i] == true ? ifTrue : ifFalse);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(TimeSpan), data.ToNullableSet()));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }

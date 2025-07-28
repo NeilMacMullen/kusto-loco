@@ -7,6 +7,7 @@ namespace KustoLoco.Core.DataSource.Columns;
 public sealed class NullableSet<T> : INullableSet
     where T : class
 {
+    
     private readonly BitArray _isNull;
     private readonly T[] _nonnull;
 
@@ -28,6 +29,7 @@ public sealed class NullableSet<T> : INullableSet
     }
 
     public bool NoNulls { get; }
+    public Type UnderlyingType { get; } = typeof( T );
 
     public int Length { get; }
 
@@ -108,6 +110,7 @@ public sealed class NullableSet_Ref<T> : INullableSet
     private readonly T?[] _values;
     public bool NoNulls { get; }
     public int Length { get; }
+    public Type UnderlyingType { get; } = typeof(T);
     public Array GetDataAsArray(bool allowNonNullReturn) => _values;
 
     public static NullableSet_Ref<T> FromObjectsOfCorrectType(object?[] nullableData)

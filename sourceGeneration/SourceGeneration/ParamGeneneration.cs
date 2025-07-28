@@ -51,7 +51,7 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine("for(var i=0;i < 1;i++)");
             dbg.EnterCodeBlock();
-            PerformNullChecks(dbg, method, false, "data");
+            EmitNullChecks(dbg, method, false, "data");
 
 
             var pvals = string.Join(",", parameters.Select(Val));
@@ -74,7 +74,7 @@ namespace KustoLoco.SourceGeneration
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
-            dbg.AppendStatement($"var data = new {GetNullableType(ret)}[{RowCount}]");
+            dbg.AppendStatement($"var data = new NullableSetBuilderOf{ret.Type}({RowCount})");
             if (method.HasContext)
             {
                 dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
@@ -82,14 +82,14 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            PerformNullChecks(dbg, method, true, $"data[{RowIndex}]");
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]");
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
             dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
 
-            dbg.AppendStatement("return new ColumnarResult(ColumnFactory.Create(data))");
+            dbg.AppendStatement($"return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()))");
             dbg.ExitCodeBlock();
         }
 
@@ -110,7 +110,7 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            PerformNullChecks(dbg, method, true, $"data[{RowIndex}]");
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]");
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
@@ -138,7 +138,7 @@ namespace KustoLoco.SourceGeneration
             }
         }
 
-        public static void PerformNullChecks(CodeEmitter dbg, ImplementationMethod method,
+        public static void EmitNullChecks(CodeEmitter dbg, ImplementationMethod method,
             bool fromColumn, string assignEmptyStringTo)
         {
             var parameters = method.TypedArguments;
