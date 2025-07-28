@@ -12,38 +12,22 @@ using NotNullStrings;
 
 namespace KustoLoco.Core.Util;
 
-public sealed class ColumnBuilder<T> : BaseColumnBuilder
+public sealed class OldColumnBuilder<T> : BaseColumnBuilder
 {
     private readonly List<object?> _data = [];
 
-    public ColumnBuilder() : this(string.Empty)
+    public OldColumnBuilder() : this(string.Empty)
     {
     }
 
-    public ColumnBuilder(string name)
+    public OldColumnBuilder(string name)
     {
         Name = name;
     }
 
     public override int RowCount => _data.Count;
-    public override object? this[int index] => _data[index];
-
+   
     public void Add(T value) => _data.Add(value);
-
-    public override void AddRange(BaseColumnBuilder other)
-    {
-        if (other is not ColumnBuilder<T> typedOther)
-            throw new ArgumentException(
-                $"Expected other of type {TypeNameHelper.GetTypeDisplayName(typeof(ColumnBuilder<T>))}, found {TypeNameHelper.GetTypeDisplayName(other)}");
-
-        _data.AddRange(typedOther._data);
-    }
-
-    public override void AddCapacity(int n) =>
-        _data.Capacity = _data.Count + n;
-
-    public override void TrimExcess() =>
-        _data.TrimExcess();
 
     public override void Add(object? value)
     {
@@ -75,10 +59,9 @@ public sealed class ColumnBuilder<T> : BaseColumnBuilder
 
     public override BaseColumn ToColumn()
     {
-        if (_nullableSet is INullableSet set)
+        if (_nullableSet is { } set)
             return ColumnFactory.CreateFromDataSet<T>(set);
         
-        TrimExcess();
         if (typeof(T) == typeof(string) && _data.Count > 10000)
         {
             var pool = new StringPool(1000);
@@ -90,5 +73,4 @@ public sealed class ColumnBuilder<T> : BaseColumnBuilder
         return ColumnFactory.CreateFromObjects<T>(_data.ToArray());
     }
 
-    public override Array GetDataAsArray() => _data.Cast<T>().ToArray();
 }

@@ -24,10 +24,10 @@ internal partial class TreeEvaluator
         var ts = new TableSymbol("schema", cs);
         var builders = new BaseColumnBuilder[]
         {
-            new ColumnBuilder<string?>(),
-            new ColumnBuilder<int?>(),
-            new ColumnBuilder<string?>(),
-            new ColumnBuilder<string?>()
+            new GenericColumnBuilderOfstring(),
+            new GenericColumnBuilderOfint(),
+            new GenericColumnBuilderOfstring(),
+            new GenericColumnBuilderOfstring()
         };
         var table = context.Left.Value;
         var i = 0;

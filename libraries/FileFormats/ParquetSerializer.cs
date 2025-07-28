@@ -62,8 +62,15 @@ public class ParquetSerializer : ITableSerializer
         {
             _console.ShowProgress($"Writing column {columnDefinition.Name}...");
             var data = CreateArrayFromRawObjects(columnDefinition, result);
-            var dataColumn = new DataColumn(
-                dataFields[columnDefinition.Index],data);
+            //todo we could optimise saving here by writing non-nullable types but
+            //we'd need to know whether there are nulls before creating the schema
+            //and that would probably require us to propagate this knowledge through
+            //Columns
+            //if (data.NoNulls)
+            //    def = new DataField(def.Name, TypeMapping.UnderlyingType(def.ClrType));
+            var arr = data.GetDataAsArray(false);
+            var def = dataFields[columnDefinition.Index];
+            var dataColumn = new DataColumn(def,arr);
             await groupWriter.WriteColumnAsync(dataColumn);
         }
 
@@ -146,12 +153,13 @@ public class ParquetSerializer : ITableSerializer
         return await LoadTable(fileStream, tableName);
     }
 
-    private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
+    private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
     {
         //TODO - it feels like this could be done more efficiently
-        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType, string.Empty);
+
+        var builder = NullableSetBuilderLocator.GetNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
-        return builder.GetDataAsArray();
+        return builder.ToNullableSet();
     }
 }

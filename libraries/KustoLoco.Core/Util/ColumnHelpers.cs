@@ -154,52 +154,52 @@ public static class ColumnHelpers
         typeSymbol = typeSymbol.Simplify();
         if (typeSymbol == ScalarTypes.Int)
         {
-            return new ColumnBuilder<int?>(name);
+            return new GenericColumnBuilderOfint(name);
         }
 
         if (typeSymbol == ScalarTypes.Long)
         {
-            return new ColumnBuilder<long?>(name);
+            return new GenericColumnBuilderOflong(name);
         }
 
         if (typeSymbol == ScalarTypes.Decimal)
         {
-            return new ColumnBuilder<decimal?>(name);
+            return new GenericColumnBuilderOfdecimal(name);
         }
 
         if (typeSymbol == ScalarTypes.Real)
         {
-            return new ColumnBuilder<double?>(name);
+            return new GenericColumnBuilderOfdouble(name);
         }
 
         if (typeSymbol == ScalarTypes.Bool)
         {
-            return new ColumnBuilder<bool?>(name);
+            return new GenericColumnBuilderOfbool(name);
         }
 
         if (typeSymbol == ScalarTypes.String)
         {
-            return new ColumnBuilder<string?>(name);
+            return new GenericColumnBuilderOfstring(name);
         }
 
         if (typeSymbol == ScalarTypes.DateTime)
         {
-            return new ColumnBuilder<DateTime?>(name);
+            return new GenericColumnBuilderOfDateTime(name);
         }
 
         if (typeSymbol == ScalarTypes.Guid)
         {
-            return new ColumnBuilder<Guid?>(name);
+            return new GenericColumnBuilderOfGuid(name);
         }
 
         if (typeSymbol == ScalarTypes.TimeSpan)
         {
-            return new ColumnBuilder<TimeSpan?>(name);
+            return new GenericColumnBuilderOfTimeSpan(name);
         }
 
         if (typeSymbol == ScalarTypes.Dynamic)
         {
-            return new ColumnBuilder<JsonNode?>(name);
+            return new GenericColumnBuilderOfJsonNode(name);
         }
 
         // TODO: Support all data types

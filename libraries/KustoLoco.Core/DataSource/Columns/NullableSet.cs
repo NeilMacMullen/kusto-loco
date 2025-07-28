@@ -9,7 +9,6 @@ public sealed class NullableSet<T> : INullableSet
 {
     private readonly BitArray _isNull;
     private readonly T[] _nonnull;
-    public readonly bool NoNulls;
 
     public NullableSet(T?[] values, bool hasNulls)
     {
@@ -28,10 +27,30 @@ public sealed class NullableSet<T> : INullableSet
         }
     }
 
+    public bool HasNulls { get; }
+    public bool NoNulls { get; }
+
     public int Length { get; }
 
     public bool IsNull(int i) => !NoNulls && _isNull[i];
     public object? NullableValue(int i) => IsNull(i) ? null : _nonnull[i];
+
+    public Array GetDataAsArray(bool allowNonNullReturn)
+    {
+        if (allowNonNullReturn && !_isNull.HasAnySet())
+            return _nonnull;
+        var nullable = new T?[Length];
+        for (var i = 0; i < Length; i++)
+        {
+            //note we need to use IsNull here because the bitarray
+            //could be empty
+            nullable[i] = IsNull(i)
+                ? null
+                : _nonnull[i];
+        }
+
+        return nullable;
+    }
 
     public static NullableSet<T> FromObjectsOfCorrectType(object?[] nullableData)
     {
@@ -52,13 +71,15 @@ public sealed class NullableSet<T> : INullableSet
     }
 
     public static NullableSet<T> CreateFromBaseArray(Array baseArray)
-    {   //for parquet which can give use arrays of either nullable or
+    {
+        //for parquet which can give use arrays of either nullable or
         //non-nullable data
         if (baseArray is T[] nonNullData)
         {
             var length = baseArray.Length;
             return new NullableSet<T>(new BitArray(1), nonNullData);
         }
+
         if (baseArray is T?[] nullableData)
         {
             var length = baseArray.Length;
@@ -73,11 +94,11 @@ public sealed class NullableSet<T> : INullableSet
                 else
                     nonnull[i] = t;
             }
+
             return new NullableSet<T>(isNull, nonnull);
         }
 
         throw new InvalidOperationException();
-
     }
 }
 
@@ -86,14 +107,16 @@ public sealed class NullableSet_Ref<T> : INullableSet
     where T : class
 {
     private readonly T?[] _values;
-    public readonly bool NoNulls;
+    public bool NoNulls { get; }
     public int Length { get; }
+    public Array GetDataAsArray(bool allowNonNullReturn) => _values;
 
     public static NullableSet_Ref<T> FromObjectsOfCorrectType(object?[] nullableData)
     {
         var length = nullableData.Length;
         var values = new T[length];
         var noNulls = true;
+        //TODO- special case for string
         for (var i = 0; i < length; i++)
         {
             var d = nullableData[i];
@@ -120,6 +143,7 @@ public sealed class NullableSet_Ref<T> : INullableSet
                 break;
             }
         }
+
         //todo - add special casing for Strings here to use stringpool
         return new NullableSet_Ref<T>(nullableData, noNulls);
     }

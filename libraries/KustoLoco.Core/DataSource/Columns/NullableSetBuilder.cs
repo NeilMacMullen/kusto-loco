@@ -3,8 +3,16 @@ using System.Collections;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
+public interface INullableSetBuilder
+{
+    INullableSetBuilder Create(int initialLength);
+     INullableSet ToNullableSet();
+     void Add(object? value);
+}
+
+
 [KustoGeneric(Types = "value")]
-public sealed class NullableSetBuilder<T>
+public sealed class NullableSetBuilder<T> :INullableSetBuilder
     where T : class
 {
     private readonly BitArray _isNull;
@@ -17,7 +25,7 @@ public sealed class NullableSetBuilder<T>
         _nonnull = new T[initialLength];
     }
 
-    private int Length => _nonnull.Length;
+    public int Length => _nonnull.Length;
 
     public void Add(T? value)
     {
@@ -42,24 +50,32 @@ public sealed class NullableSetBuilder<T>
         _isNull.Length = _occupied;
         return new NullableSet<T>(_isNull, _nonnull);
     }
+
+    public void Add(object? value) => Add((value is T d) ?d:null  );
+   
+
+    public INullableSetBuilder Create(int initialLength) => new NullableSetBuilder<T>(initialLength);
 }
 
 [KustoGeneric(Types = "reference")]
-public sealed class NullableSetBuilder_ref<T>
+public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
     where T : class
 {
     private T?[] _nonnull;
     private int _occupied;
-    
+
+    public INullableSetBuilder Create(int initialLength) => new NullableSetBuilder<T>(initialLength);
 
     public NullableSetBuilder_ref(int initialLength)
     {
         _nonnull = new T[initialLength];
     }
+    
 
-    private int Length => _nonnull.Length;
+    public int Length => _nonnull.Length;
     private bool _noNulls;
 
+    public void Add(object? value) => Add(value as T );
     public void Add(T? value)
     {
         var currentLength = Length;
