@@ -27,7 +27,6 @@ public sealed class NullableSet<T> : INullableSet
         }
     }
 
-    public bool HasNulls { get; }
     public bool NoNulls { get; }
 
     public int Length { get; }

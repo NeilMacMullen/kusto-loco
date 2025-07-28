@@ -24,13 +24,13 @@ internal class ArrayLengthFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var column = (TypedBaseColumn<JsonNode?>)arguments[0].Column;
 
-        var data = new long?[column.RowCount];
+        var data = new NullableSetBuilderOflong(column.RowCount);
         for (var i = 0; i < column.RowCount; i++)
         {
             var array = column[i] as JsonArray;
-            data[i] = array?.Count;
+            data.Add(array?.Count);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(long), data.ToNullableSet()));
     }
 }

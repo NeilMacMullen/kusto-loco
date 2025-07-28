@@ -39,9 +39,9 @@ where T:class
     public override BaseColumn ToColumn()
     {
         if (_nullableSet is { } set)
-            return   ColumnFactoryLocator.CreateFromDataSet(typeof(T),set);
+            return   ColumnFactory.CreateFromDataSet(typeof(T),set);
 
-        return ColumnFactoryLocator.CreateFromDataSet(typeof(T), _data.ToNullableSet());
+        return ColumnFactory.CreateFromDataSet(typeof(T), _data.ToNullableSet());
     }
 
 }
@@ -73,9 +73,9 @@ public sealed class GenericColumnBuilder_ref<T> : BaseColumnBuilder
     public override BaseColumn ToColumn()
     {
         if (_nullableSet is { } set)
-            return ColumnFactoryLocator.CreateFromDataSet(typeof(T), set);
+            return ColumnFactory.CreateFromDataSet(typeof(T), set);
 
-        return ColumnFactoryLocator.CreateFromDataSet(typeof(T), _data.ToNullableSet());
+        return ColumnFactory.CreateFromDataSet(typeof(T), _data.ToNullableSet());
     }
 
 }

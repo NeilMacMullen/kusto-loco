@@ -32,13 +32,13 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
         if (right.IsSingleValue && (right[0] == false))
             return new ColumnarResult(right);
 
-        var data = new bool?[left.RowCount];
+        var data = new NullableSetBuilderOfbool(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
-            data[i] = WeirdAnd(left[i], right[i]);
+            data.Add(WeirdAnd(left[i], right[i]));
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(bool), data.ToNullableSet()));
     }
 
     // Nulls are treated as "unknown/any" for logical operations in Kusto.

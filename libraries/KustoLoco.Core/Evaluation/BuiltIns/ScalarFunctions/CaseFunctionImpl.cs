@@ -41,7 +41,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
 
 
         var rowCount = fallback.RowCount;
-        var data = new T?[rowCount];
+        var data = NullableSetBuilderLocator.GetNullableSetBuilderForType(typeof(T), rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             var val = fallback[i];
@@ -52,9 +52,9 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
                     break;
                 }
 
-            data[i] = val;
+            data.Add(val);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(typeof(T),data.ToNullableSet()));
     }
 }
