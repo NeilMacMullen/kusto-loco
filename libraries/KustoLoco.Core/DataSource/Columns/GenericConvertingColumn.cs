@@ -15,20 +15,24 @@ where T:class
 {
   
     public readonly BaseColumn BackingColumn;
-    private readonly Func<object?,T> _converter;
+    private readonly Func<object?,T?> _converter; //GENERIC INPLACE
 
-    private GenericConvertingColumn(BaseColumn backing, Func<object?, T> converter)
+    private GenericConvertingColumn(BaseColumn backing,
+        Func<object?,T?> converter //GENERIC INPLACE
+        )
     {
         _converter = converter;
         BackingColumn = backing;
     }
 
-    public override T this[int index] => _converter(BackingColumn.GetRawDataValue(index));
+    public override T? this[int index] => _converter(BackingColumn.GetRawDataValue(index));
 
     public override int RowCount =>BackingColumn.RowCount;
 
 
-    public static GenericTypedBaseColumn<T> Create(BaseColumn backing,Func<object?,T> converter)
+    public static GenericTypedBaseColumn<T> Create(BaseColumn backing,
+        Func<object?,T?> converter //GENERIC INPLACE
+        )
     {
         //in principle some optimisation is possible here if the backing has just a single value... we could
         //convert once ahead of time then create a singlevalue wrapper around the converted value

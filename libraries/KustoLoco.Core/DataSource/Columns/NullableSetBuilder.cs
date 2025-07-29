@@ -93,11 +93,11 @@ public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
     private T?[] _nonnull;
     private int _occupied;
 
-    public static NullableSetBuilder<T> CreateFixed(int size)
-        => new NullableSetBuilder<T>(size, false);
+    public static NullableSetBuilder_ref<T> CreateFixed(int size)
+        => new NullableSetBuilder_ref<T>(size, false);
 
-    public static NullableSetBuilder<T> CreateExpandable(int size)
-        => new NullableSetBuilder<T>(size, true);
+    public static NullableSetBuilder_ref<T> CreateExpandable(int size)
+        => new NullableSetBuilder_ref<T>(size, true);
     
     public INullableSetBuilder Create(int initialLength,bool canResize) => new NullableSetBuilder<T>(initialLength,canResize);
 

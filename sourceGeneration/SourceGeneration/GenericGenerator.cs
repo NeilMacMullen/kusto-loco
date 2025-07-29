@@ -41,9 +41,7 @@ public class GenericGenerator : IIncrementalGenerator
             {
                 var rawClassName = classDeclaration.Identifier.ValueText;
                 var wrapperClassName = rawClassName + "Generic";
-
-                var trimmedClassName = Regex.Replace(rawClassName, @"_.*$", "");
-
+                var classStringLines = classDeclaration.ToString().Split('\n');
                 var attributes =
                     CustomAttributeHelper<KustoGenericAttribute>.CreateFromNode(classDeclaration);
                 if (!attributes.IsValid)
@@ -53,38 +51,14 @@ public class GenericGenerator : IIncrementalGenerator
                 EmitHeader(code, classDeclaration);
                 foreach (var type in types)
                 {
-                  
-                    var generic = "T";
-                    var classString = classDeclaration.ToString();
-                    
-                    classString = classString.Replace(rawClassName, trimmedClassName);
+                    var modified = classStringLines.Select(line => ProcessLine(attributes, rawClassName, type, line))
+                        .ToArray();
+                    var classOut = string.Join("\n", modified);
 
-                    //get rid of attribute
-                    classString = Regex.Replace(classString, $@"\[{attributes.AttributeName()}.*\]", "");
-                    var additionalAttrs = attributes.GetStringFor(nameof(KustoGenericAttribute.AdditionalAttributes));
-                    if (additionalAttrs != "")
-                        code.AppendLine($"[{additionalAttrs}]");
-
-
-                    classString = classString.Replace($"<{generic}>", $"Of{type}");
-                    //take care of constructor
-                    classString = classString.Replace($"{trimmedClassName}(", $"{trimmedClassName}Of{type}(");
-                    //get rid of constraints...
-                    classString = Regex.Replace(classString, $@"\s*where\s*{generic}\s*:.*", "");
-
-                    classString = classString.Replace($"{generic}?", $"{type}?");
-                    classString = classString.Replace($"({generic})", $"({type})");
-                    classString = classString.Replace($" {generic}[", $" {type}[");
-                    classString = classString.Replace($" {generic} ", $" {type} ");
-                    classString = classString.Replace($"{{{generic}}}", $"{type}");
-                    classString = classString.Replace($" {generic};", $" {type};");
-
-                    var condition = $"TYPE_{type.ToUpperInvariant()}";
-                    classString = classString.Replace(condition, "true");
 
                     try
                     {
-                        code.AppendLine(classString);
+                        code.AppendLine(classOut);
                     }
                     catch (Exception ex)
                     {
@@ -103,6 +77,68 @@ public class GenericGenerator : IIncrementalGenerator
             context.AddSource("sourcegeneratorexception", c.ToString());
             // throw;
         }
+    }
+
+    private string ProcessLine(CustomAttributeHelper<KustoGenericAttribute> attributes,
+        string rawClassName,
+        string type,
+        string classString)
+    {
+        var containsGenericDirective =
+            classString.Contains("//") && classString.Contains("GENERIC");
+
+
+        var trimmedClassName = Regex.Replace(rawClassName, @"_.*$", "");
+
+        var generic = "T";
+        classString = classString.Replace(rawClassName, trimmedClassName);
+
+        //get rid of attribute
+        classString = Regex.Replace(classString, $@"\[{attributes.AttributeName()}.*\]", "");
+        //var additionalAttrs = attributes.GetStringFor(nameof(KustoGenericAttribute.AdditionalAttributes));
+        //if (additionalAttrs != "")
+        //    code.AppendLine($"[{additionalAttrs}]");
+
+        //get rid of constraints...
+        classString = Regex.Replace(classString, $@"\s*where\s*{generic}\s*:.*", "");
+
+        if (!containsGenericDirective && !classString.Contains("INPLACE"))
+        {
+            //replace simple <T> attributes
+            classString = classString.Replace($"<{generic}>", $"Of{type}");
+            //now look for more complicated examples
+            var matches = Regex.Match(classString, @"\<(.+)\>");
+            if (matches.Success)
+            {
+                var types = matches.Groups[1].Value.Split(',').Select(s => s.Trim()).ToArray();
+                var trimmedTypes = types.Except(new[] { generic }).ToArray();
+                if (trimmedTypes.Length < types.Length)
+                {
+                    var ttString = string.Join(",", trimmedTypes);
+                    classString = classString.Replace(matches.Groups[0].Value, $"Of{type}<{ttString}>");
+                }
+            }
+        }
+
+        classString = classString.Replace($"{generic}?", $"{type}?");
+            classString = classString.Replace($"({generic})", $"({type})");
+            classString = classString.Replace($" {generic}[", $" {type}[");
+            classString = classString.Replace($" {generic} ", $" {type} ");
+            classString = classString.Replace($"{{{generic}}}", $"{type}");
+            classString = classString.Replace($" {generic};", $" {type};");
+            classString = classString.Replace($",{generic}>", $",{type}>");
+        
+
+
+        //take care of constructor
+        classString = classString.Replace($"{trimmedClassName}(", $"{trimmedClassName}Of{type}(");
+
+        //T?
+
+
+        var condition = $"TYPE_{type.ToUpperInvariant()}";
+        classString = classString.Replace(condition, "true");
+        return classString;
     }
 
     private static void EmitHeader(CodeEmitter code, ClassDeclarationSyntax classDeclaration)
