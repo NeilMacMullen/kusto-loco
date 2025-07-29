@@ -29,7 +29,7 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<bool?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<bool?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfbool(predicateCol.RowCount);
+        var data = NullableSetBuilderOfbool.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -60,7 +60,7 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<int?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<int?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfint(predicateCol.RowCount);
+        var data = NullableSetBuilderOfint.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -91,7 +91,7 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<long?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<long?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOflong(predicateCol.RowCount);
+        var data = NullableSetBuilderOflong.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -122,7 +122,7 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<double?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<double?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfdouble(predicateCol.RowCount);
+        var data = NullableSetBuilderOfdouble.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -153,7 +153,7 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<string?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<string?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfstring(predicateCol.RowCount);
+        var data = NullableSetBuilderOfstring.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -184,7 +184,7 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<DateTime?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<DateTime?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfDateTime(predicateCol.RowCount);
+        var data = NullableSetBuilderOfDateTime.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);
@@ -215,7 +215,7 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
         var ifTrueCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
         var ifFalseCol = (TypedBaseColumn<TimeSpan?>)(arguments[2].Column);
 
-        var data = new NullableSetBuilderOfTimeSpan(predicateCol.RowCount);
+        var data = NullableSetBuilderOfTimeSpan.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
         {
             var (ifTrue, ifFalse) = (ifTrueCol[i], ifFalseCol[i]);

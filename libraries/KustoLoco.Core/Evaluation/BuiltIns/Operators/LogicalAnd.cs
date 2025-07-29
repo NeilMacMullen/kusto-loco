@@ -32,7 +32,7 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
         if (right.IsSingleValue && (right[0] == false))
             return new ColumnarResult(right);
 
-        var data = new NullableSetBuilderOfbool(left.RowCount);
+        var data = NullableSetBuilderOfbool.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
             data.Add(WeirdAnd(left[i], right[i]));

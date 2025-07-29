@@ -40,8 +40,8 @@ datatable(Size:int) [7]
 | extend S= case(Size <= 3, 'Small',                        
                  Size <= 10, 'Medium', 
                              'Large')";
-        var result = await LastLineOfResult(query);
-        result.Should().Contain("Medium");
+        var result = await ResultAsString(query);
+        result.Should().Be("7,Medium");
     }
 
     [TestMethod]

@@ -41,7 +41,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
 
 
         var rowCount = fallback.RowCount;
-        var data = NullableSetBuilderLocator.GetNullableSetBuilderForType(typeof(T), rowCount);
+        var data = NullableSetBuilderLocator.GetNullableSetBuilderForType(typeof(T), rowCount,false);
         for (var i = 0; i < rowCount; i++)
         {
             var val = fallback[i];

@@ -16,7 +16,7 @@ namespace KustoLoco.Core.Util;
 public sealed class GenericColumnBuilder<T> : BaseColumnBuilder
 where T:class
 {
-    private readonly NullableSetBuilder<T> _data = new NullableSetBuilder<T>(10000);
+    private readonly NullableSetBuilder<T> _data = NullableSetBuilder<T>.CreateExpandable(10000);
 
     public GenericColumnBuilder() : this(string.Empty)
     {
@@ -50,7 +50,7 @@ where T:class
 public sealed class GenericColumnBuilder_ref<T> : BaseColumnBuilder
     where T : class
 {
-    private readonly NullableSetBuilder<T> _data = new NullableSetBuilder<T>(10000);
+    private readonly NullableSetBuilder<T> _data = NullableSetBuilder<T>.CreateExpandable(10000);
 
     public GenericColumnBuilder_ref() : this(string.Empty)
     {

@@ -155,9 +155,7 @@ public class ParquetSerializer : ITableSerializer
 
     private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
     {
-        //TODO - it feels like this could be done more efficiently
-
-        var builder = NullableSetBuilderLocator.GetNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
+        var builder = NullableSetBuilderLocator.GetNullableSetBuilderForType(r.UnderlyingType, res.RowCount,false);
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
         return builder.ToNullableSet();

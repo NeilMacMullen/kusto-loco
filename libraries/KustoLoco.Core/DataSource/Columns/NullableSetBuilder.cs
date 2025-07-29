@@ -5,7 +5,7 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 public interface INullableSetBuilder
 {
-    INullableSetBuilder Create(int initialLength);
+     INullableSetBuilder Create(int initialLength, bool canResize);
      INullableSet ToNullableSet();
      void Add(object? value);
      object? this[int index] { get; set; }
@@ -16,12 +16,20 @@ public interface INullableSetBuilder
 public sealed class NullableSetBuilder<T> :INullableSetBuilder
     where T : class
 {
+    private readonly bool _canResize;
     private readonly BitArray _isNull;
     private  T[] _nonnull;
     private int _occupied;
 
-    public NullableSetBuilder(int initialLength)
+    public static NullableSetBuilder<T> CreateFixed(int size)
+        => new NullableSetBuilder<T>(size, false);
+
+    public static NullableSetBuilder<T> CreateExpandable(int size)
+        => new NullableSetBuilder<T>(size, true);
+    
+    public NullableSetBuilder(int initialLength, bool canResize)
     {
+        _canResize = canResize;
         _isNull = new BitArray(initialLength);
         _nonnull = new T[initialLength];
     }
@@ -62,28 +70,40 @@ public sealed class NullableSetBuilder<T> :INullableSetBuilder
 
     public INullableSet ToNullableSet()
     {
-        Array.Resize(ref _nonnull, _occupied);
-        _isNull.Length = _occupied;
+        if (_canResize)
+        {
+            Array.Resize(ref _nonnull, _occupied);
+            _isNull.Length = _occupied;
+        }
+
         return new NullableSet<T>(_isNull, _nonnull);
     }
 
     public void Add(object? value) => Add((value is T d) ?d:null  );
    
 
-    public INullableSetBuilder Create(int initialLength) => new NullableSetBuilder<T>(initialLength);
+    public INullableSetBuilder Create(int initialLength,bool canResize) => new NullableSetBuilder<T>(initialLength,canResize);
 }
 
 [KustoGeneric(Types = "reference")]
 public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
     where T : class
 {
+    private readonly bool _canResize;
     private T?[] _nonnull;
     private int _occupied;
 
-    public INullableSetBuilder Create(int initialLength) => new NullableSetBuilder<T>(initialLength);
+    public static NullableSetBuilder<T> CreateFixed(int size)
+        => new NullableSetBuilder<T>(size, false);
 
-    public NullableSetBuilder_ref(int initialLength)
+    public static NullableSetBuilder<T> CreateExpandable(int size)
+        => new NullableSetBuilder<T>(size, true);
+    
+    public INullableSetBuilder Create(int initialLength,bool canResize) => new NullableSetBuilder<T>(initialLength,canResize);
+
+    public NullableSetBuilder_ref(int initialLength,bool canResize)
     {
+        _canResize = canResize;
         _nonnull = new T[initialLength];
     }
     
@@ -109,7 +129,8 @@ public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
 
     public INullableSet ToNullableSet()
     {
-        Array.Resize(ref _nonnull, _occupied);
+        if(_canResize)
+            Array.Resize(ref _nonnull, _occupied);
         return new NullableSet<T>(_nonnull,_noNulls);
     }
 

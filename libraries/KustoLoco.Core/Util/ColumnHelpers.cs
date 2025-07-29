@@ -305,7 +305,7 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data)
     {
-        var columnData = new NullableSetBuilderOfint(data.Length);
+        var columnData = NullableSetBuilderOfint.CreateFixed(data.Length);
         foreach (var item in data)
         {
             int? d  = item == null
@@ -318,7 +318,7 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data)
     {
-        var columnData = new NullableSetBuilderOflong(data.Length);
+        var columnData = NullableSetBuilderOflong.CreateFixed(data.Length);
         foreach (var item in data)
         {
             long? d = item == null
@@ -331,7 +331,7 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data)
     {
-        var columnData = new NullableSetBuilderOfdouble(data.Length);
+        var columnData = NullableSetBuilderOfdouble.CreateFixed(data.Length);
         foreach (var item in data)
         {
             double? d = item == null
@@ -344,7 +344,7 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
     {
-        var columnData = new NullableSetBuilderOfdecimal(data.Length);
+        var columnData = NullableSetBuilderOfdecimal.CreateFixed(data.Length);
         foreach (var item in data)
         {
             decimal? d = item == null
@@ -357,7 +357,7 @@ public static class ColumnHelpers
 
     private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
     {
-        var columnData = new NullableSetBuilderOfbool(data.Length);
+        var columnData = NullableSetBuilderOfbool.CreateFixed(data.Length);
         foreach (var item in data)
         {
             bool? d = item == null

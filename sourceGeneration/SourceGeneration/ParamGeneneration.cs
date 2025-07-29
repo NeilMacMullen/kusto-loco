@@ -51,7 +51,7 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine("for(var i=0;i < 1;i++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, false, "data");
+            EmitNullChecks(dbg, method, false, "data",true);
 
 
             var pvals = string.Join(",", parameters.Select(Val));
@@ -74,7 +74,7 @@ namespace KustoLoco.SourceGeneration
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
-            dbg.AppendStatement($"var data = new NullableSetBuilderOf{ret.Type}({RowCount})");
+            dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
             if (method.HasContext)
             {
                 dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
@@ -82,7 +82,7 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]");
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]",true);
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
@@ -110,7 +110,7 @@ namespace KustoLoco.SourceGeneration
 
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]");
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]",false);
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
@@ -139,7 +139,7 @@ namespace KustoLoco.SourceGeneration
         }
 
         public static void EmitNullChecks(CodeEmitter dbg, ImplementationMethod method,
-            bool fromColumn, string assignEmptyStringTo)
+            bool fromColumn, string assignEmptyStringTo,bool explicitNullAssignment)
         {
             var parameters = method.TypedArguments;
             foreach (var p in parameters)
@@ -156,6 +156,9 @@ namespace KustoLoco.SourceGeneration
                     dbg.EnterCodeBlock();
                     if (method.ReturnType.IsString)
                         dbg.AppendStatement($"{assignEmptyStringTo}=string.Empty");
+                    else
+                    if (explicitNullAssignment)
+                        dbg.AppendStatement($"{assignEmptyStringTo}=null");
                     dbg.AppendStatement("continue");
                     dbg.ExitCodeBlock();
                 }
