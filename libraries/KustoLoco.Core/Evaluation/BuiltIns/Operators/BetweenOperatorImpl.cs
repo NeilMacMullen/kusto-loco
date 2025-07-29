@@ -32,7 +32,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
         var row = (TypedBaseColumn<T?>)arguments[0].Column;
         var left = (TypedBaseColumn<T?>)arguments[1].Column;
         var right = (TypedBaseColumn<T?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
         var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
 
@@ -48,7 +48,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private bool? Impl(T? r, T? left, T? right) =>
@@ -81,7 +81,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
         var row = (TypedBaseColumn<int?>)arguments[0].Column;
         var left = (TypedBaseColumn<long?>)arguments[1].Column;
         var right = (TypedBaseColumn<long?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
         var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
 
@@ -97,7 +97,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
 
@@ -130,7 +130,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
         var row = (TypedBaseColumn<DateTime?>)arguments[0].Column;
         var left = (TypedBaseColumn<DateTime?>)arguments[1].Column;
         var right = (TypedBaseColumn<TimeSpan?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
         var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
 
@@ -146,7 +146,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private bool? Impl(DateTime? r, DateTime? left, TimeSpan? right) =>

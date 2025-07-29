@@ -148,6 +148,7 @@ namespace KustoLoco.SourceGeneration
             usingManager.Add("KustoLoco.Core.DataSource.Columns");
             usingManager.Add("System.Diagnostics");
             usingManager.Add("System.Collections.Generic");
+            usingManager.Add("KustoLoco.Core.DataSource.Columns");
 
             foreach (var u in usingManager.GetUsings()) code.AppendLine(u);
         }

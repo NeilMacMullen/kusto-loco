@@ -3,8 +3,8 @@ using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
+[KustoGeneric(Types = "all")]
 public class GenericInMemoryColumn<T> : GenericTypedBaseColumn<T>
-where T:class
 {
     private readonly INullableSet _nullableSet;
 

@@ -32,7 +32,7 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
             columns[i] = (TypedBaseColumn<string?>)arguments[i].Column;
         }
 
-        var data = new string?[columns[0].RowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -46,6 +46,6 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
             builder.Clear();
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
     }
 }

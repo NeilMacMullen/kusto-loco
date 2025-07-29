@@ -33,7 +33,7 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
         Debug.Assert(p1LonColumn.RowCount == p1LatColumn.RowCount && p1LonColumn.RowCount == p2LonColumn.RowCount &&
                      p1LonColumn.RowCount == p2LatColumn.RowCount);
 
-        var data = new double?[p1LonColumn.RowCount];
+        var data = NullableSetBuilderOfdouble.CreateFixed(p1LonColumn.RowCount);
 
         var blockSize = 1000;
         var rangePartitioner = Partitioner.Create(0, p1LonColumn.RowCount, blockSize);
@@ -44,6 +44,6 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.HaversineDistance(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }

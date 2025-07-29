@@ -6,7 +6,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 public interface INullableSetBuilder
 {
      INullableSetBuilder Create(int initialLength, bool canResize);
-     INullableSet ToNullableSet();
      void Add(object? value);
      object? this[int index] { get; set; }
 }
@@ -14,7 +13,6 @@ public interface INullableSetBuilder
 
 [KustoGeneric(Types = "value")]
 public sealed class NullableSetBuilder<T> :INullableSetBuilder
-    where T : class
 {
     private readonly bool _canResize;
     private readonly BitArray _isNull;
@@ -68,7 +66,7 @@ public sealed class NullableSetBuilder<T> :INullableSetBuilder
         _occupied++;
     }
 
-    public INullableSet ToNullableSet()
+    public NullableSet<T> ToNullableSet()
     {
         if (_canResize)
         {
@@ -127,7 +125,7 @@ public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
         _occupied++;
     }
 
-    public INullableSet ToNullableSet()
+    public NullableSet<T> ToNullableSet()
     {
         if(_canResize)
             Array.Resize(ref _nonnull, _occupied);

@@ -12,7 +12,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// </remarks>
 [KustoGeneric(Types = "all")]
 public class GenericSingleValueColumn<T> : GenericTypedBaseColumn<T>
-where T:class
 {
     private readonly int _rowCount;
 

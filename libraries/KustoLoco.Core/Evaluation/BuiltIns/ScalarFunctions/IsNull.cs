@@ -24,14 +24,14 @@ internal class IsNullBoolFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -50,14 +50,14 @@ internal class IsNullIntFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<int?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -76,14 +76,14 @@ internal class IsNullLongFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<long?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -102,14 +102,14 @@ internal class IsNullDoubleFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<double?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -128,14 +128,14 @@ internal class IsNullDecimalFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<decimal?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -154,14 +154,14 @@ internal class IsNullDateTimeFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -180,14 +180,14 @@ internal class IsNullTimeSpanFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var valueCol = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 
     internal static bool Impl(string s) => false;

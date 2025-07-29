@@ -90,15 +90,7 @@ public class TableBuilder
         _columnNames = _columnNames.Add(name);
         return this;
     }
-    /// <summary>
-    /// Adds a column of data to builder by copying it into a new array
-    /// </summary>
-    public TableBuilder WithColumn<T>(string name, IEnumerable<T> items)
-    {
-        var column = ColumnFactory.Create(items.ToArray());
-        return WithColumn(name, column);
-    }
-
+   
     /// <summary>
     /// Creates a column from collection of items where we know the type
     /// </summary>

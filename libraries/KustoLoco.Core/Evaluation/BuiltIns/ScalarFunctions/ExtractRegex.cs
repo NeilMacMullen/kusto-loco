@@ -37,7 +37,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
         var values = (TypedBaseColumn<string?>)arguments[2].Column;
 
         var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
-        var data = new string?[values.RowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(values.RowCount);
         for (var i = 0; i < values.RowCount; i++)
         {
             var pattern = patterns[i];
@@ -47,7 +47,7 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
             data[i] = GetResult(cacheEntry.Regex!, captureGroups[i], values[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private static Regex GetRegex(string? pattern) => new(pattern ?? string.Empty);

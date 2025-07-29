@@ -4,7 +4,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 [KustoGeneric(Types = "all")]
 public abstract class GenericTypedBaseColumn<T> : BaseColumn
-where T:class
 {
     protected GenericTypedBaseColumn()
         : base(TypeMapping.SymbolForType(typeof(T)))

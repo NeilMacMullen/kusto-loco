@@ -29,13 +29,13 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
         }
 
         var rowCount = columns[0].RowCount;
-        var data = new JsonNode?[rowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             data[i] = Evaluate(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     protected JsonArray? Evaluate(string? source, string? delimiter)

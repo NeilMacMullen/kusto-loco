@@ -120,14 +120,15 @@ public class GenericGenerator : IIncrementalGenerator
             }
         }
 
+        classString = classString.Replace("T.One", $"({type})1");
+        classString = classString.Replace("T.Zero", $"({type})0");
         classString = classString.Replace($"{generic}?", $"{type}?");
-            classString = classString.Replace($"({generic})", $"({type})");
-            classString = classString.Replace($" {generic}[", $" {type}[");
-            classString = classString.Replace($" {generic} ", $" {type} ");
-            classString = classString.Replace($"{{{generic}}}", $"{type}");
-            classString = classString.Replace($" {generic};", $" {type};");
-            classString = classString.Replace($",{generic}>", $",{type}>");
-        
+        classString = classString.Replace($"({generic})", $"({type})");
+        classString = classString.Replace($" {generic}[", $" {type}[");
+        classString = classString.Replace($" {generic} ", $" {type} ");
+        classString = classString.Replace($"{{{generic}}}", $"{type}");
+        classString = classString.Replace($" {generic};", $" {type};");
+        classString = classString.Replace($",{generic}>", $",{type}>");
 
 
         //take care of constructor

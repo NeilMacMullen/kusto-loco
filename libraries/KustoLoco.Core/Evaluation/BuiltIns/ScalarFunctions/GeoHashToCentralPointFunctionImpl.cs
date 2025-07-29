@@ -28,7 +28,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
         var rowCount = hash.RowCount;
 
-        var data = new JsonNode[rowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(rowCount);
 
         var blockSize = 1000;
         var rangePartitioner = Partitioner.Create(0, rowCount, blockSize);
@@ -40,7 +40,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
                 data[i] = PtToJson(pt.Latitude, pt.Longitude);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private static JsonObject PtToJson(double latitude, double longitude) =>

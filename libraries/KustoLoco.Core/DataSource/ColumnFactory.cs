@@ -1,7 +1,6 @@
 ﻿using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Util;
 using System;
-using System.Linq;
 using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.DataSource;
@@ -18,43 +17,28 @@ public static class ColumnFactory
     {
         var u = TypeMapping.UnderlyingType(t);
         if (u == typeof(bool))
-            return CreateFromDataSet<bool?>(set);
+            return GenericColumnFactoryOfbool.CreateFromDataSet((NullableSetOfbool)set);
         if (u == typeof(int))
-            return CreateFromDataSet<int?>(set);
+            return GenericColumnFactoryOfint.CreateFromDataSet((NullableSetOfint)set);
         if (u == typeof(long))
-            return CreateFromDataSet<long?>(set);
+            return GenericColumnFactoryOflong.CreateFromDataSet((NullableSetOflong)set);
         if (u == typeof(decimal))
-            return CreateFromDataSet<decimal?>(set);
+            return GenericColumnFactoryOfdecimal.CreateFromDataSet((NullableSetOfdecimal)set);
         if (u == typeof(double))
-            return CreateFromDataSet<double?>(set);
+            return GenericColumnFactoryOfdouble.CreateFromDataSet((NullableSetOfdouble)set);
         if (u == typeof(Guid))
-            return CreateFromDataSet<Guid?>(set);
+            return GenericColumnFactoryOfGuid.CreateFromDataSet((NullableSetOfGuid)set);
         if (u == typeof(DateTime))
-            return CreateFromDataSet<DateTime?>(set);
+            return GenericColumnFactoryOfDateTime.CreateFromDataSet((NullableSetOfDateTime)set);
         if (u == typeof(TimeSpan))
-            return CreateFromDataSet<TimeSpan?>(set);
+            return GenericColumnFactoryOfTimeSpan.CreateFromDataSet((NullableSetOfTimeSpan)set);
         if (u == typeof(string))
-            return CreateFromDataSet<string?>(set);
+            return GenericColumnFactoryOfstring.CreateFromDataSet((NullableSetOfstring)set);
         if (u == typeof(JsonNode))
-            return CreateFromDataSet<JsonNode?>(set);
+            return GenericColumnFactoryOfJsonNode.CreateFromDataSet((NullableSetOfJsonNode)set);
         throw new InvalidOperationException($"Unable to create set of type {t.Name}");
     }
-
-    public static TypedBaseColumn<T> CreateFromObjects<T>(object?[] data) =>
-        data.Length == 1
-            ? new SingleValueColumn<T>(data[0], 1)
-            : new InMemoryColumn<T>(data);
-
-    public static TypedBaseColumn<T> CreateFromDataSet<T>(INullableSet data) =>
-        data.Length == 1
-            ? new SingleValueColumn<T>(data.NullableValue(0), 1)
-            : new InMemoryColumn<T>(data);
-
-
-    public static TypedBaseColumn<T> Create<T>(T?[] data) =>
-        CreateFromObjects<T>(data.Cast<object?>().ToArray());
-
-   
+  
 
     public static BaseColumn Inflate(BaseColumn column, int logicalRowCount)
     {

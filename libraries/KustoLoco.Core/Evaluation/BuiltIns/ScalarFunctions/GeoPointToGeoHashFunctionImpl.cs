@@ -31,7 +31,7 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
             ? (TypedBaseColumn<long?>)arguments[2].Column
             : new SingleValueColumn<long?>(DefaultResolution, rowCount);
 
-        var data = new string[rowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
 
         var blockSize = 1000;
         var rangePartitioner = Partitioner.Create(0, p1LonColumn.RowCount, blockSize);
@@ -42,6 +42,6 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
                 data[i] = GeoSupport.GeoHash(p1LonColumn[i], p1LatColumn[i], resColumn[i]);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }

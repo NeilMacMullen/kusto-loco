@@ -26,26 +26,26 @@ internal class RandFunctionImpl : IScalarFunctionImpl
         //the first column is a "dummy" column inserted by the evaluator
         //because we specified this as "ForceColumnarResult"
         var column = (TypedBaseColumn<int?>)arguments[0].Column;
-        var data = new double?[column.RowCount];
+       
         if (arguments.Length > 1)
         {
             var nColumn = (TypedBaseColumn<double?>)arguments[1].Column;
             var length = nColumn.RowCount;
-            data = new double?[length];
-
+            var data = NullableSetBuilderOfdouble.CreateFixed(length);
+       
             for (var i = 0; i < length; i++)
             {
                 var max = nColumn[i];
                 data[i] = GetRand(max);
             }
+            return new ColumnarResult(GenericColumnFactoryOfdouble.CreateFromDataSet(data.ToNullableSet()));
         }
         else
         {
+            var data = NullableSetBuilderOfdouble.CreateFixed(column.RowCount);
             for (var i = 0; i < column.RowCount; i++) data[i] = GetRand(0);
+            return new ColumnarResult(GenericColumnFactoryOfdouble.CreateFromDataSet(data.ToNullableSet()));
         }
-
-
-        return new ColumnarResult(ColumnFactory.Create(data));
     }
 
     private double? GetRand(double? scale) =>

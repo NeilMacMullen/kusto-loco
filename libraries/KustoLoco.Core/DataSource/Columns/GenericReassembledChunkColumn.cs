@@ -8,7 +8,7 @@ namespace KustoLoco.Core.DataSource.Columns;
 ///     Represents a column formed of one or more sections which are processed in order
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class GenericReassembledChunkColumn<T> : TypedBaseColumn<T>
+public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
 where T:class
 {
     private readonly int _Length;
@@ -102,7 +102,7 @@ where T:class
         return new GenericReassembledChunkColumn<T>(slicedColumns);
     }
 
-    public static TypedBaseColumn<T> Create(IReadOnlyCollection<TypedBaseColumn<T>> backing) =>
+    public static GenericTypedBaseColumn<T> Create(IReadOnlyCollection<GenericTypedBaseColumn<T>> backing) =>
         //If there's only one column, just return it since no reassembly is needed
         backing.Count == 1
             ? backing.First()
@@ -116,6 +116,7 @@ where T:class
 
     private readonly record struct Section(int Offset, int Length, BaseColumn BackingColumn)
     {
-        public static readonly Section Empty = new(0, 0, ColumnFactory.Create(Array.Empty<T>()));
+        public static readonly Section Empty = new(0, 0,
+            GenericColumnFactory<T>.CreateFromObjects([]));
     }
 }

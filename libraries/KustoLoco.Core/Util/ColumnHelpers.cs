@@ -223,14 +223,14 @@ public static class ColumnHelpers
     public static BaseColumn ReassembleInOrder(BaseColumn[] others)
         => MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
-    private static TypedBaseColumn<T> Create<T>(ImmutableArray<int> mapping, TypedBaseColumn<T>[] other,
+    private static BaseColumn Create<T>(ImmutableArray<int> mapping, BaseColumn[] other,
         MappingType mapType)
     {
         return mapType switch
                {
                    MappingType.Arbitrary => MapColumn(other[0], mapping),
                    MappingType.Chunk => ChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
-                   MappingType.Reassembly => ReassembledChunkColumn<T>.Create(other),
+                   MappingType.Reassembly =>  ReassembledChunkColumn<T>.Create(other), 
                    _ => throw new NotImplementedException()
                };
     }
@@ -239,9 +239,10 @@ public static class ColumnHelpers
         MappingType mapType)
     {
         var typeSymbol = others.First().Type;
+        return Create(mapping, others.ToArray(), mapType);
         if (typeSymbol == ScalarTypes.Int)
         {
-            return Create(mapping, others.Cast<TypedBaseColumn<int?>>().ToArray(), mapType);
+            return Create(mapping, others.ToArray(), mapType);
         }
 
         if (typeSymbol == ScalarTypes.Long)
@@ -303,7 +304,8 @@ public static class ColumnHelpers
         return new InMemoryColumn<T>(data);
     }
 
-    private static TypedBaseColumn<int?> CreateFromIntsObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOfint
+        CreateFromIntsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfint.CreateFixed(data.Length);
         foreach (var item in data)
@@ -313,10 +315,10 @@ public static class ColumnHelpers
                 : Convert.ToInt32(item);
             columnData.Add(d);
         }
-        return ColumnFactory.CreateFromDataSet<int?>(columnData.ToNullableSet());
+        return GenericColumnFactoryOfint.CreateFromDataSet(columnData.ToNullableSet());
     }
 
-    private static TypedBaseColumn<long?> CreateFromLongsObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOflong CreateFromLongsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOflong.CreateFixed(data.Length);
         foreach (var item in data)
@@ -326,10 +328,10 @@ public static class ColumnHelpers
                 : Convert.ToInt64(item);
             columnData.Add(d);
         }
-        return ColumnFactory.CreateFromDataSet<long?>(columnData.ToNullableSet());
+        return GenericColumnFactoryOflong.CreateFromDataSet(columnData.ToNullableSet());
     }
 
-    private static TypedBaseColumn<double?> CreateFromDoublesObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOfdouble CreateFromDoublesObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfdouble.CreateFixed(data.Length);
         foreach (var item in data)
@@ -339,10 +341,10 @@ public static class ColumnHelpers
                 : Convert.ToDouble(item);
             columnData.Add(d);
         }
-        return ColumnFactory.CreateFromDataSet<double?>(columnData.ToNullableSet());
+        return GenericColumnFactoryOfdouble.CreateFromDataSet(columnData.ToNullableSet());
     }
 
-    private static TypedBaseColumn<decimal?> CreateFromDecimalsObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOfdecimal CreateFromDecimalsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfdecimal.CreateFixed(data.Length);
         foreach (var item in data)
@@ -352,10 +354,10 @@ public static class ColumnHelpers
                 : Convert.ToDecimal(item);
             columnData.Add(d);
         }
-        return ColumnFactory.CreateFromDataSet<decimal?>(columnData.ToNullableSet());
+        return GenericColumnFactoryOfdecimal.CreateFromDataSet(columnData.ToNullableSet());
     }
 
-    private static TypedBaseColumn<bool?> CreateFromBoolsObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOfbool CreateFromBoolsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfbool.CreateFixed(data.Length);
         foreach (var item in data)
@@ -365,12 +367,12 @@ public static class ColumnHelpers
                 : Convert.ToBoolean(item);
             columnData.Add(d);
         }
-        return ColumnFactory.CreateFromDataSet<bool?>(columnData.ToNullableSet());
+        return GenericColumnFactoryOfbool.CreateFromDataSet(columnData.ToNullableSet()); 
     }
 
-    private static TypedBaseColumn<JsonNode?> CreateFroDynamicObjectArray(object?[] data)
+    private static GenericTypedBaseColumnOfJsonNode CreateFroDynamicObjectArray(object?[] data)
     {
-        return ColumnFactory.CreateFromObjects<JsonNode?>(data);
+        return GenericColumnFactoryOfJsonNode.CreateFromObjects(data);
     }
 
     private static TypedBaseColumn<T> CreateFromScalar<T>(T value, int rowCount)

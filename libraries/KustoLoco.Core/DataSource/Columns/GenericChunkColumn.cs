@@ -9,7 +9,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// <typeparam name="T"></typeparam>
 [KustoGeneric(Types = "all")]
 public class GenericChunkColumn<T> : GenericTypedBaseColumn<T>
-where T:class
 {
     private readonly int _length;
     private readonly int _offset;

@@ -19,7 +19,7 @@ namespace KustoLoco.SourceGeneration
             => p.Type.Replace("?", "") + "?";
 
         public static string MakeTypedColumn(Param p) =>
-            $"var {ColumnName(p)} = (TypedBaseColumn<{GetNullableType(p)}>) arguments[{p.ColumnIndex}].Column;";
+            $"var {ColumnName(p)} = (GenericTypedBaseColumnOf{p.Type}) arguments[{p.ColumnIndex}].Column;";
 
         public static string MakeTypedVariable(Param p) =>
             $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.ColumnIndex}].Value;";

@@ -32,7 +32,7 @@ internal class RowNumberFunctionImpl : IScalarFunctionImpl
                 ColumnHelpers.CreateFromScalar(false,
                     ScalarTypes.Bool, column.RowCount);
 
-        var data = new long?[column.RowCount];
+        var data = NullableSetBuilderOflong.CreateFixed(column.RowCount);
 
         var index = indexResetValue;
         for (var i = 0; i < column.RowCount; i++)
@@ -42,6 +42,6 @@ internal class RowNumberFunctionImpl : IScalarFunctionImpl
             data[i] = index++;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOflong.CreateFromDataSet(data.ToNullableSet()));
     }
 }

@@ -5,14 +5,12 @@ using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-internal class CaseFunctionImpl<T> : IScalarFunctionImpl
-
+[KustoGeneric(Types = "all")]
+internal class GenericCaseFunctionImpl<T> : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        var val = arguments.Last().Value is T?
-            ? (T?)arguments.Last().Value
-            : default;
+        var val = arguments.Last().Value;
         for (var p = 0; p < arguments.Length / 2; p++)
         {
             var pred = arguments[p * 2].Value as bool?;
@@ -41,7 +39,7 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
 
 
         var rowCount = fallback.RowCount;
-        var data = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(typeof(T), rowCount);
+        var data = NullableSetBuilder<T>.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             var val = fallback[i];
@@ -55,6 +53,6 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
             data.Add(val);
         }
 
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
+        return new ColumnarResult(GenericColumnFactory<T>.CreateFromDataSet(data.ToNullableSet()));
     }
 }

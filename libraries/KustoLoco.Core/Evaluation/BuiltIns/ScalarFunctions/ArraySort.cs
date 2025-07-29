@@ -32,14 +32,14 @@ internal class ArraySortFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var column = (TypedBaseColumn<JsonNode?>)arguments[0].Column;
 
-        var data = new JsonNode?[column.RowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(column.RowCount);
         for (var i = 0; i < column.RowCount; i++)
         {
             var array = column[i] as JsonArray;
             data[i] = array == null ? null : Do(array);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private JsonArray Do(JsonArray array)

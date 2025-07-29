@@ -5,9 +5,7 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 [KustoGeneric(Types = "value")]
 public sealed class NullableSet<T> : INullableSet
-    where T : class
 {
-    
     private readonly BitArray _isNull;
     private readonly T[] _nonnull;
 
@@ -29,7 +27,7 @@ public sealed class NullableSet<T> : INullableSet
     }
 
     public bool NoNulls { get; }
-    public Type UnderlyingType { get; } = typeof( T );
+    public Type UnderlyingType { get; } = typeof(T);
 
     public int Length { get; }
 
@@ -40,15 +38,12 @@ public sealed class NullableSet<T> : INullableSet
     {
         if (allowNonNullReturn && !_isNull.HasAnySet())
             return _nonnull;
-        var nullable = new T?[Length];
+        var nullable = new object?[Length];
         for (var i = 0; i < Length; i++)
-        {
             //note we need to use IsNull here because the bitarray
             //could be empty
-            nullable[i] = IsNull(i)
-                ? null
-                : _nonnull[i];
-        }
+            if (!IsNull(i))
+                nullable[i] = _nonnull[i];
 
         return nullable;
     }
@@ -105,7 +100,6 @@ public sealed class NullableSet<T> : INullableSet
 
 [KustoGeneric(Types = "reference")]
 public sealed class NullableSet_Ref<T> : INullableSet
-    where T : class
 {
     private readonly T?[] _values;
     public bool NoNulls { get; }
@@ -139,11 +133,9 @@ public sealed class NullableSet_Ref<T> : INullableSet
         for (var i = 0; i < length; i++)
         {
             var d = nullableData[i];
-            if (d is not T t)
-            {
-                noNulls = false;
-                break;
-            }
+            if (d is T t) continue;
+            noNulls = false;
+            break;
         }
 
         //todo - add special casing for Strings here to use stringpool

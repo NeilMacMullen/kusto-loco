@@ -26,7 +26,7 @@ internal class StrcatDelimFunctionImpl : IScalarFunctionImpl
         var stringColumns = columns.Skip(1).ToArray();
 
         var rowCount = columns[0].RowCount;
-        var data = new string?[rowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
         for (var row = 0; row < rowCount; row++)
         {
             var delimiter = delimiterColumn[row];
@@ -35,6 +35,6 @@ internal class StrcatDelimFunctionImpl : IScalarFunctionImpl
             data[row] = joinedString;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
     }
 }

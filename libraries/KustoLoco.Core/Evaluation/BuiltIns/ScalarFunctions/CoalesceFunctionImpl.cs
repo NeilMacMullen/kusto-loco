@@ -21,9 +21,9 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
    Do not modify by hand - your changes will be lost .
     
 
-   Built:  03:56:34 PM on Saturday, 26 Jul 2025
-   Machine: NPM-LENOVO
-   User:  neilm
+   Built:  05:33:20 PM on Tuesday, 29 Jul 2025
+   Machine: BEAST
+   User:  User
 
 */ 
  
@@ -53,12 +53,12 @@ internal sealed class CoalesceFunctionIntImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new int?[numRows];
+     var data = NullableSetBuilderOfint.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<int?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfint)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -69,7 +69,7 @@ internal sealed class CoalesceFunctionIntImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfint.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -96,12 +96,12 @@ internal sealed class CoalesceFunctionLongImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new long?[numRows];
+     var data = NullableSetBuilderOflong.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<long?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOflong)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -112,7 +112,7 @@ internal sealed class CoalesceFunctionLongImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOflong.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -139,12 +139,12 @@ internal sealed class CoalesceFunctionDecimalImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new decimal?[numRows];
+     var data = NullableSetBuilderOfdecimal.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<decimal?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfdecimal)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -155,7 +155,7 @@ internal sealed class CoalesceFunctionDecimalImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfdecimal.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -182,12 +182,12 @@ internal sealed class CoalesceFunctionDoubleImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new double?[numRows];
+     var data = NullableSetBuilderOfdouble.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<double?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfdouble)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -198,7 +198,7 @@ internal sealed class CoalesceFunctionDoubleImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfdouble.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -225,12 +225,12 @@ internal sealed class CoalesceFunctionDateTimeImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new DateTime?[numRows];
+     var data = NullableSetBuilderOfDateTime.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<DateTime?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfDateTime)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -241,7 +241,7 @@ internal sealed class CoalesceFunctionDateTimeImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfDateTime.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -268,12 +268,12 @@ internal sealed class CoalesceFunctionTimeSpanImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new TimeSpan?[numRows];
+     var data = NullableSetBuilderOfTimeSpan.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<TimeSpan?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfTimeSpan)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -284,7 +284,7 @@ internal sealed class CoalesceFunctionTimeSpanImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfTimeSpan.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -311,12 +311,12 @@ internal sealed class CoalesceFunctionGuidImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new Guid?[numRows];
+     var data = NullableSetBuilderOfGuid.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<Guid?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfGuid)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -327,7 +327,7 @@ internal sealed class CoalesceFunctionGuidImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfGuid.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -354,12 +354,12 @@ internal sealed class CoalesceFunctionBoolImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new bool?[numRows];
+     var data = NullableSetBuilderOfbool.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<bool?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfbool)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -370,7 +370,7 @@ internal sealed class CoalesceFunctionBoolImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -397,12 +397,12 @@ internal sealed class CoalesceFunctionStringImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new string?[numRows];
+     var data = NullableSetBuilderOfstring.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<string?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfstring)arguments[i].Column;
              var item = column[j];
             if (item is null 
             || item.Length == 0    
@@ -413,7 +413,7 @@ internal sealed class CoalesceFunctionStringImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 
@@ -440,12 +440,12 @@ internal sealed class CoalesceFunctionJsonNodeImpl : IScalarFunctionImpl
      Debug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
-     var data = new JsonNode?[numRows];
+     var data = NullableSetBuilderOfJsonNode.CreateFixed(numRows);
      for (var j = 0; j < numRows; j++)
      {
          for (var i = 0; i < arguments.Length; i++)
          {
-             var column = (TypedBaseColumn<JsonNode?>)arguments[i].Column;
+             var column = (GenericTypedBaseColumnOfJsonNode)arguments[i].Column;
              var item = column[j];
             if (item is null 
                
@@ -456,7 +456,7 @@ internal sealed class CoalesceFunctionJsonNodeImpl : IScalarFunctionImpl
          }
      }
 
-     return new ColumnarResult(ColumnFactory.Create(data));
+     return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
  }
 }  
 

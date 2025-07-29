@@ -372,12 +372,16 @@ internal static class BuiltInScalarFunctions
             (
                 //note most restrictive types have to be checked first!
                 Array.Empty<ScalarOverloadInfo>()
-                    .Concat(BuildOverloads(new CaseFunctionImpl<bool?>(), ScalarTypes.Bool))
-                    .Concat(BuildOverloads(new CaseFunctionImpl<int?>(), ScalarTypes.Int))
-                    .Concat(BuildOverloads(new CaseFunctionImpl<long?>(), ScalarTypes.Long))
-                    .Concat(BuildOverloads(new CaseFunctionImpl<double?>(), ScalarTypes.Real))
-                    .Concat(BuildOverloads(new CaseFunctionImpl<DateTime?>(), ScalarTypes.DateTime))
-                    .Concat(BuildOverloads(new CaseFunctionImpl<string>(), ScalarTypes.String))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfbool(), ScalarTypes.Bool))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfint(), ScalarTypes.Int))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOflong(), ScalarTypes.Long))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfdecimal(), ScalarTypes.Decimal))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfdouble(), ScalarTypes.Real))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfDateTime(), ScalarTypes.DateTime))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfTimeSpan(), ScalarTypes.TimeSpan))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfstring(), ScalarTypes.String))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfGuid(), ScalarTypes.Guid))
+                    .Concat(BuildOverloads(new GenericCaseFunctionImplOfJsonNode(), ScalarTypes.Dynamic))
                     .ToArray()
             ));
     }

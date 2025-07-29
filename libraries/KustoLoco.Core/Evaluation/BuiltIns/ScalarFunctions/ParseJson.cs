@@ -24,13 +24,13 @@ internal class ParseJsonStringFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 1);
         var column = (TypedBaseColumn<string?>)arguments[0].Column;
 
-        var data = new JsonNode?[column.RowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(column.RowCount);
         for (var i = 0; i < column.RowCount; i++)
         {
             data[i] = ParseInternal(column[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private static JsonNode? ParseInternal(string? input)

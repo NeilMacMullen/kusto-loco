@@ -28,9 +28,9 @@ internal class {{m}}OfFunction{{tName}}Impl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<{{t}}?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOf{{t}}>().ToArray();
 
-        var data = new {{t}}?[columns[0].RowCount];
+        var data = NullableSetBuilderOf{{t}}.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -38,7 +38,7 @@ internal class {{m}}OfFunction{{tName}}Impl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.{{m}}Of{{tName}}(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOf{{t}}.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 {{end}}

@@ -24,13 +24,14 @@ internal class DebugEmitImpl : IScalarFunctionImpl
     {
         var left = (TypedBaseColumn<string?>)(arguments[0].Column);
 
-        var data = new int?[left.RowCount];
+        var data = NullableSetBuilderOfint.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
             Logger.Warn(left);
             data[i] = i;
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfint
+            .CreateFromDataSet(data.ToNullableSet()));
     }
 }

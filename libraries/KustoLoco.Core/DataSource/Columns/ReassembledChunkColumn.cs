@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace KustoLoco.Core.DataSource.Columns;
-
+#if false
 /// <summary>
 ///     Represents a column formed of one or more sections which are processed in order
 /// </summary>
@@ -118,3 +118,5 @@ public class ReassembledChunkColumn<T> : TypedBaseColumn<T>
         public static readonly Section Empty = new(0, 0, ColumnFactory.Create(Array.Empty<T>()));
     }
 }
+
+#endif

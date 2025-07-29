@@ -35,13 +35,13 @@ internal abstract class TrimFunctionCore : IScalarFunctionImpl
         }
 
         var rowCount = columns[0].RowCount;
-        var data = new string?[rowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             data[i] = Trim(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
     }
 
     protected abstract string Trim(object? regex, object? target);
