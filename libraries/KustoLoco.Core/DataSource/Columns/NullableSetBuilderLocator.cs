@@ -6,7 +6,14 @@ namespace KustoLoco.Core.DataSource.Columns;
 
 public static class NullableSetBuilderLocator
 {
-    public static INullableSetBuilder GetNullableSetBuilderForType(Type t, int initialLength,bool canResize)
+
+    public static INullableSetBuilder GetFixedNullableSetBuilderForType(Type t, int initialLength)
+        => GetNullableSetBuilderForType(t, initialLength, false);
+
+    public static INullableSetBuilder GetExpandableNullableSetBuilderForType(Type t, int initialLength)
+        => GetNullableSetBuilderForType(t, initialLength, true);
+    
+    private static INullableSetBuilder GetNullableSetBuilderForType(Type t, int initialLength,bool canResize)
     {
         var u = TypeMapping.UnderlyingType(t);
         if (u == typeof(bool))
