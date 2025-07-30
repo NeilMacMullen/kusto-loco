@@ -1,12 +1,15 @@
-﻿using System.Linq;
-using KustoLoco.Core.DataSource.Columns;
+﻿using KustoLoco.Core.DataSource.Columns;
+using System.Linq;
 
 namespace KustoLoco.Core.DataSource;
 
 [KustoGeneric(Types = "all")]
 public static class GenericColumnFactory<T>
 {
- 
+
+    public static GenericTypedBaseColumn<T> CreateFromObject(object? data, int rowcount)
+        => new GenericSingleValueColumn<T>(data, 1);
+
     public static GenericTypedBaseColumn<T> CreateFromObjects(object?[] data)
         =>
             data.Length == 1

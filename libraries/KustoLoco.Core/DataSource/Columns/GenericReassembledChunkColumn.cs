@@ -9,7 +9,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
-where T:class
 {
     private readonly int _Length;
 
@@ -102,11 +101,14 @@ where T:class
         return new GenericReassembledChunkColumn<T>(slicedColumns);
     }
 
-    public static GenericTypedBaseColumn<T> Create(IReadOnlyCollection<GenericTypedBaseColumn<T>> backing) =>
+    public static GenericTypedBaseColumn<T> Create(IReadOnlyCollection<BaseColumn> rawbacking)
+    {
+        var backing = rawbacking.Cast<GenericTypedBaseColumn<T>>().ToArray();
         //If there's only one column, just return it since no reassembly is needed
-        backing.Count == 1
-            ? backing.First()
+        return backing.Length == 1
+            ? backing[0]
             : new GenericReassembledChunkColumn<T>(backing);
+    }
 
     public override object? GetRawDataValue(int index)
     {

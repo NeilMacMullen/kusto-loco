@@ -21,16 +21,17 @@ public class SingleValueTests
     [TestMethod]
     public void BuilderCreatesSingleValueColumn()
     {
-        var column = ColumnFactory.Create(new int?[1]);
-        column.Should().BeOfType<SingleValueColumn<int?>>();
+        var dataset = NullableSetOfint.FromObjectsOfCorrectType([(int) 1]);
+        var column = GenericColumnFactoryOfint.CreateFromDataSet(dataset);
+        column.Should().BeOfType<GenericSingleValueColumnOfint>();
     }
 
     [TestMethod]
     public void BuilderCreatesSingleValueColumnAfterExpansion()
     {
-        var column = new InMemoryColumn<int?>([99]);
+        var column = new GenericInMemoryColumnOfint([99]);
         var expanded = ColumnFactory.Inflate(column, 100);
-        expanded.Should().BeOfType<SingleValueColumn<int?>>();
+        expanded.Should().BeOfType<GenericSingleValueColumnOfint>();
         expanded.RowCount.Should().Be(100);
         expanded.GetRawDataValue(7).Should().Be(99);
     }

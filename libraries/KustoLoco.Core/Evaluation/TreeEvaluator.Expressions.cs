@@ -63,7 +63,7 @@ internal partial class TreeEvaluator
             for (var i = 0; i < items.Column.RowCount; i++)
                 data[i] = IndexIntoPossibleJsonArray(itemsCol[i], node.Index);
 
-            var column = new InMemoryColumn<JsonNode?>(data);
+            var column = new GenericInMemoryColumnOfJsonNode(data);
             return new ColumnarResult(column);
         }
 
@@ -91,7 +91,7 @@ internal partial class TreeEvaluator
                     if (obj.TryGetPropertyValue(node.MemberName, out var value))
                         data[i] = value;
 
-            var column = new InMemoryColumn<JsonNode?>(data);
+            var column = new GenericInMemoryColumnOfJsonNode(data);
             return new ColumnarResult(column);
         }
 

@@ -43,6 +43,7 @@ public static class ColumnFactory
     public static BaseColumn Inflate(BaseColumn column, int logicalRowCount)
     {
         var value = column.GetRawDataValue(0);
-        return ColumnHelpers.CreateFromScalar(value, column.Type, logicalRowCount);
+        var columnType= TypeMapping.UnderlyingTypeForSymbol(column.Type);
+        return SingleValueColumnLocator.CreateSingleValueColumn(columnType, value, logicalRowCount);
     }
 }

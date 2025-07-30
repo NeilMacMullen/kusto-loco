@@ -7,15 +7,15 @@ namespace ExtendedCoreTests;
 [TestClass]
 public class IndirectTests
 {
-    private MappedColumn<string> MakeDecimatedColumn(int sourceCount)
+    private GenericMappedColumnOfstring MakeDecimatedColumn(int sourceCount)
     {
         var originalData = Enumerable.Range(0, sourceCount)
-            .Select(i => i.ToString()).ToArray();
-        var cs = new InMemoryColumn<string>(originalData);
-        var backing = MappedColumn<string>.Create(
+            .Select(i => i.ToString()).Cast<object?>().ToArray();
+        var cs = new GenericInMemoryColumnOfstring(originalData);
+        var backing = GenericMappedColumnOfstring.Create(
             [..Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0)]
             , cs);
-        return (MappedColumn<string>)backing;
+        return (GenericMappedColumnOfstring)backing;
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public class IndirectTests
     [TestMethod]
     public void IndirectionFollowedViaCasting()
     {
-        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
+        var backing = (GenericTypedBaseColumnOfstring)MakeDecimatedColumn(100);
         backing.RowCount.Should().Be(10);
         backing[0].Should().Be("0");
         backing[1].Should().Be("10");
@@ -43,7 +43,7 @@ public class IndirectTests
     [TestMethod]
     public void SlicingIndirectedColumnCanWork()
     {
-        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
+        var backing = (GenericTypedBaseColumnOfstring)MakeDecimatedColumn(100);
         var sliced = backing.Slice(5, 2);
         sliced.RowCount.Should().Be(2);
         sliced.GetRawDataValue(0).Should().Be("50");
@@ -83,8 +83,8 @@ public class IndirectTests
     [TestMethod] public void  InMemoryCanBeCast()
     {
         var data = new int[]{1, 2, 3};
-        var col = new InMemoryColumn<int>(data.Cast<object?>().ToArray());
-        var baseCol = (TypedBaseColumn<int>)col;
+        var col = new GenericInMemoryColumnOfint(data.Cast<object?>().ToArray());
+        var baseCol = (GenericTypedBaseColumnOfint)col;
         
     }
 

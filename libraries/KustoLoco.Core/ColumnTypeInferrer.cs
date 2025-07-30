@@ -33,7 +33,7 @@ public static class ColumnTypeInferrer
         if (source.Type != ScalarTypes.String)
             return source;
 
-        var stringColumn = (TypedBaseColumn<string>)source;
+        var stringColumn = (GenericTypedBaseColumnOfstring)source;
 
      
         //attempt each type in turn until we find one that works

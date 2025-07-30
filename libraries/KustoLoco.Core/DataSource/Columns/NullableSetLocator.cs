@@ -20,15 +20,15 @@ public static class NullableSetLocator
         if (u == typeof(double))
             return NullableSetOfdouble.FromObjectsOfCorrectType(data);
         if (u == typeof(Guid))
-            return  NullableSetOfGuid.FromObjectsOfCorrectType(data);
+            return NullableSetOfGuid.FromObjectsOfCorrectType(data);
         if (u == typeof(DateTime))
-            return  NullableSetOfDateTime.FromObjectsOfCorrectType(data);
+            return NullableSetOfDateTime.FromObjectsOfCorrectType(data);
         if (u == typeof(TimeSpan))
-            return  NullableSetOfTimeSpan.FromObjectsOfCorrectType(data);
+            return NullableSetOfTimeSpan.FromObjectsOfCorrectType(data);
         if (u == typeof(string))
-            return  NullableSetOfstring.FromObjectsOfCorrectType(data);
+            return NullableSetOfstring.FromObjectsOfCorrectType(data);
         if (u == typeof(JsonNode))
-            return  NullableSetOfJsonNode.FromObjectsOfCorrectType(data);
+            return NullableSetOfJsonNode.FromObjectsOfCorrectType(data);
         throw new InvalidOperationException($"Unable to create set of type {t.Name}");
     }
 
@@ -58,3 +58,33 @@ public static class NullableSetLocator
         throw new InvalidOperationException($"Unable to create set of type {t.Name}");
     }
 }
+
+public static class Generic
+    {
+        public static INullableSet GetNullableForType(Type t, object?[] data)
+        {
+            var u = TypeMapping.UnderlyingType(t);
+            if (u == typeof(bool))
+                return NullableSetOfbool.FromObjectsOfCorrectType(data);
+            if (u == typeof(int))
+                return NullableSetOfint.FromObjectsOfCorrectType(data);
+            if (u == typeof(long))
+                return NullableSetOflong.FromObjectsOfCorrectType(data);
+            if (u == typeof(decimal))
+                return NullableSetOfdecimal.FromObjectsOfCorrectType(data);
+            if (u == typeof(double))
+                return NullableSetOfdouble.FromObjectsOfCorrectType(data);
+            if (u == typeof(Guid))
+                return NullableSetOfGuid.FromObjectsOfCorrectType(data);
+            if (u == typeof(DateTime))
+                return NullableSetOfDateTime.FromObjectsOfCorrectType(data);
+            if (u == typeof(TimeSpan))
+                return NullableSetOfTimeSpan.FromObjectsOfCorrectType(data);
+            if (u == typeof(string))
+                return NullableSetOfstring.FromObjectsOfCorrectType(data);
+            if (u == typeof(JsonNode))
+                return NullableSetOfJsonNode.FromObjectsOfCorrectType(data);
+            throw new InvalidOperationException($"Unable to create set of type {t.Name}");
+        }
+
+    }

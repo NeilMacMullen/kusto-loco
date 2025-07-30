@@ -158,6 +158,7 @@ public class ParquetSerializer : ITableSerializer
         var builder = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
-        return builder.ToNullableSet();
+        //TODO fix up 
+        return NullableSetOfint.FromObjectsOfCorrectType([0]); //builder.ToNullableSet();
     }
 }

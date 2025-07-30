@@ -3,11 +3,11 @@ using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
-public class InMemoryColumn<T> : TypedBaseColumn<T>
+public class OldInMemoryColumn<T> : TypedBaseColumn<T>
 {
     private readonly INullableSet _nullableSet;
 
-    public InMemoryColumn(INullableSet data)
+    public OldInMemoryColumn(INullableSet data)
     {
         _nullableSet = data;
         if (typeof(T) == typeof(JsonArray))
@@ -17,7 +17,7 @@ public class InMemoryColumn<T> : TypedBaseColumn<T>
         }
     }
 
-    public InMemoryColumn(object?[] data)
+    public OldInMemoryColumn(object?[] data)
     {
         _nullableSet = NullableSetLocator.GetNullableForType(typeof(T), data);
         if (typeof(T)== typeof(JsonArray))

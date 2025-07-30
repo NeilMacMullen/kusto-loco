@@ -8,7 +8,6 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// </summary>
 [KustoGeneric(Types = "all")]
 public class GenericMappedColumn<T> : GenericTypedBaseColumn<T>
-where T:class
 {
     private readonly ImmutableArray<int> _lookups;
     public readonly GenericTypedBaseColumn<T> BackingColumn;

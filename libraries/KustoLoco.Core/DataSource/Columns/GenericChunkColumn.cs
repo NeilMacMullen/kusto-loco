@@ -26,8 +26,12 @@ public class GenericChunkColumn<T> : GenericTypedBaseColumn<T>
     public override int RowCount => _length;
 
 
-    public static GenericTypedBaseColumn<T> Create(int offset, int length, GenericTypedBaseColumn<T> backing)
+    public static GenericTypedBaseColumn<T> Create(int offset, int length, BaseColumn rawBacking)
     {
+        if (rawBacking is not GenericTypedBaseColumn<T> backing)
+        {
+            throw new InvalidOperationException("wrong type");
+        }
         if (backing is GenericSingleValueColumn<T> single)
             return single.ResizeTo(length);
         //if we're actually slicing the whole column, just return the original backing column
