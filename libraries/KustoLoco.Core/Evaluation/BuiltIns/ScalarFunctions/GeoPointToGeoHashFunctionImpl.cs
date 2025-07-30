@@ -9,7 +9,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
 {
-    private const int DefaultResolution = 5;
+    private const long DefaultResolution = 5;
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
@@ -23,13 +23,13 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var p1LonColumn = (TypedBaseColumn<double?>)arguments[0].Column;
-        var p1LatColumn = (TypedBaseColumn<double?>)arguments[1].Column;
+        var p1LonColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
+        var p1LatColumn = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
         var rowCount = p1LonColumn.RowCount;
         var resColumn = arguments.Length > 2
-            ? (TypedBaseColumn<long?>)arguments[2].Column
-            : new SingleValueColumn<long?>(DefaultResolution, rowCount);
+            ? (GenericTypedBaseColumnOflong)arguments[2].Column
+            : new GenericSingleValueColumnOflong(DefaultResolution, rowCount);
 
         var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
 

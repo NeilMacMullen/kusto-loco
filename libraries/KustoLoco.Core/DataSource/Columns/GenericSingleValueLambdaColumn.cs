@@ -2,12 +2,15 @@
 
 namespace KustoLoco.Core.DataSource.Columns;
 
-public class OldSingleValueLambdaColumn<T> : OldTypedBaseColumn<T>
+[KustoGeneric(Types = "all")]
+public class GenericSingleValueLambdaColumn<T> : GenericTypedBaseColumn<T>
 {
-    private readonly Func<T?> _dataFetcher;
+    private readonly Func<T?> _dataFetcher; //GENERIC INLINE
     private readonly int _length;
 
-    public OldSingleValueLambdaColumn(Func<T?> dataFetcher, int rowCount)
+    public GenericSingleValueLambdaColumn(
+        Func<T?> dataFetcher,//GENERIC INLINE
+        int rowCount)
     {
         _dataFetcher = dataFetcher;
         _length = rowCount;
@@ -20,7 +23,7 @@ public class OldSingleValueLambdaColumn<T> : OldTypedBaseColumn<T>
     public override int RowCount => _length;
     public override object? GetRawDataValue(int index) => this[index];
 
-    public override BaseColumn Slice(int start, int length) => new OldSingleValueLambdaColumn<T>(_dataFetcher, length);
+    public override BaseColumn Slice(int start, int length) => new GenericSingleValueLambdaColumn<T>(_dataFetcher, length);
 
     public override void ForEach(Action<object?> action)
     {

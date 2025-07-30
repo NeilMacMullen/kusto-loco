@@ -43,7 +43,7 @@ public class OperatorTests
         var table = TableBuilder.CreateEmpty("data", tableLength);
 
         var invocationCountForIndex = 0;
-        var lazy = new SingleValueLambdaColumn<string?>(() =>
+        var lazy = new GenericSingleValueLambdaColumnOfstring(() =>
         {
             invocationCountForIndex++;
             return "a";
@@ -69,7 +69,7 @@ public class OperatorTests
         var context = CreateContext();
 
 
-        var c1 = new SingleValueColumn<int?>(1, tableLength);
+        var c1 = new GenericSingleValueColumnOfint(1, tableLength);
         var builder = TableBuilder.CreateEmpty("data", tableLength)
             .WithColumn("c1", c1)
             .WithColumn("c2", c1);

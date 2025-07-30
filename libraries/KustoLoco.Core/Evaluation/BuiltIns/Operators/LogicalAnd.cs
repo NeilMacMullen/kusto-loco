@@ -24,8 +24,8 @@ internal class LogicalAndOperatorImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
 
-        var left = (TypedBaseColumn<bool?>)arguments[0].Column;
-        var right = (TypedBaseColumn<bool?>)arguments[1].Column;
+        var left = (GenericTypedBaseColumnOfbool)arguments[0].Column;
+        var right = (GenericTypedBaseColumnOfbool)arguments[1].Column;
         //short-circuiting for indexed columns
         if (left.IsSingleValue && (left[0] == false))
             return new ColumnarResult(left);

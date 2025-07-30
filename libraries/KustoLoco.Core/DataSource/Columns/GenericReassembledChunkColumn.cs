@@ -8,6 +8,7 @@ namespace KustoLoco.Core.DataSource.Columns;
 ///     Represents a column formed of one or more sections which are processed in order
 /// </summary>
 /// <typeparam name="T"></typeparam>
+[KustoGeneric(Types = "all")]
 public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
 {
     private readonly int _Length;

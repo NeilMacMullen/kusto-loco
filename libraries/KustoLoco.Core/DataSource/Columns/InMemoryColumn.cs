@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
-public class OldInMemoryColumn<T> : TypedBaseColumn<T>
+public class OldInMemoryColumn<T> : OldTypedBaseColumn<T>
 {
     private readonly INullableSet _nullableSet;
 
@@ -35,7 +35,7 @@ public class OldInMemoryColumn<T> : TypedBaseColumn<T>
 
     public override BaseColumn Slice(int start, int length)
     {
-        return ChunkColumn<T>.Create(start, length, this);
+        return OldChunkColumn<T>.Create(start, length, this);
     }
 
     public override void ForEach(Action<object?> action)

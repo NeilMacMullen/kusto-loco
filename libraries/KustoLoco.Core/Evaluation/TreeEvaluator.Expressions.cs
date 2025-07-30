@@ -57,7 +57,7 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
+            var itemsCol = (GenericTypedBaseColumnOfJsonNode)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
@@ -83,7 +83,7 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
+            var itemsCol = (GenericTypedBaseColumnOfJsonNode)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)

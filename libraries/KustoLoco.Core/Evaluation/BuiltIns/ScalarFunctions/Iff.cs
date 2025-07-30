@@ -25,9 +25,9 @@ internal class IffBoolFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<bool?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<bool?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfbool)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfbool)(arguments[2].Column);
 
         var data = NullableSetBuilderOfbool.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -56,9 +56,9 @@ internal class IffIntFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<int?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<int?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfint)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfint)(arguments[2].Column);
 
         var data = NullableSetBuilderOfint.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -87,9 +87,9 @@ internal class IffLongFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<long?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<long?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOflong)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOflong)(arguments[2].Column);
 
         var data = NullableSetBuilderOflong.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -118,9 +118,9 @@ internal class IffRealFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<double?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<double?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfdouble)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfdouble)(arguments[2].Column);
 
         var data = NullableSetBuilderOfdouble.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -149,9 +149,9 @@ internal class IffStringFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<string?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<string?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfstring)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfstring)(arguments[2].Column);
 
         var data = NullableSetBuilderOfstring.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -180,9 +180,9 @@ internal class IffDateTimeFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<DateTime?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<DateTime?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfDateTime)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfDateTime)(arguments[2].Column);
 
         var data = NullableSetBuilderOfDateTime.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)
@@ -211,9 +211,9 @@ internal class IffTimeSpanFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 3);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var predicateCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var ifTrueCol = (TypedBaseColumn<TimeSpan?>)(arguments[1].Column);
-        var ifFalseCol = (TypedBaseColumn<TimeSpan?>)(arguments[2].Column);
+        var predicateCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var ifTrueCol = (GenericTypedBaseColumnOfTimeSpan)(arguments[1].Column);
+        var ifFalseCol = (GenericTypedBaseColumnOfTimeSpan)(arguments[2].Column);
 
         var data = NullableSetBuilderOfTimeSpan.CreateFixed(predicateCol.RowCount);
         for (var i = 0; i < predicateCol.RowCount; i++)

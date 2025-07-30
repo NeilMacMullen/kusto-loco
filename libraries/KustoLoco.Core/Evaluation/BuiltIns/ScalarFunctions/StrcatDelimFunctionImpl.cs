@@ -20,7 +20,7 @@ internal class StrcatDelimFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length > 0);
         var columns =
-            arguments.Select(c => (TypedBaseColumn<string?>)c.Column)
+            arguments.Select(c => (GenericTypedBaseColumnOfstring)c.Column)
                 .ToArray();
         var delimiterColumn = columns[0];
         var stringColumns = columns.Skip(1).ToArray();

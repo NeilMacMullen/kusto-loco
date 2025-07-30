@@ -32,9 +32,9 @@ internal class ExtractRegexFunctionImpl : IScalarFunctionImpl
         Debug.Assert(
             arguments[0].Column.RowCount == arguments[1].Column.RowCount &&
             arguments[0].Column.RowCount == arguments[2].Column.RowCount);
-        var patterns = (TypedBaseColumn<string?>)arguments[0].Column;
-        var captureGroups = (TypedBaseColumn<long?>)arguments[1].Column;
-        var values = (TypedBaseColumn<string?>)arguments[2].Column;
+        var patterns = (GenericTypedBaseColumnOfstring)arguments[0].Column;
+        var captureGroups = (GenericTypedBaseColumnOflong)arguments[1].Column;
+        var values = (GenericTypedBaseColumnOfstring)arguments[2].Column;
 
         var cacheEntry = (Pattern: (string?)null, Regex: (Regex?)null);
         var data = NullableSetBuilderOfstring.CreateFixed(values.RowCount);

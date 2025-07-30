@@ -115,9 +115,9 @@ public class TableBuilder
     /// An index column is a column that contains a single value repeated for the length of the table
     /// Typically used to provide efficient filtering and summarization operations
     /// </remarks>
-    public TableBuilder WithIndexColumn<T>(string name, T? value)
+    public TableBuilder WithIndexColumn(string name, int value)
     {
-        var indexColumn = new SingleValueColumn<T>(value, Length);
+        var indexColumn = new GenericSingleValueColumnOfint(value, Length);
         return WithColumn(name, indexColumn);
     }
 
@@ -155,27 +155,27 @@ public class TableBuilder
         {
             var propertyType = p.PropertyType;
             if (propertyType == typeof(int))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, int?>(records, o => (int?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)p.GetValue(o)));
             if (propertyType == typeof(long))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, long?>(records, o => (long?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)p.GetValue(o)));
             if (propertyType == typeof(float))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (float?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (float?)p.GetValue(o)));
             if (propertyType == typeof(double))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, double?>(records, o => (double?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)p.GetValue(o)));
             if (propertyType == typeof(decimal))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, decimal?>(records, o => (decimal?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)p.GetValue(o)));
             if (propertyType == typeof(string))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, string?>(records, o => (string?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)p.GetValue(o)));
             if (propertyType == typeof(DateTime))
                 builder.WithColumn(p.Name,
-                    new LambdaWrappedColumn<T, DateTime?>(records, o => (DateTime?)p.GetValue(o)));
+                    new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)p.GetValue(o)));
             if (propertyType == typeof(TimeSpan))
                 builder.WithColumn(p.Name,
-                    new LambdaWrappedColumn<T, TimeSpan?>(records, o => (TimeSpan?)p.GetValue(o)));
+                    new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)p.GetValue(o)));
             if (propertyType == typeof(bool))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, bool?>(records, o => (bool?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)p.GetValue(o)));
             if (propertyType == typeof(Guid))
-                builder.WithColumn(p.Name, new LambdaWrappedColumn<T, Guid?>(records, o => (Guid?)p.GetValue(o)));
+                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)p.GetValue(o)));
         }
 
         return builder;

@@ -16,19 +16,19 @@ internal class RowNumberFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length > 0);
         //the first column is a "dummy" column inserted by the evaluator
         //because we specified this as "ForceColumnarResult"
-        var column = (TypedBaseColumn<int?>)arguments[0].Column;
+        var column = (GenericTypedBaseColumnOfint)arguments[0].Column;
 
         var indexResetValue = 1L;
         if (arguments.Length > 1)
         {
-            var indexResetColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var indexResetColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             indexResetValue = indexResetColumn[0] ?? 0;
         }
 
         var resetColumn =
             arguments.Length > 2
-                ? (TypedBaseColumn<bool?>)arguments[2].Column
-                : (TypedBaseColumn<bool?>)
+                ? (GenericTypedBaseColumnOfbool)arguments[2].Column
+                : (GenericTypedBaseColumnOfbool)
                 ColumnHelpers.CreateFromScalar(false,
                     ScalarTypes.Bool, column.RowCount);
 

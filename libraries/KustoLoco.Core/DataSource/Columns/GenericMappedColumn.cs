@@ -23,10 +23,11 @@ public class GenericMappedColumn<T> : GenericTypedBaseColumn<T>
     public override int RowCount => _lookups.Length;
 
 
-    public static GenericTypedBaseColumn<T> Create(ImmutableArray<int> lookups, GenericTypedBaseColumn<T> backing)
+    public static GenericTypedBaseColumn<T> Create(ImmutableArray<int> lookups, BaseColumn rawBacking)
     {
-        if (backing is GenericSingleValueColumn<T> single)
+        if (rawBacking is GenericSingleValueColumn<T> single)
             return single.ResizeTo(lookups.Length);
+        var backing = (GenericTypedBaseColumn<T>)rawBacking;
         return new GenericMappedColumn<T>(lookups, backing);
     }
 

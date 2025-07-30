@@ -28,7 +28,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? int.MinValue : int.MaxValue;
-        var valuesColumn = (TypedBaseColumn<int?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOfint) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;
@@ -46,7 +46,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? long.MinValue : long.MaxValue;
-        var valuesColumn = (TypedBaseColumn<long?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOflong) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;
@@ -64,7 +64,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? decimal.MinValue : decimal.MaxValue;
-        var valuesColumn = (TypedBaseColumn<decimal?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOfdecimal) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;
@@ -82,7 +82,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? double.MinValue : double.MaxValue;
-        var valuesColumn = (TypedBaseColumn<double?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOfdouble) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;
@@ -100,7 +100,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? DateTime.MinValue : DateTime.MaxValue;
-        var valuesColumn = (TypedBaseColumn<DateTime?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOfDateTime) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;
@@ -118,7 +118,7 @@ public static class IndexFinder
     
         var valueIndex = 0;
         var valueSoFar = max ? TimeSpan.MinValue : TimeSpan.MaxValue;
-        var valuesColumn = (TypedBaseColumn<TimeSpan?>) column;
+        var valuesColumn = (GenericTypedBaseColumnOfTimeSpan) column;
         for (var i = 0; i < valuesColumn.RowCount; i++)
         {
             if (valuesColumn[i] is not { } n) continue;

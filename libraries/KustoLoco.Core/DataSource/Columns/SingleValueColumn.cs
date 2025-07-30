@@ -10,13 +10,13 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// or filtering operations.  Single-value columns can also efficiently represent "index" columns since a single filter comparison
 /// can select a large number of rows.
 /// </remarks>
-public class SingleValueColumn<T> : TypedBaseColumn<T>
+public class OldSingleValueColumn<T> : OldTypedBaseColumn<T>
 {
     private readonly int _rowCount;
 
     private readonly T? Value;
 
-    public SingleValueColumn(object? value, int nominalRowCount)
+    public OldSingleValueColumn(object? value, int nominalRowCount)
     {
         _rowCount = nominalRowCount;
         Value = (T?) value;
@@ -35,9 +35,9 @@ public class SingleValueColumn<T> : TypedBaseColumn<T>
         }
     }
 
-    public override BaseColumn Slice(int start, int length) => new SingleValueColumn<T>(Value, length);
+    public override BaseColumn Slice(int start, int length) => new OldSingleValueColumn<T>(Value, length);
 
     public override object? GetRawDataValue(int index) => Value;
 
-    public TypedBaseColumn<T> ResizeTo(int lookupsLength) => new SingleValueColumn<T>(Value, lookupsLength);
+    public OldTypedBaseColumn<T> ResizeTo(int lookupsLength) => new OldSingleValueColumn<T>(Value, lookupsLength);
 }

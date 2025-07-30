@@ -13,13 +13,13 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<int?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfint)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         var accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<int?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfint)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -56,13 +56,13 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<long?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOflong)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         long accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<long?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOflong)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -99,13 +99,13 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<double?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfdouble)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         double accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<double?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfdouble)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -142,13 +142,13 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<decimal?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfdecimal)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         decimal accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<decimal?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfdecimal)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -185,13 +185,13 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<TimeSpan?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfTimeSpan)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         var accumulator = TimeSpan.Zero;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<TimeSpan?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfTimeSpan)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];

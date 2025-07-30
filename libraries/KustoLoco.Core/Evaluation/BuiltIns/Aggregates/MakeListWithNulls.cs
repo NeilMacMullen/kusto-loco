@@ -15,7 +15,7 @@ internal class MakeListWithNullsIntFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfint)arguments[0].Column;
 
         var list = new List<int?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -32,7 +32,7 @@ internal class MakeListWithNullsLongFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOflong)arguments[0].Column;
 
         var list = new List<long?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -49,7 +49,7 @@ internal class MakeListWithNullsDoubleFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
 
         var list = new List<double?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -66,7 +66,7 @@ internal class MakeListWithNullsDecimalFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdecimal)arguments[0].Column;
 
         var list = new List<decimal?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -83,7 +83,7 @@ internal class MakeListWithNullsTimeSpanFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfTimeSpan)arguments[0].Column;
 
         var list = new List<TimeSpan?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -100,7 +100,7 @@ internal class MakeListWithNullsDateTimeFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
 
         var list = new List<DateTime?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)
@@ -117,7 +117,7 @@ internal class MakeListWithNullsStringFunctionImpl : IAggregateImpl
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfstring)arguments[0].Column;
 
         var list = new List<string?>();
         for (var i = 0; i < valuesColumn.RowCount; i++)

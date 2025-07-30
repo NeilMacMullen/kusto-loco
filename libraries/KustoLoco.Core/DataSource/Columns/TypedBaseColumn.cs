@@ -2,10 +2,10 @@
 
 namespace KustoLoco.Core.DataSource.Columns;
 
-public abstract class TypedBaseColumn<T> : BaseColumn
+public abstract class OldTypedBaseColumn<T> : BaseColumn
 
 {
-    protected TypedBaseColumn()
+    protected OldTypedBaseColumn()
         : base(TypeMapping.SymbolForType(typeof(T)))
     {
     }

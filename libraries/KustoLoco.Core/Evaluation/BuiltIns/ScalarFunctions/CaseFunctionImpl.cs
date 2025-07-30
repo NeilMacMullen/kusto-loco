@@ -28,12 +28,12 @@ internal class GenericCaseFunctionImpl<T> : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         var caseLength = arguments.Length / 2;
-        var fallback = (TypedBaseColumn<T?>)arguments.Last().Column;
+        var fallback = (GenericTypedBaseColumn<T>)arguments.Last().Column;
         var condValues = Enumerable.Range(0, caseLength)
             .Select(i => new
             {
-                Pred = (TypedBaseColumn<bool?>)arguments[i * 2].Column,
-                Val = (TypedBaseColumn<T?>)arguments[i * 2 + 1].Column
+                Pred = (GenericTypedBaseColumnOfbool)arguments[i * 2].Column,
+                Val = (GenericTypedBaseColumn<T>)arguments[i * 2 + 1].Column
             })
             .ToArray();
 

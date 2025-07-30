@@ -2,6 +2,7 @@
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
+[KustoGeneric(Types = "all")]
 internal abstract class BasePrevNext<T>(bool isPrev) : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
@@ -10,16 +11,17 @@ internal abstract class BasePrevNext<T>(bool isPrev) : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        return NextPrevSlider.InvokeColumnar<T?>(arguments, isPrev);
+        return NextPrevSlider<T>.InvokeColumnar(arguments, isPrev);
     }
 }
 
+[KustoGeneric(Types = "all")]
 internal abstract class BasePrev<T> : BasePrevNext<T>
 {
     internal BasePrev() :base(true){}
 }
 
-
+[KustoGeneric(Types = "all")]
 internal abstract class BaseNext<T> : BasePrevNext<T>
 {
     internal BaseNext() : base(false) { }
@@ -27,23 +29,23 @@ internal abstract class BaseNext<T> : BasePrevNext<T>
 
 
 
-internal class PrevFunctionIntImpl : BasePrev<int?>;
-internal class PrevFunctionLongImpl : BasePrev<long?>;
-internal class PrevFunctionRealImpl : BasePrev<double?>;
-internal class PrevFunctionDecimalImpl : BasePrev<decimal?>;
-internal class PrevFunctionStringImpl : BasePrev<string?>;
-internal class PrevFunctionGuidImpl : BasePrev<Guid?>;
-internal class PrevFunctionTimespanImpl : BasePrev<TimeSpan?>;
-internal class PrevFunctionDateTimeImpl : BasePrev<DateTime?>;
+internal class PrevFunctionIntImpl : BasePrevOfint;
+internal class PrevFunctionLongImpl : BasePrevOflong;
+internal class PrevFunctionRealImpl : BasePrevOfdouble;
+internal class PrevFunctionDecimalImpl : BasePrevOfdecimal;
+internal class PrevFunctionStringImpl : BasePrevOfstring;
+internal class PrevFunctionGuidImpl : BasePrevOfGuid;
+internal class PrevFunctionTimespanImpl : BasePrevOfTimeSpan;
+internal class PrevFunctionDateTimeImpl : BasePrevOfDateTime;
 
 
 
 
-internal class NextFunctionIntImpl : BaseNext<int?>;
-internal class NextFunctionLongImpl : BaseNext<long?>;
-internal class NextFunctionRealImpl : BaseNext<double?>;
-internal class NextFunctionDecimalImpl : BaseNext<decimal?>;
-internal class NextFunctionStringImpl : BaseNext<string?>;
-internal class NextFunctionGuidImpl : BaseNext<Guid?>;
-internal class NextFunctionTimespanImpl : BaseNext<TimeSpan?>;
-internal class NextFunctionDateTimeImpl : BaseNext<DateTime?>;
+internal class NextFunctionIntImpl : BaseNextOfint;
+internal class NextFunctionLongImpl : BaseNextOflong;
+internal class NextFunctionRealImpl : BaseNextOfdouble;
+internal class NextFunctionDecimalImpl : BaseNextOfdecimal;
+internal class NextFunctionStringImpl : BaseNextOfstring;
+internal class NextFunctionGuidImpl : BaseNextOfGuid;
+internal class NextFunctionTimespanImpl : BaseNextOfTimeSpan;
+internal class NextFunctionDateTimeImpl : BaseNextOfDateTime;

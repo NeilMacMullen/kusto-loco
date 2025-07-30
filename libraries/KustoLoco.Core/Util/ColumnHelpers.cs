@@ -94,9 +94,7 @@ public static class ColumnHelpers
         MapColumn([other], [offset, length],
             MappingType.Chunk);
 
-    public static BaseColumn MapColumn(BaseColumn other, ImmutableArray<int> mapping) =>
-        MapColumn([other], mapping, MappingType.Arbitrary);
-
+   
     public static BaseColumn ReassembleInOrder(BaseColumn[] others)
         => MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
@@ -105,11 +103,119 @@ public static class ColumnHelpers
         mapType switch
         {
             MappingType.Arbitrary => MapColumn(other[0], mapping),
-            MappingType.Chunk => GenericChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
-            MappingType.Reassembly => GenericReassembledChunkColumn<T>.Create(other),
+            MappingType.Chunk => ChunkCreate(mapping[0], mapping[1], other[0]),
+            MappingType.Reassembly => Reassemble(other),
             _ => throw new NotImplementedException()
         };
 
+    public static BaseColumn ChunkCreate(int a,int b,BaseColumn col)
+    {
+        var typeSymbol = col.Type;
+        if (typeSymbol == ScalarTypes.Int)
+            return GenericChunkColumnOfint.Create(a,b,col);
+
+        if (typeSymbol == ScalarTypes.Long)
+            return GenericChunkColumnOflong.Create(a, b, col);
+
+        if (typeSymbol == ScalarTypes.Decimal)
+            return GenericChunkColumnOfdecimal.Create(a, b, col);
+        if (typeSymbol == ScalarTypes.Real)
+            return GenericChunkColumnOfdouble.Create(a, b, col);
+
+        if (typeSymbol == ScalarTypes.Bool)
+            return GenericChunkColumnOfbool.Create(a, b, col); ;
+
+        if (typeSymbol == ScalarTypes.String)
+            return GenericChunkColumnOfstring.Create(a, b, col);
+        if (typeSymbol == ScalarTypes.DateTime)
+            return GenericChunkColumnOfDateTime.Create(a, b, col);
+
+        if (typeSymbol == ScalarTypes.TimeSpan)
+            return GenericChunkColumnOfTimeSpan.Create(a, b, col);
+
+        if (typeSymbol == ScalarTypes.Guid)
+            return GenericChunkColumnOfGuid.Create(a, b, col);
+        if (typeSymbol == ScalarTypes.Dynamic)
+            return GenericChunkColumnOfJsonNode.Create(a, b, col);
+
+        // TODO: Support all data types
+        throw new NotImplementedException(
+            $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+    }
+
+
+    public static BaseColumn MapColumn(BaseColumn other, ImmutableArray<int> mapping)
+    {
+            var typeSymbol = other.Type;
+            if (typeSymbol == ScalarTypes.Int) return GenericMappedColumnOfint.Create(mapping, other);
+
+            if (typeSymbol == ScalarTypes.Long)
+            return GenericMappedColumnOflong.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.Decimal)
+            return GenericMappedColumnOfdecimal.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.Real)
+            return GenericMappedColumnOfdouble.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.Bool)
+            return GenericMappedColumnOfbool.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.String)
+            return GenericMappedColumnOfstring.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.DateTime)
+            return GenericMappedColumnOfDateTime.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.TimeSpan)
+            return GenericMappedColumnOfTimeSpan.Create(mapping, other);
+
+        if (typeSymbol == ScalarTypes.Guid)
+            return GenericMappedColumnOfGuid.Create(mapping, other);
+        if (typeSymbol == ScalarTypes.Dynamic)
+            return GenericMappedColumnOfJsonNode.Create(mapping, other);
+
+        // TODO: Support all data types
+        throw new NotImplementedException(
+                $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+    }
+
+    public static BaseColumn Reassemble(BaseColumn[] other)
+    {
+        var typeSymbol = other[0].Type;
+        if (typeSymbol == ScalarTypes.Int)
+            return GenericReassembledChunkColumnOfint.Create(other);
+
+        if (typeSymbol == ScalarTypes.Long)
+            return GenericReassembledChunkColumnOflong.Create(other);
+
+        if (typeSymbol == ScalarTypes.Decimal)
+            return GenericReassembledChunkColumnOfdecimal.Create(other);
+
+        if (typeSymbol == ScalarTypes.Real)
+            return GenericReassembledChunkColumnOfdouble.Create(other);
+
+        if (typeSymbol == ScalarTypes.Bool)
+            return GenericReassembledChunkColumnOfbool.Create(other);
+
+        if (typeSymbol == ScalarTypes.String)
+            return GenericReassembledChunkColumnOfstring.Create(other);
+
+        if (typeSymbol == ScalarTypes.DateTime)
+            return GenericReassembledChunkColumnOfDateTime.Create(other);
+
+        if (typeSymbol == ScalarTypes.TimeSpan)
+            return GenericReassembledChunkColumnOfTimeSpan.Create(other);
+
+        if (typeSymbol == ScalarTypes.Guid)
+            return GenericReassembledChunkColumnOfGuid.Create(other);
+        if (typeSymbol == ScalarTypes.Dynamic)
+            return GenericReassembledChunkColumnOfJsonNode.Create(other);
+
+        // TODO: Support all data types
+        throw new NotImplementedException(
+            $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
+    }
 
     public static BaseColumn CreateFromScalar(object? value, TypeSymbol type, int logicalRowCount)
     {
@@ -127,43 +233,44 @@ public static class ColumnHelpers
         MappingType mapType)
     {
         var typeSymbol = others.First().Type;
-        if (typeSymbol == ScalarTypes.Int) return Create<int?>(mapping, others.ToArray(), mapType);
+        if (typeSymbol == ScalarTypes.Int)
+            return Create<int>(mapping, others.Cast<GenericTypedBaseColumnOfint>().ToArray(), mapType); 
 
         if (typeSymbol == ScalarTypes.Long)
-            return Create<long>(mapping, others.Cast<TypedBaseColumn<long?>>().ToArray(), mapType);
+            return Create<long>(mapping, others.Cast<GenericTypedBaseColumnOflong>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Decimal)
-            return Create<decimal>(mapping, others.Cast<TypedBaseColumn<decimal?>>().ToArray(), mapType);
+            return Create<decimal>(mapping, others.Cast<GenericTypedBaseColumnOfdecimal>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Real)
-            return Create<double>(mapping, others.Cast<TypedBaseColumn<double?>>().ToArray(), mapType);
+            return Create<double>(mapping, others.Cast<GenericTypedBaseColumnOfdouble>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Bool)
-            return Create<bool>(mapping, others.Cast<TypedBaseColumn<bool?>>().ToArray(), mapType);
+            return Create<bool>(mapping, others.Cast<GenericTypedBaseColumnOfbool>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.String)
-            return Create<string>(mapping, others.Cast<TypedBaseColumn<string?>>().ToArray(), mapType);
+            return Create<string>(mapping, others.Cast<GenericTypedBaseColumnOfstring>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.DateTime)
-            return Create<DateTime>(mapping, others.Cast<TypedBaseColumn<DateTime?>>().ToArray(), mapType);
+            return Create<DateTime>(mapping, others.Cast<GenericTypedBaseColumnOfDateTime>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.TimeSpan)
-            return Create<TimeSpan>(mapping, others.Cast<TypedBaseColumn<TimeSpan?>>().ToArray(), mapType);
+            return Create<TimeSpan>(mapping, others.Cast<GenericTypedBaseColumnOfTimeSpan>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Guid)
-            return Create<Guid>(mapping, others.Cast<TypedBaseColumn<Guid?>>().ToArray(), mapType);
+            return Create<Guid>(mapping, others.Cast<GenericTypedBaseColumnOfGuid>().ToArray(), mapType);
         if (typeSymbol == ScalarTypes.Dynamic)
-            return Create<JsonNode>(mapping, others.Cast<TypedBaseColumn<JsonNode?>>().ToArray(), mapType);
+            return Create<JsonNode>(mapping, others.Cast<GenericTypedBaseColumnOfJsonNode>().ToArray(), mapType);
 
         // TODO: Support all data types
         throw new NotImplementedException(
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
-
-    public static TypedBaseColumn<T> MapColumn<T>(TypedBaseColumn<T> other, ImmutableArray<int> mapping)
+    /*
+    public static GenericTypedBaseColumn<T> MapColumn<T>(TypedBaseColumn<T> other, ImmutableArray<int> mapping)
         => MappedColumn<T>.Create(mapping, other);
-
+    */
 
     private static GenericTypedBaseColumnOfint
         CreateFromIntsObjectArray(object?[] data)
@@ -239,9 +346,10 @@ public static class ColumnHelpers
     private static GenericTypedBaseColumnOfJsonNode CreateFroDynamicObjectArray(object?[] data) =>
         GenericColumnFactoryOfJsonNode.CreateFromObjects(data);
 
-    private static TypedBaseColumn<T> CreateSingleValueColumn<T>(T value, int rowCount)
-        => new SingleValueColumn<T>(value, rowCount);
-
+    /*
+    private static GenericTypedBaseColumn<T> CreateSingleValueColumn<T>(T value, int rowCount)
+        => new GenericSingleValueColumn<T>(value, rowCount);
+    */
 
     private enum MappingType
     {

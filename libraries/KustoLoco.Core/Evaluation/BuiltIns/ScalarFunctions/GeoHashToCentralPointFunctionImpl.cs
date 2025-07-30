@@ -24,7 +24,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var hash = (TypedBaseColumn<string?>)arguments[0].Column;
+        var hash = (GenericTypedBaseColumnOfstring)arguments[0].Column;
 
         var rowCount = hash.RowCount;
 

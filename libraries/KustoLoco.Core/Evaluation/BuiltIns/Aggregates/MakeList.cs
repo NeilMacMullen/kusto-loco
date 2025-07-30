@@ -16,12 +16,12 @@ internal class MakeListIntFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfint)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -53,12 +53,12 @@ internal class MakeListLongFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOflong)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -90,12 +90,12 @@ internal class MakeListDoubleFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -128,12 +128,12 @@ internal class MakeListDecimalFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdecimal)arguments[0].Column;
 
         var maxSize = decimal.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<decimal?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOfdecimal)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -165,12 +165,12 @@ internal class MakeListTimeSpanFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfTimeSpan)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -202,12 +202,12 @@ internal class MakeListDateTimeFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -239,12 +239,12 @@ internal class MakeListStringFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfstring)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -276,12 +276,12 @@ internal class MakeListDynamicFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<JsonNode?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfJsonNode)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)

@@ -10,13 +10,13 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// When we're provided with an immutable array of records, we can simply share the array and provide a lambda per
 /// column to access the data.
 /// </remarks>
-public class LambdaWrappedColumn<TRow, T> : TypedBaseColumn<T>
+public class OldLambdaWrappedColumn<TRow, T> : OldTypedBaseColumn<T>
 {
     private readonly Func<TRow, T> _dataFetcher;
 
     private readonly ImmutableArray<TRow> _rows;
 
-    public LambdaWrappedColumn(ImmutableArray<TRow> rows, Func<TRow, T> dataFetcher)
+    public OldLambdaWrappedColumn(ImmutableArray<TRow> rows, Func<TRow, T> dataFetcher)
     {
         _dataFetcher = dataFetcher;
         _rows = rows;
@@ -29,7 +29,7 @@ public class LambdaWrappedColumn<TRow, T> : TypedBaseColumn<T>
     public override object? GetRawDataValue(int index) => this[index];
 
     public override BaseColumn Slice(int start, int length)
-        => new LambdaWrappedColumn<TRow, T>(_rows.Slice(start, length), _dataFetcher);
+        => new OldLambdaWrappedColumn<TRow, T>(_rows.Slice(start, length), _dataFetcher);
 
     public override void ForEach(Action<object?> action)
     {

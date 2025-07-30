@@ -55,7 +55,7 @@ public class IndirectTests
     public void MappedIndirectionFlattens()
     {
         var backing = MakeDecimatedColumn(100);
-        var flattened = ColumnHelpers.MapColumn(backing, [0, 1]) as MappedColumn<string>;
+        var flattened = ColumnHelpers.MapColumn(backing, [0, 1]) as GenericMappedColumnOfstring;
         flattened!.RowCount.Should().Be(2);
         flattened.IndirectIndex(0).Should().Be(backing.IndirectIndex(0));
         flattened.IndirectIndex(1).Should().Be(backing.IndirectIndex(1));
@@ -64,9 +64,9 @@ public class IndirectTests
     [TestMethod]
     public void IndirectingSingleValueColumnReturnsSingleValue()
     {
-        var sv = new SingleValueColumn<string>("HELLO", 100);
+        var sv = new GenericSingleValueColumnOfstring("HELLO", 100);
         var second = ColumnHelpers.MapColumn(sv, [0, 1]);
-        second.GetType().Should().Be(typeof(SingleValueColumn<string>));
+        second.GetType().Should().Be(typeof(GenericSingleValueColumnOfstring));
         second.RowCount.Should().Be(2);
         second.GetRawDataValue(0).Should().Be("HELLO");
     }
@@ -74,9 +74,9 @@ public class IndirectTests
     [TestMethod]
     public void SlicingSingleValueColumnReturnsSingleValue()
     {
-        var sv = new SingleValueColumn<string>("HELLO", 100);
+        var sv = new GenericSingleValueColumnOfstring("HELLO", 100);
         var sliced = sv.Slice(10, 20);
-        sliced.Should().BeOfType<SingleValueColumn<string>>();
+        sliced.Should().BeOfType<GenericSingleValueColumnOfstring>();
         sliced.RowCount.Should().Be(20);
         sliced.GetRawDataValue(0).Should().Be("HELLO");
     }

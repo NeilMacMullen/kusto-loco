@@ -31,7 +31,7 @@ internal partial class TreeEvaluator
         static ITableSource CreateTable(ScalarResult from, ScalarResult to, ScalarResult step,
             TableSymbol resultType)
         {
-            var columnType = resultType.Columns[0].Type!;
+            var columnType = resultType.Columns[0].Type;
 
             if (columnType == ScalarTypes.Long)
                 return new RangeResultTableOflong(from, to, step, resultType);

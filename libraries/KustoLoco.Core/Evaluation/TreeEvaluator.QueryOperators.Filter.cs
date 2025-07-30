@@ -61,7 +61,7 @@ internal partial class TreeEvaluator
                     return (default, TableChunk.Empty, false);
                 case ColumnarResult columnar:
                 {
-                    var predicateColumn = (TypedBaseColumn<bool?>)columnar.Column;
+                    var predicateColumn = (GenericTypedBaseColumnOfbool)columnar.Column;
 
                     var wantedRows = new List<int>();
                     for (var i = 0; i < predicateColumn.RowCount; i++)

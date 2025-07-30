@@ -22,7 +22,7 @@ internal class DebugEmitImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var left = (TypedBaseColumn<string?>)(arguments[0].Column);
+        var left = (GenericTypedBaseColumnOfstring)(arguments[0].Column);
 
         var data = NullableSetBuilderOfint.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)

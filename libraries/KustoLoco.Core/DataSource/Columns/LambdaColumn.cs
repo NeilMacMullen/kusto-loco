@@ -2,12 +2,12 @@
 
 namespace KustoLoco.Core.DataSource.Columns;
 
-public class LambdaColumn<T> : TypedBaseColumn<T>
+public class OldLambdaColumn<T> : OldTypedBaseColumn<T>
 {
     private readonly Func<int, T?> _dataFetcher;
     private readonly int _length;
 
-    public LambdaColumn(Func<int, T?> dataFetcher, int rowCount)
+    public OldLambdaColumn(Func<int, T?> dataFetcher, int rowCount)
     {
         _dataFetcher = dataFetcher;
         _length = rowCount;
@@ -22,7 +22,7 @@ public class LambdaColumn<T> : TypedBaseColumn<T>
 
     public override BaseColumn Slice(int start, int length)
     {
-        return ChunkColumn<T>.Create(start, length, this);
+        return OldChunkColumn<T>.Create(start, length, this);
     }
 
     public override void ForEach(Action<object?> action)

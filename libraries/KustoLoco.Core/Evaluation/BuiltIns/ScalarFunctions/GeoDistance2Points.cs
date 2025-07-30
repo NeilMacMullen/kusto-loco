@@ -26,10 +26,10 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 4);
-        var p1LonColumn = (TypedBaseColumn<double?>)arguments[0].Column;
-        var p1LatColumn = (TypedBaseColumn<double?>)arguments[1].Column;
-        var p2LonColumn = (TypedBaseColumn<double?>)arguments[2].Column;
-        var p2LatColumn = (TypedBaseColumn<double?>)arguments[3].Column;
+        var p1LonColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
+        var p1LatColumn = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
+        var p2LonColumn = (GenericTypedBaseColumnOfdouble)arguments[2].Column;
+        var p2LatColumn = (GenericTypedBaseColumnOfdouble)arguments[3].Column;
         Debug.Assert(p1LonColumn.RowCount == p1LatColumn.RowCount && p1LonColumn.RowCount == p2LonColumn.RowCount &&
                      p1LonColumn.RowCount == p2LatColumn.RowCount);
 

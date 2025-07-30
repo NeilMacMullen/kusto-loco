@@ -9,13 +9,13 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// When performing type conversion of function parameters, it's useful to be able to
 /// create a column that simply applies the conversion as the number is needed.
 /// </remarks>
-public class ConvertingColumn<T> : TypedBaseColumn<T>
+public class OldConvertingColumn<T> : OldTypedBaseColumn<T>
 {
   
     public readonly BaseColumn BackingColumn;
     private readonly Func<object?, T> _converter;
 
-    private ConvertingColumn(BaseColumn backing, Func<object?, T> converter)
+    private OldConvertingColumn(BaseColumn backing, Func<object?, T> converter)
     {
         _converter = converter;
         BackingColumn = backing;
@@ -26,12 +26,12 @@ public class ConvertingColumn<T> : TypedBaseColumn<T>
     public override int RowCount =>BackingColumn.RowCount;
 
 
-    public static TypedBaseColumn<T> Create(BaseColumn backing,Func<object?,T> converter)
+    public static OldTypedBaseColumn<T> Create(BaseColumn backing,Func<object?,T> converter)
     {
         //in principle some optimisation is possible here if the backing has just a single value... we could
         //convert once ahead of time then create a singlevalue wrapper around the converted value
         //but that's probably a corner case.
-        return new ConvertingColumn<T>(backing,converter);
+        return new OldConvertingColumn<T>(backing,converter);
     }
 
   
@@ -43,7 +43,7 @@ public class ConvertingColumn<T> : TypedBaseColumn<T>
 
     public override BaseColumn Slice(int start, int length)
     {
-        return new ConvertingColumn<T>(BackingColumn.Slice(start, length), _converter);
+        return new OldConvertingColumn<T>(BackingColumn.Slice(start, length), _converter);
     }
 
 

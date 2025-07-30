@@ -25,11 +25,11 @@ internal class RandFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length > 0);
         //the first column is a "dummy" column inserted by the evaluator
         //because we specified this as "ForceColumnarResult"
-        var column = (TypedBaseColumn<int?>)arguments[0].Column;
+        var column = (GenericTypedBaseColumnOfint)arguments[0].Column;
        
         if (arguments.Length > 1)
         {
-            var nColumn = (TypedBaseColumn<double?>)arguments[1].Column;
+            var nColumn = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
             var length = nColumn.RowCount;
             var data = NullableSetBuilderOfdouble.CreateFixed(length);
        

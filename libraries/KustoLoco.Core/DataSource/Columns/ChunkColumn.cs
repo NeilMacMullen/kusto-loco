@@ -7,13 +7,13 @@ namespace KustoLoco.Core.DataSource.Columns;
 ///     of the source column to be used
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class ChunkColumn<T> : TypedBaseColumn<T>
+public class OldChunkColumn<T> : OldTypedBaseColumn<T>
 {
     private readonly int _length;
     private readonly int _offset;
-    public readonly TypedBaseColumn<T> BackingColumn;
+    public readonly OldTypedBaseColumn<T> BackingColumn;
 
-    private ChunkColumn(int offset, int length, TypedBaseColumn<T> backing)
+    private OldChunkColumn(int offset, int length, OldTypedBaseColumn<T> backing)
     {
         _offset = offset;
         _length = length;
@@ -25,14 +25,14 @@ public class ChunkColumn<T> : TypedBaseColumn<T>
     public override int RowCount => _length;
 
 
-    public static TypedBaseColumn<T> Create(int offset, int length, TypedBaseColumn<T> backing)
+    public static OldTypedBaseColumn<T> Create(int offset, int length, OldTypedBaseColumn<T> backing)
     {
-        if (backing is SingleValueColumn<T> single)
+        if (backing is OldSingleValueColumn<T> single)
             return single.ResizeTo(length);
         //if we're actually slicing the whole column, just return the original backing column
         if (offset==0 && length == backing.RowCount)
             return backing;
-        return new ChunkColumn<T>(offset, length, backing);
+        return new OldChunkColumn<T>(offset, length, backing);
     }
 
     public int IndirectIndex(int index) => _offset + index;

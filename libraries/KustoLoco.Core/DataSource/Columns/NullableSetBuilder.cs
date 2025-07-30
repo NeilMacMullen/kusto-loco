@@ -22,8 +22,9 @@ public sealed class NullableSetBuilder<T> :INullableSetBuilder
     public static NullableSetBuilder<T> CreateFixed(int size)
         => new NullableSetBuilder<T>(size, false);
 
+    //ensure we start with some capacity
     public static NullableSetBuilder<T> CreateExpandable(int size)
-        => new NullableSetBuilder<T>(size, true);
+        => new NullableSetBuilder<T>(Math.Max(size,100), true);
     
     public NullableSetBuilder(int initialLength, bool canResize)
     {

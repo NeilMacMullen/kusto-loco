@@ -6,12 +6,12 @@ namespace KustoLoco.Core.DataSource.Columns;
 /// <summary>
 ///     Allows a column to arbitrarily remap rows to those in another column
 /// </summary>
-public class MappedColumn<T> : TypedBaseColumn<T>
+public class OldMappedColumn<T> : OldTypedBaseColumn<T>
 {
     private readonly ImmutableArray<int> _lookups;
-    public readonly TypedBaseColumn<T> BackingColumn;
+    public readonly OldTypedBaseColumn<T> BackingColumn;
 
-    private MappedColumn(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
+    private OldMappedColumn(ImmutableArray<int> lookups, OldTypedBaseColumn<T> backing)
     {
         _lookups = lookups;
         BackingColumn = backing;
@@ -22,11 +22,11 @@ public class MappedColumn<T> : TypedBaseColumn<T>
     public override int RowCount => _lookups.Length;
 
 
-    public static TypedBaseColumn<T> Create(ImmutableArray<int> lookups, TypedBaseColumn<T> backing)
+    public static OldTypedBaseColumn<T> Create(ImmutableArray<int> lookups, OldTypedBaseColumn<T> backing)
     {
-        if (backing is SingleValueColumn<T> single)
+        if (backing is OldSingleValueColumn<T> single)
             return single.ResizeTo(lookups.Length);
-        return new MappedColumn<T>(lookups, backing);
+        return new OldMappedColumn<T>(lookups, backing);
     }
 
     public int IndirectIndex(int index) => _lookups[index];
@@ -42,7 +42,7 @@ public class MappedColumn<T> : TypedBaseColumn<T>
     public override BaseColumn Slice(int start, int length)
     {
         var slicedData = _lookups.Slice(start, length);
-        return new MappedColumn<T>(slicedData, BackingColumn);
+        return new OldMappedColumn<T>(slicedData, BackingColumn);
     }
 
 

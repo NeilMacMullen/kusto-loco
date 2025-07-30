@@ -172,6 +172,7 @@ public class GenericGenerator : IIncrementalGenerator
                 case "all": wanted.AddRange(all); break;
                 case "numeric": wanted.AddRange(numeric); break;
                 case "reference": wanted.AddRange(reference); break;
+                case "comparable": wanted.AddRange(comparable); break;
                 case "value": wanted.AddRange(value); break;
                 default:
                     wanted.Add(t);

@@ -298,7 +298,17 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("55");
     }
-
+    [TestMethod]
+    public async Task BetweenStressTest()
+    {
+        var query = @"
+    range i from 1 to 100 step 1
+    | extend t = toreal(i), u = toint(i) + 10
+                                | where i between(t..i)
+    ";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("55");
+    }
 
     [TestMethod]
     public async Task RangeTimeSpan()

@@ -14,12 +14,12 @@ namespace KustoLoco.Core.DataSource.Columns;
 public class GenericLambdaWrappedColumn<TRow,T> : GenericTypedBaseColumn<T>
 where T:class
 {
-    private readonly Func<TRow,T> _dataFetcher; //GENERIC SKIP
+    private readonly Func<TRow,T?> _dataFetcher; //GENERIC INPLACE
 
     private readonly ImmutableArray<TRow> _rows;
 
     public GenericLambdaWrappedColumn(ImmutableArray<TRow> rows,
-        Func<TRow,T> dataFetcher  //GENERIC SKIP
+        Func<TRow,T?> dataFetcher  //GENERIC INPLACE
         )
     {
         _dataFetcher = dataFetcher;
