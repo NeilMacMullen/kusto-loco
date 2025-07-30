@@ -13,7 +13,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 public static class SafePartitioner
 {
     private const int Granularity = 64;
-    private const int DefaultBlockSize = 1024;
+    private const int DefaultBlockSize = 1024*10;
 
     public static OrderablePartitioner<Tuple<int, int>>
         Create(int total)

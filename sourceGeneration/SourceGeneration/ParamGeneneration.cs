@@ -44,14 +44,11 @@ namespace KustoLoco.SourceGeneration
             dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedVariables(dbg, parameters);
             dbg.AppendStatement($"{GetNullableType(ret)} data=null");
-            if (method.HasContext)
-            {
-                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
-            }
+            if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
 
             dbg.AppendLine("for(var i=0;i < 1;i++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, false, "data",true);
+            EmitNullChecks(dbg, method, false, "data", true);
 
 
             var pvals = string.Join(",", parameters.Select(Val));
@@ -65,8 +62,9 @@ namespace KustoLoco.SourceGeneration
             dbg.ExitCodeBlock();
         }
 
-        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method)
+        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method, bool partition)
         {
+            partition = false;
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
@@ -75,21 +73,31 @@ namespace KustoLoco.SourceGeneration
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
             dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
-            if (method.HasContext)
+            if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+
+            if (partition)
             {
-                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                dbg.AppendLine($"var rangePartitioner = SafePartitioner.Create({RowCount});");
+                dbg.AppendLine("Parallel.ForEach(rangePartitioner, (range, loopState) =>");
+                dbg.EnterCodeBlock();
+                dbg.AppendLine($"for (var {RowIndex} = range.Item1; {RowIndex} < range.Item2; {RowIndex}++)");
+            }
+            else
+            {
+                dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             }
 
-            dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]",true);
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", true);
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
             dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
             dbg.ExitCodeBlock();
+            if (partition)
+                dbg.AppendLine("});");
 
-            dbg.AppendStatement($"return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()))");
+            dbg.AppendStatement("return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()))");
             dbg.ExitCodeBlock();
         }
 
@@ -103,14 +111,11 @@ namespace KustoLoco.SourceGeneration
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
 
-            if (method.HasContext)
-            {
-                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
-            }
+            if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
 
             dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]",false);
+            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", false);
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
                 pvals = $"context,{pvals}";
@@ -124,22 +129,16 @@ namespace KustoLoco.SourceGeneration
 
         public static void AddTypedColumns(CodeEmitter dbg, Param[] parameters)
         {
-            foreach (var p in parameters)
-            {
-                dbg.AppendLine(MakeTypedColumn(p));
-            }
+            foreach (var p in parameters) dbg.AppendLine(MakeTypedColumn(p));
         }
 
         public static void AddTypedVariables(CodeEmitter dbg, Param[] parameters)
         {
-            foreach (var p in parameters)
-            {
-                dbg.AppendLine(MakeTypedVariable(p));
-            }
+            foreach (var p in parameters) dbg.AppendLine(MakeTypedVariable(p));
         }
 
         public static void EmitNullChecks(CodeEmitter dbg, ImplementationMethod method,
-            bool fromColumn, string assignEmptyStringTo,bool explicitNullAssignment)
+            bool fromColumn, string assignEmptyStringTo, bool explicitNullAssignment)
         {
             var parameters = method.TypedArguments;
             foreach (var p in parameters)
@@ -156,8 +155,7 @@ namespace KustoLoco.SourceGeneration
                     dbg.EnterCodeBlock();
                     if (method.ReturnType.IsString)
                         dbg.AppendStatement($"{assignEmptyStringTo}=string.Empty");
-                    else
-                    if (explicitNullAssignment)
+                    else if (explicitNullAssignment)
                         dbg.AppendStatement($"{assignEmptyStringTo}=null");
                     dbg.AppendStatement("continue");
                     dbg.ExitCodeBlock();

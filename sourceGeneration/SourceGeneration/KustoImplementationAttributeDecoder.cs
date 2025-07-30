@@ -15,6 +15,7 @@ namespace KustoLoco.SourceGeneration
 
         internal KustoImplementationAttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
         {
+            Partition= !attr.GetStringFor(nameof(KustoImplementationAttribute.Partition)).Equals("false");
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             SymbolName = funcSymbol;
             if (funcSymbol.Contains("Functions"))
@@ -41,7 +42,7 @@ namespace KustoLoco.SourceGeneration
                     ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
             }
         }
-
+        public bool Partition { get; }
         public string SymbolTypeName
         {
             get
@@ -61,7 +62,7 @@ namespace KustoLoco.SourceGeneration
         public bool IsFuncOrOp => ImplementationType == ImplementationType.Function ||
                                   ImplementationType == ImplementationType.Operator;
 
-
+        
         public string BaseClassName
         {
             get

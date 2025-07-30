@@ -3,7 +3,7 @@
 // ReSharper disable PartialTypeWithSinglePart
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "Operators.Contains")]
+[KustoImplementation(Keyword = "Operators.Contains",Partition= true)]
 internal partial class ContainsFunction
 {
     private static bool Impl(ContainsContext context, string a, string b)

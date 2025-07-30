@@ -149,6 +149,9 @@ namespace KustoLoco.SourceGeneration
             usingManager.Add("System.Diagnostics");
             usingManager.Add("System.Collections.Generic");
             usingManager.Add("KustoLoco.Core.DataSource.Columns");
+            usingManager.Add("System.Collections.Concurrent");
+            usingManager.Add("System.Threading.Tasks");
+            usingManager.Add("KustoLoco.Core.Evaluation.BuiltIns.Impl");
 
             foreach (var u in usingManager.GetUsings()) code.AppendLine(u);
         }
@@ -207,7 +210,7 @@ namespace KustoLoco.SourceGeneration
             if (m.HasScalar)
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
-                ParamGeneneration.BuildColumnarMethod(dbg, m);
+                ParamGeneneration.BuildColumnarMethod(dbg, m,false);
             if (m.KustoImplementationAttributeDecoder.ImplementationType == ImplementationType.Aggregate)
                 ParamGeneneration.BuildInvokeMethod(dbg, m);
             return m;

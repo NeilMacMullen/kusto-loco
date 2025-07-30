@@ -6,6 +6,7 @@ namespace KustoLoco.SourceGeneration.Attributes
     {
         public string Keyword { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
+        public bool Partition { get; set; } = false;
     }
 
     public class KustoGenericAttribute : Attribute
