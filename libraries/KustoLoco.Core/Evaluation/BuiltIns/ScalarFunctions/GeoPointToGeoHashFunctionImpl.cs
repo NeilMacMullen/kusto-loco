@@ -33,8 +33,7 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
 
         var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
 
-        var blockSize = 1000;
-        var rangePartitioner = Partitioner.Create(0, p1LonColumn.RowCount, blockSize);
+        var rangePartitioner = SafePartitioner.Create(p1LonColumn.RowCount);
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
             for (var i = range.Item1; i < range.Item2; i++)

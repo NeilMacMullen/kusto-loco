@@ -35,7 +35,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
         var right = (GenericTypedBaseColumn<T>)arguments[2].Column;
         var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
@@ -61,6 +61,55 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
 
 
 
+internal class IntBetweenOperatorImpl : IScalarFunctionImpl
+
+{
+    private readonly bool _invert;
+
+    public IntBetweenOperatorImpl(bool invert) => _invert = invert;
+
+    public ScalarResult InvokeScalar(ScalarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 3);
+        var r = (int?)arguments[0].Value;
+        var left = (long?)arguments[1].Value;
+        var right = (long?)arguments[2].Value;
+        return new ScalarResult(ScalarTypes.Bool, Impl(r, left, right));
+    }
+
+    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
+    {
+        Debug.Assert(arguments.Length == 3);
+
+        var row = (GenericTypedBaseColumnOfint)arguments[0].Column;
+        var left = (GenericTypedBaseColumnOflong)arguments[1].Column;
+        var right = (GenericTypedBaseColumnOflong)arguments[2].Column;
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
+
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
+
+        Parallel.ForEach(rangePartitioner, (range, loopState) =>
+        {
+            for (var i = range.Item1; i < range.Item2; i++)
+            {
+                var r = row[i];
+                var lefts = left[i];
+                var rights = right[i];
+                data[i] = Impl(r, lefts, rights);
+            }
+        });
+
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
+    }
+
+
+    private bool? Impl(int? r, long? left, long? right) =>
+        r.HasValue && left.HasValue && right.HasValue
+        && (r >= left
+            && r <= right)
+        ^ _invert;
+}
+
 internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
 {
     private readonly bool _invert;
@@ -85,7 +134,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
         var right = (GenericTypedBaseColumnOfTimeSpan)arguments[2].Column;
         var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {

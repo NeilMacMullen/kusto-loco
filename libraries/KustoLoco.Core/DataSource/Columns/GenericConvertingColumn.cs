@@ -25,6 +25,8 @@ where T:class
         BackingColumn = backing;
     }
 
+    public override T? GetNullableT(int index) => this[index];
+
     public override T? this[int index] => _converter(BackingColumn.GetRawDataValue(index));
 
     public override int RowCount =>BackingColumn.RowCount;

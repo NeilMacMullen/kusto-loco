@@ -39,6 +39,19 @@ public class ParquetSerializer : ITableSerializer
         return await SaveTable(fileStream, result);
     }
 
+    public async Task SaveTestTable(Stream fileStream,int count)
+    {
+        var dataFields = new[] { new DataField("test", typeof(int), false) };
+        var schema = new ParquetSchema(dataFields.Cast<Field>().ToArray());
+
+        await using var writer = await ParquetWriter.CreateAsync(schema, fileStream);
+        using var groupWriter = writer.CreateRowGroup();
+        var arr = Enumerable.Range(0, 100).ToArray();
+        var def = dataFields[0];
+        var dataColumn = new DataColumn(def, arr);
+        await groupWriter.WriteColumnAsync(dataColumn);
+    }
+
     public async Task<TableSaveResult> SaveTable(Stream fileStream, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
@@ -68,7 +81,7 @@ public class ParquetSerializer : ITableSerializer
             //Columns
             //if (data.NoNulls)
             //    def = new DataField(def.Name, TypeMapping.UnderlyingType(def.ClrType));
-            var arr = data.GetDataAsArray(false);
+            var arr = data.GetDataAsArray();
             var def = dataFields[columnDefinition.Index];
             var dataColumn = new DataColumn(def,arr);
             await groupWriter.WriteColumnAsync(dataColumn);
@@ -159,6 +172,8 @@ public class ParquetSerializer : ITableSerializer
         foreach (var cellData in res.EnumerateColumnData(r))
             builder.Add(cellData);
         //TODO fix up 
-        return NullableSetOfint.FromObjectsOfCorrectType([0]); //builder.ToNullableSet();
+        var set= builder.ToINullableSet();
+        //var nonnullable = set.NoNulls;
+        return set;
     }
 }

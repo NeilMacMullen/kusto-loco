@@ -19,7 +19,7 @@ public static class GenericColumnFactory<T>
     public static GenericTypedBaseColumn<T> CreateFromDataSet(NullableSet<T> data)
         =>
             data.Length == 1
-                ? new GenericSingleValueColumn<T>(data.NullableValue(0), 1)
+                ? new GenericSingleValueColumn<T>(data.NullableT(0), 1)
                 : new GenericInMemoryColumn<T>(data);
 
     public static GenericTypedBaseColumn<T> Create(T?[] data)

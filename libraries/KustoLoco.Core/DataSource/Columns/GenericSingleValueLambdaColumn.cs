@@ -18,6 +18,8 @@ public class GenericSingleValueLambdaColumn<T> : GenericTypedBaseColumn<T>
     }
 
 
+    public override T? GetNullableT(int index) => _dataFetcher();
+
     public override T? this[int index] => _dataFetcher();
 
     public override int RowCount => _length;

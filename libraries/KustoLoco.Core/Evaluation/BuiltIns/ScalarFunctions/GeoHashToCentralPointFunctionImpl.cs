@@ -30,8 +30,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
         var data = NullableSetBuilderOfJsonNode.CreateFixed(rowCount);
 
-        var blockSize = 1000;
-        var rangePartitioner = Partitioner.Create(0, rowCount, blockSize);
+        var rangePartitioner = SafePartitioner.Create(rowCount);
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
             for (var i = range.Item1; i < range.Item2; i++)

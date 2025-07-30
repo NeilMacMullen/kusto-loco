@@ -24,6 +24,8 @@ public class GenericSingleValueColumn<T> : GenericTypedBaseColumn<T>
         hints = ColumnHints.HoldsSingleValue;
     }
 
+    public override T? GetNullableT(int index) =>this[index];
+
     public override T? this[int index] => Value;
 
     public override int RowCount => _rowCount;

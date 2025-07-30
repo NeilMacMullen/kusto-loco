@@ -18,6 +18,8 @@ public class GenericMappedColumn<T> : GenericTypedBaseColumn<T>
         BackingColumn = backing;
     }
 
+    public override T? GetNullableT(int index) =>this[index];
+
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
 
     public override int RowCount => _lookups.Length;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection.Metadata.Ecma335;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -32,18 +34,21 @@ public sealed class NullableSet<T> : INullableSet
     public int Length { get; }
 
     public bool IsNull(int i) => !NoNulls && _isNull[i];
-    public object? NullableValue(int i) => IsNull(i) ? null : _nonnull[i];
+    public object? NullableObject(int i) => IsNull(i) ? null : _nonnull[i];
 
-    public Array GetDataAsArray(bool allowNonNullReturn)
+    public T? NullableT(int i) => IsNull(i) ? default(T?) : _nonnull[i];
+
+    public Array GetDataAsArray()
     {
-        if (allowNonNullReturn && !_isNull.HasAnySet())
+        //TODO - we currently can't do this because the main consumer of this API(Parquet serializer)
+        //really wants a nullable array
+        /*
+        if (NoNulls)
             return _nonnull;
-        var nullable = new object?[Length];
+        */
+        var nullable = new T?[Length];
         for (var i = 0; i < Length; i++)
-            //note we need to use IsNull here because the bitarray
-            //could be empty
-            if (!IsNull(i))
-                nullable[i] = _nonnull[i];
+                nullable[i] = NullableT(i);
 
         return nullable;
     }
@@ -105,7 +110,21 @@ public sealed class NullableSet_Ref<T> : INullableSet
     public bool NoNulls { get; }
     public int Length { get; }
     public Type UnderlyingType { get; } = typeof(T);
-    public Array GetDataAsArray(bool allowNonNullReturn) => _values;
+    public Array GetDataAsArray()
+    {
+#if TYPE_STRING
+        if (NoNulls)
+            return _values;
+        var nullable = new T?[Length];
+        for (var i = 0; i < Length; i++)
+                nullable[i] = NullableT(i);
+
+        return nullable;
+#else
+        return _values;
+#endif
+    }
+
 
     public static NullableSet_Ref<T> FromObjectsOfCorrectType(object?[] nullableData)
     {
@@ -152,10 +171,14 @@ public sealed class NullableSet_Ref<T> : INullableSet
 
 #if TYPE_STRING
     public bool IsNull(int i) => false;
-    public object? NullableValue(int i) => _values[i] ?? "" ;
+    public object? NullableObject(int i) => _values[i] ?? string.Empty ;
+     public T?  NullableT(int i)=>  _values[i]??string.Empty;
 #else
     public bool IsNull(int i) => _values[i] == null;
-    public object? NullableValue(int i) => _values[i];
+    public object? NullableObject(int i) => _values[i];
+    public T?  NullableT(int i)=>  _values[i];
 
 #endif
 }
+
+

@@ -12,7 +12,7 @@ public class SerializeTests
 {
     private readonly ITableSerializer _csvSerializer;
     private readonly KustoResultSerializer _kustoResultSerializer;
-    private readonly ITableSerializer _parquetSerializer;
+    private readonly ParquetSerializer _parquetSerializer;
 
     public SerializeTests()
     {
@@ -36,6 +36,20 @@ public class SerializeTests
         await _csvSerializer.SaveTable(sw, KustoQueryResult.Empty);
         var retStr = Encoding.UTF8.GetString(sw.ToArray());
         retStr.Should().Be(string.Empty);
+    }
+
+    [TestMethod]
+    public async Task NonNullableCanBeRead()
+    {
+        var count = 100;
+        var strm = new MemoryStream();
+        await _parquetSerializer.SaveTestTable(strm,count);
+        var bytes =strm.ToArray();
+        
+        var lr = await _kustoResultSerializer.FromBytes(bytes);
+        lr.RowCount.Should().Be(count);
+        lr.ColumnCount.Should().Be(1);
+        lr.Get(0, count-1).Should().Be(count - 1);
     }
 
     [TestMethod]

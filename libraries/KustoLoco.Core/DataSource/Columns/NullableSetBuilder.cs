@@ -8,6 +8,7 @@ public interface INullableSetBuilder
      INullableSetBuilder Create(int initialLength, bool canResize);
      void Add(object? value);
      object? this[int index] { get; set; }
+     INullableSet ToINullableSet();
 }
 
 
@@ -49,6 +50,8 @@ public sealed class NullableSetBuilder<T> :INullableSetBuilder
             }
         }
     }
+
+    public INullableSet ToINullableSet() => ToNullableSet();
 
     public void Add(T? value)
     {
@@ -132,7 +135,7 @@ public sealed class NullableSetBuilder_ref<T> :INullableSetBuilder
             Array.Resize(ref _nonnull, _occupied);
         return new NullableSet<T>(_nonnull,_noNulls);
     }
-
+    public INullableSet ToINullableSet() => ToNullableSet();
     public object? this[int index]
     {
         get =>  _nonnull[index];

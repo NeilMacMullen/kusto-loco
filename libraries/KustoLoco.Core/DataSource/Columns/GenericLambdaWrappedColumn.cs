@@ -26,6 +26,8 @@ where T:class
         _rows = rows;
     }
 
+    public override T? GetNullableT(int index) => this[index];
+
     public override T? this[int index] => _dataFetcher(_rows[index]);
 
     public override int RowCount => _rows.Length;

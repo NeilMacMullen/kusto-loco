@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Kusto.Language.Symbols;
@@ -35,14 +34,11 @@ internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
 
         var data = NullableSetBuilderOfdouble.CreateFixed(p1LonColumn.RowCount);
 
-        var blockSize = 1000;
-        var rangePartitioner = Partitioner.Create(0, p1LonColumn.RowCount, blockSize);
+        var rangePartitioner = SafePartitioner.Create(p1LonColumn.RowCount);
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
             for (var i = range.Item1; i < range.Item2; i++)
-            {
                 data[i] = GeoSupport.HaversineDistance(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
-            }
         });
         return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }

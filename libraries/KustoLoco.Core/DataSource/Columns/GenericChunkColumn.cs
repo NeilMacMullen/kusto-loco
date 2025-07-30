@@ -20,6 +20,9 @@ public class GenericChunkColumn<T> : GenericTypedBaseColumn<T>
         _length = length;
         BackingColumn = backing;
     }
+    
+
+    public override T? GetNullableT(int index) => this[index];
 
     public override T? this[int index] => BackingColumn[IndirectIndex(index)];
 

@@ -6,9 +6,9 @@ namespace KustoLoco.Core.DataSource.Columns;
 [KustoGeneric(Types = "all")]
 public class GenericInMemoryColumn<T> : GenericTypedBaseColumn<T>
 {
-    private readonly INullableSet _nullableSet;
+    private readonly NullableSet<T> _nullableSet;
 
-    public GenericInMemoryColumn(INullableSet data)
+    public GenericInMemoryColumn(NullableSet<T> data)
     {
         _nullableSet = data;
         if (typeof(T) == typeof(JsonArray))
@@ -20,7 +20,7 @@ public class GenericInMemoryColumn<T> : GenericTypedBaseColumn<T>
 
     public GenericInMemoryColumn(object?[] data)
     {
-        _nullableSet =  NullableSetLocator.GetNullableForType(typeof(T), data);
+        _nullableSet =   NullableSet<T>.FromObjectsOfCorrectType(data);
         if (typeof(T)== typeof(JsonArray))
         {
             throw new InvalidOperationException(
@@ -28,11 +28,13 @@ public class GenericInMemoryColumn<T> : GenericTypedBaseColumn<T>
         }
     }
 
-    public override T? this[int index] => (T?) _nullableSet.NullableValue(index) ;
+    public override T? GetNullableT(int index) => this[index];
+
+    public override T? this[int index] => (T?) _nullableSet.NullableT(index) ;
 
     public override int RowCount => _nullableSet.Length;
 
-    public override object? GetRawDataValue(int index) => _nullableSet.NullableValue(index);
+    public override object? GetRawDataValue(int index) => _nullableSet.NullableObject(index);
 
     public override BaseColumn Slice(int start, int length)
     {
