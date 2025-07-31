@@ -106,6 +106,15 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                     ClipboardAvalonia.SetText(txt);
                 }
                     break;
+
+                case "csv":
+                {
+                    var csvText = Result.EnumerateRows()
+                        .Select(row => row.Select(ObjectToString).JoinString(","))
+                        .JoinAsLines();
+                    ClipboardAvalonia.SetText(csvText);
+                }
+                    break;
             }
         }
     }
