@@ -1,11 +1,18 @@
-﻿using Avalonia.Controls;
+﻿using System.Globalization;
+using System.IO;
+using System.Text;
+using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
 using Clowd.Clipboard;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CsvHelper;
+using CsvHelper.Configuration;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
+using KustoLoco.FileFormats;
 using Lokql.Engine.Commands;
 using lokqlDx;
 using LokqlDx.Views;
@@ -109,10 +116,23 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
                 case "csv":
                 {
-                    var csvText = Result.EnumerateRows()
-                        .Select(row => row.Select(ObjectToString).JoinString(","))
-                        .JoinAsLines();
-                    ClipboardAvalonia.SetText(csvText);
+                    var csvText = new StringBuilder();
+                    using var stringWriter = new StringWriter(csvText);
+                    using var csvWriter = new CsvWriter(stringWriter, new CsvConfiguration(CultureInfo.InvariantCulture));
+                    
+                    foreach (var row in Result.EnumerateRows())
+                    {
+                        foreach (var cell in row)
+                        {
+                            var value = cell is DateTime dt 
+                                ? dt.ToString("o", CultureInfo.InvariantCulture) 
+                                : Convert.ToString(cell, CultureInfo.InvariantCulture);
+                            csvWriter.WriteField(value);
+                        }
+                        csvWriter.NextRecord();
+                    }
+                    
+                    ClipboardAvalonia.SetText(csvText.ToString().TrimEnd());
                 }
                     break;
             }
