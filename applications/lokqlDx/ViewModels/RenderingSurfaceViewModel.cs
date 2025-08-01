@@ -1,11 +1,16 @@
-﻿using Avalonia.Controls;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text;
+using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
 using Clowd.Clipboard;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
+using KustoLoco.FileFormats;
 using Lokql.Engine.Commands;
 using lokqlDx;
 using LokqlDx.Views;
@@ -55,7 +60,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         => _plotter.RenderToImage(result, pWidth, pHeight, _kustoSettings);
 
     [RelayCommand]
-    private void DataGridCopy(string extent)
+    private async Task DataGridCopy(string extent)
     {
         if (OperatingSystem.IsWindows())
         {
@@ -68,7 +73,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             {
                 var txt = Result.EnumerateRows().Select(row => row.Select(ObjectToString).JoinString())
                     .JoinAsLines();
-                ClipboardAvalonia.SetText(txt);
+                await ClipboardAvalonia.SetTextAsync(txt);
                 return;
             }
 
@@ -87,7 +92,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 case "cell":
                 {
                     var txt = ObjectToString(Result.Get(columnIndex, rowIndex));
-                    ClipboardAvalonia.SetText(txt);
+                    await ClipboardAvalonia.SetTextAsync(txt);
                 }
                     break;
 
@@ -95,7 +100,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 {
                     var colHdr = Result.ColumnDefinitions()[columnIndex];
                     var txt = Result.EnumerateColumnData(colHdr).Select(ObjectToString).JoinAsLines();
-                    ClipboardAvalonia.SetText(txt);
+                    await ClipboardAvalonia.SetTextAsync(txt);
                 }
                     break;
 
@@ -103,7 +108,19 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                 {
                     var colHdr = Result.ColumnDefinitions()[columnIndex];
                     var txt = Result.GetRow(rowIndex).Select(ObjectToString).JoinString();
-                    ClipboardAvalonia.SetText(txt);
+                    await ClipboardAvalonia.SetTextAsync(txt);
+                }
+                    break;
+
+                case "csv":
+                {
+                    using var stream = new MemoryStream();
+                    var csvSerializer = CsvSerializer.Default(_kustoSettings, new NullConsole());
+                    
+                    await csvSerializer.SaveTable(stream, Result);
+                    
+                    var csvText = Encoding.UTF8.GetString(stream.ToArray());
+                    await ClipboardAvalonia.SetTextAsync(csvText.TrimEnd());
                 }
                     break;
             }
