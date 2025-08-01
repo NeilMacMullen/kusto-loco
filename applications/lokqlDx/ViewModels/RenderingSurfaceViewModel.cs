@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using Avalonia.Controls;
@@ -7,8 +7,6 @@ using Avalonia.Controls.Selection;
 using Clowd.Clipboard;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CsvHelper;
-using CsvHelper.Configuration;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
@@ -116,23 +114,14 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
                 case "csv":
                 {
-                    var csvText = new StringBuilder();
-                    using var stringWriter = new StringWriter(csvText);
-                    using var csvWriter = new CsvWriter(stringWriter, new CsvConfiguration(CultureInfo.InvariantCulture));
+                    using var stream = new MemoryStream();
+                    var csvSerializer = CsvSerializer.Default(_kustoSettings, new NullConsole());
                     
-                    foreach (var row in Result.EnumerateRows())
-                    {
-                        foreach (var cell in row)
-                        {
-                            var value = cell is DateTime dt 
-                                ? dt.ToString("o", CultureInfo.InvariantCulture) 
-                                : Convert.ToString(cell, CultureInfo.InvariantCulture);
-                            csvWriter.WriteField(value);
-                        }
-                        csvWriter.NextRecord();
-                    }
+                    #pragma warning disable VSTHRD002 
+                    Task.Run(async () => await csvSerializer.SaveTable(stream, Result)).Wait();
                     
-                    ClipboardAvalonia.SetText(csvText.ToString().TrimEnd());
+                    var csvText = Encoding.UTF8.GetString(stream.ToArray());
+                    ClipboardAvalonia.SetText(csvText.TrimEnd());
                 }
                     break;
             }
