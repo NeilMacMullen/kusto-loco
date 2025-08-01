@@ -47,27 +47,33 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
 
     public override int RowCount => _Length;
 
+    private object _lockObject = new object();
+    
     private (int, GenericTypedBaseColumn<T>) IndirectIndex(int index)
     {
-        //most accesses are sequential so we can avoid a lot of scanning by just
-        //assuming the last section we used will serve the current request
-        if (!IndexInSection(_lastHitSection, index))
+        //we need to use a lock now that everything is parallelised 
+        lock (_lockObject)
         {
-            _lastHitSection = Section.Empty;
-            foreach (var section in BackingColumns)
-                if (IndexInSection(section, index))
-                {
-                    _lastHitSection = section;
-                    break;
-                }
+            //most accesses are sequential so we can avoid a lot of scanning by just
+            //assuming the last section we used will serve the current request
+            if (!IndexInSection(_lastHitSection, index))
+            {
+                _lastHitSection = Section.Empty;
+                foreach (var section in BackingColumns)
+                    if (IndexInSection(section, index))
+                    {
+                        _lastHitSection = section;
+                        break;
+                    }
+            }
+
+            if (_lastHitSection == Section.Empty)
+                throw new InvalidOperationException(
+                    $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
+
+            var retColumn = _lastHitSection.BackingColumn as GenericTypedBaseColumn<T>;
+            return (index - _lastHitSection.Offset, retColumn!);
         }
-
-        if (_lastHitSection == Section.Empty)
-            throw new InvalidOperationException(
-                $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
-
-        var retColumn = _lastHitSection.BackingColumn as GenericTypedBaseColumn<T> ;
-        return (index - _lastHitSection.Offset, retColumn!);
     }
 
     private static bool IndexInSection(Section s, int i) => i >= s.Offset && i < s.Offset + s.Length;

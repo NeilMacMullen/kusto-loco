@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
@@ -15,7 +14,7 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
     {
         var p1Lon = (double?)arguments[0].Value;
         var p1Lat = (double?)arguments[1].Value;
-        var resolution = (arguments.Length == 3)
+        var resolution = arguments.Length == 3
             ? (long?)arguments[2].Value
             : DefaultResolution;
         return new ScalarResult(ScalarTypes.String, GeoSupport.GeoHash(p1Lon, p1Lat, resolution));
@@ -37,9 +36,7 @@ internal class GeoPointToGeoHashFunctionImpl : IScalarFunctionImpl
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
             for (var i = range.Item1; i < range.Item2; i++)
-            {
                 data[i] = GeoSupport.GeoHash(p1LonColumn[i], p1LatColumn[i], resColumn[i]);
-            }
         });
         return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }

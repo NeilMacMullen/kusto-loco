@@ -64,7 +64,6 @@ namespace KustoLoco.SourceGeneration
 
         public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method, bool partition)
         {
-            partition = false;
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
@@ -73,17 +72,19 @@ namespace KustoLoco.SourceGeneration
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
             dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
-            if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
 
             if (partition)
             {
                 dbg.AppendLine($"var rangePartitioner = SafePartitioner.Create({RowCount});");
                 dbg.AppendLine("Parallel.ForEach(rangePartitioner, (range, loopState) =>");
                 dbg.EnterCodeBlock();
+                if (method.HasContext)
+                    dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
                 dbg.AppendLine($"for (var {RowIndex} = range.Item1; {RowIndex} < range.Item2; {RowIndex}++)");
             }
             else
             {
+                if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
                 dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
             }
 

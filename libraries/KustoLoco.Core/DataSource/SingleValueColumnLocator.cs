@@ -13,13 +13,13 @@ public class SingleValueColumnLocator
         if (u == typeof(bool))
             return new GenericSingleValueColumnOfbool(data,rowCount);
         if (u == typeof(int))
-            return new GenericSingleValueColumnOfint(data, rowCount);
+            return new GenericSingleValueColumnOfint(data ==null ? null :Convert.ToInt32(data), rowCount);
         if (u == typeof(long))
-            return new GenericSingleValueColumnOflong(data, rowCount);
+            return new GenericSingleValueColumnOflong(data == null ? null : Convert.ToInt64(data), rowCount);
         if (u == typeof(decimal))
-            return new GenericSingleValueColumnOfdecimal(data, rowCount);
+            return new GenericSingleValueColumnOfdecimal(data == null ? null : Convert.ToDecimal(data), rowCount);
         if (u == typeof(double))
-            return new GenericSingleValueColumnOfdouble(data, rowCount);
+            return new GenericSingleValueColumnOfdouble(data == null ? null : Convert.ToDouble(data), rowCount);
         if (u == typeof(Guid))
             return new GenericSingleValueColumnOfGuid(data, rowCount);
         if (u == typeof(DateTime))

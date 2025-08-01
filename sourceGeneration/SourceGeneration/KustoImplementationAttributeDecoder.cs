@@ -15,7 +15,7 @@ namespace KustoLoco.SourceGeneration
 
         internal KustoImplementationAttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
         {
-            Partition= !attr.GetStringFor(nameof(KustoImplementationAttribute.Partition)).Equals("false");
+            Partition = ! attr.GetStringFor(nameof(KustoImplementationAttribute.Partition)).Equals("false");
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             SymbolName = funcSymbol;
             if (funcSymbol.Contains("Functions"))

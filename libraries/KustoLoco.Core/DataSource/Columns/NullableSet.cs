@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Reflection.Metadata.Ecma335;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -36,8 +34,6 @@ public sealed class NullableSet<T> : INullableSet
     public bool IsNull(int i) => !NoNulls && _isNull[i];
     public object? NullableObject(int i) => IsNull(i) ? null : _nonnull[i];
 
-    public T? NullableT(int i) => IsNull(i) ? default(T?) : _nonnull[i];
-
     public Array GetDataAsArray()
     {
         //TODO - we currently can't do this because the main consumer of this API(Parquet serializer)
@@ -48,10 +44,12 @@ public sealed class NullableSet<T> : INullableSet
         */
         var nullable = new T?[Length];
         for (var i = 0; i < Length; i++)
-                nullable[i] = NullableT(i);
+            nullable[i] = NullableT(i);
 
         return nullable;
     }
+
+    public T? NullableT(int i) => IsNull(i) ? default(T?) : _nonnull[i];
 
     public static NullableSet<T> FromObjectsOfCorrectType(object?[] nullableData)
     {
@@ -103,6 +101,10 @@ public sealed class NullableSet<T> : INullableSet
     }
 }
 
+//
+//---------------------------------------------------REFERENCE--------------------------------------------------
+//
+
 [KustoGeneric(Types = "reference")]
 public sealed class NullableSet_Ref<T> : INullableSet
 {
@@ -110,6 +112,7 @@ public sealed class NullableSet_Ref<T> : INullableSet
     public bool NoNulls { get; }
     public int Length { get; }
     public Type UnderlyingType { get; } = typeof(T);
+
     public Array GetDataAsArray()
     {
 #if TYPE_STRING
@@ -131,14 +134,23 @@ public sealed class NullableSet_Ref<T> : INullableSet
         var length = nullableData.Length;
         var values = new T[length];
         var noNulls = true;
-        //TODO- special case for string
+#if TYPE_STRING
+        var pool = new StringPool(1000);
+#endif
         for (var i = 0; i < length; i++)
         {
             var d = nullableData[i];
             if (d is not T t)
+            {
                 noNulls = false;
+            }
             else
+            {
+#if TYPE_STRING
+                t = pool.GetOrAdd(t);
+#endif
                 values[i] = t;
+            }
         }
 
         return new NullableSet_Ref<T>(values, noNulls);
@@ -149,13 +161,25 @@ public sealed class NullableSet_Ref<T> : INullableSet
         var nullableData = (T?[])baseArray;
         var length = nullableData.Length;
         var noNulls = true;
+#if TYPE_STRING
+        var pool = new StringPool(1000);
+#endif
+
         for (var i = 0; i < length; i++)
         {
             var d = nullableData[i];
-            if (d is T t) continue;
+            if (d is T t)
+            {
+#if TYPE_STRING
+        nullableData[i] = pool.GetOrAdd(d);
+#endif
+                continue;
+            }
+
             noNulls = false;
             break;
         }
+
 
         //todo - add special casing for Strings here to use stringpool
         return new NullableSet_Ref<T>(nullableData, noNulls);
@@ -176,9 +200,7 @@ public sealed class NullableSet_Ref<T> : INullableSet
 #else
     public bool IsNull(int i) => _values[i] == null;
     public object? NullableObject(int i) => _values[i];
-    public T?  NullableT(int i)=>  _values[i];
+    public T? NullableT(int i) => _values[i];
 
 #endif
 }
-
-

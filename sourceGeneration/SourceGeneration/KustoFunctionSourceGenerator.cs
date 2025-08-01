@@ -210,7 +210,7 @@ namespace KustoLoco.SourceGeneration
             if (m.HasScalar)
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
-                ParamGeneneration.BuildColumnarMethod(dbg, m,false);
+                ParamGeneneration.BuildColumnarMethod(dbg, m,attr.Partition);
             if (m.KustoImplementationAttributeDecoder.ImplementationType == ImplementationType.Aggregate)
                 ParamGeneneration.BuildInvokeMethod(dbg, m);
             return m;

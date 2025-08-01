@@ -100,16 +100,12 @@ internal partial class TreeEvaluator
                 for (var i = 0; i < numRows; i++)
                 {
                     var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
-
-                    // TODO: Should nulls be treated differently than empty string?
                     var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
                         bucket = new NpmJoinSet(onValues, [], chunk);
-
                         result.Buckets.Add(key, bucket);
                     }
-
                     bucket.Rows.Add(i);
                 }
             }

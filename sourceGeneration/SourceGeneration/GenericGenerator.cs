@@ -149,6 +149,7 @@ public class GenericGenerator : IIncrementalGenerator
         usingManager.AddFromNode(classDeclaration);
         usingManager.Add("System");
         usingManager.Add("System.Text.Json.Nodes");
+        usingManager.Add("CommunityToolkit.HighPerformance.Buffers");
         foreach (var u in usingManager.GetUsings())
             code.AppendLine(u);
         code.AppendStatement($"namespace {NodeHelpers.GetNamespaceFrom(classDeclaration)}");

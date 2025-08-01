@@ -16,7 +16,7 @@ public static class KustoFormatter
 
         return o switch
         {
-            null => string.Empty,
+            null => "<null>",
             DateTime d => d.Kind == DateTimeKind.Local
                 ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
                 : d.ToString("u"),

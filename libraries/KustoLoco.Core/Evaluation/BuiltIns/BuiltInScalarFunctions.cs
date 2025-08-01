@@ -316,6 +316,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String)
         ));
 
+        BenchmarkFunction.Register(Functions);
+        ParTest.Register(Functions);
 
         Functions.Add(
             Kusto.Language.Functions.Trim,
