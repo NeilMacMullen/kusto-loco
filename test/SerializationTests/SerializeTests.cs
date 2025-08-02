@@ -61,7 +61,7 @@ public class SerializeTests
 
         var lr = await _kustoResultSerializer.FromBytes(bytes);
         lr.RowCount.Should().Be(0);
-        lr.ColumnCount.Should().Be(1);
+        lr.ColumnCount.Should().Be(0);
     }
 
     [TestMethod]

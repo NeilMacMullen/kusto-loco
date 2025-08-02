@@ -308,4 +308,29 @@ public class JoinLookupTests : TestMethods
                        """;
         result.Should().Be(expected);
     }
+
+
+
+    [TestMethod]
+    public async Task LookupLeftOuterWithFailedLookups()
+    {
+        var query = """
+                    let X = datatable(Key:string, Value1:long)
+                    [
+                        'a',1,
+                        'b',2,
+                    ];
+                    let Y = datatable(Key:string, Value2:long)
+                    [
+                        'a',10,
+                    ];
+                    X | lookup Y on Key
+                    """;
+        var result = await ResultAsString(query, Environment.NewLine);
+        var expected = """
+                       a,1,10
+                       b,2,null
+                       """;
+        result.Should().Be(expected);
+    }
 }

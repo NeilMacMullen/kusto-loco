@@ -68,23 +68,31 @@ public class ParquetSerializer : ITableSerializer
 
 
         await using var writer = await ParquetWriter.CreateAsync(schema, fileStream);
-        using var groupWriter = writer.CreateRowGroup();
 
-        foreach (var columnDefinition in result
-                     .ColumnDefinitions())
+        var offset = 0;
+        while (offset < result.RowCount)
         {
-            _console.ShowProgress($"Writing column {columnDefinition.Name}...");
-            var data = CreateArrayFromRawObjects(columnDefinition, result);
-            //todo we could optimise saving here by writing non-nullable types but
-            //we'd need to know whether there are nulls before creating the schema
-            //and that would probably require us to propagate this knowledge through
-            //Columns
-            //if (data.NoNulls)
-            //    def = new DataField(def.Name, TypeMapping.UnderlyingType(def.ClrType));
-            var arr = data.GetDataAsArray();
-            var def = dataFields[columnDefinition.Index];
-            var dataColumn = new DataColumn(def,arr);
-            await groupWriter.WriteColumnAsync(dataColumn);
+            var length = Math.Min(10_000_000, result.RowCount-offset);
+            using var groupWriter = writer.CreateRowGroup();
+
+            foreach (var columnDefinition in result
+                         .ColumnDefinitions())
+            {
+                _console.ShowProgress($"Writing column {columnDefinition.Name} {offset} {length}...");
+                var data = CreateArrayFromRawObjects(columnDefinition, result,offset,length);
+                //todo we could optimise saving here by writing non-nullable types but
+                //we'd need to know whether there are nulls before creating the schema
+                //and that would probably require us to propagate this knowledge through
+                //Columns
+                //if (data.NoNulls)
+                //    def = new DataField(def.Name, TypeMapping.UnderlyingType(def.ClrType));
+                var arr = data.GetDataAsArray();
+                var def = dataFields[columnDefinition.Index];
+                var dataColumn = new DataColumn(def, arr);
+                await groupWriter.WriteColumnAsync(dataColumn);
+              
+            }
+            offset += length;
         }
 
         _console.CompleteProgress("");
@@ -95,19 +103,18 @@ public class ParquetSerializer : ITableSerializer
     {
         if (fileStream.Length == 0)
             return TableLoadResult.Success(InMemoryTableSource.Empty);
+        _console.WriteLine("Reading stream...");
         using var fileReader = await ParquetReader.CreateAsync(fileStream);
         var rowGroupCount = fileReader.RowGroupCount;
-        //is it possible to have a parquet file with no row groups?
-        //seems unlikely so treat it as fatal error.
+        //KustResult.Empty can produce this
         if (rowGroupCount == 0)
-            return TableLoadResult.Failure("No row groups in file");
+            return TableLoadResult.Success(InMemoryTableSource.Empty);
 
         var totalRows = 0;
         BaseColumnBuilder[] columnBuilders = [];
         INullableSet[] nullableSets = [];
         for (var rowGroupIndex = 0; rowGroupIndex < rowGroupCount; rowGroupIndex++)
         {
-            _console.Write("loading rowgroup..");
             var rowGroup = await fileReader.ReadEntireRowGroupAsync(rowGroupIndex);
 
             var pqColumns = rowGroup.Select(d => d).ToArray();
@@ -128,20 +135,19 @@ public class ParquetSerializer : ITableSerializer
                 var dataColumn = rowGroup[columnIndex];
                 //lookup the builder for this column
                 //var builderInfo = columnBuilders[columnIndex];
-                _console.ShowProgress($"{stopwatch.ElapsedMilliseconds} adding capacity ");
                 //builderInfo.AddCapacity(column.Data.Length);
                 _console.ShowProgress(
-                    $"{stopwatch.ElapsedMilliseconds} Reading column {dataColumn.Field.Name} from rowGroup {rowGroupIndex}");
+                    $"Column:{dataColumn.Field.Name} {rowGroupIndex+1}/{rowGroupCount}");
                 var set = NullableSetLocator.GetNullableForTypeAndBaseArray(dataColumn.Field.ClrType, column.Data);
 
                 nullableSets[columnIndex] = set;
                 
-                _console.ShowProgress(
-                    $"{stopwatch.ElapsedMilliseconds} Added {column.Data.Length} data for {dataColumn.Field.Name} from rowGroup {rowGroupIndex}");
+               // _console.ShowProgress(
+               //     $"{stopwatch.ElapsedMilliseconds} Added {rowGroup.Length}/{column.Data.Length} data for {dataColumn.Field.Name} from rowGroup //{rowGroupIndex}");
                 columnIndex++;
             }
 
-            totalRows += rowGroup.GetLength(0);
+            totalRows += rowGroup.Length;
         }
 
         //having read all the data, we can now create the table
@@ -166,10 +172,10 @@ public class ParquetSerializer : ITableSerializer
         return await LoadTable(fileStream, tableName);
     }
 
-    private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
+    private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res,int start,int length)
     {
         var builder = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
-        foreach (var cellData in res.EnumerateColumnData(r))
+        foreach (var cellData in res.EnumerateColumnData(r).Skip(start).Take(length))
             builder.Add(cellData);
         //TODO fix up 
         var set= builder.ToINullableSet();

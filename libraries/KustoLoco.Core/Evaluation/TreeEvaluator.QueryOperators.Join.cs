@@ -106,6 +106,7 @@ internal partial class TreeEvaluator
                         bucket = new NpmJoinSet(onValues, [], chunk);
                         result.Buckets.Add(key, bucket);
                     }
+
                     bucket.Rows.Add(i);
                 }
             }
@@ -134,21 +135,41 @@ internal partial class TreeEvaluator
         {
             var leftColumns = BuildersFromBucketed(left);
             var rightColumns = BuildersFromBucketed(right);
-            foreach (var leftBucket in left.Buckets)
+            if (_isLookup)
             {
-                var leftValue = leftBucket.Value;
-                var numLeftRows = dedupeLeft ? 1 : leftValue.RowCount;
+                foreach (var rightBucket in right.Buckets)
+                {
+                    var rightValue = rightBucket.Value;
+                    var numrightRows = rightValue.RowCount;
 
-                if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
-                    for (var i = 0; i < numLeftRows; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
-                    {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
-                    }
+                    if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
+                        for (var i = 0; i < numrightRows; i++)
+                        for (var j = 0; j < leftValue.RowCount; j++)
+                        {
+                            AddPartialRow(leftColumns, leftValue, i);
+                            AddPartialRow(rightColumns, rightValue, j);
+                        }
+                }
+
+                rightColumns = FilterRightColumnsForLookup(rightColumns);
+            }
+            else
+            {
+                foreach (var leftBucket in left.Buckets)
+                {
+                    var leftValue = leftBucket.Value;
+                    var numLeftRows = dedupeLeft ? 1 : leftValue.RowCount;
+
+                    if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
+                        for (var i = 0; i < numLeftRows; i++)
+                        for (var j = 0; j < rightValue.RowCount; j++)
+                        {
+                            AddPartialRow(leftColumns, leftValue, i);
+                            AddPartialRow(rightColumns, rightValue, j);
+                        }
+                }
             }
 
-            rightColumns = FilterRightColumnsForLookup(rightColumns);
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
         }
 
@@ -193,7 +214,8 @@ internal partial class TreeEvaluator
             var leftColumns = BuildersFromBucketed(left);
             var rightColumns = BuildersFromBucketed(right);
 
-
+            //it's not really practical to optimise this for lookup
+            //because we need to populate every left row
             foreach (var (key, leftValue) in left.Buckets)
                 if (right.Buckets.TryGetValue(key, out var rightValue))
                     for (var i = 0; i < leftValue.RowCount; i++)
@@ -206,8 +228,8 @@ internal partial class TreeEvaluator
                     for (var i = 0; i < leftValue.RowCount; i++)
                     {
                         AddPartialRow(leftColumns, leftValue, i);
-                        for (var c = 0; c < rightColumns.Length; c++)
-                            rightColumns[c].Add(null);
+                        foreach (var t in rightColumns)
+                            t.Add(null);
                     }
 
             rightColumns = FilterRightColumnsForLookup(rightColumns);
