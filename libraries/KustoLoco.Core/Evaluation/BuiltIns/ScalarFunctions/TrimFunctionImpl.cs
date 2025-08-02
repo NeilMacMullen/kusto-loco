@@ -28,20 +28,20 @@ internal abstract class TrimFunctionCore : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
 
-        var columns = new TypedBaseColumn<string?>[arguments.Length];
+        var columns = new GenericTypedBaseColumnOfstring[arguments.Length];
         for (var i = 0; i < arguments.Length; i++)
         {
-            columns[i] = (TypedBaseColumn<string?>)arguments[i].Column;
+            columns[i] = (GenericTypedBaseColumnOfstring)arguments[i].Column;
         }
 
         var rowCount = columns[0].RowCount;
-        var data = new string?[rowCount];
+        var data = NullableSetBuilderOfstring.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             data[i] = Trim(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfstring.CreateFromDataSet(data.ToNullableSet()));
     }
 
     protected abstract string Trim(object? regex, object? target);

@@ -7,15 +7,15 @@ namespace ExtendedCoreTests;
 [TestClass]
 public class IndirectTests
 {
-    private MappedColumn<string> MakeDecimatedColumn(int sourceCount)
+    private GenericMappedColumnOfstring MakeDecimatedColumn(int sourceCount)
     {
         var originalData = Enumerable.Range(0, sourceCount)
-            .Select(i => i.ToString()).ToArray();
-        var cs = new InMemoryColumn<string>(originalData);
-        var backing = MappedColumn<string>.Create(
+            .Select(i => i.ToString()).Cast<object?>().ToArray();
+        var cs = new GenericInMemoryColumnOfstring(originalData);
+        var backing = GenericMappedColumnOfstring.Create(
             [..Enumerable.Range(0, sourceCount).Where(i => i % 10 == 0)]
             , cs);
-        return (MappedColumn<string>)backing;
+        return (GenericMappedColumnOfstring)backing;
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public class IndirectTests
     [TestMethod]
     public void IndirectionFollowedViaCasting()
     {
-        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
+        var backing = (GenericTypedBaseColumnOfstring)MakeDecimatedColumn(100);
         backing.RowCount.Should().Be(10);
         backing[0].Should().Be("0");
         backing[1].Should().Be("10");
@@ -43,7 +43,7 @@ public class IndirectTests
     [TestMethod]
     public void SlicingIndirectedColumnCanWork()
     {
-        var backing = (TypedBaseColumn<string>)MakeDecimatedColumn(100);
+        var backing = (GenericTypedBaseColumnOfstring)MakeDecimatedColumn(100);
         var sliced = backing.Slice(5, 2);
         sliced.RowCount.Should().Be(2);
         sliced.GetRawDataValue(0).Should().Be("50");
@@ -55,7 +55,7 @@ public class IndirectTests
     public void MappedIndirectionFlattens()
     {
         var backing = MakeDecimatedColumn(100);
-        var flattened = ColumnHelpers.MapColumn(backing, [0, 1]) as MappedColumn<string>;
+        var flattened = ColumnHelpers.MapColumn(backing, [0, 1]) as GenericMappedColumnOfstring;
         flattened!.RowCount.Should().Be(2);
         flattened.IndirectIndex(0).Should().Be(backing.IndirectIndex(0));
         flattened.IndirectIndex(1).Should().Be(backing.IndirectIndex(1));
@@ -64,9 +64,9 @@ public class IndirectTests
     [TestMethod]
     public void IndirectingSingleValueColumnReturnsSingleValue()
     {
-        var sv = new SingleValueColumn<string>("HELLO", 100);
+        var sv = new GenericSingleValueColumnOfstring("HELLO", 100);
         var second = ColumnHelpers.MapColumn(sv, [0, 1]);
-        second.GetType().Should().Be(typeof(SingleValueColumn<string>));
+        second.GetType().Should().Be(typeof(GenericSingleValueColumnOfstring));
         second.RowCount.Should().Be(2);
         second.GetRawDataValue(0).Should().Be("HELLO");
     }
@@ -74,17 +74,17 @@ public class IndirectTests
     [TestMethod]
     public void SlicingSingleValueColumnReturnsSingleValue()
     {
-        var sv = new SingleValueColumn<string>("HELLO", 100);
+        var sv = new GenericSingleValueColumnOfstring("HELLO", 100);
         var sliced = sv.Slice(10, 20);
-        sliced.Should().BeOfType<SingleValueColumn<string>>();
+        sliced.Should().BeOfType<GenericSingleValueColumnOfstring>();
         sliced.RowCount.Should().Be(20);
         sliced.GetRawDataValue(0).Should().Be("HELLO");
     }
     [TestMethod] public void  InMemoryCanBeCast()
     {
         var data = new int[]{1, 2, 3};
-        var col = new InMemoryColumn<int>(data);
-        var baseCol = (TypedBaseColumn<int>)col;
+        var col = new GenericInMemoryColumnOfint(data.Cast<object?>().ToArray());
+        var baseCol = (GenericTypedBaseColumnOfint)col;
         
     }
 

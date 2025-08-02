@@ -21,9 +21,10 @@
 
         </DockPanel>
 
-        <Popup Name="myPopup" Placement="Pointer">
-            <Border BorderThickness="1">
-                <TextBlock Name="myPopupText" Background="Black" Foreground="White" Padding="3">
+        <Popup Name="myPopup" Placement="Pointer" VerticalOffset="20" HorizontalOffset="20">
+            <Border BorderThickness="1" BorderBrush="BlueViolet">
+                <TextBlock Name="myPopupText" Background="Black"
+                           Foreground="White" Padding="3">
                     Popup Text
                 </TextBlock>
             </Border>

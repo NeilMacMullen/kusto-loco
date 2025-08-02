@@ -3,19 +3,21 @@
 
 namespace KustoLoco.SourceGeneration
 {
-
-    public class AttributeDecoder
+    /// <summary>
+    /// A helper specifically for the KustoImplementationAttribute
+    /// </summary>
+    public class KustoImplementationAttributeDecoder
     {
         public ImplementationType ImplementationType;
         public bool IsBuiltIn;
 
         public string SymbolName;
 
-        internal AttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
+        internal KustoImplementationAttributeDecoder(CustomAttributeHelper<KustoImplementationAttribute> attr)
         {
+            Partition = ! attr.GetStringFor(nameof(KustoImplementationAttribute.Partition)).Equals("false");
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             SymbolName = funcSymbol;
-
             if (funcSymbol.Contains("Functions"))
             {
                 IsBuiltIn = true;
@@ -40,7 +42,7 @@ namespace KustoLoco.SourceGeneration
                     ImplementationType = (ImplementationType)Enum.Parse(typeof(ImplementationType), category);
             }
         }
-
+        public bool Partition { get; }
         public string SymbolTypeName
         {
             get
@@ -60,7 +62,7 @@ namespace KustoLoco.SourceGeneration
         public bool IsFuncOrOp => ImplementationType == ImplementationType.Function ||
                                   ImplementationType == ImplementationType.Operator;
 
-
+        
         public string BaseClassName
         {
             get
@@ -108,5 +110,6 @@ namespace KustoLoco.SourceGeneration
                     return "not yet implemented";
             }
         }
+
     }
 }

@@ -22,16 +22,16 @@ internal class IsNullBoolFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<bool?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -48,16 +48,16 @@ internal class IsNullIntFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<int?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfint)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -74,16 +74,16 @@ internal class IsNullLongFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<long?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOflong)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -100,16 +100,16 @@ internal class IsNullDoubleFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<double?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfdouble)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -126,16 +126,16 @@ internal class IsNullDecimalFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<decimal?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfdecimal)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -152,16 +152,16 @@ internal class IsNullDateTimeFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<DateTime?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfDateTime)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -178,16 +178,16 @@ internal class IsNullTimeSpanFunctionImpl : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1);
-        var valueCol = (TypedBaseColumn<TimeSpan?>)(arguments[0].Column);
+        var valueCol = (GenericTypedBaseColumnOfTimeSpan)(arguments[0].Column);
 
-        var data = new bool?[valueCol.RowCount];
+        var data = NullableSetBuilderOfbool.CreateFixed(valueCol.RowCount);
         for (var i = 0; i < valueCol.RowCount; i++)
         {
             var value = valueCol[i];
-            data[i] = value == null;
+            data.Add(value == null);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
     }
 
     internal static bool Impl(string s) => false;

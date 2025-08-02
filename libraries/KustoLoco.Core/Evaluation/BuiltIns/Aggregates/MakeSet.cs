@@ -15,12 +15,12 @@ internal class MakeSetIntFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfint)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -52,12 +52,12 @@ internal class MakeSetLongFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOflong)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -89,12 +89,12 @@ internal class MakeSetDoubleFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -126,12 +126,12 @@ internal class MakeSetDecimalFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfdecimal)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -163,12 +163,12 @@ internal class MakeSetTimeSpanFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfTimeSpan)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -200,12 +200,12 @@ internal class MakeSetDateTimeFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
@@ -237,12 +237,12 @@ internal class MakeSetStringFunctionImpl : IAggregateImpl
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
         Debug.Assert(arguments.Length == 1 || arguments.Length == 2);
-        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
+        var valuesColumn = (GenericTypedBaseColumnOfstring)arguments[0].Column;
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 2)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[1].Column;
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[1].Column;
             Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)

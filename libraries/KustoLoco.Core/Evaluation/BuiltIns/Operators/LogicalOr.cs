@@ -23,8 +23,8 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
         Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var right = (TypedBaseColumn<bool?>)(arguments[1].Column);
+        var left = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var right = (GenericTypedBaseColumnOfbool)(arguments[1].Column);
 
         //short-circuiting for indexed columns
         if (left.IsSingleValue && (left[0] == true))
@@ -32,13 +32,13 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
         if (right.IsSingleValue && (right[0] == true))
             return new ColumnarResult(right);
 
-        var data = new bool?[left.RowCount];
+        var data =NullableSetBuilderOfbool.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
             data[i] = WeirdOr(left[i], right[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     // Nulls are treated as "unknown/any" for logical operations in Kusto.

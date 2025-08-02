@@ -10,5 +10,13 @@ namespace KustoLoco.SourceGeneration
     {
         public string Keyword { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
+        public bool Partition { get; set; } = false;
     }
+
+    internal class KustoGenericAttribute : Attribute
+    {
+        public string Types { get; set; } = string.Empty;
+        public string AdditionalAttributes { get; set; } = string.Empty;
+    }
+    
 }

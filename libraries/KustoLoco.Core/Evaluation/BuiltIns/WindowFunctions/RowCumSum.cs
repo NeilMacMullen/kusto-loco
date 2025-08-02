@@ -13,13 +13,13 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<int?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfint)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         var accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<int?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfint)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -28,7 +28,7 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new int?[termCol.RowCount];
+        var data = NullableSetBuilderOfint.CreateFixed(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -43,10 +43,10 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<int?>(data));
+        return new ColumnarResult(new GenericInMemoryColumnOfint(data.ToNullableSet()));
     }
 }
 
@@ -56,13 +56,13 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<long?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOflong)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         long accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<long?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOflong)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -71,7 +71,7 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new long?[termCol.RowCount];
+        var data = NullableSetBuilderOflong.CreateFixed(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -86,10 +86,10 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<long?>(data));
+        return new ColumnarResult(new GenericInMemoryColumnOflong(data.ToNullableSet()));
     }
 }
 
@@ -99,13 +99,13 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<double?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfdouble)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         double accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<double?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfdouble)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -114,7 +114,7 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new double?[termCol.RowCount];
+        var data = NullableSetBuilderOfdouble.CreateFixed(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -129,10 +129,10 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<double?>(data));
+        return new ColumnarResult(new GenericInMemoryColumnOfdouble(data.ToNullableSet()));
     }
 }
 
@@ -142,13 +142,13 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<decimal?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfdecimal)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         decimal accumulator = 0;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<decimal?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfdecimal)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -157,7 +157,7 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new decimal?[termCol.RowCount];
+        var data = NullableSetBuilderOfdecimal.CreateFixed(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -172,10 +172,10 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<decimal?>(data));
+        return new ColumnarResult(new GenericInMemoryColumnOfdecimal(data.ToNullableSet()));
     }
 }
 
@@ -185,13 +185,13 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
         ColumnarResult? previousWindowResult)
     {
         Debug.Assert(thisWindowArguments.Length == 2);
-        var termCol = (TypedBaseColumn<TimeSpan?>)thisWindowArguments[0].Column;
-        var restartCol = (TypedBaseColumn<bool?>)thisWindowArguments[1].Column;
+        var termCol = (GenericTypedBaseColumnOfTimeSpan)thisWindowArguments[0].Column;
+        var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
         var accumulator = TimeSpan.Zero;
         if (previousWindowResult != null)
         {
-            var previousColumn = (TypedBaseColumn<TimeSpan?>)previousWindowResult.Column;
+            var previousColumn = (GenericTypedBaseColumnOfTimeSpan)previousWindowResult.Column;
             Debug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
@@ -200,7 +200,7 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
             accumulator = lastValue.Value;
         }
 
-        var data = new TimeSpan?[termCol.RowCount];
+        var data = NullableSetBuilderOfTimeSpan.CreateFixed(termCol.RowCount);
         for (var i = 0; i < termCol.RowCount; i++)
         {
             var restart = restartCol[i];
@@ -215,9 +215,9 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
                 accumulator += term.Value;
             }
 
-            data[i] = accumulator;
+            data.Add(accumulator);
         }
 
-        return new ColumnarResult(new InMemoryColumn<TimeSpan?>(data));
+        return new ColumnarResult(new GenericInMemoryColumnOfTimeSpan(data.ToNullableSet()));
     }
 }

@@ -1,13 +1,21 @@
 using AwesomeAssertions;
 using NotNullStrings;
 
-// ReSharper disable StringLiteralTypo
-
 namespace BasicTests;
 
 [TestClass]
 public class SimpleFunctionTests : TestMethods
 {
+
+    [TestMethod]
+    public async Task Cast()
+    {
+        var query = "print trim_start(@'a+','aaainnerbbba')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("innerbbba");
+    }
+
+
     [TestMethod]
     public async Task TrimStart()
     {
@@ -40,8 +48,8 @@ datatable(Size:int) [7]
 | extend S= case(Size <= 3, 'Small',                        
                  Size <= 10, 'Medium', 
                              'Large')";
-        var result = await LastLineOfResult(query);
-        result.Should().Contain("Medium");
+        var result = await ResultAsString(query);
+        result.Should().Be("7,Medium");
     }
 
     [TestMethod]
@@ -154,8 +162,7 @@ datatable(Size:int) [50]
     {
         var query = "print c=1/0";
         var result = await LastLineOfResult(query);
-        // Depending on implementation, this may return null, error, or special value
-        result.Should().Match(r => r == "" || r.Contains("error") || r == "null");
+        result.Should().Contain("null");
     }
 
 
@@ -164,7 +171,7 @@ datatable(Size:int) [50]
     {
         var query = "print c=toint('notanumber')";
         var result = await LastLineOfResult(query);
-        result.Should().Be(""); // KQL returns null for invalid conversion
+        result.Should().Contain("null"); // KQL returns null for invalid conversion
     }
 
     [TestMethod]
@@ -298,7 +305,7 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("55");
     }
-
+   
 
     [TestMethod]
     public async Task RangeTimeSpan()

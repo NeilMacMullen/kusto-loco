@@ -22,20 +22,20 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
     {
         Debug.Assert(arguments.Length == 2);
 
-        var columns = new TypedBaseColumn<string?>[2];
+        var columns = new GenericTypedBaseColumnOfstring[2];
         for (var i = 0; i < arguments.Length; i++)
         {
-            columns[i] = (TypedBaseColumn<string?>)arguments[i].Column;
+            columns[i] = (GenericTypedBaseColumnOfstring)arguments[i].Column;
         }
 
         var rowCount = columns[0].RowCount;
-        var data = new JsonNode?[rowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             data[i] = Evaluate(columns[0][i], columns[1][i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     protected JsonArray? Evaluate(string? source, string? delimiter)

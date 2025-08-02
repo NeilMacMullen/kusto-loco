@@ -18,9 +18,9 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
    Do not modify by hand - your changes will be lost .
     
 
-   Built:  03:56:34 PM on Saturday, 26 Jul 2025
-   Machine: NPM-LENOVO
-   User:  neilm
+   Built:  05:33:20 PM on Tuesday, 29 Jul 2025
+   Machine: BEAST
+   User:  User
 
 */ 
 
@@ -39,9 +39,9 @@ internal class MinOfFunctionIntImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<int?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfint>().ToArray();
 
-        var data = new int?[columns[0].RowCount];
+        var data = NullableSetBuilderOfint.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -49,7 +49,7 @@ internal class MinOfFunctionIntImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfInt(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfint.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -65,9 +65,9 @@ internal class MinOfFunctionLongImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<long?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOflong>().ToArray();
 
-        var data = new long?[columns[0].RowCount];
+        var data = NullableSetBuilderOflong.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -75,7 +75,7 @@ internal class MinOfFunctionLongImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfLong(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOflong.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -91,9 +91,9 @@ internal class MinOfFunctionDecimalImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<decimal?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfdecimal>().ToArray();
 
-        var data = new decimal?[columns[0].RowCount];
+        var data = NullableSetBuilderOfdecimal.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -101,7 +101,7 @@ internal class MinOfFunctionDecimalImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfDecimal(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfdecimal.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -117,9 +117,9 @@ internal class MinOfFunctionDoubleImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<double?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfdouble>().ToArray();
 
-        var data = new double?[columns[0].RowCount];
+        var data = NullableSetBuilderOfdouble.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -127,7 +127,7 @@ internal class MinOfFunctionDoubleImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfDouble(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfdouble.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -143,9 +143,9 @@ internal class MinOfFunctionDateTimeImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<DateTime?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfDateTime>().ToArray();
 
-        var data = new DateTime?[columns[0].RowCount];
+        var data = NullableSetBuilderOfDateTime.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -153,7 +153,7 @@ internal class MinOfFunctionDateTimeImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfDateTime(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfDateTime.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -169,9 +169,9 @@ internal class MinOfFunctionTimeSpanImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<TimeSpan?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfTimeSpan>().ToArray();
 
-        var data = new TimeSpan?[columns[0].RowCount];
+        var data = NullableSetBuilderOfTimeSpan.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -179,7 +179,7 @@ internal class MinOfFunctionTimeSpanImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MinOfTimeSpan(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfTimeSpan.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -197,9 +197,9 @@ internal class MaxOfFunctionIntImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<int?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfint>().ToArray();
 
-        var data = new int?[columns[0].RowCount];
+        var data = NullableSetBuilderOfint.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -207,7 +207,7 @@ internal class MaxOfFunctionIntImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfInt(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfint.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -223,9 +223,9 @@ internal class MaxOfFunctionLongImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<long?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOflong>().ToArray();
 
-        var data = new long?[columns[0].RowCount];
+        var data = NullableSetBuilderOflong.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -233,7 +233,7 @@ internal class MaxOfFunctionLongImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfLong(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOflong.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -249,9 +249,9 @@ internal class MaxOfFunctionDecimalImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<decimal?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfdecimal>().ToArray();
 
-        var data = new decimal?[columns[0].RowCount];
+        var data = NullableSetBuilderOfdecimal.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -259,7 +259,7 @@ internal class MaxOfFunctionDecimalImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfDecimal(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfdecimal.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -275,9 +275,9 @@ internal class MaxOfFunctionDoubleImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<double?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfdouble>().ToArray();
 
-        var data = new double?[columns[0].RowCount];
+        var data = NullableSetBuilderOfdouble.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -285,7 +285,7 @@ internal class MaxOfFunctionDoubleImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfDouble(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfdouble.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -301,9 +301,9 @@ internal class MaxOfFunctionDateTimeImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<DateTime?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfDateTime>().ToArray();
 
-        var data = new DateTime?[columns[0].RowCount];
+        var data = NullableSetBuilderOfDateTime.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -311,7 +311,7 @@ internal class MaxOfFunctionDateTimeImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfDateTime(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfDateTime.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 
@@ -327,9 +327,9 @@ internal class MaxOfFunctionTimeSpanImpl : IScalarFunctionImpl
     {
         var columns = arguments
             .Select(a => a.Column)
-            .Cast<TypedBaseColumn<TimeSpan?>>().ToArray();
+            .Cast<GenericTypedBaseColumnOfTimeSpan>().ToArray();
 
-        var data = new TimeSpan?[columns[0].RowCount];
+        var data = NullableSetBuilderOfTimeSpan.CreateFixed(columns[0].RowCount);
         var builder = new StringBuilder();
         for (var row = 0; row < columns[0].RowCount; row++)
         {
@@ -337,7 +337,7 @@ internal class MaxOfFunctionTimeSpanImpl : IScalarFunctionImpl
             foreach (var t in columns) ret = TypeComparison.MaxOfTimeSpan(ret, t[row]);
             data[row] = ret;
         }
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfTimeSpan.CreateFromDataSet(data.ToNullableSet()));
     }
 }
 

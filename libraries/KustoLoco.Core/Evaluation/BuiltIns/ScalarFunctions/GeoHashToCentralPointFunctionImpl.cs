@@ -24,14 +24,13 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        var hash = (TypedBaseColumn<string?>)arguments[0].Column;
+        var hash = (GenericTypedBaseColumnOfstring)arguments[0].Column;
 
         var rowCount = hash.RowCount;
 
-        var data = new JsonNode[rowCount];
+        var data = NullableSetBuilderOfJsonNode.CreateFixed(rowCount);
 
-        var blockSize = 1000;
-        var rangePartitioner = Partitioner.Create(0, rowCount, blockSize);
+        var rangePartitioner = SafePartitioner.Create(rowCount);
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
             for (var i = range.Item1; i < range.Item2; i++)
@@ -40,7 +39,7 @@ internal class GeoHashToCentralPointFunctionImpl : IScalarFunctionImpl
                 data[i] = PtToJson(pt.Latitude, pt.Longitude);
             }
         });
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfJsonNode.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private static JsonObject PtToJson(double latitude, double longitude) =>

@@ -61,42 +61,42 @@ internal partial class TreeEvaluator
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Int => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<int?>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOfint.Create(columnResult.Column,
                         i => i == null ? null : Convert.ToInt32(i));
                     return new ColumnarResult(convertingColumn);
                 },
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Long => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<long?>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOflong.Create(columnResult.Column,
                         i => i == null ? null : Convert.ToInt64(i));
                     return new ColumnarResult(convertingColumn);
                 },
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Decimal => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<decimal?>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOfdecimal.Create(columnResult.Column,
                         i => i == null ? null : Convert.ToDecimal(i));
                     return new ColumnarResult(convertingColumn);
                 },
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Real => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<double?>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOfdouble.Create(columnResult.Column,
                         i => i == null ? null : Convert.ToDouble(i));
                     return new ColumnarResult(convertingColumn);
                 },
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.String => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<string>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOfstring.Create(columnResult.Column,
                         i => i == null ? string.Empty : Convert.ToString(i).NullToEmpty());
                     return new ColumnarResult(convertingColumn);
                 },
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.DateTime => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
-                    var convertingColumn = ConvertingColumn<DateTime?>.Create(columnResult.Column,
+                    var convertingColumn = GenericConvertingColumnOfDateTime.Create(columnResult.Column,
                         i => i == null ? null : Convert.ToDateTime(i));
                     return new ColumnarResult(convertingColumn);
                 },
