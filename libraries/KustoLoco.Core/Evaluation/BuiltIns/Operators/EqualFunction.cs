@@ -3,7 +3,7 @@
 // ReSharper disable PartialTypeWithSinglePart
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "Operators.Equal",Partition = true)]
+[KustoImplementation(Keyword = "Operators.Equal")]
 internal partial class EqualFunction
 {
     private static bool IntImpl(int a, int b) => a == b;

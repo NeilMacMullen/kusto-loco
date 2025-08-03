@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "Aggregates.Min", Partition = true)]
+[KustoImplementation(Keyword = "Aggregates.Min")]
 internal partial class MinAggregate
 {
     internal static long IntImpl(NumericAggregate context, int n)

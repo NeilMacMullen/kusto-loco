@@ -33,8 +33,10 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Real)
             )
         );
-
-
+        TicksFunction.Register(Functions);
+        TidFunction.Register(Functions);
+        ProcFunction.Register(Functions);
+        DiagnosticsFunction.Register(Functions);
 
         //can't generate because arbitrary number of arguments
         Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(

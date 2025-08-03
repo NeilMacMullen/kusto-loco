@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "partest",Partition = true)]
+[KustoImplementation(Keyword = "partest")]
 internal partial class ParTest
 {
     private static string Impl(long input)
