@@ -35,16 +35,7 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.TimeSpan),
                 IsNullStringFunctionImpl.Overload));
 
-        IsEmptyFunction.Register(Functions);
-        IsNotEmptyFunction.Register(Functions);
-        IsAsciiFunction.Register(Functions);
-        IsFiniteFunction.Register(Functions);
-        IsInfFunction.Register(Functions);
-        IsNanFunction.Register(Functions);
-        IsUtf8Function.Register(Functions);
-        ReverseFunction.Register(Functions);
-
-        Coalesce.Register(Functions);
+      
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         Functions.Add(Kusto.Language.Functions.PI,
@@ -52,15 +43,12 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.Real)));
 
 
-        AgoFunction.Register(Functions);
-        FormatDateTime.Register(Functions);
+       
 
         Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(
             new StrcatFunctionImpl(), true,
             ScalarTypes.String, ScalarTypes.String)));
-
-        MinOfRegister.Register(Functions);
-        MaxOfRegister.Register(Functions);
+      
 
         //add multiple overloads for strcat_delim
         var strcatDelimiterOverrides = Enumerable.Range(2, 64)
@@ -69,81 +57,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String,
                     Enumerable.Range(0, n).Select(TypeSymbol (_) => ScalarTypes.String).ToArray()))
             .ToArray();
-
-        Functions.Add(Kusto.Language.Functions.StrcatDelim, new ScalarFunctionInfo(strcatDelimiterOverrides));
-        AroundFunction.Register(Functions);
-        StrlenFunction.Register(Functions);
-        StrcmpFunction.Register(Functions);
-        StrcatArrayFunction.Register(Functions);
-        ArrayConcatFunction.Register(Functions);
-        ArrayReverseFunction.Register(Functions);
-        StrRepFunction.Register(Functions);
-        CountOfFunction.Register(Functions);
-        IndexOfFunction.Register(Functions);
-        ToLowerFunction.Register(Functions);
-        ToUpperFunction.Register(Functions);
-
-        ReplaceStringFunction.Register(Functions);
-        SubstringFunction.Register(Functions);
-        ArrayRotateLeftFunction.Register(Functions);
-        ArrayRotateRightFunction.Register(Functions);
-
-        Base64Decode.Register(Functions);
-        Base64Encode.Register(Functions);
-        BinaryAnd.Register(Functions);
-        BinaryOr.Register(Functions);
-        BinaryXor.Register(Functions);
-        BinaryNot.Register(Functions);
-        BinaryShiftLeft.Register(Functions);
-        BinaryShiftRight.Register(Functions);
-        BitsetCountOnes.Register(Functions);
-
-
-        BinFunction.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Floor, BinFunction.S);
-        GetYearFunction.Register(Functions);
-        GetMonthFunction.Register(Functions);
-        GetHourOfDayFunction.Register(Functions);
-        AbsFunction.Register(Functions);
-        SinFunction.Register(Functions);
-        CosFunction.Register(Functions);
-        TanFunction.Register(Functions);
-        SignFunction.Register(Functions);
-        RoundFunction.Register(Functions);
-        ToHexFunction.Register(Functions);
-        RadiansFunction.Register(Functions);
-        DegreesFunction.Register(Functions);
-        LogFunction.Register(Functions);
-        ExpFunction.Register(Functions);
-
-        Log10Function.Register(Functions);
-        Log2Function.Register(Functions);
-        PowFunction.Register(Functions);
-        SqrtFunction.Register(Functions);
-        DayOfWeekFunction.Register(Functions);
-
-        DayOfMonthFunction.Register(Functions);
-
-        DayOfYearFunction.Register(Functions);
-        StartOfDayFunction.Register(Functions);
-        EndOfDayFunction.Register(Functions);
-
-        StartOfWeekFunction.Register(Functions);
-
-        EndOfWeekFunction.Register(Functions);
-        StartOfMonthFunction.Register(Functions);
-        EndOfMonthFunction.Register(Functions);
-        StartOfYearFunction.Register(Functions);
-        EndOfYearFunction.Register(Functions);
-        DatetimeDiffFunction.Register(Functions);
-        DatetimeAddFunction.Register(Functions);
-        DatetimePartFunction.Register(Functions);
-
-
-        MakeDateTime.Register(Functions);
-        MakeTimeSpan.Register(Functions);
-        DateTimeUtcToLocalFunction.Register(Functions);
-
+        Functions.Add(Kusto.Language.Functions.StrcatDelim, new ScalarFunctionInfo(strcatDelimiterOverrides));
         var iffFunctionInfo = new ScalarFunctionInfo(
             new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool,
                 ScalarTypes.Bool, ScalarTypes.Bool,
@@ -168,24 +83,7 @@ internal static class BuiltInScalarFunctions
                 ScalarTypes.String, ScalarTypes.String));
         Functions.Add(Kusto.Language.Functions.Iff, iffFunctionInfo);
         Functions.Add(Kusto.Language.Functions.Iif, iffFunctionInfo);
-
-
-        ToIntFunction.Register(Functions);
-        ToLongFunction.Register(Functions);
-        ToDoubleFunction.Register(Functions);
-        ToDecimalFunction.Register(Functions);
-        ToRealFunction.Register(Functions);
-        ToBoolFunction.Register(Functions);
-        ToGuidFunction.Register(Functions);
-        ToStringFunction.Register(Functions);
-        ToDateTimeFunction.Register(Functions);
-        ToTimespanFunction.Register(Functions);
-
-
-        UrlDecodeFunction.Register(Functions);
-        UrlEncodeComponentFunction.Register(Functions);
-        ExtractFunction.Register(Functions);
-
+        
         ScalarOverloadInfo[] MakePrevNextOverloads(IScalarFunctionImpl func, TypeSymbol type)
         {
             return
@@ -257,39 +155,7 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Real)
             )
         );
-        ParseJsonFunction.Register(Functions);
-        ArraySortAscFunction.Register(Functions);
-        ArraySortDescFunction.Register(Functions);
-        ArrayLengthFunction.Register(Functions);
-        GeoDistance2PointsFunction.Register(Functions);
-        GeoPointToGeoHashFunction.Register(Functions);
-        GeoHashToCentralPointFunction.Register(Functions);
-        BenchmarkFunction.Register(Functions);
-        ParTest.Register(Functions);
-
-        Functions.Add(
-            Kusto.Language.Functions.Trim,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new TrimFunctionImpl(),
-                    ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String)));
-        Functions.Add(
-            Kusto.Language.Functions.TrimStart,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new TrimStartFunctionImpl(),
-                    ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String)));
-
-        Functions.Add(
-            Kusto.Language.Functions.TrimEnd,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new TrimEndFunctionImpl(),
-                    ScalarTypes.String,
-                    ScalarTypes.String,
-                    ScalarTypes.String)));
-
+      
 
         Functions.Add(
             Kusto.Language.Functions.Split,
@@ -334,5 +200,106 @@ internal static class BuiltInScalarFunctions
                     .Concat(BuildOverloads(new GenericCaseFunctionImplOfJsonNode(), ScalarTypes.Dynamic))
                     .ToArray()
             ));
+
+        TrimFunction.Register(Functions);
+        TrimStartFunction.Register(Functions);
+        TrimEndFunction.Register(Functions);
+        IsEmptyFunction.Register(Functions);
+        IsNotEmptyFunction.Register(Functions);
+        IsAsciiFunction.Register(Functions);
+        IsFiniteFunction.Register(Functions);
+        IsInfFunction.Register(Functions);
+        IsNanFunction.Register(Functions);
+        IsUtf8Function.Register(Functions);
+        ReverseFunction.Register(Functions);
+        Coalesce.Register(Functions);
+        AgoFunction.Register(Functions);
+        FormatDateTime.Register(Functions);
+        MinOfRegister.Register(Functions);
+        MaxOfRegister.Register(Functions);
+        AroundFunction.Register(Functions);
+        StrlenFunction.Register(Functions);
+        StrcmpFunction.Register(Functions);
+        StrcatArrayFunction.Register(Functions);
+        ArrayConcatFunction.Register(Functions);
+        ArrayReverseFunction.Register(Functions);
+        StrRepFunction.Register(Functions);
+        CountOfFunction.Register(Functions);
+        IndexOfFunction.Register(Functions);
+        ToLowerFunction.Register(Functions);
+        ToUpperFunction.Register(Functions);
+        ReplaceStringFunction.Register(Functions);
+        SubstringFunction.Register(Functions);
+        ArrayRotateLeftFunction.Register(Functions);
+        ArrayRotateRightFunction.Register(Functions);
+        Base64Decode.Register(Functions);
+        Base64Encode.Register(Functions);
+        BinaryAnd.Register(Functions);
+        BinaryOr.Register(Functions);
+        BinaryXor.Register(Functions);
+        BinaryNot.Register(Functions);
+        BinaryShiftLeft.Register(Functions);
+        BinaryShiftRight.Register(Functions);
+        BitsetCountOnes.Register(Functions);
+        BinFunction.Register(Functions);
+        GetYearFunction.Register(Functions);
+        GetMonthFunction.Register(Functions);
+        GetHourOfDayFunction.Register(Functions);
+        AbsFunction.Register(Functions);
+        SinFunction.Register(Functions);
+        CosFunction.Register(Functions);
+        TanFunction.Register(Functions);
+        SignFunction.Register(Functions);
+        RoundFunction.Register(Functions);
+        ToHexFunction.Register(Functions);
+        RadiansFunction.Register(Functions);
+        DegreesFunction.Register(Functions);
+        LogFunction.Register(Functions);
+        ExpFunction.Register(Functions);
+        Log10Function.Register(Functions);
+        Log2Function.Register(Functions);
+        PowFunction.Register(Functions);
+        SqrtFunction.Register(Functions);
+        DayOfWeekFunction.Register(Functions);
+        DayOfMonthFunction.Register(Functions);
+        DayOfYearFunction.Register(Functions);
+        StartOfDayFunction.Register(Functions);
+        EndOfDayFunction.Register(Functions);
+        StartOfWeekFunction.Register(Functions);
+        EndOfWeekFunction.Register(Functions);
+        StartOfMonthFunction.Register(Functions);
+        EndOfMonthFunction.Register(Functions);
+        StartOfYearFunction.Register(Functions);
+        EndOfYearFunction.Register(Functions);
+        DatetimeDiffFunction.Register(Functions);
+        DatetimeAddFunction.Register(Functions);
+        DatetimePartFunction.Register(Functions);
+        MakeDateTime.Register(Functions);
+        MakeTimeSpan.Register(Functions);
+        DateTimeUtcToLocalFunction.Register(Functions);
+        ToIntFunction.Register(Functions);
+        ToLongFunction.Register(Functions);
+        ToDoubleFunction.Register(Functions);
+        ToDecimalFunction.Register(Functions);
+        ToRealFunction.Register(Functions);
+        ToBoolFunction.Register(Functions);
+        ToGuidFunction.Register(Functions);
+        ToStringFunction.Register(Functions);
+        ToDateTimeFunction.Register(Functions);
+        ToTimespanFunction.Register(Functions);
+        UrlDecodeFunction.Register(Functions);
+        UrlEncodeComponentFunction.Register(Functions);
+        ExtractFunction.Register(Functions);
+        ParseJsonFunction.Register(Functions);
+        ArraySortAscFunction.Register(Functions);
+        ArraySortDescFunction.Register(Functions);
+        ArrayLengthFunction.Register(Functions);
+        GeoDistance2PointsFunction.Register(Functions);
+        GeoPointToGeoHashFunction.Register(Functions);
+        GeoHashToCentralPointFunction.Register(Functions);
+        BenchmarkFunction.Register(Functions);
+        ParTest.Register(Functions);
+
+      
     }
 }
