@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;

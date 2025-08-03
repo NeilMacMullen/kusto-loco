@@ -26,9 +26,7 @@ internal abstract class BaseNext<T> : BasePrevNext<T>
 {
     internal BaseNext() : base(false) { }
 }
-
-
-
+internal class PrevFunctionBoolImpl : BasePrevOfbool;
 internal class PrevFunctionIntImpl : BasePrevOfint;
 internal class PrevFunctionLongImpl : BasePrevOflong;
 internal class PrevFunctionRealImpl : BasePrevOfdouble;
@@ -38,9 +36,7 @@ internal class PrevFunctionGuidImpl : BasePrevOfGuid;
 internal class PrevFunctionTimespanImpl : BasePrevOfTimeSpan;
 internal class PrevFunctionDateTimeImpl : BasePrevOfDateTime;
 
-
-
-
+internal class NextFunctionBoolImpl : BaseNextOfbool;
 internal class NextFunctionIntImpl : BaseNextOfint;
 internal class NextFunctionLongImpl : BaseNextOflong;
 internal class NextFunctionRealImpl : BaseNextOfdouble;

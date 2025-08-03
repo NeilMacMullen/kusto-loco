@@ -899,6 +899,19 @@ print toscalar(letters | summarize mx=min(bitmap));";
         res.Should().Contain("3.1415");
     }
 
+
+    [TestMethod]
+    public async Task PiColumnar()
+    {
+        var query = """
+                    range i from 1 to 10 step 1
+                    | extend p=pi()
+                    | summarize sum(p)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("31.415");
+    }
+
     [TestMethod]
     public async Task ArrayRotateLeft()
     {
@@ -1200,4 +1213,39 @@ print toscalar(letters | summarize mx=min(bitmap));";
         lines.Should().AllSatisfy(c => c.Should().Contain("3.14"));
         lines.Length.Should().Be(3);
     }
+
+    [TestMethod]
+    public async Task IffCanReturnNull()
+    {
+        var query = """
+                    print iff(true,int(null),5)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("null");
+    }
+
+    [TestMethod]
+    public async Task BuiltIns_isnull_Columnar()
+    {
+        var query = """
+
+                    datatable(b:bool, i:int, l:long, r:real, d:datetime, t:timespan, s:string) [
+                      bool(null), int(null), long(null), real(null), datetime(null), timespan(null), '',
+                      false, 0, 0, 0, datetime(null), 0s, ' ',
+                      true, 1, 2, 3.5, datetime(2023-02-26), 5m, 'hello'
+                    ]
+                    | project b=isnull(b), i=isnull(i), l=isnull(l), r=isnull(r), d=isnull(d), t=isnull(t), s=isnull(s)
+
+                    """;
+
+        var expected = """
+                       True,True,True,True,True,True,False
+                       False,False,False,False,True,False,False
+                       False,False,False,False,False,False,False
+                       """;
+
+        var result = await ResultAsString(query, Environment.NewLine);
+        result.Should().Be(expected);
+    }
+
 }

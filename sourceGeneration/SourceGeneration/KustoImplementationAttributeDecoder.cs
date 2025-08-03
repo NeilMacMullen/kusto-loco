@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 
 
 namespace KustoLoco.SourceGeneration
@@ -17,6 +18,7 @@ namespace KustoLoco.SourceGeneration
         {
             Partition = ! attr.GetStringFor(nameof(KustoImplementationAttribute.Partition)).Equals("false");
             CustomContext = attr.GetStringFor(nameof(KustoImplementationAttribute.CustomContext)).Equals("true");
+            InitialValue = attr.GetStringFor(nameof(KustoImplementationAttribute.InitialValue));
             var funcSymbol = attr.GetStringFor(nameof(KustoImplementationAttribute.Keyword));
             SymbolName = funcSymbol;
             if (funcSymbol.Contains("Functions"))
@@ -81,6 +83,8 @@ namespace KustoLoco.SourceGeneration
                 }
             }
         }
+
+        public string InitialValue { get; }
 
 
         public string OverloadName()

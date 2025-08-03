@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using Kusto.Language.Symbols;
 
@@ -14,9 +11,8 @@ internal class NowFunctionImpl : IScalarFunctionImpl
         Debug.Assert(arguments.Length == 0);
         return new ScalarResult(ScalarTypes.DateTime, DateTime.UtcNow);
     }
-
+    //we never call this in columnar because it takes no arguments
+    //and we shortcut to creating singlevalue column
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
         => throw new NotSupportedException();
 }
-
-

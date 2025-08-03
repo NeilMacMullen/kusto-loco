@@ -7,7 +7,10 @@ namespace KustoLoco.SourceGeneration
         private const string RowIndex = "rowIndex";
 
         private const string RowCount = "rowCount";
-        public static string Val(Param p) => p.IsRefType ? $"{p.Name}" : $"{p.Name}.Value";
+
+        public static string Val(Param p) => p.IsRefType || p.IsNullable
+            ? $"{p.Name}"
+            : $"{p.Name}.Value";
 
         public static string ColumnName(Param p)
             => $"{p.Name}Column";
@@ -62,8 +65,8 @@ namespace KustoLoco.SourceGeneration
             dbg.ExitCodeBlock();
         }
 
-        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method, bool partition,
-            bool customContext)
+        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method,
+            KustoImplementationAttributeDecoder attributes)
         {
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
@@ -74,12 +77,12 @@ namespace KustoLoco.SourceGeneration
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
             dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
 
-            if (partition)
+            if (attributes.Partition)
             {
                 dbg.AppendLine($"var rangePartitioner = SafePartitioner.Create({RowCount});");
                 dbg.AppendLine("Parallel.ForEach(rangePartitioner, (range, loopState) =>");
                 dbg.EnterCodeBlock();
-                if (customContext)
+                if (attributes.CustomContext)
                 {
                     if (method.HasContext)
                         dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
@@ -88,8 +91,20 @@ namespace KustoLoco.SourceGeneration
                 {
                     foreach (var p in parameters)
                         dbg.AppendStatement($"{p.Type}? last_{p.Name}=null");
-                    dbg.AppendStatement($"{ret.Type}? last_result =null;");
+                    if (!parameters.All(p => p.IsNullable))
+                    {
+                        dbg.AppendStatement($"{ret.Type}? last_result =null;");
+                    }
+                    else
+                    {
+                        if (attributes.InitialValue == "")
+                            dbg.AppendLine(
+                                "#error - InitialValue must be supplied for functions with all nullable parameters");
+                        else
+                            dbg.AppendStatement($"{ret.Type}? last_result ={attributes.InitialValue};");
+                    }
                 }
+
                 dbg.AppendLine($"for (var {RowIndex} = range.Item1; {RowIndex} < range.Item2; {RowIndex}++)");
             }
             else
@@ -103,11 +118,11 @@ namespace KustoLoco.SourceGeneration
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
             {
-                if (!customContext) dbg.AppendLine("#error - method has context");
+                if (!attributes.CustomContext) dbg.AppendLine("#error - method has context");
                 pvals = $"context,{pvals}";
             }
 
-            if (!customContext)
+            if (!attributes.CustomContext)
             {
                 dbg.AppendLine("if (");
                 var ands = string.Join("&&", parameters.Select(p => $"({p.Name} == last_{p.Name})"));
@@ -120,14 +135,20 @@ namespace KustoLoco.SourceGeneration
                     dbg.AppendStatement($"last_{p.Name}={p.Name}");
                 dbg.AppendStatement($"last_result = {method.Name}({pvals})");
                 dbg.AppendStatement($"data[{RowIndex}]=last_result ");
+                dbg.AppendLine("#if false");
+                //dbg.AppendLine(method.Body);
+                dbg.AppendLine("#endif");
+
                 dbg.ExitCodeBlock();
             }
             else
+            {
                 dbg.AppendStatement($"data[{RowIndex}]= {method.Name}({pvals})");
-            
-           
+            }
+
+
             dbg.ExitCodeBlock();
-            if (partition)
+            if (attributes.Partition)
                 dbg.AppendLine("});");
 
             dbg.AppendStatement("return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()))");
@@ -184,14 +205,17 @@ namespace KustoLoco.SourceGeneration
                 }
                 else
                 {
-                    dbg.AppendLine($"if ({p.Name} == null)");
-                    dbg.EnterCodeBlock();
-                    if (method.ReturnType.IsString)
-                        dbg.AppendStatement($"{assignEmptyStringTo}=string.Empty");
-                    else if (explicitNullAssignment)
-                        dbg.AppendStatement($"{assignEmptyStringTo}=null");
-                    dbg.AppendStatement("continue");
-                    dbg.ExitCodeBlock();
+                    if (!p.IsNullable)
+                    {
+                        dbg.AppendLine($"if ({p.Name} == null)");
+                        dbg.EnterCodeBlock();
+                        if (method.ReturnType.IsString)
+                            dbg.AppendStatement($"{assignEmptyStringTo}=string.Empty");
+                        else if (explicitNullAssignment)
+                            dbg.AppendStatement($"{assignEmptyStringTo}=null");
+                        dbg.AppendStatement("continue");
+                        dbg.ExitCodeBlock();
+                    }
                 }
             }
         }

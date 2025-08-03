@@ -48,8 +48,11 @@ namespace KustoLoco.SourceGeneration
                     var kustoAttributes=
                         new KustoImplementationAttributeDecoder(attributes);
 
-                    var modifiers = string.Join(" ", classDeclaration.Modifiers.Select(m => m.ValueText));
-
+                    var rawModifiers = classDeclaration.Modifiers.Select(m => m.ValueText).ToList();
+                    if (!rawModifiers.Contains("sealed"))
+                        rawModifiers.Insert(1,"sealed");
+                    var modifiers = string.Join(" ",rawModifiers);
+                    
                     var implementationMethods = classDeclaration.Members.OfType<MethodDeclarationSyntax>()
                         .Where(m => m.Identifier.ValueText.EndsWith("Impl"))
                         .ToArray();
@@ -69,6 +72,7 @@ namespace KustoLoco.SourceGeneration
                         code.EnterCodeBlock();
                         var m = GenerateImplementation(code, className, implMethod, kustoAttributes);
                         implMethodClasses.Add(m);
+                        code.AppendLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
                         code.AppendLine(implMethod.ToFullString());
                         foreach (var endMethod in endMethods.Where(e => e.Identifier.ValueText.Contains(m.Name)))
                             code.AppendLine(endMethod.ToFullString());
@@ -151,6 +155,7 @@ namespace KustoLoco.SourceGeneration
             usingManager.Add("KustoLoco.Core.DataSource.Columns");
             usingManager.Add("System.Collections.Concurrent");
             usingManager.Add("System.Threading.Tasks");
+            usingManager.Add("System.Runtime.CompilerServices");
             usingManager.Add("KustoLoco.Core.Evaluation.BuiltIns.Impl");
 
             foreach (var u in usingManager.GetUsings()) code.AppendLine(u);
@@ -210,7 +215,7 @@ namespace KustoLoco.SourceGeneration
             if (m.HasScalar)
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
-                ParamGeneneration.BuildColumnarMethod(dbg, m,attr.Partition,attr.CustomContext);
+                ParamGeneneration.BuildColumnarMethod(dbg, m,attr);
             if (m.KustoImplementationAttributeDecoder.ImplementationType == ImplementationType.Aggregate)
                 ParamGeneneration.BuildInvokeMethod(dbg, m);
             return m;

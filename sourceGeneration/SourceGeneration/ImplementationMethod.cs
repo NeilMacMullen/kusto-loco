@@ -7,10 +7,11 @@ namespace KustoLoco.SourceGeneration
     {
         public readonly string Name;
         public readonly Param ReturnType;
+        public readonly string Body;
         public KustoImplementationAttributeDecoder KustoImplementationAttributeDecoder;
         public bool HasContext;
 
-        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments,
+        public ImplementationMethod(string className,string name, Param returnType, Param[] arguments,
             KustoImplementationAttributeDecoder attr)
         {
             KustoImplementationAttributeDecoder = attr;

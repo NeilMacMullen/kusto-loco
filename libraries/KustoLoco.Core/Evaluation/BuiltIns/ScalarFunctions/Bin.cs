@@ -11,7 +11,6 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Functions.Bin")]
 internal partial class BinFunction
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static long? IntImpl(int left, int right)
     {
         if (right <= 0)
@@ -23,20 +22,17 @@ internal partial class BinFunction
         return left - remn;
     }
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static long? LongImpl(long left, long right)
     {
         if (right <= 0)
             return null;
 
-        var remn = left % right;
-        if (remn < 0) remn += right;
+        var remainder = left % right;
+        if (remainder < 0) remainder += right;
 
-        return left - remn;
+        return left - remainder;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static double? DoubleImpl(double left, double right)
     {
         if (right <= 0)

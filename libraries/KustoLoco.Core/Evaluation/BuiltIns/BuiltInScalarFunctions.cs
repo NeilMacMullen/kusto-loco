@@ -15,41 +15,35 @@ internal static class BuiltInScalarFunctions
 
     static BuiltInScalarFunctions()
     {
-        NotFunction.Register(Functions);
-        Functions.Add(
-            Kusto.Language.Functions.IsNull,
-            new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new IsNullBoolFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Bool),
-                new ScalarOverloadInfo(new IsNullIntFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Int),
-                new ScalarOverloadInfo(new IsNullLongFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Long),
-                new ScalarOverloadInfo(new IsNullDoubleFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new IsNullDecimalFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.Decimal),
-                new ScalarOverloadInfo(new IsNullDateTimeFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.DateTime),
-                new ScalarOverloadInfo(new IsNullTimeSpanFunctionImpl(), ScalarTypes.Bool,
-                    ScalarTypes.TimeSpan),
-                IsNullStringFunctionImpl.Overload));
-
-      
+        //not worth auto-generating these because they are short-circuited scalars
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
         Functions.Add(Kusto.Language.Functions.PI,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new PiFunctionImpl(),
                 ScalarTypes.Real)));
 
+        var randHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
+        Functions.Add(Kusto.Language.Functions.Rand,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new RandFunctionImpl(),
+                    randHints,
+                    ScalarTypes.Real),
+                new ScalarOverloadInfo(new RandFunctionImpl(),
+                    randHints,
+                    ScalarTypes.Real,
+                    ScalarTypes.Real)
+            )
+        );
 
-       
 
+
+        //can't generate because arbitrary number of arguments
         Functions.Add(Kusto.Language.Functions.Strcat, new ScalarFunctionInfo(new ScalarOverloadInfo(
             new StrcatFunctionImpl(), true,
             ScalarTypes.String, ScalarTypes.String)));
-      
 
+        
+
+        //can't generate because arbitrary number of arguments
         //add multiple overloads for strcat_delim
         var strcatDelimiterOverrides = Enumerable.Range(2, 64)
             .Select(n =>
@@ -57,32 +51,9 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String,
                     Enumerable.Range(0, n).Select(TypeSymbol (_) => ScalarTypes.String).ToArray()))
             .ToArray();
-        Functions.Add(Kusto.Language.Functions.Floor, BinFunction.S);
+      
         Functions.Add(Kusto.Language.Functions.StrcatDelim, new ScalarFunctionInfo(strcatDelimiterOverrides));
-        var iffFunctionInfo = new ScalarFunctionInfo(
-            new ScalarOverloadInfo(new IffBoolFunctionImpl(), ScalarTypes.Bool,
-                ScalarTypes.Bool, ScalarTypes.Bool,
-                ScalarTypes.Bool),
-            new ScalarOverloadInfo(new IffIntFunctionImpl(), ScalarTypes.Int,
-                ScalarTypes.Bool, ScalarTypes.Int,
-                ScalarTypes.Int),
-            new ScalarOverloadInfo(new IffLongFunctionImpl(), ScalarTypes.Long,
-                ScalarTypes.Bool, ScalarTypes.Long,
-                ScalarTypes.Long),
-            new ScalarOverloadInfo(new IffRealFunctionImpl(), ScalarTypes.Real,
-                ScalarTypes.Bool, ScalarTypes.Real,
-                ScalarTypes.Real),
-            new ScalarOverloadInfo(new IffDateTimeFunctionImpl(),
-                ScalarTypes.DateTime, ScalarTypes.Bool,
-                ScalarTypes.DateTime, ScalarTypes.DateTime),
-            new ScalarOverloadInfo(new IffTimeSpanFunctionImpl(),
-                ScalarTypes.TimeSpan, ScalarTypes.Bool,
-                ScalarTypes.TimeSpan, ScalarTypes.TimeSpan),
-            new ScalarOverloadInfo(new IffStringFunctionImpl(),
-                ScalarTypes.String, ScalarTypes.Bool,
-                ScalarTypes.String, ScalarTypes.String));
-        Functions.Add(Kusto.Language.Functions.Iff, iffFunctionInfo);
-        Functions.Add(Kusto.Language.Functions.Iif, iffFunctionInfo);
+
         
         ScalarOverloadInfo[] MakePrevNextOverloads(IScalarFunctionImpl func, TypeSymbol type)
         {
@@ -98,6 +69,7 @@ internal static class BuiltInScalarFunctions
         Functions.Add(Kusto.Language.Functions.Prev,
             new ScalarFunctionInfo(
                 MakePrevNextOverloads(new PrevFunctionIntImpl(), ScalarTypes.Int)
+                    .Concat(MakePrevNextOverloads(new PrevFunctionBoolImpl(), ScalarTypes.Bool))
                     .Concat(MakePrevNextOverloads(new PrevFunctionLongImpl(), ScalarTypes.Long))
                     .Concat(MakePrevNextOverloads(new PrevFunctionRealImpl(), ScalarTypes.Real))
                     .Concat(MakePrevNextOverloads(new PrevFunctionDecimalImpl(), ScalarTypes.Decimal))
@@ -112,6 +84,7 @@ internal static class BuiltInScalarFunctions
         Functions.Add(Kusto.Language.Functions.Next,
             new ScalarFunctionInfo(
                 MakePrevNextOverloads(new NextFunctionIntImpl(), ScalarTypes.Int)
+                    .Concat(MakePrevNextOverloads(new NextFunctionBoolImpl(), ScalarTypes.Bool))
                     .Concat(MakePrevNextOverloads(new NextFunctionLongImpl(), ScalarTypes.Long))
                     .Concat(MakePrevNextOverloads(new NextFunctionRealImpl(), ScalarTypes.Real))
                     .Concat(MakePrevNextOverloads(new NextFunctionDecimalImpl(), ScalarTypes.Decimal))
@@ -144,17 +117,7 @@ internal static class BuiltInScalarFunctions
             )
         );
 
-        var randHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
-        Functions.Add(Kusto.Language.Functions.Rand,
-            new ScalarFunctionInfo(new ScalarOverloadInfo(new RandFunctionImpl(),
-                    randHints,
-                    ScalarTypes.Real),
-                new ScalarOverloadInfo(new RandFunctionImpl(),
-                    randHints,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real)
-            )
-        );
+       
       
 
         Functions.Add(
@@ -201,6 +164,10 @@ internal static class BuiltInScalarFunctions
                     .ToArray()
             ));
 
+        NotFunction.Register(Functions);
+        IsNullFunction.Register(Functions);
+        IffFunction.Register(Functions);
+        Functions.Add(Kusto.Language.Functions.Iif, IffFunction.S); //synonym for Iff
         TrimFunction.Register(Functions);
         TrimStartFunction.Register(Functions);
         TrimEndFunction.Register(Functions);
@@ -242,6 +209,7 @@ internal static class BuiltInScalarFunctions
         BinaryShiftRight.Register(Functions);
         BitsetCountOnes.Register(Functions);
         BinFunction.Register(Functions);
+        Functions.Add(Kusto.Language.Functions.Floor, BinFunction.S); //Floor is just a synonym for bin
         GetYearFunction.Register(Functions);
         GetMonthFunction.Register(Functions);
         GetHourOfDayFunction.Register(Functions);
