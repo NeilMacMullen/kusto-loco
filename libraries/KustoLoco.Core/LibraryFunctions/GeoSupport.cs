@@ -15,7 +15,7 @@ public static class GeoSupport
     private static double ToRadians(double? degrees)
         => ToRadians(degrees!.Value);
 
-    public static double? HaversineDistance(double? lon1, double? lat1, double? lon2, double? lat2)
+    public static double? HaversineDistance(double lon1, double lat1, double lon2, double lat2)
     {
         if (!CheckValid(lon1, lat1))
             return null;

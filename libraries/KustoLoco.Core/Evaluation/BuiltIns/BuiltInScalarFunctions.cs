@@ -286,29 +286,31 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Long,
                     ScalarTypes.Dynamic)));
 
-        Functions.Add(Kusto.Language.Functions.GeoDistance2Points, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new GeoDistance2PointsFunctionImpl(),
-                    ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real)));
+        GeoDistance2PointsFunction.Register(Functions);
         /*
-        Functions.Add(Kusto.Language.Functions.GeoPointToGeohash, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(),
-                    ScalarTypes.String,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real,
-                    ScalarTypes.Long),
-            new
-                ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(),
-                    ScalarTypes.String,
-                    ScalarTypes.Real,
-                    ScalarTypes.Real)
-        ));
-        */
+
+Functions.Add(Kusto.Language.Functions.GeoDistance2Points, new ScalarFunctionInfo(
+    new
+        ScalarOverloadInfo(new GeoDistance2PointsFunctionImpl(),
+            ScalarTypes.Real,
+            ScalarTypes.Real,
+            ScalarTypes.Real,
+            ScalarTypes.Real,
+            ScalarTypes.Real)));
+Functions.Add(Kusto.Language.Functions.GeoPointToGeohash, new ScalarFunctionInfo(
+    new
+        ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(),
+            ScalarTypes.String,
+            ScalarTypes.Real,
+            ScalarTypes.Real,
+            ScalarTypes.Long),
+    new
+        ScalarOverloadInfo(new GeoPointToGeoHashFunctionImpl(),
+            ScalarTypes.String,
+            ScalarTypes.Real,
+            ScalarTypes.Real)
+));
+*/
         GeoPointToGeoHashFunction.Register(Functions);
         Functions.Add(Kusto.Language.Functions.GeohashToCentralPoint, new ScalarFunctionInfo(
             new

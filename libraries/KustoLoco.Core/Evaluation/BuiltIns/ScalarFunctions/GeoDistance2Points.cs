@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Kusto.Language.Symbols;
@@ -10,36 +11,9 @@ using KustoLoco.Core.LibraryFunctions;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-internal class GeoDistance2PointsFunctionImpl : IScalarFunctionImpl
+[KustoImplementation(Keyword = "Functions.GeoDistance2Points")]
+public partial class GeoDistance2PointsFunction
 {
-    public ScalarResult InvokeScalar(ScalarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 4);
-        var p1Lon = (double?)arguments[0].Value;
-        var p1Lat = (double?)arguments[1].Value;
-        var p2Lon = (double?)arguments[2].Value;
-        var p2Lat = (double?)arguments[3].Value;
-        return new ScalarResult(ScalarTypes.Real, GeoSupport.HaversineDistance(p1Lon, p1Lat, p2Lon, p2Lat));
-    }
-
-    public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
-    {
-        Debug.Assert(arguments.Length == 4);
-        var p1LonColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
-        var p1LatColumn = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
-        var p2LonColumn = (GenericTypedBaseColumnOfdouble)arguments[2].Column;
-        var p2LatColumn = (GenericTypedBaseColumnOfdouble)arguments[3].Column;
-        Debug.Assert(p1LonColumn.RowCount == p1LatColumn.RowCount && p1LonColumn.RowCount == p2LonColumn.RowCount &&
-                     p1LonColumn.RowCount == p2LatColumn.RowCount);
-
-        var data = NullableSetBuilderOfdouble.CreateFixed(p1LonColumn.RowCount);
-
-        var rangePartitioner = SafePartitioner.Create(p1LonColumn.RowCount);
-        Parallel.ForEach(rangePartitioner, (range, loopState) =>
-        {
-            for (var i = range.Item1; i < range.Item2; i++)
-                data[i] = GeoSupport.HaversineDistance(p1LonColumn[i], p1LatColumn[i], p2LonColumn[i], p2LatColumn[i]);
-        });
-        return new ColumnarResult(ColumnFactory.CreateFromDataSet(data.ToNullableSet()));
-    }
+    public double? Impl(double p1Lon, double p1Lat, double p2Lon, double p2Lat)
+        => GeoSupport.HaversineDistance(p1Lon, p1Lat, p2Lon, p2Lat);
 }
