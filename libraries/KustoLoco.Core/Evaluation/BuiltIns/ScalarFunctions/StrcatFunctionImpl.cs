@@ -10,7 +10,7 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length > 0);
+        MyDebug.Assert(arguments.Length > 0);
         var builder = new StringBuilder();
         foreach (var t in arguments)
         {
@@ -22,7 +22,7 @@ internal class StrcatFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length > 0);
+        MyDebug.Assert(arguments.Length > 0);
         var columns = new GenericTypedBaseColumnOfstring[arguments.Length];
         for (var i = 0; i < arguments.Length; i++)
         {

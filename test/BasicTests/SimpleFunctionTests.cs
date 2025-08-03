@@ -7,6 +7,7 @@ namespace BasicTests;
 public class SimpleFunctionTests : TestMethods
 {
 
+
     [TestMethod]
     public async Task Cast()
     {

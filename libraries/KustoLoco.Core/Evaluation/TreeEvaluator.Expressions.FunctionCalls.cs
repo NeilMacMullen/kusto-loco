@@ -37,7 +37,6 @@ internal partial class TreeEvaluator
         for (var i = 0; i < node.Arguments.ChildCount; i++)
         {
             var argVal = node.Arguments.GetChild(i).Accept(this, context);
-            Debug.Assert(argVal != null);
             arguments[i] = argVal;
         }
 
@@ -71,7 +70,6 @@ internal partial class TreeEvaluator
         for (var i = 0; i < node.Arguments.ChildCount; i++)
         {
             var argVal = node.Arguments.GetChild(i).Accept(this, context);
-            Debug.Assert(argVal != null);
             arguments[i] = argVal;
         }
 
@@ -80,7 +78,6 @@ internal partial class TreeEvaluator
 
     public override EvaluationResult VisitAggregateCallNode(IRAggregateCallNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Chunk != TableChunk.Empty);
         var impl = node.GetOrSetCache(() => node.OverloadInfo.AggregateImpl);
 
         var rawArguments = new EvaluationResult[node.Arguments.ChildCount];
@@ -88,7 +85,6 @@ internal partial class TreeEvaluator
         for (var i = 0; i < node.Arguments.ChildCount; i++)
         {
             var argResult = node.Arguments.GetChild(i).Accept(this, context);
-            Debug.Assert(argResult != null);
             rawArguments[i] = argResult;
             hasScalar = hasScalar || argResult.IsScalar;
         }
@@ -128,7 +124,6 @@ internal partial class TreeEvaluator
                     $"Not sure how to deal with parameters having >1 DeclaredTypes (found {signature.Parameters[i].DeclaredTypes.Count} for function {functionSymbol.Name}.");
 
             var argValue = node.Arguments.GetChild(i).Accept(this, context);
-            Debug.Assert(argValue != null);
             functionCallScope.AddSymbol(node.ParamSymbols[i], argValue);
         }
 

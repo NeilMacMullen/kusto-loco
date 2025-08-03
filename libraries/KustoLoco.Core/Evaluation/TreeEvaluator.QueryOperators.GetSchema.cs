@@ -11,7 +11,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitGetSchemaOperator(IRGetSchemaOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != TabularResult.Empty);
+        MyDebug.Assert(context.Left != TabularResult.Empty);
 
 
         var cs = new[]

@@ -13,7 +13,7 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
         var left = (bool?)arguments[0].Value;
         var right = (bool?)arguments[1].Value;
         return new ScalarResult(ScalarTypes.Bool, WeirdOr(left, right));
@@ -21,8 +21,8 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        MyDebug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
         var left = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
         var right = (GenericTypedBaseColumnOfbool)(arguments[1].Column);
 

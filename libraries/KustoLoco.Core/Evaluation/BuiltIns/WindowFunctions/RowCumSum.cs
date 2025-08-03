@@ -12,7 +12,7 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
         ColumnarResult? previousWindowResult)
     {
-        Debug.Assert(thisWindowArguments.Length == 2);
+        MyDebug.Assert(thisWindowArguments.Length == 2);
         var termCol = (GenericTypedBaseColumnOfint)thisWindowArguments[0].Column;
         var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
@@ -20,12 +20,12 @@ internal class RowCumSumIntFunctionImpl : IWindowFunctionImpl
         if (previousWindowResult != null)
         {
             var previousColumn = (GenericTypedBaseColumnOfint)previousWindowResult.Column;
-            Debug.Assert(previousColumn.RowCount > 0);
+            MyDebug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
-            Debug.Assert(lastValue.HasValue);
+            MyDebug.Assert(lastValue.HasValue);
 
-            accumulator = lastValue.Value;
+            accumulator = lastValue!.Value;
         }
 
         var data = NullableSetBuilderOfint.CreateFixed(termCol.RowCount);
@@ -55,7 +55,7 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
         ColumnarResult? previousWindowResult)
     {
-        Debug.Assert(thisWindowArguments.Length == 2);
+        MyDebug.Assert(thisWindowArguments.Length == 2);
         var termCol = (GenericTypedBaseColumnOflong)thisWindowArguments[0].Column;
         var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
@@ -63,12 +63,10 @@ internal class RowCumSumLongFunctionImpl : IWindowFunctionImpl
         if (previousWindowResult != null)
         {
             var previousColumn = (GenericTypedBaseColumnOflong)previousWindowResult.Column;
-            Debug.Assert(previousColumn.RowCount > 0);
+            MyDebug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
-            Debug.Assert(lastValue.HasValue);
-
-            accumulator = lastValue.Value;
+            accumulator = lastValue!.Value;
         }
 
         var data = NullableSetBuilderOflong.CreateFixed(termCol.RowCount);
@@ -98,7 +96,7 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
         ColumnarResult? previousWindowResult)
     {
-        Debug.Assert(thisWindowArguments.Length == 2);
+        MyDebug.Assert(thisWindowArguments.Length == 2);
         var termCol = (GenericTypedBaseColumnOfdouble)thisWindowArguments[0].Column;
         var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
@@ -106,12 +104,12 @@ internal class RowCumSumDoubleFunctionImpl : IWindowFunctionImpl
         if (previousWindowResult != null)
         {
             var previousColumn = (GenericTypedBaseColumnOfdouble)previousWindowResult.Column;
-            Debug.Assert(previousColumn.RowCount > 0);
+            MyDebug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
-            Debug.Assert(lastValue.HasValue);
+            MyDebug.Assert(lastValue.HasValue);
 
-            accumulator = lastValue.Value;
+            accumulator = lastValue!.Value;
         }
 
         var data = NullableSetBuilderOfdouble.CreateFixed(termCol.RowCount);
@@ -141,7 +139,7 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
         ColumnarResult? previousWindowResult)
     {
-        Debug.Assert(thisWindowArguments.Length == 2);
+        MyDebug.Assert(thisWindowArguments.Length == 2);
         var termCol = (GenericTypedBaseColumnOfdecimal)thisWindowArguments[0].Column;
         var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
@@ -149,12 +147,12 @@ internal class RowCumSumDecimalFunctionImpl : IWindowFunctionImpl
         if (previousWindowResult != null)
         {
             var previousColumn = (GenericTypedBaseColumnOfdecimal)previousWindowResult.Column;
-            Debug.Assert(previousColumn.RowCount > 0);
+            MyDebug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
-            Debug.Assert(lastValue.HasValue);
+            MyDebug.Assert(lastValue.HasValue);
 
-            accumulator = lastValue.Value;
+            accumulator = lastValue!.Value;
         }
 
         var data = NullableSetBuilderOfdecimal.CreateFixed(termCol.RowCount);
@@ -184,7 +182,7 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
     public ColumnarResult InvokeWindow(ColumnarResult[] thisWindowArguments, ColumnarResult[]? previousWindowArguments,
         ColumnarResult? previousWindowResult)
     {
-        Debug.Assert(thisWindowArguments.Length == 2);
+        MyDebug.Assert(thisWindowArguments.Length == 2);
         var termCol = (GenericTypedBaseColumnOfTimeSpan)thisWindowArguments[0].Column;
         var restartCol = (GenericTypedBaseColumnOfbool)thisWindowArguments[1].Column;
 
@@ -192,12 +190,12 @@ internal class RowCumSumTimeSpanFunctionImpl : IWindowFunctionImpl
         if (previousWindowResult != null)
         {
             var previousColumn = (GenericTypedBaseColumnOfTimeSpan)previousWindowResult.Column;
-            Debug.Assert(previousColumn.RowCount > 0);
+            MyDebug.Assert(previousColumn.RowCount > 0);
 
             var lastValue = previousColumn[previousColumn.RowCount - 1];
-            Debug.Assert(lastValue.HasValue);
+            MyDebug.Assert(lastValue.HasValue);
 
-            accumulator = lastValue.Value;
+            accumulator = lastValue!.Value;
         }
 
         var data = NullableSetBuilderOfTimeSpan.CreateFixed(termCol.RowCount);

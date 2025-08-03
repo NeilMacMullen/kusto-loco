@@ -123,7 +123,7 @@ internal static class BuiltInsHelper
     {
         var scalarArgs = arguments.Cast<ScalarResult>().ToArray();
         var result = impl.InvokeScalar(scalarArgs);
-        Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
+        MyDebug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
         return result;
     }
@@ -191,7 +191,7 @@ internal static class BuiltInsHelper
         }
 
         var result = impl.InvokeColumnar(columnarArgs);
-        Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
+        MyDebug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
         return result;
     }
@@ -230,7 +230,7 @@ internal static class BuiltInsHelper
             var columnarArgs = CreateResultArray(arguments);
 
             var result = impl.InvokeWindow(columnarArgs, lastWindowArgs, previousResult);
-            Debug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
+            MyDebug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
                 $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
             lastWindowArgs = columnarArgs;
             previousResult = result;

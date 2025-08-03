@@ -202,7 +202,7 @@ namespace KustoLoco.SourceGeneration
 
 
         private static ImplementationMethod GenerateImplementation(CodeEmitter dbg, string className,
-            MethodDeclarationSyntax method, KustoImplementationAttributeDecoder attr)
+            MethodDeclarationSyntax method, KustoImplementationAttributeDecoder attributes)
         {
             var parameters = method.ParameterList.Parameters
                 .Select((p, i) => new Param(i, p.Identifier.ValueText, p.Type.ToFullString()))
@@ -210,14 +210,14 @@ namespace KustoLoco.SourceGeneration
 
             var ret = new Param(0, string.Empty, method.ReturnType.ToFullString());
 
-            var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters, attr);
+            var m = new ImplementationMethod(className, method.Identifier.ValueText, ret, parameters, attributes);
             ParamGeneneration.BuildOverloadInfo(dbg, m);
             if (m.HasScalar)
                 ParamGeneneration.BuildScalarMethod(dbg, m);
             if (m.HasColumnar)
-                ParamGeneneration.BuildColumnarMethod(dbg, m,attr);
+                ParamGeneneration.BuildColumnarMethod(dbg, m,attributes);
             if (m.KustoImplementationAttributeDecoder.ImplementationType == ImplementationType.Aggregate)
-                ParamGeneneration.BuildInvokeMethod(dbg, m);
+                ParamGeneneration.BuildInvokeMethod(dbg, m,attributes);
             return m;
         }
 

@@ -8,6 +8,7 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Extensions;
+using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
@@ -18,9 +19,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
     {
-
-        
-        Debug.Assert(context.Left != TabularResult.Empty);
+        MyDebug.Assert(context.Left != TabularResult.Empty);
         var byExpressions = new List<IRExpressionNode>();
         for (var i = 0; i < node.ByColumns.ChildCount; i++) byExpressions.Add(node.ByColumns.GetTypedChild(i));
 
@@ -28,8 +27,24 @@ internal partial class TreeEvaluator
         for (var i = 0; i < node.Aggregations.ChildCount; i++)
             aggregationExpressions.Add(node.Aggregations.GetTypedChild(i));
 
+        //we have to go to some trouble to ensure we use the correct types since
+        //the parser gets it wrong this only applies to things like
+        //sumarize max(int(a)) not tuples ops like summarize arg_max
+        var symbol = (TableSymbol)node.ResultType;
+        
+        var types = byExpressions.Concat(aggregationExpressions)
+            .Select(n => n.ResultType);
+        if (!types.Any(t => t is TupleSymbol))
+        {
+            var columns = symbol.Columns.Zip(types)
+                .Select((pair) => new ColumnSymbol(pair.First.Name, pair.Second))
+                .ToArray();
+
+             symbol = new TableSymbol(symbol.Name, columns);
+        }
+
         var result = new SummarizeResultTable(this, context.Left.Value, context, byExpressions,
-            aggregationExpressions, (TableSymbol)node.ResultType);
+            aggregationExpressions, symbol);
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
@@ -83,7 +98,7 @@ internal partial class TreeEvaluator
             foreach (var byExpression in _byExpressions)
             {
                 var byExpressionResult = (ColumnarResult)byExpression.Accept(_owner, chunkContext);
-                Debug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
+                MyDebug.Assert(byExpressionResult.Type.Simplify() == byExpression.ResultType.Simplify(),
                     $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
                 byValuesColumns.Add(byExpressionResult.Column);
             }
@@ -149,8 +164,7 @@ internal partial class TreeEvaluator
                     var aggregationResult = aggregationExpression.Accept(_owner, chunkContext);
                     if (aggregationResult is ScalarResult scalar)
                     {
-
-                        Debug.Assert(scalar.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
+                        MyDebug.Assert(scalar.Type.Simplify() == aggregationExpression.ResultType.Simplify(),
                             $"Aggregation expression produced wrong type {SchemaDisplay.GetText(scalar.Type)}, expected {SchemaDisplay.GetText(aggregationExpression.ResultType)}.");
                         resultColumns[summarySet.ByValues.Length + i].Add(scalar.Value);
                     }

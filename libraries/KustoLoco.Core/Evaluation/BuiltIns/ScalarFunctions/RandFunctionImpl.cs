@@ -22,7 +22,7 @@ internal class RandFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length > 0);
+        MyDebug.Assert(arguments.Length > 0);
         //the first column is a "dummy" column inserted by the evaluator
         //because we specified this as "ForceColumnarResult"
         var column = (GenericTypedBaseColumnOfint)arguments[0].Column;

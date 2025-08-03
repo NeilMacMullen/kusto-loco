@@ -18,7 +18,7 @@ internal class StrcatDelimFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length > 0);
+        MyDebug.Assert(arguments.Length > 0);
         var columns =
             arguments.Select(c => (GenericTypedBaseColumnOfstring)c.Column)
                 .ToArray();

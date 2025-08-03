@@ -140,9 +140,13 @@ internal static class BuiltInOperators
         TypeSymbol resultType,
         IRExpressionNode[] arguments)
     {
-        if (!TryGetOverload(symbol,resultType, arguments, out var overload))
+        if (!TryGetOverload(symbol, resultType, arguments, out var overload))
+        {
+            //Compensate for stupid parser that doesn't realise ints are going to be promoted
+            if (resultType==ScalarTypes.Int && !TryGetOverload(symbol, ScalarTypes.Long, arguments, out overload))
             throw new NotImplementedException(
                 $"Operator {SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
+        }
 
         return overload!;
     }

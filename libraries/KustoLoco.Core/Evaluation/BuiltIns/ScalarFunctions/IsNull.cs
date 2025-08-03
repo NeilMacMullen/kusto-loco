@@ -9,7 +9,8 @@ using System.Diagnostics;
 using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
-    
+
+//custom context because implementation is so cheap
 [KustoImplementation(Keyword = "Functions.IsNull",CustomContext= true)]
 public sealed partial class IsNullFunction
 {

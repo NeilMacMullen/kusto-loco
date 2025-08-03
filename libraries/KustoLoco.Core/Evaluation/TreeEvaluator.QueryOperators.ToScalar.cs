@@ -14,7 +14,7 @@ internal partial class TreeEvaluator
         EvaluationContext context)
     {
         var result = node.Expression.Accept(this, context);
-        Debug.Assert(result != EvaluationResult.Null);
+        MyDebug.Assert(result != EvaluationResult.Null);
 
         if (node.Expression.ResultKind == EvaluatedExpressionKind.Table)
         {
@@ -25,7 +25,7 @@ internal partial class TreeEvaluator
             {
                 if (chunk.Columns[0].RowCount > 0)
                 {
-                    Debug.Assert(chunk.Columns[0].Type.Simplify() == node.ResultType.Simplify());
+                    MyDebug.Assert(chunk.Columns[0].Type.Simplify() == node.ResultType.Simplify());
                     return new ScalarResult(chunk.Columns[0].Type, chunk.Columns[0].GetRawDataValue(0));
                 }
             }

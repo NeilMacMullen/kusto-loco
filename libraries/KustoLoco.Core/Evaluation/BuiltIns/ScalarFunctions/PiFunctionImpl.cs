@@ -8,7 +8,7 @@ internal class PiFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 0);
+        MyDebug.Assert(arguments.Length == 0);
         return new ScalarResult(ScalarTypes.Real, Math.PI);
     }
     //we never call this in columnar because it takes no arguments

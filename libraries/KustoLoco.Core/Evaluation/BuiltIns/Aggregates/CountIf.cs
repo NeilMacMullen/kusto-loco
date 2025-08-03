@@ -12,7 +12,7 @@ internal class CountIfFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 1);
+        MyDebug.Assert(arguments.Length == 1);
         var column = (GenericTypedBaseColumnOfbool)arguments[0].Column;
         long count = 0;
         for (var i = 0; i < column.RowCount; i++)

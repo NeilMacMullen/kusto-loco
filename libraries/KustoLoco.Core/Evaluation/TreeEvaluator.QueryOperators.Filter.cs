@@ -21,7 +21,6 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
         var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }

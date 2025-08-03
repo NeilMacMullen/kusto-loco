@@ -115,11 +115,10 @@ This string will be base64 encoded
     private static void Test(string query, string expectedOutput)
     {
         var engine = BabyKustoEngine.CreateForTest();
-        var result = (TabularResult?)engine.Evaluate(
+        var result = (TabularResult)engine.Evaluate(
             [],
             query);
-        Debug.Assert(result != null);
-        var stringified = result.Value.DumpToString();
+        var stringified = result!.Value.DumpToString();
 
         var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");
         var canonicalExpectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");

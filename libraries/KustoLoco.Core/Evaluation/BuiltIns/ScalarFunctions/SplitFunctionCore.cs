@@ -12,7 +12,7 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
 
         return new ScalarResult(ScalarTypes.DynamicArrayOfString,
             Evaluate(arguments[0].Value as string, arguments[1].Value as string));
@@ -20,7 +20,7 @@ internal class SplitFunctionImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
 
         var columns = new GenericTypedBaseColumnOfstring[2];
         for (var i = 0; i < arguments.Length; i++)

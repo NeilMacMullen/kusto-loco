@@ -11,7 +11,7 @@ internal class CountFunctionImpl : IAggregateImpl
 {
    public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 0);
+        MyDebug.Assert(arguments.Length == 0);
         return new ScalarResult(ScalarTypes.Long, (long)chunk.RowCount);
     }
 }

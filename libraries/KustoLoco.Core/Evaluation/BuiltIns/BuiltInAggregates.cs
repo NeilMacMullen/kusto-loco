@@ -372,8 +372,7 @@ internal static class BuiltInAggregates
             throw new NotImplementedException(
                 $"Aggregate function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
 
-        Debug.Assert(overload != null);
-        return overload;
+        return overload!;
     }
 
     public static bool TryGetOverload(FunctionSymbol symbol,

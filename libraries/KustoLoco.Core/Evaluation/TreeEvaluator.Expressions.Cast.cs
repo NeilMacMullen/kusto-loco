@@ -20,39 +20,39 @@ internal partial class TreeEvaluator
             {
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Int => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt32(value));
                 },
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Long => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToInt64(value));
                 },
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Real => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDouble(value));
                 },
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Decimal => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDecimal(value));
                 }
                 ,
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.DateTime => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToDateTime(value));
                 }
                 ,
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.String => arguments =>
                 {
-                    Debug.Assert(arguments.Length == 1);
+                    MyDebug.Assert(arguments.Length == 1);
                     var value = ((ScalarResult)arguments[0]).Value;
                     return new ScalarResult(node.ResultType, value == null ? null : Convert.ToString(value));
                 },
@@ -107,7 +107,6 @@ internal partial class TreeEvaluator
         });
 
         var expressionResult = node.Expression.Accept(this, context);
-        Debug.Assert(expressionResult != null);
         return impl([expressionResult]);
     }
 }

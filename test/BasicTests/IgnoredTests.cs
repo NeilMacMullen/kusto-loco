@@ -24,4 +24,17 @@ public class IgnoredTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("55");
     }
+    [TestMethod]
+    [Ignore("It's unclear whether promoting to long is just a bug in ADX")]
+    public async Task UnaryMinusColumnar()
+    {
+        var query = """
+                    datatable(n:int)[1]
+                    | extend x=-n
+                    | project x
+                    | getschema
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
 }

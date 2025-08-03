@@ -32,7 +32,7 @@ internal partial class TreeEvaluator
         {
             var expression = node.Expressions.GetChild(i);
             var expressionResult = expression.Accept(this, context);
-            Debug.Assert(expressionResult != EvaluationResult.Null);
+            MyDebug.Assert(expressionResult != EvaluationResult.Null);
             var tableResult = (TabularResult)expressionResult;
             tables.Add(tableResult.Value);
 

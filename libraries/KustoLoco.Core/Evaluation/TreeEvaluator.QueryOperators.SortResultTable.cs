@@ -53,7 +53,7 @@ internal partial class TreeEvaluator
                 {
                     var sortExpression = _sortColumns[i].Expression;
                     var sortExpressionResult = sortExpression.Accept(_evaluator, chunkContext);
-                    Debug.Assert(sortExpressionResult != EvaluationResult.Null);
+                    MyDebug.Assert(sortExpressionResult != EvaluationResult.Null);
                     var sortedChunkColumn = ((ColumnarResult)sortExpressionResult).Column;
                     for (var j = 0; j < sortedChunkColumn.RowCount; j++)
                         sortColumnsData[i].Add(sortedChunkColumn.GetRawDataValue(j));

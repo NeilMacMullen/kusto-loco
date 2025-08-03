@@ -50,7 +50,7 @@ internal sealed class CoalesceFunctionIntImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfint.CreateFixed(numRows);
@@ -93,7 +93,7 @@ internal sealed class CoalesceFunctionLongImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOflong.CreateFixed(numRows);
@@ -136,7 +136,7 @@ internal sealed class CoalesceFunctionDecimalImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfdecimal.CreateFixed(numRows);
@@ -179,7 +179,7 @@ internal sealed class CoalesceFunctionDoubleImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfdouble.CreateFixed(numRows);
@@ -222,7 +222,7 @@ internal sealed class CoalesceFunctionDateTimeImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfDateTime.CreateFixed(numRows);
@@ -265,7 +265,7 @@ internal sealed class CoalesceFunctionTimeSpanImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfTimeSpan.CreateFixed(numRows);
@@ -308,7 +308,7 @@ internal sealed class CoalesceFunctionGuidImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfGuid.CreateFixed(numRows);
@@ -351,7 +351,7 @@ internal sealed class CoalesceFunctionBoolImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfbool.CreateFixed(numRows);
@@ -394,7 +394,7 @@ internal sealed class CoalesceFunctionStringImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfstring.CreateFixed(numRows);
@@ -437,7 +437,7 @@ internal sealed class CoalesceFunctionJsonNodeImpl : IScalarFunctionImpl
 
  public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
  {
-     Debug.Assert(arguments.Length > 0);
+     MyDebug.Assert(arguments.Length > 0);
 
      var numRows = arguments[0].Column.RowCount;
      var data = NullableSetBuilderOfJsonNode.CreateFixed(numRows);

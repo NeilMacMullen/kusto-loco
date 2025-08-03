@@ -210,8 +210,7 @@ a:dynamic
     private static void Test(string query, string expectedOutput)
     {
         var engine = BabyKustoEngine.CreateForTest();
-        var result = (TabularResult?)engine.Evaluate([], query);
-        Debug.Assert(result != null);
+        var result = (TabularResult)engine.Evaluate([], query);
         var stringified = result.Value.DumpToString();
 
         var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");

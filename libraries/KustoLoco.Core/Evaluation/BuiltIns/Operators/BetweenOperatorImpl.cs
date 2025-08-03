@@ -19,7 +19,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (T?)arguments[0].Value;
         var left = (T?)arguments[1].Value;
         var right = (T?)arguments[2].Value;
@@ -28,7 +28,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
         var row = (GenericTypedBaseColumn<T>)arguments[0].Column;
         var left = (GenericTypedBaseColumn<T>)arguments[1].Column;
@@ -70,7 +70,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (int?)arguments[0].Value;
         var left = (long?)arguments[1].Value;
         var right = (long?)arguments[2].Value;
@@ -79,7 +79,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
         var row = (GenericTypedBaseColumnOfint)arguments[0].Column;
         var left = (GenericTypedBaseColumnOflong)arguments[1].Column;
@@ -118,7 +118,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (DateTime?)arguments[0].Value;
         var left = (DateTime?)arguments[1].Value;
         var right = (TimeSpan?)arguments[2].Value;
@@ -127,7 +127,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
         var row = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
         var left = (GenericTypedBaseColumnOfDateTime)arguments[1].Column;

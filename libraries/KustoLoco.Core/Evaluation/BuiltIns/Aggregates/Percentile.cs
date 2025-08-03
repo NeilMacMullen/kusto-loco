@@ -15,7 +15,7 @@ internal class PercentileAggregateIntImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
         var valuesCol = (GenericTypedBaseColumnOfint)arguments[0].Column;
         var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
@@ -43,7 +43,7 @@ internal class PercentileAggregateLongImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
         var valuesCol = (GenericTypedBaseColumnOflong)arguments[0].Column;
         var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
@@ -71,7 +71,7 @@ internal class PercentileAggregateDoubleImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
         var valuesCol = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
         var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 

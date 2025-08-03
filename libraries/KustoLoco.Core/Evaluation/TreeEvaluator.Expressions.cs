@@ -33,7 +33,7 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node,
         EvaluationContext context)
     {
-        Debug.Assert(context.Chunk != TableChunk.Empty);
+        MyDebug.Assert(context.Chunk != TableChunk.Empty);
         var column = context.Chunk.Columns[node.ReferencedColumnIndex];
         return new ColumnarResult(column);
     }

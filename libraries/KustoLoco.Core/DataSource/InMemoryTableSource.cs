@@ -28,7 +28,7 @@ public class InMemoryTableSource : ITableSource
 
     public int RowCount => _data.First().RowCount;
     public TableSymbol Type { get; }
-    public IEnumerable<ITableChunk> GetData() => _data;
+    public IEnumerable<ITableChunk> GetData() =>_data;
 
     public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
         => _data.ToAsyncEnumerable();

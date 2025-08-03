@@ -21,7 +21,7 @@ internal partial class TreeEvaluator
             : context.Left.Value;
 
 
-        Debug.Assert(context.Left != TabularResult.Empty);
+        MyDebug.Assert(context.Left != TabularResult.Empty);
         var columns = new List<IROutputColumnNode>(node.Columns.ChildCount);
         for (var i = 0; i < node.Columns.ChildCount; i++) columns.Add(node.Columns.GetTypedChild(i));
 

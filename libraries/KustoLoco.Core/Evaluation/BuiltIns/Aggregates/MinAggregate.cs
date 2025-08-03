@@ -1,21 +1,26 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 
 // ReSharper disable PartialTypeWithSinglePart
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "Aggregates.Min")]
+[KustoImplementation(Keyword = "Aggregates.Min", Partition = true)]
 internal partial class MinAggregate
 {
-    internal static int IntImpl(NumericAggregate context, int n)
+    internal static long IntImpl(NumericAggregate context, int n)
     {
         context.LongValue = context.Count == 0 ? n : Math.Min(context.LongValue, n);
         context.Count++;
         return 0;
     }
 
-    internal static int? IntImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (int)context.LongValue;
+    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+    }
 
     internal static long LongImpl(NumericAggregate context, long n)
     {
@@ -24,8 +29,11 @@ internal partial class MinAggregate
         return 0;
     }
 
-    internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.LongValue;
+    internal static long? LongImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+    }
 
     internal static double DoubleImpl(NumericAggregate context, double n)
     {
@@ -34,8 +42,11 @@ internal partial class MinAggregate
         return 0;
     }
 
-    internal static double? DoubleImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DoubleValue;
+    internal static double? DoubleImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DoubleValue).Min() : null;
+    }
 
     internal static decimal DecimalImpl(NumericAggregate context, decimal n)
     {
@@ -44,26 +55,35 @@ internal partial class MinAggregate
         return 0;
     }
 
-    internal static decimal? DecimalImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DecimalValue;
+    internal static decimal? DecimalImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DecimalValue).Min() : null;
+    }
 
-    internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
+    internal static TimeSpan TimeSpanImpl(NumericAggregate context, TimeSpan n)
     {
         context.LongValue = context.Count == 0 ? n.Ticks : Math.Min(context.LongValue, n.Ticks);
         context.Count++;
         return TimeSpan.Zero;
     }
 
-    internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
+    internal static TimeSpan? TimeSpanImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? new TimeSpan(valid.Select(c => c.LongValue).Min()) : null;
+    }
 
-    internal static DateTime DtImpl(NumericAggregate context, DateTime n)
+    internal static DateTime DateTimeImpl(NumericAggregate context, DateTime n)
     {
         context.LongValue = context.Count == 0 ? n.Ticks : Math.Min(context.LongValue, n.Ticks);
         context.Count++;
         return DateTime.MinValue;
     }
 
-    internal static DateTime? DtImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new DateTime(context.LongValue, DateTimeKind.Utc);
+    internal static DateTime? DateTimeImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    {
+        var valid = contextSet.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? new DateTime(valid.Select(c => c.LongValue).Min(), DateTimeKind.Utc) : null;
+    }
 }

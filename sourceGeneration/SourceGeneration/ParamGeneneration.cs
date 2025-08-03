@@ -44,7 +44,6 @@ namespace KustoLoco.SourceGeneration
             var ret = method.ReturnType;
             dbg.AppendLine("public ScalarResult InvokeScalar(ScalarResult[] arguments)");
             dbg.EnterCodeBlock();
-            dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedVariables(dbg, parameters);
             dbg.AppendStatement($"{GetNullableType(ret)} data=null");
             if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
@@ -72,7 +71,6 @@ namespace KustoLoco.SourceGeneration
             var ret = method.ReturnType;
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
-            dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
             dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
@@ -155,28 +153,57 @@ namespace KustoLoco.SourceGeneration
             dbg.ExitCodeBlock();
         }
 
-        public static void BuildInvokeMethod(CodeEmitter dbg, ImplementationMethod method)
+        public static void BuildInvokeMethod(CodeEmitter dbg, ImplementationMethod method,
+            KustoImplementationAttributeDecoder attributes)
         {
+            if (!method.HasContext)
+                dbg.AppendLine("#error - aggregate functions must use context");
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
             dbg.AppendLine("public EvaluationResult Invoke(ITableChunk chunk,ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
-            dbg.AppendStatement($"Debug.Assert(arguments.Length=={parameters.Length})");
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
+            
+            if (attributes.Partition)
+            {
+                dbg.AppendStatement($"var contextSet=new ConcurrentBag<{method.ContextArgument.Type}>()");
+                dbg.AppendLine($"var rangePartitioner = SafePartitioner.Create({RowCount});");
+                dbg.AppendLine("Parallel.ForEach(rangePartitioner, (range, loopState) =>");
+                dbg.EnterCodeBlock();
+                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                dbg.AppendStatement("contextSet.Add(context)");
 
-            if (method.HasContext) dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                dbg.AppendLine($"for (var {RowIndex} = range.Item1; {RowIndex} < range.Item2; {RowIndex}++)");
+                dbg.EnterCodeBlock();
+                EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", false);
+                var pvals = string.Join(",", parameters.Select(Val));
+                if (method.HasContext)
+                    pvals = $"context,{pvals}";
+                dbg.AppendStatement($"{method.Name}({pvals})");
+                dbg.ExitCodeBlock();
+                dbg.ExitCodeBlock();
+                dbg.AppendLine(");");
+                
+            }
+            else
+            {
+                dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
+                dbg.EnterCodeBlock();
+                EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", false);
+                var pvals = string.Join(",", parameters.Select(Val));
+                if (method.HasContext)
+                    pvals = $"context,{pvals}";
+                dbg.AppendStatement($"{method.Name}({pvals})");
+                dbg.ExitCodeBlock();
+            }
+            if (attributes.Partition)
+               dbg.AppendStatement($"var result = {method.Name}Finish(contextSet)");
+            else
+                dbg.AppendStatement($"var result = {method.Name}Finish(context)");
 
-            dbg.AppendLine($"for (var {RowIndex} = 0; {RowIndex} < {RowCount}; {RowIndex}++)");
-            dbg.EnterCodeBlock();
-            EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", false);
-            var pvals = string.Join(",", parameters.Select(Val));
-            if (method.HasContext)
-                pvals = $"context,{pvals}";
-            dbg.AppendStatement($"{method.Name}({pvals})");
-            dbg.ExitCodeBlock();
-            dbg.AppendStatement($"var result = {method.Name}Finish(context)");
-            dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
+                dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
             dbg.AppendStatement("return new ScalarResult(returnType,result)");
             dbg.ExitCodeBlock();
         }

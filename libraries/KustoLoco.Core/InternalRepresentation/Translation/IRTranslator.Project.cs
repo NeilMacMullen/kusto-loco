@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
@@ -30,7 +31,7 @@ internal partial class IRTranslator
 
     public override IRNode VisitProjectRenameOperator(ProjectRenameOperator node)
     {
-        Debug.Assert(_rowScope != TableSymbol.Empty);
+        MyDebug.Assert(_rowScope != TableSymbol.Empty);
         var resultTypeMember = node.ResultType.Members;
         //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
         var renamedColumns = new Dictionary<ColumnSymbol, ColumnSymbol>();
@@ -76,7 +77,7 @@ internal partial class IRTranslator
     /// </summary>
     private IRNode EasyProjectImpl(TypeSymbol resultType)
     {
-        Debug.Assert(_rowScope != TableSymbol.Empty);
+        MyDebug.Assert(_rowScope != TableSymbol.Empty);
         var resultTypeMember = resultType.Members;
 
         var columns = new List<IROutputColumnNode>();
@@ -102,7 +103,7 @@ internal partial class IRTranslator
     private IRNode HandleExtendOperatorInternal(SyntaxList<SeparatedElement<Expression>> expressions,
         TypeSymbol resultType,bool requiresSerialization=false)
     {
-        Debug.Assert(_rowScope != TableSymbol.Empty);
+        MyDebug.Assert(_rowScope != TableSymbol.Empty);
         var pendingExpressions = new LinkedList<IRExpressionNode>();
         //TODO HERE - we should not be keying on ColumnSymbol, but on the original column name/type
         var namedExtendedColumns = new Dictionary<ColumnSymbol, LinkedListNode<IRExpressionNode>>();
