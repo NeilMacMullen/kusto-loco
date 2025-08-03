@@ -62,7 +62,8 @@ namespace KustoLoco.SourceGeneration
             dbg.ExitCodeBlock();
         }
 
-        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method, bool partition)
+        public static void BuildColumnarMethod(CodeEmitter dbg, ImplementationMethod method, bool partition,
+            bool customContext)
         {
             var parameters = method.TypedArguments;
             var ret = method.ReturnType;
@@ -78,8 +79,17 @@ namespace KustoLoco.SourceGeneration
                 dbg.AppendLine($"var rangePartitioner = SafePartitioner.Create({RowCount});");
                 dbg.AppendLine("Parallel.ForEach(rangePartitioner, (range, loopState) =>");
                 dbg.EnterCodeBlock();
-                if (method.HasContext)
-                    dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                if (customContext)
+                {
+                    if (method.HasContext)
+                        dbg.AppendStatement($"var context = new {method.ContextArgument.Type}()");
+                }
+                else
+                {
+                    foreach (var p in parameters)
+                        dbg.AppendStatement($"{p.Type}? last_{p.Name}=null");
+                    dbg.AppendStatement($"{ret.Type}? last_result =null;");
+                }
                 dbg.AppendLine($"for (var {RowIndex} = range.Item1; {RowIndex} < range.Item2; {RowIndex}++)");
             }
             else
@@ -92,8 +102,30 @@ namespace KustoLoco.SourceGeneration
             EmitNullChecks(dbg, method, true, $"data[{RowIndex}]", true);
             var pvals = string.Join(",", parameters.Select(Val));
             if (method.HasContext)
+            {
+                if (!customContext) dbg.AppendLine("#error - method has context");
                 pvals = $"context,{pvals}";
-            dbg.AppendStatement($"data[{RowIndex}] = {method.Name}({pvals})");
+            }
+
+            if (!customContext)
+            {
+                dbg.AppendLine("if (");
+                var ands = string.Join("&&", parameters.Select(p => $"({p.Name} == last_{p.Name})"));
+                dbg.AppendLine(ands);
+                dbg.AppendLine(")");
+                dbg.AppendStatement($"data[{RowIndex}] = last_result");
+                dbg.AppendLine("else");
+                dbg.EnterCodeBlock();
+                foreach (var p in parameters)
+                    dbg.AppendStatement($"last_{p.Name}={p.Name}");
+                dbg.AppendStatement($"last_result = {method.Name}({pvals})");
+                dbg.AppendStatement($"data[{RowIndex}]=last_result ");
+                dbg.ExitCodeBlock();
+            }
+            else
+                dbg.AppendStatement($"data[{RowIndex}]= {method.Name}({pvals})");
+            
+           
             dbg.ExitCodeBlock();
             if (partition)
                 dbg.AppendLine("});");
