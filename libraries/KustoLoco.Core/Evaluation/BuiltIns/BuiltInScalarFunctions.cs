@@ -285,7 +285,6 @@ internal static class BuiltInScalarFunctions
                 ScalarOverloadInfo(new ArrayLengthFunctionImpl(),
                     ScalarTypes.Long,
                     ScalarTypes.Dynamic)));
-
         GeoDistance2PointsFunction.Register(Functions);
         GeoPointToGeoHashFunction.Register(Functions);
         GeoHashToCentralPointFunction.Register(Functions);
