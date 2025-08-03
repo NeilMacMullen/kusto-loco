@@ -8,6 +8,6 @@ public partial class ArraySortDescFunction
     JsonNode? Impl(JsonNode node)
     {
         return node is not JsonArray array ? null
-            : JsonArrayHelpers.Sort(array, false);
+            : JsonArrayHelper.Sort(array, false);
     }
 }

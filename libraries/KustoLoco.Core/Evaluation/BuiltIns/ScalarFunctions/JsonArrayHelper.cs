@@ -6,19 +6,67 @@ using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-internal static class JsonArrayHelpers
+/// <summary>
+/// Provides helper methods for working with <see cref="JsonArray"/> objects.
+/// </summary>
+internal static class JsonArrayHelper
 {
+    /// <summary>
+    /// Creates a <see cref="JsonArray"/> from a collection of items.
+    /// If an item is a <see cref="JsonNode"/>, it is added directly; otherwise, it is wrapped in a <see cref="JsonValue"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the source collection.</typeparam>
+    /// <param name="source">The source collection.</param>
+    /// <returns>A new <see cref="JsonArray"/> containing the items.</returns>
+    public static JsonArray From<T>(ICollection<T> source)
+    {
+        var array = new JsonNode?[source.Count];
+        var i = 0;
+        foreach (var item in source)
+        {
+            // If the item is already a JsonNode, use it directly.
+            if (item is JsonNode node)
+                array[i++] = node;
+            else
+            {
+                // Otherwise, wrap the item in a JsonValue, or use null if the item is null.
+                array[i++] = item == null
+                    ? null
+                    : JsonValue.Create(item);
+            }
+        }
+
+        return new JsonArray(array);
+    }
+    
+    /// <summary>
+    /// Clones each item in the given <see cref="JsonArray"/> using <see cref="JsonNode.DeepClone"/>.
+    /// </summary>
+    /// <param name="array">The array to clone.</param>
+    /// <returns>An array of cloned <see cref="JsonNode"/> items.</returns>
     internal static JsonNode?[] ClonedItems(JsonArray array)
         => array.Select(n => n?.DeepClone()).ToArray();
 
+    /// <summary>
+    /// Returns a new <see cref="JsonArray"/> with the items in reverse order.
+    /// </summary>
+    /// <param name="array">The array to reverse.</param>
+    /// <returns>A reversed <see cref="JsonArray"/>.</returns>
     internal static JsonArray Reverse(JsonArray array) => new(ClonedItems(array).Reverse().ToArray());
 
+    /// <summary>
+    /// Rotates the items in the <see cref="JsonArray"/> to the left by the specified shift amount.
+    /// </summary>
+    /// <param name="array">The array to rotate.</param>
+    /// <param name="shift">The number of positions to shift.</param>
+    /// <returns>A rotated <see cref="JsonArray"/>.</returns>
     public static JsonNode RotateLeft(JsonArray array, long shift)
     {
         var count = array.Count;
         if (count == 0)
             return array;
 
+        // Normalize the shift value to the array length.
         var ashift = shift % count;
         if (ashift < 0) ashift += count;
         if (ashift == 0)
@@ -28,16 +76,25 @@ internal static class JsonArrayHelpers
         var rotated = new JsonNode?[count];
         for (var i = 0; i < count; i++)
         {
+            // Calculate the new offset for each item.
             var newOffset = i + ashift;
             rotated[i] = items[newOffset % count];
         }
 
         return new JsonArray(rotated);
     }
-    public static JsonArray Sort(JsonArray array,bool ascending)
+
+    /// <summary>
+    /// Sorts the items in the <see cref="JsonArray"/> in ascending or descending order.
+    /// </summary>
+    /// <param name="array">The array to sort.</param>
+    /// <param name="ascending">True for ascending order, false for descending.</param>
+    /// <returns>A sorted <see cref="JsonArray"/>.</returns>
+    public static JsonArray Sort(JsonArray array, bool ascending)
     {
         var count = array.Count;
         var ordering = Enumerable.Range(0, count).ToList();
+        // Sort indices using a custom comparer.
         ordering.Sort(new JsonArrayComparer(array, ascending: ascending));
 
         var result = new JsonNode?[count];
@@ -50,27 +107,41 @@ internal static class JsonArrayHelpers
 
         return new JsonArray(result);
     }
+
+    /// <summary>
+    /// Compares items in a <see cref="JsonArray"/> by their values for sorting.
+    /// </summary>
     private class JsonArrayComparer : IComparer<int>
     {
         private readonly JsonArray _array;
         private readonly bool _ascending;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonArrayComparer"/> class.
+        /// </summary>
+        /// <param name="array">The array to compare items from.</param>
+        /// <param name="ascending">True for ascending order, false for descending.</param>
         public JsonArrayComparer(JsonArray array, bool ascending)
         {
             _array = array ?? throw new ArgumentNullException(nameof(array));
             _ascending = ascending;
         }
 
+        /// <summary>
+        /// Compares two items by their index in the array.
+        /// </summary>
         public int Compare(int x, int y)
         {
             var a = _array[x];
             var b = _array[y];
 
+            // If both are JsonValue, compare their values.
             if (a is JsonValue valueA && b is JsonValue valueB)
             {
                 return CompareValues(valueA, valueB);
             }
 
+            // JsonValue is considered less than other types.
             if (a is JsonValue)
             {
                 return -1;
@@ -81,9 +152,13 @@ internal static class JsonArrayHelpers
                 return 1;
             }
 
+            // If neither is JsonValue, treat as equal.
             return 0;
         }
 
+        /// <summary>
+        /// Compares two <see cref="JsonValue"/> objects.
+        /// </summary>
         private int CompareValues(JsonValue a, JsonValue b)
         {
             var vA = ExtractValue(a);
@@ -92,6 +167,7 @@ internal static class JsonArrayHelpers
             var isDoubleA = TryToDouble(vA, out var dA);
             var isDoubleB = TryToDouble(vB, out var dB);
 
+            // Compare as doubles if possible.
             if (isDoubleA && isDoubleB)
             {
                 if (!double.IsNaN(dA) && !double.IsNaN(dB))
@@ -123,6 +199,7 @@ internal static class JsonArrayHelpers
                 return 1;
             }
 
+            // Compare as strings if possible.
             var isStringA = vA is string;
             var isStringB = vB is string;
             if (isStringA && isStringB)
@@ -144,7 +221,7 @@ internal static class JsonArrayHelpers
             // TODO: Sort guids, but we don't support them now...
             return 0;
 
-
+            // Extracts the underlying value from a <see cref="JsonValue"/>.
             static object? ExtractValue(JsonValue value)
             {
                 var result = value.GetValue<object?>();
@@ -171,6 +248,7 @@ internal static class JsonArrayHelpers
                 return result;
             }
 
+            // Attempts to convert an object to a double value.
             static bool TryToDouble(object? item, out double value)
             {
                 switch (item)
