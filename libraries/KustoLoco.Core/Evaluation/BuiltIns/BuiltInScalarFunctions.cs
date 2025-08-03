@@ -257,17 +257,7 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Real)
             )
         );
-
-        Functions.Add(Kusto.Language.Functions.ParseJson, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new ParseJsonDynamicFunctionImpl(),
-                    ScalarTypes.Dynamic,
-                    ScalarTypes.Dynamic),
-            new
-                ScalarOverloadInfo(new ParseJsonStringFunctionImpl(),
-                    ScalarTypes.Dynamic,
-                    ScalarTypes.String)));
-
+        ParseJsonFunction.Register(Functions);
         ArraySortAscFunction.Register(Functions);
         ArraySortDescFunction.Register(Functions);
         ArrayLengthFunction.Register(Functions);
