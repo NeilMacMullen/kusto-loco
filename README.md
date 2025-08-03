@@ -1,3 +1,5 @@
+![](https://ghvc.kabelkultur.se/?username=NeilMacMullen&repository=kusto-loco&label=kusto-loco%20Views)
+
 
 If you are using this project please give it a :star: to show your appreciation - thanks!
 
