@@ -258,7 +258,6 @@ internal static class BuiltInScalarFunctions
             )
         );
 
-
         Functions.Add(Kusto.Language.Functions.ParseJson, new ScalarFunctionInfo(
             new
                 ScalarOverloadInfo(new ParseJsonDynamicFunctionImpl(),
@@ -269,22 +268,9 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Dynamic,
                     ScalarTypes.String)));
 
-        Functions.Add(Kusto.Language.Functions.ArraySortAsc, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new ArraySortFunctionImpl(true),
-                    ScalarTypes.Dynamic,
-                    ScalarTypes.Dynamic)));
-        Functions.Add(Kusto.Language.Functions.ArraySortDesc, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new ArraySortFunctionImpl(false),
-                    ScalarTypes.Dynamic,
-                    ScalarTypes.Dynamic)));
-
-        Functions.Add(Kusto.Language.Functions.ArrayLength, new ScalarFunctionInfo(
-            new
-                ScalarOverloadInfo(new ArrayLengthFunctionImpl(),
-                    ScalarTypes.Long,
-                    ScalarTypes.Dynamic)));
+        ArraySortAscFunction.Register(Functions);
+        ArraySortDescFunction.Register(Functions);
+        ArrayLengthFunction.Register(Functions);
         GeoDistance2PointsFunction.Register(Functions);
         GeoPointToGeoHashFunction.Register(Functions);
         GeoHashToCentralPointFunction.Register(Functions);
