@@ -5,22 +5,13 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Functions.Extract")]
 internal partial class ExtractFunction
 {
-    private static string Impl(ExtractContext context, string pattern, long captureGroup, string input)
+    private static string Impl(string pattern, long captureGroup, string input)
     {
-        if (context.LastPattern == pattern &&
-            context.LastInput == input &&
-            context.LastCaptureGroup == captureGroup)
-            return context.LastResult;
-        context.LastPattern = pattern;
-        context.LastInput = input;
-        context.LastCaptureGroup=captureGroup;
-
         var match = Regex.Match(input, pattern, RegexOptions.Compiled);
         var result = string.Empty;
-        if (match.Success)
-            if (captureGroup < match.Groups.Count)
-                result = match.Groups[(int)captureGroup].Value;
-        context.LastResult = result;
+        if (!match.Success) return result;
+        if (captureGroup < match.Groups.Count)
+            result = match.Groups[(int)captureGroup].Value;
         return result;
     }
 }
