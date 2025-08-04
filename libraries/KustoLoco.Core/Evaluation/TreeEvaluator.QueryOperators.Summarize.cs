@@ -16,6 +16,8 @@ using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
+
+
 internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSummarizeOperator(IRSummarizeOperatorNode node, EvaluationContext context)
