@@ -7,6 +7,7 @@ using System.Linq;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Diagnostics;
 using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
@@ -91,7 +92,7 @@ internal partial class TreeEvaluator
         protected override (SummarizeResultTableContext NewContext, ITableChunk NewChunk, bool ShouldBreak)
             ProcessChunk(SummarizeResultTableContext context, ITableChunk chunk)
         {
-            //Logger.Info($"Process chunk called on chunk with {chunk.RowCount} rows");
+            EventLog.Log("Process chunk");
             var byValuesColumns = new List<BaseColumn>(_byExpressions.Count);
 
             var chunkContext = _context with { Chunk = chunk };
@@ -102,6 +103,7 @@ internal partial class TreeEvaluator
                     $"By expression produced wrong type {byExpressionResult.Type}, expected {byExpression.ResultType}.");
                 byValuesColumns.Add(byExpressionResult.Column);
             }
+            EventLog.Log("Processed By columns");
 
             if (byValuesColumns.Any())
             {
@@ -122,6 +124,7 @@ internal partial class TreeEvaluator
                     var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
                 }
+                EventLog.Log("calculated buckets");
 
                 foreach (var (summaryKey, summary) in thisChunkContext.BucketizedTables)
                 {
@@ -130,6 +133,8 @@ internal partial class TreeEvaluator
                     var set = GetOrAddBucket(summaryKey, context);
                     set.SummarisedChunks.Add(wantedRowChunk);
                 }
+                EventLog.Log("sliced columns");
+
             }
             else
             {
@@ -143,6 +148,8 @@ internal partial class TreeEvaluator
 
         protected override ITableChunk ProcessLastChunk(SummarizeResultTableContext context)
         {
+            EventLog.Log("process last chunk");
+
             var resultColumns = ColumnHelpers.CreateBuildersForTable(Type);
 
             foreach (var summarySet in context.BucketizedTables.Values)
@@ -182,6 +189,8 @@ internal partial class TreeEvaluator
             }
 
             var resultChunk = new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray());
+            EventLog.Log("finished last chunk");
+
             return resultChunk;
         }
     }

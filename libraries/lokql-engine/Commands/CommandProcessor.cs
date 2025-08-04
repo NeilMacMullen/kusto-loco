@@ -57,6 +57,7 @@ public class CommandProcessor
                 .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
                 .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.RunAsync)
                 .WithAdditionalCommand<CopilotCommand.Options>(CopilotCommand.RunAsync)
+                .WithAdditionalCommand<GetEventLogCommand.Options>(GetEventLogCommand.RunAsync)
             ;
 
         cp.AddAdditionalCommandSchema(AppInsightsCommand.SchemaCsv);

@@ -33,6 +33,8 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.Real)
             )
         );
+        DiagTicksFunction.Register(Functions);
+
         TicksFunction.Register(Functions);
         TidFunction.Register(Functions);
         ProcFunction.Register(Functions);
