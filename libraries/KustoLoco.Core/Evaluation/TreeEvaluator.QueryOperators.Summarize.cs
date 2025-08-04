@@ -112,19 +112,29 @@ internal partial class TreeEvaluator
                 var thisChunkContext = new SummarizeResultTableContext
                     { BucketizedTables = new Dictionary<SummaryKey, SummarySet>() };
 
+                var dictStopWatch = new Stopwatch();
+                var listStopWatch = new Stopwatch();
+                var setStopWatch = new Stopwatch();
+
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
+                    setStopWatch.Start();
                     //although it's tempting to use a linq select here, 
                     //this loop has to be very performant, and it's significantly
                     //faster to set properties in a for loop
                     var key = new SummaryKey();
                     for (var c = 0; c < byValuesColumns.Count; c++)
                         key.Set(c, byValuesColumns[c].GetRawDataValue(rowIndex));
+                    setStopWatch.Stop();
+                    dictStopWatch.Start();
                     var bucket = GetOrAddBucket(key, thisChunkContext);
+                    dictStopWatch.Stop();
+                    listStopWatch.Start();
                     var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
+                    listStopWatch.Stop();
                 }
-                EventLog.Log("calculated buckets");
+                EventLog.Log($"calculated buckets set{setStopWatch.ElapsedMilliseconds} dict {dictStopWatch.ElapsedMilliseconds} list {listStopWatch.ElapsedMilliseconds}");
 
                 foreach (var (summaryKey, summary) in thisChunkContext.BucketizedTables)
                 {
