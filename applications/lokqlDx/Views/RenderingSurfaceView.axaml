@@ -44,7 +44,8 @@
                                           CommandParameter="row" />
                                 <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
                                           CommandParameter="table" />
-                                <MenuItem Header="Copy to CSV (without headers)" Command="{Binding DataGridCopyCommand}"
+                                <Separator/>
+                                <MenuItem Header="Copy to clipboard as CSV (without headers)" Command="{Binding DataGridCopyCommand}"
                                           CommandParameter="csv" />
                             </ContextMenu>
                         </TreeDataGrid.ContextMenu>

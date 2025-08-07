@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core;
+using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using LokqlDx.ViewModels.Dialogs;
 
@@ -16,7 +17,7 @@ public partial class FlyoutViewModel : ObservableObject, IDialogViewModel
     {
         _result = result;
         var settings1 = settings.Snapshot();
-        _renderingSurface = new RenderingSurfaceViewModel("flyout", settings1, displayPreferences);
+        _renderingSurface = new RenderingSurfaceViewModel("flyout", settings1, displayPreferences,new NullConsole());
     }
 
     public Task Result { get; } = Task.CompletedTask;

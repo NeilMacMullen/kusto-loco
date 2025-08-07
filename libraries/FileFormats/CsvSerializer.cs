@@ -181,7 +181,7 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    private static class CsvSerializerSettings
+    public static class CsvSerializerSettings
     {
         private const string Prefix = "csv";
 
