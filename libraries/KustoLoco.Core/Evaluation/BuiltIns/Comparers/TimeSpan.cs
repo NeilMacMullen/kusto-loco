@@ -27,5 +27,5 @@ internal class TimeSpanDescNullsFirstComparer : IComparer
 internal class TimeSpanDescNullsLastComparer : IComparer
 {
     public int Compare(object? a, object? b) =>
-        GenericComparer.CompareT<TimeSpan>(a, b, true, false);
+        GenericComparer.CompareT<TimeSpan>(a, b, false, false);
 }

@@ -91,33 +91,63 @@ public class ResultChartAccessor
     
     public IReadOnlyCollection<ChartSeries> CalculateSeries()
     {
+        var columns = _result.ColumnDefinitions();
+        // Check if all columns are numeric
+        if (columns.Length > 1
+            && IsNumeric(columns[0]) || IsTemporal(columns[0])
+            && columns.Skip(1).All(IsNumeric))
+        {
+            var xCol = columns[0];
+            var yCols = columns.Skip(1).ToArray();
+            var rowCount = _result.RowCount;
+            var xLookup = CreateLookup(xCol);
+            var xData = _result.EnumerateColumnData(xCol).Select(d => xLookup.AxisValueFor(d)).ToArray();
+
+            var all = new List<ChartSeries>();
+            for (var i = 0; i < yCols.Length; i++)
+            {
+                var yCol = yCols[i];
+                var lookup = CreateLookup(yCol);
+                var yData = _result.EnumerateColumnData(yCol)
+                    .Select(d=>lookup.AxisValueFor(d))
+                    .ToArray();
+
+                // Use column name as legend, index as color
+                var legend = yCol.Name.OrWhenBlank("_none");
+                var color = Enumerable.Repeat(i, rowCount).ToArray();
+
+                all.Add(new ChartSeries(i, legend, xData, yData, color));
+            }
+            return all;
+        }
+
+        // Default grouping by series value
         var series = _result.EnumerateRows()
             .GroupBy(SeriesValue)
             .ToArray();
 
-        var all = new List<ChartSeries>();
+        var allDefault = new List<ChartSeries>();
 
         //allow point colors to be specifically defined
         var colorColumn = _result.ColumnDefinitions()
             .Where(c => c.Name == "_color" && c.UnderlyingType == typeof(long))
             .ToArray();
-        
-        var colorIndex = colorColumn.Any()? colorColumn.First().Index : -1;
+
+        var colorIndex = colorColumn.Any() ? colorColumn.First().Index : -1;
 
         foreach (var (index, s) in series.Index())
         {
             var x = s.Select(r => _xLookup.AxisValueFor(r[_xColumn.Index])).ToArray();
             var y = s.Select(r => _valueLookup.AxisValueFor(r[_valueColumn.Index])).ToArray();
-            var legend = (s.Key?.ToString()?? "_null").OrWhenBlank("_none");
+            var legend = (s.Key?.ToString() ?? "_null").OrWhenBlank("_none");
             var c = colorIndex < 0
                 ? s.Select(_ => index).ToArray()
-                : s.Select(r => (int) ((long?) r[colorIndex] ?? 0)).ToArray();
-           
+                : s.Select(r => (int)((long?)r[colorIndex] ?? 0)).ToArray();
 
-            all.Add(new ChartSeries(index, legend, x, y,c));
+            allDefault.Add(new ChartSeries(index, legend, x, y, c));
         }
 
-        return all;
+        return allDefault;
     }
 
     /// <summary>

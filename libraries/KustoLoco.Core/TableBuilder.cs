@@ -13,6 +13,7 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 
 namespace KustoLoco.Core;
@@ -148,39 +149,40 @@ public class TableBuilder
     /// <remarks>
     /// This method allows us to create very efficient columns since the only overhead over the original data is the method call
     /// </remarks>
-    public  static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records)
+    public static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records)
     {
         var builder = CreateEmpty(tableName, records.Length);
+
+        var columnActions = new Dictionary<Type, Action<PropertyInfo>>
+        {
+            [typeof(int)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)p.GetValue(o))),
+            [typeof(long)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)p.GetValue(o))),
+            [typeof(float)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (float?)p.GetValue(o))),
+            [typeof(double)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)p.GetValue(o))),
+            [typeof(decimal)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)p.GetValue(o))),
+            [typeof(string)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)p.GetValue(o) ??string.Empty )),
+            [typeof(DateTime)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)p.GetValue(o))),
+            [typeof(TimeSpan)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)p.GetValue(o))),
+            [typeof(bool)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)p.GetValue(o))),
+            [typeof(Guid)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)p.GetValue(o))),
+        };
+
         foreach (var p in typeof(T).GetProperties())
         {
             var propertyType = p.PropertyType;
-            if (propertyType == typeof(int))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)p.GetValue(o)));
-            if (propertyType == typeof(long))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)p.GetValue(o)));
-            if (propertyType == typeof(float))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (float?)p.GetValue(o)));
-            if (propertyType == typeof(double))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)p.GetValue(o)));
-            if (propertyType == typeof(decimal))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)p.GetValue(o)));
-            if (propertyType == typeof(string))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)p.GetValue(o)));
-            if (propertyType == typeof(DateTime))
+            if (columnActions.TryGetValue(propertyType, out var action))
+            {
+                action(p);
+            }
+            else
+            {
                 builder.WithColumn(p.Name,
-                    new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)p.GetValue(o)));
-            if (propertyType == typeof(TimeSpan))
-                builder.WithColumn(p.Name,
-                    new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)p.GetValue(o)));
-            if (propertyType == typeof(bool))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)p.GetValue(o)));
-            if (propertyType == typeof(Guid))
-                builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)p.GetValue(o)));
+                    new GenericLambdaWrappedColumnOfstring<T>(records, string? (o) => p.GetValue(o)?.ToString() ?? string.Empty));
+            }
         }
 
         return builder;
     }
-
     public static TableBuilder FromOrderedDictionarySet(string tableName,
         IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
