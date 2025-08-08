@@ -100,16 +100,16 @@ public class ResultChartAccessor
             var xCol = columns[0];
             var yCols = columns.Skip(1).ToArray();
             var rowCount = _result.RowCount;
-            var xData = _result.EnumerateColumnData(xCol)
-                .Select(Convert.ToDouble)
-                .ToArray();
+            var xLookup = CreateLookup(xCol);
+            var xData = _result.EnumerateColumnData(xCol).Select(d => xLookup.AxisValueFor(d)).ToArray();
 
             var all = new List<ChartSeries>();
             for (var i = 0; i < yCols.Length; i++)
             {
                 var yCol = yCols[i];
+                var lookup = CreateLookup(yCol);
                 var yData = _result.EnumerateColumnData(yCol)
-                    .Select(Convert.ToDouble)
+                    .Select(d=>lookup.AxisValueFor(d))
                     .ToArray();
 
                 // Use column name as legend, index as color

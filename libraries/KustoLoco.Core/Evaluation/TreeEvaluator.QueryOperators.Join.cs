@@ -114,6 +114,7 @@ internal partial class TreeEvaluator
             return result;
         }
 
+
         private void AddPartialRow(BaseColumnBuilder[] builders,
             NpmJoinSet joinset, int index)
         {
@@ -146,8 +147,8 @@ internal partial class TreeEvaluator
                         for (var i = 0; i < numrightRows; i++)
                         for (var j = 0; j < leftValue.RowCount; j++)
                         {
-                            AddPartialRow(leftColumns, leftValue, i);
-                            AddPartialRow(rightColumns, rightValue, j);
+                            AddPartialRow(leftColumns, leftValue, j);
+                            AddPartialRow(rightColumns, rightValue, i);
                         }
                 }
 
