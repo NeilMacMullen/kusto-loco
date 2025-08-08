@@ -213,6 +213,7 @@ internal static class BuiltInScalarFunctions
         BinaryShiftRight.Register(Functions);
         BitsetCountOnes.Register(Functions);
         BinFunction.Register(Functions);
+        BinAtFunction.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Floor, BinFunction.S); //Floor is just a synonym for bin
         GetYearFunction.Register(Functions);
         GetMonthFunction.Register(Functions);
