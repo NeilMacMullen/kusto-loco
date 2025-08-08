@@ -76,17 +76,19 @@ internal partial class TreeEvaluator
         {
             return new SummarizeResultTableContext
             {
-                BucketizedTables = new Dictionary<SummaryKey, SummarySet>()
+                BucketizedTables = new CachedDictionary<SummaryKey, SummarySet>(1)
             };
         }
 
         private static SummarySet GetOrAddBucket(SummaryKey key,
             SummarizeResultTableContext context)
         {
-            if (!context.BucketizedTables.TryGetValue(key, out var bucket))
-                context.BucketizedTables[key] = bucket =
-                    new SummarySet(key.GetArray(),
-                        [], []);
+            if (context.BucketizedTables.TryGetValue(key, out var bucket)) return bucket;
+            
+            bucket =
+                new SummarySet(key.GetArray(),
+                    [], []);
+            context.BucketizedTables.Add(key, bucket);
 
             return bucket;
         }
@@ -112,31 +114,21 @@ internal partial class TreeEvaluator
                 //it's important that we isolate the results for each chunk
                 //before merging them back to the global summary context
                 var thisChunkContext = new SummarizeResultTableContext
-                    { BucketizedTables = new Dictionary<SummaryKey, SummarySet>() };
-
-                var dictStopWatch = new Stopwatch();
-                var listStopWatch = new Stopwatch();
-                var setStopWatch = new Stopwatch();
+                    { BucketizedTables = new CachedDictionary<SummaryKey, SummarySet>(1) };
 
                 for (var rowIndex = 0; rowIndex < chunk.RowCount; rowIndex++)
                 {
-                    setStopWatch.Start();
                     //although it's tempting to use a linq select here, 
                     //this loop has to be very performant, and it's significantly
                     //faster to set properties in a for loop
                     var key = new SummaryKey();
                     for (var c = 0; c < byValuesColumns.Count; c++)
                         key.Set(c, byValuesColumns[c].GetRawDataValue(rowIndex));
-                    setStopWatch.Stop();
-                    dictStopWatch.Start();
                     var bucket = GetOrAddBucket(key, thisChunkContext);
-                    dictStopWatch.Stop();
-                    listStopWatch.Start();
                     var rowList = bucket.RowIds;
                     rowList.Add(rowIndex);
-                    listStopWatch.Stop();
                 }
-                EventLog.Log($"calculated buckets set{setStopWatch.ElapsedMilliseconds} dict {dictStopWatch.ElapsedMilliseconds} list {listStopWatch.ElapsedMilliseconds}");
+                EventLog.Log($"calculated buckets set");
 
                 foreach (var (summaryKey, summary) in thisChunkContext.BucketizedTables)
                 {
@@ -209,6 +201,6 @@ internal partial class TreeEvaluator
 
     private struct SummarizeResultTableContext
     {
-        public Dictionary<SummaryKey, SummarySet> BucketizedTables;
+        public CachedDictionary<SummaryKey, SummarySet> BucketizedTables;
     }
 }
