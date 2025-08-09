@@ -22,7 +22,7 @@ public static class ColumnTypeInferrer
         //so this would just lead to excessive casts
         new(typeof(long), s => (long.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
         new(typeof(double), s => (s.Length <=17 || s.Contains('.')) && double.TryParse(s, CultureInfo.InvariantCulture, out var i) ? (true,i) :(false,0)),
-        new(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
+        new(typeof(DateTime), s => (DateTime.TryParse(s, CultureInfo.InvariantCulture, out var i), i.ToUniversalTime())),
         new(typeof(Guid), s => (Guid.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
         new(typeof(TimeSpan), s => (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var i), i)),
         new(typeof(bool), s => (bool.TryParse(s, out var i), i))

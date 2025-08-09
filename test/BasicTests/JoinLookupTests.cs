@@ -121,7 +121,7 @@ public class JoinLookupTests : TestMethods
                     """;
         var result = await ResultAsString(query, Environment.NewLine);
         var expected = """
-                       a,1,,null
+                       a,1,,<null>
                        b,2,b,10
                        b,3,b,10
                        c,4,c,20
@@ -158,7 +158,7 @@ public class JoinLookupTests : TestMethods
                        b,3,b,10
                        c,4,c,20
                        c,4,c,30
-                       ,null,d,40
+                       ,<null>,d,40
                        """;
         result.Should().Be(expected);
     }
@@ -187,12 +187,12 @@ public class JoinLookupTests : TestMethods
         var result = await ResultAsString(query, Environment.NewLine);
         //NOTE this a different order than ADX
         var expected = """
-                       a,1,,null
+                       a,1,,<null>
                        b,2,b,10
                        b,3,b,10
                        c,4,c,20
                        c,4,c,30
-                       ,null,d,40
+                       ,<null>,d,40
                        """;
         result.Should().Be(expected);
     }
@@ -329,7 +329,7 @@ public class JoinLookupTests : TestMethods
         var result = await ResultAsString(query, Environment.NewLine);
         var expected = """
                        a,1,10
-                       b,2,null
+                       b,2,<null>
                        """;
         result.Should().Be(expected);
     }

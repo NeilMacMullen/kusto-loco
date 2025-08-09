@@ -3,6 +3,7 @@ using NotNullStrings;
 
 namespace BasicTests;
 
+
 [TestClass]
 public class SimpleFunctionTests : TestMethods
 {
@@ -1183,13 +1184,13 @@ print toscalar(letters | summarize mx=min(bitmap));";
         await Check("take 2 | order by b asc nulls last", "False,True");
         await Check("take 2 | order by b desc nulls last", "True,False");
 
-        await Check("order by b asc", "null,False,True");
-        await Check("order by b desc", "True,False,null");
+        await Check("order by b asc", "<null>,False,True");
+        await Check("order by b desc", "True,False,<null>");
 
-        await Check("order by b desc nulls first", "null,True,False");
-        await Check("order by b asc nulls last", "False,True,null");
-        await Check("order by b desc nulls last", "True,False,null");
-        await Check("order by b asc nulls first", "null,False,True");
+        await Check("order by b desc nulls first", "<null>,True,False");
+        await Check("order by b asc nulls last", "False,True,<null>");
+        await Check("order by b desc nulls last", "True,False,<null>");
+        await Check("order by b asc nulls first", "<null>,False,True");
     }
 
 

@@ -199,4 +199,38 @@ public class DateTimeTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("2023-01-30 00:00:00Z");
     }
+
+    [TestMethod]
+    public async Task LocalToUtc()
+    {
+        //ensure we didn't get any fractional values
+        var query = """
+                    datatable(local_dt: datetime, tz: string)
+                    [ datetime(2020-02-02 20:02:20), 'US/Pacific', 
+                      datetime(2020-02-02 20:02:20), 'America/Chicago', 
+                      datetime(2020-02-02 20:02:20), 'Europe/Paris']
+                    | extend utc_dt = datetime_local_to_utc(local_dt, tz)
+                    """;
+        var result = await ResultAsString(query, Environment.NewLine);
+        result.Should().Be("""
+                           2020-02-02 20:02:20Z,US/Pacific,2020-02-03 04:02:20Z
+                           2020-02-02 20:02:20Z,America/Chicago,2020-02-03 02:02:20Z
+                           2020-02-02 20:02:20Z,Europe/Paris,2020-02-02 19:02:20Z
+                           """
+        );
+    }
+
+    [TestMethod]
+    public async Task UtcToLocal()
+    {
+        //ensure we didn't get any fractional values
+        var query = """
+                    print dt=now()
+                    | extend pacific_dt = datetime_utc_to_local(dt, 'US/Pacific'), canberra_dt = datetime_utc_to_local(dt, 'Australia/Canberra')
+                    | extend diff = pacific_dt - canberra_dt
+                    | project diff
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Be("-17:00:00");
+    }
 }

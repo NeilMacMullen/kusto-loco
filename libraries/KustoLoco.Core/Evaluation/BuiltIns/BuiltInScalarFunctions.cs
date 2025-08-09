@@ -250,6 +250,7 @@ internal static class BuiltInScalarFunctions
         MakeDateTime.Register(Functions);
         MakeTimeSpan.Register(Functions);
         DateTimeUtcToLocalFunction.Register(Functions);
+        DateTimeLocalToUtcFunction.Register(Functions);
         ToIntFunction.Register(Functions);
         ToLongFunction.Register(Functions);
         ToDoubleFunction.Register(Functions);
@@ -272,6 +273,8 @@ internal static class BuiltInScalarFunctions
         GeoHashToCentralPointFunction.Register(Functions);
         BenchmarkFunction.Register(Functions);
         ParTest.Register(Functions);
+        DateTimeKindFunction.Register(Functions);
+        
 
       
     }

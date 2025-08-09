@@ -45,7 +45,7 @@ public class BinTests : TestMethods
                     """;
         var result = await ResultAsString(query,Environment.NewLine);
         result.Should().Be("""
-                           23/02/2018 15:14:00
+                           2018-02-23 15:14:00Z
                            """);
     }
     
@@ -64,9 +64,9 @@ public class BinTests : TestMethods
                     """;
         var result = await ResultAsString(query,Environment.NewLine);
         result.Should().Be("""
-                           23/02/2018 15:14:00,8
-                           24/02/2018 15:14:00,7
-                           26/02/2018 15:14:00,5
+                           2018-02-23 15:14:00Z,8
+                           2018-02-24 15:14:00Z,7
+                           2018-02-26 15:14:00Z,5
                            """);
     }
 

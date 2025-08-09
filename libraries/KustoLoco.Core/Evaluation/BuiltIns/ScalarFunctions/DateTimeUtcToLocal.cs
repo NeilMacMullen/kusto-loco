@@ -23,4 +23,24 @@ internal partial class DateTimeUtcToLocalFunction
     }
 }
 
+[KustoImplementation(Keyword = "Functions.DatetimeLocalToUtc")]
+internal partial class DateTimeLocalToUtcFunction
+{
+    private static DateTime? Impl(DateTime input, string tz)
+    {
+        if (tz.IsBlank())
+            return null;
+        try
+        {
+            var tzi = TimeZoneInfo.FindSystemTimeZoneById(tz);
+            var d = TimeZoneInfo.ConvertTimeToUtc(input, tzi);
+            return DateTime.SpecifyKind(d, DateTimeKind.Utc);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}
+
 

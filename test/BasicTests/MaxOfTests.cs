@@ -50,7 +50,7 @@ public class MaxOfTests : TestMethods
                     | project max_of(A, B)
                     """;
         var res = await ResultAsString(query);
-        res.Should().Be("6,8,2,1,null");
+        res.Should().Be("6,8,2,1,<null>");
     }
 
     [TestMethod]
@@ -68,7 +68,7 @@ public class MaxOfTests : TestMethods
                     | project min_of(A, B)
                     """;
         var res = await ResultAsString(query);
-        res.Should().Be("1,1,2,1,null");
+        res.Should().Be("1,1,2,1,<null>");
     }
 
     [TestMethod]
