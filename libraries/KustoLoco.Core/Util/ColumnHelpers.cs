@@ -88,9 +88,10 @@ public static class ColumnHelpers
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }
 
+
+    //TODO - packing the offset and length into a mapping array is just a bit of 
+    //a hack to make the internal API easier
     public static BaseColumn MapColumn(BaseColumn other, int offset, int length) =>
-        //TODO - packing the offset and length into a mapping array is just a bit of 
-        //a hack to make the internal API easier
         MapColumn([other], [offset, length],
             MappingType.Chunk);
 
@@ -275,6 +276,7 @@ public static class ColumnHelpers
     private static GenericTypedBaseColumnOfint
         CreateFromIntsObjectArray(object?[] data)
     {
+        //the conversion is required to handle cases where the data is ushort/ etc
         var columnData = NullableSetBuilderOfint.CreateFixed(data.Length);
         foreach (var item in data)
         {
@@ -289,6 +291,7 @@ public static class ColumnHelpers
 
     private static GenericTypedBaseColumnOflong CreateFromLongsObjectArray(object?[] data)
     {
+        //the conversion is required to handle cases where the data is ulong etc
         var columnData = NullableSetBuilderOflong.CreateFixed(data.Length);
         foreach (var item in data)
         {
@@ -303,6 +306,7 @@ public static class ColumnHelpers
 
     private static GenericTypedBaseColumnOfdouble CreateFromDoublesObjectArray(object?[] data)
     {
+        //use conversion because float could be passed in
         var columnData = NullableSetBuilderOfdouble.CreateFixed(data.Length);
         foreach (var item in data)
         {
@@ -315,6 +319,7 @@ public static class ColumnHelpers
         return GenericColumnFactoryOfdouble.CreateFromDataSet(columnData.ToNullableSet());
     }
 
+    //TODO - is this really needed ?  There are no types that could be synonymous with decimal
     private static GenericTypedBaseColumnOfdecimal CreateFromDecimalsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfdecimal.CreateFixed(data.Length);
@@ -328,7 +333,7 @@ public static class ColumnHelpers
 
         return GenericColumnFactoryOfdecimal.CreateFromDataSet(columnData.ToNullableSet());
     }
-
+    //proabably also rendundant
     private static GenericTypedBaseColumnOfbool CreateFromBoolsObjectArray(object?[] data)
     {
         var columnData = NullableSetBuilderOfbool.CreateFixed(data.Length);

@@ -15,6 +15,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core;
 
@@ -32,9 +33,9 @@ public class TableBuilder
     public readonly int Length;
     public readonly string Name;
 
-    private ImmutableArray<string> _columnNames ;
+    private ImmutableArray<string> _columnNames;
 
-    private ImmutableArray<BaseColumn> _columns ;
+    private ImmutableArray<BaseColumn> _columns;
 
     private TableBuilder(string name, IEnumerable<BaseColumn> columns,
         IEnumerable<string> columnNames, int length)
@@ -58,6 +59,7 @@ public class TableBuilder
             [],
             [],
             length);
+
     /// <summary>
     /// Try to ensure that added column names are unique and not blank
     /// </summary>
@@ -65,18 +67,20 @@ public class TableBuilder
     {
         if (name.IsBlank())
             name = "_column";
-       
+
         if (!_columnNames.Contains(name))
             return name;
-        for(var i = 1; i < 1000;i++)
+        for (var i = 1; i < 1000; i++)
         {
             var newName = $"{name}_{i}";
             if (!_columnNames.Contains(newName))
                 return newName;
         }
+
         //if we ever see this I shudder to think what the input must be
         throw new InvalidOperationException("can't find a unique column name amongst large number of duplicate names ");
     }
+
     /// <summary>
     /// Adds a column to the builder 
     /// </summary>
@@ -91,7 +95,7 @@ public class TableBuilder
         _columnNames = _columnNames.Add(name);
         return this;
     }
-   
+
     /// <summary>
     /// Creates a column from collection of items where we know the type
     /// </summary>
@@ -100,7 +104,7 @@ public class TableBuilder
         //TODO - since we know the length of the column we could use a more efficient allocation scheme in the builder
         //TODO - in fact this is only currently called from places we have already forced a ToArray so
         //we're doing a double copy here
-        var builder = ColumnHelpers.CreateBuilder(type,name);
+        var builder = ColumnHelpers.CreateBuilder(type, name);
         foreach (var item in items)
         {
             builder.Add(item);
@@ -122,7 +126,9 @@ public class TableBuilder
         return WithColumn(name, indexColumn);
     }
 
-  
+    public static TableBuilder CreateFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records)
+        => CreateFromVolatileData(tableName, records, []);
+
     /// <summary>
     /// Creates a TableBuilder from a collection of records by _copying_ the data into new columns
     /// </summary>
@@ -130,52 +136,89 @@ public class TableBuilder
     /// This method is less efficient than <see cref="CreateFromImmutableData{T}"/> since it requires copying the data into new arrays.
     /// It's a little more flexible though and the overhead is generally not a problem for small collections (a few 1000s) of records.
     /// </remarks>
-    public static TableBuilder CreateFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records)
+    public static TableBuilder CreateFromVolatileData<T>(string tableName, IReadOnlyCollection<T> records,IReadOnlyCollection<IKustoTypeConverter> overrides)
     {
         var builder = CreateEmpty(tableName, records.Count);
         foreach (var p in typeof(T).GetProperties())
         {
-            var data = records.Select(r => p.GetValue(r)).ToArray();
+            var data = Array.Empty<object?>();
+            var ov = overrides.FirstOrDefault(o => o.SourceType == p.PropertyType);
+            if (ov != null)
+            {
+                data = records.Select(r => ov.Convert(p.GetValue(r))).ToArray();
 
-            builder.WithColumn(p.Name, p.PropertyType, data);
+                builder.WithColumn(p.Name, ov.TargetType, data);
+                continue;
+            }
+
+            if (TypeMapping.IsImportableType(p.PropertyType))
+            {
+                data = records.Select(r => p.GetValue(r)).ToArray();
+                builder.WithColumn(p.Name, p.PropertyType, data);
+                continue;
+            }
+            data = records.Select(r => p.GetValue(r)?.ToString()??string.Empty).Cast<object?>().ToArray();
+            builder.WithColumn(p.Name, typeof(string), data);
+
         }
 
         return builder;
     }
 
-    /// <summary>
-    /// Creates columns that wrap row properties in a lambda value getter
-    /// </summary>
-    /// <remarks>
-    /// This method allows us to create very efficient columns since the only overhead over the original data is the method call
-    /// </remarks>
+
     public static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records)
+        => CreateFromImmutableData(tableName, records, []);
+    /// <summary>
+/// Creates columns that wrap row properties in a lambda value getter
+/// </summary>
+/// <remarks>
+/// This method allows us to create very efficient columns since the only overhead over the original data is the method call
+/// </remarks>
+    public static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records,IKustoTypeConverter[] overrides)
     {
         var builder = CreateEmpty(tableName, records.Length);
 
-        var columnActions = new Dictionary<Type, Action<PropertyInfo>>
+        var columnActions = new Dictionary<Type, Action<string,Func<T,object?>>>
         {
-            [typeof(int)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)p.GetValue(o))),
-            [typeof(long)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)p.GetValue(o))),
-            [typeof(float)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (float?)p.GetValue(o))),
-            [typeof(double)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)p.GetValue(o))),
-            [typeof(decimal)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)p.GetValue(o))),
-            [typeof(string)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)p.GetValue(o) ??string.Empty )),
-            [typeof(DateTime)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)p.GetValue(o))),
-            [typeof(TimeSpan)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)p.GetValue(o))),
-            [typeof(bool)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)p.GetValue(o))),
-            [typeof(Guid)] = p => builder.WithColumn(p.Name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)p.GetValue(o))),
+            [typeof(short)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
+            [typeof(ushort)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
+            [typeof(int)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
+            [typeof(uint)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
+            [typeof(long)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)fn(o))),
+            [typeof(ulong)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)fn(o))),
+
+            [typeof(float)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)fn(o))),
+            [typeof(double)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)fn(o))),
+            [typeof(decimal)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)fn(o))),
+            [typeof(string)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)fn(o) ??string.Empty )),
+            [typeof(DateTime)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)fn(o))),
+            [typeof(TimeSpan)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)fn(o))),
+            [typeof(bool)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)fn(o))),
+            [typeof(Guid)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)fn(o))),
+            [typeof(JsonNode)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfJsonNode<T>(records, o => (Guid?)fn(o))),
         };
 
         foreach (var p in typeof(T).GetProperties())
         {
+            var ov = overrides.FirstOrDefault(o =>
+                    o.SourceType == p.PropertyType);
+            if (ov != null)
+            {
+                if (columnActions.TryGetValue(ov.TargetType, out var make))
+                {
+                    make(p.Name, o => ov.Convert( p.GetValue(o)));
+                }
+                continue;
+            }
+            //fallthrough to standard type mapping
             var propertyType = p.PropertyType;
             if (columnActions.TryGetValue(propertyType, out var action))
             {
-                action(p);
+                action(p.Name,o=>p.GetValue(o));
             }
             else
             {
+                //if nothing else, convert to string
                 builder.WithColumn(p.Name,
                     new GenericLambdaWrappedColumnOfstring<T>(records, string? (o) => p.GetValue(o)?.ToString() ?? string.Empty));
             }

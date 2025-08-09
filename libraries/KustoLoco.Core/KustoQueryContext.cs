@@ -106,6 +106,9 @@ public class KustoQueryContext
         return AddTable(TableBuilder.CreateFromVolatileData(tableName, records));
     }
 
+    public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
+        => WrapDataIntoTable(tableName, records, []);
+
     /// <summary>
     ///     Adds immutable data to the context
     /// </summary>
@@ -114,7 +117,8 @@ public class KustoQueryContext
     ///     However, the client must ensure that the data is truly immutable and consists only of types
     ///     that are directly supported by Kusto.
     /// </remarks>
-    public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records)
+    public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records,
+        IReadOnlyCollection<IKustoTypeConverter> overrides)
     {
         return AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
     }
