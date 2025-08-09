@@ -8,5 +8,5 @@ internal partial class ArrayReverseFunction
     public JsonNode? Impl(JsonNode node)
         => node is not JsonArray array
             ? null
-            : JsonArrayHelpers.Reverse(array);
+            : JsonArrayHelper.Reverse(array);
 }

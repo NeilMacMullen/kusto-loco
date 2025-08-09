@@ -30,6 +30,23 @@ public static class TypeMapping
         [typeof(ulong)] = new KustoType(ScalarTypes.Long, false),
     };
 
+    private static Type[] NativeKustoTypes { get; } =
+    [
+        typeof(int), typeof(long),typeof(decimal), typeof(double), typeof(bool), typeof(DateTime), typeof(TimeSpan), typeof(JsonNode),
+        typeof(string),typeof(Guid)
+    ];
+    private static Type[] SupportedImportTypes { get; } = NativeKustoTypes.Concat(
+    [
+        typeof(uint), typeof(short), typeof(ushort), typeof(ulong), typeof(float)
+    ]).ToArray();
+
+
+    public static bool IsNativeKustoType(Type test)
+        => NativeKustoTypes.Contains(test);
+    public static bool IsImportableType(Type test)
+        => SupportedImportTypes.Contains(test);
+
+
     private static readonly Dictionary<TypeSymbol, Type> KustoToNetToLookup;
 
     static TypeMapping()

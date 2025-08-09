@@ -5,14 +5,12 @@ using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-internal class CaseFunctionImpl<T> : IScalarFunctionImpl
-
+[KustoGeneric(Types = "all")]
+internal class GenericCaseFunctionImpl<T> : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        var val = arguments.Last().Value is T?
-            ? (T?)arguments.Last().Value
-            : default;
+        var val = arguments.Last().Value;
         for (var p = 0; p < arguments.Length / 2; p++)
         {
             var pred = arguments[p * 2].Value as bool?;
@@ -30,18 +28,18 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
         var caseLength = arguments.Length / 2;
-        var fallback = (TypedBaseColumn<T?>)arguments.Last().Column;
+        var fallback = (GenericTypedBaseColumn<T>)arguments.Last().Column;
         var condValues = Enumerable.Range(0, caseLength)
             .Select(i => new
             {
-                Pred = (TypedBaseColumn<bool?>)arguments[i * 2].Column,
-                Val = (TypedBaseColumn<T?>)arguments[i * 2 + 1].Column
+                Pred = (GenericTypedBaseColumnOfbool)arguments[i * 2].Column,
+                Val = (GenericTypedBaseColumn<T>)arguments[i * 2 + 1].Column
             })
             .ToArray();
 
 
         var rowCount = fallback.RowCount;
-        var data = new T?[rowCount];
+        var data = NullableSetBuilder<T>.CreateFixed(rowCount);
         for (var i = 0; i < rowCount; i++)
         {
             var val = fallback[i];
@@ -52,9 +50,9 @@ internal class CaseFunctionImpl<T> : IScalarFunctionImpl
                     break;
                 }
 
-            data[i] = val;
+            data.Add(val);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactory<T>.CreateFromDataSet(data.ToNullableSet()));
     }
 }

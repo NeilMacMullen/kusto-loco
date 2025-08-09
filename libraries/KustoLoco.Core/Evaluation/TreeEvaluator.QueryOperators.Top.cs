@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -13,7 +13,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitTopOperator(IRTopOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != EvaluationResult.Null);
+        MyDebug.Assert(context.Left != EvaluationResult.Null);
         var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[1];
 
         var orderedExpression = node.ByExpression;
@@ -23,7 +23,7 @@ internal partial class TreeEvaluator
         var sortResult = new SortResultTable(this, context, context.Left.Value, sortColumns);
 
         var countExpressionResult = node.CountExpression.Accept(this, context);
-        Debug.Assert(countExpressionResult != EvaluationResult.Null);
+        MyDebug.Assert(countExpressionResult != EvaluationResult.Null);
         var count = (ScalarResult)countExpressionResult;
         var result =
             new TakeResultTable(sortResult, count.Value == null ? 0 : Convert.ToInt32(count.Value));

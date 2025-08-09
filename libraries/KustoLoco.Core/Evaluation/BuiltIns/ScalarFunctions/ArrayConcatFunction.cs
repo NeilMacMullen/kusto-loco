@@ -14,7 +14,7 @@ internal partial class ArrayConcatFunction
         {
             if (item is JsonArray subArray)
             {
-                var cloned = JsonArrayHelpers.ClonedItems(subArray);
+                var cloned = JsonArrayHelper.ClonedItems(subArray);
                 foreach(var i in cloned)
                     result.Add(i);
             }

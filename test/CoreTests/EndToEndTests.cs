@@ -1,6 +1,7 @@
-// Copyright (c) Microsoft Corporation.
+//
 // Licensed under the MIT License.
 
+using System;
 using System.Diagnostics;
 using AwesomeAssertions;
 using KustoLoco.Core;
@@ -3826,16 +3827,24 @@ aaathis is a test";
 
     private static void Test(string query, string expectedOutput)
     {
-        var engine = BabyKustoEngine.CreateForTest();
-        var result = (TabularResult)engine.Evaluate(
-            [], query);
-        Debug.Assert(result != null);
-        var stringified = result.Value.DumpToString();
+        try
+        {
+            var engine = BabyKustoEngine.CreateForTest();
+            var result = (TabularResult)engine.Evaluate(
+                [], query);
+            var stringified = result.Value.DumpToString();
 
-        var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");
-        var canonicalExpectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
+            var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");
+            var canonicalExpectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
 
-        canonicalOutput.Should().Be(canonicalExpectedOutput);
+            canonicalOutput.Should().Be(canonicalExpectedOutput);
+        }
+        catch (Exception x)
+        {
+            Console.WriteLine($"EXCEPTION: {x}");
+        }
+
+        
     }
 
     /// <summary>

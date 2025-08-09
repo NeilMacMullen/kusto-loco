@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -15,9 +15,9 @@ internal class PercentileAggregateIntImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
-        var valuesCol = (TypedBaseColumn<int?>)arguments[0].Column;
-        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
+        MyDebug.Assert(arguments.Length == 2);
+        var valuesCol = (GenericTypedBaseColumnOfint)arguments[0].Column;
+        var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)
@@ -43,9 +43,9 @@ internal class PercentileAggregateLongImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
-        var valuesCol = (TypedBaseColumn<long?>)arguments[0].Column;
-        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
+        MyDebug.Assert(arguments.Length == 2);
+        var valuesCol = (GenericTypedBaseColumnOflong)arguments[0].Column;
+        var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)
@@ -71,9 +71,9 @@ internal class PercentileAggregateDoubleImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
-        var valuesCol = (TypedBaseColumn<double?>)arguments[0].Column;
-        var percentilesCol = (TypedBaseColumn<double?>)arguments[1].Column;
+        MyDebug.Assert(arguments.Length == 2);
+        var valuesCol = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
+        var percentilesCol = (GenericTypedBaseColumnOfdouble)arguments[1].Column;
 
         var percentile = percentilesCol[0];
         if (!percentile.HasValue)

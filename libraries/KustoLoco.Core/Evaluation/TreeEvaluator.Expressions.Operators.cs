@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -16,7 +16,6 @@ internal partial class TreeEvaluator
                 node.ResultKind, node.ResultType, EvaluationHints.None));
 
         var val = node.Expression.Accept(this, context);
-        Debug.Assert(val != null);
         var arguments = new[] { val };
         return impl(arguments);
     }
@@ -34,7 +33,6 @@ internal partial class TreeEvaluator
         //   is single value.  But of course we won't find that until we try to evaluate...
         var leftVal = node.Left.Accept(this, context);
         var rightVal = node.Right.Accept(this, context);
-        Debug.Assert(leftVal != null && rightVal != null);
         var arguments = new[] { leftVal, rightVal };
         return impl(arguments);
     }

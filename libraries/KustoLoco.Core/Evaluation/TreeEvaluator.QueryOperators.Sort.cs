@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -13,7 +13,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitSortOperator(IRSortOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != EvaluationResult.Null);
+        MyDebug.Assert(context.Left != EvaluationResult.Null);
         var sortColumns = new (IRExpressionNode Expression, IComparer Comparer)[node.Expressions.ChildCount];
         for (var i = 0; i < node.Expressions.ChildCount; i++)
         {

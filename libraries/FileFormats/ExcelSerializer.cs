@@ -101,7 +101,7 @@ public class ExcelSerializer : ITableSerializer
             {
                 //'object' implies the column is a mix of types, so we need to
                 //convert to string and then infer the type
-                var colBuilder = new ColumnBuilder<string>();
+                var colBuilder = new GenericColumnBuilderOfstring();
                 foreach (var item in colData) colBuilder.Add(item?.ToString().NullToEmpty());
                 column = ColumnTypeInferrer.AutoInfer(colBuilder.ToColumn());
             }

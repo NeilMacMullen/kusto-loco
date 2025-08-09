@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -11,6 +11,7 @@ using Kusto.Language;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using KustoLoco.Core.Extensions;
@@ -321,35 +322,36 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         if (FunctionFinder.TryGetOverload(_functions, functionSymbol, returnType, irArguments, parameters,
                 out var functionOverload))
         {
-            Debug.Assert(functionOverload != null);
-            ApplyTypeCoercions(irArguments, functionOverload);
-            return new IRBuiltInScalarFunctionCallNode(signature, functionOverload, parameters,
+            ApplyTypeCoercions(irArguments, functionOverload!);
+            return new IRBuiltInScalarFunctionCallNode(signature, functionOverload!, parameters,
                 IRListNode.From(irArguments), node.ResultType);
         }
 
-
-        if (BuiltInAggregates.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
-                out var aggregateOverload))
-        {
-            Debug.Assert(aggregateOverload != null);
-            irArguments = irArguments.Take(aggregateOverload.NumParametersToMatch).ToArray();
-            parameters = parameters.Take(aggregateOverload.NumParametersToMatch).ToList();
-            ApplyTypeCoercions(irArguments, aggregateOverload);
-            return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments),
-                node.ResultType);
-        }
+        //try the int->long return type conversion for aggregate types 
+        var types = returnType == ScalarTypes.Int
+            ? new[] { ScalarTypes.Int, ScalarTypes.Long }
+            : new[] { returnType };
+        foreach (var expectedReturnType in types)
+            if (BuiltInAggregates.TryGetOverload(functionSymbol, expectedReturnType, irArguments, parameters,
+                    out var aggregateOverload))
+            {
+                irArguments = irArguments.Take(aggregateOverload!.NumParametersToMatch).ToArray();
+                parameters = parameters.Take(aggregateOverload.NumParametersToMatch).ToList();
+                ApplyTypeCoercions(irArguments, aggregateOverload);
+                return new IRAggregateCallNode(signature, aggregateOverload, parameters, IRListNode.From(irArguments),
+                    expectedReturnType);
+            }
 
         if (BuiltInWindowFunctions.TryGetOverload(functionSymbol, returnType, irArguments, parameters,
                 out var windowFunctionOverload))
         {
-            Debug.Assert(windowFunctionOverload != null);
-            ApplyTypeCoercions(irArguments, windowFunctionOverload);
-            return new IRBuiltInWindowFunctionCallNode(signature, windowFunctionOverload, parameters,
+            ApplyTypeCoercions(irArguments, windowFunctionOverload!);
+            return new IRBuiltInWindowFunctionCallNode(signature, windowFunctionOverload!, parameters,
                 IRListNode.From(irArguments), node.ResultType);
         }
 
         throw new InvalidOperationException(
-            $"Function {functionSymbol.Name}{SchemaDisplay.GetText(functionSymbol)} is not implemented.");
+            $"Function {functionSymbol.Name}{SchemaDisplay.GetText(functionSymbol)} is not implemented for arguments {string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}");
     }
 
     private static void ApplyTypeCoercions(IRExpressionNode[] irArguments, OverloadInfoBase overloadInfo)

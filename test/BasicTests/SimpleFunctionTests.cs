@@ -1,13 +1,22 @@
 using AwesomeAssertions;
 using NotNullStrings;
 
-// ReSharper disable StringLiteralTypo
-
 namespace BasicTests;
 
 [TestClass]
 public class SimpleFunctionTests : TestMethods
 {
+
+
+    [TestMethod]
+    public async Task Cast()
+    {
+        var query = "print trim_start(@'a+','aaainnerbbba')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("innerbbba");
+    }
+
+
     [TestMethod]
     public async Task TrimStart()
     {
@@ -40,8 +49,8 @@ datatable(Size:int) [7]
 | extend S= case(Size <= 3, 'Small',                        
                  Size <= 10, 'Medium', 
                              'Large')";
-        var result = await LastLineOfResult(query);
-        result.Should().Contain("Medium");
+        var result = await ResultAsString(query);
+        result.Should().Be("7,Medium");
     }
 
     [TestMethod]
@@ -154,8 +163,7 @@ datatable(Size:int) [50]
     {
         var query = "print c=1/0";
         var result = await LastLineOfResult(query);
-        // Depending on implementation, this may return null, error, or special value
-        result.Should().Match(r => r == "" || r.Contains("error") || r == "null");
+        result.Should().Contain("null");
     }
 
 
@@ -164,7 +172,7 @@ datatable(Size:int) [50]
     {
         var query = "print c=toint('notanumber')";
         var result = await LastLineOfResult(query);
-        result.Should().Be(""); // KQL returns null for invalid conversion
+        result.Should().Contain("null"); // KQL returns null for invalid conversion
     }
 
     [TestMethod]
@@ -298,7 +306,7 @@ datatable(Size:int) [50]
         var result = await LastLineOfResult(query);
         result.Should().Be("55");
     }
-
+   
 
     [TestMethod]
     public async Task RangeTimeSpan()
@@ -892,6 +900,19 @@ print toscalar(letters | summarize mx=min(bitmap));";
         res.Should().Contain("3.1415");
     }
 
+
+    [TestMethod]
+    public async Task PiColumnar()
+    {
+        var query = """
+                    range i from 1 to 10 step 1
+                    | extend p=pi()
+                    | summarize sum(p)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("31.415");
+    }
+
     [TestMethod]
     public async Task ArrayRotateLeft()
     {
@@ -1193,4 +1214,39 @@ print toscalar(letters | summarize mx=min(bitmap));";
         lines.Should().AllSatisfy(c => c.Should().Contain("3.14"));
         lines.Length.Should().Be(3);
     }
+
+    [TestMethod]
+    public async Task IffCanReturnNull()
+    {
+        var query = """
+                    print iff(true,int(null),5)
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("null");
+    }
+
+    [TestMethod]
+    public async Task BuiltIns_isnull_Columnar()
+    {
+        var query = """
+
+                    datatable(b:bool, i:int, l:long, r:real, d:datetime, t:timespan, s:string) [
+                      bool(null), int(null), long(null), real(null), datetime(null), timespan(null), '',
+                      false, 0, 0, 0, datetime(null), 0s, ' ',
+                      true, 1, 2, 3.5, datetime(2023-02-26), 5m, 'hello'
+                    ]
+                    | project b=isnull(b), i=isnull(i), l=isnull(l), r=isnull(r), d=isnull(d), t=isnull(t), s=isnull(s)
+
+                    """;
+
+        var expected = """
+                       True,True,True,True,True,True,False
+                       False,False,False,False,True,False,False
+                       False,False,False,False,False,False,False
+                       """;
+
+        var result = await ResultAsString(query, Environment.NewLine);
+        result.Should().Be(expected);
+    }
+
 }

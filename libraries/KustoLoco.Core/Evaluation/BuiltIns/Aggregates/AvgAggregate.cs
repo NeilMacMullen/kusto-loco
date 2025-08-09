@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 
 // ReSharper disable PartialTypeWithSinglePart
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
@@ -13,9 +15,12 @@ internal partial class AvgAggregate
         return 0;
     }
 
-    internal static double? IntImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : context.DoubleValue / context.Count;
+    internal static double? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any() ? valid.Sum(c => c.DoubleValue) / totalCount : null;
+    }
 
     internal static double LongImpl(NumericAggregate context, long n)
     {
@@ -24,9 +29,12 @@ internal partial class AvgAggregate
         return 0;
     }
 
-    internal static double? LongImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : context.DoubleValue / context.Count;
+    internal static double? LongImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any() ? valid.Sum(c => c.DoubleValue) / totalCount : null;
+    }
 
     internal static double DoubleImpl(NumericAggregate context, double n)
     {
@@ -35,9 +43,12 @@ internal partial class AvgAggregate
         return 0;
     }
 
-    internal static double? DoubleImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : context.DoubleValue / context.Count;
+    internal static double? DoubleImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any() ? valid.Sum(c => c.DoubleValue) / totalCount : null;
+    }
 
     internal static decimal DecimalImpl(NumericAggregate context, decimal n)
     {
@@ -46,9 +57,12 @@ internal partial class AvgAggregate
         return 0;
     }
 
-    internal static decimal? DecimalImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : context.DecimalValue / context.Count;
+    internal static decimal? DecimalImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any() ? valid.Sum(c => c.DecimalValue) / totalCount : null;
+    }
 
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
     {
@@ -57,10 +71,14 @@ internal partial class AvgAggregate
         return TimeSpan.Zero;
     }
 
-
-    internal static TimeSpan? TsImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : new TimeSpan((long)context.DoubleValue / context.Count);
+    internal static TimeSpan? TsImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any()
+            ? new TimeSpan((long)(valid.Sum(c => c.DoubleValue) / totalCount))
+            : null;
+    }
 
     internal static DateTime DtImpl(NumericAggregate context, DateTime n)
     {
@@ -69,7 +87,12 @@ internal partial class AvgAggregate
         return DateTime.MinValue;
     }
 
-    internal static DateTime? DtImplFinish(NumericAggregate context) => context.Count == 0
-        ? null
-        : new DateTime((long)context.DoubleValue / context.Count,DateTimeKind.Utc);
+    internal static DateTime? DtImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        var totalCount = valid.Sum(c => c.Count);
+        return valid.Any()
+            ? new DateTime((long)(valid.Sum(c => c.DoubleValue) / totalCount), DateTimeKind.Utc)
+            : null;
+    }
 }

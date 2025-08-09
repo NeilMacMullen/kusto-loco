@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -21,7 +21,6 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitFilterOperator(IRFilterOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != null);
         var result = new FilterResultsTable(this, context.Left.Value, context, node.Condition);
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
@@ -61,7 +60,7 @@ internal partial class TreeEvaluator
                     return (default, TableChunk.Empty, false);
                 case ColumnarResult columnar:
                 {
-                    var predicateColumn = (TypedBaseColumn<bool?>)columnar.Column;
+                    var predicateColumn = (GenericTypedBaseColumnOfbool)columnar.Column;
 
                     var wantedRows = new List<int>();
                     for (var i = 0; i < predicateColumn.RowCount; i++)

@@ -8,5 +8,5 @@ internal partial class ArrayRotateRightFunction
     public JsonNode? Impl(JsonNode node, long n) =>
         node is not JsonArray array
             ? null
-            : JsonArrayHelpers.RotateLeft(array, -n);
+            : JsonArrayHelper.RotateLeft(array, -n);
 }

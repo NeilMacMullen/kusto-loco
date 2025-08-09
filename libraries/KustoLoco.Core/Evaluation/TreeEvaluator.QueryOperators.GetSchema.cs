@@ -11,7 +11,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitGetSchemaOperator(IRGetSchemaOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != TabularResult.Empty);
+        MyDebug.Assert(context.Left != TabularResult.Empty);
 
 
         var cs = new[]
@@ -24,10 +24,10 @@ internal partial class TreeEvaluator
         var ts = new TableSymbol("schema", cs);
         var builders = new BaseColumnBuilder[]
         {
-            new ColumnBuilder<string?>(),
-            new ColumnBuilder<int?>(),
-            new ColumnBuilder<string?>(),
-            new ColumnBuilder<string?>()
+            new GenericColumnBuilderOfstring(),
+            new GenericColumnBuilderOfint(),
+            new GenericColumnBuilderOfstring(),
+            new GenericColumnBuilderOfstring()
         };
         var table = context.Left.Value;
         var i = 0;

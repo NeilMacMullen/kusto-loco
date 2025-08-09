@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using AwesomeAssertions;
 using KustoLoco.Core;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Util;
 // ReSharper disable StringLiteralTypo
 
@@ -56,14 +57,14 @@ public class TableBuilderTests
     [TestMethod]
     public void ColumnNamesAreUnique()
     {
-        var data =new[] { 1, 2, 3 };
+        var data = new object?[] {1, 2, 3};
         var builder =
 
             TableBuilder.CreateEmpty("test", data.Length)
-                .WithColumn("A", data)
-            .WithColumn("", data)
-            .WithColumn("A", data)
-                .WithColumn("", data)
+                .WithColumn("A", typeof(int),data)
+            .WithColumn("", typeof(int), data)
+            .WithColumn("A", typeof(int), data)
+                .WithColumn("", typeof(int), data)
 
             ;
         var src = builder.ToTableSource();

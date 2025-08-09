@@ -16,7 +16,7 @@ public class DateTimeTests : TestMethods
     {
         var query = "print D=todatetime('not-a-date')";
         var result = await LastLineOfResult(query);
-        result.Should().Be(""); // KQL returns null for invalid datetime parse
+        result.Should().Contain("null"); // KQL returns null for invalid datetime parse
     }
 
 

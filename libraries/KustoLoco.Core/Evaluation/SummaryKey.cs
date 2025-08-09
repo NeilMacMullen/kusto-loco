@@ -4,7 +4,7 @@ namespace KustoLoco.Core.Evaluation;
 
 public record struct SummaryKey
 {
-    private int num;
+    public int num;
     private object? O0;
     private object? O1;
     private object? O2;
@@ -92,5 +92,19 @@ public record struct SummaryKey
         if (num > 8) ret[8] = O8;
         if (num > 9) ret[9] = O9;
         return ret;
+    }
+
+    public void CopyToArray(object?[] ret)
+    {
+        if (num > 0) ret[0] = O0;
+        if (num > 1) ret[1] = O1;
+        if (num > 2) ret[2] = O2;
+        if (num > 3) ret[3] = O3;
+        if (num > 4) ret[4] = O4;
+        if (num > 5) ret[5] = O5;
+        if (num > 6) ret[6] = O6;
+        if (num > 7) ret[7] = O7;
+        if (num > 8) ret[8] = O8;
+        if (num > 9) ret[9] = O9;
     }
 }

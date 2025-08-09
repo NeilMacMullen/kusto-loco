@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 
 // ReSharper disable PartialTypeWithSinglePart
 
@@ -14,8 +16,11 @@ internal partial class SumAggregate
         return 0;
     }
 
-    internal static long? IntImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.LongValue;
+    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Sum() : null;
+    }
 
     internal static long LongImpl(NumericAggregate context, long n)
     {
@@ -24,8 +29,11 @@ internal partial class SumAggregate
         return 0;
     }
 
-    internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.LongValue;
+    internal static long? LongImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Sum() : null;
+    }
 
     internal static double DoubleImpl(NumericAggregate context, double n)
     {
@@ -34,8 +42,11 @@ internal partial class SumAggregate
         return 0;
     }
 
-    internal static double? DoubleImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DoubleValue;
+    internal static double? DoubleImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DoubleValue).Sum() : null;
+    }
 
     internal static decimal DecimalImpl(NumericAggregate context, decimal n)
     {
@@ -44,8 +55,11 @@ internal partial class SumAggregate
         return 0;
     }
 
-    internal static decimal? DecimalImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DecimalValue;
+    internal static decimal? DecimalImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DecimalValue).Sum() : null;
+    }
 
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n)
     {
@@ -54,6 +68,9 @@ internal partial class SumAggregate
         return TimeSpan.Zero;
     }
 
-    internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
+    internal static TimeSpan? TsImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? new TimeSpan(valid.Select(c => c.LongValue).Sum()) : null;
+    }
 }

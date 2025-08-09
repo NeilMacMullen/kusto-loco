@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+//
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -92,10 +92,9 @@ d
     private static void Test(string query, string expectedOutput)
     {
         var engine = BabyKustoEngine.CreateForTest();
-        var result = (TabularResult?)engine.Evaluate(
+        var result = (TabularResult)engine.Evaluate(
             [],
             query);
-        Debug.Assert(result != null);
         var stringified = result.Value.DumpToString();
 
         var canonicalOutput = stringified.Trim().Replace("\r\n", "\n");

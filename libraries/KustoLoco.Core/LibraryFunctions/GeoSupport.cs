@@ -15,7 +15,7 @@ public static class GeoSupport
     private static double ToRadians(double? degrees)
         => ToRadians(degrees!.Value);
 
-    public static double? HaversineDistance(double? lon1, double? lat1, double? lon2, double? lat2)
+    public static double? HaversineDistance(double lon1, double lat1, double lon2, double lat2)
     {
         if (!CheckValid(lon1, lat1))
             return null;
@@ -35,17 +35,15 @@ public static class GeoSupport
         return d;
     }
 
-    public static string GeoHash(double? lon, double? lat, long? resolution)
+    public static string GeoHash(double lon, double lat, long resolution)
     {
         if (!CheckValid(lon, lat))
-            return string.Empty;
-        if (resolution == null)
             return string.Empty;
 
         var geohasher = new Geohasher();
 
         // Encode latitude and longitude into a geohash string
-        return geohasher.Encode(lat!.Value, lon!.Value, (int)resolution.Value);
+        return geohasher.Encode(lat, lon, (int)resolution);
     }
 
     public static (double Latitude, double Longitude) GeoHashCentralPoint(string point)
