@@ -1,5 +1,6 @@
 using System.Globalization;
 using AwesomeAssertions;
+using AwesomeAssertions.Common;
 
 namespace BasicTests;
 
@@ -232,5 +233,15 @@ public class DateTimeTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         result.Should().Be("-17:00:00");
+    }
+
+    [TestMethod]
+    public void DtCheck()
+    {
+        var dt = DateTime.Parse("2 feb 2020 11:00");
+        dt.Kind.Should().Be(DateTimeKind.Unspecified);
+        var universal = dt.ToUniversalTime();
+        universal.Kind.Should().Be(DateTimeKind.Utc);
+        universal.ToString("g").Should().Be("02/02/2020 11:00");
     }
 }

@@ -14,17 +14,16 @@ namespace KustoLoco.Core.Evaluation.BuiltIns;
 
 internal static class BuiltInAggregates
 {
-    private static readonly Dictionary<FunctionSymbol, AggregateInfo> aggregates = new();
-
+    public static readonly Dictionary<FunctionSymbol, AggregateInfo> Aggregates = new();
     static BuiltInAggregates()
     {
-        aggregates.Add(Aggregates.Count,
+        Aggregates.Add(Kusto.Language.Aggregates.Count,
             new AggregateInfo(new AggregateOverloadInfo(new CountFunctionImpl(), ScalarTypes.Long)));
-        aggregates.Add(Aggregates.CountIf,
+        Aggregates.Add(Kusto.Language.Aggregates.CountIf,
             new AggregateInfo(new AggregateOverloadInfo(new CountIfFunctionImpl(), ScalarTypes.Long,
                 ScalarTypes.Bool)));
-        aggregates.Add(
-            Aggregates.DCount,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.DCount,
             new AggregateInfo(
                 new AggregateOverloadInfo(new DCountAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int),
@@ -40,8 +39,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.TimeSpan),
                 new AggregateOverloadInfo(new DCountAggregateStringImpl(), ScalarTypes.Long,
                     ScalarTypes.String)));
-        aggregates.Add(
-            Aggregates.CountDistinct,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.CountDistinct,
             new AggregateInfo(
                 new AggregateOverloadInfo(new DCountAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int),
@@ -57,8 +56,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.TimeSpan),
                 new AggregateOverloadInfo(new DCountAggregateStringImpl(), ScalarTypes.Long,
                     ScalarTypes.String)));
-        aggregates.Add(
-            Aggregates.DCountIf,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.DCountIf,
             new AggregateInfo(
                 new AggregateOverloadInfo(new DCountIfAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int,
@@ -81,8 +80,8 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new DCountIfAggregateStringImpl(), ScalarTypes.Long,
                     ScalarTypes.String,
                     ScalarTypes.Bool)));
-        aggregates.Add(
-            Aggregates.CountDistinctIf,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.CountDistinctIf,
             new AggregateInfo(
                 new AggregateOverloadInfo(new DCountIfAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int,
@@ -106,19 +105,19 @@ internal static class BuiltInAggregates
                     ScalarTypes.String,
                     ScalarTypes.Bool)));
 
-        AvgAggregate.Register(aggregates);
-        AvgIfAggregate.Register(aggregates);
-        SumAggregate.Register(aggregates);
-        SumIfAggregate.Register(aggregates);
-        MinAggregate.Register(aggregates);
-        MinIfAggregate.Register(aggregates);
-        MaxAggregate.Register(aggregates);
-        MaxIfAggregate.Register(aggregates);
+        AvgAggregate.Register(Aggregates);
+        AvgIfAggregate.Register(Aggregates);
+        SumAggregate.Register(Aggregates);
+        SumIfAggregate.Register(Aggregates);
+        MinAggregate.Register(Aggregates);
+        MinIfAggregate.Register(Aggregates);
+        MaxAggregate.Register(Aggregates);
+        MaxIfAggregate.Register(Aggregates);
 
-        TakeAny.Register(aggregates);
+        TakeAny.Register(Aggregates);
 
-        aggregates.Add(
-            Aggregates.Percentile,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.Percentile,
             new AggregateInfo(
                 new AggregateOverloadInfo(new PercentileAggregateIntImpl(), ScalarTypes.Long,
                     ScalarTypes.Int,
@@ -130,7 +129,7 @@ internal static class BuiltInAggregates
                     ScalarTypes.Real, ScalarTypes.Real,
                     ScalarTypes.Real)));
         
-        aggregates.Add(Aggregates.ArgMax,new AggregateInfo(
+        Aggregates.Add(Kusto.Language.Aggregates.ArgMax,new AggregateInfo(
             new AggregateOverloadInfo(new ArgMaxFunctionIntImpl(),ScalarTypes.Dynamic,1,ScalarTypes.Int),
                 new AggregateOverloadInfo(new ArgMaxFunctionLongImpl(), ScalarTypes.Dynamic,1, ScalarTypes.Long),
         new AggregateOverloadInfo(new ArgMaxFunctionDecimalImpl(), ScalarTypes.Dynamic,1, ScalarTypes.Decimal),
@@ -139,7 +138,7 @@ internal static class BuiltInAggregates
         new AggregateOverloadInfo(new ArgMaxFunctionTimeSpanImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.TimeSpan)
             ));
 
-        aggregates.Add(Aggregates.ArgMin, new AggregateInfo(
+        Aggregates.Add(Kusto.Language.Aggregates.ArgMin, new AggregateInfo(
             new AggregateOverloadInfo(new ArgMinFunctionIntImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Int),
             new AggregateOverloadInfo(new ArgMinFunctionLongImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Long),
             new AggregateOverloadInfo(new ArgMinFunctionDecimalImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.Decimal),
@@ -148,8 +147,8 @@ internal static class BuiltInAggregates
             new AggregateOverloadInfo(new ArgMinFunctionTimeSpanImpl(), ScalarTypes.Dynamic, 1, ScalarTypes.TimeSpan)
         ));
 
-        aggregates.Add(
-            Aggregates.MakeSet,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeSet,
             new AggregateInfo(
                 new AggregateOverloadInfo(new MakeSetIntFunctionImpl(), ScalarTypes.Dynamic,
                     ScalarTypes.Int),
@@ -187,8 +186,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.String,
                     ScalarTypes.Long)));
 
-        aggregates.Add(
-            Aggregates.MakeSetIf,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeSetIf,
             new AggregateInfo(
                 new AggregateOverloadInfo(new MakeSetIfIntFunctionImpl(), ScalarTypes.Dynamic,
                     ScalarTypes.Int,
@@ -235,8 +234,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.Dynamic, ScalarTypes.String,
                     ScalarTypes.Bool, ScalarTypes.Long)));
 
-        aggregates.Add(
-            Aggregates.MakeList,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeList,
             new AggregateInfo(
                 new AggregateOverloadInfo(new MakeListIntFunctionImpl(), ScalarTypes.Dynamic,
                     ScalarTypes.Int),
@@ -282,8 +281,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.Dynamic, ScalarTypes.String,
                     ScalarTypes.Long)));
 
-        aggregates.Add(
-            Aggregates.MakeListIf,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeListIf,
             new AggregateInfo(
                 new AggregateOverloadInfo(new MakeListIfIntFunctionImpl(), ScalarTypes.Dynamic,
                     ScalarTypes.Int,
@@ -339,8 +338,8 @@ internal static class BuiltInAggregates
                     ScalarTypes.Dynamic, ScalarTypes.String,
                     ScalarTypes.Bool, ScalarTypes.Long)));
 
-        aggregates.Add(
-            Aggregates.MakeListWithNulls,
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeListWithNulls,
             new AggregateInfo(
                 new AggregateOverloadInfo(new MakeListWithNullsIntFunctionImpl(),
                     ScalarTypes.Dynamic, ScalarTypes.Int),
@@ -379,7 +378,7 @@ internal static class BuiltInAggregates
         TypeSymbol returnType, IRExpressionNode[] arguments, List<Parameter> parameters,
         out AggregateOverloadInfo? overload)
     {
-        if (!aggregates.TryGetValue(symbol, out var aggregateInfo))
+        if (!Aggregates.TryGetValue(symbol, out var aggregateInfo))
         {
             overload = null;
             return false;

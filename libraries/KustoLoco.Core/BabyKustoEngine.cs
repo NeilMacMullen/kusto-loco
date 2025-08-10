@@ -17,6 +17,7 @@ using NLog;
 namespace KustoLoco.Core;
 
 public readonly record struct FunctionInfo(string Name, bool Implemented);
+public readonly record struct AggregateInfo(string Name, bool Implemented);
 
 public class BabyKustoEngine
 {
@@ -53,7 +54,19 @@ public class BabyKustoEngine
         _additionalfuncs = funcs;
     }
 
-    public IReadOnlyCollection<FunctionInfo> GetImplementedList()
+    public IReadOnlyCollection<AggregateInfo> GetImplementedAggregateList()
+    {
+        var aggregates = BuiltInAggregates.Aggregates.Select(a => new AggregateInfo(a.Key.Name, true))
+            .ToArray();
+        var notImplemented =
+            GlobalState.Default.Aggregates.Except(BuiltInAggregates.Aggregates.Keys)
+                .Select(f => new AggregateInfo(f.Name, false))
+                .ToArray();
+        return aggregates.Concat(notImplemented).ToArray();
+    }
+
+
+    public IReadOnlyCollection<FunctionInfo> GetImplementedFunctionList()
     {
         var funcs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
             .Select(f => new FunctionInfo(f.Key.Name, true))

@@ -106,7 +106,7 @@ public class ParquetSerializer : ITableSerializer
         _console.WriteLine("Reading stream...");
         using var fileReader = await ParquetReader.CreateAsync(fileStream);
         var rowGroupCount = fileReader.RowGroupCount;
-        //KustResult.Empty can produce this
+        //KustoResult.Empty can produce this
         if (rowGroupCount == 0)
             return TableLoadResult.Success(InMemoryTableSource.Empty);
 
@@ -133,17 +133,11 @@ public class ParquetSerializer : ITableSerializer
             foreach (var column in rowGroup)
             {
                 var dataColumn = rowGroup[columnIndex];
-                //lookup the builder for this column
-                //var builderInfo = columnBuilders[columnIndex];
-                //builderInfo.AddCapacity(column.Data.Length);
                 _console.ShowProgress(
                     $"Column:{dataColumn.Field.Name} {rowGroupIndex+1}/{rowGroupCount}");
                 var set = NullableSetLocator.GetNullableForTypeAndBaseArray(dataColumn.Field.ClrType, column.Data);
 
                 nullableSets[columnIndex] = set;
-                
-               // _console.ShowProgress(
-               //     $"{stopwatch.ElapsedMilliseconds} Added {rowGroup.Length}/{column.Data.Length} data for {dataColumn.Field.Name} from rowGroup //{rowGroupIndex}");
                 columnIndex++;
             }
 

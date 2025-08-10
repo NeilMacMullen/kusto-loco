@@ -2,8 +2,8 @@
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "to_utc")]
-internal partial class ToUtcFunction
+[KustoImplementation(Keyword = "datetime_to_utc")]
+internal partial class DateTimeToUtcFunction
 {
     private static DateTime Impl(DateTime dt)
     {

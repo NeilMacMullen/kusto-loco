@@ -26,3 +26,4 @@ public sealed partial class IsNullFunction
     public static bool TimeSpanImpl(TimeSpan? predicate) => predicate == null;
 }
 
+//custom context because implementation is so cheap

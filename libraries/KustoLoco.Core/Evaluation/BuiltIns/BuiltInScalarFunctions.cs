@@ -170,6 +170,8 @@ internal static class BuiltInScalarFunctions
 
         NotFunction.Register(Functions);
         IsNullFunction.Register(Functions);
+        IsNotNullFunction.Register(Functions);
+
         IffFunction.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Iif, IffFunction.S); //synonym for Iff
         TrimFunction.Register(Functions);
@@ -222,6 +224,12 @@ internal static class BuiltInScalarFunctions
         SinFunction.Register(Functions);
         CosFunction.Register(Functions);
         TanFunction.Register(Functions);
+        CotFunction.Register(Functions);
+        AsinFunction.Register(Functions);
+        AcosFunction.Register(Functions);
+        AtanFunction.Register(Functions);
+        Atan2Function.Register(Functions);
+        CeilingFunction.Register(Functions);
         SignFunction.Register(Functions);
         RoundFunction.Register(Functions);
         ToHexFunction.Register(Functions);
@@ -229,6 +237,8 @@ internal static class BuiltInScalarFunctions
         DegreesFunction.Register(Functions);
         LogFunction.Register(Functions);
         ExpFunction.Register(Functions);
+        Exp2Function.Register(Functions);
+        Exp10Function.Register(Functions);
         Log10Function.Register(Functions);
         Log2Function.Register(Functions);
         PowFunction.Register(Functions);
@@ -257,6 +267,7 @@ internal static class BuiltInScalarFunctions
         ToDecimalFunction.Register(Functions);
         ToRealFunction.Register(Functions);
         ToBoolFunction.Register(Functions);
+        StringSizeFunction.Register(Functions);
         ToGuidFunction.Register(Functions);
         ToStringFunction.Register(Functions);
         ToDateTimeFunction.Register(Functions);

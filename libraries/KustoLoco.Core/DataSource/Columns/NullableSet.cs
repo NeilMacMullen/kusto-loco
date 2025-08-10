@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 
 namespace KustoLoco.Core.DataSource.Columns;
 
@@ -76,6 +77,9 @@ public sealed class NullableSet<T> : INullableSet
         if (baseArray is T[] nonNullData)
         {
             var length = baseArray.Length;
+#if TYPE_DATETIME
+            nonNullData = nonNullData.Select(dt=>dt.ToUniversalTime()).ToArray();
+#endif 
             return new NullableSet<T>(new BitArray(1), nonNullData);
         }
 
@@ -91,7 +95,11 @@ public sealed class NullableSet<T> : INullableSet
                 if (d is not T t)
                     isNull[i] = true;
                 else
+#if TYPE_DATETIME
+                    nonnull[i] = t.ToUniversalTime();
+#else
                     nonnull[i] = t;
+#endif
             }
 
             return new NullableSet<T>(isNull, nonnull);
