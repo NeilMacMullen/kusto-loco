@@ -43,6 +43,18 @@ public class ImportTests
     }
 
     [TestMethod]
+    public async Task CustomConverterWithName()
+    {
+        var converter = new KustoTypeConverter<MyId, string>((name,s) => $"{name}:{s.Id}---{s.Number}");
+        var child = new MyDto { Name = "hello", Id = new MyId("identifier", 999) };
+        var context = new KustoQueryContext()
+            .AddTable(TableBuilder.CreateFromImmutableData("test", [child], [converter]));
+        var result = await context.RunQuery("test");
+        KustoFormatter.Tabulate(result).Should().Contain("hello");
+        KustoFormatter.Tabulate(result).Should().Contain("Id:identifier---999");
+    }
+
+    [TestMethod]
     public async Task CustomConverterWithMutableData()
     {
         var converter = new KustoTypeConverter<MyId, string>(s => $"{s.Id}---{s.Number}");

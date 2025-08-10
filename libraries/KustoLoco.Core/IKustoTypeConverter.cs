@@ -6,5 +6,5 @@ public interface IKustoTypeConverter
 {
     public Type SourceType { get; }
     public Type TargetType { get; }
-    public object? Convert(object? obj);
+    public object? Convert(string name,object? obj);
 }

@@ -145,7 +145,7 @@ public class TableBuilder
             var ov = overrides.FirstOrDefault(o => o.SourceType == p.PropertyType);
             if (ov != null)
             {
-                data = records.Select(r => ov.Convert(p.GetValue(r))).ToArray();
+                data = records.Select(r => ov.Convert(p.Name,p.GetValue(r))).ToArray();
 
                 builder.WithColumn(p.Name, ov.TargetType, data);
                 continue;
@@ -206,7 +206,7 @@ public class TableBuilder
             {
                 if (columnActions.TryGetValue(ov.TargetType, out var make))
                 {
-                    make(p.Name, o => ov.Convert( p.GetValue(o)));
+                    make(p.Name, o => ov.Convert(p.Name, p.GetValue(o)));
                 }
                 continue;
             }
