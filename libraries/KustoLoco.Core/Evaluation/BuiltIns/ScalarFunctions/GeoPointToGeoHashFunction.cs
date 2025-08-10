@@ -5,20 +5,14 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Functions.GeoPointToGeohash")]
 public partial class GeoPointToGeoHashFunction
 {
-    public string Impl(double lon, double lat, long resolution)
-    {
-        return GeoSupport.GeoHash(lon, lat, resolution);
-    }
-    public string IntImpl(double lon, double lat, int resolution)
-    {
-        return GeoSupport.GeoHash(lon, lat, resolution);
-    }
+    private static string Impl(double lon, double lat, long resolution)
+        => GeoSupport.GeoHash(lon, lat, resolution);
 
+    private static string IntImpl(double lon, double lat, int resolution)
+        => GeoSupport.GeoHash(lon, lat, resolution);
 
-    public string DefaultResolutionImpl(double lon, double lat)
-    {
-        return GeoSupport.GeoHash(lon, lat, GeoPointToGeoHashFunction.DefaultResolution);
-    }
+    private static string DefaultImpl(double lon, double lat)
+        => GeoSupport.GeoHash(lon, lat, GeoPointToGeoHashFunction.DefaultResolution);
 
     public const int DefaultResolution = 5;
 }
