@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -56,17 +56,33 @@ internal static class BuiltInOperators
         //separate columns
         operators.Add(Operators.Between,
             new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new IntBetweenOperatorImpl(false), ScalarTypes.Bool,
+                new ScalarOverloadInfo(new BetweenOperatorImplOfint(false), ScalarTypes.Bool,
+                    ScalarTypes.Int, ScalarTypes.Int,
+                    ScalarTypes.Int),
+                new ScalarOverloadInfo(new IntBetweenOperatorImpl(false),
+                    ScalarTypes.Bool,
                     ScalarTypes.Int, ScalarTypes.Long,
                     ScalarTypes.Long),
-                new ScalarOverloadInfo(new BetweenOperatorImpl<long>(false),
+                new ScalarOverloadInfo(new BetweenOperatorImplOflong(false),
                     ScalarTypes.Bool,
                     ScalarTypes.Long, ScalarTypes.Long,
                     ScalarTypes.Long),
-                new ScalarOverloadInfo(new BetweenOperatorImpl<DateTime>(false),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfdecimal(false),
+                    ScalarTypes.Bool,
+                    ScalarTypes.Decimal, ScalarTypes.Decimal,
+                    ScalarTypes.Decimal),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfdouble(false),
+                    ScalarTypes.Bool,
+                    ScalarTypes.Real, ScalarTypes.Real,
+                    ScalarTypes.Real),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfDateTime(false),
                     ScalarTypes.Bool,
                     ScalarTypes.DateTime, ScalarTypes.DateTime,
                     ScalarTypes.DateTime),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfTimeSpan(false),
+                    ScalarTypes.Bool,
+                    ScalarTypes.TimeSpan, ScalarTypes.TimeSpan,
+                    ScalarTypes.TimeSpan),
                 new ScalarOverloadInfo(new BetweenOperatorDateTimeWithTimespanImpl(false),
                     ScalarTypes.Bool,
                     ScalarTypes.DateTime, ScalarTypes.DateTime,
@@ -76,17 +92,17 @@ internal static class BuiltInOperators
 
         operators.Add(Operators.NotBetween,
             new ScalarFunctionInfo(
-                new ScalarOverloadInfo(new IntBetweenOperatorImpl(true), ScalarTypes.Bool,
+                new ScalarOverloadInfo(new BetweenOperatorImplOfint(true), ScalarTypes.Bool,
                     ScalarTypes.Int, ScalarTypes.Long,
                     ScalarTypes.Long),
-                new ScalarOverloadInfo(new BetweenOperatorImpl<long>(true),
+                new ScalarOverloadInfo(new BetweenOperatorImplOflong(true),
                     ScalarTypes.Bool,
                     ScalarTypes.Long, ScalarTypes.Long,
                     ScalarTypes.Long),
-                new ScalarOverloadInfo(new BetweenOperatorImpl<int>(true),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfint(true),
                     ScalarTypes.Bool,
                     ScalarTypes.Int, ScalarTypes.Int, ScalarTypes.Int),
-                new ScalarOverloadInfo(new BetweenOperatorImpl<DateTime>(true),
+                new ScalarOverloadInfo(new BetweenOperatorImplOfDateTime(true),
                     ScalarTypes.Bool,
                     ScalarTypes.DateTime, ScalarTypes.DateTime,
                     ScalarTypes.DateTime))
@@ -124,9 +140,11 @@ internal static class BuiltInOperators
         TypeSymbol resultType,
         IRExpressionNode[] arguments)
     {
-        if (!TryGetOverload(symbol,resultType, arguments, out var overload))
+        if (!TryGetOverload(symbol, resultType, arguments, out var overload))
+        {
             throw new NotImplementedException(
                 $"Operator {SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
+        }
 
         return overload!;
     }

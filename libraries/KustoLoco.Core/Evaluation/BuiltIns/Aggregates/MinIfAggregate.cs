@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 
 // ReSharper disable PartialTypeWithSinglePart
 
@@ -7,7 +9,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Aggregates.MinIf")]
 internal partial class MinIfAggregate
 {
-    internal static int IntImpl(NumericAggregate context, int n, bool t)
+    internal static long IntImpl(NumericAggregate context, int n, bool t)
     {
         if (!t)
             return 0;
@@ -16,8 +18,11 @@ internal partial class MinIfAggregate
         return 0;
     }
 
-    internal static int? IntImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : (int)context.LongValue;
+    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+    }
 
     internal static long LongImpl(NumericAggregate context, long n, bool t)
     {
@@ -28,8 +33,11 @@ internal partial class MinIfAggregate
         return 0;
     }
 
-    internal static long? LongImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.LongValue;
+    internal static long? LongImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+    }
 
     internal static double DoubleImpl(NumericAggregate context, double n, bool t)
     {
@@ -40,9 +48,11 @@ internal partial class MinIfAggregate
         return 0;
     }
 
-    internal static double? DoubleImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DoubleValue;
-
+    internal static double? DoubleImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DoubleValue).Min() : null;
+    }
 
     internal static decimal DecimalImpl(NumericAggregate context, decimal n, bool t)
     {
@@ -53,8 +63,11 @@ internal partial class MinIfAggregate
         return 0;
     }
 
-    internal static decimal? DecimalImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : context.DecimalValue;
+    internal static decimal? DecimalImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? valid.Select(c => c.DecimalValue).Min() : null;
+    }
 
     internal static TimeSpan TsImpl(NumericAggregate context, TimeSpan n, bool t)
     {
@@ -65,8 +78,11 @@ internal partial class MinIfAggregate
         return TimeSpan.Zero;
     }
 
-    internal static TimeSpan? TsImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new TimeSpan(context.LongValue);
+    internal static TimeSpan? TsImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? new TimeSpan(valid.Select(c => c.LongValue).Min()) : null;
+    }
 
     internal static DateTime DtImpl(NumericAggregate context, TimeSpan n, bool t)
     {
@@ -77,6 +93,9 @@ internal partial class MinIfAggregate
         return DateTime.MinValue;
     }
 
-    internal static DateTime? DtImplFinish(NumericAggregate context)
-        => context.Count == 0 ? null : new DateTime(context.LongValue, DateTimeKind.Utc);
+    internal static DateTime? DtImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    {
+        var valid = contexts.Where(c => c.Count > 0).ToList();
+        return valid.Any() ? new DateTime(valid.Select(c => c.LongValue).Min(), DateTimeKind.Utc) : null;
+    }
 }

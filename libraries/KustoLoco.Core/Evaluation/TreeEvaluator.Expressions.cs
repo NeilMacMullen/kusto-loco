@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -33,7 +33,7 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitRowScopeNameReferenceNode(IRRowScopeNameReferenceNode node,
         EvaluationContext context)
     {
-        Debug.Assert(context.Chunk != TableChunk.Empty);
+        MyDebug.Assert(context.Chunk != TableChunk.Empty);
         var column = context.Chunk.Columns[node.ReferencedColumnIndex];
         return new ColumnarResult(column);
     }
@@ -57,13 +57,13 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
+            var itemsCol = (GenericTypedBaseColumnOfJsonNode)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
                 data[i] = IndexIntoPossibleJsonArray(itemsCol[i], node.Index);
 
-            var column = new InMemoryColumn<JsonNode?>(data);
+            var column = new GenericInMemoryColumnOfJsonNode(data);
             return new ColumnarResult(column);
         }
 
@@ -83,7 +83,7 @@ internal partial class TreeEvaluator
             var items = (ColumnarResult?)node.Expression.Accept(this, context);
             if (items == null) throw new InvalidOperationException("Expression yielded null result");
 
-            var itemsCol = (TypedBaseColumn<JsonNode?>)items.Column;
+            var itemsCol = (GenericTypedBaseColumnOfJsonNode)items.Column;
 
             var data = new JsonNode?[itemsCol.RowCount];
             for (var i = 0; i < items.Column.RowCount; i++)
@@ -91,7 +91,7 @@ internal partial class TreeEvaluator
                     if (obj.TryGetPropertyValue(node.MemberName, out var value))
                         data[i] = value;
 
-            var column = new InMemoryColumn<JsonNode?>(data);
+            var column = new GenericInMemoryColumnOfJsonNode(data);
             return new ColumnarResult(column);
         }
 

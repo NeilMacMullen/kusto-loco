@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -19,10 +19,10 @@ internal partial class TreeEvaluator
 
     public override EvaluationResult VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != TabularResult.Empty);
+        MyDebug.Assert(context.Left != TabularResult.Empty);
 
         var countExpressionResult = node.Expression.Accept(this, context);
-        Debug.Assert(countExpressionResult != EvaluationResult.Null);
+        MyDebug.Assert(countExpressionResult != EvaluationResult.Null);
         var count = (ScalarResult)countExpressionResult;
         var result =
             new TakeResultTable(context.Left.Value, count.Value == null ? 0 : Convert.ToInt32(count.Value));

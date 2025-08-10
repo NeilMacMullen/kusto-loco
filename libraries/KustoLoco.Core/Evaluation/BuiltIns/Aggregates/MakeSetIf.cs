@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -14,16 +14,16 @@ internal class MakeSetIfIntFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<int?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfint)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -56,16 +56,16 @@ internal class MakeSetIfLongFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<long?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOflong)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -98,16 +98,16 @@ internal class MakeSetIfDoubleFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<double?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfdouble)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -140,16 +140,16 @@ internal class MakeSetIfDecimalFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<decimal?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfdecimal)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -182,16 +182,16 @@ internal class MakeSetIfTimeSpanFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<TimeSpan?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfTimeSpan)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -224,16 +224,16 @@ internal class MakeSetIfDateTimeFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<DateTime?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {
@@ -266,16 +266,16 @@ internal class MakeSetIfStringFunctionImpl : IAggregateImpl
 {
     public EvaluationResult Invoke(ITableChunk chunk, ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2 || arguments.Length == 3);
-        var valuesColumn = (TypedBaseColumn<string?>)arguments[0].Column;
-        var predicatesColumn = (TypedBaseColumn<bool?>)arguments[1].Column;
-        Debug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
+        MyDebug.Assert(arguments.Length == 2 || arguments.Length == 3);
+        var valuesColumn = (GenericTypedBaseColumnOfstring)arguments[0].Column;
+        var predicatesColumn = (GenericTypedBaseColumnOfbool)arguments[1].Column;
+        MyDebug.Assert(valuesColumn.RowCount == predicatesColumn.RowCount);
 
         var maxSize = long.MaxValue;
         if (arguments.Length == 3)
         {
-            var maxSizeColumn = (TypedBaseColumn<long?>)arguments[2].Column;
-            Debug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
+            var maxSizeColumn = (GenericTypedBaseColumnOflong)arguments[2].Column;
+            MyDebug.Assert(valuesColumn.RowCount == maxSizeColumn.RowCount);
 
             if (maxSizeColumn.RowCount > 0)
             {

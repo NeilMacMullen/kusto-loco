@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -13,7 +13,7 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
 {
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments.Length == 2);
         var left = (bool?)arguments[0].Value;
         var right = (bool?)arguments[1].Value;
         return new ScalarResult(ScalarTypes.Bool, WeirdOr(left, right));
@@ -21,10 +21,10 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 2);
-        Debug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
-        var left = (TypedBaseColumn<bool?>)(arguments[0].Column);
-        var right = (TypedBaseColumn<bool?>)(arguments[1].Column);
+        MyDebug.Assert(arguments.Length == 2);
+        MyDebug.Assert(arguments[0].Column.RowCount == arguments[1].Column.RowCount);
+        var left = (GenericTypedBaseColumnOfbool)(arguments[0].Column);
+        var right = (GenericTypedBaseColumnOfbool)(arguments[1].Column);
 
         //short-circuiting for indexed columns
         if (left.IsSingleValue && (left[0] == true))
@@ -32,13 +32,13 @@ internal class LogicalOrOperatorImpl : IScalarFunctionImpl
         if (right.IsSingleValue && (right[0] == true))
             return new ColumnarResult(right);
 
-        var data = new bool?[left.RowCount];
+        var data =NullableSetBuilderOfbool.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
             data[i] = WeirdOr(left[i], right[i]);
         }
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     // Nulls are treated as "unknown/any" for logical operations in Kusto.

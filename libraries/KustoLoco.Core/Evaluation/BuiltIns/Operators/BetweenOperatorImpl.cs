@@ -8,6 +8,7 @@ using KustoLoco.Core.DataSource.Columns;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
+[KustoGeneric(Types="comparable")]
 internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
     where T : struct, IComparable<T>
 
@@ -18,7 +19,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (T?)arguments[0].Value;
         var left = (T?)arguments[1].Value;
         var right = (T?)arguments[2].Value;
@@ -27,14 +28,14 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
-        var row = (TypedBaseColumn<T?>)arguments[0].Column;
-        var left = (TypedBaseColumn<T?>)arguments[1].Column;
-        var right = (TypedBaseColumn<T?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var row = (GenericTypedBaseColumn<T>)arguments[0].Column;
+        var left = (GenericTypedBaseColumn<T>)arguments[1].Column;
+        var right = (GenericTypedBaseColumn<T>)arguments[2].Column;
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
@@ -48,7 +49,7 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private bool? Impl(T? r, T? left, T? right) =>
@@ -57,6 +58,8 @@ internal class BetweenOperatorImpl<T> : IScalarFunctionImpl
             && r.Value.CompareTo(right.Value) <= 0)
         ^ _invert;
 }
+
+
 
 internal class IntBetweenOperatorImpl : IScalarFunctionImpl
 
@@ -67,7 +70,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (int?)arguments[0].Value;
         var left = (long?)arguments[1].Value;
         var right = (long?)arguments[2].Value;
@@ -76,14 +79,14 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
-        var row = (TypedBaseColumn<int?>)arguments[0].Column;
-        var left = (TypedBaseColumn<long?>)arguments[1].Column;
-        var right = (TypedBaseColumn<long?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var row = (GenericTypedBaseColumnOfint)arguments[0].Column;
+        var left = (GenericTypedBaseColumnOflong)arguments[1].Column;
+        var right = (GenericTypedBaseColumnOflong)arguments[2].Column;
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
@@ -96,8 +99,7 @@ internal class IntBetweenOperatorImpl : IScalarFunctionImpl
             }
         });
 
-
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
 
@@ -116,7 +118,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
         var r = (DateTime?)arguments[0].Value;
         var left = (DateTime?)arguments[1].Value;
         var right = (TimeSpan?)arguments[2].Value;
@@ -125,14 +127,14 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
 
     public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
     {
-        Debug.Assert(arguments.Length == 3);
+        MyDebug.Assert(arguments.Length == 3);
 
-        var row = (TypedBaseColumn<DateTime?>)arguments[0].Column;
-        var left = (TypedBaseColumn<DateTime?>)arguments[1].Column;
-        var right = (TypedBaseColumn<TimeSpan?>)arguments[2].Column;
-        var data = new bool?[row.RowCount];
+        var row = (GenericTypedBaseColumnOfDateTime)arguments[0].Column;
+        var left = (GenericTypedBaseColumnOfDateTime)arguments[1].Column;
+        var right = (GenericTypedBaseColumnOfTimeSpan)arguments[2].Column;
+        var data = NullableSetBuilderOfbool.CreateFixed(row.RowCount);
 
-        var rangePartitioner = Partitioner.Create(0, left.RowCount, 1000);
+        var rangePartitioner = SafePartitioner.Create(left.RowCount);
 
         Parallel.ForEach(rangePartitioner, (range, loopState) =>
         {
@@ -146,7 +148,7 @@ internal class BetweenOperatorDateTimeWithTimespanImpl : IScalarFunctionImpl
         });
 
 
-        return new ColumnarResult(ColumnFactory.Create(data));
+        return new ColumnarResult(GenericColumnFactoryOfbool.CreateFromDataSet(data.ToNullableSet()));
     }
 
     private bool? Impl(DateTime? r, DateTime? left, TimeSpan? right) =>

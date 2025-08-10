@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
 using Kusto.Language.Utils;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
@@ -49,7 +50,7 @@ internal partial class IRTranslator
     private List<IRJoinOnClause> DecodeOnExpressions(TableSymbol rightType, JoinOnClause onClause)
     {
         List<IRJoinOnClause> onExpressions = [];
-        Debug.Assert(_rowScope != TableSymbol.Empty);
+        MyDebug.Assert(_rowScope != TableSymbol.Empty);
         foreach (var element in onClause.Expressions)
         {
             var expression = element.Element;

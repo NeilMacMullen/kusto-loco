@@ -36,7 +36,7 @@ In the ScalarFuntions folder add an implenetation class.  This needs to provide 
  {
      public ScalarResult InvokeScalar(ScalarResult[] arguments)
      {
-         Debug.Assert(arguments.Length == 1);
+         MyDebug.Assert(arguments.Length == 1);
          var input = (DateTime?)arguments[0].Value;
 
          return new ScalarResult(ScalarTypes.String, Impl(input));
@@ -44,7 +44,7 @@ In the ScalarFuntions folder add an implenetation class.  This needs to provide 
 
      public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)
      {
-         Debug.Assert(arguments.Length == 1);
+         MyDebug.Assert(arguments.Length == 1);
          var inputCol = (TypedBaseColumn<DateTime?>)arguments[0].Column;
 
          var data = new string?[inputCol.RowCount];

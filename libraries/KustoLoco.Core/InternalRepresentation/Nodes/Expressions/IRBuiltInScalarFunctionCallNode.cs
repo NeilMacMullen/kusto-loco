@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -39,5 +39,5 @@ internal class IRBuiltInScalarFunctionCallNode : IRExpressionNode
             visitor.VisitBuiltInScalarFunctionCall(this, context);
 
     public override string ToString() =>
-        $"BuiltInScalarFunctionCall({SchemaDisplay.GetText(Signature.Symbol)}): {SchemaDisplay.GetText(ResultType)}";
+        $"BuiltInScalarFunctionCall('{Signature.Symbol.Name}' {SchemaDisplay.GetText(Signature.Symbol)}): returnType {SchemaDisplay.GetText(ResultType)}";
 }

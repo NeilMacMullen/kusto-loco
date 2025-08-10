@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System;
@@ -43,8 +43,7 @@ internal static class BuiltInWindowFunctions
                 $"Window function {symbol.Name}{SchemaDisplay.GetText(symbol)} is not implemented for argument types ({string.Join(", ", arguments.Select(arg => SchemaDisplay.GetText(arg.ResultType)))}).");
         }
 
-        Debug.Assert(overload != null);
-        return overload;
+        return overload!;
     }
 
     public static bool TryGetOverload(FunctionSymbol symbol,

@@ -8,3 +8,4 @@ internal partial class LogFunction
 {
     private static double Impl(double input) => Math.Log(input);
 }
+

@@ -1,6 +1,8 @@
-﻿using KustoLoco.Core;
+﻿using System.Diagnostics;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NLog;
@@ -37,6 +39,19 @@ public class ParquetSerializer : ITableSerializer
         return await SaveTable(fileStream, result);
     }
 
+    public async Task SaveTestTable(Stream fileStream,int count)
+    {
+        var dataFields = new[] { new DataField("test", typeof(int), false) };
+        var schema = new ParquetSchema(dataFields.Cast<Field>().ToArray());
+
+        await using var writer = await ParquetWriter.CreateAsync(schema, fileStream);
+        using var groupWriter = writer.CreateRowGroup();
+        var arr = Enumerable.Range(0, 100).ToArray();
+        var def = dataFields[0];
+        var dataColumn = new DataColumn(def, arr);
+        await groupWriter.WriteColumnAsync(dataColumn);
+    }
+
     public async Task<TableSaveResult> SaveTable(Stream fileStream, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
@@ -53,17 +68,31 @@ public class ParquetSerializer : ITableSerializer
 
 
         await using var writer = await ParquetWriter.CreateAsync(schema, fileStream);
-        using var groupWriter = writer.CreateRowGroup();
 
-        foreach (var columnDefinition in result
-                     .ColumnDefinitions())
+        var offset = 0;
+        while (offset < result.RowCount)
         {
-            _console.ShowProgress($"Writing column {columnDefinition.Name}...");
-            var dataColumn = new DataColumn(
-                dataFields[columnDefinition.Index],
-                CreateArrayFromRawObjects(columnDefinition, result)
-            );
-            await groupWriter.WriteColumnAsync(dataColumn);
+            var length = Math.Min(10_000_000, result.RowCount-offset);
+            using var groupWriter = writer.CreateRowGroup();
+
+            foreach (var columnDefinition in result
+                         .ColumnDefinitions())
+            {
+                _console.ShowProgress($"Writing column {columnDefinition.Name} {offset} {length}...");
+                var data = CreateArrayFromRawObjects(columnDefinition, result,offset,length);
+                //todo we could optimise saving here by writing non-nullable types but
+                //we'd need to know whether there are nulls before creating the schema
+                //and that would probably require us to propagate this knowledge through
+                //Columns
+                //if (data.NoNulls)
+                //    def = new DataField(def.Name, TypeMapping.UnderlyingType(def.ClrType));
+                var arr = data.GetDataAsArray();
+                var def = dataFields[columnDefinition.Index];
+                var dataColumn = new DataColumn(def, arr);
+                await groupWriter.WriteColumnAsync(dataColumn);
+              
+            }
+            offset += length;
         }
 
         _console.CompleteProgress("");
@@ -74,52 +103,59 @@ public class ParquetSerializer : ITableSerializer
     {
         if (fileStream.Length == 0)
             return TableLoadResult.Success(InMemoryTableSource.Empty);
+        _console.WriteLine("Reading stream...");
         using var fileReader = await ParquetReader.CreateAsync(fileStream);
         var rowGroupCount = fileReader.RowGroupCount;
-        //is it possible to have a parquet file with no row groups?
-        //seems unlikely so treat it as fatal error.
+        //KustoResult.Empty can produce this
         if (rowGroupCount == 0)
-            return TableLoadResult.Failure("No row groups in file");
+            return TableLoadResult.Success(InMemoryTableSource.Empty);
 
         var totalRows = 0;
         BaseColumnBuilder[] columnBuilders = [];
-
+        INullableSet[] nullableSets = [];
         for (var rowGroupIndex = 0; rowGroupIndex < rowGroupCount; rowGroupIndex++)
         {
             var rowGroup = await fileReader.ReadEntireRowGroupAsync(rowGroupIndex);
 
+            var pqColumns = rowGroup.Select(d => d).ToArray();
             //populate column builders if this is the first row group
             if (!columnBuilders.Any())
                 columnBuilders = rowGroup
                     .Select(dataColumn => ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
                     .ToArray();
+            if (!nullableSets.Any())
+                nullableSets = new INullableSet[columnBuilders.Length];
+
 
             //add data from this row group
             var columnIndex = 0;
+            var stopwatch = Stopwatch.StartNew();
             foreach (var column in rowGroup)
             {
-                //lookup the builder for this column
-                var builderInfo = columnBuilders[columnIndex];
-                builderInfo.AddCapacity(column.Data.Length);
+                var dataColumn = rowGroup[columnIndex];
                 _console.ShowProgress(
-                    $"Reading column {builderInfo.Name} from rowGroup {rowGroupIndex}");
-                //TODO - surely there is a more efficient way to do this by wrapping the original data?
-                foreach (var cellData in column.Data)
-                    builderInfo.Add(cellData);
+                    $"Column:{dataColumn.Field.Name} {rowGroupIndex+1}/{rowGroupCount}");
+                var set = NullableSetLocator.GetNullableForTypeAndBaseArray(dataColumn.Field.ClrType, column.Data);
+
+                nullableSets[columnIndex] = set;
                 columnIndex++;
             }
 
-            totalRows += rowGroup.GetLength(0);
+            totalRows += rowGroup.Length;
         }
 
         //having read all the data, we can now create the table
-        foreach (var colBuilder in columnBuilders)
-            colBuilder.TrimExcess();
+       // foreach (var colBuilder in columnBuilders)
+        //    colBuilder.TrimExcess();
 
         var tableBuilder = TableBuilder.CreateEmpty(tableName, totalRows);
-        foreach (var colBuilder in columnBuilders)
-            tableBuilder = tableBuilder.WithColumn(colBuilder.Name, colBuilder.ToColumn());
-
+        for (var i = 0; i < columnBuilders.Length; i++)
+        {
+            var builder = columnBuilders[i];
+            var set = nullableSets[i];
+            builder.AddNullableSet(set);
+            tableBuilder = tableBuilder.WithColumn(builder.Name,builder.ToColumn());
+        }   
         _console.CompleteProgress("");
         return TableLoadResult.Success(tableBuilder.ToTableSource());
     }
@@ -130,12 +166,14 @@ public class ParquetSerializer : ITableSerializer
         return await LoadTable(fileStream, tableName);
     }
 
-    private static Array CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res)
+    private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res,int start,int length)
     {
-        //TODO - it feels like this could be done more efficiently
-        var builder = ColumnHelpers.CreateBuilder(r.UnderlyingType, string.Empty);
-        foreach (var cellData in res.EnumerateColumnData(r))
+        var builder = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
+        foreach (var cellData in res.EnumerateColumnData(r).Skip(start).Take(length))
             builder.Add(cellData);
-        return builder.GetDataAsArray();
+        //TODO fix up 
+        var set= builder.ToINullableSet();
+        //var nonnullable = set.NoNulls;
+        return set;
     }
 }

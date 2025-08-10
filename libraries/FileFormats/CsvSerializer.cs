@@ -39,7 +39,7 @@ public class CsvSerializer : ITableSerializer
     public Task<TableLoadResult> LoadTable(Stream stream, string tableName)
     {
         var keys = Array.Empty<string>();
-        var builders = Array.Empty<ColumnBuilder<string>>();
+        var builders = Array.Empty<GenericColumnBuilderOfstring>();
         var inferColumnNames = _settings.GetBool(CsvSerializerSettings.InferColumnNames);
         using var reader = new StreamReader(stream);
         var config = _config with { HasHeaderRecord = !inferColumnNames };
@@ -60,7 +60,7 @@ public class CsvSerializer : ITableSerializer
             keys = csv.Context.Reader?.HeaderRecord.Select(TrimIfRequired)
                 .ToArray();
             builders = keys
-                .Select(_ => new ColumnBuilder<string>())
+                .Select(_ => new GenericColumnBuilderOfstring())
                 .ToArray();
         }
 
@@ -72,7 +72,7 @@ public class CsvSerializer : ITableSerializer
             {
                 keys = Enumerable.Range(0, csv.ColumnCount).Select(c => $"Column{c}").ToArray();
                 builders = keys
-                    .Select(_ => new ColumnBuilder<string>())
+                    .Select(_ => new GenericColumnBuilderOfstring())
                     .ToArray();
             }
 

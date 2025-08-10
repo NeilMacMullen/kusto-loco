@@ -11,5 +11,5 @@ internal partial class ToDateTimeFunction
 {
     private static DateTime? Impl(string input) =>
         DateTime.TryParse(input,CultureInfo.GetCultureInfo("en-GB"),
-            out var result) ? result : null;
+            out var result) ? result.ToUniversalTime() : null;
 }

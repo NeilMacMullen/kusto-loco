@@ -1,7 +1,5 @@
 ﻿using System;
-
-// ReSharper disable PartialTypeWithSinglePart
-
+using System.Threading.Tasks;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

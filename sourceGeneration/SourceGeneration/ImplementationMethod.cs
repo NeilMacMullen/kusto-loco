@@ -7,13 +7,14 @@ namespace KustoLoco.SourceGeneration
     {
         public readonly string Name;
         public readonly Param ReturnType;
-        public AttributeDecoder AttributeDecoder;
+        public readonly string Body;
+        public KustoImplementationAttributeDecoder KustoImplementationAttributeDecoder;
         public bool HasContext;
 
-        public ImplementationMethod(string className, string name, Param returnType, Param[] arguments,
-            AttributeDecoder attr)
+        public ImplementationMethod(string className,string name, Param returnType, Param[] arguments,
+            KustoImplementationAttributeDecoder attr)
         {
-            AttributeDecoder = attr;
+            KustoImplementationAttributeDecoder = attr;
             ClassName = className;
             Name = name;
             ReturnType = returnType;
@@ -31,8 +32,8 @@ namespace KustoLoco.SourceGeneration
         public Param ContextArgument => HasContext ? AllArguments.First() : throw new InvalidOperationException();
         public string ClassName { get; }
 
-        public string OverloadName => AttributeDecoder.OverloadName();
-        public bool HasScalar => AttributeDecoder.IsFuncOrOp;
-        public bool HasColumnar => AttributeDecoder.IsFuncOrOp;
+        public string OverloadName => KustoImplementationAttributeDecoder.OverloadName();
+        public bool HasScalar => KustoImplementationAttributeDecoder.IsFuncOrOp;
+        public bool HasColumnar => KustoImplementationAttributeDecoder.IsFuncOrOp;
     }
 }

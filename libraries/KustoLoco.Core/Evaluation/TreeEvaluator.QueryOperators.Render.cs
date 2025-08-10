@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿//
 // Licensed under the MIT License.
 
 using System.Diagnostics;
@@ -10,7 +10,7 @@ internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitRenderOperator(IRRenderOperatorNode node, EvaluationContext context)
     {
-        Debug.Assert(context.Left != EvaluationResult.Null);
+        MyDebug.Assert(context.Left != EvaluationResult.Null);
        
         return TabularResult.CreateWithVisualisation(
             context.Left.Value,

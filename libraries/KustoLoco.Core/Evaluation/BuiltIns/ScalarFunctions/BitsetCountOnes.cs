@@ -1,6 +1,6 @@
 ﻿namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "bitset_count_ones")]
+[KustoImplementation(Keyword = "Functions.BitsetCountOnes")]
 internal partial class BitsetCountOnes
 {
     private static long Impl(long a)

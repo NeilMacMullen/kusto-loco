@@ -1,6 +1,6 @@
 ﻿namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "binary_shift_left")]
+[KustoImplementation(Keyword = "Functions.BinaryShiftLeft")]
 internal partial class BinaryShiftLeft
 {
     private static long Impl(long a,long b)

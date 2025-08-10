@@ -42,5 +42,5 @@ public abstract class TestMethods
     }
 
     public string RowString(object?[] args)
-        => args.Select(r => r?.ToString() ?? "null").JoinString(",");
+        => args.Select(KustoFormatter.ObjectToKustoString).JoinString(",");
 }

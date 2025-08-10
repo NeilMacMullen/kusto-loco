@@ -11,9 +11,11 @@
             Name = name.Trim();
             //remove nullable annotation because some
             //return types such as JsonNode need to return nulls
+            if (type.Contains("?"))
+                IsNullable = true;
             Type = type.Trim().Replace("?","");
         }
-
+        public bool IsNullable { get; }
         /// <summary>
         ///     The index into the table that is being processed
         /// </summary>
