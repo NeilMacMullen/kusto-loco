@@ -189,7 +189,6 @@ public sealed class NullableSet_Ref<T> : INullableSet
         }
 
 
-        //todo - add special casing for Strings here to use stringpool
         return new NullableSet_Ref<T>(nullableData, noNulls);
     }
 

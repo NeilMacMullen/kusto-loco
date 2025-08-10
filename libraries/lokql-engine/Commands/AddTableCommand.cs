@@ -40,7 +40,7 @@ public static class AddTableCommand
         return Task.CompletedTask;
     }
 
-    [Verb("addtable",aliases:["csvdata"],
+    [Verb("addtable", aliases: ["csvdata"],
         HelpText = @"loads data from formatted inline text and adds a table
 The first line is assumed to be the header row.  Separators are inferred from
 the first row and items are trimmed by default
@@ -52,8 +52,7 @@ Examples:
 
 The table name is optional and defaults to 'data' if not provided.
 "
-
-        )]
+    )]
     internal class Options
     {
         [Value(0, HelpText = "Name of table (defaults to 'data')")]
