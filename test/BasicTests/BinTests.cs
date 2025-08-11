@@ -12,7 +12,7 @@ public class BinTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be("11");
     }
-    
+
 
     [TestMethod]
     public async Task Double()

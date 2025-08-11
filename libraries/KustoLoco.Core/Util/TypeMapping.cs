@@ -42,9 +42,9 @@ public static class TypeMapping
 
 
     public static bool IsNativeKustoType(Type test)
-        => NativeKustoTypes.Contains(test);
+        => NativeKustoTypes.Contains(TypeMapping.UnderlyingType(test));
     public static bool IsImportableType(Type test)
-        => SupportedImportTypes.Contains(test);
+        => SupportedImportTypes.Contains(TypeMapping.UnderlyingType(test));
 
 
     private static readonly Dictionary<TypeSymbol, Type> KustoToNetToLookup;

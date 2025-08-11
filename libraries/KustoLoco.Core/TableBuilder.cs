@@ -105,9 +105,22 @@ public class TableBuilder
         //TODO - in fact this is only currently called from places we have already forced a ToArray so
         //we're doing a double copy here
         var builder = ColumnHelpers.CreateBuilder(type, name);
-        foreach (var item in items)
+
+        var src = items.AsEnumerable();
+        //last minute conversions...
+        var underlyingType = TypeMapping.UnderlyingType(type);
+        src = underlyingType switch
         {
-            builder.Add(item);
+            { } t when t == typeof(float)  => src.Select(Convert.ToDouble).Cast<object?>(),
+            { } t when t == typeof(short)  => src.Select(Convert.ToInt32).Cast<object?>(),
+            { } t when t == typeof(ushort) => src.Select(Convert.ToInt32).Cast<object?>(),
+            { } t when t == typeof(uint)   => src.Select(Convert.ToInt32).Cast<object?>(),
+            { } t when t == typeof(ulong)  => src.Select(Convert.ToInt64).Cast<object?>(),
+            _ => src
+        };
+        foreach (var o in src)
+        {
+            builder.Add(o);   
         }
 
         return WithColumn(name, builder.ToColumn());
@@ -180,28 +193,32 @@ public class TableBuilder
 
         var columnActions = new Dictionary<Type, Action<string,Func<T,object?>>>
         {
-            [typeof(short)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
-            [typeof(ushort)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
-            [typeof(int)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
-            [typeof(uint)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => (int?)fn(o))),
-            [typeof(long)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)fn(o))),
-            [typeof(ulong)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => (long?)fn(o))),
-
-            [typeof(float)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)fn(o))),
-            [typeof(double)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => (double?)fn(o))),
-            [typeof(decimal)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdecimal<T>(records, o => (decimal?)fn(o))),
-            [typeof(string)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfstring<T>(records, o => (string?)fn(o) ??string.Empty )),
-            [typeof(DateTime)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfDateTime<T>(records, o => (DateTime?)fn(o))),
-            [typeof(TimeSpan)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o => (TimeSpan?)fn(o))),
-            [typeof(bool)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfbool<T>(records, o => (bool?)fn(o))),
-            [typeof(Guid)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfGuid<T>(records, o => (Guid?)fn(o))),
-            [typeof(JsonNode)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfJsonNode<T>(records, o => (Guid?)fn(o))),
+            //non-native CLR types need conversion
+            [typeof(short)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => Convert.ToInt32(fn(o)))),
+            [typeof(ushort)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => Convert.ToInt32(fn(o)))),
+            [typeof(uint)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o =>  Convert.ToInt32(fn(o)))),
+            [typeof(ulong)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => Convert.ToInt64(fn(o)))),
+            [typeof(float)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => Convert.ToDouble(fn(o)))),
+                
+            [typeof(bool)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfbool<T>(records,o=>(bool?) fn(o))),
+            [typeof(int)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o=>(int?) fn(o))),
+            [typeof(long)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o=>(long?) fn(o))),
+            [typeof(double)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o=>(double?)fn(o))),
+            [typeof(decimal)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdecimal<T>(records,o=> (decimal?)fn(o))),
+            [typeof(string)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfstring<T>(records, o =>  (string?)fn(o) ??string.Empty)),
+            [typeof(DateTime)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfDateTime<T>(records, o=>(DateTime?) fn(o))),
+            [typeof(TimeSpan)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfTimeSpan<T>(records, o=>(TimeSpan?)fn(o))),
+            [typeof(Guid)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfGuid<T>(records,o=>(Guid?)fn(o))),
+            [typeof(JsonNode)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfJsonNode<T>(records, o=>(JsonNode?)fn(o)))
         };
 
         foreach (var p in typeof(T).GetProperties())
         {
+            var propertyType = p.PropertyType;
+            var underlyingPropertyType = TypeMapping.UnderlyingType(propertyType);
+
             var ov = overrides.FirstOrDefault(o =>
-                    o.SourceType == p.PropertyType);
+                    o.SourceType == underlyingPropertyType);
             if (ov != null)
             {
                 if (columnActions.TryGetValue(ov.TargetType, out var make))
@@ -211,8 +228,8 @@ public class TableBuilder
                 continue;
             }
             //fallthrough to standard type mapping
-            var propertyType = p.PropertyType;
-            if (columnActions.TryGetValue(propertyType, out var action))
+           
+            if (columnActions.TryGetValue(underlyingPropertyType, out var action))
             {
                 action(p.Name,o=>p.GetValue(o));
             }
