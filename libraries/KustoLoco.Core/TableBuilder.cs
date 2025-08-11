@@ -119,7 +119,7 @@ public class TableBuilder
 
             { } t when t == typeof(short)  => src.Select(Convert.ToInt32).Cast<object?>(),
             { } t when t == typeof(ushort) => src.Select(Convert.ToInt32).Cast<object?>(),
-            { } t when t == typeof(uint)   => src.Select(Convert.ToInt32).Cast<object?>(),
+            { } t when t == typeof(uint)   => src.Select(Convert.ToInt64).Cast<object?>(),
 
             { } t when t == typeof(ulong)  => src.Select(Convert.ToInt64).Cast<object?>(),
             { } t when t == typeof(float)  => src.Select(Convert.ToDouble).Cast<object?>(),
@@ -206,7 +206,7 @@ public class TableBuilder
 
             [typeof(short)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => Convert.ToInt32(fn(o)))),
             [typeof(ushort)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o => Convert.ToInt32(fn(o)))),
-            [typeof(uint)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfint<T>(records, o =>  Convert.ToInt32(fn(o)))),
+            [typeof(uint)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o =>  Convert.ToInt64(fn(o)))),
             [typeof(ulong)] = (name, fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOflong<T>(records, o => Convert.ToInt64(fn(o)))),
             [typeof(float)] = (name,fn) => builder.WithColumn(name, new GenericLambdaWrappedColumnOfdouble<T>(records, o => Convert.ToDouble(fn(o)))),
                 
