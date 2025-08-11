@@ -96,6 +96,9 @@ public class TableBuilder
         return this;
     }
 
+    public TableBuilder WithColumn<T>(string name, IReadOnlyCollection<T> items)
+        => WithColumn(name, typeof(T), items.Cast<object?>().ToArray());
+    
     /// <summary>
     /// Creates a column from collection of items where we know the type
     /// </summary>
