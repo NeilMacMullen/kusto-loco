@@ -28,6 +28,9 @@ public static class TypeMapping
         //promote to longer type to preserve sign bit
         [typeof(uint)] = new KustoType(ScalarTypes.Long, false),
         [typeof(ulong)] = new KustoType(ScalarTypes.Long, false),
+        [typeof(byte)] = new KustoType(ScalarTypes.Int, false),
+        [typeof(sbyte)] = new KustoType(ScalarTypes.Int, false),
+
     };
 
     private static Type[] NativeKustoTypes { get; } =
@@ -37,6 +40,7 @@ public static class TypeMapping
     ];
     private static Type[] SupportedImportTypes { get; } = NativeKustoTypes.Concat(
     [
+        typeof(byte),typeof(sbyte),
         typeof(uint), typeof(short), typeof(ushort), typeof(ulong), typeof(float)
     ]).ToArray();
 

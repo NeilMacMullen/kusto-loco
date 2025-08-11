@@ -84,15 +84,52 @@ public class ImportTests
             f = (float)2,
             fn=(float?)3
         };
-
+        var objects = new[] { o };
         var context = new KustoQueryContext();
-        context.CopyDataIntoTable("data",[o] );
+        context.CopyDataIntoTable("data",objects );
         var results = (await context.RunQuery("data | take 1"));
-        results.ToJsonString().Should().Contain("2");
-        results.ToJsonString().Should().Contain("3");
+        results.ToJsonString().Should().Be(JsonSerializer.Serialize(objects));
 
     }
 
+    
+    [TestMethod]
+    public async Task Byte()
+    {
+       
+        var o = new
+        {
+            f = (byte)2,
+            fn=(byte?)3,
+            sf = (sbyte)2,
+            sfn=(sbyte?)3
+        };
+        
+        var objects = new[] { o };
+        var context = new KustoQueryContext();
+        context.CopyDataIntoTable("data",objects );
+        var results = (await context.RunQuery("data | take 1"));
+        results.ToJsonString().Should().Be(JsonSerializer.Serialize(objects));
+    }
+
+    [TestMethod]
+    public async Task ByteWrapped()
+    {
+       
+        var o = new
+        {
+            f = (byte)2,
+            fn=(byte?)3,
+            sf = (sbyte)2,
+            sfn=(sbyte?)3
+        };
+        
+        var objects = new[] { o }.ToImmutableArray();
+        var context = new KustoQueryContext();
+        context.WrapDataIntoTable("data",objects );
+        var results = (await context.RunQuery("data | take 1"));
+        results.ToJsonString().Should().Be(JsonSerializer.Serialize(objects));
+    }
     
     [TestMethod]
     public async Task Nullable()
@@ -136,11 +173,16 @@ public class ImportTests
             str = "abcd",
             g = Guid.NewGuid(),
             dt = DateTime.UtcNow,
+            b= (byte)1,
+            sb= (sbyte)1,
+            nb= (byte?)1,
+            nsb= (sbyte?)1,
             i = 5,
+            usht = (short)9,
             sht = (short)9,
             uln = (ulong?)10,
             lng = (long)6,
-            b = true,
+            boo = true,
             f = (float)2,
             d = (double)4,
             t = TimeSpan.FromHours(1)
