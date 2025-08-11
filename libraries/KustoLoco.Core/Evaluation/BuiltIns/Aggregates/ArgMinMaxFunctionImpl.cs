@@ -65,7 +65,7 @@ internal class ArgMaxFunctionLongImpl : IAggregateImpl
     {
 
         var maxIndex = IndexFinder.FindIndexOfLong(arguments[0].Column, true);
-        //the first argument the column used to calculate maxIndex
+        //the first argument the column is used to calculate maxIndex
         //so we normally skip it but if the call was of the form arg_max(A)
         //then we need in include it
         var skip = arguments.Length > 1 ? 1 : 0;

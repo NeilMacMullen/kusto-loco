@@ -95,6 +95,13 @@ internal partial class TreeEvaluator
             foreach (var sym in tuple.Columns)
             {
                 var index = context.Chunk.Table.Type.Columns.IndexOf(sym);
+                if (index < 0)
+                {
+                   //this is a very nasty hack to deal with constructs such as arg_max(sin(X),*)
+                   arguments = arguments.Append(arguments[0]).ToArray();
+                   continue;
+                }
+
                 var col = context.Chunk.Columns[index];
                 var res = new ColumnarResult(col);
                 arguments = arguments.Append(res).ToArray();
