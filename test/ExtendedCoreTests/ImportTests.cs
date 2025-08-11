@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.Text.Json;
 using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
@@ -73,6 +75,89 @@ public class ImportTests
         var col = ColumnHelpers.CreateFromObjectArray(data, TypeMapping.SymbolForType(typeof(short)));
         col.GetRawDataValue(50).Should().Be(50);
     }
+
+    [TestMethod]
+    public async Task Float()
+    {
+        var o = new
+        {
+            f = (float)2,
+            fn=(float?)3
+        };
+
+        var context = new KustoQueryContext();
+        context.CopyDataIntoTable("data",[o] );
+        var results = (await context.RunQuery("data | take 1"));
+        results.ToJsonString().Should().Contain("2");
+        results.ToJsonString().Should().Contain("3");
+
+    }
+
+    
+    [TestMethod]
+    public async Task Nullable()
+    {
+        var o = new
+        {
+            fn=(float?)3
+        };
+        var objects = new[] { o };
+
+        var context = new KustoQueryContext();
+        context.CopyDataIntoTable("data",objects );
+        var results = (await context.RunQuery("data | take 1"));
+        results.ToJsonString().Should()
+            .Be(JsonSerializer.Serialize(objects));
+    }
+
+
+    [TestMethod]
+    public async Task NullableWrapped()
+    {
+        var o = new
+        {
+            fn=(float?)3
+        };
+        var objects = new[] { o }.ToImmutableArray();
+        
+        var context = new KustoQueryContext();
+        context.WrapDataIntoTable("data",objects );
+        var results = (await context.RunQuery("data | take 1"));
+        results.ToJsonString().Should()
+            .Be(JsonSerializer.Serialize(objects));
+    }
+
+    
+    [TestMethod]
+    public async Task AllTypesSupportedForAnonymousType()
+    {
+        var o = new
+        {
+            str = "abcd",
+            g = Guid.NewGuid(),
+            dt = DateTime.UtcNow,
+            i = 5,
+            sht = (short)9,
+            uln = (ulong?)10,
+            lng = (long)6,
+            b = true,
+            f = (float)2,
+            d = (double)4,
+            t = TimeSpan.FromHours(1)
+        };
+
+        var records = Enumerable.Range(0, 1).Select(i => o).ToImmutableArray();
+
+        var context = new KustoQueryContext();
+        context.CopyDataIntoTable("data", records);
+        var results = (await context.RunQuery("data | take 1"));
+        var r = results.ToJsonString();
+        var expected = JsonSerializer.Serialize(new[] { o });
+        Console.WriteLine("EXP " + expected);
+        Console.WriteLine("ACT " + r);
+        r.Should().Be(expected);
+    }
+    
 }
 
 public class EnumClass
