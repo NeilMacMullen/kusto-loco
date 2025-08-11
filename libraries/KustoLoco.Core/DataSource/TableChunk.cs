@@ -59,7 +59,7 @@ public class TableChunk : ITableChunk
             if (columns[i].RowCount != expected)
             {
                 throw new ArgumentException(
-                    $"Mismatched column lengths, column[0] has {expected} rows, but column[{i} has {columns[i].RowCount} rows.");
+                    $"Mismatched column lengths, column[0] has {expected} rows, but column[{i}] has {columns[i].RowCount} rows.");
             }
         }
     }

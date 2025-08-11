@@ -95,6 +95,8 @@ internal partial class TreeEvaluator
             foreach (var sym in tuple.Columns)
             {
                 var index = context.Chunk.Table.Type.Columns.IndexOf(sym);
+                if (index<0)
+                    continue;
                 var col = context.Chunk.Columns[index];
                 var res = new ColumnarResult(col);
                 arguments = arguments.Append(res).ToArray();
