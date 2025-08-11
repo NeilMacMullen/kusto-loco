@@ -164,15 +164,15 @@ public class ArgMinMaxTests : TestMethods
     public async Task ArgMaxWithCalc()
     {
         var query = """
-                    datatable(Name: string, Start: int , End:int) [
+                    datatable(Name: string, Start: real , End:real) [
                         "Apple", 3, 1,
                         "Pear", 5, 5,
                     ]
-                    | summarize arg_max(End-Start,*)
+                    | summarize arg_max(sin(Start),*)
                     """;
 
         var result = await LastLineOfResult(query);
-        result.Should().Be("Apple,0,3,1");
+        result.Should().Be("2,Apple,3,1");
     }
 
     [TestMethod]
