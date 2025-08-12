@@ -194,7 +194,7 @@ public class TableBuilder
 /// <remarks>
 /// This method allows us to create very efficient columns since the only overhead over the original data is the method call
 /// </remarks>
-    public static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records,IKustoTypeConverter[] overrides)
+    public static TableBuilder CreateFromImmutableData<T>(string tableName, ImmutableArray<T> records,IReadOnlyCollection<IKustoTypeConverter> overrides)
     {
         var builder = CreateEmpty(tableName, records.Length);
 

@@ -120,7 +120,7 @@ public class KustoQueryContext
     public KustoQueryContext WrapDataIntoTable<T>(string tableName, ImmutableArray<T> records,
         IReadOnlyCollection<IKustoTypeConverter> overrides)
     {
-        return AddTable(TableBuilder.CreateFromImmutableData(tableName, records));
+        return AddTable(TableBuilder.CreateFromImmutableData(tableName, records,overrides));
     }
     /// <summary>
     /// Adds table from a named DataTable
