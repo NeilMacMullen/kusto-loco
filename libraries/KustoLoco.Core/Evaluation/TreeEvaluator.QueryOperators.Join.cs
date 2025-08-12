@@ -1,16 +1,16 @@
 ﻿//
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -117,14 +117,6 @@ internal partial class TreeEvaluator
             return result;
         }
 
-
-        private static void AddPartialRow(BaseColumnBuilder[] builders,
-            JoinSet joinset, int index)
-        {
-            var (chunk, row) = joinset.Get(index);
-            AddPartialRow(builders, chunk, row);
-        }
-
         private static void AddPartialRow(BaseColumnBuilder[] builders,
             ITableChunk chunk, int row)
         {
@@ -151,16 +143,14 @@ internal partial class TreeEvaluator
                 foreach (var rightBucket in right.Buckets)
                 {
                     var rightValue = rightBucket.Value;
-                    
+
                     if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
-                    
+
                     foreach (var (rightChunk, rightRow) in rightValue.Enumerate())
+                    foreach (var (leftChunk, leftRow) in leftValue.Enumerate())
                     {
-                        foreach (var (leftChunk, leftRow) in leftValue.Enumerate())
-                        {
-                            AddPartialRow(leftColumns, leftChunk, leftRow);
-                            AddPartialRow(rightColumns, rightChunk, rightRow);
-                        }
+                        AddPartialRow(leftColumns, leftChunk, leftRow);
+                        AddPartialRow(rightColumns, rightChunk, rightRow);
                     }
                 }
 
@@ -173,13 +163,18 @@ internal partial class TreeEvaluator
                     var leftValue = leftBucket.Value;
                     var numLeftRows = dedupeLeft ? 1 : leftValue.RowCount;
 
-                    if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
-                        for (var i = 0; i < numLeftRows; i++)
-                        for (var j = 0; j < rightValue.RowCount; j++)
+                    if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
+                    var leftEnum = dedupeLeft
+                        ? [leftValue.Get(0)]
+                        : leftValue.Enumerate();
+                    foreach (var (leftChunk, leftRow) in leftEnum)
+                    {
+                        foreach (var (rightChunk, rightRow) in rightValue.Enumerate())
                         {
-                            AddPartialRow(leftColumns, leftValue, i);
-                            AddPartialRow(rightColumns, rightValue, j);
+                            AddPartialRow(leftColumns, leftChunk, leftRow);
+                            AddPartialRow(rightColumns, rightChunk, rightRow);
                         }
+                    }
                 }
             }
 
@@ -199,9 +194,12 @@ internal partial class TreeEvaluator
         {
             var resultColumns = BuildersFromBucketed(left);
             foreach (var rightBucket in right.Buckets)
-                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                        AddPartialRow(resultColumns, leftValue, i);
+            {
+                if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
+
+                foreach (var (lChunk,lRow) in leftValue.Enumerate())
+                    AddPartialRow(resultColumns, lChunk,lRow);
+            }
 
             return ChunkFromBuilders(resultColumns);
         }
@@ -210,10 +208,12 @@ internal partial class TreeEvaluator
         {
             var resultColumns = BuildersFromBucketed(left);
             foreach (var (key, leftValue) in left.Buckets)
-                if (!right.Buckets.ContainsKey(key))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                        AddPartialRow(resultColumns, leftValue, i);
+            {
+                if (right.Buckets.ContainsKey(key)) continue;
+                foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    AddPartialRow(resultColumns, lChunk, lRow);
 
+            }
 
             return ChunkFromBuilders(resultColumns);
         }
@@ -231,19 +231,23 @@ internal partial class TreeEvaluator
             //because we need to populate every left row
             foreach (var (key, leftValue) in left.Buckets)
                 if (right.Buckets.TryGetValue(key, out var rightValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
+                {
+                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
+                        AddPartialRow(leftColumns, lChunk, lRow);
+                        AddPartialRow(rightColumns, rChunk,rRow);
                     }
+                }
                 else
-                    for (var i = 0; i < leftValue.RowCount; i++)
+                {
+                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
+                        AddPartialRow(leftColumns, lChunk, lRow);
                         foreach (var t in rightColumns)
                             t.Add(null);
                     }
+                }
 
             rightColumns = FilterRightColumnsForLookup(rightColumns);
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
@@ -266,9 +270,12 @@ internal partial class TreeEvaluator
         {
             var resultColumns = BuildersFromBucketed(right);
             foreach (var leftBucket in left.Buckets)
-                if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                        AddPartialRow(resultColumns, rightValue, i);
+            {
+                if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
+                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    AddPartialRow(resultColumns, rChunk,rRow);
+            }
+
             return ChunkFromBuilders(resultColumns);
         }
 
@@ -277,12 +284,12 @@ internal partial class TreeEvaluator
             var resultColumns = BuildersFromBucketed(right);
 
             foreach (var rightBucket in right.Buckets)
-                if (!left.Buckets.TryGetValue(rightBucket.Key, out _))
-                {
-                    var rightValue = rightBucket.Value;
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                        AddPartialRow(resultColumns, rightBucket.Value, i);
-                }
+            {
+                if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
+                var rightValue = rightBucket.Value;
+                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    AddPartialRow(resultColumns, rChunk, rRow);
+            }
 
             return ChunkFromBuilders(resultColumns);
         }
@@ -296,19 +303,21 @@ internal partial class TreeEvaluator
                 var rightValue = rightBucket.Value;
 
                 if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
+                {
+                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
+                        AddPartialRow(leftColumns, lChunk, lRow);
+                        AddPartialRow(rightColumns, rChunk, rRow);
                     }
+                }
                 else
-                    for (var i = 0; i < rightValue.RowCount; i++)
+                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
                     {
                         foreach (var t in leftColumns)
                             t.Add(null);
 
-                        AddPartialRow(rightColumns, rightValue, i);
+                        AddPartialRow(rightColumns, rChunk, rRow);
                     }
             }
 
@@ -329,20 +338,20 @@ internal partial class TreeEvaluator
                 {
                     var numRightRows = rightValue.RowCount;
 
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
+                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
+                        AddPartialRow(leftColumns, lChunk, lRow);
+                        AddPartialRow(rightColumns, rChunk, rRow);
                     }
                 }
                 else
                 {
-                    for (var i = 0; i < leftValue.RowCount; i++)
+                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        for (var c = 0; c < rightColumns.Length; c++)
-                            rightColumns[c].Add(null);
+                        AddPartialRow(leftColumns, lChunk, lRow);
+                        foreach (var t in rightColumns)
+                            t.Add(null);
                     }
                 }
             }
@@ -351,14 +360,14 @@ internal partial class TreeEvaluator
             {
                 var rightValue = rightBucket.Value;
 
-                if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                    {
-                        for (var c = 0; c < leftColumns.Length; c++)
-                            leftColumns[c].Add(null);
+                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
+                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                {
+                    foreach (var t in leftColumns)
+                        t.Add(null);
 
-                        AddPartialRow(rightColumns, rightValue, i);
-                    }
+                    AddPartialRow(rightColumns, rChunk, rRow);
+                }
             }
 
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
