@@ -3,6 +3,7 @@ using System.Text.Json;
 using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Util;
+using NotNullStrings;
 
 namespace ExtendedCoreTests;
 
@@ -44,6 +45,21 @@ public class ImportTests
         KustoFormatter.Tabulate(result).Should().Contain("identifier---999");
     }
 
+    [TestMethod]
+    public async Task CustomConverterWithStringArray()
+    {
+        var converter = new KustoTypeConverter<string[], string>(s => $"{s.Length} {s.JoinString(";")}");
+        var child = new { Data = new string[] { "abc", "def" } };
+        var data = Enumerable.Range(0,1).Select(_=>child).ToImmutableArray();
+        var context = new KustoQueryContext()
+            .WrapDataIntoTable("test",data,[converter]);
+            
+            //.AddTable(TableBuilder.CreateFromImmutableData("test", [child], [converter]));
+        var result = await context.RunQuery("test");
+        KustoFormatter.Tabulate(result).Should().Contain("2 abc;def");
+   }
+
+    
     [TestMethod]
     public async Task CustomConverterWithName()
     {
