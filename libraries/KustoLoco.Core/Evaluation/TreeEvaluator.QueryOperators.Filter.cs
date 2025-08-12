@@ -47,7 +47,6 @@ internal partial class TreeEvaluator
         protected override (NoContext NewContext, ITableChunk NewChunk, bool ShouldBreak) ProcessChunk(NoContext _,
             ITableChunk chunk)
         {
-            Logger.Debug("Filter processing chunk...");
             var chunkContext = _context with { Chunk = chunk };
             var evaluated = _condition.Accept(_owner, chunkContext);
 
