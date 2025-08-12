@@ -8,7 +8,6 @@ using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
-using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
@@ -24,7 +23,7 @@ internal partial class TreeEvaluator
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
-    private class JoinResultTable : ITableSource
+    private partial class JoinResultTable : ITableSource
     {
         private readonly EvaluationContext _context;
         private readonly bool _isLookup;
@@ -105,11 +104,11 @@ internal partial class TreeEvaluator
                     var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
-                        bucket = new NpmJoinSet();
+                        bucket = new JoinSet();
                         result.Buckets.Add(key, bucket);
                     }
 
-                    bucket.Add(chunk,i);
+                    bucket.Add(chunk, i);
                 }
 
                 chunkIndex++;
@@ -119,10 +118,16 @@ internal partial class TreeEvaluator
         }
 
 
-        private void AddPartialRow(BaseColumnBuilder[] builders,
-            NpmJoinSet joinset, int index)
+        private static void AddPartialRow(BaseColumnBuilder[] builders,
+            JoinSet joinset, int index)
         {
             var (chunk, row) = joinset.Get(index);
+            AddPartialRow(builders, chunk, row);
+        }
+
+        private static void AddPartialRow(BaseColumnBuilder[] builders,
+            ITableChunk chunk, int row)
+        {
             for (var c = 0; c < builders.Length; c++)
             {
                 var data = chunk.Columns[c]
@@ -146,15 +151,17 @@ internal partial class TreeEvaluator
                 foreach (var rightBucket in right.Buckets)
                 {
                     var rightValue = rightBucket.Value;
-                    var numrightRows = rightValue.RowCount;
-
-                    if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                        for (var i = 0; i < numrightRows; i++)
-                        for (var j = 0; j < leftValue.RowCount; j++)
+                    
+                    if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
+                    
+                    foreach (var (rightChunk, rightRow) in rightValue.Enumerate())
+                    {
+                        foreach (var (leftChunk, leftRow) in leftValue.Enumerate())
                         {
-                            AddPartialRow(leftColumns, leftValue, j);
-                            AddPartialRow(rightColumns, rightValue, i);
+                            AddPartialRow(leftColumns, leftChunk, leftRow);
+                            AddPartialRow(rightColumns, rightChunk, rightRow);
                         }
+                    }
                 }
 
                 rightColumns = FilterRightColumnsForLookup(rightColumns);
@@ -298,8 +305,9 @@ internal partial class TreeEvaluator
                 else
                     for (var i = 0; i < rightValue.RowCount; i++)
                     {
-                        for (var c = 0; c < leftColumns.Length; c++)
-                            leftColumns[c].Add(null);
+                        foreach (var t in leftColumns)
+                            t.Add(null);
+
                         AddPartialRow(rightColumns, rightValue, i);
                     }
             }
@@ -354,52 +362,6 @@ internal partial class TreeEvaluator
             }
 
             return ChunkFromBuilders(leftColumns.Concat(rightColumns));
-        }
-
-        private class BucketedRows
-        {
-            public BucketedRows(ITableSource table)
-            {
-                Table = table;
-            }
-
-            public ITableSource Table { get; }
-            public Dictionary<SummaryKey, NpmJoinSet> Buckets { get; } = new();
-        }
-    }
-
-    public class NpmJoinSet()
-    {
-        private ITableChunk[] _chunks= [];
-        private List<int>[] _rowNums =[];
-
-        public void Add(ITableChunk chunk, int row)
-        {
-            if (!_chunks.Contains(chunk))
-            {
-                _chunks = _chunks.Prepend(chunk).ToArray();
-                _rowNums = _rowNums.Prepend([]).ToArray();
-            }
-            _rowNums[0].Add(row);
-        }
-
-        public int RowCount => _rowNums.Sum(i => i.Count);
-
-        public (ITableChunk chunk, int row) Get(int index)
-        {
-            var chunkIndex = 0;
-            foreach (var list in _rowNums)
-            {
-                if (index < list.Count)
-                {
-                    return (_chunks[chunkIndex], list.ElementAt(index));
-                }
-
-                index -= list.Count;
-                chunkIndex++;
-            }
-
-            throw new InvalidOperationException();
         }
     }
 }
