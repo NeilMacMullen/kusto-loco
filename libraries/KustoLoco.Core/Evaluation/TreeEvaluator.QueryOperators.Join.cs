@@ -8,6 +8,7 @@ using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
+using KustoLoco.Core.Evaluation.BuiltIns.Impl;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
@@ -84,6 +85,7 @@ internal partial class TreeEvaluator
         {
             var result = new BucketedRows(table);
             var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
+            var chunkIndex = 0;
             foreach (var chunk in table.GetData())
             {
                 var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
@@ -103,12 +105,14 @@ internal partial class TreeEvaluator
                     var key = new SummaryKey(onValues);
                     if (!result.Buckets.TryGetValue(key, out var bucket))
                     {
-                        bucket = new NpmJoinSet(onValues, [], chunk);
+                        bucket = new NpmJoinSet();
                         result.Buckets.Add(key, bucket);
                     }
 
-                    bucket.Rows.Add(i);
+                    bucket.Add(chunk,i);
                 }
+
+                chunkIndex++;
             }
 
             return result;
@@ -118,10 +122,11 @@ internal partial class TreeEvaluator
         private void AddPartialRow(BaseColumnBuilder[] builders,
             NpmJoinSet joinset, int index)
         {
+            var (chunk, row) = joinset.Get(index);
             for (var c = 0; c < builders.Length; c++)
             {
-                var data = joinset.Chunk.Columns[c]
-                    .GetRawDataValue(joinset.Rows[index]);
+                var data = chunk.Columns[c]
+                    .GetRawDataValue(row);
                 builders[c].Add(data);
             }
         }
@@ -363,11 +368,38 @@ internal partial class TreeEvaluator
         }
     }
 
-    private readonly record struct NpmJoinSet(
-        object?[] OnValues,
-        List<int> Rows,
-        ITableChunk Chunk)
+    public class NpmJoinSet()
     {
-        public int RowCount => Rows.Count;
+        private ITableChunk[] _chunks= [];
+        private List<int>[] _rowNums =[];
+
+        public void Add(ITableChunk chunk, int row)
+        {
+            if (!_chunks.Contains(chunk))
+            {
+                _chunks = _chunks.Prepend(chunk).ToArray();
+                _rowNums = _rowNums.Prepend([]).ToArray();
+            }
+            _rowNums[0].Add(row);
+        }
+
+        public int RowCount => _rowNums.Sum(i => i.Count);
+
+        public (ITableChunk chunk, int row) Get(int index)
+        {
+            var chunkIndex = 0;
+            foreach (var list in _rowNums)
+            {
+                if (index < list.Count)
+                {
+                    return (_chunks[chunkIndex], list.ElementAt(index));
+                }
+
+                index -= list.Count;
+                chunkIndex++;
+            }
+
+            throw new InvalidOperationException();
+        }
     }
 }
