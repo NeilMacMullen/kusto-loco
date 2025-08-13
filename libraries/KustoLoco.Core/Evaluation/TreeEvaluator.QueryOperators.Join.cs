@@ -63,8 +63,8 @@ internal partial class TreeEvaluator
             var rightTable = ChunkHelpers.FromITableSource(right);
             return _joinKind switch
             {
-                IRJoinKind.InnerUnique => InnerJoin(leftTable, rightTable, true),
-                IRJoinKind.Inner => InnerJoin(leftTable, rightTable, false),
+                IRJoinKind.InnerUnique => InnerJoinOrLookup(leftTable, rightTable, true),
+                IRJoinKind.Inner => InnerJoinOrLookup(leftTable, rightTable, false),
                 IRJoinKind.LeftOuter => LeftOuterJoin(leftTable, rightTable),
                 IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable),
                 IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable),
@@ -76,45 +76,73 @@ internal partial class TreeEvaluator
             };
         }
 
-        private BucketedRows Bucketize(ITableSource table, bool isLeft)
+        private BaseColumn[] CalculateOnValues(IMaterializedTableSource table, bool isLeft)
+        {
+            var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
+            var chunk = table.Chunks[0];
+
+            var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
+
+            var chunkContext = new EvaluationContext(_context.Scope, chunk);
+            foreach (var onExpression in onExpressions)
+            {
+                var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
+                onValuesColumns.Add(onExpressionResult!.Column);
+            }
+
+            return onValuesColumns.ToArray();
+        }
+
+        private SummaryKey KeyFromOnValues(BaseColumn [] onValuesColumns, int i)
+        {
+            var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
+            return new SummaryKey(onValues);
+        }
+        private BucketedRows Bucketize(IMaterializedTableSource table, bool isLeft)
         {
             var result = new BucketedRows(table);
-            var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
-            foreach (var chunk in table.GetData())
-            {
-                var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
-                {
-                    var chunkContext = new EvaluationContext(_context.Scope, chunk);
-                    foreach (var onExpression in onExpressions)
-                    {
-                        var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
-                        onValuesColumns.Add(onExpressionResult!.Column);
-                    }
-                }
-                var numRows = chunk.RowCount;
-                for (var i = 0; i < numRows; i++)
-                {
-                    var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
-                    var key = new SummaryKey(onValues);
-                    if (!result.Buckets.TryGetValue(key, out var bucket))
-                    {
-                        bucket = new JoinSet();
-                        result.Buckets.Add(key, bucket);
-                    }
+            var chunk = table.Chunks[0];
 
-                    bucket.Add(i);
+            var onValuesColumns = CalculateOnValues(table, isLeft);
+
+            var numRows = chunk.RowCount;
+            for (var i = 0; i < numRows; i++)
+            {
+                var key = KeyFromOnValues(onValuesColumns, i);
+                if (!result.Buckets.TryGetValue(key, out var bucket))
+                {
+                    bucket = new JoinSet();
+                    result.Buckets.Add(key, bucket);
                 }
+
+                bucket.Add(i);
             }
 
             return result;
         }
 
-        /// When dedupeleft is true, takes the first left match of each bucket instead of all.
-        /// In other words, setting
-        /// <paramref name="dedupeLeft" />
-        /// to true produces the default join behavior (i.e.
-        /// `innerunique`).
-        /// Setting it to false produces the `inner`-join behavior.
+        private IEnumerable<ITableChunk> InnerLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            var onValuesColumns = CalculateOnValues(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            var leftRowCount = leftTable.RowCount;
+            for(var lRow=0;lRow <leftRowCount;lRow++)
+            {
+                var key = KeyFromOnValues(onValuesColumns, lRow);
+                if (!right.Buckets.TryGetValue(key, out var rightValue)) continue;
+                foreach (var rightRow in rightValue.RowNumbers)
+                {
+                    leftIndices.Add(lRow);
+                    rightIndices.Add(rightRow);
+                }
+            }
+
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
+
         private IEnumerable<ITableChunk> InnerJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable, bool dedupeLeft)
         {
@@ -122,25 +150,6 @@ internal partial class TreeEvaluator
             var right = Bucketize(rightTable, false);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
-            if (_isLookup)
-            {
-                foreach (var rightBucket in right.Buckets)
-                {
-                    var rightValue = rightBucket.Value;
-                    if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
-
-                    foreach (var rightRow in rightValue.RowNumbers)
-                    foreach (var leftRow in leftValue.RowNumbers)
-                    {
-                        leftIndices.Add(leftRow);
-                        rightIndices.Add(rightRow);
-                    }
-                }
-
-                return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
-            }
-
-            //join
             foreach (var leftBucket in left.Buckets)
             {
                 var leftValue = leftBucket.Value;
@@ -158,6 +167,21 @@ internal partial class TreeEvaluator
             }
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
+
+
+        /// When dedupeleft is true, takes the first left match of each bucket instead of all.
+        /// In other words, setting
+        /// <paramref name="dedupeLeft" />
+        /// to true produces the default join behavior (i.e.
+        /// `innerunique`).
+        /// Setting it to false produces the `inner`-join behavior.
+        private IEnumerable<ITableChunk> InnerJoinOrLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable, bool dedupeLeft)
+        {
+            if (_isLookup)
+                return InnerLookup(leftTable, rightTable);
+            return InnerJoin(leftTable, rightTable, dedupeLeft);
         }
 
 
@@ -343,7 +367,6 @@ internal partial class TreeEvaluator
             foreach (var leftBucket in left.Buckets)
             {
                 var leftValue = leftBucket.Value;
-
 
                 if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
                 {
