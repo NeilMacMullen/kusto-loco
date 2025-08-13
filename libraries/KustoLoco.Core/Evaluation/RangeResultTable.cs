@@ -79,9 +79,5 @@ public class RangeResultTable<T> : ITableSource
         yield return new TableChunk(this, [GenericColumnFactory<T>.CreateFromDataSet(chunk.ToNullableSet())]);
     }
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(
-        CancellationToken cancellation = default)
-    {
-        return GetData().ToAsyncEnumerable();
-    }
+   
 }

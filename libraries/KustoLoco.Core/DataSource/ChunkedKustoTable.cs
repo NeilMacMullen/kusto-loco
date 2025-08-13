@@ -30,8 +30,6 @@ public class ChunkedKustoTable : ITableSource
         }
     }
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
-        throw new NotImplementedException();
-
+   
     public static ChunkedKustoTable FromTable(ITableSource source, int chunkSize) => new(source, chunkSize);
 }

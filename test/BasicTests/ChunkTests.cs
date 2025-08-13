@@ -4,6 +4,7 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Util;
 using LogSetup;
 using NLog;
+using NotNullStrings;
 
 namespace BasicTests;
 
@@ -207,6 +208,32 @@ public class ChunkTests
             """);
         result.RowCount.Should().Be(20);
         //TODO - here compare tabulated output for more coverage
+    }
+
+    [TestMethod]
+    public async Task LookupAcrossChunks()
+    {
+        var context = CreateContext();
+        var rows = Enumerable.Range(0, 100).Select(i => new Row(i.ToString(), i)).ToArray();
+        var lookupRows = Enumerable.Range(95, 10).Select(i => new Row(i.ToString(), 95))
+            .ToArray();
+        AddChunkedTableFromRecords(context, "data", rows, 3);
+        AddChunkedTableFromRecords(context, "lk", lookupRows, 3);
+
+        var result = await context.RunQuery("""
+                                            data 
+                                            | lookup kind =inner lk on Value
+                                            | project Name1
+                                            """
+                                            );
+        result.RowCount.Should().Be(10);
+
+        var col = result.ColumnDefinitions()[0];
+        var str= result.EnumerateColumnData(col)
+            .Select(i=>int.Parse((string)i!))
+            .Order()
+            .JoinString(",");
+        str.Should().Be("95,96,97,98,99,100,101,102,103,104");
     }
 
 }

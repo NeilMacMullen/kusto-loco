@@ -124,11 +124,6 @@ internal partial class TreeEvaluator
                 GenericColumnFactoryOfTimeSpan.CreateFromDataSet(chunk.ToNullableSet())]);
         }
 
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(
-            CancellationToken cancellation = default)
-        {
-            return GetData().ToAsyncEnumerable();
-        }
     }
 
     private class RangeResultTableForDateTime : ITableSource
@@ -195,12 +190,6 @@ internal partial class TreeEvaluator
 
             yield return new TableChunk(this, [
                 GenericColumnFactoryOfDateTime.CreateFromDataSet(chunk.ToNullableSet())]);
-        }
-
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(
-            CancellationToken cancellation = default)
-        {
-            return GetData().ToAsyncEnumerable();
         }
     }
 }

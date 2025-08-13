@@ -32,7 +32,7 @@ public static class KustoFormatter
     public static string Tabulate(IReadOnlyCollection<OrderedDictionary> dictionaries)
     {
         var table = TableBuilder.FromOrderedDictionarySet(string.Empty, dictionaries);
-        var source = table.ToTableSource() as InMemoryTableSource 
+        var source = table.ToTableSource() 
                   ?? throw new NotImplementedException("TableBuilder is currently assumed to return an InMemoryTableSource");
         var result = new KustoQueryResult(string.Empty, source, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         return Tabulate(result);

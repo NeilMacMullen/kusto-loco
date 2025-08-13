@@ -17,9 +17,7 @@ public class GenericSingleValueLambdaColumn<T> : GenericTypedBaseColumn<T>
         hints = ColumnHints.HoldsSingleValue;
     }
 
-
-    public override T? GetNullableT(int index) => _dataFetcher();
-
+    
     public override T? this[int index] => _dataFetcher();
 
     public override int RowCount => _length;

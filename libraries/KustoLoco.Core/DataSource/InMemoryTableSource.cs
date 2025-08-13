@@ -13,13 +13,13 @@ namespace KustoLoco.Core.DataSource;
 /// <summary>
 ///     Use primary for EvaluationResults when all data has been materialized and is available
 /// </summary>
-public class InMemoryTableSource : ITableSource
+public class InMemoryTableSource : IMaterializedTableSource
 {
     public static readonly InMemoryTableSource Empty = new(TableSymbol.Empty, []);
 
     //actually only ever one chunk
     private readonly ITableChunk[] _data;
-
+    public ITableChunk GetChunk() =>_data.Single();
     public InMemoryTableSource(TableSymbol type, BaseColumn[] columns)
     {
         Type = type;
@@ -27,12 +27,11 @@ public class InMemoryTableSource : ITableSource
     }
 
     public int RowCount => _data.First().RowCount;
+    public ITableChunk[] Chunks => _data ;
     public TableSymbol Type { get; }
     public IEnumerable<ITableChunk> GetData() =>_data;
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-        => _data.ToAsyncEnumerable();
-
+  
     //TODO - this is brittle and will break with empty tables
     public InMemoryTableSource ShareAs(string newName)
     {

@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
@@ -23,7 +23,7 @@ internal partial class TreeEvaluator
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
-    private class JoinResultTable : ITableSource
+    private partial class JoinResultTable : ITableSource
     {
         private readonly EvaluationContext _context;
         private readonly bool _isLookup;
@@ -59,185 +59,260 @@ internal partial class TreeEvaluator
 
             var rightTabularResult = (TabularResult)rightResult;
             var right = rightTabularResult.Value;
-
-            var leftBuckets = Bucketize(_left, true);
-            var rightBuckets = Bucketize(right, false);
+            var leftTable = ChunkHelpers.FromITableSource(_left);
+            var rightTable = ChunkHelpers.FromITableSource(right);
             return _joinKind switch
             {
-                IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, true),
-                IRJoinKind.Inner => InnerJoin(leftBuckets, rightBuckets, false),
-                IRJoinKind.LeftOuter => LeftOuterJoin(leftBuckets, rightBuckets),
-                IRJoinKind.RightOuter => RightOuterJoin(leftBuckets, rightBuckets),
-                IRJoinKind.FullOuter => FullOuterJoin(leftBuckets, rightBuckets),
-                IRJoinKind.LeftSemi => LeftSemiJoin(leftBuckets, rightBuckets),
-                IRJoinKind.RightSemi => RightSemiJoin(leftBuckets, rightBuckets),
-                IRJoinKind.LeftAnti => LeftAntiJoin(leftBuckets, rightBuckets),
-                IRJoinKind.RightAnti => RightAntiJoin(leftBuckets, rightBuckets),
+                IRJoinKind.InnerUnique => InnerJoinOrLookup(leftTable, rightTable, true),
+                IRJoinKind.Inner => InnerJoinOrLookup(leftTable, rightTable, false),
+                IRJoinKind.LeftOuter => LeftOuterJoinOrLookup(leftTable, rightTable),
+                IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable),
+                IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable),
+                IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable),
+                IRJoinKind.RightSemi => RightSemiJoin(leftTable, rightTable),
+                IRJoinKind.LeftAnti => LeftAntiJoin(leftTable, rightTable),
+                IRJoinKind.RightAnti => RightAntiJoin(leftTable, rightTable),
                 _ => throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.")
             };
         }
 
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
-            throw new NotSupportedException();
+        private BaseColumn[] CalculateOnValues(IMaterializedTableSource table, bool isLeft)
+        {
+            var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
+            var chunk = table.Chunks[0];
 
-        private BucketedRows Bucketize(ITableSource table, bool isLeft)
+            var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
+
+            var chunkContext = new EvaluationContext(_context.Scope, chunk);
+            foreach (var onExpression in onExpressions)
+            {
+                var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
+                onValuesColumns.Add(onExpressionResult!.Column);
+            }
+
+            return onValuesColumns.ToArray();
+        }
+
+        private SummaryKey KeyFromOnValues(BaseColumn[] onValuesColumns, int i)
+        {
+            var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
+            return new SummaryKey(onValues);
+        }
+
+        private BucketedRows Bucketize(IMaterializedTableSource table, bool isLeft)
         {
             var result = new BucketedRows(table);
-            var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
-            foreach (var chunk in table.GetData())
-            {
-                var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
-                {
-                    var chunkContext = new EvaluationContext(_context.Scope, chunk);
-                    for (var i = 0; i < onExpressions.Length; i++)
-                    {
-                        var onExpression = onExpressions[i];
-                        var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
-                        onValuesColumns.Add(onExpressionResult!.Column);
-                    }
-                }
-                var numRows = chunk.RowCount;
-                for (var i = 0; i < numRows; i++)
-                {
-                    var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
-                    var key = new SummaryKey(onValues);
-                    if (!result.Buckets.TryGetValue(key, out var bucket))
-                    {
-                        bucket = new NpmJoinSet(onValues, [], chunk);
-                        result.Buckets.Add(key, bucket);
-                    }
+            var chunk = table.Chunks[0];
 
-                    bucket.Rows.Add(i);
+            var onValuesColumns = CalculateOnValues(table, isLeft);
+
+            var numRows = chunk.RowCount;
+            for (var i = 0; i < numRows; i++)
+            {
+                var key = KeyFromOnValues(onValuesColumns, i);
+                if (!result.Buckets.TryGetValue(key, out var bucket))
+                {
+                    bucket = new JoinSet();
+                    result.Buckets.Add(key, bucket);
                 }
+
+                bucket.Add(i);
             }
 
             return result;
         }
 
-
-        private void AddPartialRow(BaseColumnBuilder[] builders,
-            NpmJoinSet joinset, int index)
+        private IEnumerable<ITableChunk> InnerLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            for (var c = 0; c < builders.Length; c++)
+            var onValuesColumns = CalculateOnValues(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            var leftRowCount = leftTable.RowCount;
+            for (var lRow = 0; lRow < leftRowCount; lRow++)
             {
-                var data = joinset.Chunk.Columns[c]
-                    .GetRawDataValue(joinset.Rows[index]);
-                builders[c].Add(data);
+                var key = KeyFromOnValues(onValuesColumns, lRow);
+                if (!right.Buckets.TryGetValue(key, out var rightValue)) continue;
+                foreach (var rightRow in rightValue.RowNumbers)
+                {
+                    leftIndices.Add(lRow);
+                    rightIndices.Add(rightRow);
+                }
             }
+
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
 
-        /// <param name="dedupeLeft">
-        ///     When true, takes the first left match of each bucket instead of all.
-        ///     In other words, setting <paramref name="dedupeLeft" /> to true produces the default join behavior (i.e.
-        ///     `innerunique`).
-        ///     Setting it to false produces the `inner`-join behavior.
-        /// </param>
-        private IEnumerable<ITableChunk> InnerJoin(BucketedRows left, BucketedRows right, bool dedupeLeft)
+        private IEnumerable<ITableChunk> InnerJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable, bool dedupeLeft)
         {
-            var leftColumns = BuildersFromBucketed(left);
-            var rightColumns = BuildersFromBucketed(right);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            foreach (var leftBucket in left.Buckets)
+            {
+                var leftValue = leftBucket.Value;
+
+                if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
+                var leftRows = dedupeLeft
+                    ? leftValue.RowNumbers.Take(1).ToList()
+                    : leftValue.RowNumbers;
+                foreach (var leftRow in leftRows)
+                foreach (var rightRow in rightValue.RowNumbers)
+                {
+                    leftIndices.Add(leftRow);
+                    rightIndices.Add(rightRow);
+                }
+            }
+
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
+
+
+        /// When dedupeleft is true, takes the first left match of each bucket instead of all.
+        /// In other words, setting
+        /// <paramref name="dedupeLeft" />
+        /// to true produces the default join behavior (i.e.
+        /// `innerunique`).
+        /// Setting it to false produces the `inner`-join behavior.
+        private IEnumerable<ITableChunk> InnerJoinOrLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable, bool dedupeLeft)
+        {
             if (_isLookup)
-            {
-                foreach (var rightBucket in right.Buckets)
-                {
-                    var rightValue = rightBucket.Value;
-                    var numrightRows = rightValue.RowCount;
-
-                    if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                        for (var i = 0; i < numrightRows; i++)
-                        for (var j = 0; j < leftValue.RowCount; j++)
-                        {
-                            AddPartialRow(leftColumns, leftValue, j);
-                            AddPartialRow(rightColumns, rightValue, i);
-                        }
-                }
-
-                rightColumns = FilterRightColumnsForLookup(rightColumns);
-            }
-            else
-            {
-                foreach (var leftBucket in left.Buckets)
-                {
-                    var leftValue = leftBucket.Value;
-                    var numLeftRows = dedupeLeft ? 1 : leftValue.RowCount;
-
-                    if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
-                        for (var i = 0; i < numLeftRows; i++)
-                        for (var j = 0; j < rightValue.RowCount; j++)
-                        {
-                            AddPartialRow(leftColumns, leftValue, i);
-                            AddPartialRow(rightColumns, rightValue, j);
-                        }
-                }
-            }
-
-            return ChunkFromBuilders(leftColumns.Concat(rightColumns));
+                return InnerLookup(leftTable, rightTable);
+            return InnerJoin(leftTable, rightTable, dedupeLeft);
         }
 
-        private ITableChunk[] ChunkFromBuilders(IEnumerable<BaseColumnBuilder> builders)
+
+        private ITableChunk[] CreateChunks(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable, List<int> leftIndices, List<int> rightIndices)
+        {
+            var leftIArray = leftIndices.ToImmutableArray();
+            var rightIArray = rightIndices.ToImmutableArray();
+            var leftCols = leftTable.Chunks[0].Columns
+                .Select(col => ColumnHelpers.MapColumn(col, leftIArray)).ToArray();
+            var rawRight = rightTable.Chunks[0].Columns;
+            var rightCols = FilterRightColumnsForLookup(rawRight)
+                .Select(col => ColumnHelpers.MapColumn(col, rightIArray)).ToArray();
+            return ChunkFromColumns(leftCols.Concat(rightCols));
+        }
+
+        private ITableChunk[] CreateChunks(IMaterializedTableSource table, List<int> indices)
+        {
+            var indicesIArray = indices.ToImmutableArray();
+            var cols = table.Chunks[0].Columns
+                .Select(col => ColumnHelpers.MapColumn(col, indicesIArray)).ToArray();
+            return ChunkFromColumns(cols);
+        }
+
+
+        private ITableChunk[] ChunkFromColumns(IEnumerable<BaseColumn> builders)
         {
             var columns = builders
-                .Select(c => c.ToColumn())
                 .ToArray();
             var chunk = new TableChunk(this, columns);
             return [chunk];
         }
 
-        private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
+
+        private IEnumerable<ITableChunk> LeftSemiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            var resultColumns = BuildersFromBucketed(left);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var indices = new List<int>();
             foreach (var rightBucket in right.Buckets)
-                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                        AddPartialRow(resultColumns, leftValue, i);
+            {
+                if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
 
-            return ChunkFromBuilders(resultColumns);
+                indices.AddRange(leftValue.RowNumbers);
+            }
+
+            return CreateChunks(leftTable, indices);
         }
 
-        private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> LeftAntiJoin(
+            IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            var resultColumns = BuildersFromBucketed(left);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var indices = new List<int>();
             foreach (var (key, leftValue) in left.Buckets)
-                if (!right.Buckets.ContainsKey(key))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                        AddPartialRow(resultColumns, leftValue, i);
+            {
+                if (right.Buckets.ContainsKey(key)) continue;
+                indices.AddRange(leftValue.RowNumbers);
+            }
 
-
-            return ChunkFromBuilders(resultColumns);
+            return CreateChunks(leftTable, indices);
         }
 
-        private BaseColumnBuilder[] BuildersFromBucketed(BucketedRows b)
-            => b.Table.Type.Columns.Select(c => ColumnHelpers.CreateBuilder(c.Type)).ToArray();
 
+        private IEnumerable<ITableChunk> LeftOuterJoinOrLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable) =>
+            _isLookup
+                ? LeftOuterLookup(leftTable, rightTable)
+                : LeftOuterJoin(leftTable, rightTable);
 
-        private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            var leftColumns = BuildersFromBucketed(left);
-            var rightColumns = BuildersFromBucketed(right);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
 
             //it's not really practical to optimise this for lookup
             //because we need to populate every left row
             foreach (var (key, leftValue) in left.Buckets)
                 if (right.Buckets.TryGetValue(key, out var rightValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
+                    foreach (var lRow in leftValue.RowNumbers)
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(rRow);
                     }
                 else
-                    for (var i = 0; i < leftValue.RowCount; i++)
+                    foreach (var lRow in leftValue.RowNumbers)
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        foreach (var t in rightColumns)
-                            t.Add(null);
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(-1);
                     }
 
-            rightColumns = FilterRightColumnsForLookup(rightColumns);
-            return ChunkFromBuilders(leftColumns.Concat(rightColumns));
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
 
-        private BaseColumnBuilder[] FilterRightColumnsForLookup(BaseColumnBuilder[] rightColumns)
+        private IEnumerable<ITableChunk> LeftOuterLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            var onValues = CalculateOnValues(leftTable, true);
+            for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
+            {
+                var key = KeyFromOnValues(onValues, lRow);
+                if (right.Buckets.TryGetValue(key, out var rightValue))
+                {
+                    foreach (var rRow in rightValue.RowNumbers)
+                    {
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(rRow);
+                    }
+                }
+                else
+                {
+                    leftIndices.Add(lRow);
+                    rightIndices.Add(-1);
+                }
+            }
+
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
+
+        private BaseColumn[] FilterRightColumnsForLookup(BaseColumn[] rightColumns)
         {
             if (!_isLookup)
                 return rightColumns;
@@ -250,86 +325,91 @@ internal partial class TreeEvaluator
                 .ToArray();
         }
 
-        private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            var resultColumns = BuildersFromBucketed(right);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var indices = new List<int>();
             foreach (var leftBucket in left.Buckets)
-                if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                        AddPartialRow(resultColumns, rightValue, i);
-            return ChunkFromBuilders(resultColumns);
-        }
-
-        private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
-        {
-            var resultColumns = BuildersFromBucketed(right);
-
-            foreach (var rightBucket in right.Buckets)
-                if (!left.Buckets.TryGetValue(rightBucket.Key, out _))
-                {
-                    var rightValue = rightBucket.Value;
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                        AddPartialRow(resultColumns, rightBucket.Value, i);
-                }
-
-            return ChunkFromBuilders(resultColumns);
-        }
-
-        private IEnumerable<ITableChunk> RightOuterJoin(BucketedRows left, BucketedRows right)
-        {
-            var leftColumns = BuildersFromBucketed(left);
-            var rightColumns = BuildersFromBucketed(right);
-            foreach (var rightBucket in right.Buckets)
             {
-                var rightValue = rightBucket.Value;
-
-                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
-                    {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
-                    }
-                else
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                    {
-                        for (var c = 0; c < leftColumns.Length; c++)
-                            leftColumns[c].Add(null);
-                        AddPartialRow(rightColumns, rightValue, i);
-                    }
+                if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
+                indices.AddRange(rightValue.RowNumbers);
             }
 
-            return ChunkFromBuilders(leftColumns.Concat(rightColumns));
+            return CreateChunks(rightTable, indices);
         }
 
-        private IEnumerable<ITableChunk> FullOuterJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
-            var leftColumns = BuildersFromBucketed(left);
-            var rightColumns = BuildersFromBucketed(right);
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var indices = new List<int>();
+            foreach (var rightBucket in right.Buckets)
+            {
+                if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
+                var rightValue = rightBucket.Value;
+                indices.AddRange(rightValue.RowNumbers);
+            }
+
+            return CreateChunks(rightTable, indices);
+        }
+
+        private IEnumerable<ITableChunk> RightOuterJoin(
+            IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            var left = Bucketize(leftTable, true);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            var onValues = CalculateOnValues(rightTable, false);
+            for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
+            {
+                var key = KeyFromOnValues(onValues, rRow);
+                if (left.Buckets.TryGetValue(key, out var leftValue))
+                    foreach (var lRow in leftValue.RowNumbers)
+                    {
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(rRow);
+                    }
+                else
+                {
+                    leftIndices.Add(-1);
+                    rightIndices.Add(rRow);
+                }
+            }
+
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
+
+        private IEnumerable<ITableChunk> FullOuterJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
 
             foreach (var leftBucket in left.Buckets)
             {
                 var leftValue = leftBucket.Value;
 
-
                 if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
                 {
-                    var numRightRows = rightValue.RowCount;
-
-                    for (var i = 0; i < leftValue.RowCount; i++)
-                    for (var j = 0; j < rightValue.RowCount; j++)
+                    foreach (var lRow in leftValue.RowNumbers)
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        AddPartialRow(rightColumns, rightValue, j);
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(rRow);
                     }
                 }
                 else
                 {
-                    for (var i = 0; i < leftValue.RowCount; i++)
+                    foreach (var lRow in leftValue.RowNumbers)
                     {
-                        AddPartialRow(leftColumns, leftValue, i);
-                        for (var c = 0; c < rightColumns.Length; c++)
-                            rightColumns[c].Add(null);
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(-1);
                     }
                 }
             }
@@ -338,36 +418,15 @@ internal partial class TreeEvaluator
             {
                 var rightValue = rightBucket.Value;
 
-                if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    for (var i = 0; i < rightValue.RowCount; i++)
-                    {
-                        for (var c = 0; c < leftColumns.Length; c++)
-                            leftColumns[c].Add(null);
-
-                        AddPartialRow(rightColumns, rightValue, i);
-                    }
+                if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
+                foreach (var rRow in rightValue.RowNumbers)
+                {
+                    leftIndices.Add(-1);
+                    rightIndices.Add(rRow);
+                }
             }
 
-            return ChunkFromBuilders(leftColumns.Concat(rightColumns));
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
-
-        private class BucketedRows
-        {
-            public BucketedRows(ITableSource table)
-            {
-                Table = table;
-            }
-
-            public ITableSource Table { get; }
-            public Dictionary<SummaryKey, NpmJoinSet> Buckets { get; } = new();
-        }
-    }
-
-    private readonly record struct NpmJoinSet(
-        object?[] OnValues,
-        List<int> Rows,
-        ITableChunk Chunk)
-    {
-        public int RowCount => Rows.Count;
     }
 }

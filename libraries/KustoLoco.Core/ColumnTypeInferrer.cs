@@ -40,6 +40,7 @@ public static class ColumnTypeInferrer
         foreach (var t in TypeTriers)
         {
             var processedAll = true;
+            var hasAnyValues = false;
             var builder = ColumnHelpers.CreateBuilder(t.Type,source.Name);
             for (var i = 0; i < stringColumn.RowCount; i++)
             {
@@ -54,7 +55,10 @@ public static class ColumnTypeInferrer
 
                 var (parsed, val) = t.Parser(cell);
                 if (parsed)
+                {
                     builder.Add(val);
+                    hasAnyValues= true;
+                }
                 else
                 {
                     //one failure is enough to give up on this type
@@ -62,7 +66,10 @@ public static class ColumnTypeInferrer
                     break;
                 }
             }
-
+            //if every cell is blank then assume string rather than long
+            if (processedAll && !hasAnyValues)
+                return source;
+            
             if (processedAll)
                 return builder.ToColumn();
         }

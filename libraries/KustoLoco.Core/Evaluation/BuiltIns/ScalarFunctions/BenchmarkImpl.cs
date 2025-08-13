@@ -27,7 +27,7 @@ internal class BenchmarkImpl : IScalarFunctionImpl
         var data = NullableSetBuilderOflong.CreateFixed(rowCount);
 
         var rangePartitioner = SafePartitioner.Create(rowCount);
-        var instr = instrColumn.GetNullableT(0)!;
+        var instr = instrColumn[0]!;
         var watch = Stopwatch.StartNew();
         var noFetch = instr.Contains("nofetch");
         var noSvFetch = instr.Contains("nosvfetch");

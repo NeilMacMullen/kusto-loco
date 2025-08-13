@@ -10,7 +10,6 @@ public abstract class GenericTypedBaseColumn<T> : BaseColumn
         : base(TypeMapping.SymbolForType(typeof(T)))
     {
     }
-    public abstract T? GetNullableT(int index);
 
     public virtual T? this[int index] => default;
     public override BaseColumn Slide(int padAmount, object ? defaultValue)
