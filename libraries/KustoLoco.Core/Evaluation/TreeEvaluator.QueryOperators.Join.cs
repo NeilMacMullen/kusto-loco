@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
@@ -62,39 +61,32 @@ internal partial class TreeEvaluator
             var right = rightTabularResult.Value;
             var leftTable = ChunkHelpers.FromITableSource(_left);
             var rightTable = ChunkHelpers.FromITableSource(right);
-            var leftBuckets = Bucketize(leftTable, true);
-            var rightBuckets = Bucketize(rightTable, false);
             return _joinKind switch
             {
-                IRJoinKind.InnerUnique => InnerJoin(leftTable, rightTable, leftBuckets, rightBuckets, true),
-                IRJoinKind.Inner => InnerJoin(leftTable, rightTable, leftBuckets, rightBuckets, false),
-                IRJoinKind.LeftOuter => LeftOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.RightSemi => RightSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.LeftAnti => LeftAntiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.RightAnti => RightAntiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
+                IRJoinKind.InnerUnique => InnerJoin(leftTable, rightTable, true),
+                IRJoinKind.Inner => InnerJoin(leftTable, rightTable, false),
+                IRJoinKind.LeftOuter => LeftOuterJoin(leftTable, rightTable),
+                IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable),
+                IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable),
+                IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable),
+                IRJoinKind.RightSemi => RightSemiJoin(leftTable, rightTable),
+                IRJoinKind.LeftAnti => LeftAntiJoin(leftTable, rightTable),
+                IRJoinKind.RightAnti => RightAntiJoin(leftTable, rightTable),
                 _ => throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.")
             };
         }
-
-        public IAsyncEnumerable<ITableChunk> DataAsync(CancellationToken cancellation = default) =>
-            throw new NotSupportedException();
 
         private BucketedRows Bucketize(ITableSource table, bool isLeft)
         {
             var result = new BucketedRows(table);
             var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
-            var chunkIndex = 0;
             foreach (var chunk in table.GetData())
             {
                 var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
                 {
                     var chunkContext = new EvaluationContext(_context.Scope, chunk);
-                    for (var i = 0; i < onExpressions.Length; i++)
+                    foreach (var onExpression in onExpressions)
                     {
-                        var onExpression = onExpressions[i];
                         var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);
                         onValuesColumns.Add(onExpressionResult!.Column);
                     }
@@ -112,26 +104,22 @@ internal partial class TreeEvaluator
 
                     bucket.Add(i);
                 }
-
-                chunkIndex++;
             }
 
             return result;
         }
 
-     
-        private static void AddPartialRow(List<int> indices, int row)
-            => indices.Add(row);
-
-        /// <param name="dedupeLeft">
-        ///     When true, takes the first left match of each bucket instead of all.
-        ///     In other words, setting <paramref name="dedupeLeft" /> to true produces the default join behavior (i.e.
-        ///     `innerunique`).
-        ///     Setting it to false produces the `inner`-join behavior.
-        /// </param>
+        /// When dedupeleft is true, takes the first left match of each bucket instead of all.
+        /// In other words, setting
+        /// <paramref name="dedupeLeft" />
+        /// to true produces the default join behavior (i.e.
+        /// `innerunique`).
+        /// Setting it to false produces the `inner`-join behavior.
         private IEnumerable<ITableChunk> InnerJoin(IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable, BucketedRows left, BucketedRows right, bool dedupeLeft)
+            IMaterializedTableSource rightTable, bool dedupeLeft)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             if (_isLookup)
@@ -148,25 +136,27 @@ internal partial class TreeEvaluator
                         rightIndices.Add(rightRow);
                     }
                 }
+
                 return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
             }
+
             //join
             foreach (var leftBucket in left.Buckets)
             {
                 var leftValue = leftBucket.Value;
-                var numLeftRows = dedupeLeft ? 1 : leftValue.RowCount;
 
                 if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
-                var leftEnum = dedupeLeft
+                var leftRows = dedupeLeft
                     ? leftValue.RowNumbers.Take(1).ToList()
-                    :  leftValue.RowNumbers;
-                foreach (var leftRow in leftEnum)
+                    : leftValue.RowNumbers;
+                foreach (var leftRow in leftRows)
                 foreach (var rightRow in rightValue.RowNumbers)
                 {
                     leftIndices.Add(leftRow);
                     rightIndices.Add(rightRow);
                 }
             }
+
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
 
@@ -183,6 +173,7 @@ internal partial class TreeEvaluator
                 .Select(col => ColumnHelpers.MapColumn(col, rightIArray)).ToArray();
             return ChunkFromColumns(leftCols.Concat(rightCols));
         }
+
         private ITableChunk[] CreateChunks(IMaterializedTableSource table, List<int> indices)
         {
             var indicesIArray = indices.ToImmutableArray();
@@ -191,7 +182,6 @@ internal partial class TreeEvaluator
             return ChunkFromColumns(cols);
         }
 
-       
 
         private ITableChunk[] ChunkFromColumns(IEnumerable<BaseColumn> builders)
         {
@@ -202,8 +192,11 @@ internal partial class TreeEvaluator
         }
 
 
-        private IEnumerable<ITableChunk> LeftSemiJoin(IMaterializedTableSource leftTable, IMaterializedTableSource rightTable, BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> LeftSemiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var indices = new List<int>();
             foreach (var rightBucket in right.Buckets)
             {
@@ -213,13 +206,15 @@ internal partial class TreeEvaluator
                     indices.Add(lRow);
             }
 
-            return CreateChunks(leftTable,indices);
+            return CreateChunks(leftTable, indices);
         }
 
         private IEnumerable<ITableChunk> LeftAntiJoin(
             IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var indices = new List<int>();
             foreach (var (key, leftValue) in left.Buckets)
             {
@@ -228,13 +223,16 @@ internal partial class TreeEvaluator
                     indices.Add(lRow);
             }
 
-            return CreateChunks(leftTable,indices);
+            return CreateChunks(leftTable, indices);
         }
 
-     
+
         private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
-        { var leftIndices = new List<int>();
+            IMaterializedTableSource rightTable)
+        {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
             var rightIndices = new List<int>();
 
             //it's not really practical to optimise this for lookup
@@ -245,30 +243,18 @@ internal partial class TreeEvaluator
                     foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
-                        rightIndices.Add(rRow);;
+                        rightIndices.Add(rRow);
                     }
                 else
                     foreach (var lRow in leftValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
-                        rightIndices.Add(-1);;
+                        rightIndices.Add(-1);
                     }
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
 
-        private BaseColumnBuilder[] FilterRightColumnsForLookup(BaseColumnBuilder[] rightColumns)
-        {
-            if (!_isLookup)
-                return rightColumns;
-            var rightOns = _onClauses
-                .Select(c => c.Right.ReferencedColumnIndex)
-                .ToArray();
-            return rightColumns.Index()
-                .Where(v => !rightOns.Contains(v.Index))
-                .Select(v => v.Item)
-                .ToArray();
-        }
 
         private BaseColumn[] FilterRightColumnsForLookup(BaseColumn[] rightColumns)
         {
@@ -284,8 +270,10 @@ internal partial class TreeEvaluator
         }
 
         private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var indices = new List<int>();
             foreach (var leftBucket in left.Buckets)
             {
@@ -293,11 +281,15 @@ internal partial class TreeEvaluator
                 foreach (var rRow in rightValue.RowNumbers)
                     indices.Add(rRow);
             }
+
             return CreateChunks(rightTable, indices);
         }
 
-        private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable, IMaterializedTableSource rightTable, BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var indices = new List<int>();
             foreach (var rightBucket in right.Buckets)
             {
@@ -307,14 +299,15 @@ internal partial class TreeEvaluator
                     indices.Add(rRow);
             }
 
-            return CreateChunks(rightTable,indices);
+            return CreateChunks(rightTable, indices);
         }
 
         private IEnumerable<ITableChunk> RightOuterJoin(
             IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable,
-            BucketedRows left, BucketedRows right)
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             foreach (var rightBucket in right.Buckets)
@@ -326,25 +319,24 @@ internal partial class TreeEvaluator
                     foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
-                        rightIndices.Add(rRow);;
-
+                        rightIndices.Add(rRow);
                     }
                 else
                     foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(-1);
-                        rightIndices.Add(rRow);;
-
+                        rightIndices.Add(rRow);
                     }
             }
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
-
         }
 
         private IEnumerable<ITableChunk> FullOuterJoin(IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
+            IMaterializedTableSource rightTable)
         {
+            var left = Bucketize(leftTable, true);
+            var right = Bucketize(rightTable, false);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
 
@@ -355,14 +347,11 @@ internal partial class TreeEvaluator
 
                 if (right.Buckets.TryGetValue(leftBucket.Key, out var rightValue))
                 {
-                    var numRightRows = rightValue.RowCount;
-
                     foreach (var lRow in leftValue.RowNumbers)
                     foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
-                        rightIndices.Add(rRow);;
-
+                        rightIndices.Add(rRow);
                     }
                 }
                 else
@@ -370,8 +359,7 @@ internal partial class TreeEvaluator
                     foreach (var lRow in leftValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
-                        rightIndices.Add(-1);;
-
+                        rightIndices.Add(-1);
                     }
                 }
             }
@@ -380,14 +368,14 @@ internal partial class TreeEvaluator
             {
                 var rightValue = rightBucket.Value;
 
-                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
+                if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
                 foreach (var rRow in rightValue.RowNumbers)
                 {
                     leftIndices.Add(-1);
-                    rightIndices.Add(rRow);;
-
+                    rightIndices.Add(rRow);
                 }
             }
+
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
     }
