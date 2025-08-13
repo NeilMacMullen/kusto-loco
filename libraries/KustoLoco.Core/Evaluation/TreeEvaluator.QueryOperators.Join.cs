@@ -227,8 +227,7 @@ internal partial class TreeEvaluator
             {
                 if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
 
-                foreach (var lRow in leftValue.RowNumbers)
-                    indices.Add(lRow);
+                indices.AddRange(leftValue.RowNumbers);
             }
 
             return CreateChunks(leftTable, indices);
@@ -244,8 +243,7 @@ internal partial class TreeEvaluator
             foreach (var (key, leftValue) in left.Buckets)
             {
                 if (right.Buckets.ContainsKey(key)) continue;
-                foreach (var lRow in leftValue.RowNumbers)
-                    indices.Add(lRow);
+                indices.AddRange(leftValue.RowNumbers);
             }
 
             return CreateChunks(leftTable, indices);
@@ -336,8 +334,7 @@ internal partial class TreeEvaluator
             foreach (var leftBucket in left.Buckets)
             {
                 if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
-                foreach (var rRow in rightValue.RowNumbers)
-                    indices.Add(rRow);
+                indices.AddRange(rightValue.RowNumbers);
             }
 
             return CreateChunks(rightTable, indices);
@@ -353,8 +350,7 @@ internal partial class TreeEvaluator
             {
                 if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
                 var rightValue = rightBucket.Value;
-                foreach (var rRow in rightValue.RowNumbers)
-                    indices.Add(rRow);
+                indices.AddRange(rightValue.RowNumbers);
             }
 
             return CreateChunks(rightTable, indices);
