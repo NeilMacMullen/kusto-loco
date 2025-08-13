@@ -65,7 +65,7 @@ internal partial class TreeEvaluator
             {
                 IRJoinKind.InnerUnique => InnerJoinOrLookup(leftTable, rightTable, true),
                 IRJoinKind.Inner => InnerJoinOrLookup(leftTable, rightTable, false),
-                IRJoinKind.LeftOuter => LeftOuterJoin(leftTable, rightTable),
+                IRJoinKind.LeftOuter => LeftOuterJoinOrLookup(leftTable, rightTable),
                 IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable),
                 IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable),
                 IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable),
@@ -251,6 +251,14 @@ internal partial class TreeEvaluator
         }
 
 
+        private IEnumerable<ITableChunk> LeftOuterJoinOrLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            return _isLookup
+                ? LeftOuterLookup(leftTable, rightTable)
+                : LeftOuterJoin(leftTable, rightTable);
+        }
+
         private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
@@ -278,7 +286,33 @@ internal partial class TreeEvaluator
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
+        private IEnumerable<ITableChunk> LeftOuterLookup(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable)
+        {
+            var right = Bucketize(rightTable, false);
+            var leftIndices = new List<int>();
+            var rightIndices = new List<int>();
+            var onValues = CalculateOnValues(leftTable, true);
+            for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
+            {
+                var key = KeyFromOnValues(onValues, lRow);
+                if (right.Buckets.TryGetValue(key, out var rightValue))
+                {
+                    foreach (var rRow in rightValue.RowNumbers)
+                    {
+                        leftIndices.Add(lRow);
+                        rightIndices.Add(rRow);
+                    }
+                }
+                else
+                {
+                    leftIndices.Add(lRow);
+                    rightIndices.Add(-1);
+                }
+            }
 
+            return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
+        }
 
         private BaseColumn[] FilterRightColumnsForLookup(BaseColumn[] rightColumns)
         {
