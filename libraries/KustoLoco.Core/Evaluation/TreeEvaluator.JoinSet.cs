@@ -7,25 +7,13 @@ internal partial class TreeEvaluator
 {
     public class JoinSet
     {
-        private ITableChunk _chunk = null!;
-        private readonly List<int> _rowNumbers = [];
+        public readonly List<int> RowNumbers = [];
 
-        public int RowCount => _rowNumbers.Count;
+        public int RowCount => RowNumbers.Count;
 
-        public void Add(ITableChunk chunk, int row)
+        public void Add(int row)
         {
-            if (_rowNumbers.Count == 0)
-                _chunk = chunk;
-            _rowNumbers.Add(row);
+            RowNumbers.Add(row);
         }
-
-        public IEnumerable<(ITableChunk, int)>
-            Enumerate()
-        {
-            foreach (var row in _rowNumbers)
-                yield return (_chunk, row);
-        }
-
-        public (ITableChunk, int) GetFirst() => (_chunk, _rowNumbers[0]);
     }
 }

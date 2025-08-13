@@ -110,7 +110,7 @@ internal partial class TreeEvaluator
                         result.Buckets.Add(key, bucket);
                     }
 
-                    bucket.Add(chunk, i);
+                    bucket.Add(i);
                 }
 
                 chunkIndex++;
@@ -119,17 +119,7 @@ internal partial class TreeEvaluator
             return result;
         }
 
-        private static void AddPartialRow(BaseColumnBuilder[] builders,
-            ITableChunk chunk, int row)
-        {
-            for (var c = 0; c < builders.Length; c++)
-            {
-                var data = chunk.Columns[c]
-                    .GetRawDataValue(row);
-                builders[c].Add(data);
-            }
-        }
-
+     
         private static void AddPartialRow(List<int> indices, int row)
             => indices.Add(row);
 
@@ -151,8 +141,8 @@ internal partial class TreeEvaluator
                     var rightValue = rightBucket.Value;
                     if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
 
-                    foreach (var (rightChunk, rightRow) in rightValue.Enumerate())
-                    foreach (var (leftChunk, leftRow) in leftValue.Enumerate())
+                    foreach (var rightRow in rightValue.RowNumbers)
+                    foreach (var leftRow in leftValue.RowNumbers)
                     {
                         leftIndices.Add(leftRow);
                         rightIndices.Add(rightRow);
@@ -168,10 +158,10 @@ internal partial class TreeEvaluator
 
                 if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
                 var leftEnum = dedupeLeft
-                    ? [leftValue.GetFirst()]
-                    : leftValue.Enumerate();
-                foreach (var (leftChunk, leftRow) in leftEnum)
-                foreach (var (rightChunk, rightRow) in rightValue.Enumerate())
+                    ? leftValue.RowNumbers.Take(1).ToList()
+                    :  leftValue.RowNumbers;
+                foreach (var leftRow in leftEnum)
+                foreach (var rightRow in rightValue.RowNumbers)
                 {
                     leftIndices.Add(leftRow);
                     rightIndices.Add(rightRow);
@@ -201,14 +191,7 @@ internal partial class TreeEvaluator
             return ChunkFromColumns(cols);
         }
 
-        private ITableChunk[] ChunkFromBuilders(IEnumerable<BaseColumnBuilder> builders)
-        {
-            var columns = builders
-                .Select(c => c.ToColumn())
-                .ToArray();
-            var chunk = new TableChunk(this, columns);
-            return [chunk];
-        }
+       
 
         private ITableChunk[] ChunkFromColumns(IEnumerable<BaseColumn> builders)
         {
@@ -226,7 +209,7 @@ internal partial class TreeEvaluator
             {
                 if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
 
-                foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                foreach (var lRow in leftValue.RowNumbers)
                     indices.Add(lRow);
             }
 
@@ -241,7 +224,7 @@ internal partial class TreeEvaluator
             foreach (var (key, leftValue) in left.Buckets)
             {
                 if (right.Buckets.ContainsKey(key)) continue;
-                foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                foreach (var lRow in leftValue.RowNumbers)
                     indices.Add(lRow);
             }
 
@@ -258,14 +241,14 @@ internal partial class TreeEvaluator
             //because we need to populate every left row
             foreach (var (key, leftValue) in left.Buckets)
                 if (right.Buckets.TryGetValue(key, out var rightValue))
-                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
-                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    foreach (var lRow in leftValue.RowNumbers)
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(rRow);;
                     }
                 else
-                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    foreach (var lRow in leftValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(-1);;
@@ -307,7 +290,7 @@ internal partial class TreeEvaluator
             foreach (var leftBucket in left.Buckets)
             {
                 if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
-                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                foreach (var rRow in rightValue.RowNumbers)
                     indices.Add(rRow);
             }
             return CreateChunks(rightTable, indices);
@@ -320,7 +303,7 @@ internal partial class TreeEvaluator
             {
                 if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
                 var rightValue = rightBucket.Value;
-                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                foreach (var rRow in rightValue.RowNumbers)
                     indices.Add(rRow);
             }
 
@@ -339,15 +322,15 @@ internal partial class TreeEvaluator
                 var rightValue = rightBucket.Value;
 
                 if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
-                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
-                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    foreach (var lRow in leftValue.RowNumbers)
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(rRow);;
 
                     }
                 else
-                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(-1);
                         rightIndices.Add(rRow);;
@@ -374,8 +357,8 @@ internal partial class TreeEvaluator
                 {
                     var numRightRows = rightValue.RowCount;
 
-                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
-                    foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                    foreach (var lRow in leftValue.RowNumbers)
+                    foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(rRow);;
@@ -384,7 +367,7 @@ internal partial class TreeEvaluator
                 }
                 else
                 {
-                    foreach (var (lChunk, lRow) in leftValue.Enumerate())
+                    foreach (var lRow in leftValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(-1);;
@@ -398,7 +381,7 @@ internal partial class TreeEvaluator
                 var rightValue = rightBucket.Value;
 
                 if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
-                foreach (var (rChunk, rRow) in rightValue.Enumerate())
+                foreach (var rRow in rightValue.RowNumbers)
                 {
                     leftIndices.Add(-1);
                     rightIndices.Add(rRow);;
