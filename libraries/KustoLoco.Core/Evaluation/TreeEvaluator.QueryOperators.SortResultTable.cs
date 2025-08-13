@@ -89,10 +89,5 @@ internal partial class TreeEvaluator
             var resultChunk = new TableChunk(this, resultColumns.Select(c => c.ToColumn()).ToArray());
             yield return resultChunk;
         }
-
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

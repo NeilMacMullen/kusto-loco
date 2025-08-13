@@ -53,20 +53,7 @@ internal partial class TreeEvaluator
             return _chunks.AsReadOnly();
         }
 
-        public async IAsyncEnumerable<ITableChunk> GetDataAsync(
-            [EnumeratorCancellation] CancellationToken cancellation = default)
-        {
-            if (_chunks == null)
-            {
-                EnsureSingleHydration();
-
-                _chunks = [];
-                await foreach (var chunk in _input.GetDataAsync(cancellation)) _chunks.Add(chunk.ReParent(this));
-            }
-
-            foreach (var chunk in _chunks) yield return chunk;
-        }
-
+   
         private void EnsureSingleHydration()
         {
             if (Interlocked.CompareExchange(ref _hydrated, 1, 0) != 0)

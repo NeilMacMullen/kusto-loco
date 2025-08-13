@@ -84,17 +84,6 @@ internal partial class TreeEvaluator
             }
         }
 
-        public async IAsyncEnumerable<ITableChunk> GetDataAsync([EnumeratorCancellation] CancellationToken cancellation)
-        {
-            foreach (var table in _tables)
-            {
-                await foreach (var chunk in table.GetDataAsync(cancellation))
-                {
-                    yield return ProcessChunk(table, chunk);
-                }
-            }
-        }
-
         private TableChunk ProcessChunk(ITableSource table, ITableChunk chunk)
         {
             var columns = Enumerable.Range(0, Type.Columns.Count).Select(

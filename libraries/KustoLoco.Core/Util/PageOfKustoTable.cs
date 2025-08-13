@@ -55,10 +55,6 @@ public class PageOfKustoTable : ITableSource
             yield return ChunkSlicer.CreateEmptyChunk(_source.GetData().First());
     }
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-    {
-        throw new NotImplementedException();
-    }
 
     public static ITableSource Create(ITableSource source, int pageStartOffset, int pageSize)
     {

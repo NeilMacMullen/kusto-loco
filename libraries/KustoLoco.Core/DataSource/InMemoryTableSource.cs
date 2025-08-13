@@ -19,7 +19,7 @@ public class InMemoryTableSource : ITableSource
 
     //actually only ever one chunk
     private readonly ITableChunk[] _data;
-
+    public ITableChunk GetChunk() =>_data.Single();
     public InMemoryTableSource(TableSymbol type, BaseColumn[] columns)
     {
         Type = type;
@@ -30,9 +30,7 @@ public class InMemoryTableSource : ITableSource
     public TableSymbol Type { get; }
     public IEnumerable<ITableChunk> GetData() =>_data;
 
-    public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
-        => _data.ToAsyncEnumerable();
-
+  
     //TODO - this is brittle and will break with empty tables
     public InMemoryTableSource ShareAs(string newName)
     {

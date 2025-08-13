@@ -9,6 +9,7 @@ using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 using KustoLoco.Core.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -59,15 +60,14 @@ internal partial class TreeEvaluator
 
             var rightTabularResult = (TabularResult)rightResult;
             var right = rightTabularResult.Value;
-            var singleChunkLeft = ChunkHelpers.FromITableSource(_left);
+            var singleChunkLeft = ChunkHelpers.FromITableSource(_left) ;
             var singleChunkRight = ChunkHelpers.FromITableSource(right);
-            
             var leftBuckets = Bucketize(singleChunkLeft, true);
             var rightBuckets = Bucketize(singleChunkRight, false);
             return _joinKind switch
             {
-                IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, true),
-                IRJoinKind.Inner => InnerJoin(leftBuckets, rightBuckets, false),
+                IRJoinKind.InnerUnique => InnerJoin(singleChunkLeft,singleChunkRight,leftBuckets, rightBuckets, true),
+                IRJoinKind.Inner => InnerJoin(singleChunkLeft,singleChunkRight,leftBuckets, rightBuckets, false),
                 IRJoinKind.LeftOuter => LeftOuterJoin(leftBuckets, rightBuckets),
                 IRJoinKind.RightOuter => RightOuterJoin(leftBuckets, rightBuckets),
                 IRJoinKind.FullOuter => FullOuterJoin(leftBuckets, rightBuckets),
@@ -79,7 +79,7 @@ internal partial class TreeEvaluator
             };
         }
 
-        public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default) =>
+        public IAsyncEnumerable<ITableChunk> DataAsync(CancellationToken cancellation = default) =>
             throw new NotSupportedException();
 
         private BucketedRows Bucketize(ITableSource table, bool isLeft)
@@ -130,18 +130,24 @@ internal partial class TreeEvaluator
             }
         }
 
+        private static void AddPartialRow(List<int> indices, int row)
+            => indices.Add(row);
+
         /// <param name="dedupeLeft">
         ///     When true, takes the first left match of each bucket instead of all.
         ///     In other words, setting <paramref name="dedupeLeft" /> to true produces the default join behavior (i.e.
         ///     `innerunique`).
         ///     Setting it to false produces the `inner`-join behavior.
         /// </param>
-        private IEnumerable<ITableChunk> InnerJoin(BucketedRows left, BucketedRows right, bool dedupeLeft)
+        private IEnumerable<ITableChunk> InnerJoin(ITableSource leftTable,ITableSource rightTable,BucketedRows left, BucketedRows right, bool dedupeLeft)
         {
             var leftColumns = BuildersFromBucketed(left);
             var rightColumns = BuildersFromBucketed(right);
             if (_isLookup)
             {
+                var leftIndices = new List<int>();
+                var rightIndices = new List<int>();
+                
                 foreach (var rightBucket in right.Buckets)
                 {
                     var rightValue = rightBucket.Value;
@@ -153,10 +159,21 @@ internal partial class TreeEvaluator
                     {
                         AddPartialRow(leftColumns, leftChunk, leftRow);
                         AddPartialRow(rightColumns, rightChunk, rightRow);
+                        
+                        AddPartialRow(leftIndices,leftRow);
+                        AddPartialRow(rightIndices,rightRow);
                     }
                 }
 
-                rightColumns = FilterRightColumnsForLookup(rightColumns);
+                var leftIArray = leftIndices.ToImmutableArray();
+                var rightIArray = rightIndices.ToImmutableArray();
+                var leftCols = (leftTable as InMemoryTableSource)!.GetChunk().Columns
+                    .Select(col => ColumnHelpers.MapColumn(col, leftIArray)).ToArray();
+                var rawRight=(rightTable as InMemoryTableSource)!.GetChunk().Columns;
+                var rightCols = FilterRightColumnsForLookup(rawRight)
+                   .Select(col => ColumnHelpers.MapColumn(col, rightIArray)).ToArray();
+                return ChunkFromColumns(leftCols.Concat(rightCols));
+               // rightColumns = FilterRightColumnsForLookup(rightColumns);
             }
             else
             {
@@ -192,6 +209,15 @@ internal partial class TreeEvaluator
             return [chunk];
         }
 
+        private ITableChunk[] ChunkFromColumns(IEnumerable<BaseColumn> builders)
+        {
+            var columns = builders
+                .ToArray();
+            var chunk = new TableChunk(this, columns);
+            return [chunk];
+        }
+
+
         private IEnumerable<ITableChunk> LeftSemiJoin(BucketedRows left, BucketedRows right)
         {
             var resultColumns = BuildersFromBucketed(left);
@@ -222,7 +248,7 @@ internal partial class TreeEvaluator
 
         private BaseColumnBuilder[] BuildersFromBucketed(BucketedRows b)
             => b.Table.Type.Columns.Select(c => ColumnHelpers.CreateBuilder(c.Type)).ToArray();
-
+  
 
         private IEnumerable<ITableChunk> LeftOuterJoin(BucketedRows left, BucketedRows right)
         {
@@ -256,6 +282,19 @@ internal partial class TreeEvaluator
         }
 
         private BaseColumnBuilder[] FilterRightColumnsForLookup(BaseColumnBuilder[] rightColumns)
+        {
+            if (!_isLookup)
+                return rightColumns;
+            var rightOns = _onClauses
+                .Select(c => c.Right.ReferencedColumnIndex)
+                .ToArray();
+            return rightColumns.Index()
+                .Where(v => !rightOns.Contains(v.Index))
+                .Select(v => v.Item)
+                .ToArray();
+        }
+
+        private BaseColumn[] FilterRightColumnsForLookup(BaseColumn[] rightColumns)
         {
             if (!_isLookup)
                 return rightColumns;

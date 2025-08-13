@@ -99,7 +99,7 @@ public static class ColumnHelpers
     public static BaseColumn ReassembleInOrder(BaseColumn[] others)
         => MapColumn(others, ImmutableArray<int>.Empty, MappingType.Reassembly);
 
-    private static BaseColumn Create<T>(ImmutableArray<int> mapping, BaseColumn[] other,
+    private static BaseColumn Create(ImmutableArray<int> mapping, BaseColumn[] other,
         MappingType mapType) =>
         mapType switch
         {
@@ -237,33 +237,33 @@ public static class ColumnHelpers
     {
         var typeSymbol = others.First().Type;
         if (typeSymbol == ScalarTypes.Int)
-            return Create<int>(mapping, others.Cast<GenericTypedBaseColumnOfint>().ToArray(), mapType); 
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfint>().ToArray(), mapType); 
 
         if (typeSymbol == ScalarTypes.Long)
-            return Create<long>(mapping, others.Cast<GenericTypedBaseColumnOflong>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOflong>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Decimal)
-            return Create<decimal>(mapping, others.Cast<GenericTypedBaseColumnOfdecimal>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfdecimal>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Real)
-            return Create<double>(mapping, others.Cast<GenericTypedBaseColumnOfdouble>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfdouble>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Bool)
-            return Create<bool>(mapping, others.Cast<GenericTypedBaseColumnOfbool>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfbool>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.String)
-            return Create<string>(mapping, others.Cast<GenericTypedBaseColumnOfstring>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfstring>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.DateTime)
-            return Create<DateTime>(mapping, others.Cast<GenericTypedBaseColumnOfDateTime>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfDateTime>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.TimeSpan)
-            return Create<TimeSpan>(mapping, others.Cast<GenericTypedBaseColumnOfTimeSpan>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfTimeSpan>().ToArray(), mapType);
 
         if (typeSymbol == ScalarTypes.Guid)
-            return Create<Guid>(mapping, others.Cast<GenericTypedBaseColumnOfGuid>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfGuid>().ToArray(), mapType);
         if (typeSymbol == ScalarTypes.Dynamic)
-            return Create<JsonNode>(mapping, others.Cast<GenericTypedBaseColumnOfJsonNode>().ToArray(), mapType);
+            return Create(mapping, others.Cast<GenericTypedBaseColumnOfJsonNode>().ToArray(), mapType);
 
         // TODO: Support all data types
         throw new NotImplementedException(
