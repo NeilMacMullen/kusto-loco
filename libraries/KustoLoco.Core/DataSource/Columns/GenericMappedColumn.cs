@@ -18,8 +18,6 @@ public class GenericMappedColumn<T> : GenericTypedBaseColumn<T>
     {
         _lookups = lookups;
         BackingColumn = backing;
-  //      if (_lookups.Length == 0)
-   //         throw new InvalidOperationException();
     }
 
     

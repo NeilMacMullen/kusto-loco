@@ -72,7 +72,7 @@ internal partial class TreeEvaluator
                 IRJoinKind.RightOuter => RightOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.RightSemi => RightSemiJoin(leftBuckets, rightBuckets),
+                IRJoinKind.RightSemi => RightSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 IRJoinKind.LeftAnti => LeftAntiJoin(leftBuckets, rightBuckets),
                 IRJoinKind.RightAnti => RightAntiJoin(leftBuckets, rightBuckets),
                 _ => throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.")
@@ -186,12 +186,19 @@ internal partial class TreeEvaluator
         {
             var leftIArray = leftIndices.ToImmutableArray();
             var rightIArray = rightIndices.ToImmutableArray();
-            var leftCols = (leftTable as InMemoryTableSource)!.GetChunk().Columns
+            var leftCols = leftTable.Chunks[0].Columns
                 .Select(col => ColumnHelpers.MapColumn(col, leftIArray)).ToArray();
-            var rawRight = (rightTable as InMemoryTableSource)!.GetChunk().Columns;
+            var rawRight = rightTable.Chunks[0].Columns;
             var rightCols = FilterRightColumnsForLookup(rawRight)
                 .Select(col => ColumnHelpers.MapColumn(col, rightIArray)).ToArray();
             return ChunkFromColumns(leftCols.Concat(rightCols));
+        }
+        private ITableChunk[] CreateChunks(IMaterializedTableSource table, List<int> indices)
+        {
+            var indicesIArray = indices.ToImmutableArray();
+            var cols = table.Chunks[0].Columns
+                .Select(col => ColumnHelpers.MapColumn(col, indicesIArray)).ToArray();
+            return ChunkFromColumns(cols);
         }
 
         private ITableChunk[] ChunkFromBuilders(IEnumerable<BaseColumnBuilder> builders)
@@ -294,17 +301,18 @@ internal partial class TreeEvaluator
                 .ToArray();
         }
 
-        private IEnumerable<ITableChunk> RightSemiJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
         {
             var resultColumns = BuildersFromBucketed(right);
+            var indices = new List<int>();
             foreach (var leftBucket in left.Buckets)
             {
                 if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
                 foreach (var (rChunk, rRow) in rightValue.Enumerate())
-                    AddPartialRow(resultColumns, rChunk, rRow);
+                    indices.Add(rRow);
             }
-
-            return ChunkFromBuilders(resultColumns);
+            return CreateChunks(rightTable, indices);
         }
 
         private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
