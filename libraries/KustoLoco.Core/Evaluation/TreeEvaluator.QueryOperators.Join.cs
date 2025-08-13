@@ -59,9 +59,11 @@ internal partial class TreeEvaluator
 
             var rightTabularResult = (TabularResult)rightResult;
             var right = rightTabularResult.Value;
-
-            var leftBuckets = Bucketize(_left, true);
-            var rightBuckets = Bucketize(right, false);
+            var singleChunkLeft = ChunkHelpers.FromITableSource(_left);
+            var singleChunkRight = ChunkHelpers.FromITableSource(right);
+            
+            var leftBuckets = Bucketize(singleChunkLeft, true);
+            var rightBuckets = Bucketize(singleChunkRight, false);
             return _joinKind switch
             {
                 IRJoinKind.InnerUnique => InnerJoin(leftBuckets, rightBuckets, true),
@@ -165,7 +167,7 @@ internal partial class TreeEvaluator
 
                     if (!right.Buckets.TryGetValue(leftBucket.Key, out var rightValue)) continue;
                     var leftEnum = dedupeLeft
-                        ? [leftValue.Get(0)]
+                        ? [leftValue.GetFirst()]
                         : leftValue.Enumerate();
                     foreach (var (leftChunk, leftRow) in leftEnum)
                     {

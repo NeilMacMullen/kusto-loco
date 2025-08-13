@@ -184,6 +184,10 @@ public static class ColumnHelpers
     public static BaseColumn Reassemble(BaseColumn[] other)
     {
         var typeSymbol = other[0].Type;
+
+        if (typeSymbol == ScalarTypes.Bool)
+            return GenericReassembledChunkColumnOfbool.Create(other);
+
         if (typeSymbol == ScalarTypes.Int)
             return GenericReassembledChunkColumnOfint.Create(other);
 
@@ -196,9 +200,7 @@ public static class ColumnHelpers
         if (typeSymbol == ScalarTypes.Real)
             return GenericReassembledChunkColumnOfdouble.Create(other);
 
-        if (typeSymbol == ScalarTypes.Bool)
-            return GenericReassembledChunkColumnOfbool.Create(other);
-
+       
         if (typeSymbol == ScalarTypes.String)
             return GenericReassembledChunkColumnOfstring.Create(other);
 
@@ -210,10 +212,10 @@ public static class ColumnHelpers
 
         if (typeSymbol == ScalarTypes.Guid)
             return GenericReassembledChunkColumnOfGuid.Create(other);
+        
         if (typeSymbol == ScalarTypes.Dynamic)
             return GenericReassembledChunkColumnOfJsonNode.Create(other);
 
-        // TODO: Support all data types
         throw new NotImplementedException(
             $"Unsupported scalar type to create column builder from: {SchemaDisplay.GetText(typeSymbol)}");
     }

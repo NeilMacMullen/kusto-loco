@@ -11,9 +11,9 @@ namespace KustoLoco.Core.DataSource.Columns;
 [KustoGeneric(Types = "all")]
 public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
 {
-    private readonly int _Length;
+    private readonly int _length;
 
-    private readonly Section[] BackingColumns;
+    private readonly Section[] _backingColumns;
 
     private Section _lastHitSection;
 
@@ -29,9 +29,9 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
         }
 
 
-        BackingColumns = sections.ToArray();
+        _backingColumns = sections.ToArray();
         _lastHitSection = sections.First();
-        _Length = offset;
+        _length = offset;
     }
 
     public override T? GetNullableT(int index) =>this[index];
@@ -45,7 +45,7 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
         }
     }
 
-    public override int RowCount => _Length;
+    public override int RowCount => _length;
 
     private object _lockObject = new object();
     
@@ -59,7 +59,7 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
             if (!IndexInSection(_lastHitSection, index))
             {
                 _lastHitSection = Section.Empty;
-                foreach (var section in BackingColumns)
+                foreach (var section in _backingColumns)
                     if (IndexInSection(section, index))
                     {
                         _lastHitSection = section;
@@ -69,7 +69,7 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
 
             if (_lastHitSection == Section.Empty)
                 throw new InvalidOperationException(
-                    $"Requested an index {index} which is greater than rowcount {RowCount} with {BackingColumns.Length} backing columns");
+                    $"Requested an index {index} which is greater than rowcount {RowCount} with {_backingColumns.Length} backing columns");
 
             var retColumn = _lastHitSection.BackingColumn as GenericTypedBaseColumn<T>;
             return (index - _lastHitSection.Offset, retColumn!);
@@ -86,7 +86,7 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
     public override BaseColumn Slice(int start, int length)
     {
         var slicedColumns = new List<BaseColumn>();
-        foreach (var s in BackingColumns)
+        foreach (var s in _backingColumns)
             if (IndexInSection(s, start))
             {
                 var top = start + length;

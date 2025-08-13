@@ -16,14 +16,14 @@ namespace KustoLoco.Core.Util;
 public static class GenericColumnHelpers
 {
   
-    private static GenericTypedBaseColumn<T> Create<T>(ImmutableArray<int> mapping, GenericTypedBaseColumn<T>[] other,
+    private static GenericTypedBaseColumn<T> Create<T>(ImmutableArray<int> mapping, GenericTypedBaseColumn<T>[] others,
         MappingType mapType)
     {
         return mapType switch
                {
-                   MappingType.Arbitrary => MapColumn<T>(other[0], mapping),
-                   MappingType.Chunk => GenericChunkColumn<T>.Create(mapping[0], mapping[1], other[0]),
-                   MappingType.Reassembly =>  GenericReassembledChunkColumn<T>.Create(other), 
+                   MappingType.Arbitrary => MapColumn<T>(others[0], mapping),
+                   MappingType.Chunk => GenericChunkColumn<T>.Create(mapping[0], mapping[1], others[0]),
+                   MappingType.Reassembly =>  GenericReassembledChunkColumn<T>.Create(others), 
                    _ => throw new NotImplementedException()
                };
     }
@@ -36,8 +36,8 @@ public static class GenericColumnHelpers
     }
 
 
-    public static GenericTypedBaseColumn<T> MapColumn<T>(GenericTypedBaseColumn<T> other, ImmutableArray<int> mapping)
-        => GenericMappedColumn<T>.Create(mapping, other);
+    public static GenericTypedBaseColumn<T> MapColumn<T>(GenericTypedBaseColumn<T> others, ImmutableArray<int> mapping)
+        => GenericMappedColumn<T>.Create(mapping, others);
 
     private static GenericTypedBaseColumn<T> CreateFromObjectArray<T>(object?[] data)
     {
