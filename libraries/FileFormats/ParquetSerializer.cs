@@ -52,6 +52,7 @@ public class ParquetSerializer : ITableSerializer
         await groupWriter.WriteColumnAsync(dataColumn);
     }
 
+    public const int Max_RowGroupSize = 10_000_000;
     public async Task<TableSaveResult> SaveTable(Stream fileStream, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
@@ -72,7 +73,7 @@ public class ParquetSerializer : ITableSerializer
         var offset = 0;
         while (offset < result.RowCount)
         {
-            var length = Math.Min(10_000_000, result.RowCount-offset);
+            var length = Math.Min(Max_RowGroupSize, result.RowCount-offset);
             using var groupWriter = writer.CreateRowGroup();
 
             foreach (var columnDefinition in result
@@ -112,7 +113,6 @@ public class ParquetSerializer : ITableSerializer
 
         var totalRows = 0;
         BaseColumnBuilder[] columnBuilders = [];
-        INullableSet[] nullableSets = [];
         for (var rowGroupIndex = 0; rowGroupIndex < rowGroupCount; rowGroupIndex++)
         {
             var rowGroup = await fileReader.ReadEntireRowGroupAsync(rowGroupIndex);
@@ -123,25 +123,24 @@ public class ParquetSerializer : ITableSerializer
                 columnBuilders = rowGroup
                     .Select(dataColumn => ColumnHelpers.CreateBuilder(dataColumn.Field.ClrType, dataColumn.Field.Name))
                     .ToArray();
-            if (!nullableSets.Any())
-                nullableSets = new INullableSet[columnBuilders.Length];
-
-
+        
             //add data from this row group
             var columnIndex = 0;
             var stopwatch = Stopwatch.StartNew();
+            var columnHeight = 0;
             foreach (var column in rowGroup)
             {
                 var dataColumn = rowGroup[columnIndex];
+                var builder = columnBuilders[columnIndex];
                 _console.ShowProgress(
-                    $"Column:{dataColumn.Field.Name} {rowGroupIndex+1}/{rowGroupCount}");
-                var set = NullableSetLocator.GetNullableForTypeAndBaseArray(dataColumn.Field.ClrType, column.Data);
-
-                nullableSets[columnIndex] = set;
-                columnIndex++;
+                    $"Column:{dataColumn.Field.Name} {rowGroupIndex+1}/{rowGroupCount}  (offset {totalRows})");
+                foreach(var o in column.Data)
+                    builder.Add(o);
+                columnHeight = column.Data.Length;
+                  columnIndex++;
             }
 
-            totalRows += rowGroup.Length;
+            totalRows += columnHeight;
         }
 
         //having read all the data, we can now create the table
@@ -152,8 +151,6 @@ public class ParquetSerializer : ITableSerializer
         for (var i = 0; i < columnBuilders.Length; i++)
         {
             var builder = columnBuilders[i];
-            var set = nullableSets[i];
-            builder.AddNullableSet(set);
             tableBuilder = tableBuilder.WithColumn(builder.Name,builder.ToColumn());
         }   
         _console.CompleteProgress("");
@@ -168,12 +165,10 @@ public class ParquetSerializer : ITableSerializer
 
     private static INullableSet CreateArrayFromRawObjects(ColumnResult r, KustoQueryResult res,int start,int length)
     {
-        var builder = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(r.UnderlyingType, res.RowCount);
+        var builder = NullableSetBuilderLocator.GetFixedNullableSetBuilderForType(r.UnderlyingType, length);
         foreach (var cellData in res.EnumerateColumnData(r).Skip(start).Take(length))
             builder.Add(cellData);
-        //TODO fix up 
         var set= builder.ToINullableSet();
-        //var nonnullable = set.NoNulls;
         return set;
     }
 }
