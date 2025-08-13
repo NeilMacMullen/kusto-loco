@@ -28,8 +28,7 @@ public class GenericInMemoryColumn<T> : GenericTypedBaseColumn<T>
         }
     }
 
-    public override T? GetNullableT(int index) => this[index];
-
+    
     public override T? this[int index] => (T?) _nullableSet.NullableT(index) ;
 
     public override int RowCount => _nullableSet.Length;

@@ -28,7 +28,7 @@ public class KustoQueryResult
     ///     is explicitly provided but for the moment this allows easy json serialisation
     /// </remarks>
     public KustoQueryResult(string query,
-        InMemoryTableSource results,
+        IMaterializedTableSource results,
         VisualizationState vis,
         TimeSpan queryDuration,
         string error)
@@ -48,7 +48,7 @@ public class KustoQueryResult
     public string Query { get; init; }
 
 
-    public InMemoryTableSource Table { get; }
+    public IMaterializedTableSource Table { get; }
 
     /// <summary>
     ///     Duration of query execution

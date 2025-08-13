@@ -23,4 +23,5 @@ public interface IMaterializedTableSource : ITableSource
     public int RowCount { get; }
     public ITableChunk[] Chunks { get; }
     public int ChunkCount => Chunks.Length;
+    public IEnumerable<object?> GetColumnData(int n);
 }

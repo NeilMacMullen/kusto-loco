@@ -324,7 +324,7 @@ public class TableBuilder
             .ToTableSource();
     }
 
-    public ITableSource ToTableSource()
+    public IMaterializedTableSource ToTableSource()
     {
         var symbols = _columnNames.Zip(_columns)
             .Select(cs =>
@@ -344,7 +344,7 @@ public class TableBuilder
     /// <summary>
     /// Creates a new table by inferring the types of the columns in the input table
     /// </summary>
-    public static ITableSource AutoInferColumnTypes(ITableSource other,IKustoConsole console)
+    public static IMaterializedTableSource AutoInferColumnTypes(IMaterializedTableSource other,IKustoConsole console)
     {
         var chunks = other.GetData().ToArray();
         switch (chunks.Length)

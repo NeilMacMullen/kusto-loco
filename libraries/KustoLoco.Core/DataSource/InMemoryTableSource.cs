@@ -13,7 +13,7 @@ namespace KustoLoco.Core.DataSource;
 /// <summary>
 ///     Use primary for EvaluationResults when all data has been materialized and is available
 /// </summary>
-public class InMemoryTableSource : ITableSource
+public class InMemoryTableSource : IMaterializedTableSource
 {
     public static readonly InMemoryTableSource Empty = new(TableSymbol.Empty, []);
 
@@ -27,6 +27,7 @@ public class InMemoryTableSource : ITableSource
     }
 
     public int RowCount => _data.First().RowCount;
+    public ITableChunk[] Chunks => _data ;
     public TableSymbol Type { get; }
     public IEnumerable<ITableChunk> GetData() =>_data;
 

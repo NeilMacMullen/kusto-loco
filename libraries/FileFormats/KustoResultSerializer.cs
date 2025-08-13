@@ -55,11 +55,11 @@ public class KustoResultSerializer(ITableSerializer serializer, string format)
         return stream.ToArray();
     }
 
-    private async Task<InMemoryTableSource> GetTable(byte[] bytes)
+    private async Task<IMaterializedTableSource> GetTable(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
         var loadResult = await serializer.LoadTable(stream, "result");
-        return (loadResult.Table as InMemoryTableSource)!;
+        return (loadResult.Table );
     }
 
     public async Task<KustoQueryResult> FromBytes(byte[] bytes)

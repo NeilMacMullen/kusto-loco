@@ -214,7 +214,7 @@ public class KustoQueryContext
                 .ToImmutableArray();
 
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
-                .ToTableSource() as InMemoryTableSource;
+                .ToTableSource() ;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }
@@ -224,7 +224,7 @@ public class KustoQueryContext
                 .ToImmutableArray();
 
             var tr = TableBuilder.CreateFromImmutableData("tables", rows)
-                .ToTableSource() as InMemoryTableSource;
+                .ToTableSource() ;
 
             return new KustoQueryResult(query, tr!, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
         }

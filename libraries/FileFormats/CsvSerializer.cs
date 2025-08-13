@@ -173,7 +173,7 @@ public class CsvSerializer : ITableSerializer
     }
 
 
-    public ITableSource LoadFromString(string csv, string tableName)
+    public IMaterializedTableSource LoadFromString(string csv, string tableName)
     {
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv.Trim()));
         var result = LoadTable(stream, tableName).Result;

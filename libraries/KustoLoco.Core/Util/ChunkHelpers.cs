@@ -28,7 +28,7 @@ public static class ChunkHelpers
         return new TableChunk(chunksInThisBucket.First().Table, mergedColumns.ToArray());
     }
 
-    public static ITableSource FromITableSource(ITableSource other)
+    public static IMaterializedTableSource FromITableSource(ITableSource other)
     {
         /*
          //skip for now until we have  way of just measuring number of chunks

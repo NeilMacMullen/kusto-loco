@@ -90,8 +90,8 @@ public class ApplicationInsightsLogLoader
         var viz = results.Value.GetVisualization();
         var vizState = StateFromBinaryData(viz);
 
-        var table = builder.ToTableSource() as InMemoryTableSource;
-        return new KustoQueryResult(query, table!,
+        var table = builder.ToTableSource() ;
+        return new KustoQueryResult(query, table,
             vizState,
             TimeSpan.Zero, string.Empty);
     }

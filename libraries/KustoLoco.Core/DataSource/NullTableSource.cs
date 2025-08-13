@@ -12,7 +12,7 @@ namespace KustoLoco.Core.DataSource;
 ///     The null table source is NOT the same thing as an EMPTY table
 ///     since an empty table might still contain column information
 /// </remarks>
-public class NullTableSource : ITableSource
+public class NullTableSource : IMaterializedTableSource
 {
     public static readonly NullTableSource Instance = new();
     public TableSymbol Type { get; } = TableSymbol.Empty;
@@ -20,4 +20,8 @@ public class NullTableSource : ITableSource
 
     public IAsyncEnumerable<ITableChunk> GetDataAsync(CancellationToken cancellation = default)
         => AsyncEnumerable.Empty<ITableChunk>();
+
+    public int RowCount => 0;
+    public ITableChunk[] Chunks { get; } = [];
+    public IEnumerable<object?> GetColumnData(int n) => throw new System.NotImplementedException();
 }

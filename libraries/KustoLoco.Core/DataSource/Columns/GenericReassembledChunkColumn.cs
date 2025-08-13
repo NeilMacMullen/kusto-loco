@@ -34,8 +34,7 @@ public class GenericReassembledChunkColumn<T> : GenericTypedBaseColumn<T>
         _length = offset;
     }
 
-    public override T? GetNullableT(int index) =>this[index];
-
+    
     public override T? this[int index]
     {
         get

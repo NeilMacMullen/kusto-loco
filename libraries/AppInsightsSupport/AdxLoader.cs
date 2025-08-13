@@ -34,8 +34,7 @@ public class AdxLoader
 
         using var kustoClient = KustoClientFactory.CreateCslQueryProvider(kcsb);
         using var response = kustoClient.ExecuteQuery(database, query, null);
-        var table = TableLoaderFromIDataReader.LoadTable("result", response)
-            as InMemoryTableSource;
+        var table = TableLoaderFromIDataReader.LoadTable("result", response);
         var vs = VisualizationState.Empty;
         if (response.NextResult())
         {
@@ -55,7 +54,7 @@ public class AdxLoader
             }
         }
 
-        var res = new KustoQueryResult(query, table!,
+        var res = new KustoQueryResult(query, table,
             vs,
             TimeSpan.Zero, string.Empty);
         return await Task.FromResult(res);
@@ -77,7 +76,7 @@ public class AdxLoader
 
 public static class TableLoaderFromIDataReader
 {
-    public static ITableSource LoadTable(string tableName, IDataReader reader)
+    public static IMaterializedTableSource LoadTable(string tableName, IDataReader reader)
     {
         var columns = Enumerable.Range(0, reader.FieldCount)
             .Select(i => new ColumnResult(reader.GetName(i), i,BodgeGetFieldType(i)))
