@@ -73,8 +73,8 @@ internal partial class TreeEvaluator
                 IRJoinKind.FullOuter => FullOuterJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 IRJoinKind.LeftSemi => LeftSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 IRJoinKind.RightSemi => RightSemiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
-                IRJoinKind.LeftAnti => LeftAntiJoin(leftBuckets, rightBuckets),
-                IRJoinKind.RightAnti => RightAntiJoin(leftBuckets, rightBuckets),
+                IRJoinKind.LeftAnti => LeftAntiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
+                IRJoinKind.RightAnti => RightAntiJoin(leftTable, rightTable,leftBuckets, rightBuckets),
                 _ => throw new NotImplementedException($"Join kind {_joinKind} is not supported yet.")
             };
         }
@@ -221,35 +221,34 @@ internal partial class TreeEvaluator
 
         private IEnumerable<ITableChunk> LeftSemiJoin(IMaterializedTableSource leftTable, IMaterializedTableSource rightTable, BucketedRows left, BucketedRows right)
         {
-            var resultColumns = BuildersFromBucketed(left);
+            var indices = new List<int>();
             foreach (var rightBucket in right.Buckets)
             {
                 if (!left.Buckets.TryGetValue(rightBucket.Key, out var leftValue)) continue;
 
                 foreach (var (lChunk, lRow) in leftValue.Enumerate())
-                    AddPartialRow(resultColumns, lChunk, lRow);
+                    indices.Add(lRow);
             }
 
-            return ChunkFromBuilders(resultColumns);
+            return CreateChunks(leftTable,indices);
         }
 
-        private IEnumerable<ITableChunk> LeftAntiJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> LeftAntiJoin(
+            IMaterializedTableSource leftTable,
+            IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
         {
-            var resultColumns = BuildersFromBucketed(left);
+            var indices = new List<int>();
             foreach (var (key, leftValue) in left.Buckets)
             {
                 if (right.Buckets.ContainsKey(key)) continue;
                 foreach (var (lChunk, lRow) in leftValue.Enumerate())
-                    AddPartialRow(resultColumns, lChunk, lRow);
+                    indices.Add(lRow);
             }
 
-            return ChunkFromBuilders(resultColumns);
+            return CreateChunks(leftTable,indices);
         }
 
-        private BaseColumnBuilder[] BuildersFromBucketed(BucketedRows b)
-            => b.Table.Type.Columns.Select(c => ColumnHelpers.CreateBuilder(c.Type)).ToArray();
-
-
+     
         private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
         { var leftIndices = new List<int>();
@@ -304,7 +303,6 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable,BucketedRows left, BucketedRows right)
         {
-            var resultColumns = BuildersFromBucketed(right);
             var indices = new List<int>();
             foreach (var leftBucket in left.Buckets)
             {
@@ -315,19 +313,18 @@ internal partial class TreeEvaluator
             return CreateChunks(rightTable, indices);
         }
 
-        private IEnumerable<ITableChunk> RightAntiJoin(BucketedRows left, BucketedRows right)
+        private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable, IMaterializedTableSource rightTable, BucketedRows left, BucketedRows right)
         {
-            var resultColumns = BuildersFromBucketed(right);
-
+            var indices = new List<int>();
             foreach (var rightBucket in right.Buckets)
             {
                 if (left.Buckets.TryGetValue(rightBucket.Key, out _)) continue;
                 var rightValue = rightBucket.Value;
                 foreach (var (rChunk, rRow) in rightValue.Enumerate())
-                    AddPartialRow(resultColumns, rChunk, rRow);
+                    indices.Add(rRow);
             }
 
-            return ChunkFromBuilders(resultColumns);
+            return CreateChunks(rightTable,indices);
         }
 
         private IEnumerable<ITableChunk> RightOuterJoin(
