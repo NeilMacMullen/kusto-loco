@@ -93,11 +93,12 @@ internal partial class TreeEvaluator
             return onValuesColumns.ToArray();
         }
 
-        private SummaryKey KeyFromOnValues(BaseColumn [] onValuesColumns, int i)
+        private SummaryKey KeyFromOnValues(BaseColumn[] onValuesColumns, int i)
         {
             var onValues = onValuesColumns.Select(c => c.GetRawDataValue(i)).ToArray();
             return new SummaryKey(onValues);
         }
+
         private BucketedRows Bucketize(IMaterializedTableSource table, bool isLeft)
         {
             var result = new BucketedRows(table);
@@ -129,7 +130,7 @@ internal partial class TreeEvaluator
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             var leftRowCount = leftTable.RowCount;
-            for(var lRow=0;lRow <leftRowCount;lRow++)
+            for (var lRow = 0; lRow < leftRowCount; lRow++)
             {
                 var key = KeyFromOnValues(onValuesColumns, lRow);
                 if (!right.Buckets.TryGetValue(key, out var rightValue)) continue;
@@ -252,12 +253,10 @@ internal partial class TreeEvaluator
 
 
         private IEnumerable<ITableChunk> LeftOuterJoinOrLookup(IMaterializedTableSource leftTable,
-            IMaterializedTableSource rightTable)
-        {
-            return _isLookup
+            IMaterializedTableSource rightTable) =>
+            _isLookup
                 ? LeftOuterLookup(leftTable, rightTable)
                 : LeftOuterJoin(leftTable, rightTable);
-        }
 
         private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
@@ -286,6 +285,7 @@ internal partial class TreeEvaluator
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
         }
+
         private IEnumerable<ITableChunk> LeftOuterLookup(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
@@ -365,26 +365,23 @@ internal partial class TreeEvaluator
             IMaterializedTableSource rightTable)
         {
             var left = Bucketize(leftTable, true);
-            var right = Bucketize(rightTable, false);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
-            foreach (var rightBucket in right.Buckets)
+            var onValues = CalculateOnValues(rightTable, false);
+            for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
-                var rightValue = rightBucket.Value;
-
-                if (left.Buckets.TryGetValue(rightBucket.Key, out var leftValue))
+                var key = KeyFromOnValues(onValues, rRow);
+                if (left.Buckets.TryGetValue(key, out var leftValue))
                     foreach (var lRow in leftValue.RowNumbers)
-                    foreach (var rRow in rightValue.RowNumbers)
                     {
                         leftIndices.Add(lRow);
                         rightIndices.Add(rRow);
                     }
                 else
-                    foreach (var rRow in rightValue.RowNumbers)
-                    {
-                        leftIndices.Add(-1);
-                        rightIndices.Add(rRow);
-                    }
+                {
+                    leftIndices.Add(-1);
+                    rightIndices.Add(rRow);
+                }
             }
 
             return CreateChunks(leftTable, rightTable, leftIndices, rightIndices);
