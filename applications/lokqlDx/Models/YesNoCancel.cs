@@ -4,5 +4,6 @@ public enum YesNoCancel
 {
     Yes,
     No,
-    Cancel
+    Cancel,
+    Complete
 }

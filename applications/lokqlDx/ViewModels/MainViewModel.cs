@@ -1,6 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +14,7 @@ using lokqlDxComponents.Services;
 using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
+using System.Collections.ObjectModel;
 
 namespace LokqlDx.ViewModels;
 
@@ -236,15 +237,23 @@ public partial class MainViewModel : ObservableObject
         await Task.Run(_imageProvider.Init);
     }
 
+    private bool _trueClose = false;
     [RelayCommand]
     private async Task Closing(WindowClosingEventArgs? cancelEventArgs)
     {
-        if (cancelEventArgs is not null && await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
-        {
-            cancelEventArgs.Cancel = true;
+        if (_trueClose)
             return;
+        cancelEventArgs!.Cancel = true;
+        var userChoice = await OfferSaveOfCurrentWorkspace();
+        if (userChoice == YesNoCancel.Cancel)
+            return;
+        if (userChoice is YesNoCancel.No or YesNoCancel.Complete)
+        {
+            _trueClose = true;
+            var lifetime = Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            lifetime?.MainWindow?.Close();
         }
-
+        
         PersistUiPreferencesToDisk();
     }
 
@@ -439,12 +448,12 @@ public partial class MainViewModel : ObservableObject
     ///     Allow the user to save any pending changes
     /// </summary>
     /// <returns>
-    ///     true if the user did the save or didn't need to
+    ///    COMPPLETE if the user did the save or didn't need to
     /// </returns>
     private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
         if (!RecheckDirty())
-            return YesNoCancel.Yes;
+            return YesNoCancel.Complete;
 
         var shouldSave = _preferencesManager.FetchCachedApplicationSettings().AutoSave;
         //always show the dialog if this is a new workspace
@@ -465,7 +474,7 @@ public partial class MainViewModel : ObservableObject
         if (shouldSave)
             return await Save();
 
-        return YesNoCancel.No;
+        return YesNoCancel.Complete;
     }
 
     /// <summary>
@@ -474,13 +483,13 @@ public partial class MainViewModel : ObservableObject
     private async Task<YesNoCancel> Save()
     {
         if (!RecheckDirty())
-            return YesNoCancel.Yes;
+            return YesNoCancel.Complete;
 
         if (_workspaceManager.IsNewWorkspace)
             return await SaveAs();
 
         SaveWorkspace(_workspaceManager.Path);
-        return YesNoCancel.Yes;
+        return YesNoCancel.Complete;
     }
 
     private async Task SaveBeforeQuery()
@@ -514,6 +523,7 @@ public partial class MainViewModel : ObservableObject
             ShowOverwritePrompt = true,
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path)
         });
+        
 
         if (result?.TryGetLocalPath() is string path)
         {
@@ -523,7 +533,7 @@ public partial class MainViewModel : ObservableObject
             var title =
                 $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
             WindowTitle = title;
-            return YesNoCancel.Yes;
+            return YesNoCancel.Complete;
         }
 
         //not saving the file counts as a cancel rather than "won't do anything"
