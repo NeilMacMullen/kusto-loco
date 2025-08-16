@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;
@@ -111,12 +112,32 @@ public class BabyKustoEngine
         var diagnostics = code.GetDiagnostics();
         if (diagnostics.Count > 0)
         {
+            var sb = new StringBuilder();
+            sb.AppendLine("Query error(s):");
             foreach (var diag in diagnostics)
-                Logger.Warn($"Kusto diagnostics: {diag.Severity} {diag.Code} {diag.Message} {diag.Description}");
-
+            {
+                sb.AppendLine("---");
+                sb.AppendLine($"{diag.Message}");
+                sb.AppendLine();
+                sb.AppendLine(HighlightQuery(diag));
+                sb.AppendLine();
+            }
+            
             throw new InvalidOperationException(
-                $"Query is malformed.\r\n{string.Join("\r\n", diagnostics.Select(diag => $"[{diag.Start}] {diag.Severity} {diag.Code} {diag.Message} {diag.Description}"))}");
+               sb.ToString());
         }
+        string HighlightQuery(Diagnostic diag)
+        {
+            if (diag.End > query.Length)
+                return query;
+            if (diag.Length==0)
+                return query.Substring(0, diag.Start) +
+                       "<<<" + query.Substring(diag.End);
+            return query.Substring(0, diag.Start) +
+                   ">>>" + query.Substring(diag.Start, diag.Length) +
+                   "<<<" + query.Substring(diag.End);
+        }
+
 
         Logger.Trace("visiting with IRTranslator...");
         var irVisitor = new IRTranslator(allFuncs);

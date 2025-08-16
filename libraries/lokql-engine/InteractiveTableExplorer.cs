@@ -1,6 +1,9 @@
-﻿using KustoLoco.Core;
+﻿using Kusto.Language.Symbols;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Settings;
+using KustoLoco.PluginSupport;
 using Lokql.Engine.Commands;
 using NotNullStrings;
 
@@ -25,19 +28,21 @@ public class InteractiveTableExplorer
     public readonly ITableAdaptor _loader;
     private readonly MacroRegistry _macros;
     public readonly IKustoConsole _outputConsole;
-    private readonly IResultRenderingSurface _renderingSurface;
+    public readonly IResultRenderingSurface _renderingSurface;
     public readonly ResultHistory _resultHistory;
     public readonly KustoSettingsProvider Settings;
 
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
-        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface)
+        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface,
+        Dictionary<FunctionSymbol, ScalarFunctionInfo> additionalFunctions)
     {
         _outputConsole = outputConsole;
         Settings = settings;
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
+        _context.AddFunctions(additionalFunctions);
         _loader = new StandardFormatAdaptor(settings, _outputConsole);
         _context.SetTableLoader(_loader);
         _resultHistory = new ResultHistory();
@@ -101,7 +106,7 @@ public class InteractiveTableExplorer
                 $"Display was truncated to first {maxToDisplay} of {result.RowCount}.  Use '.display -m <n>' to change this behaviour");
     }
 
-    private void DisplayResults(KustoQueryResult result)
+    public void DisplayResultsToConsole(KustoQueryResult result)
     {
         if (result.Error.IsNotBlank())
         {
@@ -157,7 +162,7 @@ public class InteractiveTableExplorer
             await _renderingSurface.RenderToDisplay(result);
             _resultHistory.Push(result);
 
-            DisplayResults(result);
+            DisplayResultsToConsole(result);
         }
         catch (Exception ex)
         {
@@ -169,7 +174,7 @@ public class InteractiveTableExplorer
     {
         _resultHistory.Push(result);
         await _renderingSurface.RenderToDisplay(result);
-        DisplayResults(result);
+        DisplayResultsToConsole(result);
     }
 
     /// <summary>

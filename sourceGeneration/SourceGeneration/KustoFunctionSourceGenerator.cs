@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -178,23 +180,22 @@ namespace KustoLoco.SourceGeneration
             }
             else
             {
-                //assume it's a function
-                //figure out return type...
-                var returnType = ParamGeneneration.ScalarType(implementationMethods.First().ReturnType);
-                var longest = implementationMethods.OrderBy(f => f.TypedArguments.Length)
-                    .Last();
-                var shortest = implementationMethods.Min(f => f.TypedArguments.Length);
 
-                var args = longest.TypedArguments
-                    .Select((a, i) =>
-                        $"new Parameter(\"{a.Name}\", ScalarTypes.{ParamGeneneration.ScalarType(a)},{Opt(i, shortest)})")
-                    .ToArray();
-
+                var signatures = implementationMethods.Select(m =>
+                {
+                    var sb = new StringBuilder();
+                    var returnType = ParamGeneneration.ScalarType(m.ReturnType);
+                    sb.AppendLine($"new Signature(ScalarTypes.{returnType},new Parameter[]{{");
+                    var args = m.TypedArguments.Select(a =>
+                        $"new Parameter(\"{a.Name}\", ScalarTypes.{ParamGeneneration.ScalarType(a)})").ToArray();
+                    sb.AppendLine(string.Join(",", args));
+                    sb.AppendLine("})");
+                    return sb.ToString();
+                });
+                var sigString = string.Join($",\r\n", signatures);
                 code.AppendLine($"public static readonly {attr.SymbolTypeName} Func =");
                 code.AppendLine($"new {attr.SymbolTypeName}(\"{attr.SymbolName}\", ");
-                code.AppendLine($"ScalarTypes.{returnType},");
-
-                code.AppendLine(string.Join(",", args));
+                code.AppendLine(sigString);
                 code.AppendLine(" ).ConstantFoldable()");
                 code.AppendStatement(" .WithResultNameKind(ResultNameKind.None)");
             }

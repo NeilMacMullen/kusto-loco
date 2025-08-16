@@ -1,24 +1,20 @@
 ﻿using AppInsightsSupport;
 using CommandLine;
+using KustoLoco.PluginSupport;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
 public static class AdxCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        var blocks = econtext.Sequence;
-        var ai = new AdxLoader(exp.Settings, exp._outputConsole);
-
        
-        if (blocks.Complete)
+        var blocks = context.InputProcessor;
+        if (blocks.IsComplete)
             return;
-
-        var query = blocks.Next();
-        //make sure we pick up any variable interpolation in case we are inside a function
-        query = exp.Interpolate(query);
+        var query = blocks.ConsumeNextBlock();
+        var ai = new AdxLoader(context.Settings, context.Console);
 
         var connection = o.ConnectionString;
         var database = o.Database;
@@ -32,9 +28,9 @@ public static class AdxCommand
             }
         }
 
-        exp.Info("Running ADX query.  This may take a while....");
+        context.Console.Info("Running ADX query.  This may take a while....");
         var result = await ai.LoadTable(connection,database, query);
-        await exp.InjectResult(result);
+        await context.InjectResult(result);
     }
 
     [Verb("adx", 

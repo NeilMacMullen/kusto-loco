@@ -8,9 +8,9 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class LoadCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var tableName = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
         //remove table if it already exists
         if (exp.GetCurrentContext().HasTable(tableName))

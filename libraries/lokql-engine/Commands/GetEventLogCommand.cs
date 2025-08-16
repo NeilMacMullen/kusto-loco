@@ -2,6 +2,7 @@
 using CommandLine;
 using KustoLoco.Core.Diagnostics;
 using KustoLoco.FileFormats;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
@@ -10,25 +11,25 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class GetEventLogCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-   
+        var console = context.Console;
+        var queryContext = context.QueryContext;
         var tableName = o.As;
         //remove table if it already exists
-        if (exp.GetCurrentContext().HasTable(tableName)) exp.GetCurrentContext().RemoveTable(tableName);
+        if (queryContext.HasTable(tableName)) queryContext.RemoveTable(tableName);
 
         try
         {
             var events = EventLog.GetEvents().ToImmutableArray();
             if (o.Clear)
                 EventLog.Clear();
-            exp.GetCurrentContext().WrapDataIntoTable(tableName, events);
-            exp.Info($"Loaded {NameEscaper.EscapeIfNecessary(tableName)}");
+            queryContext.WrapDataIntoTable(tableName, events);
+            console.Info($"Loaded {NameEscaper.EscapeIfNecessary(tableName)}");
         }
         catch (Exception ex)
         {
-            exp.Warn($"Data malformed: {ex.Message}");
+            console.Warn($"Data malformed: {ex.Message}");
         }
 
         return Task.CompletedTask;

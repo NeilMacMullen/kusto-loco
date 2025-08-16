@@ -9,9 +9,9 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class LoadExcel
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var ser = new ExcelSerializer(exp.Settings, exp._outputConsole);
         var prefix = o.As.OrWhenBlank(Path.GetFileNameWithoutExtension(o.File));
         var dt = await ser.LoadAllTables(o.File, prefix);

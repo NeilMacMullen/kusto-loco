@@ -4,9 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class QueryCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var queryFolder = exp.Settings.Get(LokqlSettings.QueryPath);
         var filename = InteractiveTableExplorer.ToFullPath(o.File, queryFolder, ".csl");
         exp.Info($"Fetching query '{filename}'");

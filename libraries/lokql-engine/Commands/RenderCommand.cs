@@ -7,9 +7,9 @@ namespace Lokql.Engine.Commands;
 
 public static class RenderCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
         var result = exp.GetPreviousResult();
         var renderer = new KustoResultRenderer(exp.Settings);

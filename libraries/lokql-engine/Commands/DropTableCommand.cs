@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using KustoLoco.PluginSupport;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
@@ -8,20 +9,21 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class DropTableCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
         var tableName = o.Table;
         if (tableName.IsNotBlank())
         {
-            if (exp.GetCurrentContext().HasTable(tableName))
+            if (queryContext.HasTable(tableName))
             {
-                exp.GetCurrentContext().RemoveTable(tableName);
-                exp.Warn($"Table '{tableName}' removed");
+                queryContext.RemoveTable(tableName);
+                console.Warn($"Table '{tableName}' removed");
             }
             else
             {
-                exp.Warn("No such table");
+                console.Warn("No such table");
             }
             GC.Collect();
         }

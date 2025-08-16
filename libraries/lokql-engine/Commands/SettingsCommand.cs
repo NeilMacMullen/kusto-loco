@@ -1,4 +1,8 @@
-﻿using CommandLine;
+﻿using System.Collections.Immutable;
+using CommandLine;
+using DocumentFormat.OpenXml.Wordprocessing;
+using KustoLoco.Core;
+using KustoLoco.PluginSupport;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
@@ -8,17 +12,24 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class SettingsCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        var settings = exp.Settings.Enumerate()
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var settings = context.Settings;
+        var matches = settings.Enumerate()
             .Where(s => s.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
             .OrderBy(s => s.Name);
+        var settingsTableName = "_settings";
+        var table = 
+            TableBuilder.CreateFromImmutableData(settingsTableName, matches
+                .Select(s => new { Name = s.Name,Value=s.Value })
+                .OrderBy(s=>s.Name)
+                .ToImmutableArray());
 
-        var str = o.Names ?
-                settings.Select(s=>s.Name).JoinAsLines()
-            :Tabulator.Tabulate(settings, "Name|Value", s => s.Name, s => s.Value);
-        exp.Info(str);
+        queryContext.AddTable(table);
+        context.RunInput(settingsTableName);
+        console.Info($"Settings available as table '{settingsTableName}'");
         return Task.CompletedTask;
     }
 
@@ -27,7 +38,5 @@ public static class SettingsCommand
     {
         [Value(0, HelpText = "match substring", Required = false)]
         public string Match { get; set; } = string.Empty;
-        [Option(HelpText = "Only show names, not values", Required = false)]
-        public bool Names { get; set; } 
     }
 }

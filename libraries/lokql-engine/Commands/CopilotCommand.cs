@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using KustoLoco.CopilotSupport;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
@@ -7,25 +8,26 @@ public static class CopilotCommand
 {
     private static CopilotHelper? _copilot;
 
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        var blocks = econtext.Sequence;
-
-        if (blocks.Complete)
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var blocks = context.InputProcessor;
+        
+        if (blocks.IsComplete)
             return;
 
         if (_copilot == null)
         {
-            exp.Info("Creating new copilot");
-            _copilot = new CopilotHelper(exp.Settings, exp.GetCurrentContext());
+            console.Info("Creating new copilot");
+            _copilot = new CopilotHelper(context.Settings, queryContext);
         }
 
-        var query = blocks.Next();
+        var query = blocks.ConsumeNextBlock();
         var resp = await _copilot.SendUserRequest(query);
-        exp.Info(resp.Explanation);
-        exp.Warn(resp.Code);
-        await exp.RunInput(resp.Code);
+        console.Info(resp.Explanation);
+        console.Warn(resp.Code);
+        await context.RunInput(resp.Code);
     }
 
     [Verb("copilot",

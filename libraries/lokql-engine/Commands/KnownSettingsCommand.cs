@@ -1,23 +1,30 @@
-﻿using CommandLine;
+﻿using System.Collections.Immutable;
+using CommandLine;
+using KustoLoco.Core;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Lists all the registered settings
+///     Lists all the registered settings
 /// </summary>
 public static class KnownSettingsCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        var defs = exp.Settings.GetDefinitions()
+        var console = context.Console;
+        var settings = context.Settings;
+        var queryContext = context.QueryContext;
+        var defs = settings.GetDefinitions()
             .Where(d => d.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
-            .OrderBy(d => d.Name);
+            .OrderBy(d => d.Name)
+            .ToImmutableArray();
 
-        var str = Tabulator.Tabulate(defs, "Name|Description|Default", d => d.Name, d => d.Description,
-            d => d.DefaultValue);
-        exp.Info(str);
-        return Task.CompletedTask;
+        var settingDefsTableName="_knownSettings";
+        var table=TableBuilder.CreateFromImmutableData(settingDefsTableName,defs);
+        queryContext.AddTable(table);
+        await context.RunInput(settingDefsTableName);
+        console.Info($"Known settings now available as table {settingDefsTableName}");
     }
 
     [Verb("knownsettings", HelpText = @"lists all setting definitions known to the engine

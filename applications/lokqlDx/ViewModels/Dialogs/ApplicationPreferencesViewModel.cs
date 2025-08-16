@@ -19,6 +19,7 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     [ObservableProperty] private FontFamily _selectedFont;
     [ObservableProperty] private bool _showLineNumbers;
     [ObservableProperty] private bool _wordWrap;
+    [ObservableProperty] private string _pluginsFolder;
 
     public ApplicationPreferencesViewModel(PreferencesManager preferencesManager)
     {
@@ -33,6 +34,7 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         WordWrap = uiPreferences.WordWrap;
         ShowLineNumbers = uiPreferences.ShowLineNumbers;
         SaveBeforeQuery = applicationPreferences.AutoSave;
+        PluginsFolder = applicationPreferences.PluginsFolder;
 
         Document.Text = applicationPreferences.StartupScript;
 
@@ -47,12 +49,12 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     {
         _applicationPreferences.StartupScript = Document.Text;
         _applicationPreferences.AutoSave = SaveBeforeQuery;
-
+        _applicationPreferences.PluginsFolder = PluginsFolder;
         _preferencesManager.UIPreferences.ShowLineNumbers = ShowLineNumbers;
         _preferencesManager.UIPreferences.WordWrap = WordWrap;
         _preferencesManager.UIPreferences.FontFamily = SelectedFont.Name;
         _preferencesManager.UIPreferences.FontSize = FontSize;
-
+        
         _preferencesManager.Save(_applicationPreferences);
         _preferencesManager.SaveUiPrefs();
 

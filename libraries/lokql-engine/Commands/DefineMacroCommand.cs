@@ -4,10 +4,10 @@ namespace Lokql.Engine.Commands;
 
 public static class DefineMacroCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        var blocks = econtext.Sequence;
+        var exp = context.Explorer;
+        var blocks = context.Sequence;
 
         var macroBlocks = new List<string>();
         var valid =false;

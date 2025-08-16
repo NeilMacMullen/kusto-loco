@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
@@ -7,10 +8,11 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class EchoCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
-        exp.Info(o.Text);
+        var console = context.Console;
+
+        console.Info(o.Text);
         return Task.CompletedTask;
     }
 

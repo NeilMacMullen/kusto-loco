@@ -23,7 +23,7 @@ internal class CmdExplore
 
         var processor = CommandProcessorProvider.GetCommandProcessor();
         var renderer = new SixelRenderingSurface(settings);
-        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer);
+        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer, []);
         await RunInteractive(console, explorer);
     }
 

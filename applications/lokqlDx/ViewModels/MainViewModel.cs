@@ -15,14 +15,16 @@ using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
 using System.Collections.ObjectModel;
+using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns;
+using KustoLoco.PluginSupport;
 
 namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private const string NewQueryName = "new";
-    private readonly CommandProcessor _commandProcessor;
-    private readonly CommandProcessorFactory _commandProcessorFactory;
+    private CommandProcessor _commandProcessor;
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
@@ -71,8 +73,7 @@ public partial class MainViewModel : ObservableObject
         _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
-        _commandProcessorFactory = commandProcessorFactory;
-        _commandProcessor = _commandProcessorFactory.GetCommandProcessor();
+        _commandProcessor = commandProcessorFactory.GetCommandProcessor();
         _workspaceManager = workspaceManager;
         _registryOperations = registryOperations;
         _storage = storage;
@@ -89,6 +90,7 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
+       
     }
 
 
@@ -374,16 +376,32 @@ public partial class MainViewModel : ObservableObject
             ConsoleViewModel,
             _workspaceManager.Settings,
             _commandProcessor,
-            new NullResultRenderingSurface());
+            new NullResultRenderingSurface(),
+            _additionalFunctions);
+
+    private bool _pluginsLoaded = false;
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions=[];
 
     private async Task LoadWorkspace(string path)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
 
-        _explorer = CreateExplorer();
+       
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
+        if (!_pluginsLoaded)
+        {
+            var pluginsFolder = appPrefs.PluginsFolder;
+            if (pluginsFolder.IsNotBlank())
+            {
+                _commandProcessor = PluginHelper.LoadCommands(pluginsFolder, _explorer._outputConsole, _commandProcessor);
+                _additionalFunctions = PluginHelper.LoadKqlFunctions(pluginsFolder, _explorer._outputConsole);
+            }
+            _pluginsLoaded = true;
+        }
+        
+        _explorer = CreateExplorer();
         _workspaceManager.Load(path);
         CurrentWorkspace = _workspaceManager.Workspace;
 
@@ -393,7 +411,7 @@ public partial class MainViewModel : ObservableObject
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
         await _explorer.RunInput(_workspaceManager.Workspace.StartupScript);
-
+       
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
                 AddQuery(p.Name, p.Text);
@@ -408,6 +426,7 @@ public partial class MainViewModel : ObservableObject
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
+        
     }
 
     /// <summary>
