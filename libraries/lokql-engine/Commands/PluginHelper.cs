@@ -42,6 +42,8 @@ public class PluginHelper
                 var name = Path.GetFileName(pluginFolder);
                 var dllPath = Path.Combine(pluginFolder, $"{name}.dll");
                 if (!File.Exists(dllPath)) continue;
+                console.Info($"Loading plugins from {dllPath}");
+
                 currentName = name;
                 var loader = PluginLoader.CreateFromAssemblyFile(
                     assemblyFile: dllPath,

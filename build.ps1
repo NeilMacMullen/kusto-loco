@@ -5,23 +5,28 @@ param(
 
     [Parameter(Mandatory = $true, HelpMessage = "version for package")]
     [string] $version,
-    [Parameter(HelpMessage = "api key (if publising nuget packages)")]
+    [Parameter(HelpMessage = "api key (if publishing nuget packages)")]
     [string] $api,
 
     [Parameter(HelpMessage = "test only")]
     [switch] $skipBuild,
     [Parameter(HelpMessage = "do not create upload zip")]
-    [switch] $skipZip
+    [switch] $skipZip,
+
+    [Parameter(HelpMessage = "just build")]
+    [switch] $skipInstallers
 
 )
 $versionString = $version.replace('.', '-')
 $uploadsFolder = "uploads-$versionstring"
-$packages = @( ("KustoLoco.Core","KustoLoco.Core"), 
-               ("FileFormats", "KustoLoco.FileFormats"),
-               ("Rendering", "KustoLoco.Rendering"),
-               ("ScottPlotRendering","KustoLoco.Rendering.ScottPlot"), 
-               ("SixelSupport","KustoLoco.Rendering.SixelSupport")
-             )
+$packages = @( ("KustoLoco.Core", "KustoLoco.Core"), 
+    ("FileFormats", "KustoLoco.FileFormats"),
+    ("Rendering", "KustoLoco.Rendering"),
+    ("ScottPlotRendering", "KustoLoco.Rendering.ScottPlot"), 
+    ("SixelSupport", "KustoLoco.Rendering.SixelSupport"),
+    ("PluginSupport", "KustoLoco.PluginSupport")
+
+)
 
 
 if (-not $skipBuild) {
@@ -36,7 +41,7 @@ if (-not $skipBuild) {
     #make nuget packages
     
     foreach ($package in $packages) {
-        $project=$package[0]
+        $project = $package[0]
         dotnet pack -p:PackageVersion=$version .\libraries\$project\$project.csproj
     }
    
@@ -72,8 +77,9 @@ if (-not $skipBuild) {
 
 if (-not ($api -like '') ) {
     foreach ($package in $packages) {
-        $project=$package[0]
-        $nuget=$package[1]
+        $project = $package[0]
+        $nuget = $package[1]
+        write-host "Pushing project '$project' package '$nuget'"
         dotnet nuget push libraries\$project\bin\Release\$nuget.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
     }
     dotnet nuget push sourceGeneration\SourceGenDependencies\bin\Release\KustoLoco.SourceGeneration.Attributes.$($version).nupkg --api-key $api --source https://api.nuget.org/v3/index.json
@@ -84,23 +90,24 @@ get-ChildItem -r *.nupkg | % FullName
 remove-item $uploadsFolder -recurse -force
 new-item -ItemType directory -name "$uploadsFolder"
 
+if (-not $skipInstallers) {
+    # Build the installers for windows
+    $installers = @("lokql", "lokqldx", "pskql")
+    foreach ($installer in $installers) { 
+        iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\$installer.iss
+    }
 
-# Build the installers for windows
-$installers = @("lokql", "lokqldx", "pskql")
-foreach ($installer in $installers) { 
-    iscc.exe   /DMyAppVersion="$version" /DSuffix="$versionString" /DOutputDir="$uploadsFolder" .\setup\$installer.iss
-}
+    # copy other platforms as individual archives
+    if (-not $skipZip) {
 
-# copy other platforms as individual archives
-if (-not $skipZip) {
-
-    $folders = @("lokql-linux", "lokqldx-linux", "lokqldx-macos", "pskql-linux", "tutorials")  
-    foreach ($folder in $folders) {
-        $compress = @{
-            Path             = ".\publish\$folder"
-            CompressionLevel = "Fastest"
-            DestinationPath  = "$uploadsFolder\$folder-$versionString.zip"
+        $folders = @("lokql-linux", "lokqldx-linux", "lokqldx-macos", "pskql-linux", "tutorials")  
+        foreach ($folder in $folders) {
+            $compress = @{
+                Path             = ".\publish\$folder"
+                CompressionLevel = "Fastest"
+                DestinationPath  = "$uploadsFolder\$folder-$versionString.zip"
+            }
+            Compress-Archive @compress
         }
-        Compress-Archive @compress
     }
 }

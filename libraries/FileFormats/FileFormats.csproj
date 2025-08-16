@@ -15,7 +15,7 @@
     <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/wiki/Release-Notes</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/releases</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <AssemblyName>KustoLoco.FileFormats</AssemblyName>
