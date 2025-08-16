@@ -42,6 +42,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
         SetText(initialText);
         _isDirty = false;
+        SetSchema(_explorer.GetSchema());
     }
 
     public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();

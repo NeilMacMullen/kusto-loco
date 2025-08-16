@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
 using KustoLoco.Core;
+using KustoLoco.PluginSupport;
 using NotNullStrings;
 
 namespace Lokql.Engine;
 
-public class ResultHistory
+public class ResultHistory:IResultHistory
 {
     private ImmutableList<StoredResult> _results = [];
 
@@ -17,7 +18,7 @@ public class ResultHistory
         MostRecent = result;
     }
 
-    public void Save(string name)
+    public void Store(string name)
     {
         _results = _results
             .Where(r=>! r.Name.Equals(name,StringComparison.InvariantCultureIgnoreCase))

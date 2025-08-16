@@ -7,7 +7,7 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class ResultsCommand
 {
-    internal static  Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static  Task RunAsync(CommandContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var res = exp._resultHistory.List();

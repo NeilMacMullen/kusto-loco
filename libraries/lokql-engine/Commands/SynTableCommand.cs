@@ -1,14 +1,16 @@
 ﻿using CommandLine;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
 public static class SynTableCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        exp.Info($"Creating synonym for table {o.CurrentName} as {NameEscaper.EscapeIfNecessary(o.As)} ...");
-        exp.GetCurrentContext().ShareTable(o.CurrentName, o.As);
+        var console = econtext.Console;
+        var queryContext = econtext.QueryContext;
+        console.Info($"Creating synonym for table {o.CurrentName} as {NameEscaper.EscapeIfNecessary(o.As)} ...");
+        queryContext.ShareTable(o.CurrentName, o.As);
         return Task.CompletedTask;
     }
 

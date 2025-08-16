@@ -15,14 +15,14 @@ using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
 using System.Collections.ObjectModel;
+using KustoLoco.PluginSupport;
 
 namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private const string NewQueryName = "new";
-    private readonly CommandProcessor _commandProcessor;
-    private readonly CommandProcessorFactory _commandProcessorFactory;
+    private CommandProcessor _commandProcessor;
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
@@ -71,8 +71,7 @@ public partial class MainViewModel : ObservableObject
         _displayPreferences = new DisplayPreferencesViewModel();
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
-        _commandProcessorFactory = commandProcessorFactory;
-        _commandProcessor = _commandProcessorFactory.GetCommandProcessor();
+        _commandProcessor = commandProcessorFactory.GetCommandProcessor();
         _workspaceManager = workspaceManager;
         _registryOperations = registryOperations;
         _storage = storage;
@@ -89,6 +88,7 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
+       
     }
 
 
@@ -376,6 +376,7 @@ public partial class MainViewModel : ObservableObject
             _commandProcessor,
             new NullResultRenderingSurface());
 
+    private bool _pluginsLoaded = false;
     private async Task LoadWorkspace(string path)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
@@ -384,6 +385,8 @@ public partial class MainViewModel : ObservableObject
         _explorer = CreateExplorer();
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
+
+        
         _workspaceManager.Load(path);
         CurrentWorkspace = _workspaceManager.Workspace;
 
@@ -393,6 +396,16 @@ public partial class MainViewModel : ObservableObject
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
         await _explorer.RunInput(_workspaceManager.Workspace.StartupScript);
+        if (!_pluginsLoaded)
+        {
+            var pluginsFolder = _explorer.Settings.GetOr("kusto.plugins","");
+            if (pluginsFolder.IsNotBlank())
+            {
+             _commandProcessor=  PluginHelper.LoadCommands(pluginsFolder, _explorer._outputConsole,_commandProcessor) ;
+            }
+
+            _pluginsLoaded = true;
+        }
 
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
@@ -408,6 +421,7 @@ public partial class MainViewModel : ObservableObject
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
+        
     }
 
     /// <summary>

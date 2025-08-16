@@ -7,7 +7,7 @@ namespace Lokql.Engine.Commands;
 
 public static class RenderCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var fileName = Path.ChangeExtension(o.File.OrWhenBlank(Path.GetTempFileName()), "html");
