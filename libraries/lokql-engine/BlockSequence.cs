@@ -6,7 +6,7 @@
 /// <remarks>
 /// a block is a string that represents a logical unit of work
 /// </remarks>
-public class BlockSequence
+public class BlockSequence 
 {
     public BlockSequence(string[] blocks)
     {
@@ -20,6 +20,9 @@ public class BlockSequence
     /// True if all blocks have been processed
     /// </summary>
     public bool Complete => Index >= Blocks.Length;
+
+    public string[] RemainingBlocks => Blocks.Skip(Index).ToArray();
+
     /// <summary>
     /// Get the next block in the sequence
     /// </summary>
@@ -28,3 +31,4 @@ public class BlockSequence
         return Index < Blocks.Length ? Blocks[Index++] : string.Empty;
     }
 }
+

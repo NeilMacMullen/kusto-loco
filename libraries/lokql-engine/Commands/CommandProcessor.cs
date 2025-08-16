@@ -4,13 +4,13 @@ using System.Globalization;
 using System.Reflection;
 using CommandLine;
 using CsvHelper;
+using KustoLoco.PluginSupport;
+using NLog.LayoutRenderers;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
-public readonly record struct CommandProcessorContext(InteractiveTableExplorer Explorer, BlockSequence Sequence);
-
-public class CommandProcessor
+public class CommandProcessor :ICommandProcessor
 {
     private SchemaLine[] _registeredSchema = [];
 
@@ -23,57 +23,77 @@ public class CommandProcessor
 
     public static CommandProcessor Default()
     {
-        var cp = new CommandProcessor()
-                .WithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
-                .WithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
+        var cp = (CommandProcessor) new CommandProcessor()
+                 //loader not exposed 
+                .LegacyWithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync) 
+                .LegacyWithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
+                 //results history not exposed
+                .LegacyWithAdditionalCommand<ResultsCommand.Options>(ResultsCommand.RunAsync)
+                .LegacyWithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
+
+                .LegacyWithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.RunAsync)
+                .LegacyWithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
+                .LegacyWithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
+               
+                .LegacyWithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
+                .LegacyWithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)
+                .LegacyWithAdditionalCommand<FormatCommand.Options>(FormatCommand.RunAsync)
+                .LegacyWithAdditionalCommand<RunScriptCommand.Options>(RunScriptCommand.RunAsync)
+                .LegacyWithAdditionalCommand<SaveQueryCommand.Options>(SaveQueryCommand.RunAsync)
+                .LegacyWithAdditionalCommand<QueryCommand.Options>(QueryCommand.RunAsync)
+                .LegacyWithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
+                .LegacyWithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
+                .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.RunAsync)
+                .WithAdditionalCommand<CopilotCommand.Options>(CopilotCommand.RunAsync)
+                .WithAdditionalCommand<GetEventLogCommand.Options>(GetEventLogCommand.RunAsync)
+                .WithAdditionalCommand<AdxCommand.Options>(AdxCommand.RunAsync)
+                .WithAdditionalCommand<PivotColumnsToRowsCommand.Options>(PivotColumnsToRowsCommand.RunAsync)
                 .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
                 .WithAdditionalCommand<SettingsCommand.Options>(SettingsCommand.RunAsync)
                 .WithAdditionalCommand<KnownSettingsCommand.Options>(KnownSettingsCommand.RunAsync)
                 .WithAdditionalCommand<PushCommand.Options>(PushCommand.RunAsync)
                 .WithAdditionalCommand<PullCommand.Options>(PullCommand.RunAsync)
-                .WithAdditionalCommand<ResultsCommand.Options>(ResultsCommand.RunAsync)
                 .WithAdditionalCommand<DropTableCommand.Options>(DropTableCommand.RunAsync)
                 .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
                 .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
                 .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
-                .WithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
-                .WithAdditionalCommand<AdxCommand.Options>(AdxCommand.RunAsync)
-                .WithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.RunAsync)
-                .WithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
-                .WithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
                 .WithAdditionalCommand<EchoCommand.Options>(EchoCommand.RunAsync)
-                .WithAdditionalCommand<PivotColumnsToRowsCommand.Options>(PivotColumnsToRowsCommand.RunAsync)
                 .WithAdditionalCommand<PivotRowsToColumnsCommand.Options>(PivotRowsToColumnsCommand.RunAsync)
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
-                .WithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
-                .WithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)
                 .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
-                .WithAdditionalCommand<FormatCommand.Options>(FormatCommand.RunAsync)
-                .WithAdditionalCommand<RunScriptCommand.Options>(RunScriptCommand.RunAsync)
-                .WithAdditionalCommand<SaveQueryCommand.Options>(SaveQueryCommand.RunAsync)
-                .WithAdditionalCommand<QueryCommand.Options>(QueryCommand.RunAsync)
-                .WithAdditionalCommand<DefineMacroCommand.Options>(DefineMacroCommand.RunAsync)
-                .WithAdditionalCommand<RunMacroCommand.Options>(RunMacroCommand.RunAsync)
-                .WithAdditionalCommand<SleepCommand.Options>(SleepCommand.RunAsync)
-                .WithAdditionalCommand<CopilotCommand.Options>(CopilotCommand.RunAsync)
-                .WithAdditionalCommand<GetEventLogCommand.Options>(GetEventLogCommand.RunAsync)
+
+
+
             ;
 
-        cp.AddAdditionalCommandSchema(AppInsightsCommand.SchemaCsv);
+        AppInsightsCommand.RegisterSchema(cp);
         return cp;
     }
 
-    public void AddAdditionalCommandSchema(string schemaCsv)
+    
+    public void RegisterSchema(string command,string schemaText)
     {
-        var stream = new StringReader(schemaCsv);
-        using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
-        var schema = csv.GetRecords<SchemaLine>().ToArray();
+        command = command.Trim();
+        if (!command.StartsWith("."))
+            command = $".{command}";
+        var schema = schemaText.Tokenize("\r\n")
+            .Select(l=>l.Tokenize(","))
+            .Select(pair=>new SchemaLine(command, pair[0], pair[1]))
+            .ToArray();
         _registeredSchema = _registeredSchema.Concat(schema).ToArray();
     }
 
-    public CommandProcessor WithAdditionalCommand<T>(Func<CommandProcessorContext, T, Task> registration)
+    public CommandProcessor LegacyWithAdditionalCommand<T>(Func<CommandContext, T, Task> registration)
+    {
+        _registrations = _registrations.Add(
+            new RegisteredCommand(typeof(T), (exp, o) => registration((CommandContext) exp, (T)o)));
+        return this;
+    }
+
+
+    public ICommandProcessor WithAdditionalCommand<T>(Func<ICommandContext, T, Task> registration)
     {
         _registrations = _registrations.Add(
             new RegisteredCommand(typeof(T), (exp, o) => registration(exp, (T)o)));
@@ -100,7 +120,7 @@ public class CommandProcessor
             .CreateWithHelpWriter(textWriter)
             .ParseArguments(tokens, typeTable);
 
-        var context = new CommandProcessorContext(exp, sequence);
+        var context = new CommandContext(exp, sequence);
         foreach (var registration in _registrations)
         {
             async Task Func(object o)
@@ -163,5 +183,5 @@ public class CommandProcessor
 
     private readonly record struct RegisteredCommand(
         Type OptionType,
-        Func<CommandProcessorContext, object, Task> TaskGeneratingFunction);
+        Func<ICommandContext, object, Task> TaskGeneratingFunction);
 }

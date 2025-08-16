@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
@@ -7,11 +8,10 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class PullCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        var res = exp._resultHistory.Fetch(o.Name);
-        await exp.InjectResult(res);
+        var res = econtext.History.Fetch(o.Name);
+        await econtext.InjectResult(res);
     }
 
     [Verb("pull",  HelpText = "retrieves a stored result and displays it")]

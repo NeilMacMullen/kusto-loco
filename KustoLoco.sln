@@ -108,6 +108,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlDxComponents", "librar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlDxComponentsTests", "test\lokqlDxComponentsTests\lokqlDxComponentsTests.csproj", "{E3F2D499-2001-4170-8F5B-EAD6B7098393}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginSupport", "libraries\PluginSupport\PluginSupport.csproj", "{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LokqlPlugin", "samples\LokqlPlugin\LokqlPlugin.csproj", "{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -262,6 +266,14 @@ Global
 		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3F2D499-2001-4170-8F5B-EAD6B7098393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -305,6 +317,8 @@ Global
 		{E3F0084D-E510-41B1-ACF5-2A649CD4B88C} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{D3F3DBD0-46D1-45A6-9A72-67C64DC04BEC} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{E3F2D499-2001-4170-8F5B-EAD6B7098393} = {932C804C-F6B7-4361-8360-E5238938E464}
+		{25FECBFA-D75E-4B1F-9F2A-BBBEB7D43D99} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
+		{22A327C6-6F58-4B45-B706-BF8D0F9FCB0E} = {48CD2752-9462-473A-8699-7AD8B146742F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}

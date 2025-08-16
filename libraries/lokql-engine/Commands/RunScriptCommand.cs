@@ -4,7 +4,7 @@ namespace Lokql.Engine.Commands;
 
 public static class RunScriptCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var scriptFolder = exp.Settings.Get(LokqlSettings.ScriptPath);

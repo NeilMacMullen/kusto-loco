@@ -9,7 +9,7 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class LoadExcel
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var ser = new ExcelSerializer(exp.Settings, exp._outputConsole);

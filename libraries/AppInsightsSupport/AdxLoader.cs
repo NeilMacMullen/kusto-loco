@@ -28,12 +28,12 @@ public class AdxLoader
     public async Task<KustoQueryResult> LoadTable(string resourcePath, string database,
         string query)
     {
-        var kcsb = new KustoConnectionStringBuilder(resourcePath)
+        var kcsb = new KustoConnectionStringBuilder(resourcePath,database)
             .WithAadUserPromptAuthentication();
 
 
-        using var kustoClient = KustoClientFactory.CreateCslQueryProvider(kcsb);
-        using var response = kustoClient.ExecuteQuery(database, query, null);
+        using var kustoClient = KustoClientFactory.CreateCslQueryProvider(kcsb) ;
+        using var response = kustoClient.ExecuteQuery(query);
         var table = TableLoaderFromIDataReader.LoadTable("result", response);
         var vs = VisualizationState.Empty;
         if (response.NextResult())

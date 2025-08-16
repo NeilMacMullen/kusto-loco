@@ -4,11 +4,11 @@ using KustoLoco.Core.Settings;
 namespace Lokql.Engine.Commands;
 
 /// <summary>
-/// Save the last result to a file
+/// Store the last result to a file
 /// </summary>
 public static class SaveCommand
 {
-    internal static async Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext econtext, Options o)
     {
         var newLayer = new KustoSettingsProvider();
         if (o.NoHeader)

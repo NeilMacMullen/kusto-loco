@@ -1,14 +1,17 @@
 ﻿using CommandLine;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
 public static class MaterializeCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        exp.GetCurrentContext().MaterializeResultAsTable(exp.GetResult(o.ResultName), o.As);
-        exp.Info($"Table {NameEscaper.EscapeIfNecessary(o.As)} now available");
+        var console = econtext.Console;
+        var queryContext = econtext.QueryContext;
+        var history = econtext.History;
+        queryContext.MaterializeResultAsTable(history.Fetch(o.ResultName), o.As);
+        console.Info($"Table {NameEscaper.EscapeIfNecessary(o.As)} now available");
         return Task.CompletedTask;
     }
 

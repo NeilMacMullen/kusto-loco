@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="McMaster.NETCore.Plugins" />
     <PackageReference Include="ShapeCrawler" />
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>
@@ -18,6 +19,7 @@
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
+    <ProjectReference Include="..\PluginSupport\PluginSupport.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>
 

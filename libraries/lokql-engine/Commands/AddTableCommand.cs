@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using KustoLoco.FileFormats;
+using KustoLoco.PluginSupport;
 
 namespace Lokql.Engine.Commands;
 
@@ -8,33 +9,35 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class AddTableCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        var blocks = econtext.Sequence;
-
-        if (blocks.Complete)
+        var console = econtext.Console;
+        var queryContext = econtext.QueryContext;
+        var blocks = econtext.InputProcessor;
+        var settings = econtext.Settings;
+        
+        if (blocks.IsComplete)
         {
-            exp.Warn("No data provided.");
+            console.Warn("No data provided.");
             return Task.CompletedTask;
         }
 
-        var csvData = blocks.Next();
+        var csvData = blocks.ConsumeNextBlock();
 
         var tableName = o.As;
         //remove table if it already exists
-        if (exp.GetCurrentContext().HasTable(tableName)) exp.GetCurrentContext().RemoveTable(tableName);
+        if (queryContext.HasTable(tableName)) queryContext.RemoveTable(tableName);
 
         try
         {
-            var serializer = CsvSerializer.Default(exp.Settings, exp._outputConsole);
+            var serializer = CsvSerializer.Default(settings, console);
             var source = serializer.LoadFromString(csvData, tableName);
-            exp.GetCurrentContext().AddTable(source);
-            exp.Info($"Loaded {NameEscaper.EscapeIfNecessary(tableName)}");
+            queryContext.AddTable(source);
+            console.Info($"Loaded {NameEscaper.EscapeIfNecessary(tableName)}");
         }
         catch (Exception ex)
         {
-            exp.Warn($"Data malformed: {ex.Message}");
+            console.Warn($"Data malformed: {ex.Message}");
         }
 
         return Task.CompletedTask;

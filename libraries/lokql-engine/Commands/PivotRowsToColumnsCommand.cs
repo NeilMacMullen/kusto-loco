@@ -2,16 +2,19 @@
 using CommandLine;
 using Kusto.Language.Utils;
 using KustoLoco.Core;
+using KustoLoco.PluginSupport;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
 public static class PivotRowsToColumnsCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext econtext, Options o)
     {
-        var exp = econtext.Explorer;
-        var result = exp._resultHistory.Fetch(o.ResultName);
+        var console = econtext.Console;
+        var queryContext = econtext.QueryContext;
+        var history = econtext.History;
+        var result = history.Fetch(o.ResultName);
 
 
         var ods = new Dictionary<object, OrderedDictionary>();
@@ -20,7 +23,7 @@ public static class PivotRowsToColumnsCommand
         var valueIndex = GetColumnIndex(o.ValueFrom);
         if (newColumnNamesIndex < 0 || valueIndex < 0)
         {
-            exp.Warn("Unable to find requested columns");
+           console.Warn("Unable to find requested columns");
             return Task.CompletedTask;
         }
 
@@ -50,8 +53,8 @@ public static class PivotRowsToColumnsCommand
         }
 
         var builder = TableBuilder.FromOrderedDictionarySet(o.As, ods.Values.ToList());
-        exp.GetCurrentContext().AddTable(builder);
-        exp.Info($"Table '{o.As}' now available");
+        queryContext.AddTable(builder);
+        console.Info($"Table '{o.As}' now available");
         return Task.CompletedTask;
 
         int GetColumnIndex(string name)

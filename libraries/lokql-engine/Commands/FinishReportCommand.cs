@@ -4,7 +4,7 @@ namespace Lokql.Engine.Commands;
 
 public static class FinishReportCommand
 {
-    internal static Task RunAsync(CommandProcessorContext econtext, Options o)
+    internal static Task RunAsync(CommandContext econtext, Options o)
     {
         var exp = econtext.Explorer;
         var report = exp.ActiveReport;
