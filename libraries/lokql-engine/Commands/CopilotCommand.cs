@@ -8,11 +8,11 @@ public static class CopilotCommand
 {
     private static CopilotHelper? _copilot;
 
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
-        var blocks = econtext.InputProcessor;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var blocks = context.InputProcessor;
         
         if (blocks.IsComplete)
             return;
@@ -20,14 +20,14 @@ public static class CopilotCommand
         if (_copilot == null)
         {
             console.Info("Creating new copilot");
-            _copilot = new CopilotHelper(econtext.Settings, queryContext);
+            _copilot = new CopilotHelper(context.Settings, queryContext);
         }
 
         var query = blocks.ConsumeNextBlock();
         var resp = await _copilot.SendUserRequest(query);
         console.Info(resp.Explanation);
         console.Warn(resp.Code);
-        await econtext.RunInput(resp.Code);
+        await context.RunInput(resp.Code);
     }
 
     [Verb("copilot",

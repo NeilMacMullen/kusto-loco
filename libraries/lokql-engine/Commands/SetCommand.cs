@@ -8,10 +8,10 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class SetCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var settings = econtext.Settings;
+        var console = context.Console;
+        var settings = context.Settings;
         settings.Set(o.Name, o.Value);
         console.Info($"Set {o.Name} to {o.Value}");
         return Task.CompletedTask;

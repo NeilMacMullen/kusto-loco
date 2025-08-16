@@ -8,10 +8,10 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class PushCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        econtext.History.Store(o.Name);
+        var console = context.Console;
+        context.History.Store(o.Name);
         console.Info($"result stored as '{o.Name}'");
         await Task.CompletedTask;
     }

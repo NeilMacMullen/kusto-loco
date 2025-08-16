@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.Design.Serialization;
+﻿using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.PluginSupport;
 using McMaster.NETCore.Plugins;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.Design.Serialization;
 
 namespace Lokql.Engine.Commands;
 
 public class PluginHelper
 {
-
     public static CommandProcessor LoadCommands(string path, IKustoConsole console,CommandProcessor processor)
     {
         var currentName = "";
@@ -29,6 +30,28 @@ public class PluginHelper
 
         return processor;
     }
+    public static Dictionary<FunctionSymbol, ScalarFunctionInfo> LoadKqlFunctions(string path, IKustoConsole console)
+    {
+        var funcs = new Dictionary<FunctionSymbol, ScalarFunctionInfo>();
+        var currentName = "";
+        try
+        {
+            var plugins = Load<IKqlFunction>(path, console);
+            foreach (var instance in plugins)
+            {
+                currentName = instance.GetNameAndVersion();
+                instance.Register(funcs);
+            }
+        }
+        catch (Exception ex)
+        {
+            console.Error($"Failed to register plugin '{currentName}'");
+            console.Error($"Exception:{ex.GetType().Name} {ex.Message}");
+        }
+
+        return funcs;
+    }
+
     private static List<T> Load<T>(string path,IKustoConsole console)
     where T:ILokqlPlugin
     {

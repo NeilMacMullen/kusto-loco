@@ -4,9 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class StartReportCommand
 {
-    internal static Task RunAsync(CommandContext econtext, Options o)
+    internal static Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var type = o.Type.ToLowerInvariant();
         var reportTemplate = Path.IsPathRooted(o.Template)
             ? o.Template
@@ -32,7 +32,7 @@ public static class StartReportCommand
            
         }
         */
-        else econtext.Explorer.Warn($"Unrecognised/unsupported report type '{type}'");
+        else context.Explorer.Warn($"Unrecognised/unsupported report type '{type}'");
 
         return Task.CompletedTask;
     }

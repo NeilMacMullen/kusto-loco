@@ -20,7 +20,7 @@ internal class CmdRun
         settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, options.Data);
         var processor = CommandProcessorProvider.GetCommandProcessor();
         var renderer = new SixelRenderingSurface(settings);
-        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer);
+        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer, []);
         var block = options.File.IsBlank() ? options.Command : File.ReadAllText(options.File);
         await explorer.RunInput(block);
     }

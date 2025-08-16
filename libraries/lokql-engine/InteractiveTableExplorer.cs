@@ -1,5 +1,7 @@
-﻿using KustoLoco.Core;
+﻿using Kusto.Language.Symbols;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Settings;
 using KustoLoco.PluginSupport;
 using Lokql.Engine.Commands;
@@ -32,13 +34,15 @@ public class InteractiveTableExplorer
 
 
     public InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
-        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface)
+        CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface,
+        Dictionary<FunctionSymbol, ScalarFunctionInfo> additionalFunctions)
     {
         _outputConsole = outputConsole;
         Settings = settings;
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
+        _context.AddFunctions(additionalFunctions);
         _loader = new StandardFormatAdaptor(settings, _outputConsole);
         _context.SetTableLoader(_loader);
         _resultHistory = new ResultHistory();

@@ -7,9 +7,9 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class ResultsCommand
 {
-    internal static  Task RunAsync(CommandContext econtext, Options o)
+    internal static  Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var res = exp._resultHistory.List();
         var str =  Tabulator.Tabulate(res, "Name|Time|Rows|Columns",s=>s.Name, s => s.Timestamp.ToShortTimeString(),
             s=>s.Result.RowCount.ToString(),s=>s.Result.ColumnCount.ToString());

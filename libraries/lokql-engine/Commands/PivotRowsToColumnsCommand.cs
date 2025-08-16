@@ -9,11 +9,11 @@ namespace Lokql.Engine.Commands;
 
 public static class PivotRowsToColumnsCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
-        var history = econtext.History;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var history = context.History;
         var result = history.Fetch(o.ResultName);
 
 

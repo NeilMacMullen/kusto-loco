@@ -12,7 +12,7 @@
     <Grid
         Margin="10"
         ColumnDefinitions="auto,auto,auto,*,auto,auto"
-        RowDefinitions="auto,30,auto,auto,*,30"
+        RowDefinitions="auto,30,auto,auto,auto,*,30"
         ColumnSpacing="15"
         RowSpacing="5">
         <TextBlock Grid.Row="0" VerticalAlignment="Center">Font</TextBlock>
@@ -63,15 +63,20 @@
             Grid.Row="2"
             Content="Automatically save workspace before running query"
             IsChecked="{Binding SaveBeforeQuery}" />
+        <DockPanel Grid.Row="3" Grid.ColumnSpan="99" Margin="0,10,0,10">
+            <TextBlock DockPanel.Dock="Top">Plugins Folder</TextBlock>
 
+            <TextBox Text="{Binding PluginsFolder}" Margin="0,10,0,0"/>
+
+		</DockPanel>
         <TextBlock
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.ColumnSpan="5"
             Text="Application pre-script (run every time a workspace is loaded)" />
 
         <Border
             Grid.ColumnSpan="6"
-            Grid.Row="4"
+            Grid.Row="5"
             Background="{DynamicResource SystemListLowColor}"
             Padding="10"
             CornerRadius="10">
@@ -87,13 +92,13 @@
 
         <Button
             Grid.Column="4"
-            Grid.Row="5"
+            Grid.Row="6"
             Content="Cancel"
             Command="{Binding CancelCommand}" />
 
         <Button
             Grid.Column="5"
-            Grid.Row="5"
+            Grid.Row="6"
             Content="Save"
             Command="{Binding SaveCommand}" />
     </Grid>

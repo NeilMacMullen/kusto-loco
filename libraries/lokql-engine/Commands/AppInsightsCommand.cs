@@ -377,11 +377,11 @@ public static class AppInsightsCommand
                                     requests,_ResourceId
                                     """;
 
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var blocks = econtext.InputProcessor;
-        var settings = econtext.Settings;
+        var console = context.Console;
+        var blocks = context.InputProcessor;
+        var settings = context.Settings;
         var ai = new ApplicationInsightsLogLoader(settings, console);
 
         var timespan = o.Timespan;
@@ -406,7 +406,7 @@ public static class AppInsightsCommand
 
         console.Info("Running application insights query.  This may take a while....");
         var result = await ai.LoadTable(tenant, rid, query, t, DateTime.UtcNow);
-        await econtext.InjectResult(result);
+        await context.InjectResult(result);
     }
 
     [Verb("appinsights", aliases: ["ai"],

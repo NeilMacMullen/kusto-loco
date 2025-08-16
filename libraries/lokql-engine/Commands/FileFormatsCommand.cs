@@ -8,9 +8,9 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class FileFormatsCommand
 {
-    internal static Task RunAsync(CommandContext econtext, Options o)
+    internal static Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var formats =
             Tabulator.Tabulate(
                 exp._loader.GetSupportedAdaptors(),

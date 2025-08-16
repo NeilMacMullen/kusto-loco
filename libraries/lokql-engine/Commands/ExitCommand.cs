@@ -5,9 +5,9 @@ namespace Lokql.Engine.Commands;
 
 public static class ExitCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
+        var console = context.Console;
         console.Warn("Exiting...");
         Environment.Exit(0);
         return Task.CompletedTask;

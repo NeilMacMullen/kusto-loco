@@ -5,11 +5,11 @@ namespace Lokql.Engine.Commands;
 
 public static class SleepCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        econtext.Console.Info("Sleeping...");
+        context.Console.Info("Sleeping...");
         await Task.Delay(TimeSpan.FromSeconds(o.Seconds));
-        econtext.Console.Info("Finished.");
+        context.Console.Info("Finished.");
     }
 
     [Verb("sleep", HelpText = @"Sleep for a number of seconds (default is 1)

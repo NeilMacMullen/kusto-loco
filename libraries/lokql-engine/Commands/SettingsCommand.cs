@@ -12,11 +12,11 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class SettingsCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
-        var settings = econtext.Settings;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var settings = context.Settings;
         var matches = settings.Enumerate()
             .Where(s => s.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
             .OrderBy(s => s.Name);
@@ -28,7 +28,7 @@ public static class SettingsCommand
                 .ToImmutableArray());
 
         queryContext.AddTable(table);
-        econtext.RunInput(settingsTableName);
+        context.RunInput(settingsTableName);
         console.Info($"Settings available as table '{settingsTableName}'");
         return Task.CompletedTask;
     }

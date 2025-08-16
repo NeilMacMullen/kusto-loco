@@ -4,7 +4,7 @@ namespace Lokql.Engine.Commands;
 
 public static class FormatCommand
 {
-    internal static Task RunAsync(CommandContext econtext, Options o)
+    internal static Task RunAsync(CommandContext context, Options o)
     {
         //if (o.Max > 0)
         //    exp._currentDisplayOptions = exp._currentDisplayOptions with { MaxToDisplay = o.Max };

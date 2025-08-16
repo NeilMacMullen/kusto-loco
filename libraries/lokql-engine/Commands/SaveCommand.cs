@@ -8,7 +8,7 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class SaveCommand
 {
-    internal static async Task RunAsync(CommandContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
         var newLayer = new KustoSettingsProvider();
         if (o.NoHeader)
@@ -16,7 +16,7 @@ public static class SaveCommand
             newLayer.Set("csv.skipheader", "true");
             newLayer.Set("tsv.skipheader", "true");
         }
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         exp.Settings.AddLayer(newLayer);
        
         await exp._loader.SaveResult(exp.GetResult(o.ResultName), o.File);

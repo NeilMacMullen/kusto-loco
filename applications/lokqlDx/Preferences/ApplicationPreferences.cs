@@ -8,4 +8,5 @@ public class ApplicationPreferences
     public bool AutoSave { get; set; }
     public string StartupScript { get; set; } = string.Empty;
     public bool HasShownLanding { get; set; }
+    public string PluginsFolder { get; set; } = string.Empty;
 }

@@ -8,17 +8,17 @@ namespace Lokql.Engine.Commands;
 
 public static class ListTablesCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
         var tableNames = queryContext.TableNames
             .Select(t => new { Table = NameEscaper.EscapeIfNecessary(t) })
             .ToImmutableArray();
         const string tableName = "_tables";
         var table = TableBuilder.CreateFromImmutableData(tableName, tableNames);
         queryContext.AddTable(table);
-        econtext.RunInput(tableName);
+        context.RunInput(tableName);
         console.Info($"Table names are now available as table {tableName}");
         return Task.CompletedTask;
     }

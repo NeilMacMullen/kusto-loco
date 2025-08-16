@@ -4,9 +4,9 @@ namespace Lokql.Engine.Commands;
 
 public static class FinishReportCommand
 {
-    internal static Task RunAsync(CommandContext econtext, Options o)
+    internal static Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var report = exp.ActiveReport;
         var reportPath = Path.IsPathRooted(o.File)
             ? o.File

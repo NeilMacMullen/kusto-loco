@@ -8,12 +8,12 @@ namespace Lokql.Engine.Commands;
 
 public static class PivotColumnsToRowsCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
 
-        var result = econtext.History.Fetch(o.ResultName);
+        var result = context.History.Fetch(o.ResultName);
         var specialColumns = o.Columns.Select(GetColumnIndex).ToArray();
         var boringColumns = Enumerable.Range(0, result.ColumnCount).Except(specialColumns)
             .ToArray();

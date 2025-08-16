@@ -186,7 +186,7 @@ public class KustoQueryContext
         {
             var (table, vis) = TableFromEvaluationResult(EvaluationResult.Null);
             var errorMessage = ex.Message;
-            if (_settings.HasSetting("kusto.stacktrace"))
+            if (_settings.GetBool(KustoSettingDefinition.FromName("kusto.stacktrace")))
             {
                 errorMessage += $"\n\n{ex.StackTrace}";
             }
@@ -287,7 +287,7 @@ public class KustoQueryContext
         {
             var (table, visualizationState) = TableFromEvaluationResult(EvaluationResult.Null);
             var errorMessage = ex.Message;
-            if (_settings.HasSetting("kusto.stacktrace"))
+            if (_settings.GetBool(KustoSettingDefinition.FromName("kusto.stacktrace")))
             {
                 errorMessage += $"\n\n{ex.StackTrace}";
             }

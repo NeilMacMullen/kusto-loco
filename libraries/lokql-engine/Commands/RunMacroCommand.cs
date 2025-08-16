@@ -5,9 +5,9 @@ namespace Lokql.Engine.Commands;
 
 public static class RunMacroCommand
 {
-    internal static async Task RunAsync(CommandContext econtext, Options o)
+    internal static async Task RunAsync(CommandContext context, Options o)
     {
-        var exp = econtext.Explorer;
+        var exp = context.Explorer;
         var macro =  exp.GetMacro(o.Name);
         if (macro.Name == string.Empty)
         {

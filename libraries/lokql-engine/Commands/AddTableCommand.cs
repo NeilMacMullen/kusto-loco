@@ -9,12 +9,12 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class AddTableCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
-        var blocks = econtext.InputProcessor;
-        var settings = econtext.Settings;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
+        var blocks = context.InputProcessor;
+        var settings = context.Settings;
         
         if (blocks.IsComplete)
         {

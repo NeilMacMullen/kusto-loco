@@ -8,9 +8,9 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class EchoCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
+        var console = context.Console;
 
         console.Info(o.Text);
         return Task.CompletedTask;

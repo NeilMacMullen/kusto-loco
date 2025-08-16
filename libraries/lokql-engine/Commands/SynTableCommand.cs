@@ -5,10 +5,10 @@ namespace Lokql.Engine.Commands;
 
 public static class SynTableCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
         console.Info($"Creating synonym for table {o.CurrentName} as {NameEscaper.EscapeIfNecessary(o.As)} ...");
         queryContext.ShareTable(o.CurrentName, o.As);
         return Task.CompletedTask;

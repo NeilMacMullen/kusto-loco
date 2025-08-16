@@ -8,10 +8,10 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class PullCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var res = econtext.History.Fetch(o.Name);
-        await econtext.InjectResult(res);
+        var res = context.History.Fetch(o.Name);
+        await context.InjectResult(res);
     }
 
     [Verb("pull",  HelpText = "retrieves a stored result and displays it")]

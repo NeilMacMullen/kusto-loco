@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 
-namespace LokqlPlugin;
+namespace ProcessesPlugin;
 
 public static class ProcessReader
 {

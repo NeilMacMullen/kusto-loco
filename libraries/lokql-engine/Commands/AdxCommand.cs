@@ -7,14 +7,14 @@ namespace Lokql.Engine.Commands;
 
 public static class AdxCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
        
-        var blocks = econtext.InputProcessor;
+        var blocks = context.InputProcessor;
         if (blocks.IsComplete)
             return;
         var query = blocks.ConsumeNextBlock();
-        var ai = new AdxLoader(econtext.Settings, econtext.Console);
+        var ai = new AdxLoader(context.Settings, context.Console);
 
         var connection = o.ConnectionString;
         var database = o.Database;
@@ -28,9 +28,9 @@ public static class AdxCommand
             }
         }
 
-        econtext.Console.Info("Running ADX query.  This may take a while....");
+        context.Console.Info("Running ADX query.  This may take a while....");
         var result = await ai.LoadTable(connection,database, query);
-        await econtext.InjectResult(result);
+        await context.InjectResult(result);
     }
 
     [Verb("adx", 

@@ -10,18 +10,20 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class KnownSettingsCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var settings = econtext.Settings;
+        var console = context.Console;
+        var settings = context.Settings;
+        var queryContext = context.QueryContext;
         var defs = settings.GetDefinitions()
             .Where(d => d.Name.Contains(o.Match, StringComparison.InvariantCultureIgnoreCase))
             .OrderBy(d => d.Name)
             .ToImmutableArray();
 
         var settingDefsTableName="_knownSettings";
-        TableBuilder.CreateFromImmutableData(settingDefsTableName,defs);
-        await econtext.RunInput(settingDefsTableName);
+        var table=TableBuilder.CreateFromImmutableData(settingDefsTableName,defs);
+        queryContext.AddTable(table);
+        await context.RunInput(settingDefsTableName);
         console.Info($"Known settings now available as table {settingDefsTableName}");
     }
 

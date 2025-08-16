@@ -8,11 +8,11 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class SetScalarCommand
 {
-    internal static async Task RunAsync(ICommandContext econtext, Options o)
+    internal static async Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var settings = econtext.Settings;
-        var history = econtext.History;
+        var console = context.Console;
+        var settings = context.Settings;
+        var history = context.History;
         var result =history.Fetch(o.Result);
         var text = (result.RowCount > 0) ? result.Get(0, 0)?.ToString() ?? "<null>" : "no data";
         settings.Set(o.Name, text);

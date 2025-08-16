@@ -11,10 +11,10 @@ namespace Lokql.Engine.Commands;
 /// </summary>
 public static class GetEventLogCommand
 {
-    internal static Task RunAsync(ICommandContext econtext, Options o)
+    internal static Task RunAsync(ICommandContext context, Options o)
     {
-        var console = econtext.Console;
-        var queryContext = econtext.QueryContext;
+        var console = context.Console;
+        var queryContext = context.QueryContext;
         var tableName = o.As;
         //remove table if it already exists
         if (queryContext.HasTable(tableName)) queryContext.RemoveTable(tableName);
