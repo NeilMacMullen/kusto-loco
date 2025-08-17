@@ -3,14 +3,13 @@ using KustoLoco.Core.Console;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.PluginSupport;
 using McMaster.NETCore.Plugins;
-using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.Design.Serialization;
+using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
 public class PluginHelper
 {
-    public static CommandProcessor LoadCommands(string path, IKustoConsole console,CommandProcessor processor)
+    public static CommandProcessor LoadCommands(string path, IKustoConsole console, CommandProcessor processor)
     {
         var currentName = "";
         try
@@ -30,6 +29,7 @@ public class PluginHelper
 
         return processor;
     }
+
     public static Dictionary<FunctionSymbol, ScalarFunctionInfo> LoadKqlFunctions(string path, IKustoConsole console)
     {
         var funcs = new Dictionary<FunctionSymbol, ScalarFunctionInfo>();
@@ -52,8 +52,8 @@ public class PluginHelper
         return funcs;
     }
 
-    private static List<T> Load<T>(string path,IKustoConsole console)
-    where T:ILokqlPlugin
+    private static List<T> Load<T>(string path, IKustoConsole console)
+        where T : ILokqlPlugin
     {
         var currentName = "";
         try
@@ -63,35 +63,36 @@ public class PluginHelper
             foreach (var pluginFolder in pluginFolders)
             {
                 var name = Path.GetFileName(pluginFolder);
-                var dllPath = Path.Combine(pluginFolder, $"{name}.dll");
-                if (!File.Exists(dllPath)) continue;
-                console.Info($"Loading plugins from {dllPath}");
+                foreach (var extension in "dll".Tokenize())
+                {
+                    var assemblyFile = Path.Combine(pluginFolder, $"{name}.{extension}");
+                    if (!File.Exists(assemblyFile)) continue;
+                    console.Info($"Loading plugins from {assemblyFile}");
 
-                currentName = name;
-                var loader = PluginLoader.CreateFromAssemblyFile(
-                    assemblyFile: dllPath,
-                    sharedTypes: [typeof(T)],
-                    isUnloadable: true);
-                loaders.Add(loader);
-
+                    currentName = name;
+                    var loader = PluginLoader.CreateFromAssemblyFile(
+                        assemblyFile,
+                        sharedTypes: [typeof(T)],
+                        isUnloadable: false);
+                    loaders.Add(loader);
+                }
             }
 
             var instances = new List<T>();
             // Create an instance of plugin types
             foreach (var loader in loaders)
+            foreach (var pluginType in loader
+                         .LoadDefaultAssembly()
+                         .GetTypes()
+                         .Where(t => typeof(T).IsAssignableFrom(t) && !t.IsAbstract))
             {
-                foreach (var pluginType in loader
-                             .LoadDefaultAssembly()
-                             .GetTypes()
-                             .Where(t => typeof(T).IsAssignableFrom(t) && !t.IsAbstract))
-                {
-                    currentName= pluginType.Name;
-                    // This assumes the implementation of IPlugin has a parameterless constructor
-                    var plugin = (T)Activator.CreateInstance(pluginType)!;
-                    console.Info($"Loaded {typeof(T).Name} plugin: {currentName} '{plugin.GetNameAndVersion()}'");
-                    instances.Add(plugin);
-                }
+                currentName = pluginType.Name;
+                // This assumes the implementation of IPlugin has a parameterless constructor
+                var plugin = (T)Activator.CreateInstance(pluginType)!;
+                console.Info($"Loaded {typeof(T).Name} plugin: {currentName} '{plugin.GetNameAndVersion()}'");
+                instances.Add(plugin);
             }
+
             return instances;
         }
         catch (Exception ex)
@@ -101,7 +102,5 @@ public class PluginHelper
         }
 
         return [];
-
-       
     }
 }

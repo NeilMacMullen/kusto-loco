@@ -39,7 +39,20 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         Document.Changing += Document_Changing;
         Document.Changed += Document_Changed;
         LoadIntellisense();
-        AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
+        //catch errors with plugin registration
+        try
+        {
+            AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
+        }
+        catch (Exception e)
+        {
+            SetText($"""
+                     ERROR LOADING PLUGINS: 
+                     {e.Message}
+                     """);
+            return;
+        }
+
         SetText(initialText);
         _isDirty = false;
         SetSchema(_explorer.GetSchema());
@@ -81,10 +94,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
-    private async Task RunQuery(string query)
-    {
-        await RunQueryString(query);
-    }
+    private async Task RunQuery(string query) => await RunQueryString(query);
 
     public async Task RunQueryString(string query)
     {
@@ -114,10 +124,10 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
         KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!
-            .Select(i => i with { Hint = IntellisenseHint.Function }).ToArray(); 
+            .Select(i => i with { Hint = IntellisenseHint.Function }).ToArray();
         using var ops = ResourceHelper.SafeGetResourceStream("IntellisenseOperators.json");
         KqlOperatorEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(ops)!
-            .Select(i=> i with{Hint = IntellisenseHint.Operator}).ToArray();
+            .Select(i => i with { Hint = IntellisenseHint.Operator }).ToArray();
         AddSettingsForIntellisense(_explorer.Settings);
     }
 
