@@ -1,4 +1,5 @@
 ﻿using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using NotNullStrings;
 using static MoreLinq.Extensions.PairwiseExtension;
 
@@ -18,15 +19,17 @@ public class ResultChartAccessor
     }
 
     private readonly KustoQueryResult _result;
+    private readonly KustoSettingsProvider _settings;
     private ColumnResult _seriesNameColumn = ColumnResult.Empty;
     private ColumnResult _valueColumn = ColumnResult.Empty;
     private IAxisLookup _valueLookup = new NumericAxisLookup<double>();
     private ColumnResult _xColumn = ColumnResult.Empty;
     private IAxisLookup _xLookup = new NumericAxisLookup<double>();
 
-    public ResultChartAccessor(KustoQueryResult result)
+    public ResultChartAccessor(KustoQueryResult result,KustoSettingsProvider settings)
     {
         _result = result;
+        _settings = settings;
     }
 
     public bool XisDateTime => IsTemporal(_xColumn);
@@ -92,10 +95,14 @@ public class ResultChartAccessor
     public IReadOnlyCollection<ChartSeries> CalculateSeries()
     {
         var columns = _result.ColumnDefinitions();
+        var skipMultiSeries = _settings.GetOr("scottplot.disablemultiseries", "");
+        
         // Check if all columns are numeric
-        if (columns.Length > 1
-            && IsNumeric(columns[0]) || IsTemporal(columns[0])
-            && columns.Skip(1).All(IsNumeric))
+        if ( skipMultiSeries.IsBlank()
+             && (columns.Length > 1)
+             && (IsNumeric(columns[0]) || IsTemporal(columns[0]))
+             && columns.Skip(1).All(IsNumeric)
+            )
         {
             var xCol = columns[0];
             var yCols = columns.Skip(1).ToArray();
