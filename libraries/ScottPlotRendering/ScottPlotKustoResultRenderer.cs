@@ -108,7 +108,7 @@ public static class ScottPlotKustoResultRenderer
     /// </summary>
     public static void RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
-        var accessor = new ResultChartAccessor(result);
+        var accessor = new ResultChartAccessor(result,settings);
         plot.Clear();
         SetInitialUiPreferences(result, plot, settings);
         if (accessor.Kind() == ResultChartAccessor.ChartKind.Pie && result.ColumnCount >= 2)
