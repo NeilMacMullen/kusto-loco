@@ -107,4 +107,22 @@ public class DynamicTests : TestMethods
     }
 
 
+    [TestMethod]
+    public async Task ArrayReverse2()
+    {
+        var query = """
+                    print arr=dynamic([1, 2, 3, 4]) 
+                    | project Result=array_reverse(arr)
+                    """;
+
+        var result = await LastLineOfResult(query);
+        result.Should().Be("""
+                           [
+                             4,
+                             3,
+                             2,
+                             1
+                           ]
+                           """);
+    }
 }

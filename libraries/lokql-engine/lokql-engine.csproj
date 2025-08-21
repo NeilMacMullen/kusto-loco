@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Clowd.Clipboard.Avalonia" />
     <PackageReference Include="CommandLineParser" />
     <PackageReference Include="McMaster.NETCore.Plugins" />
     <PackageReference Include="ShapeCrawler" />
