@@ -64,6 +64,16 @@ public class SerializeTests
         lr.ColumnCount.Should().Be(0);
     }
 
+
+    [TestMethod]
+    public async Task EmptyResult()
+    {   
+            var result = await _kustoResultSerializer.Serialize(KustoQueryResult.Empty);
+            var r = await _kustoResultSerializer.Deserialize(result);
+            r.ColumnCount.Should().Be(0);
+            r.RowCount.Should().Be(0);
+    }
+
     [TestMethod]
     public async Task SerialiseNonEmptyResult()
     {

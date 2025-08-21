@@ -89,6 +89,8 @@ public class KustoQueryContext
     /// </remarks>
     public KustoQueryContext RenameTable(string oldName, string newName)
     {
+        if (oldName == newName)
+            return this;
         ShareTable(oldName, newName);
         return RemoveTable(oldName);
     }
