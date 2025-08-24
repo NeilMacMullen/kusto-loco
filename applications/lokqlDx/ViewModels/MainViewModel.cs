@@ -46,7 +46,7 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isDirty;
 
-    [ObservableProperty] private ObservableCollection<QueryItemViewModel> _queries = new();
+    [ObservableProperty] private ObservableCollection<QueryDocument> _queries = new();
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private bool _showUpdateInfo;
     [ObservableProperty] private string _tabStripPlacement = "Left";
@@ -127,25 +127,25 @@ public partial class MainViewModel : ObservableObject
             content,
             adapter);
 
-        var queryModel = new QueryViewModel(queryEditorViewModel,
+        var QueryViewModel = new QueryViewModel(queryEditorViewModel,
             renderingSurfaceViewModel,
             copilotChatViewModel);
 
-        Queries.Insert(desiredIndex, new QueryItemViewModel(name, queryModel));
+        Queries.Insert(desiredIndex, new QueryDocument(name, QueryViewModel));
         ActiveQueryIndex = desiredIndex;
     }
 
-    private QueryItemViewModel GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);
+    private QueryDocument GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);
 
     [RelayCommand]
-    private void AddQueryHere(QueryItemViewModel model)
+    private void AddQueryHere(QueryDocument model)
     {
         var indexOfThis = Queries.IndexOf(model);
         AddQuery(NewQueryName, string.Empty, indexOfThis + 1);
     }
 
     [RelayCommand]
-    private void DeleteQuery(QueryItemViewModel model)
+    private void DeleteQuery(QueryDocument model)
     {
         if (Queries.Count <= 1)
             //can't delete the last query
@@ -208,7 +208,7 @@ public partial class MainViewModel : ObservableObject
     private void ChangeTabPlacement(string placement) => TabStripPlacement = placement;
 
     [RelayCommand]
-    private async Task RenameQuery(QueryItemViewModel model)
+    private async Task RenameQuery(QueryDocument model)
     {
         var text = new RenamableText(model.Header);
         await _dialogService.ShowRenameDialogs(text);
@@ -449,7 +449,7 @@ public partial class MainViewModel : ObservableObject
 
     private bool RecheckDirty()
     {
-        IsDirty = Queries.Any(q => q.QueryModel.IsDirty());
+        IsDirty = Queries.Any(q => q.QueryViewModel.IsDirty());
         return IsDirty;
     }
 
@@ -457,7 +457,7 @@ public partial class MainViewModel : ObservableObject
     {
         foreach (var queryItemViewModel in Queries)
         {
-            queryItemViewModel.QueryModel.Clean();
+            queryItemViewModel.QueryViewModel.Clean();
         }
         
     }
@@ -562,7 +562,7 @@ public partial class MainViewModel : ObservableObject
     private void SaveWorkspace(string path)
     {
         var queries = Queries
-            .Select(q => new PersistedQuery(q.Header, q.QueryModel.GetText()))
+            .Select(q => new PersistedQuery(q.Header, q.QueryViewModel.GetText()))
             .ToArray();
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
@@ -603,7 +603,7 @@ public partial class MainViewModel : ObservableObject
     {
         var model = GetSelectedQuery();
 
-        var result = model.QueryModel.RenderingSurfaceViewModel.Result;
+        var result = model.QueryViewModel.RenderingSurfaceViewModel.Result;
         await _dialogService.FlyoutResult(model.Header, result, _explorer.Settings, _displayPreferences);
     }
 

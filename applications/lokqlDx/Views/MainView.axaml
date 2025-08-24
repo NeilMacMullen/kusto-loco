@@ -194,8 +194,8 @@
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
 
-                        <DataTemplate DataType="vm:QueryItemViewModel">
-                            <views:QueryView DataContext="{Binding QueryModel}" />
+                        <DataTemplate DataType="vm:QueryDocument">
+                            <views:QueryView DataContext="{Binding QueryViewModel}" />
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>

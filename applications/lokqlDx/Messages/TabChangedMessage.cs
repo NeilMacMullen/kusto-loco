@@ -2,4 +2,4 @@
 using DependencyPropertyGenerator;
 using LokqlDx.ViewModels;
 
-public class TabChangedMessage(QueryItemViewModel active) : ValueChangedMessage<QueryItemViewModel>(active);
+public class TabChangedMessage(QueryDocument active) : ValueChangedMessage<QueryDocument>(active);
