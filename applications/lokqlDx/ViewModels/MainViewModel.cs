@@ -97,14 +97,18 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
-        _factory = new DockFactory(CreateDoc,ActiveQueryChanged);
+        _factory = new DockFactory(ConsoleViewModel, CreateDoc,ActiveQueryChanged);
     }
 
     private void ResetLayout(IEnumerable<QueryDocumentViewModel> queries)
     {
-        var layout = _factory.CreateLayout();
-        _factory.InitLayout(layout);
-        Layout = layout;
+        var layout = _factory.GetOrResetLayout();
+        if (layout != null)
+        {
+            _factory.InitLayout(layout);
+            Layout = layout;
+        }
+
         foreach (var query in queries.ToArray()) _factory.AddDocument(query);
     }
 

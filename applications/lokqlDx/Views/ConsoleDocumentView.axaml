@@ -8,7 +8,5 @@
              x:Class="LokqlDx.Views.ConsoleDocumentView"
              x:DataType="vm:ConsoleDocumentViewModel"
              Background="Black">
-			 <DockPanel>
-                 <Label>COnsole view</Label>
-             </DockPanel>
+    <views:ConsoleView DataContext="{Binding Model}"></views:ConsoleView>
 </UserControl>

@@ -22,20 +22,4 @@ public partial class MainView : UserControl
     {
         AvaloniaXamlLoader.Load(this);
     }
-
-    partial void OnColumnDefinitionsChanged(ColumnDefinitions? newValue)
-    {
-        if (newValue is not null) MainGrid.ColumnDefinitions = newValue;
-    }
-
-    private void ColumnGridSplitter_DragCompleted(object? sender, VectorEventArgs e) =>
-        ColumnDefinitions = MainGrid.ColumnDefinitions;
-
-    partial void OnRowDefinitionsChanged(RowDefinitions? newValue)
-    {
-        if (newValue is not null) MainGrid.RowDefinitions = newValue;
-    }
-
-    private void RowGridSplitter_DragCompleted(object? sender, VectorEventArgs e) =>
-        RowDefinitions = MainGrid.RowDefinitions;
-}
+   }

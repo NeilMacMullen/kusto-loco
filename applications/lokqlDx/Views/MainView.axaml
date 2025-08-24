@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
-             xmlns:views="using:LokqlDx.Views"
              xmlns:system="using:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MainView"
@@ -13,7 +12,7 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-  
+
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
             <InvokeCommandAction Command="{Binding InitializeCommand}" />
@@ -144,23 +143,7 @@
             </StackPanel>
         </DockPanel>
         <Grid RowDefinitions="*,20">
-            <Grid
-                x:Name="MainGrid"
-                RowDefinitions="*,auto,0.15*">
-                <DockControl Layout="{Binding Layout}">
-                </DockControl>
-
-                <GridSplitter
-                    Grid.Row="1"
-                    Height="5"
-                    Background="#227F7F7F" />
-
-                <views:ConsoleView
-                    Background="{DynamicResource SystemAltLowColor}"
-                    Grid.Row="2"
-                    DataContext="{Binding ConsoleViewModel}" />
-            </Grid>
-
+            <DockControl Layout="{Binding Layout}" />
             <StackPanel
                 x:Name="StatusBar"
                 Background="{DynamicResource SystemAltMediumColor}"
