@@ -1,12 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Dock.Model.Mvvm.Controls;
 using KustoLoco.Core.Console;
+using Lokql.Engine;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Text;
+using Avalonia.Input;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
@@ -17,22 +20,40 @@ public interface IDocumentShow
 public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
 {
     private  IDocumentShow? _show;
+   
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
-
+    [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
     public QueryLibraryViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
     {
         
         Title = "Queries";
         CanClose = false;
-        MaxWidth = 200;
+    }
+    [RelayCommand]
+    public void FilterChanged()
+    {
+      Sort();
     }
 
+    [ObservableProperty] private string _filter = string.Empty;
     public void SetShower(IDocumentShow show) => _show = show;
     public void Sort()
     {
-        var sorted = Queries.OrderBy(q => !q.Visible).ThenBy(q => q.Title);
-        Queries = new(sorted);
+        var sorted = Queries
+            .Where(ApplyFilter)
+            .OrderBy(q => !q.Visible).ThenBy(q => q.Title);
+        FilteredQueries = new(sorted);
     }
+
+    private bool ApplyFilter(QueryDocumentViewModel arg)
+    {
+        var argStr = $"{arg.Title}";
+        var toks = Filter.Tokenize(" ");
+        if (!toks.Any())
+            return true;
+        return toks.All(t => argStr.Contains(t, StringComparison.InvariantCultureIgnoreCase));
+    }
+
     public void Add(QueryDocumentViewModel model)
     {
         Queries.Add(model);
@@ -42,6 +63,7 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     public void Clear()
     {
         Queries.Clear();
+        Sort();
     }
 
     public bool IsDirty() => Queries.Any(q => q.QueryViewModel.IsDirty());
@@ -57,13 +79,11 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
             .ToArray();
     }
 
-    [ObservableProperty] private bool _editLocked=true;
-
     
     [RelayCommand]
-    public void ToggleEdit()
+    public void ToggleEdit(QueryDocumentViewModel query)
     {
-        EditLocked =!EditLocked;
+        query.EditLocked =!query.EditLocked;
     }
     [RelayCommand]
     public void Show(QueryDocumentViewModel query)
@@ -74,6 +94,12 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     {
         query.Visible = b;
         Sort();
+    }
+
+    [RelayCommand]
+    public void FilterEnter(QueryDocumentViewModel query)
+    {
+        query.EditLocked = true;
     }
 }
 

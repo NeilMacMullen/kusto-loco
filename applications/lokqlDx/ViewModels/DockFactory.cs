@@ -16,16 +16,20 @@ public class DockFactory : Factory,IDocumentShow
 {
     private readonly ConsoleViewModel _console;
     private readonly QueryLibraryViewModel _library;
+    private readonly SchemaViewModel _schema;
     private readonly Func<QueryDocumentViewModel> _create;
     private readonly Action<QueryDocumentViewModel> _onActiveChanged;
 
     public QueryDocumentDock? DocumentDock;
 
-    public DockFactory(ConsoleViewModel console,QueryLibraryViewModel library, Func<QueryDocumentViewModel> create,
+    public DockFactory(ConsoleViewModel console,QueryLibraryViewModel library,
+        SchemaViewModel schema,
+        Func<QueryDocumentViewModel> create,
         Action<QueryDocumentViewModel> onActiveChanged)
     {
         _console = console;
         _library = library;
+        _schema = schema;
         _create = create;
         _onActiveChanged = onActiveChanged;
     }
@@ -49,42 +53,60 @@ public class DockFactory : Factory,IDocumentShow
             Layout.Close.Execute(null);
     }
 
+    public void RemoveAllDocuments()
+    {
+        var allDocs = _library.Queries.ToArray();
+        foreach (var d in allDocs)
+        {
+            RemoveDockable(d,true);
+        }
+       
+    }
+    
     public IRootDock? GetOrResetLayout()
     {
 
-        (IDock,IDock)[] GetBases(IDock parent)
+        IDock [] GetBases(IDock parent)
             => parent.VisibleDockables ==null ? []: parent.VisibleDockables.OfType<IDock>()
-                .Select(b => (b, parent))
+                .Select(b => b)
                 .ToArray();
         
-        (QueryDocumentDock,IDock)[] Find(IDock item,IDock parent)
+        QueryDocumentDock[] FindDocuments(IDock item)
         {
             if (item is QueryDocumentDock qd)
-                return [(qd,parent )];
+                return [qd];
             var bases = GetBases(item);
-            return bases.SelectMany(f=>Find(f.Item1,f.Item2))
+            return bases.SelectMany(FindDocuments)
                 .ToArray();
         }
         
         if (DocumentDock is not null)
         {
+            RemoveAllDocuments();
+            
             var hostWindows = HostWindows.OfType<HostWindow>().ToArray();
             foreach (var h in hostWindows)
             {
                 if (h.DataContext is RootDock root)
                 {
-                    var docWindows =Find(root,new RootDock());
-                    foreach (var (queryDocumentDock,parent) in docWindows)
+                    var docWindows =FindDocuments(root);
+                    foreach (var queryDocumentDock in docWindows)
                     {
                         var docs = queryDocumentDock.VisibleDockables!.OfType<QueryDocumentViewModel>().ToArray();
                         foreach(var d in docs)
                             RemoveVisibleDockable(queryDocumentDock,d);
+                        if (queryDocumentDock.VisibleDockables!.Count == 0)
+                        {
+                            var parent = FindRoot(queryDocumentDock);
+                            //RemoveDockable(queryDocumentDock);
+                        }
                     }
                     if (root.VisibleDockables!.Count==0)
                         h.Close();
                 }
             }
             RemoveAllVisibleDockables(DocumentDock);
+            
             return null;
         }
 
@@ -92,26 +114,25 @@ public class DockFactory : Factory,IDocumentShow
     }
 
 
-    ToolDock Create(Tool tools,DockMode mode)
+    ToolDock Create(params Tool[]tools)
     {
         return new ToolDock
         {
             CanDrag = true,
             CanFloat = true,
             CanDrop = true,
-            ActiveDockable = tools,
+            ActiveDockable = tools.First(),
             Alignment = Alignment.Top,
             GripMode = GripMode.Visible,
             IsCollapsable = true,
-            VisibleDockables = CreateList<IDockable>(tools),
+            VisibleDockables = CreateList<IDockable>(tools.OfType<IDockable>().ToArray()),
             CanCloseLastDockable = true,
-            Dock = mode
         };
     }
     public override IRootDock CreateLayout()
     {
         //CloseLayout();
-
+       
         _library.SetShower(this);
         var documentDock = new QueryDocumentDock(_create)
         {
@@ -123,17 +144,23 @@ public class DockFactory : Factory,IDocumentShow
 
         var console = new ConsoleDocumentViewModel(_console);
 
-
-        ToolDock= new DockDock()
+        var con = Create(console);
+        var rest = Create(_library, _schema);
+        con.Proportion = 0.8;
+        rest.Proportion = 0.2;
+        ToolDock= new ProportionalDock()
         {
-            
+            Orientation = Orientation.Horizontal,
             VisibleDockables = CreateList<IDockable>
             (
-                Create(console,DockMode.Left),
-                Create(_library,DockMode.Right)
-            )
-        };
 
+                con,
+                new ProportionalDockSplitter(),
+                rest
+                )
+        };
+        documentDock.Proportion = 0.8;
+        ToolDock.Proportion = 0.2;
         var mainLayout = new ProportionalDock
         {
             // EnableGlobalDocking = false,
@@ -203,8 +230,6 @@ public class DockFactory : Factory,IDocumentShow
         if(!model.Visible)
             AddDocument(model);
         else
-        {
-            //hmm - how to we make it active if we don't know which dock it's in?
-        }
+            SetActiveDockable(model);
     }
 }

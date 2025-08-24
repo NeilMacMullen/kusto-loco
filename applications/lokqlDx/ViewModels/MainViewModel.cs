@@ -37,6 +37,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
+    private SchemaViewModel _schemaModel;
     private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
 
@@ -79,6 +80,7 @@ public partial class MainViewModel : ObservableObject
         _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
         _queryLibrary = new QueryLibraryViewModel(_displayPreferences);
+        _schemaModel = new SchemaViewModel(_displayPreferences);
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
         _commandProcessor = commandProcessorFactory.GetCommandProcessor();
@@ -98,7 +100,9 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
-        _factory = new DockFactory(ConsoleViewModel,QueryLibrary, CreateDoc,ActiveQueryChanged);
+        _factory = new DockFactory(ConsoleViewModel,QueryLibrary,
+            _schemaModel,
+            CreateDoc,ActiveQueryChanged);
     }
 
     private void ResetLayout()
@@ -120,8 +124,8 @@ public partial class MainViewModel : ObservableObject
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
         if (message.IsRunning) await SaveBeforeQuery();
-
-        return false;
+        else _schemaModel.Update(_explorer.GetSchema());
+            return false;
     }
 
     partial void OnCurrentWorkspaceChanged(Workspace value)
@@ -401,6 +405,7 @@ public partial class MainViewModel : ObservableObject
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
+        _schemaModel.Update(_explorer.GetSchema());
     }
 
     /// <summary>

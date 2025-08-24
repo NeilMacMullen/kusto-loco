@@ -9,6 +9,8 @@ public partial class QueryDocumentViewModel : Document,INotifyPropertyChanged
 {
 
     public QueryViewModel QueryViewModel { get; private set; }
+    [ObservableProperty] public bool _editLocked = true;
+
     [ObservableProperty] private bool _visible = true;
     public QueryDocumentViewModel(string title, QueryViewModel content)
     {

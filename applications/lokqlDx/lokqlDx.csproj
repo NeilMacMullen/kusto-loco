@@ -16,6 +16,9 @@
     <ApplicationIcon>Assets\kql.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\filter.svg" />
+  </ItemGroup>
+  <ItemGroup>
     <None CopyToOutputDirectory="Always" Update="appsettings.Development.json" />
   </ItemGroup>
 
@@ -68,6 +71,9 @@
   <ItemGroup>
     <Compile Update="Views\ConsoleDocumentView.axaml.cs">
       <DependentUpon>ConsoleDocumentView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SchemaView.axaml.cs">
+      <DependentUpon>SchemaView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\QueryLibraryView.axaml.cs">
       <DependentUpon>QueryLibraryView.axaml</DependentUpon>
