@@ -81,8 +81,6 @@
 
                 </MenuItem>
                 <MenuItem Header="_View">
-                    <MenuItem Header="Add _query"
-                              Command="{Binding AddQueryCommand}" />
                     <MenuItem Header="Show current result in _flyout"
                               Command="{Binding FlyoutCurrentResultCommand}" />
                 </MenuItem>
@@ -133,11 +131,6 @@
                         ToolTip.Tip="Clear console" FontSize="12">
                     X
                 </Button>
-                <Button Command="{Binding ChangeTabCommand}"
-                        ToolTip.Tip="Change Query-tab placement" FontSize="12">
-                    T
-                </Button>
-
                 <Button Command="{Binding ChangeLayoutCommand}"
                         ToolTip.Tip="Change Layout" FontSize="12">
                     &#x25a6;

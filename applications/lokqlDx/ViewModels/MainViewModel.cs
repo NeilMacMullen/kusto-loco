@@ -35,7 +35,6 @@ public partial class MainViewModel : ObservableObject
     private readonly IServiceProvider _serviceProvider;
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
-    [ObservableProperty] private int _activeQueryIndex;
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
     private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
@@ -98,18 +97,15 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
-        _factory = new DockFactory(CreateDoc);
+        _factory = new DockFactory(CreateDoc,ActiveQueryChanged);
     }
 
-    private void ResetLayout()
+    private void ResetLayout(IEnumerable<QueryDocumentViewModel> queries)
     {
         var layout = _factory.CreateLayout();
         _factory.InitLayout(layout);
         Layout = layout;
-        //  foreach (var query in Queries)
-        //   {
-        //       _factory.AddDocument(query);
-        // }
+        foreach (var query in queries.ToArray()) _factory.AddDocument(query);
     }
 
     private QueryDocumentViewModel CreateDoc() => AddQuery("new tab", string.Empty);
@@ -129,18 +125,18 @@ public partial class MainViewModel : ObservableObject
 
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
-    [RelayCommand]
-    private void AddQuery() => AddQuery(NewQueryName, string.Empty);
-
+   
     private QueryDocumentViewModel AddQuery(string name, string content)
-        => AddQuery(name, content, Queries.Count);
-
-    private QueryDocumentViewModel AddQuery(string name, string content, int desiredIndex)
+    {
+        var doc = CreateQuery(name,content);
+        Queries.Add(doc);
+        return doc;
+    }
+    private QueryDocumentViewModel CreateQuery(string name, string content)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
         var renderingSurfaceViewModel =
             new RenderingSurfaceViewModel(name, _explorer.Settings, _displayPreferences, ConsoleViewModel);
-        renderingSurfaceViewModel.Name = name;
         var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
         var copilotChatViewModel = new CopilotChatViewModel();
         var queryEditorViewModel = new QueryEditorViewModel(sharedExplorer,
@@ -149,49 +145,17 @@ public partial class MainViewModel : ObservableObject
             content,
             adapter);
 
-        var QueryViewModel = new QueryViewModel(queryEditorViewModel,
+        var queryViewModel = new QueryViewModel(queryEditorViewModel,
             renderingSurfaceViewModel,
             copilotChatViewModel);
-        var doc = new QueryDocumentViewModel(name, QueryViewModel);
-        Queries.Insert(desiredIndex, doc);
-        ActiveQueryIndex = desiredIndex;
+        var doc = new QueryDocumentViewModel(name, queryViewModel);
         return doc;
     }
 
-    private QueryDocumentViewModel GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);
 
-    [RelayCommand]
-    private void AddQueryHere(QueryDocumentViewModel model)
+    private void ActiveQueryChanged(QueryDocumentViewModel query)
     {
-        var indexOfThis = Queries.IndexOf(model);
-        AddQuery(NewQueryName, string.Empty, indexOfThis + 1);
-    }
-
-    [RelayCommand]
-    private void DeleteQuery(QueryDocumentViewModel model)
-    {
-        if (Queries.Count <= 1)
-            //can't delete the last query
-            return;
-
-        var prevActiveIndex = ActiveQueryIndex;
-        var indexOfThis = Queries.IndexOf(model);
-        Queries.RemoveAt(indexOfThis);
-        if (prevActiveIndex > indexOfThis)
-            ActiveQueryIndex = prevActiveIndex - 1;
-        else if (prevActiveIndex == indexOfThis) ActiveQueryIndex = Math.Clamp(prevActiveIndex, 0, Queries.Count - 1);
-    }
-
-    partial void OnActiveQueryIndexChanged(int value)
-    {
-        if (value >= 0)
-            ActiveQueryChanged();
-    }
-
-    private void ActiveQueryChanged()
-    {
-        var activeTab = GetSelectedQuery();
-        WeakReferenceMessenger.Default.Send(new TabChangedMessage(activeTab));
+        WeakReferenceMessenger.Default.Send(new TabChangedMessage(query));
     }
 
     [RelayCommand]
@@ -217,18 +181,6 @@ public partial class MainViewModel : ObservableObject
             await WeakReferenceMessenger.Default.Send(new SaveFileMessage(path));
     }
 
-    [RelayCommand]
-    private void ChangeTab()
-    {
-        var choices = "Left,Top,Right,Bottom".Split(',');
-        var currentIndex = Array.IndexOf(choices, TabStripPlacement);
-        var placementIndex = (currentIndex + 1) % choices.Length;
-        var placement = choices[placementIndex];
-        TabStripPlacement = placement;
-    }
-
-    [RelayCommand]
-    private void ChangeTabPlacement(string placement) => TabStripPlacement = placement;
 
     [RelayCommand]
     private async Task RenameQuery(QueryDocumentViewModel model)
@@ -243,9 +195,6 @@ public partial class MainViewModel : ObservableObject
     {
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.RetrieveUiPreferencesFromDisk();
-        AddQuery(NewQueryName, string.Empty);
-
-
         _preferencesManager.EnsureDefaultFolderExists();
         ApplyUiPreferences(false);
         RebuildRecentFilesList();
@@ -438,8 +387,7 @@ public partial class MainViewModel : ObservableObject
                 AddQuery(p.Name, p.Text);
         else
             AddQuery("query", CurrentWorkspace.Text);
-        ActiveQueryIndex = 0;
-        ResetLayout();
+        ResetLayout(Queries);
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
@@ -483,7 +431,7 @@ public partial class MainViewModel : ObservableObject
     ///     Allow the user to save any pending changes
     /// </summary>
     /// <returns>
-    ///     COMPPLETE if the user did the save or didn't need to
+    ///     COMPLETE if the user did the save or didn't need to
     /// </returns>
     private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
@@ -614,13 +562,15 @@ public partial class MainViewModel : ObservableObject
     }
 
 
+    
     [RelayCommand]
     private async Task FlyoutCurrentResult()
     {
-        var model = GetSelectedQuery();
+       // var model = GetSelectedQuery();
 
-        var result = model.QueryViewModel.RenderingSurfaceViewModel.Result;
-        await _dialogService.FlyoutResult(model.Title, result, _explorer.Settings, _displayPreferences);
+       // var result = model.QueryViewModel.RenderingSurfaceViewModel.Result;
+       // await _dialogService.FlyoutResult(model.Title, result, _explorer.Settings, _displayPreferences);
+       await Task.CompletedTask;
     }
 
     private void PersistUiPreferencesToDisk()

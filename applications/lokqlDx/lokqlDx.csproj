@@ -66,6 +66,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ConsoleDocumentView.axaml.cs">
+      <DependentUpon>ConsoleDocumentView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\QueryDocumentView.axaml.cs">
       <DependentUpon>QueryDocumentView.axaml</DependentUpon>
     </Compile>

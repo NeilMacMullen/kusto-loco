@@ -5,10 +5,10 @@
              xmlns:vm="using:LokqlDx.ViewModels"
              xmlns:views="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="LokqlDx.Views.QueryDocumentView"
-             x:DataType="vm:QueryDocumentViewModel"
+             x:Class="LokqlDx.Views.ConsoleDocumentView"
+             x:DataType="vm:ConsoleDocumentViewModel"
              Background="Black">
 			 <DockPanel>
-       <views:QueryView DataContext="{Binding  QueryViewModel}"/>
-    </DockPanel>
+                 <Label>COnsole view</Label>
+             </DockPanel>
 </UserControl>
