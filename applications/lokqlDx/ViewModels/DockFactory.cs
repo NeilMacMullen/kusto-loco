@@ -1,34 +1,38 @@
 ﻿using Avalonia.Media;
 using Avalonia.Metadata;
 using Dock.Avalonia.Controls;
+using Dock.Model;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
 using Dock.Model.Mvvm.Core;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Parquet.Serialization.Attributes;
 
 namespace LokqlDx.ViewModels;
 
-public class DockFactory : Factory
+public class DockFactory : Factory,IDocumentShow
 {
     private readonly ConsoleViewModel _console;
+    private readonly QueryLibraryViewModel _library;
     private readonly Func<QueryDocumentViewModel> _create;
     private readonly Action<QueryDocumentViewModel> _onActiveChanged;
 
     public QueryDocumentDock? DocumentDock;
 
-    public DockFactory(ConsoleViewModel console, Func<QueryDocumentViewModel> create,
+    public DockFactory(ConsoleViewModel console,QueryLibraryViewModel library, Func<QueryDocumentViewModel> create,
         Action<QueryDocumentViewModel> onActiveChanged)
     {
         _console = console;
+        _library = library;
         _create = create;
         _onActiveChanged = onActiveChanged;
     }
 
     public IRootDock Layout { get; set; } = new RootDock();
 
-    public ToolDock? ToolDock { get; set; }
+    public IDockable? ToolDock { get; set; }
 
     public override IDocumentDock CreateDocumentDock() => new QueryDocumentDock(_create);
 
@@ -87,11 +91,28 @@ public class DockFactory : Factory
         return CreateLayout();
     }
 
+
+    ToolDock Create(Tool tools,DockMode mode)
+    {
+        return new ToolDock
+        {
+            CanDrag = true,
+            CanFloat = true,
+            CanDrop = true,
+            ActiveDockable = tools,
+            Alignment = Alignment.Top,
+            GripMode = GripMode.Visible,
+            IsCollapsable = true,
+            VisibleDockables = CreateList<IDockable>(tools),
+            CanCloseLastDockable = true,
+            Dock = mode
+        };
+    }
     public override IRootDock CreateLayout()
     {
         //CloseLayout();
 
-
+        _library.SetShower(this);
         var documentDock = new QueryDocumentDock(_create)
         {
             IsCollapsable = false,
@@ -100,22 +121,18 @@ public class DockFactory : Factory
             CanCloseLastDockable = true
         };
 
-        var c = new ConsoleDocumentViewModel(_console);
+        var console = new ConsoleDocumentViewModel(_console);
 
-        var tooldockExists = ToolDock != null;
-        ToolDock ??= new ToolDock
+
+        ToolDock= new DockDock()
         {
-            CanDrag = true,
-            CanFloat = true,
-            CanDrop = true,
-            ActiveDockable = c,
-            Alignment = Alignment.Top,
-            GripMode = GripMode.Visible,
-            IsCollapsable = true,
-            VisibleDockables = CreateList<IDockable>(c),
-            CanCloseLastDockable = true
+            
+            VisibleDockables = CreateList<IDockable>
+            (
+                Create(console,DockMode.Left),
+                Create(_library,DockMode.Right)
+            )
         };
-
 
         var mainLayout = new ProportionalDock
         {
@@ -154,6 +171,7 @@ public class DockFactory : Factory
     public void AddDocument(QueryDocumentViewModel query)
     {
         DocumentDock?.AddDocument(query);
+        query.Visible = true;
     }
 
     public IRootDock? GetActiveRoot() =>
@@ -169,5 +187,24 @@ public class DockFactory : Factory
         base.OnActiveDockableChanged(dockable);
         if (vm != null)
             _onActiveChanged?.Invoke(vm);
+    }
+
+    public override void OnDockableClosed(IDockable? dockable)
+    {
+        if (dockable is QueryDocumentViewModel query)
+        {
+            _library.ChangeVisibilty(query, false);
+        }
+        base.OnDockableClosed(dockable);
+    }
+
+    public void Show(QueryDocumentViewModel model)
+    {
+        if(!model.Visible)
+            AddDocument(model);
+        else
+        {
+            //hmm - how to we make it active if we don't know which dock it's in?
+        }
     }
 }

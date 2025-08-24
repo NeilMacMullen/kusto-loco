@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:LokqlDx.ViewModels"
+             xmlns:v="using:LokqlDx.Views"
+             xmlns:converters="clr-namespace:LokqlDx.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LokqlDx.Views.QueryLibraryView"
+             x:DataType="vm:QueryLibraryViewModel"
+             MaxWidth="200">
+    <UserControl.Resources>
+        <converters:BoolToBrushMultiConverter x:Key="BoolToColorMulti"/>
+        <converters:NegateBoolConverter x:Key="Negate" />
+        <SolidColorBrush x:Key="Visible" Color="GreenYellow" />
+        <SolidColorBrush x:Key="Hidden" Color="White" />
+    </UserControl.Resources>
+    <Border BorderThickness="1" CornerRadius="5" Background="White" Margin="2">
+        <DockPanel Background="Black">
+            <Button DockPanel.Dock="Top" Command="{Binding ToggleEditCommand}"
+                    HorizontalAlignment="Right" FontSize="8">
+                Edit
+            </Button>
+            <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
+                <ItemsControl
+                    ItemsSource="{Binding Queries}"
+                    Background="Black"
+                    x:Name="ItemList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Left">
+                                    <Label
+                                        Background="Black"
+                                        Content="{Binding Title,Mode=TwoWay}"
+                                        IsVisible="{Binding  $parent[v:QueryLibraryView].DataContext.EditLocked}">
+
+                                        <Label.Foreground>
+                                            <MultiBinding Converter="{StaticResource BoolToColorMulti}">
+                                                <Binding Path="Visible" />
+                                                <Binding Source="{StaticResource Hidden}"/>
+                                                <Binding Source="{StaticResource Visible}" />
+                                            </MultiBinding>
+                                        </Label.Foreground>
+                                        <Interaction.Behaviors>
+                                            <EventTriggerBehavior EventName="DoubleTapped">
+                                                <InvokeCommandAction Command="{Binding $parent[v:QueryLibraryView].DataContext.ShowCommand}" CommandParameter="{Binding}" />
+                                            </EventTriggerBehavior>
+                                        </Interaction.Behaviors>
+                                    </Label>
+
+                                    <TextBox
+                                        Text="{Binding Title,Mode=TwoWay}"
+                                        IsVisible="{Binding  $parent[v:QueryLibraryView].DataContext.EditLocked,
+
+									Converter={StaticResource Negate}}" />
+
+                                </Grid>
+
+                            </DockPanel>
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+
+
+</UserControl>

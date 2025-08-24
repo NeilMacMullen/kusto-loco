@@ -5,11 +5,11 @@ using Dock.Model.Mvvm.Controls;
 
 namespace LokqlDx.ViewModels;
 
-public partial class QueryDocumentViewModel : Document
+public partial class QueryDocumentViewModel : Document,INotifyPropertyChanged
 {
 
     public QueryViewModel QueryViewModel { get; private set; }
-
+    [ObservableProperty] private bool _visible = true;
     public QueryDocumentViewModel(string title, QueryViewModel content)
     {
         Title = title;

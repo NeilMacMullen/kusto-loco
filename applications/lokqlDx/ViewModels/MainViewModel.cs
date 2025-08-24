@@ -21,6 +21,7 @@ using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
+
 public partial class MainViewModel : ObservableObject
 {
     private const string NewQueryName = "new";
@@ -40,7 +41,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
 
     [ObservableProperty] private Workspace _currentWorkspace = new();
-
+    [ObservableProperty] private QueryLibraryViewModel _queryLibrary;
     private InteractiveTableExplorer _explorer;
 
     private string _initWorkspacePath = string.Empty;
@@ -51,7 +52,6 @@ public partial class MainViewModel : ObservableObject
 
     private bool _pluginsLoaded;
 
-    [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = new();
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private bool _showUpdateInfo;
     [ObservableProperty] private string _tabStripPlacement = "Left";
@@ -61,7 +61,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
-
 
     public MainViewModel(
         DialogService dialogService,
@@ -75,9 +74,11 @@ public partial class MainViewModel : ObservableObject
         AssetFolderImageProvider imageProvider
     )
     {
+       
         _imageProvider = imageProvider;
         _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
+        _queryLibrary = new QueryLibraryViewModel(_displayPreferences);
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
         _commandProcessor = commandProcessorFactory.GetCommandProcessor();
@@ -97,11 +98,12 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
-        _factory = new DockFactory(ConsoleViewModel, CreateDoc,ActiveQueryChanged);
+        _factory = new DockFactory(ConsoleViewModel,QueryLibrary, CreateDoc,ActiveQueryChanged);
     }
 
-    private void ResetLayout(IEnumerable<QueryDocumentViewModel> queries)
+    private void ResetLayout()
     {
+        var queries = QueryLibrary.Queries.ToArray();
         var layout = _factory.GetOrResetLayout();
         if (layout != null)
         {
@@ -133,7 +135,7 @@ public partial class MainViewModel : ObservableObject
     private QueryDocumentViewModel AddQuery(string name, string content)
     {
         var doc = CreateQuery(name,content);
-        Queries.Add(doc);
+        QueryLibrary.Add(doc);
         return doc;
     }
     private QueryDocumentViewModel CreateQuery(string name, string content)
@@ -380,7 +382,7 @@ public partial class MainViewModel : ObservableObject
         CurrentWorkspace = _workspaceManager.Workspace;
 
         //reset the list of queries
-        Queries = [];
+        QueryLibrary.Clear();
 
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
@@ -391,7 +393,7 @@ public partial class MainViewModel : ObservableObject
                 AddQuery(p.Name, p.Text);
         else
             AddQuery("query", CurrentWorkspace.Text);
-        ResetLayout(Queries);
+        ResetLayout();
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
@@ -421,13 +423,14 @@ public partial class MainViewModel : ObservableObject
 
     private bool RecheckDirty()
     {
-        IsDirty = Queries.Any(q => q.QueryViewModel.IsDirty());
+        IsDirty = QueryLibrary.IsDirty();
         return IsDirty;
     }
 
     private void ResetDirty()
     {
-        foreach (var queryItemViewModel in Queries) queryItemViewModel.QueryViewModel.Clean();
+        QueryLibrary.ClearDirty();
+       
     }
 
 
@@ -529,9 +532,8 @@ public partial class MainViewModel : ObservableObject
 
     private void SaveWorkspace(string path)
     {
-        var queries = Queries
-            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText()))
-            .ToArray();
+        var queries = QueryLibrary.Persist();
+           ;
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
         ResetDirty();

@@ -25,7 +25,7 @@ public class QueryDocumentDock : DocumentDock
 
         var index = VisibleDockables?.Count + 1;
         var document = _create();
-        document.Title = $"{DateTime.Now.ToShortTimeString()}";
+        document.Title = $"query {index}";
 
         Factory?.AddDockable(this, document);
         Factory?.SetActiveDockable(document);

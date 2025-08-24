@@ -69,6 +69,9 @@
     <Compile Update="Views\ConsoleDocumentView.axaml.cs">
       <DependentUpon>ConsoleDocumentView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\QueryLibraryView.axaml.cs">
+      <DependentUpon>QueryLibraryView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\QueryDocumentView.axaml.cs">
       <DependentUpon>QueryDocumentView.axaml</DependentUpon>
     </Compile>
