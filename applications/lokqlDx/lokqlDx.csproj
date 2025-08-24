@@ -16,6 +16,9 @@
     <ApplicationIcon>Assets\kql.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\filter.svg" />
+  </ItemGroup>
+  <ItemGroup>
     <None CopyToOutputDirectory="Always" Update="appsettings.Development.json" />
   </ItemGroup>
 
@@ -36,10 +39,17 @@
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
+    <PackageReference Include="Dock.Avalonia" />
+    <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
+    <PackageReference Include="Dock.Model.Mvvm" />
     <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
     <PackageReference Include="MarkdownViewer.Core" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="ScottPlot.Avalonia" />
+    <PackageReference Include="StaticViewLocator">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Topten.RichTextKit" />
     <PackageReference Include="Jab" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
@@ -59,6 +69,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ConsoleDocumentView.axaml.cs">
+      <DependentUpon>ConsoleDocumentView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SchemaView.axaml.cs">
+      <DependentUpon>SchemaView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\QueryLibraryView.axaml.cs">
+      <DependentUpon>QueryLibraryView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\QueryDocumentView.axaml.cs">
+      <DependentUpon>QueryDocumentView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\QueryView.axaml.cs">
       <DependentUpon>ConsoleView.axaml</DependentUpon>
     </Compile>

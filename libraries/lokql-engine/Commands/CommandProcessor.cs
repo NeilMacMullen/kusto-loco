@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using CommandLine;
 using CsvHelper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using KustoLoco.PluginSupport;
 using NLog.LayoutRenderers;
 using NotNullStrings;
@@ -82,7 +83,7 @@ public class CommandProcessor :ICommandProcessor
             command = $".{command}";
         var schema = schemaText.Tokenize("\r\n")
             .Select(l=>l.Tokenize(","))
-            .Select(pair=>new SchemaLine(command, pair[0], pair[1]))
+            .Select(pair=>new SchemaLine(command, pair[0], pair[1],pair.Length>2 ?pair[2]:string.Empty))
             .ToArray();
         _registeredSchema = _registeredSchema.Concat(schema).ToArray();
     }

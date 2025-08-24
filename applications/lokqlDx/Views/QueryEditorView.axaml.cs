@@ -25,6 +25,11 @@ public partial class QueryEditorView : UserControl
         _editorHelper = new EditorHelper(TextEditor);
     }
 
+    public void InsertText(string text)
+    {
+        _editorHelper.InsertAtCursor(text);
+    }
+
     private QueryEditorViewModel GetVm() =>
         (DataContext as QueryEditorViewModel)!;
 

@@ -3,6 +3,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Settings;
+using KustoLoco.Core.Util;
 using KustoLoco.PluginSupport;
 using Lokql.Engine.Commands;
 using NotNullStrings;
@@ -84,9 +85,9 @@ public class InteractiveTableExplorer
 
         var dynamicSchema = _context
             .Tables()
-            .SelectMany(t => t.ColumnNames.Select(c =>
+            .SelectMany(t => t.Type.Columns.Select(c =>
                 new SchemaLine(string.Empty, NameEscaper.EscapeIfNecessary(t.Name),
-                    NameEscaper.EscapeIfNecessary(c))));
+                    NameEscaper.EscapeIfNecessary(c.Name),c.Type.Name)));
 
         return commandSchema.Concat(dynamicSchema).ToArray();
     }
@@ -249,5 +250,3 @@ public class InteractiveTableExplorer
     /// </remarks>
     public string Interpolate(string query) => BlockInterpolator.Interpolate(query, Settings);
 }
-
-public readonly record struct SchemaLine(string Command, string Table, string Column);
