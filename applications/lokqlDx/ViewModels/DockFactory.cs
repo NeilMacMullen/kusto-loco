@@ -185,6 +185,17 @@ public class DockFactory : Factory,IDocumentShow
         return rootDock;
     }
 
+    public void InsertText(string text)
+    {
+        var active = GetActive();
+
+        if (active != null)
+        {
+            var document =
+           active.QueryViewModel.QueryEditorViewModel.Document;
+            //document.Insert(document.GetOffset(document.GetLocation()));
+        }
+    }
     public override void InitLayout(IDockable layout)
     {
         HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>

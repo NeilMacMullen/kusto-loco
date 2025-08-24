@@ -9,8 +9,13 @@
              x:DataType="vm:ConsoleViewModel"
              FontFamily="{Binding DisplayPreferencesPreferences.FontFamily}"
              FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
-    <Grid>
-
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button
+                Command="{Binding ClearCommand}" FontSize="10">
+                Clear
+            </Button>
+        </StackPanel>
         <Border BorderThickness="7" Background="Black" Margin="2">
 
             <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
@@ -33,6 +38,6 @@
             </ScrollViewer>
         </Border>
 
-    </Grid>
+    </DockPanel>
 
 </UserControl>

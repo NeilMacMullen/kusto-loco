@@ -90,8 +90,16 @@ public partial class SchemaViewModel : Tool, INotifyPropertyChanged
         ExpandChildren(SchemaSource.Items.ToArray(), new IndexPath());
     }
 
+    [RelayCommand]
+    public void DoubleClick(SchemaClick click)
+
+    {
+        Console.WriteLine("here");
+    }
+
 }
 
+public readonly record struct SchemaClick(Schema Schema, string ClickedText);
 public class Schema
 {
     public Schema[] Children = [];

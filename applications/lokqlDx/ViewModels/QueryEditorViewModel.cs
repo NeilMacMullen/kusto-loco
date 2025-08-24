@@ -1,14 +1,15 @@
-﻿using System.Text.Json;
-using AvaloniaEdit.Document;
+﻿using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
+using lokqlDxComponents;
 using lokqlDxComponents.Services;
 using Microsoft.VisualStudio.Threading;
 using NotNullStrings;
+using System.Text.Json;
 
 namespace LokqlDx.ViewModels;
 
