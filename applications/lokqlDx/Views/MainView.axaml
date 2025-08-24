@@ -13,7 +13,7 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-
+  
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Loaded" SourceObject="RootControl">
             <InvokeCommandAction Command="{Binding InitializeCommand}" />
@@ -79,7 +79,7 @@
                     <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
                     <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
 
-				</MenuItem>
+                </MenuItem>
                 <MenuItem Header="_View">
                     <MenuItem Header="Add _query"
                               Command="{Binding AddQueryCommand}" />
@@ -98,7 +98,7 @@
                     <MenuItem Header=".Commands"
                               CommandParameter="LokqlDx-‐-commands"
                               Command="{Binding NavigateToWikiCommand}" />
-                    <Separator/>
+                    <Separator />
                     <MenuItem Header="Chart customisation"
                               Command="{Binding NavigateToWikiCommand}"
                               CommandParameter="ScottPlot-Chart-customisation" />
@@ -154,8 +154,9 @@
             <Grid
                 x:Name="MainGrid"
                 RowDefinitions="*,auto,0.15*">
-                <DockControl Layout="{Binding Layout}"></DockControl>
-    
+                <DockControl Layout="{Binding Layout}">
+                </DockControl>
+
                 <GridSplitter
                     Grid.Row="1"
                     Height="5"

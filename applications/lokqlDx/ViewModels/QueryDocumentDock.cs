@@ -1,5 +1,8 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using Dock.Model.Avalonia.Controls;
+﻿using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+using CommunityToolkit.Mvvm.Input;
+using Dock.Model.Mvvm.Controls;
+using LokqlDx.Views;
 
 namespace LokqlDx.ViewModels;
 

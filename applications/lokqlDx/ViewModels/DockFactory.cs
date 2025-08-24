@@ -1,7 +1,7 @@
 ﻿using Dock.Avalonia.Controls;
-using Dock.Model.Avalonia;
 using Dock.Model.Controls;
 using Dock.Model.Core;
+using Dock.Model.Mvvm;
 using Vanara.PInvoke;
 
 namespace LokqlDx.ViewModels;
@@ -21,13 +21,10 @@ public class DockFactory : Factory
 
     public override IRootDock CreateLayout()
     {
-
-        var q1 = _create();
-        
         var documentDock = new QueryDocumentDock(_create)
         {
             IsCollapsable = false,
-            VisibleDockables = CreateList<IDockable>(q1),
+            VisibleDockables = CreateList<IDockable>(),
             CanCreateDocument = true,
             CanCloseLastDockable = true,
         };

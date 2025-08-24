@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using Dock.Model.Avalonia.Controls;
+using Dock.Model.Mvvm.Controls;
 
 namespace LokqlDx.ViewModels;
 

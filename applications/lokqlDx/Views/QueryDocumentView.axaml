@@ -8,6 +8,6 @@
              x:Class="LokqlDx.Views.QueryDocumentView"
              x:DataType="vm:QueryDocumentViewModel">
     <DockPanel>
-        <Label Content="HERE"></Label>
+       <views:QueryView DataContext="{Binding  QueryViewModel}"/>
     </DockPanel>
 </UserControl>
