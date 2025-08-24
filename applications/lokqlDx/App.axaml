@@ -2,9 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LokqlDx.App"
              xmlns:labs="using:Avalonia.Labs.Controls"
+             xmlns:viewModels="clr-namespace:LokqlDx.ViewModels"
              RequestedThemeVariant="Dark">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
+    <Application.DataTemplates>
+        <viewModels:ViewLocator />
+    </Application.DataTemplates>
     <Application.Styles>
         <FluentTheme DensityStyle="Compact" />
         <labs:ControlThemes />

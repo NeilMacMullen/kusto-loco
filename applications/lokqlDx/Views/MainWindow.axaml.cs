@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using DependencyPropertyGenerator;
 
@@ -17,7 +18,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
-
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
     public MainWindow(MainView view)
     {
         InitializeComponent();

@@ -1,10 +1,14 @@
-﻿using Avalonia;
+﻿using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Dock.Model.Controls;
+using Kusto.Language.Symbols;
+using KustoLoco.Core.Evaluation.BuiltIns;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
 using LokqlDx.Desktop;
@@ -14,20 +18,16 @@ using lokqlDxComponents.Services;
 using lokqlDxComponents.Services.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using NotNullStrings;
-using System.Collections.ObjectModel;
-using Kusto.Language.Symbols;
-using KustoLoco.Core.Evaluation.BuiltIns;
-using KustoLoco.PluginSupport;
 
 namespace LokqlDx.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private const string NewQueryName = "new";
-    private CommandProcessor _commandProcessor;
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
+    private readonly DockFactory _factory;
     private readonly AssetFolderImageProvider _imageProvider;
     private readonly ILauncher _launcher;
     private readonly PreferencesManager _preferencesManager;
@@ -36,6 +36,8 @@ public partial class MainViewModel : ObservableObject
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     [ObservableProperty] private int _activeQueryIndex;
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
+    private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
 
     [ObservableProperty] private Workspace _currentWorkspace = new();
@@ -46,10 +48,16 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isDirty;
 
-    [ObservableProperty] private ObservableCollection<QueryDocument> _queries = new();
+    [ObservableProperty] private IRootDock? _layout;
+
+    private bool _pluginsLoaded;
+
+    [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = new();
     [ObservableProperty] private ObservableCollection<RecentWorkspace> _recentWorkspaces = [];
     [ObservableProperty] private bool _showUpdateInfo;
     [ObservableProperty] private string _tabStripPlacement = "Left";
+
+    private bool _trueClose;
     [ObservableProperty] private string _updateInfo = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
@@ -90,8 +98,21 @@ public partial class MainViewModel : ObservableObject
         // Register a message in some module
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
             (r, m) => { m.Reply(HandleQueryRunning(m)); });
-       
+        _factory = new DockFactory(CreateDoc);
     }
+
+    private void ResetLayout()
+    {
+        var layout = _factory.CreateLayout();
+        _factory.InitLayout(layout);
+        Layout = layout;
+        //  foreach (var query in Queries)
+        //   {
+        //       _factory.AddDocument(query);
+        // }
+    }
+
+    private QueryDocumentViewModel CreateDoc() => AddQuery("new tab", string.Empty);
 
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
@@ -111,13 +132,14 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void AddQuery() => AddQuery(NewQueryName, string.Empty);
 
-    private void AddQuery(string name, string content)
+    private QueryDocumentViewModel AddQuery(string name, string content)
         => AddQuery(name, content, Queries.Count);
 
-    private void AddQuery(string name, string content, int desiredIndex)
+    private QueryDocumentViewModel AddQuery(string name, string content, int desiredIndex)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
-        var renderingSurfaceViewModel = new RenderingSurfaceViewModel(name, _explorer.Settings, _displayPreferences,ConsoleViewModel);
+        var renderingSurfaceViewModel =
+            new RenderingSurfaceViewModel(name, _explorer.Settings, _displayPreferences, ConsoleViewModel);
         renderingSurfaceViewModel.Name = name;
         var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
         var copilotChatViewModel = new CopilotChatViewModel();
@@ -130,22 +152,23 @@ public partial class MainViewModel : ObservableObject
         var QueryViewModel = new QueryViewModel(queryEditorViewModel,
             renderingSurfaceViewModel,
             copilotChatViewModel);
-
-        Queries.Insert(desiredIndex, new QueryDocument(name, QueryViewModel));
+        var doc = new QueryDocumentViewModel(name, QueryViewModel);
+        Queries.Insert(desiredIndex, doc);
         ActiveQueryIndex = desiredIndex;
+        return doc;
     }
 
-    private QueryDocument GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);
+    private QueryDocumentViewModel GetSelectedQuery() => Queries.ElementAt(ActiveQueryIndex);
 
     [RelayCommand]
-    private void AddQueryHere(QueryDocument model)
+    private void AddQueryHere(QueryDocumentViewModel model)
     {
         var indexOfThis = Queries.IndexOf(model);
         AddQuery(NewQueryName, string.Empty, indexOfThis + 1);
     }
 
     [RelayCommand]
-    private void DeleteQuery(QueryDocument model)
+    private void DeleteQuery(QueryDocumentViewModel model)
     {
         if (Queries.Count <= 1)
             //can't delete the last query
@@ -161,7 +184,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnActiveQueryIndexChanged(int value)
     {
-        if (value >=0)
+        if (value >= 0)
             ActiveQueryChanged();
     }
 
@@ -182,16 +205,16 @@ public partial class MainViewModel : ObservableObject
                 await WeakReferenceMessenger.Default.Send(new LoadFileMessage(path));
         }
     }
+
     [RelayCommand]
     private async Task SaveData()
     {
         var file = await _dialogService.SaveDataFiles();
         if (file == null)
             return;
-            var path = file.TryGetLocalPath()!;
-            if (path.IsNotBlank())
-                await WeakReferenceMessenger.Default.Send(new SaveFileMessage(path));
-        
+        var path = file.TryGetLocalPath()!;
+        if (path.IsNotBlank())
+            await WeakReferenceMessenger.Default.Send(new SaveFileMessage(path));
     }
 
     [RelayCommand]
@@ -208,11 +231,11 @@ public partial class MainViewModel : ObservableObject
     private void ChangeTabPlacement(string placement) => TabStripPlacement = placement;
 
     [RelayCommand]
-    private async Task RenameQuery(QueryDocument model)
+    private async Task RenameQuery(QueryDocumentViewModel model)
     {
-        var text = new RenamableText(model.Header);
+        var text = new RenamableText(model.Title);
         await _dialogService.ShowRenameDialogs(text);
-        model.Header = text.NewText;
+        model.Title = text.NewText;
     }
 
     [RelayCommand]
@@ -239,7 +262,6 @@ public partial class MainViewModel : ObservableObject
         await Task.Run(_imageProvider.Init);
     }
 
-    private bool _trueClose = false;
     [RelayCommand]
     private async Task Closing(WindowClosingEventArgs? cancelEventArgs)
     {
@@ -252,10 +274,10 @@ public partial class MainViewModel : ObservableObject
         if (userChoice is YesNoCancel.No or YesNoCancel.Complete)
         {
             _trueClose = true;
-            var lifetime = Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
             lifetime?.MainWindow?.Close();
         }
-        
+
         PersistUiPreferencesToDisk();
     }
 
@@ -379,15 +401,12 @@ public partial class MainViewModel : ObservableObject
             new NullResultRenderingSurface(),
             _additionalFunctions);
 
-    private bool _pluginsLoaded = false;
-    private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions=[];
-
     private async Task LoadWorkspace(string path)
     {
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
 
-       
+
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         if (!_pluginsLoaded)
@@ -395,12 +414,14 @@ public partial class MainViewModel : ObservableObject
             var pluginsFolder = appPrefs.PluginsFolder;
             if (pluginsFolder.IsNotBlank())
             {
-                _commandProcessor = PluginHelper.LoadCommands(pluginsFolder, _explorer._outputConsole, _commandProcessor);
+                _commandProcessor =
+                    PluginHelper.LoadCommands(pluginsFolder, _explorer._outputConsole, _commandProcessor);
                 _additionalFunctions = PluginHelper.LoadKqlFunctions(pluginsFolder, _explorer._outputConsole);
             }
+
             _pluginsLoaded = true;
         }
-        
+
         _explorer = CreateExplorer();
         _workspaceManager.Load(path);
         CurrentWorkspace = _workspaceManager.Workspace;
@@ -411,14 +432,14 @@ public partial class MainViewModel : ObservableObject
         // AsyncRelayCommand<T> has an IsRunning property
         await _explorer.RunInput(appPrefs.StartupScript);
         await _explorer.RunInput(_workspaceManager.Workspace.StartupScript);
-       
+
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
                 AddQuery(p.Name, p.Text);
         else
             AddQuery("query", CurrentWorkspace.Text);
         ActiveQueryIndex = 0;
-
+        ResetLayout();
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)
         {
@@ -426,7 +447,6 @@ public partial class MainViewModel : ObservableObject
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
-        
     }
 
     /// <summary>
@@ -455,11 +475,7 @@ public partial class MainViewModel : ObservableObject
 
     private void ResetDirty()
     {
-        foreach (var queryItemViewModel in Queries)
-        {
-            queryItemViewModel.QueryViewModel.Clean();
-        }
-        
+        foreach (var queryItemViewModel in Queries) queryItemViewModel.QueryViewModel.Clean();
     }
 
 
@@ -467,7 +483,7 @@ public partial class MainViewModel : ObservableObject
     ///     Allow the user to save any pending changes
     /// </summary>
     /// <returns>
-    ///    COMPPLETE if the user did the save or didn't need to
+    ///     COMPPLETE if the user did the save or didn't need to
     /// </returns>
     private async Task<YesNoCancel> OfferSaveOfCurrentWorkspace()
     {
@@ -484,9 +500,9 @@ public partial class MainViewModel : ObservableObject
                 "You have have unsaved changes. Do you want to save them?");
             if (result == YesNoCancel.Cancel)
                 return YesNoCancel.Cancel;
-            if (result ==YesNoCancel.No)
+            if (result == YesNoCancel.No)
                 ResetDirty();
-                
+
             shouldSave = result == YesNoCancel.Yes;
         }
 
@@ -542,7 +558,7 @@ public partial class MainViewModel : ObservableObject
             ShowOverwritePrompt = true,
             SuggestedFileName = Path.GetFileName(_workspaceManager.Path)
         });
-        
+
 
         if (result?.TryGetLocalPath() is string path)
         {
@@ -562,7 +578,7 @@ public partial class MainViewModel : ObservableObject
     private void SaveWorkspace(string path)
     {
         var queries = Queries
-            .Select(q => new PersistedQuery(q.Header, q.QueryViewModel.GetText()))
+            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText()))
             .ToArray();
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
@@ -604,7 +620,7 @@ public partial class MainViewModel : ObservableObject
         var model = GetSelectedQuery();
 
         var result = model.QueryViewModel.RenderingSurfaceViewModel.Result;
-        await _dialogService.FlyoutResult(model.Header, result, _explorer.Settings, _displayPreferences);
+        await _dialogService.FlyoutResult(model.Title, result, _explorer.Settings, _displayPreferences);
     }
 
     private void PersistUiPreferencesToDisk()
@@ -627,6 +643,4 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CopyChartToClipboard()
         => WeakReferenceMessenger.Default.Send(new CopyChartMessage());
-
-
 }

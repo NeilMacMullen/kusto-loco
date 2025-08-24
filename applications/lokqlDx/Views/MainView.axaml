@@ -154,53 +154,8 @@
             <Grid
                 x:Name="MainGrid"
                 RowDefinitions="*,auto,0.15*">
-                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}"
-                            SelectedIndex="{Binding ActiveQueryIndex}"
-                            TabStripPlacement="{Binding TabStripPlacement}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Header}" FontSize="12">
-                                <TextBlock.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Rename"
-                                                  Command="{Binding $parent[UserControl].DataContext.RenameQueryCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <MenuItem Header="Delete"
-                                                  Command="{Binding $parent[UserControl].DataContext.DeleteQueryCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <Separator />
-                                        <MenuItem Header="Add query"
-                                                  Command="{Binding $parent[UserControl].DataContext.AddQueryHereCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <Separator />
-                                        <MenuItem Header="Tabs on top"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Top" />
-                                        <MenuItem Header="Tabs on left"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Left" />
-                                        <MenuItem Header="Tabs on right"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Right" />
-                                        <MenuItem Header="Tabs on bottom"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Bottom" />
-
-                                    </ContextMenu>
-                                </TextBlock.ContextMenu>
-                            </TextBlock>
-
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-
-                        <DataTemplate DataType="vm:QueryDocument">
-                            <views:QueryView DataContext="{Binding QueryViewModel}" />
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-
-
+                <DockControl Layout="{Binding Layout}"></DockControl>
+    
                 <GridSplitter
                     Grid.Row="1"
                     Height="5"

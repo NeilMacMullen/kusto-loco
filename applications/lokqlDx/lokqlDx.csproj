@@ -43,6 +43,10 @@
     <PackageReference Include="MarkdownViewer.Core" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="ScottPlot.Avalonia" />
+    <PackageReference Include="StaticViewLocator">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Topten.RichTextKit" />
     <PackageReference Include="Jab" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
@@ -62,6 +66,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\QueryDocumentView.axaml.cs">
+      <DependentUpon>QueryDocumentView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\QueryView.axaml.cs">
       <DependentUpon>ConsoleView.axaml</DependentUpon>
     </Compile>
