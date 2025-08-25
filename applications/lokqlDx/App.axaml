@@ -16,6 +16,7 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude
             Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
+        <StyleInclude Source="avares://lokqlDx/Styles/ButtonGlyphStyle.axaml" />
        <DockFluentTheme/>
     </Application.Styles>
 </Application>

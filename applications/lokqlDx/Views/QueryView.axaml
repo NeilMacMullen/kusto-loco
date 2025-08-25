@@ -17,22 +17,26 @@
 
             <StackPanel  
                         Orientation="Horizontal">
-                <Button 
-                        Command="{Binding FlipArrangementCommand}"
-                        ToolTip.Tip="Change Layout" FontSize="12">
-                    &#x27f3;
+                <Button Command="{Binding FlipArrangementCommand}"
+                        ToolTip.Tip="Change Layout"
+                        Classes="Glyph">
+                  &#x27f3;
                 </Button>
                 <Button Command="{Binding CopyChartCommand}"
-                        ToolTip.Tip="Copy chart to clipboard" FontSize="12">
-                    &#x1F4C8;
+                        ToolTip.Tip="Copy chart to clipboard"
+                        Classes="Glyph">
+                  &#x1F4C8;
                 </Button>
 				<Button Command="{Binding PinChartCommand}"
-                        ToolTip.Tip="Pin result" FontSize="12">
-                    &#x1F4CC;
+                        ToolTip.Tip="Pin result"
+                        Classes="Glyph">
+                
+                  &#x1F4CC;
                 </Button>
                 <Button Command="{Binding TearOffCommand}"
-                        ToolTip.Tip="Display result in new window" FontSize="12">
-                    &#x279A;
+                        ToolTip.Tip="Display result in new window"
+                        Classes="Glyph">
+                  &#x279A;
                 </Button>
             </StackPanel>
             </Border>

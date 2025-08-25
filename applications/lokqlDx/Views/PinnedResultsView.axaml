@@ -31,27 +31,21 @@
                                             </Grid.ColumnDefinitions>
 
                                             <Button Grid.Column="0"
-                                                    Background="Black"
-                                                    HorizontalAlignment="Right"
                                                     Content="&#x1F589;"
-                                                    FontSize="12"
-                                                    VerticalAlignment="Center"
-                                                    Margin="4,0,4,0"
                                                     DockPanel.Dock="Right"
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
                                                     CommandParameter="{Binding}"
-                                                    Click="EditButton_Click" />
+                                                    Click="EditButton_Click"
+                                                    Classes="Glyph">
+                                             </Button>
                                             <Button Grid.Column="1"
-                                                    Background="Black"
-                                                    HorizontalAlignment="Right"
                                                     Content="🗑️"
-                                                    FontSize="12"
-                                                    VerticalAlignment="Center"
-                                                    Margin="4,0,4,0"
                                                     DockPanel.Dock="Right"
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
                                                     CommandParameter="{Binding}"
-                                                    Click="EditButton_Click" />
+                                                    Click="EditButton_Click">
+                                              
+                                             </Button>
                                         </Grid>
 
                                     </Grid>

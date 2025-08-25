@@ -34,14 +34,9 @@
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
 
-                <Border DockPanel.Dock="Right" BorderBrush="LightGray" BorderThickness="1" CornerRadius="2">
-                    <Button FontSize="12" Command="{Binding EmptyTrashCommand}"
-                            Background="Black"
-                            VerticalContentAlignment="Center"
-                            HorizontalAlignment="Right"
-                            IsVisible="{Binding DeletedItemsShown}">
-                        Empty 🗑️
-                    </Button>
+                <Border DockPanel.Dock="Right"
+                        BorderBrush="LightGray" BorderThickness="1" CornerRadius="2">
+                    <Button Classes="Glyph">Empty 🗑️</Button>
                 </Border>
                 <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
                     <CheckBox
@@ -69,25 +64,17 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Button Grid.Column="0"
-                                                Background="Black"
-                                                HorizontalAlignment="Right"
+                                                Classes="Glyph"
                                                 Content="&#x1F589;"
-                                                FontSize="12"
-                                                VerticalAlignment="Center"
-                                                Margin="4,0,4,0"
                                                 DockPanel.Dock="Right"
                                                 Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleEditCommand}"
                                                 CommandParameter="{Binding}"
                                                 Click="EditButton_Click"
                                                 IsVisible="{Binding IsDeleted, Converter={StaticResource Negate}}" />
                                         <Button Grid.Column="1"
-                                                Background="Black"
-                                                HorizontalAlignment="Right"
+                                                Classes="Glyph"
                                                 Content="{Binding IsDeleted,Converter={StaticResource ChooseString},
 												ConverterParameter='♻️|🗑️'}"
-                                                FontSize="12"
-                                                VerticalAlignment="Center"
-                                                Margin="4,0,4,0"
                                                 DockPanel.Dock="Right"
                                                 Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleDeleteCommand}"
                                                 CommandParameter="{Binding}"

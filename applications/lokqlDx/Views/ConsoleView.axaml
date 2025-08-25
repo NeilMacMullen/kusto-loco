@@ -11,8 +11,9 @@
              FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button
-                Command="{Binding ClearCommand}" FontSize="10">
+			<Button
+                Classes="Glyph"
+                Command="{Binding ClearCommand}">
                 Clear
             </Button>
         </StackPanel>
