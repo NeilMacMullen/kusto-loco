@@ -11,7 +11,6 @@ namespace LokqlDx.ViewModels;
 
 public partial class ResultDisplayViewModel : Document, INotifyPropertyChanged
 {
-    [ObservableProperty] private string _title;
     [ObservableProperty] private KustoQueryResult _result;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurface;
     public ResultDisplayViewModel(string name,KustoQueryResult result)
@@ -20,8 +19,9 @@ public partial class ResultDisplayViewModel : Document, INotifyPropertyChanged
         Result = result;
         RenderingSurface =
             new RenderingSurfaceViewModel("name", new KustoSettingsProvider(),
-                new DisplayPreferencesViewModel(), new NullConsole());
-
-
+                new DisplayPreferencesViewModel(), new NullConsole())
+            {
+                Result = Result
+            };
     }
 }

@@ -48,4 +48,13 @@ public partial class PinnedResultsView : UserControl
             }
         }
     }
+    private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        if (DataContext is PinnedResultsViewModel vm && sender is TextBox tb && tb.DataContext is NamedKustoResult res)
+        {
+            vm.FilterEnterCommand.Execute(res);
+        }
+    }
 }

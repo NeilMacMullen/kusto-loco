@@ -32,10 +32,7 @@ public partial class PinnedResultsViewModel : Tool, INotifyPropertyChanged
     }
 
     [RelayCommand]
-    public void ToggleEdit(NamedKustoResult result)
-    {
-        result.EditLocked = !result.EditLocked;
-    }
+    public void ToggleEdit(NamedKustoResult result) => result.EditLocked = !result.EditLocked;
 
     [RelayCommand]
     public void ToggleDelete(NamedKustoResult result)
@@ -44,23 +41,24 @@ public partial class PinnedResultsViewModel : Tool, INotifyPropertyChanged
     }
 
     [RelayCommand]
-    public void Show(NamedKustoResult result)
-    {
-        WeakReferenceMessenger.Default.Send(new DisplayResultMessage(result.Result));
-    }
+    public void Show(NamedKustoResult result) => WeakReferenceMessenger.Default.Send(new DisplayResultMessage(result));
 
+    [RelayCommand]
+    public void FilterEnter(NamedKustoResult result) => result.EditLocked = true;
 }
 
 public partial class NamedKustoResult : ObservableObject
 {
+    [ObservableProperty] private string _description = String.Empty;
     [ObservableProperty] private string _name=String.Empty;
     [ObservableProperty] private KustoQueryResult _result=KustoQueryResult.Empty;
     [ObservableProperty] private DateTime _created=DateTime.MinValue;
     [ObservableProperty] private bool _editLocked = true;
-    public NamedKustoResult(KustoQueryResult result)
+    public NamedKustoResult(QueryResultWithSender result)
     {
-        Result = result;
-        Name = DateTime.Now.ToString("HH:mm:ss");
+        Result = result.Result;
+        Name = result.Sender +$" - {DateTime.Now:HH:mm:ss}";
         Created = DateTime.Now;
+        Description = $"Rows:{Result.RowCount} Columns:{Result.ColumnCount}";
     }
 }

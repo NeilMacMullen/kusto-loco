@@ -21,7 +21,7 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
 
     [ObservableProperty] private int _rowSpan = 3;
-
+    public string Name { get; set; } = string.Empty;
     private int n;
 
     public QueryViewModel(
@@ -134,6 +134,7 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void PinChart()
     {
-        WeakReferenceMessenger.Default.Send(new PinResultMessage(RenderingSurfaceViewModel.Result));
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result));
+        WeakReferenceMessenger.Default.Send(msg);
     }
 }

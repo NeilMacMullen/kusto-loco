@@ -21,6 +21,18 @@ public partial class QueryDocumentViewModel : Document,INotifyPropertyChanged
         {
             QueryViewModel.IsActive = m.Value == this;
         });
+        QueryViewModel.Name = Title;
+        _initialized = true;
+    }
+
+    private bool _initialized;
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        if ( _initialized && e.PropertyName == nameof(Title))
+        {
+            QueryViewModel.Name = Title;
+        }
+        base.OnPropertyChanged(e);
     }
 
 }

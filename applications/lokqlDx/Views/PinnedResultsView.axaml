@@ -9,12 +9,7 @@
              x:Class="LokqlDx.Views.PinnedResultsView"
              x:DataType="vm:PinnedResultsViewModel">
     <UserControl.Resources>
-        <converters:BoolToBrushMultiConverter x:Key="BoolToColorMulti" />
         <converters:NegateBoolConverter x:Key="Negate" />
-        <converters:BoolChooseStringConverter x:Key="ChooseString" />
-        <SolidColorBrush x:Key="Visible" Color="GreenYellow" />
-        <SolidColorBrush x:Key="Hidden" Color="LightGray" />
-        <SolidColorBrush x:Key="Deleted" Color="OrangeRed" />
     </UserControl.Resources>
     <Border BorderThickness="1" CornerRadius="5" Background="White" Margin="2">
         <DockPanel Background="Black">
@@ -26,6 +21,7 @@
                     x:Name="ItemList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
+                            <StackPanel>
                             <DockPanel>
                                 <Grid DockPanel.Dock="Right">
                                     <Grid>
@@ -42,7 +38,8 @@
                                                 VerticalAlignment="Center"
                                                 Margin="4,0,4,0"
                                                 DockPanel.Dock="Right"
-                                                Command ="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
+                                                Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
+                                                CommandParameter="{Binding}"
                                                 Click="EditButton_Click" />
                                         <Button Grid.Column="1"
                                                 Background="Black"
@@ -54,7 +51,7 @@
                                                 DockPanel.Dock="Right"
                                                 Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
                                                 CommandParameter="{Binding}"
-                                                Click="EditButton_Click"/>
+                                                Click="EditButton_Click" />
                                     </Grid>
 
                                 </Grid>
@@ -64,7 +61,7 @@
                                         Content="{Binding Name,Mode=TwoWay}"
                                         IsVisible="{Binding EditLocked}">
 
-                                    
+
                                         <Interaction.Behaviors>
                                             <EventTriggerBehavior EventName="DoubleTapped">
                                                 <InvokeCommandAction
@@ -80,14 +77,14 @@
                                              IsVisible="{Binding EditLocked,
 
 									Converter={StaticResource Negate}}"
-
+                                             KeyDown="InputElement_OnKeyDown"
                                              />
                                 </Grid>
-
-
                             </DockPanel>
+                            <Label Content="{Binding Description}"></Label>    
+                            </StackPanel>
 
-                        </DataTemplate>
+						</DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>

@@ -40,11 +40,10 @@ public class DockFactory : Factory,IDocumentShow
 
     private void DisplayResult(object recipient, DisplayResultMessage message)
     {
-        var model = new ResultDisplayViewModel("display", message.Value);
-        
-        AddDockable(DocumentDock!,model);
-
-        ;
+        var named = message.Value;
+        var model = new ResultDisplayViewModel(named.Name, named.Result);
+        AddDockable(new RootDock(),model);
+        FloatDockable(model);
     }
 
     private void InsertTextInActiveWindow(object recipient, InsertTextMessage message)

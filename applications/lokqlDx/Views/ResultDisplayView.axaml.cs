@@ -12,6 +12,9 @@ public partial class ResultDisplayView : UserControl
     }
     private async void SurfaceView_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is FlyoutViewModel viewModel) await viewModel.InitialRender();
+        if (DataContext is ResultDisplayViewModel viewModel)
+            await viewModel.RenderingSurface.RenderToDisplay(viewModel.Result);
     }
+
+    
 }
