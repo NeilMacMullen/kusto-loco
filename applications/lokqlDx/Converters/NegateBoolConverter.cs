@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.HighPerformance;
 
 namespace LokqlDx.Converters
 {

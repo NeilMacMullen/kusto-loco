@@ -20,7 +20,9 @@ public interface IDocumentShow
 public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
 {
     private  IDocumentShow? _show;
-   
+
+    public bool DeletedItemsShown => FilteredQueries.Any(q => q.IsDeleted);
+
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
     public QueryLibraryViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
@@ -41,8 +43,9 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     {
         var sorted = Queries
             .Where(ApplyFilter)
-            .OrderBy(q => !q.Visible).ThenBy(q => q.Title);
+            .OrderBy(q => q.IsDeleted).ThenBy(q=>!q.IsVisible).ThenBy(q => q.Title);
         FilteredQueries = new(sorted);
+        OnPropertyChanged(nameof(DeletedItemsShown));
     }
 
     private bool ApplyFilter(QueryDocumentViewModel arg)
@@ -90,9 +93,9 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     {
         _show?.Show(query);
     }
-    public void ChangeVisibilty(QueryDocumentViewModel query, bool b)
+    public void ChangeVisibility(QueryDocumentViewModel query, bool b)
     {
-        query.Visible = b;
+        query.IsVisible = b;
         Sort();
     }
 
@@ -100,6 +103,20 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     public void FilterEnter(QueryDocumentViewModel query)
     {
         query.EditLocked = true;
+    }
+
+    [RelayCommand]
+    public void ToggleDelete(QueryDocumentViewModel query)
+    {
+        query.IsDeleted = !query.IsDeleted;
+        Sort();
+    }
+
+    [RelayCommand]
+    public void EmptyTrash()
+    {
+        Queries= new ObservableCollection<QueryDocumentViewModel>(Queries.Where(q=>!q.IsDeleted));
+        Sort();
     }
 }
 

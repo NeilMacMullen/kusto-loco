@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using MoreLinq;
 
 namespace LokqlDx.Converters;
 
@@ -9,13 +10,22 @@ public class BoolToBrushMultiConverter : IMultiValueConverter
 {
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values.Count < 3)
+        var bools = values.OfType<bool>().ToArray();
+        var brushes = values.OfType<IBrush>().ToArray();
+        if (!bools.Any())
+        {
+            return brushes.FirstOrDefault();
+        }
+
+        if (!brushes.Any())
             return null;
+        var index = 0;
+        foreach (var b in bools)
+        {
+            index = index << 1;
+            if (b) index |= 1;
+        }
 
-        var boolValue = values[0] as bool? ?? false;
-        var falseBrush = values[1] as IBrush;
-        var trueBrush = values[2] as IBrush;
-
-        return boolValue ? trueBrush : falseBrush;
+        return brushes[Math.Min(index, brushes.Length)];
     }
 }

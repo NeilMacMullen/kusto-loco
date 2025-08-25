@@ -209,7 +209,7 @@ public class DockFactory : Factory,IDocumentShow
     public void AddDocument(QueryDocumentViewModel query)
     {
         DocumentDock?.AddDocument(query);
-        query.Visible = true;
+        query.IsVisible = true;
     }
 
     public IRootDock? GetActiveRoot() =>
@@ -231,14 +231,14 @@ public class DockFactory : Factory,IDocumentShow
     {
         if (dockable is QueryDocumentViewModel query)
         {
-            _library.ChangeVisibilty(query, false);
+            _library.ChangeVisibility(query, false);
         }
         base.OnDockableClosed(dockable);
     }
 
     public void Show(QueryDocumentViewModel model)
     {
-        if(!model.Visible)
+        if(!model.IsVisible)
             AddDocument(model);
         else
             SetActiveDockable(model);
