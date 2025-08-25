@@ -3,10 +3,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.AvaloniaEdit" />
         <PackageReference Include="Avalonia.Skia" />
         <PackageReference Include="Jab" />

@@ -4,7 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>    
+         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+         <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>    
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,6 +7,8 @@
     <IsPackable>false</IsPackable>
 
     <RootNamespace>IntellisenseTests</RootNamespace>
+
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

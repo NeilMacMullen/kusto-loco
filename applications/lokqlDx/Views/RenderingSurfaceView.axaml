@@ -39,7 +39,7 @@ Background="{DynamicResource SystemListHighColor}"
                             </Style>
                             <Style Selector="TreeDataGridColumnHeader">
                                 <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight3}" />
+                                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark3}" />
                                 <Setter Property="FontWeight" Value="Bold" />
                             </Style>
                         </TreeDataGrid.Styles>

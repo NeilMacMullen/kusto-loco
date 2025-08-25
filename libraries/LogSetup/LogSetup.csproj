@@ -5,12 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Jab" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="NLog"  />
+    <PackageReference Include="NLog" />
     <PackageReference Include="NLog.Extensions.Logging" />
     <PackageReference Include="NLog.Layouts.ClefJsonLayout" />
   </ItemGroup>

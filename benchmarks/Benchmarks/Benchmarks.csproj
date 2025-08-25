@@ -6,6 +6,7 @@
     <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
     <StartupObject>Benchmarks.Program</StartupObject>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
