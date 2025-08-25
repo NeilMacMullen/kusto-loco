@@ -124,4 +124,16 @@ public partial class QueryViewModel : ObservableObject
 
 
     public void Clean() => QueryEditorViewModel.IsDirty = false;
+
+    [RelayCommand]
+    public void CopyChart()
+    {
+        CopyChartToClipboard();
+    }
+
+    [RelayCommand]
+    public void PinChart()
+    {
+        WeakReferenceMessenger.Default.Send(new PinResultMessage(RenderingSurfaceViewModel.Result));
+    }
 }

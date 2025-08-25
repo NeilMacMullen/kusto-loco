@@ -10,7 +10,31 @@
              Background="Black"
              GotFocus="InputElement_OnGotFocus">
     <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <Border DockPanel.Dock="Right" BorderThickness="1" CornerRadius="3"
+                    BorderBrush="White"
+                    HorizontalAlignment="Right">
 
+            <StackPanel  
+                        Orientation="Horizontal">
+                <Button 
+                        Command="{Binding FlipArrangementCommand}"
+                        ToolTip.Tip="Change Layout" FontSize="12">
+                    &#x27f3;
+                </Button>
+                <Button Command="{Binding CopyChartCommand}"
+                        ToolTip.Tip="Copy chart to clipboard" FontSize="12">
+                    &#x1F4C8;
+                </Button>
+				<Button Command="{Binding PinChartCommand}"
+                        ToolTip.Tip="Pin chart" FontSize="12">
+                    &#x1F4CC;
+                </Button>
+            </StackPanel>
+            </Border>
+
+
+		</DockPanel>
         <Grid ColumnDefinitions="*,auto,*"
               RowDefinitions="*,auto,*"
               DockPanel.Dock="Bottom">

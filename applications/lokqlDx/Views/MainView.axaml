@@ -125,22 +125,6 @@
 
                 </MenuItem>
             </Menu>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                <Button Command="{Binding ClearConsoleCommand}"
-                        ToolTip.Tip="Clear console" FontSize="12">
-                    X
-                </Button>
-                <Button Command="{Binding ChangeLayoutCommand}"
-                        ToolTip.Tip="Change Layout" FontSize="12">
-                    &#x25a6;
-                </Button>
-                <Button Command="{Binding CopyChartToClipboardCommand}"
-                        ToolTip.Tip="Copy chart to clipboard" FontSize="12">
-                    &#x1f4cb;
-                </Button>
-
-
-            </StackPanel>
         </DockPanel>
         <Grid RowDefinitions="*,20">
             <DockControl Layout="{Binding Layout}" />

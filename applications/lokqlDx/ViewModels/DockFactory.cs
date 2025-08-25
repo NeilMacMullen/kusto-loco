@@ -35,6 +35,16 @@ public class DockFactory : Factory,IDocumentShow
         _create = create;
         _onActiveChanged = onActiveChanged;
         WeakReferenceMessenger.Default.Register<InsertTextMessage>(this,InsertTextInActiveWindow);
+        WeakReferenceMessenger.Default.Register<DisplayResultMessage>(this, DisplayResult);
+    }
+
+    private void DisplayResult(object recipient, DisplayResultMessage message)
+    {
+        var model = new ResultDisplayViewModel("display", message.Value);
+        
+        AddDockable(DocumentDock!,model);
+
+        ;
     }
 
     private void InsertTextInActiveWindow(object recipient, InsertTextMessage message)
@@ -124,7 +134,7 @@ public class DockFactory : Factory,IDocumentShow
 
     ToolDock Create(params Tool[]tools)
     {
-        return new ToolDock
+        return new ToolDock()
         {
             CanDrag = true,
             CanFloat = true,
@@ -153,9 +163,10 @@ public class DockFactory : Factory,IDocumentShow
         var console = new ConsoleDocumentViewModel(_console);
 
         var con = Create(console);
-        var rest = Create(_library, _schema);
-        con.Proportion = 0.8;
-        rest.Proportion = 0.2;
+        var pinnedResults = new PinnedResultsViewModel();
+        var rest = Create(_library, _schema,pinnedResults);
+        con.Proportion = 0.6;
+        rest.Proportion = 0.4;
         ToolDock= new ProportionalDock()
         {
             Orientation = Orientation.Horizontal,
