@@ -134,7 +134,14 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void PinChart()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result));
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,false));
+        WeakReferenceMessenger.Default.Send(msg);
+    }
+
+    [RelayCommand]
+    public void TearOff()
+    {
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,true));
         WeakReferenceMessenger.Default.Send(msg);
     }
 }

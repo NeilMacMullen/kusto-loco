@@ -13,7 +13,6 @@ using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using Flyout = LokqlDx.Views.Flyout;
 
 namespace LokqlDx.Services;
 
@@ -131,15 +130,7 @@ public class DialogService
             .ConfigureAwait(false);
 
 
-    public async Task FlyoutResult(string title, KustoQueryResult result, KustoSettingsProvider explorerSettings,
-        DisplayPreferencesViewModel displayPreferences) =>
-        await ShowDialog(
-                title,
-                new Flyout(),
-                new FlyoutViewModel(result, explorerSettings, displayPreferences),
-                new ShowOptions(true,new Size(600,400),false)
-                )
-            .ConfigureAwait(false);
+   
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
         await ShowDialog(

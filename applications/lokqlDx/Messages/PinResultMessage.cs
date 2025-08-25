@@ -9,4 +9,4 @@ public class PinResultMessage(QueryResultWithSender result) : ValueChangedMessag
 public class DisplayResultMessage(NamedKustoResult result) : ValueChangedMessage<NamedKustoResult>(result);
 
 
-public readonly record struct QueryResultWithSender(string Sender,KustoQueryResult Result);
+public readonly record struct QueryResultWithSender(string Sender,KustoQueryResult Result,bool ImmediateDisplay);

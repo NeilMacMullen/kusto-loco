@@ -22,69 +22,68 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                            <DockPanel>
-                                <Grid DockPanel.Dock="Right">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40" />
-                                            <ColumnDefinition Width="40" />
-                                        </Grid.ColumnDefinitions>
+                                <DockPanel>
+                                    <Grid DockPanel.Dock="Right">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="40" />
+                                                <ColumnDefinition Width="40" />
+                                            </Grid.ColumnDefinitions>
 
-                                        <Button Grid.Column="0"
-                                                Background="Black"
-                                                HorizontalAlignment="Right"
-                                                Content="&#x1F589;"
-                                                FontSize="12"
-                                                VerticalAlignment="Center"
-                                                Margin="4,0,4,0"
-                                                DockPanel.Dock="Right"
-                                                Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
-                                                CommandParameter="{Binding}"
-                                                Click="EditButton_Click" />
-                                        <Button Grid.Column="1"
-                                                Background="Black"
-                                                HorizontalAlignment="Right"
-                                                Content="🗑️"
-                                                FontSize="12"
-                                                VerticalAlignment="Center"
-                                                Margin="4,0,4,0"
-                                                DockPanel.Dock="Right"
-                                                Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
-                                                CommandParameter="{Binding}"
-                                                Click="EditButton_Click" />
+                                            <Button Grid.Column="0"
+                                                    Background="Black"
+                                                    HorizontalAlignment="Right"
+                                                    Content="&#x1F589;"
+                                                    FontSize="12"
+                                                    VerticalAlignment="Center"
+                                                    Margin="4,0,4,0"
+                                                    DockPanel.Dock="Right"
+                                                    Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Click="EditButton_Click" />
+                                            <Button Grid.Column="1"
+                                                    Background="Black"
+                                                    HorizontalAlignment="Right"
+                                                    Content="🗑️"
+                                                    FontSize="12"
+                                                    VerticalAlignment="Center"
+                                                    Margin="4,0,4,0"
+                                                    DockPanel.Dock="Right"
+                                                    Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Click="EditButton_Click" />
+                                        </Grid>
+
                                     </Grid>
-
-                                </Grid>
-                                <Grid DockPanel.Dock="Left">
-                                    <Label
-                                        Background="Black"
-                                        Content="{Binding Name,Mode=TwoWay}"
-                                        IsVisible="{Binding EditLocked}">
+                                    <Grid DockPanel.Dock="Left">
+                                        <Label
+                                            Background="Black"
+                                            Content="{Binding Name,Mode=TwoWay}"
+                                            IsVisible="{Binding EditLocked}">
 
 
-                                        <Interaction.Behaviors>
-                                            <EventTriggerBehavior EventName="DoubleTapped">
-                                                <InvokeCommandAction
-                                                    Command="{Binding $parent[v:PinnedResultsView].DataContext.ShowCommand}"
-                                                    CommandParameter="{Binding}" />
-                                            </EventTriggerBehavior>
-                                        </Interaction.Behaviors>
-                                    </Label>
+                                            <Interaction.Behaviors>
+                                                <EventTriggerBehavior EventName="DoubleTapped">
+                                                    <InvokeCommandAction
+                                                        Command="{Binding $parent[v:PinnedResultsView].DataContext.ShowCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                </EventTriggerBehavior>
+                                            </Interaction.Behaviors>
+                                        </Label>
 
-                                    <TextBox x:Name="EditTextBox"
-                                             VerticalContentAlignment="Center"
-                                             Text="{Binding Name,Mode=TwoWay}"
-                                             IsVisible="{Binding EditLocked,
+                                        <TextBox x:Name="EditTextBox"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding Name,Mode=TwoWay}"
+                                                 IsVisible="{Binding EditLocked,
 
 									Converter={StaticResource Negate}}"
-                                             KeyDown="InputElement_OnKeyDown"
-                                             />
-                                </Grid>
-                            </DockPanel>
-                            <Label Content="{Binding Description}"></Label>    
+                                                 KeyDown="InputElement_OnKeyDown" />
+                                    </Grid>
+                                </DockPanel>
+                                <Label Content="{Binding Description}" />
                             </StackPanel>
 
-						</DataTemplate>
+                        </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>

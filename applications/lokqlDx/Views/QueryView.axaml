@@ -27,8 +27,12 @@
                     &#x1F4C8;
                 </Button>
 				<Button Command="{Binding PinChartCommand}"
-                        ToolTip.Tip="Pin chart" FontSize="12">
+                        ToolTip.Tip="Pin result" FontSize="12">
                     &#x1F4CC;
+                </Button>
+                <Button Command="{Binding TearOffCommand}"
+                        ToolTip.Tip="Display result in new window" FontSize="12">
+                    &#x279A;
                 </Button>
             </StackPanel>
             </Border>

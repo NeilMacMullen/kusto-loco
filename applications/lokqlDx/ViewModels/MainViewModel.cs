@@ -569,18 +569,6 @@ public partial class MainViewModel : ObservableObject
                 path));
     }
 
-
-    
-    [RelayCommand]
-    private async Task FlyoutCurrentResult()
-    {
-       // var model = GetSelectedQuery();
-
-       // var result = model.QueryViewModel.RenderingSurfaceViewModel.Result;
-       // await _dialogService.FlyoutResult(model.Title, result, _explorer.Settings, _displayPreferences);
-       await Task.CompletedTask;
-    }
-
     private void PersistUiPreferencesToDisk()
     {
         var ui = _preferencesManager.UIPreferences;

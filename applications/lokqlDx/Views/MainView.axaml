@@ -79,10 +79,6 @@
                     <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
 
                 </MenuItem>
-                <MenuItem Header="_View">
-                    <MenuItem Header="Show current result in _flyout"
-                              Command="{Binding FlyoutCurrentResultCommand}" />
-                </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
                               Command="{Binding NavigateToWikiCommand}" />
