@@ -7,17 +7,18 @@
              xmlns:converters="clr-namespace:LokqlDx.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.PinnedResultsView"
-             x:DataType="vm:PinnedResultsViewModel">
+             x:DataType="vm:PinnedResultsViewModel"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
+             >
     <UserControl.Resources>
         <converters:NegateBoolConverter x:Key="Negate" />
     </UserControl.Resources>
-    <Border BorderThickness="1" CornerRadius="5" Background="White" Margin="2">
-        <DockPanel Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
+    <Border BorderThickness="1" CornerRadius="5" Margin="2">
+        <DockPanel >
 
             <ScrollViewer Name="TheScrollViewer">
                 <ItemsControl
                     ItemsSource="{Binding Results}"
-                    Background="Black"
                     x:Name="ItemList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -51,7 +52,6 @@
                                     </Grid>
                                     <Grid DockPanel.Dock="Left">
                                         <Label
-                                            Background="Black"
                                             Content="{Binding Name,Mode=TwoWay}"
                                             IsVisible="{Binding EditLocked}">
 

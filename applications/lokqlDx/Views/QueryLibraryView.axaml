@@ -13,11 +13,11 @@
         <converters:BoolToBrushMultiConverter x:Key="BoolToColorMulti" />
         <converters:NegateBoolConverter x:Key="Negate" />
         <converters:BoolChooseStringConverter x:Key="ChooseString" />
-        <SolidColorBrush x:Key="Visible" Color="GreenYellow" />
-        <SolidColorBrush x:Key="Hidden" Color="LightGray" />
-        <SolidColorBrush x:Key="Deleted" Color="OrangeRed" />
+        <SolidColorBrush x:Key="Visible" Color="{DynamicResource SystemAccentColorLight1}" />
+        <SolidColorBrush x:Key="Hidden" Color="{DynamicResource SystemAccentColorDark3}" />
+        <SolidColorBrush x:Key="Deleted" Color="{DynamicResource SystemErrorTextColor}" />
     </UserControl.Resources>
-        <DockPanel Background="Black" Margin="2">
+        <DockPanel  Margin="2">
             <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
                 <Label Content="🔍"
                        FontSize="16"

@@ -1,4 +1,6 @@
-﻿using Avalonia.Media;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
@@ -220,9 +222,10 @@ public class DockFactory : Factory,IDocumentShow
     }
     public override void InitLayout(IDockable layout)
     {
+        var brush = (IBrush?)Application.Current?.FindResource("SystemControlBackgroundBaseHighBrush");
         HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
         {
-            [nameof(IDockWindow)] = () => new HostWindow(){Background =Brushes.Black}
+            [nameof(IDockWindow)] = () => new HostWindow(){Background = brush }
         };
 
         base.InitLayout(layout);

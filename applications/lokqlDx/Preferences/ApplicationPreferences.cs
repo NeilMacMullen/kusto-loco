@@ -1,4 +1,6 @@
-﻿namespace LokqlDx;
+﻿using RTools_NTS.Util;
+
+namespace LokqlDx;
 
 /// <summary>
 ///     Global Preferences that are applied for every workspace
@@ -9,4 +11,5 @@ public class ApplicationPreferences
     public string StartupScript { get; set; } = string.Empty;
     public bool HasShownLanding { get; set; }
     public string PluginsFolder { get; set; } = string.Empty;
+   
 }

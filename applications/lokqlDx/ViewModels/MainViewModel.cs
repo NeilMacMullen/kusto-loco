@@ -203,7 +203,7 @@ public partial class MainViewModel : ObservableObject
         await _registryOperations.AssociateFileType(true);
         _preferencesManager.RetrieveUiPreferencesFromDisk();
         _preferencesManager.EnsureDefaultFolderExists();
-        ApplyUiPreferences(false);
+        ApplyUiPreferences();
         RebuildRecentFilesList();
 
         await LoadWorkspace(_initWorkspacePath);
@@ -296,7 +296,7 @@ public partial class MainViewModel : ObservableObject
     private async Task OpenAppPreferences()
     {
         await _dialogService.ShowAppPreferences(_preferencesManager);
-        ApplyUiPreferences(true);
+        ApplyUiPreferences();
     }
 
     [RelayCommand]
@@ -309,7 +309,7 @@ public partial class MainViewModel : ObservableObject
         _preferencesManager.UIPreferences.FontSize = Math.Clamp(
             _preferencesManager.UIPreferences.FontSize + by,
             6, 40);
-        ApplyUiPreferences(true);
+        ApplyUiPreferences();
         _preferencesManager.SaveUiPrefs();
     }
 
@@ -317,7 +317,7 @@ public partial class MainViewModel : ObservableObject
     private void ToggleWordWrap()
     {
         _preferencesManager.UIPreferences.WordWrap = !_preferencesManager.UIPreferences.WordWrap;
-        ApplyUiPreferences(true);
+        ApplyUiPreferences();
         _preferencesManager.SaveUiPrefs();
     }
 
@@ -325,7 +325,7 @@ public partial class MainViewModel : ObservableObject
     private void ToggleLineNumbers()
     {
         _preferencesManager.UIPreferences.ShowLineNumbers = !_preferencesManager.UIPreferences.ShowLineNumbers;
-        ApplyUiPreferences(true);
+        ApplyUiPreferences();
         _preferencesManager.SaveUiPrefs();
     }
 
@@ -338,15 +338,16 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task NavigateToUri(string path) => await _launcher.LaunchUriAsync(new Uri(path));
 
-    private void ApplyUiPreferences(bool skipGrid)
+    private void ApplyUiPreferences()
     {
         var uiPreferences = _preferencesManager.UIPreferences;
         _displayPreferences.FontFamily = uiPreferences.FontFamily;
         _displayPreferences.FontSize = uiPreferences.FontSize;
         _displayPreferences.WordWrap = uiPreferences.WordWrap;
         _displayPreferences.ShowLineNumbers = uiPreferences.ShowLineNumbers;
-        if (skipGrid)
-            return;
+        var theme = uiPreferences.Theme;
+        ApplicationHelper.SetTheme(theme);
+      
     }
 
     private InteractiveTableExplorer CreateExplorer() =>
@@ -589,4 +590,17 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CopyChartToClipboard()
         => WeakReferenceMessenger.Default.Send(new CopyChartMessage());
+}
+
+public static class ApplicationHelper
+{
+    public static void SetTheme(string theme)
+    {
+        if (theme == "Default")
+            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Default;
+        if (theme == "Dark")
+            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
+        if (theme == "Light")
+            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+    }
 }

@@ -3,6 +3,7 @@ using Avalonia.Media;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels.Dialogs;
 
@@ -20,6 +21,8 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     [ObservableProperty] private bool _showLineNumbers;
     [ObservableProperty] private bool _wordWrap;
     [ObservableProperty] private string _pluginsFolder;
+    [ObservableProperty] private ObservableCollection<string> _themes=[];
+    [ObservableProperty] private string _selectedTheme="";
 
     public ApplicationPreferencesViewModel(PreferencesManager preferencesManager)
     {
@@ -37,7 +40,8 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         PluginsFolder = applicationPreferences.PluginsFolder;
 
         Document.Text = applicationPreferences.StartupScript;
-
+        Themes = new ObservableCollection<string>("Dark Light Default".Tokenize());
+        SelectedTheme = uiPreferences.Theme.OrWhenBlank(Themes.First());
         _completionSource = new TaskCompletionSource();
         Result = _completionSource.Task;
     }
@@ -54,7 +58,7 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         _preferencesManager.UIPreferences.WordWrap = WordWrap;
         _preferencesManager.UIPreferences.FontFamily = SelectedFont.Name;
         _preferencesManager.UIPreferences.FontSize = FontSize;
-        
+        _preferencesManager.UIPreferences.Theme = SelectedTheme;
         _preferencesManager.Save(_applicationPreferences);
         _preferencesManager.SaveUiPrefs();
 
@@ -63,4 +67,9 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
 
     [RelayCommand]
     private void Cancel() => _completionSource.SetResult();
+
+    partial void OnSelectedThemeChanged(string value)
+    {
+        ApplicationHelper.SetTheme(value);
+    }
 }
