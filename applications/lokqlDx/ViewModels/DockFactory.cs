@@ -208,8 +208,8 @@ public class DockFactory : Factory,IDocumentShow
 
     public void AddDocument(QueryDocumentViewModel query)
     {
-        DocumentDock?.AddDocument(query);
-        query.IsVisible = true;
+        if (query.IsVisible)
+            DocumentDock?.AddDocument(query);
     }
 
     public IRootDock? GetActiveRoot() =>

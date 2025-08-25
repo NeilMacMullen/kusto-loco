@@ -10,8 +10,6 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private int _chartRow;
     [ObservableProperty] private int _columnSpan = 1;
 
-    [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
-
     // Add observable properties for grid positions
     [ObservableProperty] private int _editorViewColumn;
     [ObservableProperty] private int _editorViewRow;
@@ -28,12 +26,10 @@ public partial class QueryViewModel : ObservableObject
 
     public QueryViewModel(
         QueryEditorViewModel queryEditorViewModel,
-        RenderingSurfaceViewModel renderingSurfaceViewModel,
-        CopilotChatViewModel copilotChatViewModel)
+        RenderingSurfaceViewModel renderingSurfaceViewModel)
     {
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
-        CopilotChatViewModel = copilotChatViewModel;
         WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) => { FlipArrangement(); });
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
             (r, m) =>

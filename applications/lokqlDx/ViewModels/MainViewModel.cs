@@ -118,7 +118,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var query in queries.ToArray()) _factory.AddDocument(query);
     }
 
-    private QueryDocumentViewModel CreateDoc() => AddQuery("new tab", string.Empty);
+    private QueryDocumentViewModel CreateDoc() => AddQuery("new tab", string.Empty,true);
 
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
@@ -136,29 +136,26 @@ public partial class MainViewModel : ObservableObject
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
    
-    private QueryDocumentViewModel AddQuery(string name, string content)
+    private QueryDocumentViewModel AddQuery(string name, string content,bool isVisible)
     {
-        var doc = CreateQuery(name,content);
+        var doc = CreateQuery(name,content,isVisible);
         QueryLibrary.Add(doc);
         return doc;
     }
-    private QueryDocumentViewModel CreateQuery(string name, string content)
+    private QueryDocumentViewModel CreateQuery(string name, string content, bool isVisible)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
         var renderingSurfaceViewModel =
             new RenderingSurfaceViewModel(name, _explorer.Settings, _displayPreferences, ConsoleViewModel);
         var sharedExplorer = _explorer.ShareWithNewSurface(renderingSurfaceViewModel);
-        var copilotChatViewModel = new CopilotChatViewModel();
         var queryEditorViewModel = new QueryEditorViewModel(sharedExplorer,
             ConsoleViewModel,
             _displayPreferences,
             content,
-            adapter);
+            adapter){} ;
 
-        var queryViewModel = new QueryViewModel(queryEditorViewModel,
-            renderingSurfaceViewModel,
-            copilotChatViewModel);
-        var doc = new QueryDocumentViewModel(name, queryViewModel);
+        var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel);
+        var doc = new QueryDocumentViewModel(name, queryViewModel) {IsVisible = isVisible};
         return doc;
     }
 
@@ -394,9 +391,9 @@ public partial class MainViewModel : ObservableObject
 
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
-                AddQuery(p.Name, p.Text);
+                AddQuery(p.Name, p.Text,!p.IsHidden);
         else
-            AddQuery("query", CurrentWorkspace.Text);
+            AddQuery("query", CurrentWorkspace.Text,true);
         ResetLayout();
         UpdateUIFromWorkspace(true);
         if (!appPrefs.HasShownLanding)

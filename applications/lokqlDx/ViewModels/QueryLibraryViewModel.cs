@@ -78,7 +78,9 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
 
     public PersistedQuery[] Persist()
     {
-        return Queries.Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText()))
+        return Queries
+            .Where(q=>!q.IsDeleted)
+            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(),!q.IsVisible))
             .ToArray();
     }
 
