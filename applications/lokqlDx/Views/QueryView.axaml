@@ -7,16 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryView"
              x:DataType="vm:QueryViewModel"
-             Background="Black"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
              GotFocus="InputElement_OnGotFocus">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <Border DockPanel.Dock="Right" BorderThickness="1" CornerRadius="3"
-                    BorderBrush="White"
-                    HorizontalAlignment="Right">
-
-            <StackPanel  
-                        Orientation="Horizontal">
+            <StackPanel DockPanel.Dock="Right" 
+                        Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Command="{Binding FlipArrangementCommand}"
                         ToolTip.Tip="Change Layout"
                         Classes="Glyph">
@@ -39,8 +35,6 @@
                   &#x279A;
                 </Button>
             </StackPanel>
-            </Border>
-
 
 		</DockPanel>
         <Grid ColumnDefinitions="*,auto,*"
@@ -65,7 +59,7 @@
                 Grid.ColumnSpan="{Binding ColumnSpan}"
                 Width="{Binding GridSplitterWidth}"
                 Height="{Binding GridSplitterHeight}"
-                Background="#227F7F7F" />
+                Background="{DynamicResource AccentButtonBackgroundDisabled}" />
             <Border Grid.Column="{Binding ChartColumn}"
                     Grid.Row="{Binding ChartRow}"
                     Grid.RowSpan="{Binding RowSpan}"

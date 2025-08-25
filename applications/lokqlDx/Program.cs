@@ -4,15 +4,13 @@ using Avalonia.Platform.Storage;
 using HotAvalonia;
 using Jab;
 using LogSetup;
-using Lokql.Engine.Commands;
 using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using lokqlDxComponents.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LokqlDx.Desktop;
-
+namespace LokqlDx;
 internal class Program :Application
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -60,9 +58,4 @@ internal partial class DiContainer
 
     internal ILauncher GetLauncher() =>
         _topLevel?.Launcher ?? throw new InvalidOperationException();
-}
-
-public class CommandProcessorFactory
-{
-    public CommandProcessor GetCommandProcessor() => CommandProcessor.Default();
 }

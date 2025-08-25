@@ -9,14 +9,15 @@
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
              DataContextChanged="StyledElement_OnDataContextChanged"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
              >
-    <DockPanel>
+    <DockPanel  Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8" />
         </StackPanel>
         <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
-            <TabItem Header="Data">
-                <Grid RowDefinitions="auto,*" Background="{DynamicResource SystemAltLowColor}">
+            <TabItem Header="Data" >
+					 <Grid RowDefinitions="auto,*">
                     <TextBlock
                         Text="{Binding DataGridSizeWarning}"
                         IsVisible="{Binding ShowDataGridSizeWarning}" />
@@ -27,12 +28,19 @@
                         Source="{Binding TreeSource}"
                         FontFamily="{Binding DisplayPreferences.FontFamily}"
                         FontSize="{Binding DisplayPreferences.FontSize}"
-                        Foreground="GreenYellow"
                         CanUserResizeColumns="True"
-                        CanUserSortColumns="True">
+                        CanUserSortColumns="True"
+Background="{DynamicResource SystemListHighColor}"
+                        Foreground="{DynamicResource SystemAccentColorLight2}"
+                        >
                         <TreeDataGrid.Styles>
                             <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
-                                <Setter Property="Background" Value="#20808080" />
+                                <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
+                            </Style>
+                            <Style Selector="TreeDataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight3}" />
+                                <Setter Property="FontWeight" Value="Bold" />
                             </Style>
                         </TreeDataGrid.Styles>
                         <TreeDataGrid.ContextMenu>

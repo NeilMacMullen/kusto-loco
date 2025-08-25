@@ -11,7 +11,7 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
-using LokqlDx.Desktop;
+using LokqlDx;
 using LokqlDx.Models;
 using LokqlDx.Services;
 using lokqlDxComponents.Services;

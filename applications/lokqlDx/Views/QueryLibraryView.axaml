@@ -7,7 +7,8 @@
              xmlns:converters="clr-namespace:LokqlDx.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryLibraryView"
-             x:DataType="vm:QueryLibraryViewModel">
+             x:DataType="vm:QueryLibraryViewModel"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
     <UserControl.Resources>
         <converters:BoolToBrushMultiConverter x:Key="BoolToColorMulti" />
         <converters:NegateBoolConverter x:Key="Negate" />
@@ -16,8 +17,7 @@
         <SolidColorBrush x:Key="Hidden" Color="LightGray" />
         <SolidColorBrush x:Key="Deleted" Color="OrangeRed" />
     </UserControl.Resources>
-    <Border BorderThickness="1" CornerRadius="5" Background="White" Margin="2">
-        <DockPanel Background="Black">
+        <DockPanel Background="Black" Margin="2">
             <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
                 <Label Content="🔍"
                        FontSize="16"
@@ -34,12 +34,9 @@
             </DockPanel>
             <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
 
-                <Border DockPanel.Dock="Right"
-                        BorderBrush="LightGray" BorderThickness="1" CornerRadius="2">
-                    <Button Classes="Glyph">Empty 🗑️</Button>
-                </Border>
+                    <Button DockPanel.Dock="Right" Classes="Glyph">Empty 🗑️</Button>
                 <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
-                    <CheckBox
+                    <CheckBox FontSize="12"
                         IsChecked="{Binding SearchQueryBody}"
                         VerticalContentAlignment="Center"
                         HorizontalAlignment="Left">
@@ -48,15 +45,16 @@
                 </StackPanel>
             </DockPanel>
 
-            <ScrollViewer Name="TheScrollViewer">
-                <ItemsControl
-                    ItemsSource="{Binding FilteredQueries}"
-                    Background="Black"
-                    x:Name="ItemList">
-                    <ItemsControl.ItemTemplate>
+            <ListBox Name="TheScrollViewer"
+                     SelectionMode="Single"
+                     ItemsSource="{Binding FilteredQueries}"
+                     >
+               
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel>
-                                <Grid DockPanel.Dock="Right">
+                            <DockPanel                   
+                            >
+                                <Grid DockPanel.Dock="Right"  >
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40" />
@@ -82,11 +80,9 @@
                                                 IsVisible="{Binding IsVisible,
 												Converter={StaticResource Negate}}" />
                                     </Grid>
-
                                 </Grid>
                                 <Grid DockPanel.Dock="Left">
                                     <Label
-                                        Background="Black"
                                         Content="{Binding Title,Mode=TwoWay}"
                                         IsVisible="{Binding EditLocked}">
 
@@ -122,11 +118,9 @@
                             </DockPanel>
 
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                    </ListBox.ItemTemplate>
+            </ListBox>
         </DockPanel>
-    </Border>
-
+ 
 
 </UserControl>

@@ -12,7 +12,7 @@
         <converters:NegateBoolConverter x:Key="Negate" />
     </UserControl.Resources>
     <Border BorderThickness="1" CornerRadius="5" Background="White" Margin="2">
-        <DockPanel Background="Black">
+        <DockPanel Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
 
             <ScrollViewer Name="TheScrollViewer">
                 <ItemsControl

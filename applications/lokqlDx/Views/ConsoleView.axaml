@@ -8,7 +8,8 @@
              x:Class="LokqlDx.Views.ConsoleView"
              x:DataType="vm:ConsoleViewModel"
              FontFamily="{Binding DisplayPreferencesPreferences.FontFamily}"
-             FontSize="{Binding DisplayPreferencesPreferences.FontSize}">
+             FontSize="{Binding DisplayPreferencesPreferences.FontSize}"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button
@@ -17,15 +18,16 @@
                 Clear
             </Button>
         </StackPanel>
-        <Border BorderThickness="7" Background="Black" Margin="2">
+        <Border BorderThickness="7" Margin="2">
 
-            <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer">
+            <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer"
+Background="{DynamicResource SystemAltHighColor}"
+                          >
                 <Interaction.Behaviors>
                     <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
                 </Interaction.Behaviors>
                 <ItemsControl
                     ItemsSource="{Binding ConsoleContent}"
-                    Background="Black"
                     x:Name="ItemList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

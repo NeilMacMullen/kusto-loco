@@ -10,9 +10,9 @@
         <viewModels:ViewLocator />
     </Application.DataTemplates>
     <Application.Styles>
-        <FluentTheme DensityStyle="Compact" />
-        <labs:ControlThemes />
-        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+        <FluentTheme DensityStyle="Compact"  />
+        <labs:ControlThemes/>
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude
             Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />

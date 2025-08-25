@@ -20,7 +20,8 @@
             ShowLineNumbers="{Binding DisplayPreferences.ShowLineNumbers}"
             WordWrap="{Binding DisplayPreferences.WordWrap}"
             DragDrop.AllowDrop="True"
-            Loaded="TextEditor_OnLoaded" />
+            Loaded="TextEditor_OnLoaded"
+            Background="{DynamicResource SystemAltLowColor}"/>
         <ProgressBar
             IsIndeterminate="true"
             Height="8"

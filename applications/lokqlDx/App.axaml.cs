@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LokqlDx.Desktop;
+using LokqlDx;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using Microsoft.Extensions.DependencyInjection;
