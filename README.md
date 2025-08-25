@@ -3,6 +3,8 @@
 
 If you are using this project please give it a :star: to show your appreciation - thanks!
 
+Feel free to drop over the [Kusto-Loco](https://discord.com/channels/1409404903260164138/1409404903851294816) discord server if you have questions or feedback.
+
 # Kusto-Loco
 
 Kusto-Loco is a set of libraries and applications based around the [Kusto Query Language (KQL)](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/).  KQL is normally used against data held in [Azure Data Explorer](https://learn.microsoft.com/en-us/azure/data-explorer/) but Kusto-Loco allows you to query in-memory data held in your own applications.
