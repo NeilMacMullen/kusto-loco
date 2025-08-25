@@ -58,7 +58,7 @@
     <PackageVersion Include="ScottPlot" Version="5.0.56" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.56" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.56" />
-    <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
+    <PackageVersion Include="ShapeCrawler" Version="0.71.2" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.3" />
