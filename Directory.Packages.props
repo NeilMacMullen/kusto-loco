@@ -55,7 +55,7 @@
     <PackageVersion Include="OpenAI" Version="2.3.0" />
     <PackageVersion Include="Parquet.Net" Version="5.2.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
-    <PackageVersion Include="ScottPlot" Version="5.0.55" />
+    <PackageVersion Include="ScottPlot" Version="5.0.56" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.55" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
