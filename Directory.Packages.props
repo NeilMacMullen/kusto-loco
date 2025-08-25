@@ -57,7 +57,7 @@
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.0.56" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.56" />
-    <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
+    <PackageVersion Include="ScottPlot.WPF" Version="5.0.56" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
