@@ -7,7 +7,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryView"
              x:DataType="vm:QueryViewModel"
-             Background="Black">
+             Background="Black"
+             GotFocus="InputElement_OnGotFocus">
     <DockPanel>
 
         <Grid ColumnDefinitions="*,auto,*"
@@ -18,7 +19,7 @@
                     Grid.RowSpan="{Binding RowSpan}"
                     Grid.ColumnSpan="{Binding ColumnSpan}"
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
-                <views:QueryEditorView
+                <views:QueryEditorView Name="TheQueryEditor"
                     Padding="4"
                     Background="{DynamicResource SystemAltLowColor}"
                     DataContext="{Binding QueryEditorViewModel}" />
@@ -40,7 +41,7 @@
 
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
 
-                <views:RenderingSurfaceView
+                <views:RenderingSurfaceView Name="TheRenderingSurface"
                     DataContext="{Binding RenderingSurfaceViewModel}" />
             </Border>
         </Grid>

@@ -83,4 +83,9 @@ public class EditorHelper(TextEditor query) : IEditorCursorViewModel
     }
 
     public void InsertAtCursor(string text) => Query.Document.Insert(Query.CaretOffset, text);
+
+    public int CurrentOffset()
+    {
+        return Query.CaretOffset;
+    }
 }

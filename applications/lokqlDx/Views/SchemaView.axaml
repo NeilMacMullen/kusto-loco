@@ -3,19 +3,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
-             xmlns:v="using:LokqlDx.Views"
-             xmlns:converters="clr-namespace:LokqlDx.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.SchemaView"
-             x:DataType="vm:SchemaViewModel"
->
+             x:DataType="vm:SchemaViewModel">
     <DockPanel>
+
         <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
             <Label Content="🔍"
                    FontSize="16"
                    VerticalAlignment="Center"
                    Margin="4,0,4,0"
-                   DockPanel.Dock="Left"/>
+                   DockPanel.Dock="Left" />
             <TextBox Text="{Binding Filter}" VerticalContentAlignment="Center">
                 <Interaction.Behaviors>
                     <EventTriggerBehavior EventName="TextChanged">
@@ -24,7 +22,16 @@
                 </Interaction.Behaviors>
             </TextBox>
         </DockPanel>
-        <TreeDataGrid Source="{Binding SchemaSource}" DoubleTapped="InputElement_OnDoubleTapped"/>
+        <DockPanel DockPanel.Dock="Bottom">
+            <CheckBox IsChecked="{Binding ShowCommands}"
+
+                      DockPanel.Dock="Bottom">
+                Show Commands
+            </CheckBox>
+            <TreeDataGrid Source="{Binding SchemaSource}" DoubleTapped="InputElement_OnDoubleTapped"
+                          DockPanel.Dock="Top" />
+        </DockPanel>
+
     </DockPanel>
 
 </UserControl>

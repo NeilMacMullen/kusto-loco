@@ -1,14 +1,8 @@
-﻿using Avalonia.Media;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Dock.Model.Mvvm.Controls;
-using KustoLoco.Core.Console;
-using Lokql.Engine;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
-using Avalonia.Input;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
@@ -17,43 +11,46 @@ public interface IDocumentShow
 {
     void Show(QueryDocumentViewModel model);
 }
-public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
+
+public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
 {
-    private  IDocumentShow? _show;
-
-    public bool DeletedItemsShown => FilteredQueries.Any(q => q.IsDeleted);
-
-    [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
+    [ObservableProperty] private string _filter = string.Empty;
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
+    [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
+    [ObservableProperty] private bool _searchQueryBody;
+    private IDocumentShow? _show;
+
     public QueryLibraryViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
     {
-        
         Title = "Queries";
         CanClose = false;
     }
-    [RelayCommand]
-    public void FilterChanged()
-    {
-      Sort();
-    }
 
-    [ObservableProperty] private string _filter = string.Empty;
+    public bool DeletedItemsShown => FilteredQueries.Any(q => q.IsDeleted);
+
+    [RelayCommand]
+    public void FilterChanged() => Sort();
+
     public void SetShower(IDocumentShow show) => _show = show;
+
     public void Sort()
     {
         var sorted = Queries
             .Where(ApplyFilter)
-            .OrderBy(q => q.IsDeleted).ThenBy(q=>!q.IsVisible).ThenBy(q => q.Title);
-        FilteredQueries = new(sorted);
+            .OrderBy(q => q.IsDeleted).ThenBy(q => !q.IsVisible).ThenBy(q => q.Title);
+        FilteredQueries = new ObservableCollection<QueryDocumentViewModel>(sorted);
         OnPropertyChanged(nameof(DeletedItemsShown));
     }
 
     private bool ApplyFilter(QueryDocumentViewModel arg)
     {
-        var argStr = $"{arg.Title}";
         var toks = Filter.Tokenize(" ");
         if (!toks.Any())
             return true;
+
+        var argStr = $"{arg.Title}";
+        if (SearchQueryBody)
+            argStr += arg.QueryViewModel.GetText();
         return toks.All(t => argStr.Contains(t, StringComparison.InvariantCultureIgnoreCase));
     }
 
@@ -76,25 +73,20 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
         foreach (var queryItemViewModel in Queries) queryItemViewModel.QueryViewModel.Clean();
     }
 
-    public PersistedQuery[] Persist()
-    {
-        return Queries
-            .Where(q=>!q.IsDeleted)
-            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(),!q.IsVisible))
+    public PersistedQuery[] Persist() =>
+        Queries
+            .Where(q => !q.IsDeleted)
+            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(), !q.IsVisible))
             .ToArray();
-    }
 
-    
+    partial void OnSearchQueryBodyChanged(bool value) => Sort();
+
     [RelayCommand]
-    public void ToggleEdit(QueryDocumentViewModel query)
-    {
-        query.EditLocked =!query.EditLocked;
-    }
+    public void ToggleEdit(QueryDocumentViewModel query) => query.EditLocked = !query.EditLocked;
+
     [RelayCommand]
-    public void Show(QueryDocumentViewModel query)
-    {
-        _show?.Show(query);
-    }
+    public void Show(QueryDocumentViewModel query) => _show?.Show(query);
+
     public void ChangeVisibility(QueryDocumentViewModel query, bool b)
     {
         query.IsVisible = b;
@@ -102,10 +94,7 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     }
 
     [RelayCommand]
-    public void FilterEnter(QueryDocumentViewModel query)
-    {
-        query.EditLocked = true;
-    }
+    public void FilterEnter(QueryDocumentViewModel query) => query.EditLocked = true;
 
     [RelayCommand]
     public void ToggleDelete(QueryDocumentViewModel query)
@@ -117,10 +106,7 @@ public partial class QueryLibraryViewModel : Tool,INotifyPropertyChanged
     [RelayCommand]
     public void EmptyTrash()
     {
-        Queries= new ObservableCollection<QueryDocumentViewModel>(Queries.Where(q=>!q.IsDeleted));
+        Queries = new ObservableCollection<QueryDocumentViewModel>(Queries.Where(q => !q.IsDeleted));
         Sort();
     }
 }
-
-
-   

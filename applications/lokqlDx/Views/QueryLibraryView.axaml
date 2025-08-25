@@ -32,8 +32,9 @@
                     </Interaction.Behaviors>
                 </TextBox>
             </DockPanel>
-            <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
-                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="2">
+            <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
+
+                <Border DockPanel.Dock="Right" BorderBrush="LightGray" BorderThickness="1" CornerRadius="2">
                     <Button FontSize="12" Command="{Binding EmptyTrashCommand}"
                             Background="Black"
                             VerticalContentAlignment="Center"
@@ -42,8 +43,15 @@
                         Empty 🗑️
                     </Button>
                 </Border>
-
-            </StackPanel>
+                <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
+                    <CheckBox
+                        IsChecked="{Binding SearchQueryBody}"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Left">
+                        Search body
+                    </CheckBox>
+                </StackPanel>
+            </DockPanel>
 
             <ScrollViewer Name="TheScrollViewer">
                 <ItemsControl

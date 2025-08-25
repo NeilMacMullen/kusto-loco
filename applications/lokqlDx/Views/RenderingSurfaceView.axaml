@@ -8,7 +8,8 @@
              x:Class="LokqlDx.Views.RenderingSurfaceView"
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
-             DataContextChanged="StyledElement_OnDataContextChanged">
+             DataContextChanged="StyledElement_OnDataContextChanged"
+             >
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8" />

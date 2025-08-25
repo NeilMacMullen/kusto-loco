@@ -1,5 +1,7 @@
 ﻿using Avalonia.Media;
 using Avalonia.Metadata;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Dock.Avalonia.Controls;
 using Dock.Model;
 using Dock.Model.Controls;
@@ -32,6 +34,12 @@ public class DockFactory : Factory,IDocumentShow
         _schema = schema;
         _create = create;
         _onActiveChanged = onActiveChanged;
+        WeakReferenceMessenger.Default.Register<InsertTextMessage>(this,InsertTextInActiveWindow);
+    }
+
+    private void InsertTextInActiveWindow(object recipient, InsertTextMessage message)
+    {
+      InsertText(message.Value);
     }
 
     public IRootDock Layout { get; set; } = new RootDock();
@@ -187,14 +195,18 @@ public class DockFactory : Factory,IDocumentShow
 
     public void InsertText(string text)
     {
-        var active = GetActive();
+        if (LastActiveDockable == null)
+            return;
 
-        if (active != null)
+
+        //do it in the background otherwise the sender reclaims focus
+        Dispatcher.UIThread.Post(() =>
         {
-            var document =
-           active.QueryViewModel.QueryEditorViewModel.Document;
-            //document.Insert(document.GetOffset(document.GetLocation()));
-        }
+            LastActiveDockable.QueryViewModel.QueryEditorViewModel.Insert(text);
+            SetActiveDockable(LastActiveDockable);
+            SetFocusedDockable(FindRoot(LastActiveDockable)!, LastActiveDockable);
+        });
+
     }
     public override void InitLayout(IDockable layout)
     {
@@ -217,14 +229,25 @@ public class DockFactory : Factory,IDocumentShow
             .OfType<IRootDock>()
             .FirstOrDefault();
 
-    public QueryDocumentViewModel? GetActive() => GetActiveRoot()?.FocusedDockable as QueryDocumentViewModel;
+    public QueryDocumentViewModel? GetActive()
+    {
+        var focussed =Find(d => d is IRootDock)
+            .OfType<IRootDock>()
+            .Select(r => r.FocusedDockable)
+            .OfType<QueryDocumentViewModel>()
+            .ToArray();
+        return focussed.FirstOrDefault();
+    }
 
+    private QueryDocumentViewModel? LastActiveDockable;
     public override void OnActiveDockableChanged(IDockable? dockable)
     {
-        var vm = dockable as QueryDocumentViewModel;
+        if (dockable is QueryDocumentViewModel vm)
+            LastActiveDockable = vm;
+        
         base.OnActiveDockableChanged(dockable);
-        if (vm != null)
-            _onActiveChanged?.Invoke(vm);
+        if (LastActiveDockable != null)
+            _onActiveChanged?.Invoke(LastActiveDockable);
     }
 
     public override void OnDockableClosed(IDockable? dockable)

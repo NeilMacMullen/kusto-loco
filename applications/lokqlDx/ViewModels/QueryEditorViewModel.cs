@@ -74,6 +74,8 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
     public IntellisenseEntry[] SettingNames { get; set; } = [];
     public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
+    public int EditorOffset { get; set; }
+
     public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
     public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
 
@@ -143,5 +145,12 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     {
         _explorer = explorer;
         AddSettingsForIntellisense(_explorer.Settings);
+    }
+
+    public void Insert(string text)
+    {
+        var insertPoint = Math.Min(EditorOffset + 1, Document.TextLength);
+        if (insertPoint < 0) insertPoint = 0;
+        Document.Insert(insertPoint,text);
     }
 }

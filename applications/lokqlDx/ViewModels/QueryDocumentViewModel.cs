@@ -22,4 +22,5 @@ public partial class QueryDocumentViewModel : Document,INotifyPropertyChanged
             QueryViewModel.IsActive = m.Value == this;
         });
     }
+
 }

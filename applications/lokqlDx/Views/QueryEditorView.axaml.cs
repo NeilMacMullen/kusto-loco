@@ -25,12 +25,9 @@ public partial class QueryEditorView : UserControl
         _editorHelper = new EditorHelper(TextEditor);
     }
 
-    public void InsertText(string text)
-    {
-        _editorHelper.InsertAtCursor(text);
-    }
+    public void InsertText(string text) => _editorHelper.InsertAtCursor(text);
 
-    private QueryEditorViewModel GetVm() =>
+    private QueryEditorViewModel? GetVm() =>
         (DataContext as QueryEditorViewModel)!;
 
 
@@ -65,13 +62,25 @@ public partial class QueryEditorView : UserControl
 
 
     private async void InternalEditor_OnKeyDown(object? sender, KeyEventArgs e)
-        => await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, GetVm());
+    {
+        if (GetVm() is not { } vm)
+            return;
+        await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, vm);
+        vm.EditorOffset = _editorHelper.CurrentOffset();
+    }
 
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(),
+        if (GetVm() is not { } vm)
+            return;
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, vm,
             new CompletionWindowWrapper(TextEditor.TextArea));
         TextEditor.TextArea.Focus();
+    }
+
+    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TextEditor.Focus();
     }
 }
