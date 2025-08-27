@@ -37,12 +37,10 @@ public partial class MainViewModel : ObservableObject
     private readonly IStorageProvider _storage;
     private readonly WorkspaceManager _workspaceManager;
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
-    private SchemaViewModel _schemaModel;
     private CommandProcessor _commandProcessor;
     [ObservableProperty] private ConsoleViewModel _consoleViewModel;
 
     [ObservableProperty] private Workspace _currentWorkspace = new();
-    [ObservableProperty] private QueryLibraryViewModel _queryLibrary;
     private InteractiveTableExplorer _explorer;
 
     private string _initWorkspacePath = string.Empty;
@@ -62,8 +60,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
+    private readonly ToolManager _toolManager;
 
-   
+    private QueryLibraryViewModel QueryLibrary => _toolManager._libraryViewModel;
+
     public MainViewModel(
         DialogService dialogService,
         PreferencesManager preferencesManager,
@@ -80,8 +80,9 @@ public partial class MainViewModel : ObservableObject
         _imageProvider = imageProvider;
         _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
-        _queryLibrary = new QueryLibraryViewModel(_displayPreferences);
-        _schemaModel = new SchemaViewModel(_displayPreferences);
+
+        ConsoleViewModel = new ConsoleViewModel(_displayPreferences);
+        _toolManager = new ToolManager(_displayPreferences,ConsoleViewModel);
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
         _commandProcessor = commandProcessorFactory.GetCommandProcessor();
@@ -90,7 +91,7 @@ public partial class MainViewModel : ObservableObject
         _storage = storage;
         _launcher = launcher;
     
-        ConsoleViewModel = new ConsoleViewModel(_displayPreferences);
+        
         
         _explorer = CreateExplorer();
 
@@ -100,8 +101,7 @@ public partial class MainViewModel : ObservableObject
             (_, m) => { m.Reply(CreateDoc(m)); });
 
 
-        _factory = new DockFactory(ConsoleViewModel,QueryLibrary,
-            _schemaModel);
+        _factory = new DockFactory(_toolManager);
     }
 
     private void ResetLayout()
@@ -114,7 +114,8 @@ public partial class MainViewModel : ObservableObject
             Layout = layout;
         }
 
-        foreach (var query in queries.ToArray()) _factory.AddDocument(query);
+        foreach (var query in queries.ToArray())
+            _factory.AddDocument(query);
     }
 
     private QueryDocumentViewModel CreateDoc(CreateDocumentRequest msg)
@@ -128,7 +129,7 @@ public partial class MainViewModel : ObservableObject
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
         if (message.IsRunning) await SaveBeforeQuery();
-        else _schemaModel.Update(_explorer.GetSchema());
+        else  Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
             return false;
     }
 
@@ -394,25 +395,20 @@ public partial class MainViewModel : ObservableObject
         else
             AddQuery("query", CurrentWorkspace.Text,true);
         ResetLayout();
-        UpdateUIFromWorkspace(true);
+        UpdateUIFromWorkspace();
         if (!appPrefs.HasShownLanding)
         {
             //NavigateToLanding();
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
-        _schemaModel.Update(_explorer.GetSchema());
+        Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
     }
 
     /// <summary>
     ///     Update the UI because a new workspace has been loaded
     /// </summary>
-    /// <remarks>
-    ///     The clearWorkingContext flags indicates whether we should clear all working context
-    ///     We don't always want to do this, for example if we are doing a save-as in which case it's
-    ///     a bit disconcerting for the user if all their charts/tables disappear
-    /// </remarks>
-    private void UpdateUIFromWorkspace(bool clearWorkingContext)
+    private void UpdateUIFromWorkspace()
     {
         var version = UpgradeManager.GetCurrentVersion();
         var title = _workspaceManager.Path.IsBlank()

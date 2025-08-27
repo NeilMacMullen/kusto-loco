@@ -11,7 +11,7 @@ using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-public partial class SchemaViewModel : Tool, INotifyPropertyChanged
+public partial class SchemaViewModel : Tool
 {
     [ObservableProperty] private string _filter = string.Empty;
     private ObservableCollection<Schema> _schema = [];
@@ -21,16 +21,17 @@ public partial class SchemaViewModel : Tool, INotifyPropertyChanged
 
     [ObservableProperty] private bool _showCommands;
 
-    public SchemaViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
+    public SchemaViewModel()
     {
         Title = "Schema";
         CanClose = false;
+        Messaging.RegisterForValue<SchemaUpdateMessage, SchemaLine[]>(this,Update);
     }
 
     [RelayCommand]
     public void FilterChanged() => Update(_schemaLine);
 
-    public void Update(SchemaLine[] schema)
+    private void Update(SchemaLine[] schema)
     {
         _schemaLine = schema;
         var s = schema

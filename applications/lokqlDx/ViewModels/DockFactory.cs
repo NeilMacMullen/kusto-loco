@@ -12,23 +12,21 @@ namespace LokqlDx.ViewModels;
 
 public class DockFactory : Factory
 {
-    private readonly ConsoleViewModel _console;
-    private readonly QueryLibraryViewModel _library;
-    private readonly SchemaViewModel _schema;
+    private readonly ToolManager _toolManager;
+    private  ConsoleViewModel _console => _toolManager._console;
+    private  QueryLibraryViewModel _library=>_toolManager._libraryViewModel;
+    private  SchemaViewModel _schema=>_toolManager._schemaViewModel;
 
     public QueryDocumentDock? DocumentDock;
 
     private QueryDocumentViewModel? LastActiveDockable;
 
-    public DockFactory(ConsoleViewModel console, QueryLibraryViewModel library,
-        SchemaViewModel schema
-  )   {
-        _console = console;
-        _library = library;
-        _schema = schema;
-      
+    public DockFactory(ToolManager toolManager)
+   {
+       _toolManager = toolManager;
 
-        Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
+
+       Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
         Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
         Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
     }

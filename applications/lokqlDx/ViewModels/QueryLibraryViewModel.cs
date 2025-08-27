@@ -10,14 +10,14 @@ using NotNullStrings;
 namespace LokqlDx.ViewModels;
 
 
-public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
+public partial class QueryLibraryViewModel : Tool
 {
     [ObservableProperty] private string _filter = string.Empty;
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
     [ObservableProperty] private bool _searchQueryBody;
   
-    public QueryLibraryViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
+    public QueryLibraryViewModel()
     {
         Title = "Queries";
         CanClose = false;
@@ -82,8 +82,7 @@ public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
     public void ToggleEdit(QueryDocumentViewModel query) => query.EditLocked = !query.EditLocked;
 
     [RelayCommand]
-    public void Show(QueryDocumentViewModel query) => WeakReferenceMessenger.Default
-        .Send(new ShowQueryRequestMessage(query));
+    public void Show(QueryDocumentViewModel query) => Messaging.Send(new ShowQueryRequestMessage(query));
 
     public void ChangeVisibility(QueryDocumentViewModel query, bool b)
     {

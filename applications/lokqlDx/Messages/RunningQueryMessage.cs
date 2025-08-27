@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging.Messages;
+using Lokql.Engine;
 using LokqlDx.ViewModels;
 
 public class RunningQueryMessage(bool isRunning) : AsyncRequestMessage<bool>
@@ -12,3 +13,5 @@ public class CreateDocumentRequest(string title) : RequestMessage<QueryDocumentV
     public string Title { get; set; } = title;
     public QueryDocumentViewModel? Model;
 }
+
+public class SchemaUpdateMessage(SchemaLine[] lines) : ValueChangedMessage<SchemaLine[]>(lines);
