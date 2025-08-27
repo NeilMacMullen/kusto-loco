@@ -9,15 +9,14 @@ using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace LokqlDx.ViewModels;
 
-public partial class PinnedResultsViewModel : Tool
+public partial class PinnedResultsViewModel : LokqlTool
 {
     [ObservableProperty] private ObservableCollection<NamedKustoResult> _results = [];
 
     public PinnedResultsViewModel()
     {
         Title = "Results";
-        CanClose = false;
-
+     
         Messaging.RegisterForValue<PinResultMessage, QueryResultWithSender>(this, ReceivePinMesssage);
     }
 

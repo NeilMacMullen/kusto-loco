@@ -11,7 +11,7 @@ using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-public partial class SchemaViewModel : Tool
+public partial class SchemaViewModel : LokqlTool
 {
     [ObservableProperty] private string _filter = string.Empty;
     private ObservableCollection<Schema> _schema = [];
@@ -24,7 +24,6 @@ public partial class SchemaViewModel : Tool
     public SchemaViewModel()
     {
         Title = "Schema";
-        CanClose = false;
         Messaging.RegisterForValue<SchemaUpdateMessage, SchemaLine[]>(this,Update);
     }
 

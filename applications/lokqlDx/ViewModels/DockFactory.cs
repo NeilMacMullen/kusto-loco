@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Metadata;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using Dock.Avalonia.Controls;
@@ -7,13 +8,15 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
+using DocumentFormat.OpenXml.EMMA;
+using NetTopologySuite.Operation.Distance;
 
 namespace LokqlDx.ViewModels;
 
 public class DockFactory : Factory
 {
     private readonly ToolManager _toolManager;
-    private  ConsoleViewModel _console => _toolManager._console;
+    private  ConsoleDocumentViewModel _console => _toolManager.Console;
     private  QueryLibraryViewModel _library=>_toolManager._libraryViewModel;
     private  SchemaViewModel _schema=>_toolManager._schemaViewModel;
 
@@ -29,11 +32,15 @@ public class DockFactory : Factory
        Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
         Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
         Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
+        Messaging.RegisterForValue<ShowToolMessage, string>(this, ShowTool);
+
     }
+
+   
 
     public IRootDock Layout { get; set; } = new RootDock();
 
-    public IDockable? ToolDock { get; set; }
+    public IDock? ToolDock { get; set; }
 
 
     private void DisplayResult(NamedKustoResult named)
@@ -124,8 +131,13 @@ public class DockFactory : Factory
     }
 
 
-    private ToolDock Create(params Tool[] tools) =>
-        new()
+    private ToolDock Create(params LokqlTool[] tools)
+    {
+        foreach (var lokqlTool in tools)
+        {
+            lokqlTool.IsVisible = true;
+        }
+        return new ToolDock
         {
             CanDrag = true,
             CanFloat = true,
@@ -137,6 +149,7 @@ public class DockFactory : Factory
             VisibleDockables = CreateList(tools.OfType<IDockable>().ToArray()),
             CanCloseLastDockable = true
         };
+    }
 
     public override IRootDock CreateLayout()
     {
@@ -150,11 +163,10 @@ public class DockFactory : Factory
             CanCloseLastDockable = true
         };
 
-        var console = new ConsoleDocumentViewModel(_console);
-
-        var con = Create(console);
-        var pinnedResults = new PinnedResultsViewModel();
-        var rest = Create(_library, _schema, pinnedResults);
+      
+        var con = Create(_console);
+       
+        var rest = Create(_library, _schema, _toolManager._pinnedResults);
         con.Proportion = 0.6;
         rest.Proportion = 0.4;
         ToolDock = new ProportionalDock
@@ -173,7 +185,7 @@ public class DockFactory : Factory
         {
             // EnableGlobalDocking = false,
             Orientation = Orientation.Vertical,
-            VisibleDockables = CreateList
+            VisibleDockables = CreateList<IDockable>
             (
                 documentDock,
                 new ProportionalDockSplitter(),
@@ -192,7 +204,7 @@ public class DockFactory : Factory
         Layout = rootDock;
         return rootDock;
     }
-
+    
     public void InsertText(string text)
     {
         if (LastActiveDockable == null)
@@ -268,7 +280,10 @@ public class DockFactory : Factory
 
     public override void OnDockableClosed(IDockable? dockable)
     {
-        if (dockable is QueryDocumentViewModel query) _library.ChangeVisibility(query, false);
+        if (dockable is QueryDocumentViewModel query)
+            _library.ChangeVisibility(query, false);
+        if (dockable is LokqlTool tool)
+            tool.IsVisible = false;
         base.OnDockableClosed(dockable);
     }
 
@@ -280,4 +295,31 @@ public class DockFactory : Factory
         else
             SetActiveDockable(model);
     }
+    private void ShowTool(string tool)
+    {
+        void CreateIfNotVisible(LokqlTool tool)
+        {
+            if (tool.IsVisible)
+                return;
+            AddDockable(new RootDock(), tool);
+            FloatDockable(tool);
+        }
+        
+        switch (tool)
+        {
+            case "console":
+                CreateIfNotVisible(_console);
+                break;
+            case "queries":
+                CreateIfNotVisible(_toolManager._libraryViewModel);
+                break;
+            case "results":
+                CreateIfNotVisible(_toolManager._pinnedResults);
+                break;
+            case "schema":
+                CreateIfNotVisible(_toolManager._schemaViewModel);
+                break;
+        }
+    }
+
 }

@@ -15,3 +15,6 @@ public class CreateDocumentRequest(string title) : RequestMessage<QueryDocumentV
 }
 
 public class SchemaUpdateMessage(SchemaLine[] lines) : ValueChangedMessage<SchemaLine[]>(lines);
+
+
+public class ShowToolMessage(string tool) : ValueChangedMessage<string>(tool);

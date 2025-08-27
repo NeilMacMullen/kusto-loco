@@ -10,7 +10,7 @@ using NotNullStrings;
 namespace LokqlDx.ViewModels;
 
 
-public partial class QueryLibraryViewModel : Tool
+public partial class QueryLibraryViewModel : LokqlTool
 {
     [ObservableProperty] private string _filter = string.Empty;
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
@@ -20,7 +20,6 @@ public partial class QueryLibraryViewModel : Tool
     public QueryLibraryViewModel()
     {
         Title = "Queries";
-        CanClose = false;
     }
 
     public bool DeletedItemsShown => FilteredQueries.Any(q => q.IsDeleted);
@@ -41,14 +40,14 @@ public partial class QueryLibraryViewModel : Tool
 
     private bool ApplyFilter(QueryDocumentViewModel arg)
     {
-        var toks = Filter.Tokenize(" ");
-        if (!toks.Any())
+        var filterTokens = Filter.Tokenize(" ");
+        if (!filterTokens.Any())
             return true;
 
         var argStr = $"{arg.Title}";
         if (SearchQueryBody)
             argStr += arg.QueryViewModel.GetText();
-        return toks.All(t => argStr.Contains(t, StringComparison.InvariantCultureIgnoreCase));
+        return filterTokens.All(t => argStr.Contains(t, StringComparison.InvariantCultureIgnoreCase));
     }
 
     public void Add(QueryDocumentViewModel model)

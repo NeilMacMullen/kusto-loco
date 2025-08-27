@@ -574,16 +574,12 @@ public partial class MainViewModel : ObservableObject
         _preferencesManager.SaveUiPrefs();
     }
 
-
     [RelayCommand]
-    private void ChangeLayout() =>Messaging.Send(new LayoutChangedMessage(0));
-
-    [RelayCommand]
-    private void ClearConsole() =>Messaging.Send(new ClearConsoleMessage(0));
-
-    [RelayCommand]
-    private void CopyChartToClipboard()
-        =>Messaging.Send(new CopyChartMessage());
+    private void ShowTool(string toolName)
+    {
+        Messaging.Send(new ShowToolMessage(toolName));
+    }
+   
 }
 
 public static class ApplicationHelper
