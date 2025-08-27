@@ -21,7 +21,6 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
 
     [ObservableProperty] private int _rowSpan = 3;
-    public string Name { get; set; } = string.Empty;
     private int n;
 
     public QueryViewModel(
@@ -30,29 +29,31 @@ public partial class QueryViewModel : ObservableObject
     {
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
-        WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) => { FlipArrangement(); });
+        Messaging.RegisterForEvent<LayoutChangedMessage>(this, FlipArrangement);
+        Messaging.RegisterForEvent<CopyChartMessage>(this, CopyChartHandler);
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
-            (r, m) =>
+            (_, m) =>
             {
                 if (IsActive)
                     m.Reply(LoadFile(m));
             });
         WeakReferenceMessenger.Default.Register<SaveFileMessage>(this,
-            (r, m) =>
+            (_, m) =>
             {
                 if (IsActive)
                     m.Reply(SaveFile(m));
             });
-
-        WeakReferenceMessenger.Default.Register<CopyChartMessage>(this,
-            (r, m) =>
-            {
-                if (IsActive)
-                    CopyChartToClipboard();
-            });
     }
 
+    public string Name { get; set; } = string.Empty;
+
     public bool IsActive { get; set; }
+
+    private void CopyChartHandler()
+    {
+        if (IsActive)
+            CopyChartToClipboard();
+    }
 
     private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();
 
@@ -134,14 +135,14 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void PinChart()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,false));
-        WeakReferenceMessenger.Default.Send(msg);
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, false));
+        Messaging.Send(msg);
     }
 
     [RelayCommand]
     public void TearOff()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,true));
-        WeakReferenceMessenger.Default.Send(msg);
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, true));
+        Messaging.Send(msg);
     }
 }

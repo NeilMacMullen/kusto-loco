@@ -124,7 +124,7 @@ public partial class SchemaViewModel : Tool, INotifyPropertyChanged
 
     [RelayCommand]
     public void DoubleClick(SchemaClick click) =>
-        WeakReferenceMessenger.Default.Send(new InsertTextMessage(click.ClickedText));
+       Messaging.Send(new InsertTextMessage(click.ClickedText));
 
     partial void OnShowCommandsChanged(bool value) =>
         // Call your command or update logic here

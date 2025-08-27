@@ -63,6 +63,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
 
+   
     public MainViewModel(
         DialogService dialogService,
         PreferencesManager preferencesManager,
@@ -128,10 +129,7 @@ public partial class MainViewModel : ObservableObject
             return false;
     }
 
-    partial void OnCurrentWorkspaceChanged(Workspace value)
-    {
-        //QueryEditorViewModel.CurrentWorkspace = value;
-    }
+    
 
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
@@ -160,10 +158,7 @@ public partial class MainViewModel : ObservableObject
     }
 
 
-    private void ActiveQueryChanged(QueryDocumentViewModel query)
-    {
-        WeakReferenceMessenger.Default.Send(new TabChangedMessage(query));
-    }
+    private void ActiveQueryChanged(QueryDocumentViewModel query) => Messaging.Send(new TabChangedMessage(query));
 
     [RelayCommand]
     private async Task LoadData()
@@ -173,7 +168,7 @@ public partial class MainViewModel : ObservableObject
         {
             var path = storageFile.TryGetLocalPath()!;
             if (path.IsNotBlank())
-                await WeakReferenceMessenger.Default.Send(new LoadFileMessage(path));
+                await Messaging.Send(new LoadFileMessage(path));
         }
     }
 
@@ -185,7 +180,7 @@ public partial class MainViewModel : ObservableObject
             return;
         var path = file.TryGetLocalPath()!;
         if (path.IsNotBlank())
-            await WeakReferenceMessenger.Default.Send(new SaveFileMessage(path));
+            await Messaging.Send(new SaveFileMessage(path));
     }
 
 
@@ -582,14 +577,14 @@ public partial class MainViewModel : ObservableObject
 
 
     [RelayCommand]
-    private void ChangeLayout() => WeakReferenceMessenger.Default.Send(new LayoutChangedMessage(0));
+    private void ChangeLayout() =>Messaging.Send(new LayoutChangedMessage(0));
 
     [RelayCommand]
-    private void ClearConsole() => WeakReferenceMessenger.Default.Send(new ClearConsoleMessage(0));
+    private void ClearConsole() =>Messaging.Send(new ClearConsoleMessage(0));
 
     [RelayCommand]
     private void CopyChartToClipboard()
-        => WeakReferenceMessenger.Default.Send(new CopyChartMessage());
+        =>Messaging.Send(new CopyChartMessage());
 }
 
 public static class ApplicationHelper
@@ -602,7 +597,7 @@ public static class ApplicationHelper
             Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
         if (theme == "Light")
             Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
-        WeakReferenceMessenger.Default.Send(new ThemeChangedMessage(theme));
+       Messaging.Send(new ThemeChangedMessage(theme));
     }
 
     public static string GetTheme()

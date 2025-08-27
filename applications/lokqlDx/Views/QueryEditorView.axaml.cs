@@ -21,15 +21,13 @@ public partial class QueryEditorView : UserControl
     {
         InitializeComponent();
         _editorHelper = new EditorHelper(TextEditor);
-        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this,ThemeChanged);
+        Messaging.RegisterForEvent<ThemeChangedMessage>(this, OnThemeChanged);
     }
 
-    private void ThemeChanged(object recipient, ThemeChangedMessage message)
+    private void OnThemeChanged()
     {
         HighlightHelper.ApplySyntaxHighlighting(TextEditor);
     }
-
-    public void InsertText(string text) => _editorHelper.InsertAtCursor(text);
 
     private QueryEditorViewModel? GetVm() =>
         (DataContext as QueryEditorViewModel)!;

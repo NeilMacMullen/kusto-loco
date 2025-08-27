@@ -16,6 +16,7 @@ public static class HighlightHelper
 
     public static void ApplySyntaxHighlighting(TextEditor editor, string theme)
     {
+#if ! PREVIEWER
         var file = "VSDark";
         if (theme.Equals("light", StringComparison.InvariantCultureIgnoreCase))
             file = "VSLight";
@@ -40,5 +41,6 @@ public static class HighlightHelper
         using var combinedReader = syntaxDoc.CreateReader();
         var def = HighlightingLoader.Load(combinedReader, HighlightingManager.Instance);
         editor.SyntaxHighlighting = def;
+#endif
     }
 }

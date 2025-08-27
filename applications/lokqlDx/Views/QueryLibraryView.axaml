@@ -34,7 +34,7 @@
         </DockPanel>
         <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
 
-            <Button DockPanel.Dock="Right" Classes="Glyph">Empty 🗑️</Button>
+            <Button DockPanel.Dock="Right" Classes="SmallButton">Empty 🗑️</Button>
             <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
                 <CheckBox FontSize="12"
                           IsChecked="{Binding SearchQueryBody}"

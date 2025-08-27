@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Dock.Model.Mvvm.Controls;
+using DocumentFormat.OpenXml.Linq;
+using System.ComponentModel;
 
 namespace LokqlDx.ViewModels;
 
@@ -17,12 +18,14 @@ public partial class QueryDocumentViewModel : Document,INotifyPropertyChanged
     {
         Title = title;
         QueryViewModel = content;
-        WeakReferenceMessenger.Default.Register<TabChangedMessage>(this, (r, m) =>
-        {
-            QueryViewModel.IsActive = m.Value == this;
-        });
+        Messaging.RegisterForValue<TabChangedMessage, QueryDocumentViewModel>(this, ActiveDocumentChanged);
         QueryViewModel.Name = Title;
         _initialized = true;
+    }
+
+    private void ActiveDocumentChanged(QueryDocumentViewModel model)
+    {
+        QueryViewModel.IsActive = model == this;
     }
 
     private bool _initialized;

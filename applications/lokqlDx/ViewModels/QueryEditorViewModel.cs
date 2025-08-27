@@ -103,7 +103,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     {
         if (query.IsBlank())
             return;
-        await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(true));
+        await Messaging.Send(new RunningQueryMessage(true));
         if (ExecutingQuery is not null)
             await ExecutingQuery.InvokeAsync(this, EventArgs.Empty);
 
@@ -117,7 +117,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         SetSchema(_explorer.GetSchema());
         AddSettingsForIntellisense(_explorer.Settings);
-        await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(false));
+        await Messaging.Send(new RunningQueryMessage(false));
     }
 
 

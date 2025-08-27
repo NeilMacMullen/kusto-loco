@@ -13,7 +13,7 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button
-                Classes="Glyph"
+                Classes="SmallButton"
                 Command="{Binding ClearCommand}">
                 Clear
             </Button>

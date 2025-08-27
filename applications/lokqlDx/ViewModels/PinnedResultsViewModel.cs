@@ -9,7 +9,7 @@ using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace LokqlDx.ViewModels;
 
-public partial class PinnedResultsViewModel : Tool, INotifyPropertyChanged
+public partial class PinnedResultsViewModel : Tool
 {
     [ObservableProperty] private ObservableCollection<NamedKustoResult> _results = [];
 
@@ -18,17 +18,16 @@ public partial class PinnedResultsViewModel : Tool, INotifyPropertyChanged
         Title = "Results";
         CanClose = false;
 
-        WeakReferenceMessenger.Default.Register<PinResultMessage>(this,
-            ReceivePinMesssage);
+        Messaging.RegisterForValue<PinResultMessage, QueryResultWithSender>(this, ReceivePinMesssage);
     }
 
-    private void ReceivePinMesssage(object? sender, PinResultMessage message)
+    private void ReceivePinMesssage(QueryResultWithSender val)
     {
-        var named = new NamedKustoResult(message.Value);
+        var named = new NamedKustoResult(val);
         Results.Add(named);
-        if (message.Value.ImmediateDisplay)
+        if (val.ImmediateDisplay)
         {
-            WeakReferenceMessenger.Default.Send(new DisplayResultMessage(named));
+           Messaging.Send(new DisplayResultMessage(named));
         }
     }
 
@@ -39,7 +38,7 @@ public partial class PinnedResultsViewModel : Tool, INotifyPropertyChanged
     public void ToggleDelete(NamedKustoResult result) => Results.Remove(result);
 
     [RelayCommand]
-    public void Show(NamedKustoResult result) => WeakReferenceMessenger.Default.Send(new DisplayResultMessage(result));
+    public void Show(NamedKustoResult result) =>Messaging.Send(new DisplayResultMessage(result));
 
     [RelayCommand]
     public void FilterEnter(NamedKustoResult result) => result.EditLocked = true;

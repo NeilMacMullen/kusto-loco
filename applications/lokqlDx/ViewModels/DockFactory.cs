@@ -33,9 +33,10 @@ public class DockFactory : Factory
         _schema = schema;
         _create = create;
         _onActiveChanged = onActiveChanged;
-        WeakReferenceMessenger.Default.Register<InsertTextMessage>(this, InsertTextInActiveWindow);
-        WeakReferenceMessenger.Default.Register<DisplayResultMessage>(this, DisplayResult);
-        WeakReferenceMessenger.Default.Register<ShowQueryRequestMessage>(this, ShowQuery);
+        
+        Messaging.RegisterForValue<InsertTextMessage,string>(this,InsertTextInActiveWindow);
+        Messaging.RegisterForValue<DisplayResultMessage,NamedKustoResult>(this,DisplayResult);
+        Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this,ShowQuery);
     }
 
     public IRootDock Layout { get; set; } = new RootDock();
@@ -43,15 +44,14 @@ public class DockFactory : Factory
     public IDockable? ToolDock { get; set; }
 
 
-    private void DisplayResult(object recipient, DisplayResultMessage message)
+    private void DisplayResult(NamedKustoResult named)
     {
-        var named = message.Value;
         var model = new ResultDisplayViewModel(named.Name, named.Result);
         AddDockable(new RootDock(), model);
         FloatDockable(model);
     }
 
-    private void InsertTextInActiveWindow(object recipient, InsertTextMessage message) => InsertText(message.Value);
+    private void InsertTextInActiveWindow(string text) => InsertText(text);
 
     public override IDocumentDock CreateDocumentDock() => new QueryDocumentDock(_create);
 
@@ -276,9 +276,8 @@ public class DockFactory : Factory
     }
 
 
-    private void ShowQuery(object recipient, ShowQueryRequestMessage message)
+    private void ShowQuery(QueryDocumentViewModel model)
     {
-        var model = message.Value;
         if (!model.IsVisible)
             AddDocument(model);
         else

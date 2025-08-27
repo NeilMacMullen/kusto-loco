@@ -97,12 +97,14 @@
             </Border>
 
             <Button
+                Classes="SmallButton"
                 Grid.Column="4"
                 Grid.Row="6"
                 Content="Cancel"
                 Command="{Binding CancelCommand}" />
 
-            <Button
+			<Button
+                Classes="SmallButton"
                 Grid.Column="5"
                 Grid.Row="6"
                 Content="Save"
