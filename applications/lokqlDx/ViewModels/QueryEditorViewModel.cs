@@ -123,8 +123,6 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
     private void LoadIntellisense()
     {
-        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
-
         using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
         KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!
             .Select(i => i with { Hint = IntellisenseHint.Function }).ToArray();

@@ -602,5 +602,11 @@ public static class ApplicationHelper
             Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
         if (theme == "Light")
             Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+        WeakReferenceMessenger.Default.Send(new ThemeChangedMessage(theme));
+    }
+
+    public static string GetTheme()
+    {
+       return Application.Current?.ActualThemeVariant.ToString().OrWhenBlank("Dark")!;
     }
 }

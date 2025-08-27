@@ -3,15 +3,12 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Dock.Model.Mvvm.Controls;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-public interface IDocumentShow
-{
-    void Show(QueryDocumentViewModel model);
-}
 
 public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
 {
@@ -19,8 +16,7 @@ public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
     [ObservableProperty] private bool _searchQueryBody;
-    private IDocumentShow? _show;
-
+  
     public QueryLibraryViewModel(DisplayPreferencesViewModel displayPreferencesPreferences)
     {
         Title = "Queries";
@@ -32,13 +28,13 @@ public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
     [RelayCommand]
     public void FilterChanged() => Sort();
 
-    public void SetShower(IDocumentShow show) => _show = show;
-
     public void Sort()
     {
         var sorted = Queries
             .Where(ApplyFilter)
-            .OrderBy(q => q.IsDeleted).ThenBy(q => !q.IsVisible).ThenBy(q => q.Title);
+            .OrderBy(q => q.IsDeleted)
+            .ThenBy(q => !q.IsVisible)
+            .ThenBy(q => q.Title);
         FilteredQueries = new ObservableCollection<QueryDocumentViewModel>(sorted);
         OnPropertyChanged(nameof(DeletedItemsShown));
     }
@@ -86,7 +82,8 @@ public partial class QueryLibraryViewModel : Tool, INotifyPropertyChanged
     public void ToggleEdit(QueryDocumentViewModel query) => query.EditLocked = !query.EditLocked;
 
     [RelayCommand]
-    public void Show(QueryDocumentViewModel query) => _show?.Show(query);
+    public void Show(QueryDocumentViewModel query) => WeakReferenceMessenger.Default
+        .Send(new ShowQueryRequestMessage(query));
 
     public void ChangeVisibility(QueryDocumentViewModel query, bool b)
     {

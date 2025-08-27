@@ -1,10 +1,8 @@
-using System.Xml;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using AvaloniaEdit.Highlighting;
-using AvaloniaEdit.Highlighting.Xshd;
+using CommunityToolkit.Mvvm.Messaging;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 using lokqlDxComponents.Views.Dialogs;
@@ -23,6 +21,12 @@ public partial class QueryEditorView : UserControl
     {
         InitializeComponent();
         _editorHelper = new EditorHelper(TextEditor);
+        WeakReferenceMessenger.Default.Register<ThemeChangedMessage>(this,ThemeChanged);
+    }
+
+    private void ThemeChanged(object recipient, ThemeChangedMessage message)
+    {
+        HighlightHelper.ApplySyntaxHighlighting(TextEditor);
     }
 
     public void InsertText(string text) => _editorHelper.InsertAtCursor(text);
@@ -33,9 +37,7 @@ public partial class QueryEditorView : UserControl
 
     private void UserControl_Loaded(object? sender, RoutedEventArgs e)
     {
-        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
-        using var reader = new XmlTextReader(s);
-        TextEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        HighlightHelper.ApplySyntaxHighlighting(TextEditor);
         //Ensure we can intercept ENTER key
         TextEditor.AddHandler(KeyDownEvent, InternalEditor_OnKeyDown, RoutingStrategies.Tunnel);
         TextEditor.AddHandler(DragDrop.DragEnterEvent, DragEnter);
@@ -79,8 +81,5 @@ public partial class QueryEditorView : UserControl
         TextEditor.TextArea.Focus();
     }
 
-    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e)
-    {
-        TextEditor.Focus();
-    }
+    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e) => TextEditor.Focus();
 }

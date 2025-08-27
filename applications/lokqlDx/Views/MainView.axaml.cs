@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using DependencyPropertyGenerator;
 
@@ -18,8 +17,5 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
-   }
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+}

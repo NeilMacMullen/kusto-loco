@@ -71,5 +71,6 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     partial void OnSelectedThemeChanged(string value)
     {
         ApplicationHelper.SetTheme(value);
+        
     }
 }
