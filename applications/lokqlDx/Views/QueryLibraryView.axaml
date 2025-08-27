@@ -17,110 +17,108 @@
         <SolidColorBrush x:Key="Hidden" Color="{DynamicResource SystemAccentColorDark3}" />
         <SolidColorBrush x:Key="Deleted" Color="{DynamicResource SystemErrorTextColor}" />
     </UserControl.Resources>
-        <DockPanel  Margin="2">
-            <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
-                <Label Content="🔍"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="4,0,4,0"
-                       DockPanel.Dock="Left" />
-                <TextBox Text="{Binding Filter}" VerticalContentAlignment="Center">
-                    <Interaction.Behaviors>
-                        <EventTriggerBehavior EventName="TextChanged">
-                            <InvokeCommandAction Command="{Binding FilterChangedCommand}" />
-                        </EventTriggerBehavior>
-                    </Interaction.Behaviors>
-                </TextBox>
-            </DockPanel>
-            <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
+    <DockPanel Margin="2">
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
+            <Label Content="🔍"
+                   FontSize="16"
+                   VerticalAlignment="Center"
+                   Margin="4,0,4,0"
+                   DockPanel.Dock="Left" />
+            <TextBox Text="{Binding Filter}" VerticalContentAlignment="Center">
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="TextChanged">
+                        <InvokeCommandAction Command="{Binding FilterChangedCommand}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
+            </TextBox>
+        </DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="2">
 
-                    <Button DockPanel.Dock="Right" Classes="Glyph">Empty 🗑️</Button>
-                <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
-                    <CheckBox FontSize="12"
-                        IsChecked="{Binding SearchQueryBody}"
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Left">
-                        Search body
-                    </CheckBox>
-                </StackPanel>
-            </DockPanel>
+            <Button DockPanel.Dock="Right" Classes="Glyph">Empty 🗑️</Button>
+            <StackPanel DockPanel.Dock="Left" HorizontalAlignment="Left">
+                <CheckBox FontSize="12"
+                          IsChecked="{Binding SearchQueryBody}"
+                          VerticalContentAlignment="Center"
+                          HorizontalAlignment="Left">
+                    Search body
+                </CheckBox>
+            </StackPanel>
+        </DockPanel>
 
-            <ListBox Name="TheScrollViewer"
-                     SelectionMode="Single"
-                     ItemsSource="{Binding FilteredQueries}"
-                     >
-               
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel                   
-                            >
-                                <Grid DockPanel.Dock="Right"  >
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40" />
-                                            <ColumnDefinition Width="40" />
-                                        </Grid.ColumnDefinitions>
+        <ListBox Name="TheScrollViewer"
+                 SelectionMode="Single"
+                 ItemsSource="{Binding FilteredQueries}">
 
-                                        <Button Grid.Column="0"
-                                                Classes="Glyph"
-                                                Content="&#x1F589;"
-                                                DockPanel.Dock="Right"
-                                                Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleEditCommand}"
-                                                CommandParameter="{Binding}"
-                                                Click="EditButton_Click"
-                                                IsVisible="{Binding IsDeleted, Converter={StaticResource Negate}}" />
-                                        <Button Grid.Column="1"
-                                                Classes="Glyph"
-                                                Content="{Binding IsDeleted,Converter={StaticResource ChooseString},
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <Grid DockPanel.Dock="Right">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="1"
+                                        Classes="Glyph"
+                                        Content="&#x1F589;"
+                                        DockPanel.Dock="Right"
+                                        Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleEditCommand}"
+                                        CommandParameter="{Binding}"
+                                        Click="EditButton_Click"
+                                        IsVisible="{Binding IsDeleted, Converter={StaticResource Negate}}" />
+                                <Button Grid.Column="0"
+                                        Classes="Glyph"
+                                        Content="{Binding IsDeleted,Converter={StaticResource ChooseString},
 												ConverterParameter='♻️|🗑️'}"
-                                                DockPanel.Dock="Right"
-                                                Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleDeleteCommand}"
-                                                CommandParameter="{Binding}"
-                                                Click="EditButton_Click"
-                                                IsVisible="{Binding IsVisible,
+                                        DockPanel.Dock="Right"
+                                        Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleDeleteCommand}"
+                                        CommandParameter="{Binding}"
+                                        Click="EditButton_Click"
+                                        IsVisible="{Binding IsVisible,
 												Converter={StaticResource Negate}}" />
-                                    </Grid>
-                                </Grid>
-                                <Grid DockPanel.Dock="Left">
-                                    <Label
-                                        Content="{Binding Title,Mode=TwoWay}"
-                                        IsVisible="{Binding EditLocked}">
+                            </Grid>
+                        </Grid>
+                        <Grid DockPanel.Dock="Left">
+                            <Label
+                                Content="{Binding Title,Mode=TwoWay}"
+                                IsVisible="{Binding EditLocked}">
 
-                                        <Label.Foreground>
-                                            <MultiBinding Converter="{StaticResource BoolToColorMulti}">
-                                                <Binding Path="IsVisible" /> <Binding Path="IsDeleted" />
-                                                <Binding Source="{StaticResource Hidden}" />
-                                                <Binding Source="{StaticResource Deleted}" />
-                                                <Binding Source="{StaticResource Visible}" />
-                                                <Binding Source="{StaticResource Deleted}" />
-                                            </MultiBinding>
-                                        </Label.Foreground>
-                                        <Interaction.Behaviors>
-                                            <EventTriggerBehavior EventName="DoubleTapped">
-                                                <InvokeCommandAction
-                                                    Command="{Binding $parent[v:QueryLibraryView].DataContext.ShowCommand}"
-                                                    CommandParameter="{Binding}" />
-                                            </EventTriggerBehavior>
-                                        </Interaction.Behaviors>
-                                    </Label>
+                                <Label.Foreground>
+                                    <MultiBinding Converter="{StaticResource BoolToColorMulti}">
+                                        <Binding Path="IsVisible" /> <Binding Path="IsDeleted" />
+                                        <Binding Source="{StaticResource Hidden}" />
+                                        <Binding Source="{StaticResource Deleted}" />
+                                        <Binding Source="{StaticResource Visible}" />
+                                        <Binding Source="{StaticResource Deleted}" />
+                                    </MultiBinding>
+                                </Label.Foreground>
+                                <Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="DoubleTapped">
+                                        <InvokeCommandAction
+                                            Command="{Binding $parent[v:QueryLibraryView].DataContext.ShowCommand}"
+                                            CommandParameter="{Binding}" />
+                                    </EventTriggerBehavior>
+                                </Interaction.Behaviors>
+                            </Label>
 
-                                    <TextBox x:Name="EditTextBox"
-                                             VerticalContentAlignment="Center"
-                                             Text="{Binding Title,Mode=TwoWay}"
-                                             IsVisible="{Binding EditLocked,
+                            <TextBox x:Name="EditTextBox"
+                                     VerticalContentAlignment="Center"
+                                     Text="{Binding Title,Mode=TwoWay}"
+                                     IsVisible="{Binding EditLocked,
 
 									Converter={StaticResource Negate}}"
 
-                                             KeyDown="InputElement_OnKeyDown" />
-                                </Grid>
+                                     KeyDown="InputElement_OnKeyDown" />
+                        </Grid>
 
 
-                            </DockPanel>
+                    </DockPanel>
 
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-            </ListBox>
-        </DockPanel>
- 
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+
 
 </UserControl>
