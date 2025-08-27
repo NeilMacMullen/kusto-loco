@@ -89,21 +89,19 @@ public partial class MainViewModel : ObservableObject
         _registryOperations = registryOperations;
         _storage = storage;
         _launcher = launcher;
-        var kustoSettings = workspaceManager.Settings;
-
+    
         ConsoleViewModel = new ConsoleViewModel(_displayPreferences);
-        //create a new explorer context
-        var loader = new StandardFormatAdaptor(
-            _workspaceManager.Settings, ConsoleViewModel);
-
-
+        
         _explorer = CreateExplorer();
-        // Register a message in some module
+
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
-            (r, m) => { m.Reply(HandleQueryRunning(m)); });
+            (_, m) => { m.Reply(HandleQueryRunning(m)); });
+        WeakReferenceMessenger.Default.Register<CreateDocumentRequest>(this,
+            (_, m) => { m.Reply(CreateDoc(m)); });
+
+
         _factory = new DockFactory(ConsoleViewModel,QueryLibrary,
-            _schemaModel,
-            CreateDoc,ActiveQueryChanged);
+            _schemaModel);
     }
 
     private void ResetLayout()
@@ -119,7 +117,12 @@ public partial class MainViewModel : ObservableObject
         foreach (var query in queries.ToArray()) _factory.AddDocument(query);
     }
 
-    private QueryDocumentViewModel CreateDoc() => AddQuery("new tab", string.Empty,true);
+    private QueryDocumentViewModel CreateDoc(CreateDocumentRequest msg)
+    {
+        var q =  AddQuery(msg.Title, string.Empty, true);
+        msg.Model = q;
+        return q;
+    }
 
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
@@ -158,7 +161,7 @@ public partial class MainViewModel : ObservableObject
     }
 
 
-    private void ActiveQueryChanged(QueryDocumentViewModel query) => Messaging.Send(new TabChangedMessage(query));
+   
 
     [RelayCommand]
     private async Task LoadData()

@@ -8,11 +8,9 @@ namespace LokqlDx.ViewModels;
 
 public class QueryDocumentDock : DocumentDock
 {
-    private readonly Func<QueryDocumentViewModel> _create;
 
-    public QueryDocumentDock(Func<QueryDocumentViewModel> create)
+    public QueryDocumentDock()
     {
-        _create = create;
         CreateDocument = new RelayCommand(CreateNewDocument);
     }
 
@@ -24,9 +22,10 @@ public class QueryDocumentDock : DocumentDock
         }
 
         var index = VisibleDockables?.Count + 1;
-        var document = _create();
-        document.Title = $"query {index}";
+        var title = $"query {index}";
+        var msg =Messaging.Send(new CreateDocumentRequest(title));
 
+        var document = msg.Model!;
         Factory?.AddDockable(this, document);
         Factory?.SetActiveDockable(document);
         Factory?.SetFocusedDockable(this, document);

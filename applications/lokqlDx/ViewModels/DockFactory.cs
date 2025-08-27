@@ -13,9 +13,7 @@ namespace LokqlDx.ViewModels;
 public class DockFactory : Factory
 {
     private readonly ConsoleViewModel _console;
-    private readonly Func<QueryDocumentViewModel> _create;
     private readonly QueryLibraryViewModel _library;
-    private readonly Action<QueryDocumentViewModel> _onActiveChanged;
     private readonly SchemaViewModel _schema;
 
     public QueryDocumentDock? DocumentDock;
@@ -23,20 +21,16 @@ public class DockFactory : Factory
     private QueryDocumentViewModel? LastActiveDockable;
 
     public DockFactory(ConsoleViewModel console, QueryLibraryViewModel library,
-        SchemaViewModel schema,
-        //TODO - replace with messages!
-        Func<QueryDocumentViewModel> create,
-        Action<QueryDocumentViewModel> onActiveChanged)
-    {
+        SchemaViewModel schema
+  )   {
         _console = console;
         _library = library;
         _schema = schema;
-        _create = create;
-        _onActiveChanged = onActiveChanged;
-        
-        Messaging.RegisterForValue<InsertTextMessage,string>(this,InsertTextInActiveWindow);
-        Messaging.RegisterForValue<DisplayResultMessage,NamedKustoResult>(this,DisplayResult);
-        Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this,ShowQuery);
+      
+
+        Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
+        Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
+        Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
     }
 
     public IRootDock Layout { get; set; } = new RootDock();
@@ -53,7 +47,11 @@ public class DockFactory : Factory
 
     private void InsertTextInActiveWindow(string text) => InsertText(text);
 
-    public override IDocumentDock CreateDocumentDock() => new QueryDocumentDock(_create);
+    public override IDocumentDock CreateDocumentDock()
+    {
+      
+        return new QueryDocumentDock();
+    }
 
     public void CloseLayout()
     {
@@ -110,7 +108,7 @@ public class DockFactory : Factory
                             RemoveVisibleDockable(queryDocumentDock, d);
                         if (queryDocumentDock.VisibleDockables!.Count == 0)
                         {
-                            var parent = FindRoot(queryDocumentDock);
+                            //var parent = FindRoot(queryDocumentDock);
                             //RemoveDockable(queryDocumentDock);
                         }
                     }
@@ -138,15 +136,15 @@ public class DockFactory : Factory
             Alignment = Alignment.Top,
             GripMode = GripMode.Visible,
             IsCollapsable = true,
-            VisibleDockables = CreateList<IDockable>(tools.OfType<IDockable>().ToArray()),
+            VisibleDockables = CreateList(tools.OfType<IDockable>().ToArray()),
             CanCloseLastDockable = true
         };
 
     public override IRootDock CreateLayout()
     {
-        //CloseLayout();
+        
 
-        var documentDock = new QueryDocumentDock(_create)
+        var documentDock = new QueryDocumentDock()
         {
             IsCollapsable = false,
             VisibleDockables = CreateList<IDockable>(),
@@ -177,7 +175,7 @@ public class DockFactory : Factory
         {
             // EnableGlobalDocking = false,
             Orientation = Orientation.Vertical,
-            VisibleDockables = CreateList<IDockable>
+            VisibleDockables = CreateList
             (
                 documentDock,
                 new ProportionalDockSplitter(),
@@ -261,12 +259,13 @@ public class DockFactory : Factory
 
     public override void OnActiveDockableChanged(IDockable? dockable)
     {
-        if (dockable is QueryDocumentViewModel vm)
-            LastActiveDockable = vm;
+        if (dockable is not QueryDocumentViewModel vm)
+            return;
 
+        LastActiveDockable = vm;
         base.OnActiveDockableChanged(dockable);
         if (LastActiveDockable != null)
-            _onActiveChanged?.Invoke(LastActiveDockable);
+            Messaging.Send(new TabChangedMessage(vm));
     }
 
     public override void OnDockableClosed(IDockable? dockable)
