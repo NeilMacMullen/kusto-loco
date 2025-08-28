@@ -8,6 +8,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.EMMA;
 using NetTopologySuite.Operation.Distance;
 
@@ -33,10 +34,19 @@ public class DockFactory : Factory
         Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
         Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
         Messaging.RegisterForValue<ShowToolMessage, string>(this, ShowTool);
+        Messaging.RegisterForEvent<ThemeChangedMessage>(this, UpdateBackgrounds);
 
     }
 
-   
+    private void UpdateBackgrounds()
+    {
+        var brush = ApplicationHelper.GetBackgroundForCurrentTheme();
+        foreach (var hostWindow in HostWindows.OfType<HostWindow>())
+        {
+            hostWindow.Background = brush;
+        }
+    }
+
 
     public IRootDock Layout { get; set; } = new RootDock();
 
@@ -222,14 +232,17 @@ public class DockFactory : Factory
 
     public override void InitLayout(IDockable layout)
     {
+        var brush = ApplicationHelper.GetBackgroundForCurrentTheme();
         HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
         {
             [nameof(IDockWindow)] = () =>
             {
-                var window = new HostWindow();
+                var window = new HostWindow()
+                {
+                    Background = brush
+                };
 
-                window.Bind(Window.BackgroundProperty,
-                    new Binding("DockThemeForegroundBrush"));
+                
 
                 return window;
             }

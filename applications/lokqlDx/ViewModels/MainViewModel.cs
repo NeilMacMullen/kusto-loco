@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -598,5 +599,13 @@ public static class ApplicationHelper
     public static string GetTheme()
     {
        return Application.Current?.ActualThemeVariant.ToString().OrWhenBlank("Dark")!;
+    }
+
+    public static IBrush GetBackgroundForCurrentTheme()
+    {
+        var theme = GetTheme();
+        if (theme.ToLower() == "dark")
+            return Brushes.Black;
+        return Brushes.White;
     }
 }
