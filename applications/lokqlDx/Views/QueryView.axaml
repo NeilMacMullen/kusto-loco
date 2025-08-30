@@ -21,6 +21,11 @@
                         Classes="Glyph">
                     &#x27f3;
                 </Button>
+                <Button Command="{Binding ToggleCursorCommand}"
+                        ToolTip.Tip="Toggle Chart Cursor"
+                        Classes="Glyph">
+                    &#x2295;
+                </Button>
                 <Button Command="{Binding CopyChartCommand}"
                         ToolTip.Tip="Copy chart to clipboard"
                         Classes="Glyph">

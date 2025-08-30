@@ -13,14 +13,28 @@ namespace LokqlDx.Views;
 
 public partial class ChartView : UserControl, IScottPlotHost
 {
-    private Crosshair _crosshair;
+    private  Crosshair _crosshair;
 
     private string _lastPopup = string.Empty;
-
+    private bool _cursorEnabled = false;
     public ChartView()
     {
         InitializeComponent();
         _crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
+        _crosshair.IsVisible = _cursorEnabled;
+        Messaging.RegisterForEvent<ToggleCursorMessage>(this,ToggleCursor);
+    }
+
+    private void ToggleCursor()
+    {
+        _cursorEnabled = !_cursorEnabled;
+        ResetCursor();
+    }
+
+    private void ResetCursor()
+    {
+        _crosshair.IsVisible = _cursorEnabled;
+        myPopup.IsOpen = _cursorEnabled;
     }
 
     private PopupSupport PopupSupport => new(PlotControl.Plot);
@@ -30,13 +44,19 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
     {
+        if (!_cursorEnabled)
+        {
+            myPopup.IsOpen = false;
+            return;
+        }
+
         var p = e.GetPosition(PlotControl);
         Pixel mousePixel = new(p.X * PlotControl.DisplayScale, p.Y * PlotControl.DisplayScale);
         var coordinates = PlotControl.Plot.GetCoordinates(mousePixel);
 
 
         DebugText.Content = PopupSupport.GetBasicPositionInfo(coordinates);
-        _crosshair.Position = coordinates;
+        _crosshair!.Position = coordinates;
 
         var popup = PopupSupport.TryPopup(coordinates);
 
@@ -86,6 +106,7 @@ public partial class ChartView : UserControl, IScottPlotHost
             plot.Clear();
             ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
             _crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
+            ResetCursor();
             PlotControl.Refresh();
         });
 

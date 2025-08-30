@@ -139,5 +139,10 @@ public partial class QueryViewModel : ObservableObject
         Messaging.Send(msg);
     }
 
+    [RelayCommand]
+    public void ToggleCursor()
+    {
+        Messaging.Send(new ToggleCursorMessage(""));
+    }
     public string GetPreQueryText() => QueryEditorViewModel.QueryContextViewModel.Text;
 }
