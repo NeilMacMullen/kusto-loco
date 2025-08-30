@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
-             xmlns:views="using:LokqlDx.Views"
              xmlns:system="using:System"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MainView"
@@ -78,13 +77,18 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
                     <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
-
-				</MenuItem>
+                </MenuItem>
                 <MenuItem Header="_View">
-                    <MenuItem Header="Add _query"
-                              Command="{Binding AddQueryCommand}" />
-                    <MenuItem Header="Show current result in _flyout"
-                              Command="{Binding FlyoutCurrentResultCommand}" />
+                    <MenuItem Header="Show _Query Manager" Command="{Binding ShowToolCommand}"
+                              CommandParameter="queries" />
+                    <MenuItem Header="Show _Schema Explorer" Command="{Binding ShowToolCommand}"
+                              CommandParameter="schema" />
+                    <MenuItem Header="Show _Results Explorer" Command="{Binding ShowToolCommand}"
+                              CommandParameter="results" />
+
+                    <MenuItem Header="Show _Output Window" Command="{Binding ShowToolCommand}"
+                              CommandParameter="console" />
+
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
@@ -98,7 +102,7 @@
                     <MenuItem Header=".Commands"
                               CommandParameter="LokqlDx-‐-commands"
                               Command="{Binding NavigateToWikiCommand}" />
-                    <Separator/>
+                    <Separator />
                     <MenuItem Header="Chart customisation"
                               Command="{Binding NavigateToWikiCommand}"
                               CommandParameter="ScottPlot-Chart-customisation" />
@@ -128,90 +132,9 @@
 
                 </MenuItem>
             </Menu>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                <Button Command="{Binding ClearConsoleCommand}"
-                        ToolTip.Tip="Clear console" FontSize="12">
-                    X
-                </Button>
-                <Button Command="{Binding ChangeTabCommand}"
-                        ToolTip.Tip="Change Query-tab placement" FontSize="12">
-                    T
-                </Button>
-
-                <Button Command="{Binding ChangeLayoutCommand}"
-                        ToolTip.Tip="Change Layout" FontSize="12">
-                    &#x25a6;
-                </Button>
-                <Button Command="{Binding CopyChartToClipboardCommand}"
-                        ToolTip.Tip="Copy chart to clipboard" FontSize="12">
-                    &#x1f4cb;
-                </Button>
-
-
-            </StackPanel>
         </DockPanel>
         <Grid RowDefinitions="*,20">
-            <Grid
-                x:Name="MainGrid"
-                RowDefinitions="*,auto,0.15*">
-                <TabControl Grid.Row="0" ItemsSource="{Binding Queries}"
-                            SelectedIndex="{Binding ActiveQueryIndex}"
-                            TabStripPlacement="{Binding TabStripPlacement}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Header}" FontSize="12">
-                                <TextBlock.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Rename"
-                                                  Command="{Binding $parent[UserControl].DataContext.RenameQueryCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <MenuItem Header="Delete"
-                                                  Command="{Binding $parent[UserControl].DataContext.DeleteQueryCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <Separator />
-                                        <MenuItem Header="Add query"
-                                                  Command="{Binding $parent[UserControl].DataContext.AddQueryHereCommand}"
-                                                  CommandParameter="{Binding}" />
-                                        <Separator />
-                                        <MenuItem Header="Tabs on top"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Top" />
-                                        <MenuItem Header="Tabs on left"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Left" />
-                                        <MenuItem Header="Tabs on right"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Right" />
-                                        <MenuItem Header="Tabs on bottom"
-                                                  Command="{Binding $parent[UserControl].DataContext.ChangeTabPlacementCommand}"
-                                                  CommandParameter="Bottom" />
-
-                                    </ContextMenu>
-                                </TextBlock.ContextMenu>
-                            </TextBlock>
-
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-
-                        <DataTemplate DataType="vm:QueryItemViewModel">
-                            <views:QueryView DataContext="{Binding QueryModel}" />
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-
-
-                <GridSplitter
-                    Grid.Row="1"
-                    Height="5"
-                    Background="#227F7F7F" />
-
-                <views:ConsoleView
-                    Background="{DynamicResource SystemAltLowColor}"
-                    Grid.Row="2"
-                    DataContext="{Binding ConsoleViewModel}" />
-            </Grid>
-
+            <DockControl Layout="{Binding Layout}" />
             <StackPanel
                 x:Name="StatusBar"
                 Background="{DynamicResource SystemAltMediumColor}"

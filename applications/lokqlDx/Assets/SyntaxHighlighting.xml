@@ -2,33 +2,31 @@
 
 <SyntaxDefinition name="KQL"
                   xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-	<Color name="Comment" foreground="#95ffa4" />
-	<Color name="String" foreground="#ce9178" />
-	<Color name="ScriptComment" foreground="#95ffa4" />
-	<Color name="InternalCommand" foreground="#b65fff" />
-	<Color name="Operator" foreground="#6dabff" />
-	<Color name="Function" foreground="#9ddbff" />
-	<Color name="Logical" foreground="#9ddb80" />
-	<Color name="ChartRelated" foreground="#9ddbff" />
-
-
+	<!-- Color definitions moved to VSDark.xml -->
 	<!-- This is the main ruleset. -->
 	<RuleSet>
 		<Span color="Comment" begin="//" />
 		<Span color="ScriptComment" begin="#" />
-		<Span color="InternalCommand" begin="^\." />
+		<Span color="InternalCommand" begin="^\." end="\s+|$" />
 
 		<Span color="String">
 			<Begin>"</Begin>
 			<End>"</End>
-
 		</Span>
 
 		<Span color="String">
 			<Begin>'</Begin>
 			<End>'</End>
-
 		</Span>
+
+		<Rule color="Number">
+			\b0[xX][0-9a-fA-F]+  # hex number
+			|    \b
+			(    \d+(\.[0-9]+)?   #number with optional floating point
+			|    \.[0-9]+         #or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)? # optional exponent
+		</Rule>
 
 		<Keywords color="Logical">
 			<Word>and</Word>
@@ -204,14 +202,7 @@
 
 		</Keywords>
 		<!-- Digits -->
-		<Rule foreground="#31d793">
-			\b0[xX][0-9a-fA-F]+  # hex number
-			|    \b
-			(    \d+(\.[0-9]+)?   #number with optional floating point
-			|    \.[0-9]+         #or just starting with floating point
-			)
-			([eE][+-]?[0-9]+)? # optional exponent
-		</Rule>
+
 
 	</RuleSet>
 </SyntaxDefinition>

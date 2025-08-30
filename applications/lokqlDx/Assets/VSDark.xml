@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Colors xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<Color name="Comment" foreground="#57A64A" />
+	<Color name="String" foreground="#D69D85" />
+	<Color name="ScriptComment" foreground="#57A64A" />
+	<Color name="InternalCommand" foreground="#09B9BB" />
+	<Color name="Operator" foreground="#4EC9B0" />
+	<Color name="Function" foreground="#DCDCAA" />
+	<Color name="Logical" foreground="#D4D4D4" />
+	<Color name="ChartRelated" foreground="#569CD6" />
+	<Color name="Number" foreground="#B5CEA8" />
+</Colors>

@@ -10,8 +10,6 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private int _chartRow;
     [ObservableProperty] private int _columnSpan = 1;
 
-    [ObservableProperty] private CopilotChatViewModel _copilotChatViewModel;
-
     // Add observable properties for grid positions
     [ObservableProperty] private int _editorViewColumn;
     [ObservableProperty] private int _editorViewRow;
@@ -23,47 +21,42 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
 
     [ObservableProperty] private int _rowSpan = 3;
-
     private int n;
 
-    public QueryViewModel(
-        QueryEditorViewModel queryEditorViewModel,
-        RenderingSurfaceViewModel renderingSurfaceViewModel,
-        CopilotChatViewModel copilotChatViewModel)
+    public QueryViewModel(QueryEditorViewModel queryEditorViewModel,
+        RenderingSurfaceViewModel renderingSurfaceViewModel)
     {
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
-        CopilotChatViewModel = copilotChatViewModel;
-        WeakReferenceMessenger.Default.Register<LayoutChangedMessage>(this, (r, m) => { FlipArrangement(); });
+        Messaging.RegisterForEvent<LayoutChangedMessage>(this, FlipArrangement);
+        Messaging.RegisterForEvent<CopyChartMessage>(this, CopyChartHandler);
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
-            (r, m) =>
+            (_, m) =>
             {
                 if (IsActive)
                     m.Reply(LoadFile(m));
             });
         WeakReferenceMessenger.Default.Register<SaveFileMessage>(this,
-            (r, m) =>
+            (_, m) =>
             {
                 if (IsActive)
                     m.Reply(SaveFile(m));
             });
-
-        WeakReferenceMessenger.Default.Register<CopyChartMessage>(this,
-            (r, m) =>
-            {
-                if (IsActive)
-                    CopyChartToClipboard();
-            });
     }
+
+    public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
 
+    private void CopyChartHandler()
+    {
+        if (IsActive)
+            CopyChartToClipboard();
+    }
+
     private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();
 
-    private async Task LoadFile(LoadFileMessage msg)
-    {
-        await QueryEditorViewModel.RunQueryString($".load {msg.Path}");
-    }
+    private async Task LoadFile(LoadFileMessage msg) => await QueryEditorViewModel.RunQueryString($".load {msg.Path}");
 
     private async Task SaveFile(SaveFileMessage msg) => await QueryEditorViewModel.RunQueryString($".save {msg.Path}");
 
@@ -108,7 +101,7 @@ public partial class QueryViewModel : ObservableObject
         ChartRow = 0;
     }
 
-    public bool IsDirty() => QueryEditorViewModel.IsDirty;
+    public bool IsDirty() => QueryEditorViewModel.IsDirty();
 
     public string GetText() => QueryEditorViewModel.GetText();
 
@@ -127,5 +120,29 @@ public partial class QueryViewModel : ObservableObject
     }
 
 
-    public void Clean() => QueryEditorViewModel.IsDirty = false;
+    public void Clean() => QueryEditorViewModel.Clean();
+
+    [RelayCommand]
+    public void CopyChart() => CopyChartToClipboard();
+
+    [RelayCommand]
+    public void PinChart()
+    {
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, false));
+        Messaging.Send(msg);
+    }
+
+    [RelayCommand]
+    public void TearOff()
+    {
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, true));
+        Messaging.Send(msg);
+    }
+
+    [RelayCommand]
+    public void ToggleCursor()
+    {
+        Messaging.Send(new ToggleCursorMessage(""));
+    }
+    public string GetPreQueryText() => QueryEditorViewModel.QueryContextViewModel.Text;
 }

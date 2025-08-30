@@ -4,7 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>    
+         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+         <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>    
   </PropertyGroup>
 
   <ItemGroup>

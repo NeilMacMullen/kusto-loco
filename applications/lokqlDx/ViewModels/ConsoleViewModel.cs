@@ -3,7 +3,6 @@ using System.Text;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using KustoLoco.Core.Console;
 
 namespace LokqlDx.ViewModels;
@@ -24,7 +23,7 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         ForegroundColor = ConsoleColor.White;
         WindowWidth = 80; // Default width
         DisplayPreferencesPreferences = displayPreferencesPreferences;
-        WeakReferenceMessenger.Default.Register<ClearConsoleMessage>(this, (r, m) => { Clear(); });
+        Messaging.RegisterForEvent<ClearConsoleMessage>(this, Clear);
     }
 
     public int WindowWidth { get; private set; } = 80;

@@ -2,7 +2,6 @@
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
@@ -16,18 +15,19 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     ICompletionManagerServiceLocator
 {
     private readonly ConsoleViewModel _consoleViewModel;
+    private readonly InteractiveTableExplorer _explorer;
 
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
     [ObservableProperty] private TextDocument _document = new();
-    private InteractiveTableExplorer _explorer;
+    [ObservableProperty] private QueryContextViewModel _queryContextViewModel = new();
 
 
-    [ObservableProperty] private bool _isDirty;
-
+    [ObservableProperty] private bool _textIsDirty;
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel, DisplayPreferencesViewModel displayPreferences,
         string initialText,
+        string preQueryText,
         IntellisenseClientAdapter adapter
     )
     {
@@ -54,11 +54,14 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         }
 
         SetText(initialText);
-        _isDirty = false;
+        QueryContextViewModel.Text = preQueryText;
+        QueryContextViewModel.IsDirty = false;
+        TextIsDirty = false;
         SetSchema(_explorer.GetSchema());
     }
 
     public SchemaIntellisenseProvider SchemaIntellisenseProvider { get; } = new();
+    public int EditorOffset { get; set; }
 
     public IntellisenseClientAdapter _intellisenseClient { get; }
 
@@ -73,6 +76,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     public IntellisenseEntry[] KqlFunctionEntries { get; set; } = [];
     public IntellisenseEntry[] SettingNames { get; set; } = [];
     public IntellisenseEntry[] KqlOperatorEntries { get; set; } = [];
+
     public IntellisenseEntry[] GetTables(string blockText) => SchemaIntellisenseProvider.GetTables(blockText);
     public IntellisenseEntry[] GetColumns(string blockText) => SchemaIntellisenseProvider.GetColumns(blockText);
 
@@ -90,17 +94,22 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     private void Document_Changed(object? sender, DocumentChangeEventArgs e)
     {
         OnPropertyChanged(nameof(Document));
-        IsDirty = true;
+        TextIsDirty = true;
     }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
-    private async Task RunQuery(string query) => await RunQueryString(query);
+    private async Task RunQuery(string query)
+    {
+        if (QueryContextViewModel.Text.IsNotBlank())
+            query = QueryContextViewModel.Text + Environment.NewLine + query;
+        await RunQueryString(query);
+    }
 
     public async Task RunQueryString(string query)
     {
         if (query.IsBlank())
             return;
-        var saved = await WeakReferenceMessenger.Default.Send(new RunningQueryMessage(true));
+        await Messaging.Send(new RunningQueryMessage(true));
         if (ExecutingQuery is not null)
             await ExecutingQuery.InvokeAsync(this, EventArgs.Empty);
 
@@ -114,14 +123,12 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         SetSchema(_explorer.GetSchema());
         AddSettingsForIntellisense(_explorer.Settings);
-        //WeakReferenceMessenger.Default.Send(new RunningQueryMessage(false));
+        await Messaging.Send(new RunningQueryMessage(false));
     }
 
 
     private void LoadIntellisense()
     {
-        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
-
         using var functions = ResourceHelper.SafeGetResourceStream("IntellisenseFunctions.json");
         KqlFunctionEntries = JsonSerializer.Deserialize<IntellisenseEntry[]>(functions)!
             .Select(i => i with { Hint = IntellisenseHint.Function }).ToArray();
@@ -138,9 +145,19 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
     internal void SetText(string text) => Document.Text = text;
 
-    public void SetExplorer(InteractiveTableExplorer explorer)
+
+    public void Insert(string text)
     {
-        _explorer = explorer;
-        AddSettingsForIntellisense(_explorer.Settings);
+        var insertPoint = Math.Min(EditorOffset + 1, Document.TextLength);
+        if (insertPoint < 0) insertPoint = 0;
+        Document.Insert(insertPoint, text);
+    }
+
+    public bool IsDirty() => TextIsDirty || QueryContextViewModel.IsDirty;
+
+    public void Clean()
+    {
+        TextIsDirty = false;
+        QueryContextViewModel.IsDirty = false;
     }
 }

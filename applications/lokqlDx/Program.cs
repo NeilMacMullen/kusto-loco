@@ -4,17 +4,32 @@ using Avalonia.Platform.Storage;
 using HotAvalonia;
 using Jab;
 using LogSetup;
-using Lokql.Engine.Commands;
 using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using lokqlDxComponents.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LokqlDx.Desktop;
+namespace LokqlDx;
 
-internal class Program :Application
+internal class Program : Application
 {
+#if PREVIEWER
+// Initialization code. Don't use any Avalonia, third-party APIs or any
+// SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+// yet and stuff might break.
+[STAThread]
+public static void Main(string[] args)
+{
+    BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+}
+// Avalonia configuration, don't remove; also used by visual designer.
+public static AppBuilder BuildAvaloniaApp()
+    => AppBuilder.Configure<App>()
+        .UsePlatformDetect()
+        .WithInterFont()
+        .LogToTrace();
+#else
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -32,6 +47,7 @@ internal class Program :Application
             .WithInterFont()
             .UseHotReload()
             .LogToTrace();
+#endif
 }
 
 [ServiceProvider]
@@ -60,9 +76,4 @@ internal partial class DiContainer
 
     internal ILauncher GetLauncher() =>
         _topLevel?.Launcher ?? throw new InvalidOperationException();
-}
-
-public class CommandProcessorFactory
-{
-    public CommandProcessor GetCommandProcessor() => CommandProcessor.Default();
 }

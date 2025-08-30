@@ -3,6 +3,7 @@ using Avalonia.Media;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels.Dialogs;
 
@@ -15,11 +16,13 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
 
     [ObservableProperty] private ObservableCollection<FontFamily> _fonts;
     [ObservableProperty] private double _fontSize;
+    [ObservableProperty] private string _pluginsFolder;
     [ObservableProperty] private bool _saveBeforeQuery;
     [ObservableProperty] private FontFamily _selectedFont;
+    [ObservableProperty] private string _selectedTheme = "";
     [ObservableProperty] private bool _showLineNumbers;
+    [ObservableProperty] private ObservableCollection<string> _themes = [];
     [ObservableProperty] private bool _wordWrap;
-    [ObservableProperty] private string _pluginsFolder;
 
     public ApplicationPreferencesViewModel(PreferencesManager preferencesManager)
     {
@@ -37,7 +40,8 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         PluginsFolder = applicationPreferences.PluginsFolder;
 
         Document.Text = applicationPreferences.StartupScript;
-
+        Themes = new ObservableCollection<string>("Dark Light Default".Tokenize());
+        SelectedTheme = uiPreferences.Theme.OrWhenBlank(Themes.First());
         _completionSource = new TaskCompletionSource();
         Result = _completionSource.Task;
     }
@@ -54,7 +58,7 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         _preferencesManager.UIPreferences.WordWrap = WordWrap;
         _preferencesManager.UIPreferences.FontFamily = SelectedFont.Name;
         _preferencesManager.UIPreferences.FontSize = FontSize;
-        
+        _preferencesManager.UIPreferences.Theme = SelectedTheme;
         _preferencesManager.Save(_applicationPreferences);
         _preferencesManager.SaveUiPrefs();
 
@@ -62,5 +66,12 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     }
 
     [RelayCommand]
-    private void Cancel() => _completionSource.SetResult();
+    private void Cancel()
+    {
+        //reset the theme !!!
+        ApplicationHelper.SetTheme(_preferencesManager.UIPreferences.Theme);
+        _completionSource.SetResult();
+    }
+
+    partial void OnSelectedThemeChanged(string value) => ApplicationHelper.SetTheme(value);
 }

@@ -1,10 +1,7 @@
-using System.Xml;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using AvaloniaEdit.Highlighting;
-using AvaloniaEdit.Highlighting.Xshd;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 using lokqlDxComponents.Views.Dialogs;
@@ -23,17 +20,18 @@ public partial class QueryEditorView : UserControl
     {
         InitializeComponent();
         _editorHelper = new EditorHelper(TextEditor);
+        Messaging.RegisterForEvent<ThemeChangedMessage>(this, OnThemeChanged);
     }
 
-    private QueryEditorViewModel GetVm() =>
+    private void OnThemeChanged() => HighlightHelper.ApplySyntaxHighlighting(TextEditor);
+
+    private QueryEditorViewModel? GetVm() =>
         (DataContext as QueryEditorViewModel)!;
 
 
     private void UserControl_Loaded(object? sender, RoutedEventArgs e)
     {
-        using var s = ResourceHelper.SafeGetResourceStream("SyntaxHighlighting.xml");
-        using var reader = new XmlTextReader(s);
-        TextEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        HighlightHelper.ApplySyntaxHighlighting(TextEditor);
         //Ensure we can intercept ENTER key
         TextEditor.AddHandler(KeyDownEvent, InternalEditor_OnKeyDown, RoutingStrategies.Tunnel);
         TextEditor.AddHandler(DragDrop.DragEnterEvent, DragEnter);
@@ -60,13 +58,22 @@ public partial class QueryEditorView : UserControl
 
 
     private async void InternalEditor_OnKeyDown(object? sender, KeyEventArgs e)
-        => await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, GetVm());
+    {
+        if (GetVm() is not { } vm)
+            return;
+        await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, vm);
+        vm.EditorOffset = _editorHelper.CurrentOffset();
+    }
 
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, GetVm(),
+        if (GetVm() is not { } vm)
+            return;
+        _completionManager = new CompletionManager(TextEditor, _editorHelper, vm,
             new CompletionWindowWrapper(TextEditor.TextArea));
         TextEditor.TextArea.Focus();
     }
+
+    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e) => TextEditor.Focus();
 }

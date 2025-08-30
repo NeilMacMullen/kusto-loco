@@ -19,6 +19,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <AssemblyName>KustoLoco.FileFormats</AssemblyName>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

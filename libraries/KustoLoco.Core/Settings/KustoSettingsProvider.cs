@@ -6,16 +6,13 @@ using NotNullStrings;
 namespace KustoLoco.Core.Settings;
 
 /// <summary>
-///     Provides a flexible way of passing settings around the various KustoLoco layers
+/// Provides a flexible, layered settings provider for KustoLoco components.
 /// </summary>
 /// <remarks>
-///     Yes, it's another string/string dictionary with basic type conversion.
-///     The benefit of loose typing here is that it's easy to add new settings
-///     without changing the interface and it fits well with the idea of allowing the user
-///     to change behaviour by typing in values dynamically.  For example, a user in lokqldx could
-///     type in "set csv.skipTypeInference yes" to disable automatic type inference.
-///     Settings are _mutable_ because we don't want to pass them in for every operation.
-///     However. it would be good to find a way to get back to immutability.
+/// This class manages settings as string key-value pairs with basic type conversion,
+/// supporting dynamic and mutable configuration. Settings can be layered, allowing
+/// overrides and snapshots. Designed for scenarios where users or components may
+/// dynamically adjust behavior at runtime.
 /// </remarks>
 public class KustoSettingsProvider
 {
@@ -24,30 +21,59 @@ public class KustoSettingsProvider
 
     private Stack<ImmutableDictionary<string, RawKustoSetting>> _settingsStack;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KustoSettingsProvider"/> class.
+    /// </summary>
     public KustoSettingsProvider()
     {
         _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>();
         _settingsStack.Push(ImmutableDictionary<string, RawKustoSetting>.Empty);
     }
 
-    public void AddLayer(KustoSettingsProvider layeredSettings) => Push(layeredSettings.GetFlattened());
+    /// <summary>
+    /// Adds a new layer of settings from another <see cref="KustoSettingsProvider"/>.
+    /// </summary>
+    /// <remarks>
+    ///  Used primarily by the macro system to push parameters as settings during the
+    /// execution
+    /// </remarks>
+    /// <param name="layeredSettings">The provider whose settings will be layered on top.</param>
+    public void AddLayer(KustoSettingsProvider layeredSettings)
+        => _settingsStack
+        .Push(layeredSettings.GetFlattened());
 
+    /// <summary>
+    /// Gets the collection of registered setting definitions.
+    /// </summary>
+    /// <returns>A read-only collection of <see cref="KustoSettingDefinition"/>.</returns>
     public IReadOnlyCollection<KustoSettingDefinition> GetDefinitions() => _registeredSettings;
 
+    /// <summary>
+    /// Registers one or more setting definitions.
+    /// </summary>
+    /// <param name="settings">The settings to register.</param>
     public void Register(params KustoSettingDefinition[] settings)
     {
         foreach (var setting in settings)
             _registeredSettings = _registeredSettings.Add(setting);
     }
 
-    public void Push(ImmutableDictionary<string, RawKustoSetting> layer) =>
-        _settingsStack.Push(layer);
+   
 
+    /// <summary>
+    /// Pops the top settings layer from the stack.
+    /// </summary>
+    /// <returns>The popped settings layer, or an empty dictionary if the stack is empty.</returns>
     public ImmutableDictionary<string, RawKustoSetting> Pop() =>
         _settingsStack.Any()
             ? _settingsStack.Pop()
             : ImmutableDictionary<string, RawKustoSetting>.Empty;
 
+    /// <summary>
+    /// Sets a string value for a setting.
+    /// </summary>
+    /// <param name="setting">The setting name.</param>
+    /// <param name="value">The value to set.</param>
     public void Set(string setting, string value)
     {
         var k = new RawKustoSetting(setting, value);
@@ -59,22 +85,40 @@ public class KustoSettingsProvider
         _settingsStack = new Stack<ImmutableDictionary<string, RawKustoSetting>>(all);
     }
 
+    /// <summary>
+    /// Sets a boolean value for a setting.
+    /// </summary>
+    /// <param name="setting">The setting name.</param>
+    /// <param name="value">The boolean value to set.</param>
     public void Set(string setting, bool value) => Set(setting, value.ToString());
 
+    /// <summary>
+    /// Sets an integer value for a setting.
+    /// </summary>
+    /// <param name="setting">The setting name.</param>
+    /// <param name="value">The integer value to set.</param>
     public void Set(string setting, int value) => Set(setting, value.ToString());
 
-
+    /// <summary>
+    /// Flattens all settings layers into a single dictionary.
+    /// </summary>
+    /// <returns>An immutable dictionary of all settings.</returns>
     private ImmutableDictionary<string, RawKustoSetting> GetFlattened()
     {
         var layers = _settingsStack.ToArray();
         var d = new Dictionary<string, RawKustoSetting>();
         foreach (var layer in layers)
-        foreach (var s in layer.Values)
-            d.TryAdd(s.Key, s);
+            foreach (var s in layer.Values)
+                d.TryAdd(s.Key, s);
 
         return d.ToImmutableDictionary();
     }
 
+    /// <summary>
+    /// Gets the value of a setting, or its default if not set.
+    /// </summary>
+    /// <param name="setting">The setting definition.</param>
+    /// <returns>The setting value as a string.</returns>
     public string Get(KustoSettingDefinition setting)
     {
         var settingName = setting.Name;
@@ -84,15 +128,10 @@ public class KustoSettingsProvider
     }
 
     /// <summary>
-    ///     Tries to interpret a string as a setting name
+    /// Tries to interpret a string as a setting name and substitute its value.
     /// </summary>
-    /// <remarks>
-    ///     There are a number of places in application code where it's convenient to see if the
-    ///     supplied string might actually be interpreted as a setting name.  For example
-    ///     .set abc xyz
-    ///     .command abc
-    ///     --> could transform to .command xyz
-    /// </remarks>
+    /// <param name="name">The potential setting name.</param>
+    /// <returns>The setting value if found; otherwise, returns the input name.</returns>
     public string TrySubstitute(string name)
     {
         var fb = new RawKustoSetting(name, name);
@@ -100,9 +139,20 @@ public class KustoSettingsProvider
         return settings.GetValueOrDefault(name.ToLowerInvariant(), fb).Value;
     }
 
+    /// <summary>
+    /// Determines whether a setting with the specified name exists.
+    /// </summary>
+    /// <param name="name">The setting name.</param>
+    /// <returns><c>true</c> if the setting exists; otherwise, <c>false</c>.</returns>
     public bool HasSetting(string name)
         => GetFlattened().ContainsKey(name.ToLowerInvariant());
 
+    /// <summary>
+    /// Gets the value of a setting or a fallback value if not set.
+    /// </summary>
+    /// <param name="setting">The setting name.</param>
+    /// <param name="fallback">The fallback value.</param>
+    /// <returns>The setting value or the fallback.</returns>
     public string GetOr(string setting, string fallback)
     {
         var fb = new KustoSettingDefinition(setting, string.Empty, fallback, string.Empty);
@@ -110,9 +160,11 @@ public class KustoSettingsProvider
     }
 
     /// <summary>
-    ///     Try to fetch a setting and interpret it as a number (int)
+    /// Gets the value of a setting as an integer, or a fallback if not set or invalid.
     /// </summary>
-    /// <remarks> return the fallback value if the number can't be parsed</remarks>
+    /// <param name="setting">The setting name.</param>
+    /// <param name="fallback">The fallback integer value.</param>
+    /// <returns>The setting value as an integer, or the fallback.</returns>
     public int GetIntOr(string setting, int fallback)
     {
         var s = GetOr(setting, fallback.ToString());
@@ -120,11 +172,13 @@ public class KustoSettingsProvider
     }
 
     /// <summary>
-    ///     Try to interpret the setting as a boolean
+    /// Gets the value of a setting as a boolean.
     /// </summary>
+    /// <param name="setting">The setting definition.</param>
+    /// <returns><c>true</c> if the setting is interpreted as true; otherwise, <c>false</c>.</returns>
     /// <remarks>
-    ///     Try using true/false first, then yes/no or use non-zero numeric value to indicate true.
-    ///     A missing setting will be interpreted as false.
+    /// Accepts "true", "yes", "on", "1" as true; "false", "no", "off", "0" as false.
+    /// Missing or unrecognized values are interpreted as false.
     /// </remarks>
     public bool GetBool(KustoSettingDefinition setting)
     {
@@ -134,14 +188,19 @@ public class KustoSettingsProvider
         return trueValues.Contains(s);
     }
 
+    /// <summary>
+    /// Enumerates all current settings as <see cref="RawKustoSetting"/> values.
+    /// </summary>
+    /// <returns>An enumerable of all settings.</returns>
     public IEnumerable<RawKustoSetting> Enumerate() => GetFlattened().Values;
 
     /// <summary>
-    ///     Obtain an array of strings from a setting that is a list of paths
+    /// Gets a setting as an array of path strings, split by ';'.
     /// </summary>
+    /// <param name="name">The setting definition.</param>
+    /// <returns>An array of path strings.</returns>
     /// <remarks>
-    ///     Path-lists use the ';' separator and elements are trimmed so it's not possible
-    ///     to use paths that start or end with spaces.
+    /// Path-lists use the ';' separator and elements are trimmed.
     /// </remarks>
     public string[] GetPathList(KustoSettingDefinition name)
     {
@@ -150,7 +209,7 @@ public class KustoSettingsProvider
     }
 
     /// <summary>
-    ///     Reset all settings to their default values
+    /// Resets all settings to their default values.
     /// </summary>
     public void Reset()
     {
@@ -158,6 +217,12 @@ public class KustoSettingsProvider
         AddLayer(new KustoSettingsProvider());
     }
 
+    /// <summary>
+    /// Gets the value of a setting as a double, or a fallback if not set or invalid.
+    /// </summary>
+    /// <param name="settingName">The setting name.</param>
+    /// <param name="p1">The fallback double value.</param>
+    /// <returns>The setting value as a double, or the fallback.</returns>
     public double GetDoubleOr(string settingName, double p1)
     {
         var s = GetOr(settingName, "");
@@ -165,14 +230,16 @@ public class KustoSettingsProvider
     }
 
     /// <summary>
-    ///     Create a snapshot of the current settings
+    /// Creates a snapshot of the current settings
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// The snapshot contains a completely independent set of values to the original
+    /// </remarks>
+    /// <returns>A new <see cref="KustoSettingsProvider"/> containing the current settings.</returns>
     public KustoSettingsProvider Snapshot()
     {
-        var settings = GetFlattened();
         var newSettings = new KustoSettingsProvider();
-        newSettings.Push(settings);
+        newSettings.AddLayer(this);
         return newSettings;
     }
 }

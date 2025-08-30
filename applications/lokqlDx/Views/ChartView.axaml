@@ -7,24 +7,23 @@
              x:Class="LokqlDx.Views.ChartView"
              PointerMoved="InputElement_OnPointerMoved">
     <Grid>
-        <DockPanel>
+        <DockPanel >
             <DockPanel DockPanel.Dock="Bottom">
-                <StackPanel DockPanel.Dock="Bottom" Background="Black">
+                <StackPanel DockPanel.Dock="Bottom" IsVisible="False">
                     <StackPanel>
-                        <Label Name="DebugText" Foreground="White" />
+                        <Label Name="DebugText" />
                     </StackPanel>
                 </StackPanel>
-
                 <avalonia:AvaPlot Name="PlotControl" DockPanel.Dock="Top" />
-
             </DockPanel>
 
         </DockPanel>
 
         <Popup Name="myPopup" Placement="Pointer" VerticalOffset="20" HorizontalOffset="20">
-            <Border BorderThickness="1" BorderBrush="BlueViolet">
-                <TextBlock Name="myPopupText" Background="Black"
-                           Foreground="White" Padding="3">
+            <Border BorderThickness="1" BorderBrush="Black"
+                    CornerRadius="10" Padding="10" Background="MintCream">
+                <TextBlock Name="myPopupText"
+                           Foreground="Black">
                     Popup Text
                 </TextBlock>
             </Border>

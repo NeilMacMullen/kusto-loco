@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using LokqlDx.Desktop;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,13 +14,21 @@ public class App : Application
     private readonly IServiceProvider _serviceProvider;
     private static IServiceProvider? _provider;
     public static T Resolve<T>() where T : notnull => _provider!.GetRequiredService<T>();
+#if PREVIEWER
+    public App()
+    {
+        _serviceProvider = new DiContainer();
+        _provider = _serviceProvider;
+    }
+#else
+
 
     public App(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _provider = _serviceProvider;
     }
-
+#endif
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()

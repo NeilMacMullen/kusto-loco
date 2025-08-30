@@ -1226,6 +1226,18 @@ print toscalar(letters | summarize mx=min(bitmap));";
         var res = await LastLineOfResult(query);
         res.Should().Contain("null");
     }
+    [TestMethod]
+    public async Task AggChecks()
+    {
+        var query = """
+                    datatable(n:int)[1]
+                    | summarize avg(n)
+                    | getschema
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Contain("real");
+    }
+
 
 
 

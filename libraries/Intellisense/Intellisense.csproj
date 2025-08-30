@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

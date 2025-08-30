@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
   <ItemGroup>
   <PackageReference Include="AwesomeAssertions" />

@@ -3,6 +3,7 @@ using System.Text;
 using KustoLoco.Rendering.ScottPlot;
 using ScottPlot;
 using ScottPlot.Plottables;
+using ScottPlot.TickGenerators;
 
 namespace LokqlDx.Views;
 
@@ -64,7 +65,7 @@ public class PopupSupport
         //TODO - temporary implementation until fixed in ScottPlot
         try
         {
-            if (axis.TickGenerator is FixedDateTimeAutomatic)
+            if (axis.TickGenerator is DateTimeAutomatic)
                 return DateTime.FromOADate(v).ToString(); //TODO - get string format from kusto settings
         }
         catch

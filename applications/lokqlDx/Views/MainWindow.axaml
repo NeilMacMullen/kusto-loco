@@ -9,7 +9,7 @@
         Icon="/Assets/kql.ico"
         Title="{Binding WindowTitle, FallbackValue='lokqlDx'}"
         TransparencyLevelHint="Mica,AcrylicBlur,Blur"
-        Background="{DynamicResource SystemAltMediumHighColor}"
+        Background="Black"
         x:DataType="vm:MainViewModel"
         PositionChanged="Window_PositionChanged"
         SizeChanged="Window_SizeChanged"

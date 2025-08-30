@@ -18,6 +18,7 @@
     <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/releases</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyName>KustoLoco.Rendering</AssemblyName>
+    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

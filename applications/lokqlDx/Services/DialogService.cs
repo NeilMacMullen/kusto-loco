@@ -4,22 +4,21 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using Kusto.Language.Symbols;
-using KustoLoco.Core;
-using KustoLoco.Core.Settings;
 using LokqlDx.Models;
 using LokqlDx.ViewModels;
 using LokqlDx.ViewModels.Dialogs;
 using LokqlDx.Views.Dialogs;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using Flyout = LokqlDx.Views.Flyout;
 
 namespace LokqlDx.Services;
 
 public class DialogService
 {
     private readonly ILauncher _launcher;
+
+    private readonly ShowOptions _modalNonResizable = new(false, new Size(0, 0), true);
+    private readonly ShowOptions _nonModalResizable = new(false, new Size(0, 0), true);
     private readonly TopLevel _topLevel;
 
     public DialogService(TopLevel topLevel, ILauncher launcher)
@@ -37,18 +36,22 @@ public class DialogService
     {
         Patterns = ["*.csv"]
     };
+
     public static FilePickerFileType TsvFiles { get; } = new("Tsv (*.tsv)")
     {
-        Patterns = [ "*.tsv"]
+        Patterns = ["*.tsv"]
     };
+
     public static FilePickerFileType ParquetFiles { get; } = new("Parquet (*.parquet")
     {
         Patterns = ["*.parquet"]
     };
+
     public static FilePickerFileType ExcelFiles { get; } = new("Excel (*.xlsx)")
     {
         Patterns = ["*.xlsx"]
     };
+
     public static FilePickerFileType JsonFiles { get; } = new("Json array (*.json)")
     {
         Patterns = ["*.json"]
@@ -62,12 +65,12 @@ public class DialogService
     public static FilePickerFileType[] DataTypesForRead { get; } =
     [
         All,
-        TsvFiles,CsvFiles, ParquetFiles, ExcelFiles, JsonFiles, TextFiles
+        TsvFiles, CsvFiles, ParquetFiles, ExcelFiles, JsonFiles, TextFiles
     ];
 
     public static FilePickerFileType[] DataTypesForWrite { get; } =
         DataTypesForRead.Append(All).ToArray();
-    
+
     public async Task<IReadOnlyList<IStorageFile>> OpenDataFiles()
     {
         // Start async operation to open the dialog.
@@ -85,11 +88,11 @@ public class DialogService
         // Start async operation to open the dialog.
         var files = await _topLevel.StorageProvider.SaveFilePickerAsync(
             new FilePickerSaveOptions
-        {
-            Title = "Save File",
-            FileTypeChoices = DataTypesForWrite,
-            ShowOverwritePrompt = true
-        });
+            {
+                Title = "Save File",
+                FileTypeChoices = DataTypesForWrite,
+                ShowOverwritePrompt = true
+            });
         return files;
     }
 
@@ -127,19 +130,9 @@ public class DialogService
                 page,
                 new MarkdownHelpWindow(),
                 new MarkDownHelpModel(page, _launcher),
-                new ShowOptions(true,new Size(600,400),false))
+                new ShowOptions(true, new Size(600, 400), false))
             .ConfigureAwait(false);
 
-
-    public async Task FlyoutResult(string title, KustoQueryResult result, KustoSettingsProvider explorerSettings,
-        DisplayPreferencesViewModel displayPreferences) =>
-        await ShowDialog(
-                title,
-                new Flyout(),
-                new FlyoutViewModel(result, explorerSettings, displayPreferences),
-                new ShowOptions(true,new Size(600,400),false)
-                )
-            .ConfigureAwait(false);
 
     public async Task ShowAppPreferences(PreferencesManager preferencesManager) =>
         await ShowDialog(
@@ -168,19 +161,14 @@ public class DialogService
                 _modalNonResizable)
             .ConfigureAwait(false);
 
-    private readonly ShowOptions _modalNonResizable = new ShowOptions(false, new Size(0, 0), true);
-    private readonly ShowOptions _nonModalResizable = new ShowOptions(false, new Size(0, 0), true);
-    private readonly record struct ShowOptions(bool CanResize, Size InitialSize,bool Modal);
-    
-    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext,ShowOptions options)
+    private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, ShowOptions options)
     {
         if (_topLevel is Window window)
         {
-            
-            var sizing = options.InitialSize.Height!=0 
+            var sizing = options.InitialSize.Height != 0
                 ? SizeToContent.Manual
-                :SizeToContent.WidthAndHeight;
-            
+                : SizeToContent.WidthAndHeight;
+
             var dialog = new Window
             {
                 Title = title,
@@ -192,7 +180,7 @@ public class DialogService
                     [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur],
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
             };
-            
+
             if (options.InitialSize.Width > 0)
             {
                 dialog.Width = options.InitialSize.Width;
@@ -223,4 +211,6 @@ public class DialogService
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }
+
+    private readonly record struct ShowOptions(bool CanResize, Size InitialSize, bool Modal);
 }

@@ -38,4 +38,5 @@ public class UIPreferences
     public string[] EditorGridSerialization { get; set; } = [];
     public string[] AvGridRowSerialization { get; set; } = [];
     public string[] AvGridColumnSerialization { get; set; } = [];
+    public string Theme { get; set; } = "";
 }

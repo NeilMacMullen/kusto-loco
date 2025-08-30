@@ -6,9 +6,45 @@
              xmlns:views="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryView"
-             x:DataType="vm:QueryViewModel">
+             x:DataType="vm:QueryViewModel"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
+             GotFocus="InputElement_OnGotFocus">
     <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding  QueryEditorViewModel.QueryContextViewModel.ToggleExpandCommand}"
+                        ToolTip.Tip="Show/Hide Query Prefix"
+                        Classes="Glyph" Content=">" />
+                <Button Command="{Binding FlipArrangementCommand}"
+                        ToolTip.Tip="Change Layout"
+                        Classes="Glyph">
+                    &#x27f3;
+                </Button>
+                <Button Command="{Binding ToggleCursorCommand}"
+                        ToolTip.Tip="Toggle Chart Cursor"
+                        Classes="Glyph">
+                    &#x2295;
+                </Button>
+                <Button Command="{Binding CopyChartCommand}"
+                        ToolTip.Tip="Copy chart to clipboard"
+                        Classes="Glyph">
+                    &#x1F4C8;
+                </Button>
+                <Button Command="{Binding PinChartCommand}"
+                        ToolTip.Tip="Pin result"
+                        Classes="Glyph">
 
+                    &#x1F4CC;
+                </Button>
+                <Button Command="{Binding TearOffCommand}"
+                        ToolTip.Tip="Display result in new window"
+                        Classes="Glyph">
+                    &#x279A;
+                </Button>
+            </StackPanel>
+
+        </DockPanel>
         <Grid ColumnDefinitions="*,auto,*"
               RowDefinitions="*,auto,*"
               DockPanel.Dock="Bottom">
@@ -17,10 +53,14 @@
                     Grid.RowSpan="{Binding RowSpan}"
                     Grid.ColumnSpan="{Binding ColumnSpan}"
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
-                <views:QueryEditorView
-                    Padding="4"
-                    Background="{DynamicResource SystemAltLowColor}"
-                    DataContext="{Binding QueryEditorViewModel}" />
+                <DockPanel>
+                    <views:QueryContextView DockPanel.Dock="Top"
+                                            DataContext="{Binding  QueryEditorViewModel.QueryContextViewModel}" />
+                    <views:QueryEditorView Name="TheQueryEditor"
+                                           Padding="4"
+                                           Background="{DynamicResource SystemAltLowColor}"
+                                           DataContext="{Binding QueryEditorViewModel}" />
+                </DockPanel>
 
             </Border>
 
@@ -31,7 +71,7 @@
                 Grid.ColumnSpan="{Binding ColumnSpan}"
                 Width="{Binding GridSplitterWidth}"
                 Height="{Binding GridSplitterHeight}"
-                Background="#227F7F7F" />
+                Background="{DynamicResource AccentButtonBackgroundDisabled}" />
             <Border Grid.Column="{Binding ChartColumn}"
                     Grid.Row="{Binding ChartRow}"
                     Grid.RowSpan="{Binding RowSpan}"
@@ -39,8 +79,8 @@
 
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
 
-                <views:RenderingSurfaceView
-                    DataContext="{Binding RenderingSurfaceViewModel}" />
+                <views:RenderingSurfaceView Name="TheRenderingSurface"
+                                            DataContext="{Binding RenderingSurfaceViewModel}" />
             </Border>
         </Grid>
 
