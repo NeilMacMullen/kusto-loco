@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using CommunityToolkit.Mvvm.Messaging;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 using lokqlDxComponents.Views.Dialogs;
@@ -24,10 +23,7 @@ public partial class QueryEditorView : UserControl
         Messaging.RegisterForEvent<ThemeChangedMessage>(this, OnThemeChanged);
     }
 
-    private void OnThemeChanged()
-    {
-        HighlightHelper.ApplySyntaxHighlighting(TextEditor);
-    }
+    private void OnThemeChanged() => HighlightHelper.ApplySyntaxHighlighting(TextEditor);
 
     private QueryEditorViewModel? GetVm() =>
         (DataContext as QueryEditorViewModel)!;

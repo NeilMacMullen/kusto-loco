@@ -4,9 +4,9 @@ namespace LokqlDx.ViewModels;
 
 public class ToolManager : Tool
 {
-    public ConsoleDocumentViewModel Console;
     public readonly DisplayPreferencesViewModel DisplayPreferences;
     public readonly PinnedResultsViewModel PinnedResults;
+    public ConsoleDocumentViewModel Console;
     public QueryLibraryViewModel LibraryViewModel;
     public SchemaViewModel SchemaViewModel;
 
@@ -16,6 +16,6 @@ public class ToolManager : Tool
         LibraryViewModel = new QueryLibraryViewModel();
         SchemaViewModel = new SchemaViewModel();
         Console = new ConsoleDocumentViewModel(console);
-        PinnedResults=new PinnedResultsViewModel();
+        PinnedResults = new PinnedResultsViewModel();
     }
 }

@@ -1,14 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Dock.Model.Mvvm.Controls;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
-
 
 public partial class QueryLibraryViewModel : LokqlTool
 {
@@ -16,7 +11,7 @@ public partial class QueryLibraryViewModel : LokqlTool
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _filteredQueries = [];
     [ObservableProperty] private ObservableCollection<QueryDocumentViewModel> _queries = [];
     [ObservableProperty] private bool _searchQueryBody;
-  
+
     public QueryLibraryViewModel()
     {
         Title = "Queries";
@@ -72,7 +67,8 @@ public partial class QueryLibraryViewModel : LokqlTool
     public PersistedQuery[] Persist() =>
         Queries
             .Where(q => !q.IsDeleted)
-            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(),q.QueryViewModel.GetPreQueryText(), !q.IsVisible))
+            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(), q.QueryViewModel.GetPreQueryText(),
+                !q.IsVisible))
             .ToArray();
 
     partial void OnSearchQueryBodyChanged(bool value) => Sort();

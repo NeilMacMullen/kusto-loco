@@ -6,14 +6,15 @@ using Avalonia.Controls.Selection;
 using Avalonia.Input;
 
 namespace LokqlDx.ViewModels;
+
 /// <summary>
-/// This is a copy of the Avalonia FlatTreeDataGridSource that allows dynamic
-/// columns
+///     This is a copy of the Avalonia FlatTreeDataGridSource that allows dynamic
+///     columns
 /// </summary>
 /// <remarks>
-/// The only difference between this and the official
-/// version is that it contains a constructor that allows
-/// the columns to be specified
+///     The only difference between this and the official
+///     version is that it contains a constructor that allows
+///     the columns to be specified
 /// </remarks>
 public class MyFlatTreeDataGridSource<TModel> : NotifyingBase,
     ITreeDataGridSource<TModel>,

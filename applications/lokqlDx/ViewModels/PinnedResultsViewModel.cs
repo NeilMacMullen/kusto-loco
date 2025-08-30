@@ -1,11 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Dock.Model.Mvvm.Controls;
 using KustoLoco.Core;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace LokqlDx.ViewModels;
 
@@ -16,7 +12,7 @@ public partial class PinnedResultsViewModel : LokqlTool
     public PinnedResultsViewModel()
     {
         Title = "Results";
-     
+
         Messaging.RegisterForValue<PinResultMessage, QueryResultWithSender>(this, ReceivePinMesssage);
     }
 
@@ -24,10 +20,7 @@ public partial class PinnedResultsViewModel : LokqlTool
     {
         var named = new PinnedKustoResult(val);
         Results.Add(named);
-        if (val.ImmediateDisplay)
-        {
-           Messaging.Send(new DisplayResultMessage(named));
-        }
+        if (val.ImmediateDisplay) Messaging.Send(new DisplayResultMessage(named));
     }
 
     [RelayCommand]
@@ -37,7 +30,7 @@ public partial class PinnedResultsViewModel : LokqlTool
     public void ToggleDelete(PinnedKustoResult result) => Results.Remove(result);
 
     [RelayCommand]
-    public void Show(PinnedKustoResult result) =>Messaging.Send(new DisplayResultMessage(result));
+    public void Show(PinnedKustoResult result) => Messaging.Send(new DisplayResultMessage(result));
 
     [RelayCommand]
     public void FilterEnter(PinnedKustoResult result) => result.EditLocked = true;

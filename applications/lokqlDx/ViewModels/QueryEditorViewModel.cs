@@ -2,13 +2,11 @@
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DependencyPropertyGenerator;
 using Intellisense;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDxComponents.Services;
 using Microsoft.VisualStudio.Threading;
-using NetTopologySuite.Operation.Distance;
 using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
@@ -17,14 +15,14 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     ICompletionManagerServiceLocator
 {
     private readonly ConsoleViewModel _consoleViewModel;
+    private readonly InteractiveTableExplorer _explorer;
 
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
     [ObservableProperty] private TextDocument _document = new();
-    private InteractiveTableExplorer _explorer;
+    [ObservableProperty] private QueryContextViewModel _queryContextViewModel = new();
 
 
     [ObservableProperty] private bool _textIsDirty;
-    [ObservableProperty] private QueryContextViewModel _queryContextViewModel = new();
 
     public QueryEditorViewModel(InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel, DisplayPreferencesViewModel displayPreferences,
@@ -147,7 +145,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
     internal void SetText(string text) => Document.Text = text;
 
-    
+
     public void Insert(string text)
     {
         var insertPoint = Math.Min(EditorOffset + 1, Document.TextLength);
@@ -155,10 +153,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         Document.Insert(insertPoint, text);
     }
 
-    public bool IsDirty()
-    {
-        return TextIsDirty || QueryContextViewModel.IsDirty;
-    }
+    public bool IsDirty() => TextIsDirty || QueryContextViewModel.IsDirty;
 
     public void Clean()
     {

@@ -11,36 +11,35 @@
              GotFocus="InputElement_OnGotFocus">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-            <StackPanel DockPanel.Dock="Right" 
+            <StackPanel DockPanel.Dock="Right"
                         Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Command="{Binding  QueryEditorViewModel.QueryContextViewModel.ToggleExpandCommand}"
                         ToolTip.Tip="Show/Hide Query Prefix"
-                        Classes="Glyph" Content=">" >
-                </Button>
+                        Classes="Glyph" Content=">" />
                 <Button Command="{Binding FlipArrangementCommand}"
                         ToolTip.Tip="Change Layout"
                         Classes="Glyph">
-                  &#x27f3;
+                    &#x27f3;
                 </Button>
                 <Button Command="{Binding CopyChartCommand}"
                         ToolTip.Tip="Copy chart to clipboard"
                         Classes="Glyph">
-                  &#x1F4C8;
+                    &#x1F4C8;
                 </Button>
-				<Button Command="{Binding PinChartCommand}"
+                <Button Command="{Binding PinChartCommand}"
                         ToolTip.Tip="Pin result"
                         Classes="Glyph">
-                
-                  &#x1F4CC;
+
+                    &#x1F4CC;
                 </Button>
                 <Button Command="{Binding TearOffCommand}"
                         ToolTip.Tip="Display result in new window"
                         Classes="Glyph">
-                  &#x279A;
+                    &#x279A;
                 </Button>
             </StackPanel>
 
-		</DockPanel>
+        </DockPanel>
         <Grid ColumnDefinitions="*,auto,*"
               RowDefinitions="*,auto,*"
               DockPanel.Dock="Bottom">
@@ -49,15 +48,16 @@
                     Grid.RowSpan="{Binding RowSpan}"
                     Grid.ColumnSpan="{Binding ColumnSpan}"
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
-<DockPanel>
-	<views:QueryContextView DockPanel.Dock="Top" DataContext="{Binding  QueryEditorViewModel.QueryContextViewModel}"/>
-	<views:QueryEditorView Name="TheQueryEditor"
-                           Padding="4"
-                           Background="{DynamicResource SystemAltLowColor}"
-                           DataContext="{Binding QueryEditorViewModel}" />
-</DockPanel>
+                <DockPanel>
+                    <views:QueryContextView DockPanel.Dock="Top"
+                                            DataContext="{Binding  QueryEditorViewModel.QueryContextViewModel}" />
+                    <views:QueryEditorView Name="TheQueryEditor"
+                                           Padding="4"
+                                           Background="{DynamicResource SystemAltLowColor}"
+                                           DataContext="{Binding QueryEditorViewModel}" />
+                </DockPanel>
 
-</Border>
+            </Border>
 
             <GridSplitter
                 Grid.Row="{Binding GridSplitterRow}"
@@ -75,7 +75,7 @@
                     BorderBrush="{DynamicResource SystemAltMediumColor}" BorderThickness="1">
 
                 <views:RenderingSurfaceView Name="TheRenderingSurface"
-                    DataContext="{Binding RenderingSurfaceViewModel}" />
+                                            DataContext="{Binding RenderingSurfaceViewModel}" />
             </Border>
         </Grid>
 

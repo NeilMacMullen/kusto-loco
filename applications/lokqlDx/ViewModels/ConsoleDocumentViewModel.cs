@@ -7,6 +7,7 @@ public partial class LokqlTool : Tool
 {
     [ObservableProperty] private bool _isVisible;
 }
+
 public class ConsoleDocumentViewModel : LokqlTool
 {
     public ConsoleDocumentViewModel(ConsoleViewModel model)
@@ -17,5 +18,6 @@ public class ConsoleDocumentViewModel : LokqlTool
         CanPin = true;
         Model = model;
     }
+
     public ConsoleViewModel Model { get; private set; }
 }

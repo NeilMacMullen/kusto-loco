@@ -11,10 +11,9 @@ using lokqlDxComponents.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LokqlDx;
-internal class Program :Application
+
+internal class Program : Application
 {
-
-
 #if PREVIEWER
 // Initialization code. Don't use any Avalonia, third-party APIs or any
 // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -40,6 +39,7 @@ public static AppBuilder BuildAvaloniaApp()
         var container = new DiContainer();
         BuildAvaloniaApp(container).StartWithClassicDesktopLifetime(args);
     }
+
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp(IServiceProvider serviceProvider)
         => AppBuilder.Configure(serviceProvider.GetRequiredService<App>)
@@ -48,7 +48,6 @@ public static AppBuilder BuildAvaloniaApp()
             .UseHotReload()
             .LogToTrace();
 #endif
-
 }
 
 [ServiceProvider]

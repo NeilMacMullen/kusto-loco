@@ -26,7 +26,6 @@ public class DockFactory : Factory
         Messaging.RegisterForEvent<ThemeChangedMessage>(this, UpdateBackgrounds);
     }
 
-   
 
     public IRootDock Layout { get; set; } = new RootDock();
 
@@ -48,10 +47,7 @@ public class DockFactory : Factory
 
     private void InsertTextInActiveWindow(string text) => InsertText(text);
 
-    public override IDocumentDock CreateDocumentDock()
-    {
-        return new QueryDocumentDock();
-    }
+    public override IDocumentDock CreateDocumentDock() => new QueryDocumentDock();
 
     public void CloseLayout()
     {
@@ -143,7 +139,7 @@ public class DockFactory : Factory
         };
     }
 
-   
+
     public override IRootDock CreateLayout()
     {
         var documentDock = new QueryDocumentDock
@@ -290,7 +286,9 @@ public class DockFactory : Factory
             AddDocument(model);
         }
         else
+        {
             SetActiveDockable(model);
+        }
     }
 
     private void ShowTool(string tool)
@@ -319,6 +317,4 @@ public class DockFactory : Factory
                 break;
         }
     }
-
-    
 }

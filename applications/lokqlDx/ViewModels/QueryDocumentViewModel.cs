@@ -6,12 +6,11 @@ namespace LokqlDx.ViewModels;
 
 public partial class QueryDocumentViewModel : Document, INotifyPropertyChanged
 {
-    [ObservableProperty] public bool _editLocked = true;
-
     private readonly bool _initialized;
+    [ObservableProperty] public bool _editLocked = true;
     [ObservableProperty] private bool _isDeleted;
 
-    [ObservableProperty] private bool _isVisible=true;
+    [ObservableProperty] private bool _isVisible = true;
 
     public QueryDocumentViewModel(string title, QueryViewModel content)
     {

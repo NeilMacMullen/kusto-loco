@@ -32,18 +32,18 @@
                 WordWrap="{Binding WordWrap}"
                 ShowLineNumbers="{Binding ShowLineNumbers}"
                 Document="{Binding Document}"
-                Height="300" Width="600"/>
+                Height="300" Width="600" />
         </Border>
 
         <Button
-           Classes="SmallButton"
+            Classes="SmallButton"
             Grid.Column="2"
             Grid.Row="2"
             Content="Cancel"
             Command="{Binding CancelCommand}" />
 
-		<Button
-           Classes="SmallButton"
+        <Button
+            Classes="SmallButton"
             Grid.Column="3"
             Grid.Row="2"
             Content="Save"

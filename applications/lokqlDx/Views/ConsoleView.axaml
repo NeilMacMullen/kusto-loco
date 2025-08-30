@@ -12,7 +12,7 @@
              Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-			<Button
+            <Button
                 Classes="SmallButton"
                 Command="{Binding ClearCommand}">
                 Clear
@@ -21,8 +21,7 @@
         <Border BorderThickness="7" Margin="2">
 
             <ScrollViewer DockPanel.Dock="Bottom" Name="TheScrollViewer"
-Background="{DynamicResource SystemAltHighColor}"
-                          >
+                          Background="{DynamicResource SystemAltHighColor}">
                 <Interaction.Behaviors>
                     <v:ScrollToEndBehavior ScrollToEnd="{Binding TriggerScroll}" />
                 </Interaction.Behaviors>

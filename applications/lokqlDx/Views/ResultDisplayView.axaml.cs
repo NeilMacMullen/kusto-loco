@@ -10,11 +10,10 @@ public partial class ResultDisplayView : UserControl
     {
         InitializeComponent();
     }
+
     private async void SurfaceView_OnLoaded(object? sender, RoutedEventArgs e)
     {
         if (DataContext is ResultDisplayViewModel viewModel)
             await viewModel.RenderingSurface.RenderToDisplay(viewModel.Result);
     }
-
-    
 }

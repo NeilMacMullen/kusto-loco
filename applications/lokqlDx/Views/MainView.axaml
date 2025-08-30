@@ -78,18 +78,18 @@
                     <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
                     <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
                 </MenuItem>
-                    <MenuItem Header="_View">
-                        <MenuItem Header="Show _Query Manager" Command="{Binding ShowToolCommand}"
-                                  CommandParameter="queries"/>
-                        <MenuItem Header="Show _Schema Explorer" Command="{Binding ShowToolCommand}"
-                                  CommandParameter="schema"/>
-                        <MenuItem Header="Show _Results Explorer" Command="{Binding ShowToolCommand}"
-                                  CommandParameter="results"/>
+                <MenuItem Header="_View">
+                    <MenuItem Header="Show _Query Manager" Command="{Binding ShowToolCommand}"
+                              CommandParameter="queries" />
+                    <MenuItem Header="Show _Schema Explorer" Command="{Binding ShowToolCommand}"
+                              CommandParameter="schema" />
+                    <MenuItem Header="Show _Results Explorer" Command="{Binding ShowToolCommand}"
+                              CommandParameter="results" />
 
-						<MenuItem Header="Show _Output Window" Command="{Binding ShowToolCommand}"
-                                  CommandParameter="console"/>
+                    <MenuItem Header="Show _Output Window" Command="{Binding ShowToolCommand}"
+                              CommandParameter="console" />
 
-					</MenuItem>
+                </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
                               Command="{Binding NavigateToWikiCommand}" />

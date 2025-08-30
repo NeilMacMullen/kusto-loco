@@ -2,207 +2,207 @@
 
 <SyntaxDefinition name="KQL"
                   xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-    <!-- Color definitions moved to VSDark.xml -->
-    <!-- This is the main ruleset. -->
-    <RuleSet>
-        <Span color="Comment" begin="//" />
-        <Span color="ScriptComment" begin="#" />
-        <Span color="InternalCommand" begin="^\." end="\s+|$"/>
+	<!-- Color definitions moved to VSDark.xml -->
+	<!-- This is the main ruleset. -->
+	<RuleSet>
+		<Span color="Comment" begin="//" />
+		<Span color="ScriptComment" begin="#" />
+		<Span color="InternalCommand" begin="^\." end="\s+|$" />
 
-        <Span color="String">
-            <Begin>"</Begin>
-            <End>"</End>
-        </Span>
+		<Span color="String">
+			<Begin>"</Begin>
+			<End>"</End>
+		</Span>
 
-        <Span color="String">
-            <Begin>'</Begin>
-            <End>'</End>
-        </Span>
+		<Span color="String">
+			<Begin>'</Begin>
+			<End>'</End>
+		</Span>
 
-        <Rule color="Number">
-	        \b0[xX][0-9a-fA-F]+  # hex number
-	        |    \b
-	        (    \d+(\.[0-9]+)?   #number with optional floating point
-	        |    \.[0-9]+         #or just starting with floating point
-	        )
-	        ([eE][+-]?[0-9]+)? # optional exponent
-        </Rule>
+		<Rule color="Number">
+			\b0[xX][0-9a-fA-F]+  # hex number
+			|    \b
+			(    \d+(\.[0-9]+)?   #number with optional floating point
+			|    \.[0-9]+         #or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)? # optional exponent
+		</Rule>
 
-        <Keywords color="Logical">
-            <Word>and</Word>
-            <Word>or</Word>
-            <Word>==</Word>
-            <Word>=</Word>
-            <Word>!=</Word>
-            <Word>&lt;=</Word>
-            <Word>&gt;=</Word>
-            <Word>&lt;</Word>
-            <Word>&gt;</Word>
-        </Keywords>
+		<Keywords color="Logical">
+			<Word>and</Word>
+			<Word>or</Word>
+			<Word>==</Word>
+			<Word>=</Word>
+			<Word>!=</Word>
+			<Word>&lt;=</Word>
+			<Word>&gt;=</Word>
+			<Word>&lt;</Word>
+			<Word>&gt;</Word>
+		</Keywords>
 
-        <Keywords color="ChartRelated">
-            <Word>anomalychart</Word>
-            <Word>areachart</Word>
-            <word>ladderchart</word>
-            <Word>barchart</Word>
-            <Word>card</Word>
-            <Word>columnchart</Word>
-            <Word>linechart</Word>
-            <Word>piechart</Word>
-            <Word>scatterchart</Word>
-            <Word>stackedareachart</Word>
-            <Word>table</Word>
-            <Word>timechart</Word>
-            <Word>with</Word>
-            <Word>title</Word>
-            <Word>legend</Word>
-            <Word>hidden</Word>
-            <Word>visible</Word>
-        </Keywords>
+		<Keywords color="ChartRelated">
+			<Word>anomalychart</Word>
+			<Word>areachart</Word>
+			<word>ladderchart</word>
+			<Word>barchart</Word>
+			<Word>card</Word>
+			<Word>columnchart</Word>
+			<Word>linechart</Word>
+			<Word>piechart</Word>
+			<Word>scatterchart</Word>
+			<Word>stackedareachart</Word>
+			<Word>table</Word>
+			<Word>timechart</Word>
+			<Word>with</Word>
+			<Word>title</Word>
+			<Word>legend</Word>
+			<Word>hidden</Word>
+			<Word>visible</Word>
+		</Keywords>
 
-        <Keywords color="Operator">
-            <Word>where</Word>
-            <Word>project-keep</Word>
-            <Word>project-away</Word>
-            <Word>project</Word>
-            <Word>project-rename</Word>
-            <Word>project-reorder</Word>
-            <Word>order</Word>
-            <Word>take</Word>
-            <Word>summarize</Word>
-            <Word>extend</Word>
-            <Word>count</Word>
-            <Word>render</Word>
-            <Word>join</Word>
-            <Word>union</Word>
-            <Word>getschema</Word>
-            <Word>datatable</Word>
-            <Word>dynamic</Word>
-        </Keywords>
+		<Keywords color="Operator">
+			<Word>where</Word>
+			<Word>project-keep</Word>
+			<Word>project-away</Word>
+			<Word>project</Word>
+			<Word>project-rename</Word>
+			<Word>project-reorder</Word>
+			<Word>order</Word>
+			<Word>take</Word>
+			<Word>summarize</Word>
+			<Word>extend</Word>
+			<Word>count</Word>
+			<Word>render</Word>
+			<Word>join</Word>
+			<Word>union</Word>
+			<Word>getschema</Word>
+			<Word>datatable</Word>
+			<Word>dynamic</Word>
+		</Keywords>
 
-        <Keywords color="Function">
-            <Word>print</Word>
-            <Word>datetime</Word>
-            <Word>$left.</Word>
-            <Word>$right.</Word>
-            <Word>on</Word>
-            <Word>prev</Word>
-            <Word>next</Word>
-            <Word>asc</Word>
-            <Word>desc</Word>
-            <Word>max</Word>
-            <Word>min</Word>
-            <Word>max_of</Word>
-            <Word>min_of</Word>
-            <Word>sum</Word>
-            <Word>avg</Word>
-            <Word>by</Word>
-            <Word>abs</Word>
-            <Word>ago</Word>
-            <Word>array_length</Word>
-            <Word>array_sort_asc</Word>
-            <Word>array_sort_desc</Word>
-            <Word>array_concat</Word>
-            <Word>bin</Word>
-            <Word>case</Word>
-            <Word>coalesce</Word>
-            <Word>cos</Word>
-            <Word>datetime_diff</Word>
-            <Word>datetime_part</Word>
-            <Word>datetime_utc_to_local</Word>
-            <Word>dayofmonth</Word>
-            <Word>dayofweek</Word>
-            <Word>dayofyear</Word>
-            <Word>degrees</Word>
-            <Word>endofday</Word>
-            <Word>endofmonth</Word>
-            <Word>endofweek</Word>
-            <Word>endofyear</Word>
-            <Word>exp</Word>
-            <Word>extract</Word>
-            <Word>format_datetime</Word>
-            <Word>geo_distance_2points</Word>
-            <Word>geo_geohash_to_central_point</Word>
-            <Word>geo_point_to_geohash</Word>
-            <Word>getyear</Word>
-            <Word>hourofday</Word>
-            <Word>iff</Word>
-            <Word>iif</Word>
-            <Word>isempty</Word>
-            <Word>isnull</Word>
-            <Word>log</Word>
-            <Word>log10</Word>
-            <Word>log2</Word>
-            <Word>min_of</Word>
-            <Word>monthofyear</Word>
-            <Word>not</Word>
-            <Word>now</Word>
-            <Word>parse_json</Word>
-            <Word>pow</Word>
-            <Word>radians</Word>
-            <Word>replace_string</Word>
-            <Word>round</Word>
-            <Word>row_number</Word>
-            <Word>sign</Word>
-            <Word>sin</Word>
-            <Word>split</Word>
-            <Word>sqrt</Word>
-            <Word>startofday</Word>
-            <Word>startofmonth</Word>
-            <Word>startofweek</Word>
-            <Word>startofyear</Word>
-            <Word>strcat</Word>
-            <Word>strlen</Word>
-            <Word>substring</Word>
-            <Word>tan</Word>
-            <Word>tobool</Word>
-            <Word>todatetime</Word>
-            <Word>todouble</Word>
-            <Word>tohex</Word>
-            <Word>toint</Word>
-            <Word>tolong</Word>
-            <Word>tolower</Word>
-            <Word>tostring</Word>
-            <Word>totimespan</Word>
-            <Word>toupper</Word>
-            <Word>trim_end</Word>
-            <Word>trim</Word>
-            <Word>trim_start</Word>
-            <Word>url_decode</Word>
-            <Word>url_encode_component</Word>
-            <Word>contains_cs</Word>
-            <Word>contains</Word>
-            <Word>!contains_cs</Word>
-            <Word>!contains</Word>
-            <Word>between</Word>
-            <Word>!between</Word>
-            <Word>dcount (aggregation function)</Word>
-            <Word>dcountif (aggregation function)</Word>
-            <Word>trimws</Word>
-            <Word>levenshtein</Word>
-            <Word>string_similarity</Word>
-            <Word>datetime_to_iso</Word>
-            <Word>padleft</Word>
-            <Word>padright</Word>
-            <Word>todatetimefmt</Word>
-            <Word>parsehex</Word>
-            <Word>binary_and</Word>
-            <Word>binary_or</Word>
-            <Word>binary_xor</Word>
-            <Word>binary_not</Word>
-            <Word>bitset_count_ones</Word>
-            <Word>binary_shift_left</Word>
-            <Word>binary_shift_right</Word>
-            <Word>make_datetime</Word>
-            <Word>make_timespan</Word>
-            <Word>make_list</Word>
-            <Word>make_listif</Word>
-            <Word>arg_min</Word>
-            <Word>arg_max</Word>
+		<Keywords color="Function">
+			<Word>print</Word>
+			<Word>datetime</Word>
+			<Word>$left.</Word>
+			<Word>$right.</Word>
+			<Word>on</Word>
+			<Word>prev</Word>
+			<Word>next</Word>
+			<Word>asc</Word>
+			<Word>desc</Word>
+			<Word>max</Word>
+			<Word>min</Word>
+			<Word>max_of</Word>
+			<Word>min_of</Word>
+			<Word>sum</Word>
+			<Word>avg</Word>
+			<Word>by</Word>
+			<Word>abs</Word>
+			<Word>ago</Word>
+			<Word>array_length</Word>
+			<Word>array_sort_asc</Word>
+			<Word>array_sort_desc</Word>
+			<Word>array_concat</Word>
+			<Word>bin</Word>
+			<Word>case</Word>
+			<Word>coalesce</Word>
+			<Word>cos</Word>
+			<Word>datetime_diff</Word>
+			<Word>datetime_part</Word>
+			<Word>datetime_utc_to_local</Word>
+			<Word>dayofmonth</Word>
+			<Word>dayofweek</Word>
+			<Word>dayofyear</Word>
+			<Word>degrees</Word>
+			<Word>endofday</Word>
+			<Word>endofmonth</Word>
+			<Word>endofweek</Word>
+			<Word>endofyear</Word>
+			<Word>exp</Word>
+			<Word>extract</Word>
+			<Word>format_datetime</Word>
+			<Word>geo_distance_2points</Word>
+			<Word>geo_geohash_to_central_point</Word>
+			<Word>geo_point_to_geohash</Word>
+			<Word>getyear</Word>
+			<Word>hourofday</Word>
+			<Word>iff</Word>
+			<Word>iif</Word>
+			<Word>isempty</Word>
+			<Word>isnull</Word>
+			<Word>log</Word>
+			<Word>log10</Word>
+			<Word>log2</Word>
+			<Word>min_of</Word>
+			<Word>monthofyear</Word>
+			<Word>not</Word>
+			<Word>now</Word>
+			<Word>parse_json</Word>
+			<Word>pow</Word>
+			<Word>radians</Word>
+			<Word>replace_string</Word>
+			<Word>round</Word>
+			<Word>row_number</Word>
+			<Word>sign</Word>
+			<Word>sin</Word>
+			<Word>split</Word>
+			<Word>sqrt</Word>
+			<Word>startofday</Word>
+			<Word>startofmonth</Word>
+			<Word>startofweek</Word>
+			<Word>startofyear</Word>
+			<Word>strcat</Word>
+			<Word>strlen</Word>
+			<Word>substring</Word>
+			<Word>tan</Word>
+			<Word>tobool</Word>
+			<Word>todatetime</Word>
+			<Word>todouble</Word>
+			<Word>tohex</Word>
+			<Word>toint</Word>
+			<Word>tolong</Word>
+			<Word>tolower</Word>
+			<Word>tostring</Word>
+			<Word>totimespan</Word>
+			<Word>toupper</Word>
+			<Word>trim_end</Word>
+			<Word>trim</Word>
+			<Word>trim_start</Word>
+			<Word>url_decode</Word>
+			<Word>url_encode_component</Word>
+			<Word>contains_cs</Word>
+			<Word>contains</Word>
+			<Word>!contains_cs</Word>
+			<Word>!contains</Word>
+			<Word>between</Word>
+			<Word>!between</Word>
+			<Word>dcount (aggregation function)</Word>
+			<Word>dcountif (aggregation function)</Word>
+			<Word>trimws</Word>
+			<Word>levenshtein</Word>
+			<Word>string_similarity</Word>
+			<Word>datetime_to_iso</Word>
+			<Word>padleft</Word>
+			<Word>padright</Word>
+			<Word>todatetimefmt</Word>
+			<Word>parsehex</Word>
+			<Word>binary_and</Word>
+			<Word>binary_or</Word>
+			<Word>binary_xor</Word>
+			<Word>binary_not</Word>
+			<Word>bitset_count_ones</Word>
+			<Word>binary_shift_left</Word>
+			<Word>binary_shift_right</Word>
+			<Word>make_datetime</Word>
+			<Word>make_timespan</Word>
+			<Word>make_list</Word>
+			<Word>make_listif</Word>
+			<Word>arg_min</Word>
+			<Word>arg_max</Word>
 
-        </Keywords>
-        <!-- Digits -->
-        
+		</Keywords>
+		<!-- Digits -->
 
-    </RuleSet>
+
+	</RuleSet>
 </SyntaxDefinition>

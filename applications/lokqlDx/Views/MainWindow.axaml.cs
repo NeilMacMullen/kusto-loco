@@ -18,10 +18,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+
     public MainWindow(MainView view)
     {
         InitializeComponent();
@@ -29,6 +26,8 @@ public partial class MainWindow : Window
 
         if (ActualTransparencyLevel == WindowTransparencyLevel.Mica) Background = Brushes.Transparent;
     }
+
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void Window_PositionChanged(object? sender, PixelPointEventArgs e) =>
         WindowPosition = new Point(e.Point.X, e.Point.Y);

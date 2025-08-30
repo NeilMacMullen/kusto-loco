@@ -3,9 +3,7 @@ using System.Text;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using KustoLoco.Core.Console;
-using Vanara.PInvoke;
 
 namespace LokqlDx.ViewModels;
 
@@ -26,7 +24,7 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
         WindowWidth = 80; // Default width
         DisplayPreferencesPreferences = displayPreferencesPreferences;
         Messaging.RegisterForEvent<ClearConsoleMessage>(this, Clear);
-     }
+    }
 
     public int WindowWidth { get; private set; } = 80;
 

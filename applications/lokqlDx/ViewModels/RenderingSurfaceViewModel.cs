@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
@@ -13,7 +11,6 @@ using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using Lokql.Engine.Commands;
 using lokqlDx;
-using LokqlDx.Services;
 using LokqlDx.Views;
 using NotNullStrings;
 
@@ -21,13 +18,13 @@ namespace LokqlDx.ViewModels;
 
 public partial class RenderingSurfaceViewModel : ObservableObject, IResultRenderingSurface
 {
+    private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _kustoSettings;
 
     [ObservableProperty] private int _activeTab;
 
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
-    private readonly IKustoConsole _console;
 
     [ObservableProperty] private string _name = string.Empty;
 
@@ -39,7 +36,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     [ObservableProperty] private ITreeDataGridSource<Row> _treeSource = new MyFlatTreeDataGridSource<Row>([], []);
 
     public RenderingSurfaceViewModel(string name, KustoSettingsProvider kustoSettings,
-        DisplayPreferencesViewModel displayPreferences,IKustoConsole console)
+        DisplayPreferencesViewModel displayPreferences, IKustoConsole console)
     {
         _kustoSettings = kustoSettings;
         _displayPreferences = displayPreferences;
@@ -120,20 +117,21 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                     var maxAllowed = 10000;
                     if (Result.RowCount > maxAllowed)
                     {
-                     _console.Warn($"Results are too large to copy to clipboard - only {maxAllowed} lines are allowed");
-                     break;
+                        _console.Warn(
+                            $"Results are too large to copy to clipboard - only {maxAllowed} lines are allowed");
+                        break;
                     }
+
                     var settings = _kustoSettings.Snapshot();
-                    settings.Set(CsvSerializer.CsvSerializerSettings.SkipHeaderOnSave.Name,true);
+                    settings.Set(CsvSerializer.CsvSerializerSettings.SkipHeaderOnSave.Name, true);
                     using var stream = new MemoryStream();
                     var csvSerializer = CsvSerializer.Default(settings, _console);
-                    
+
                     await csvSerializer.SaveTable(stream, Result);
-                    
+
                     var csvText = Encoding.UTF8.GetString(stream.ToArray());
                     await ClipboardAvalonia.SetTextAsync(csvText.TrimEnd());
                     _console.Info("Results copied to clipboard");
-                    
                 }
                     break;
             }
@@ -141,10 +139,8 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     }
 
 
-    public void CopyToClipboard()
-    {
-        _plotter.CopyToClipboard();
-    }
+    public void CopyToClipboard() => _plotter.CopyToClipboard();
+
     private Task RenderTable(KustoQueryResult result)
     {
         //ensure that if there are no results we clear the data grid

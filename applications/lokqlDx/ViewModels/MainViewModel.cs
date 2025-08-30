@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -12,7 +13,6 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
-using LokqlDx;
 using LokqlDx.Models;
 using LokqlDx.Services;
 using lokqlDxComponents.Services;
@@ -22,10 +22,8 @@ using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
-
 public partial class MainViewModel : ObservableObject
 {
-    private const string NewQueryName = "new";
     private readonly DialogService _dialogService;
 
     private readonly DisplayPreferencesViewModel _displayPreferences;
@@ -36,6 +34,7 @@ public partial class MainViewModel : ObservableObject
     private readonly RegistryOperations _registryOperations;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStorageProvider _storage;
+    private readonly ToolManager _toolManager;
     private readonly WorkspaceManager _workspaceManager;
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
     private CommandProcessor _commandProcessor;
@@ -61,9 +60,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
-    private readonly ToolManager _toolManager;
-
-    private QueryLibraryViewModel QueryLibrary => _toolManager.LibraryViewModel;
 
     public MainViewModel(
         DialogService dialogService,
@@ -77,13 +73,12 @@ public partial class MainViewModel : ObservableObject
         AssetFolderImageProvider imageProvider
     )
     {
-       
         _imageProvider = imageProvider;
         _serviceProvider = serviceProvider;
         _displayPreferences = new DisplayPreferencesViewModel();
 
         ConsoleViewModel = new ConsoleViewModel(_displayPreferences);
-        _toolManager = new ToolManager(_displayPreferences,ConsoleViewModel);
+        _toolManager = new ToolManager(_displayPreferences, ConsoleViewModel);
         _dialogService = dialogService;
         _preferencesManager = preferencesManager;
         _commandProcessor = commandProcessorFactory.GetCommandProcessor();
@@ -91,9 +86,8 @@ public partial class MainViewModel : ObservableObject
         _registryOperations = registryOperations;
         _storage = storage;
         _launcher = launcher;
-    
-        
-        
+
+
         _explorer = CreateExplorer();
 
         WeakReferenceMessenger.Default.Register<RunningQueryMessage>(this,
@@ -104,6 +98,8 @@ public partial class MainViewModel : ObservableObject
 
         _factory = new DockFactory(_toolManager);
     }
+
+    private QueryLibraryViewModel QueryLibrary => _toolManager.LibraryViewModel;
 
     private void ResetLayout()
     {
@@ -122,7 +118,7 @@ public partial class MainViewModel : ObservableObject
 
     private QueryDocumentViewModel CreateDoc(CreateDocumentRequest msg)
     {
-        var q =  AddQuery(msg.Title, string.Empty,string.Empty, true);
+        var q = AddQuery(msg.Title, string.Empty, string.Empty, true);
         msg.Model = q;
         return q;
     }
@@ -131,21 +127,21 @@ public partial class MainViewModel : ObservableObject
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
         if (message.IsRunning) await SaveBeforeQuery();
-        else  Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
-            return false;
+        else Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
+        return false;
     }
 
-    
 
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
-   
-    private QueryDocumentViewModel AddQuery(string name, string content,string preQueryText, bool isVisible)
+
+    private QueryDocumentViewModel AddQuery(string name, string content, string preQueryText, bool isVisible)
     {
-        var doc = CreateQuery(name,content,preQueryText,isVisible);
+        var doc = CreateQuery(name, content, preQueryText, isVisible);
         QueryLibrary.Add(doc);
         return doc;
     }
+
     private QueryDocumentViewModel CreateQuery(string name, string content, string preQueryText, bool isVisible)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
@@ -157,15 +153,13 @@ public partial class MainViewModel : ObservableObject
             _displayPreferences,
             content,
             preQueryText,
-            adapter){} ;
+            adapter);
 
         var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel);
-        var doc = new QueryDocumentViewModel(name, queryViewModel) {IsVisible = isVisible};
+        var doc = new QueryDocumentViewModel(name, queryViewModel) { IsVisible = isVisible };
         return doc;
     }
 
-
-   
 
     [RelayCommand]
     private async Task LoadData()
@@ -349,7 +343,6 @@ public partial class MainViewModel : ObservableObject
         _displayPreferences.ShowLineNumbers = uiPreferences.ShowLineNumbers;
         var theme = uiPreferences.Theme;
         ApplicationHelper.SetTheme(theme);
-      
     }
 
     private InteractiveTableExplorer CreateExplorer() =>
@@ -394,9 +387,9 @@ public partial class MainViewModel : ObservableObject
 
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
-                AddQuery(p.Name.NullToEmpty(), p.Text.NullToEmpty(),p.PreQueryText.NullToEmpty(), !p.IsHidden);
+                AddQuery(p.Name.NullToEmpty(), p.Text.NullToEmpty(), p.PreQueryText.NullToEmpty(), !p.IsHidden);
         else
-            AddQuery("query", CurrentWorkspace.Text,string.Empty,true);
+            AddQuery("query", CurrentWorkspace.Text, string.Empty, true);
         ResetLayout();
         UpdateUIFromWorkspace();
         if (!appPrefs.HasShownLanding)
@@ -405,6 +398,7 @@ public partial class MainViewModel : ObservableObject
             appPrefs.HasShownLanding = true;
             _preferencesManager.Save(appPrefs);
         }
+
         Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
     }
 
@@ -427,11 +421,7 @@ public partial class MainViewModel : ObservableObject
         return IsDirty;
     }
 
-    private void ResetDirty()
-    {
-        QueryLibrary.ClearDirty();
-       
-    }
+    private void ResetDirty() => QueryLibrary.ClearDirty();
 
 
     /// <summary>
@@ -533,7 +523,7 @@ public partial class MainViewModel : ObservableObject
     private void SaveWorkspace(string path)
     {
         var queries = QueryLibrary.Persist();
-           ;
+        ;
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
         ResetDirty();
@@ -578,11 +568,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowTool(string toolName)
-    {
-        Messaging.Send(new ShowToolMessage(toolName));
-    }
-   
+    private void ShowTool(string toolName) => Messaging.Send(new ShowToolMessage(toolName));
 }
 
 public static class ApplicationHelper
@@ -592,18 +578,15 @@ public static class ApplicationHelper
         theme = theme.OrWhenBlank("Dark");
         Application.Current!.RequestedThemeVariant = theme switch
         {
-            "Default" => Avalonia.Styling.ThemeVariant.Default,
-            "Dark" => Avalonia.Styling.ThemeVariant.Dark,
-            "Light" => Avalonia.Styling.ThemeVariant.Light,
-            _ => Avalonia.Styling.ThemeVariant.Dark
+            "Default" => ThemeVariant.Default,
+            "Dark" => ThemeVariant.Dark,
+            "Light" => ThemeVariant.Light,
+            _ => ThemeVariant.Dark
         };
         Messaging.Send(new ThemeChangedMessage(theme));
     }
 
-    public static string GetTheme()
-    {
-       return Application.Current?.ActualThemeVariant.ToString().OrWhenBlank("Dark")!;
-    }
+    public static string GetTheme() => Application.Current?.ActualThemeVariant.ToString().OrWhenBlank("Dark")!;
 
     public static IBrush GetBackgroundForCurrentTheme()
     {

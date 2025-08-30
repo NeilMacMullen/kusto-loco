@@ -16,13 +16,13 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
 
     [ObservableProperty] private ObservableCollection<FontFamily> _fonts;
     [ObservableProperty] private double _fontSize;
+    [ObservableProperty] private string _pluginsFolder;
     [ObservableProperty] private bool _saveBeforeQuery;
     [ObservableProperty] private FontFamily _selectedFont;
+    [ObservableProperty] private string _selectedTheme = "";
     [ObservableProperty] private bool _showLineNumbers;
+    [ObservableProperty] private ObservableCollection<string> _themes = [];
     [ObservableProperty] private bool _wordWrap;
-    [ObservableProperty] private string _pluginsFolder;
-    [ObservableProperty] private ObservableCollection<string> _themes=[];
-    [ObservableProperty] private string _selectedTheme="";
 
     public ApplicationPreferencesViewModel(PreferencesManager preferencesManager)
     {
@@ -73,9 +73,5 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
         _completionSource.SetResult();
     }
 
-    partial void OnSelectedThemeChanged(string value)
-    {
-        ApplicationHelper.SetTheme(value);
-        
-    }
+    partial void OnSelectedThemeChanged(string value) => ApplicationHelper.SetTheme(value);
 }

@@ -103,7 +103,7 @@
                 Content="Cancel"
                 Command="{Binding CancelCommand}" />
 
-			<Button
+            <Button
                 Classes="SmallButton"
                 Grid.Column="5"
                 Grid.Row="6"

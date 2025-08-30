@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using LokqlDx.ViewModels;
 
@@ -29,6 +28,4 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
     }
 
     private void StyledElement_OnDataContextChanged(object? sender, EventArgs e) => RegisterHost();
-
-   
 }

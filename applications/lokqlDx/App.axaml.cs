@@ -11,7 +11,7 @@ namespace LokqlDx;
 
 public class App : Application
 {
-private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private static IServiceProvider? _provider;
     public static T Resolve<T>() where T : notnull => _provider!.GetRequiredService<T>();
 #if PREVIEWER
@@ -21,7 +21,7 @@ private readonly IServiceProvider _serviceProvider;
         _provider = _serviceProvider;
     }
 #else
-   
+
 
     public App(IServiceProvider serviceProvider)
     {
@@ -68,6 +68,4 @@ private readonly IServiceProvider _serviceProvider;
 
         base.OnFrameworkInitializationCompleted();
     }
-
-    
 }

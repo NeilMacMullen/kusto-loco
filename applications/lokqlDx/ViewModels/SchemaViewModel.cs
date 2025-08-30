@@ -1,11 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Dock.Model.Mvvm.Controls;
 using Lokql.Engine;
 using NotNullStrings;
 
@@ -24,7 +21,7 @@ public partial class SchemaViewModel : LokqlTool
     public SchemaViewModel()
     {
         Title = "Schema";
-        Messaging.RegisterForValue<SchemaUpdateMessage, SchemaLine[]>(this,Update);
+        Messaging.RegisterForValue<SchemaUpdateMessage, SchemaLine[]>(this, Update);
     }
 
     [RelayCommand]
@@ -124,7 +121,7 @@ public partial class SchemaViewModel : LokqlTool
 
     [RelayCommand]
     public void DoubleClick(SchemaClick click) =>
-       Messaging.Send(new InsertTextMessage(click.ClickedText));
+        Messaging.Send(new InsertTextMessage(click.ClickedText));
 
     partial void OnShowCommandsChanged(bool value) =>
         // Call your command or update logic here

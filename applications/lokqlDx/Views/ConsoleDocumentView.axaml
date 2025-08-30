@@ -8,5 +8,5 @@
              x:Class="LokqlDx.Views.ConsoleDocumentView"
              x:DataType="vm:ConsoleDocumentViewModel"
              Background="Black">
-    <views:ConsoleView DataContext="{Binding Model}"></views:ConsoleView>
+    <views:ConsoleView DataContext="{Binding Model}" />
 </UserControl>

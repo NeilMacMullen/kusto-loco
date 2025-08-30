@@ -19,7 +19,7 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private int _gridSplitterWidth = 5;
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-   
+
     [ObservableProperty] private int _rowSpan = 3;
     private int n;
 
@@ -56,10 +56,7 @@ public partial class QueryViewModel : ObservableObject
 
     private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();
 
-    private async Task LoadFile(LoadFileMessage msg)
-    {
-        await QueryEditorViewModel.RunQueryString($".load {msg.Path}");
-    }
+    private async Task LoadFile(LoadFileMessage msg) => await QueryEditorViewModel.RunQueryString($".load {msg.Path}");
 
     private async Task SaveFile(SaveFileMessage msg) => await QueryEditorViewModel.RunQueryString($".save {msg.Path}");
 
@@ -126,10 +123,7 @@ public partial class QueryViewModel : ObservableObject
     public void Clean() => QueryEditorViewModel.Clean();
 
     [RelayCommand]
-    public void CopyChart()
-    {
-        CopyChartToClipboard();
-    }
+    public void CopyChart() => CopyChartToClipboard();
 
     [RelayCommand]
     public void PinChart()
@@ -145,8 +139,5 @@ public partial class QueryViewModel : ObservableObject
         Messaging.Send(msg);
     }
 
-    public string GetPreQueryText()
-    {
-        return QueryEditorViewModel.QueryContextViewModel.Text;
-    }
+    public string GetPreQueryText() => QueryEditorViewModel.QueryContextViewModel.Text;
 }

@@ -7,10 +7,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.QueryDocumentView"
              x:DataType="vm:QueryDocumentViewModel"
-             GotFocus="InputElement_OnGotFocus"
-
-             >
-			 <DockPanel>
-       <views:QueryView DataContext="{Binding  QueryViewModel}" Name="TheQueryView"/>
+             GotFocus="InputElement_OnGotFocus">
+    <DockPanel>
+        <views:QueryView DataContext="{Binding  QueryViewModel}" Name="TheQueryView" />
     </DockPanel>
 </UserControl>
