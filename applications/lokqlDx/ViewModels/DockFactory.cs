@@ -1,56 +1,45 @@
-﻿using Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Metadata;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using Avalonia.Threading;
 using Dock.Avalonia.Controls;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
-using DocumentFormat.OpenXml.EMMA;
-using NetTopologySuite.Operation.Distance;
 
 namespace LokqlDx.ViewModels;
 
 public class DockFactory : Factory
 {
     private readonly ToolManager _toolManager;
-    private  ConsoleDocumentViewModel _console => _toolManager.Console;
-    private  QueryLibraryViewModel _library=>_toolManager._libraryViewModel;
-    private  SchemaViewModel _schema=>_toolManager._schemaViewModel;
 
     public QueryDocumentDock? DocumentDock;
 
     private QueryDocumentViewModel? LastActiveDockable;
 
     public DockFactory(ToolManager toolManager)
-   {
-       _toolManager = toolManager;
+    {
+        _toolManager = toolManager;
 
-
-       Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
+        Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
         Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
         Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
         Messaging.RegisterForValue<ShowToolMessage, string>(this, ShowTool);
         Messaging.RegisterForEvent<ThemeChangedMessage>(this, UpdateBackgrounds);
-
     }
 
-    private void UpdateBackgrounds()
-    {
-        var brush = ApplicationHelper.GetBackgroundForCurrentTheme();
-        foreach (var hostWindow in HostWindows.OfType<HostWindow>())
-        {
-            hostWindow.Background = brush;
-        }
-    }
+    private ConsoleDocumentViewModel _console => _toolManager.Console;
+    private QueryLibraryViewModel _library => _toolManager._libraryViewModel;
+    private SchemaViewModel _schema => _toolManager._schemaViewModel;
 
 
     public IRootDock Layout { get; set; } = new RootDock();
 
     public IDock? ToolDock { get; set; }
+
+    private void UpdateBackgrounds()
+    {
+        var brush = ApplicationHelper.GetBackgroundForCurrentTheme();
+        foreach (var hostWindow in HostWindows.OfType<HostWindow>()) hostWindow.Background = brush;
+    }
 
 
     private void DisplayResult(NamedKustoResult named)
@@ -64,7 +53,6 @@ public class DockFactory : Factory
 
     public override IDocumentDock CreateDocumentDock()
     {
-      
         return new QueryDocumentDock();
     }
 
@@ -143,10 +131,7 @@ public class DockFactory : Factory
 
     private ToolDock Create(params LokqlTool[] tools)
     {
-        foreach (var lokqlTool in tools)
-        {
-            lokqlTool.IsVisible = true;
-        }
+        foreach (var lokqlTool in tools) lokqlTool.IsVisible = true;
         return new ToolDock
         {
             CanDrag = true,
@@ -163,9 +148,7 @@ public class DockFactory : Factory
 
     public override IRootDock CreateLayout()
     {
-        
-
-        var documentDock = new QueryDocumentDock()
+        var documentDock = new QueryDocumentDock
         {
             IsCollapsable = false,
             VisibleDockables = CreateList<IDockable>(),
@@ -173,9 +156,9 @@ public class DockFactory : Factory
             CanCloseLastDockable = true
         };
 
-      
+
         var con = Create(_console);
-       
+
         var rest = Create(_library, _schema, _toolManager._pinnedResults);
         con.Proportion = 0.6;
         rest.Proportion = 0.4;
@@ -214,7 +197,7 @@ public class DockFactory : Factory
         Layout = rootDock;
         return rootDock;
     }
-    
+
     public void InsertText(string text)
     {
         if (LastActiveDockable == null)
@@ -237,12 +220,11 @@ public class DockFactory : Factory
         {
             [nameof(IDockWindow)] = () =>
             {
-                var window = new HostWindow()
+                var window = new HostWindow
                 {
                     Background = brush
                 };
 
-                
 
                 return window;
             }
@@ -308,6 +290,7 @@ public class DockFactory : Factory
         else
             SetActiveDockable(model);
     }
+
     private void ShowTool(string tool)
     {
         void CreateIfNotVisible(LokqlTool tool)
@@ -317,7 +300,7 @@ public class DockFactory : Factory
             AddDockable(new RootDock(), tool);
             FloatDockable(tool);
         }
-        
+
         switch (tool)
         {
             case "console":
@@ -334,5 +317,4 @@ public class DockFactory : Factory
                 break;
         }
     }
-
 }

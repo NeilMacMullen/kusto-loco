@@ -1,0 +1,22 @@
+{
+  [
+    {
+      "Title": "Sample Query 1",
+      "IsVisible": true,
+      "IsDeleted": false,
+      "EditLocked": true
+    },
+    {
+      "Title": "Sample Query 2",
+      "IsVisible": false,
+      "IsDeleted": false,
+      "EditLocked": false
+    },
+    {
+      "Title": "Deleted Query",
+      "IsVisible": true,
+      "IsDeleted": true,
+      "EditLocked": false
+    }
+  ]
+}
