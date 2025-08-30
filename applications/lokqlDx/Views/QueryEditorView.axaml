@@ -10,7 +10,7 @@
              x:Name="QueryEditor"
              Loaded="UserControl_Loaded"
              GotFocus="InputElement_OnGotFocus">
-    <Grid>
+        <Grid>
         <avaloniaEdit:TextEditor
             x:Name="TextEditor"
             Document="{Binding Document}"
@@ -30,4 +30,5 @@
             HorizontalAlignment="Stretch"
             IsVisible="{Binding RunQueryCommand.IsRunning, Mode=OneWay, FallbackValue=False}" />
     </Grid>
+
 </UserControl>

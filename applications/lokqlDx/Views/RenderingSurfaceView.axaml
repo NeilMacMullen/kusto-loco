@@ -9,15 +9,14 @@
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
              DataContextChanged="StyledElement_OnDataContextChanged"
-             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
-             >
-    <DockPanel  Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
+    <DockPanel Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8" />
         </StackPanel>
         <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
-            <TabItem Header="Data" >
-					 <Grid RowDefinitions="auto,*">
+            <TabItem Header="Data" Classes="TabHeader">
+                <Grid RowDefinitions="auto,*">
                     <TextBlock
                         Text="{Binding DataGridSizeWarning}"
                         IsVisible="{Binding ShowDataGridSizeWarning}" />
@@ -30,15 +29,15 @@
                         FontSize="{Binding DisplayPreferences.FontSize}"
                         CanUserResizeColumns="True"
                         CanUserSortColumns="True"
-Background="{DynamicResource SystemListHighColor}"
-                        Foreground="{DynamicResource SystemAccentColorLight2}"
-                        >
+                        Background="{DynamicResource SystemListHighColor}"
+                        Foreground="{DynamicResource SystemAccentColorLight2}">
                         <TreeDataGrid.Styles>
                             <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
                                 <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
                             </Style>
                             <Style Selector="TreeDataGridColumnHeader">
-                                <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+                                <Setter Property="Background"
+                                        Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark3}" />
                                 <Setter Property="FontWeight" Value="Bold" />
                             </Style>
@@ -53,15 +52,16 @@ Background="{DynamicResource SystemListHighColor}"
                                           CommandParameter="row" />
                                 <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
                                           CommandParameter="table" />
-                                <Separator/>
-                                <MenuItem Header="Copy to clipboard as CSV (without headers)" Command="{Binding DataGridCopyCommand}"
+                                <Separator />
+                                <MenuItem Header="Copy to clipboard as CSV (without headers)"
+                                          Command="{Binding DataGridCopyCommand}"
                                           CommandParameter="csv" />
                             </ContextMenu>
                         </TreeDataGrid.ContextMenu>
                     </TreeDataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Chart">
+            <TabItem Header="Chart" Classes="TabHeader">
                 <views:ChartView
                     x:Name="ChartView" />
             </TabItem>

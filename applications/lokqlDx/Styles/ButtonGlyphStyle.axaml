@@ -37,4 +37,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource  AccentButtonBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
+    <Style Selector="TabItem.TabHeader">
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
 	</Styles>

@@ -1,3 +1,3 @@
 ﻿namespace LokqlDx.ViewModels;
 
-public record PersistedQuery(string Name, string Text,bool IsHidden);
+public record PersistedQuery(string Name, string Text,string PreQueryText,bool IsHidden);

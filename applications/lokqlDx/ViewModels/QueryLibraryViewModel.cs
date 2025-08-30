@@ -72,7 +72,7 @@ public partial class QueryLibraryViewModel : LokqlTool
     public PersistedQuery[] Persist() =>
         Queries
             .Where(q => !q.IsDeleted)
-            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(), !q.IsVisible))
+            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(),q.QueryViewModel.GetPreQueryText(), !q.IsVisible))
             .ToArray();
 
     partial void OnSearchQueryBodyChanged(bool value) => Sort();

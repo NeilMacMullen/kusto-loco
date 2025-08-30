@@ -117,11 +117,12 @@ public partial class MainViewModel : ObservableObject
 
         foreach (var query in queries.ToArray())
             _factory.AddDocument(query);
+        _factory.ShowQuery(queries.First());
     }
 
     private QueryDocumentViewModel CreateDoc(CreateDocumentRequest msg)
     {
-        var q =  AddQuery(msg.Title, string.Empty, true);
+        var q =  AddQuery(msg.Title, string.Empty,string.Empty, true);
         msg.Model = q;
         return q;
     }
@@ -139,13 +140,13 @@ public partial class MainViewModel : ObservableObject
     internal void SetInitWorkspacePath(string workspacePath) => _initWorkspacePath = workspacePath;
 
    
-    private QueryDocumentViewModel AddQuery(string name, string content,bool isVisible)
+    private QueryDocumentViewModel AddQuery(string name, string content,string preQueryText, bool isVisible)
     {
-        var doc = CreateQuery(name,content,isVisible);
+        var doc = CreateQuery(name,content,preQueryText,isVisible);
         QueryLibrary.Add(doc);
         return doc;
     }
-    private QueryDocumentViewModel CreateQuery(string name, string content, bool isVisible)
+    private QueryDocumentViewModel CreateQuery(string name, string content, string preQueryText, bool isVisible)
     {
         var adapter = _serviceProvider.GetRequiredService<IntellisenseClientAdapter>();
         var renderingSurfaceViewModel =
@@ -155,6 +156,7 @@ public partial class MainViewModel : ObservableObject
             ConsoleViewModel,
             _displayPreferences,
             content,
+            preQueryText,
             adapter){} ;
 
         var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel);
@@ -392,9 +394,9 @@ public partial class MainViewModel : ObservableObject
 
         if (CurrentWorkspace.Queries.Any())
             foreach (var p in CurrentWorkspace.Queries)
-                AddQuery(p.Name, p.Text,!p.IsHidden);
+                AddQuery(p.Name.NullToEmpty(), p.Text.NullToEmpty(),p.PreQueryText.NullToEmpty(), !p.IsHidden);
         else
-            AddQuery("query", CurrentWorkspace.Text,true);
+            AddQuery("query", CurrentWorkspace.Text,string.Empty,true);
         ResetLayout();
         UpdateUIFromWorkspace();
         if (!appPrefs.HasShownLanding)

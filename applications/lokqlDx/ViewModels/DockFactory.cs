@@ -282,10 +282,13 @@ public class DockFactory : Factory
     }
 
 
-    private void ShowQuery(QueryDocumentViewModel model)
+    public void ShowQuery(QueryDocumentViewModel model)
     {
         if (!model.IsVisible)
+        {
+            model.IsVisible = true;
             AddDocument(model);
+        }
         else
             SetActiveDockable(model);
     }
@@ -316,4 +319,6 @@ public class DockFactory : Factory
                 break;
         }
     }
+
+    
 }

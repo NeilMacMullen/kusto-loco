@@ -19,12 +19,11 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private int _gridSplitterWidth = 5;
     [ObservableProperty] private QueryEditorViewModel _queryEditorViewModel;
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurfaceViewModel;
-
+   
     [ObservableProperty] private int _rowSpan = 3;
     private int n;
 
-    public QueryViewModel(
-        QueryEditorViewModel queryEditorViewModel,
+    public QueryViewModel(QueryEditorViewModel queryEditorViewModel,
         RenderingSurfaceViewModel renderingSurfaceViewModel)
     {
         QueryEditorViewModel = queryEditorViewModel;
@@ -105,7 +104,7 @@ public partial class QueryViewModel : ObservableObject
         ChartRow = 0;
     }
 
-    public bool IsDirty() => QueryEditorViewModel.IsDirty;
+    public bool IsDirty() => QueryEditorViewModel.IsDirty();
 
     public string GetText() => QueryEditorViewModel.GetText();
 
@@ -124,7 +123,7 @@ public partial class QueryViewModel : ObservableObject
     }
 
 
-    public void Clean() => QueryEditorViewModel.IsDirty = false;
+    public void Clean() => QueryEditorViewModel.Clean();
 
     [RelayCommand]
     public void CopyChart()
@@ -144,5 +143,10 @@ public partial class QueryViewModel : ObservableObject
     {
         var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, true));
         Messaging.Send(msg);
+    }
+
+    public string GetPreQueryText()
+    {
+        return QueryEditorViewModel.QueryContextViewModel.Text;
     }
 }
