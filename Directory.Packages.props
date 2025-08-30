@@ -51,22 +51,22 @@
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog" Version="6.0.3" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.10.2" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.2" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.10.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.3" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.3" />
-    <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.3" />
+    <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.4" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.3.0" />
     <PackageVersion Include="Parquet.Net" Version="5.2.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
-    <PackageVersion Include="ScottPlot" Version="5.0.55" />
+    <PackageVersion Include="ScottPlot" Version="5.0.56" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.56" />
-    <PackageVersion Include="ScottPlot.WPF" Version="5.0.55" />
+    <PackageVersion Include="ScottPlot.WPF" Version="5.0.56" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.50.0" />
     <PackageVersion Include="StaticViewLocator" Version="0.0.1" />
-    <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.3" />
+    <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.4" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
@@ -75,8 +75,8 @@
     <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.0.15" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.15" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.15" />
-    <PackageVersion Include="Vanara.Core" Version="4.1.6" />
-    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.1.6" />
+    <PackageVersion Include="Vanara.Core" Version="4.2.0" />
+    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.2.0" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
     <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
@@ -104,6 +104,6 @@
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.2" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 </Project>

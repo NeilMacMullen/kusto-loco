@@ -314,8 +314,8 @@ public static class ScottPlotKustoResultRenderer
         if (accessor.XisNominal || accessor.YisNominal) plot.HideGrid();
     }
 
-    private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new FixedDateTimeAutomatic();
-    private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new FixedDateTimeAutomatic();
+    private static void MakeYAxisDateTime(Plot plot) => plot.Axes.Left.TickGenerator = new DateTimeAutomatic();
+    private static void MakeXAxisDateTime(Plot plot) => plot.Axes.Bottom.TickGenerator = new DateTimeAutomatic();
 
 
     private static void FixupAxisForLadder(Plot plot, ResultChartAccessor accessor)
