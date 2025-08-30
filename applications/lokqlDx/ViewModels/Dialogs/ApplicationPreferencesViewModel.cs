@@ -66,7 +66,12 @@ public partial class ApplicationPreferencesViewModel : ObservableObject, IDialog
     }
 
     [RelayCommand]
-    private void Cancel() => _completionSource.SetResult();
+    private void Cancel()
+    {
+        //reset the theme !!!
+        ApplicationHelper.SetTheme(_preferencesManager.UIPreferences.Theme);
+        _completionSource.SetResult();
+    }
 
     partial void OnSelectedThemeChanged(string value)
     {

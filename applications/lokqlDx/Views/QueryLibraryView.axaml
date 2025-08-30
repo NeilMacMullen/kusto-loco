@@ -14,8 +14,8 @@
         <converters:NegateBoolConverter x:Key="Negate" />
         <converters:BoolChooseStringConverter x:Key="ChooseString" />
         <SolidColorBrush x:Key="Visible" Color="{DynamicResource SystemAccentColorLight1}" />
-        <SolidColorBrush x:Key="Hidden" Color="{DynamicResource SystemAccentColorDark3}" />
-        <SolidColorBrush x:Key="Deleted" Color="{DynamicResource SystemErrorTextColor}" />
+        <SolidColorBrush x:Key="Hidden" Color="{DynamicResource SystemAccentColorLight3}" />
+        <SolidColorBrush x:Key="Deleted" Color="Red" />
     </UserControl.Resources>
     <DockPanel Margin="2">
         <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="0,0,0,8">
@@ -79,39 +79,46 @@
 												Converter={StaticResource Negate}}" />
                             </Grid>
                         </Grid>
-                        <Grid DockPanel.Dock="Left">
-                            <Label
-                                Content="{Binding Title,Mode=TwoWay}"
-                                IsVisible="{Binding EditLocked}">
-
-                                <Label.Foreground>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Ellipse Width="14" Height="14"
+                                     Margin="0,0,8,0"
+                                     VerticalAlignment="Center">
+                                <Ellipse.Fill>
                                     <MultiBinding Converter="{StaticResource BoolToColorMulti}">
-                                        <Binding Path="IsVisible" /> <Binding Path="IsDeleted" />
+                                        <Binding Path="IsVisible" />
+                                        <Binding Path="IsDeleted" />
                                         <Binding Source="{StaticResource Hidden}" />
                                         <Binding Source="{StaticResource Deleted}" />
                                         <Binding Source="{StaticResource Visible}" />
                                         <Binding Source="{StaticResource Deleted}" />
                                     </MultiBinding>
-                                </Label.Foreground>
-                                <Interaction.Behaviors>
-                                    <EventTriggerBehavior EventName="DoubleTapped">
-                                        <InvokeCommandAction
-                                            Command="{Binding $parent[v:QueryLibraryView].DataContext.ShowCommand}"
-                                            CommandParameter="{Binding}" />
-                                    </EventTriggerBehavior>
-                                </Interaction.Behaviors>
-                            </Label>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <Grid>
+                                <Label
+                                    Content="{Binding Title,Mode=TwoWay}"
+                                    IsVisible="{Binding EditLocked}">
 
-                            <TextBox x:Name="EditTextBox"
-                                     VerticalContentAlignment="Center"
-                                     Text="{Binding Title,Mode=TwoWay}"
-                                     IsVisible="{Binding EditLocked,
+
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="DoubleTapped">
+                                            <InvokeCommandAction
+                                                Command="{Binding $parent[v:QueryLibraryView].DataContext.ShowCommand}"
+                                                CommandParameter="{Binding}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </Label>
+
+                                <TextBox x:Name="EditTextBox"
+                                         VerticalContentAlignment="Center"
+                                         Text="{Binding Title,Mode=TwoWay}"
+                                         IsVisible="{Binding EditLocked,
 
 									Converter={StaticResource Negate}}"
 
-                                     KeyDown="InputElement_OnKeyDown" />
-                        </Grid>
-
+                                         KeyDown="InputElement_OnKeyDown" />
+                            </Grid>
+                        </StackPanel>
 
                     </DockPanel>
 

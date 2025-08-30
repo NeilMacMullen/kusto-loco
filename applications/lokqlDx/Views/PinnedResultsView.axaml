@@ -8,13 +8,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.PinnedResultsView"
              x:DataType="vm:PinnedResultsViewModel"
-             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}"
-             >
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
     <UserControl.Resources>
         <converters:NegateBoolConverter x:Key="Negate" />
     </UserControl.Resources>
     <Border BorderThickness="1" CornerRadius="5" Margin="2">
-        <DockPanel >
+        <DockPanel>
 
             <ScrollViewer Name="TheScrollViewer">
                 <ItemsControl
@@ -37,44 +36,51 @@
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
                                                     CommandParameter="{Binding}"
                                                     Click="EditButton_Click"
-                                                    Classes="Glyph">
-                                             </Button>
+                                                    Classes="Glyph" />
                                             <Button Grid.Column="1"
                                                     Content="🗑️"
                                                     DockPanel.Dock="Right"
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
                                                     CommandParameter="{Binding}"
-                                                    Click="EditButton_Click">
-                                              
-                                             </Button>
+                                                    Click="EditButton_Click" />
                                         </Grid>
 
                                     </Grid>
-                                    <Grid DockPanel.Dock="Left">
-                                        <Label
-                                            Content="{Binding Name,Mode=TwoWay}"
-                                            IsVisible="{Binding EditLocked}">
+                                    <StackPanel DockPanel.Dock="Left">
+                                        <Border BorderBrush="{DynamicResource AccentButtonBackground}"
+                                                BorderThickness="1" CornerRadius="4">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Label
+                                                        Content="{Binding Name,Mode=TwoWay}"
+                                                        IsVisible="{Binding EditLocked}">
+                                                        <Interaction.Behaviors>
+                                                            <EventTriggerBehavior EventName="DoubleTapped">
+                                                                <InvokeCommandAction
+                                                                    Command="{Binding $parent[v:PinnedResultsView].DataContext.ShowCommand}"
+                                                                    CommandParameter="{Binding}" />
+                                                            </EventTriggerBehavior>
+                                                        </Interaction.Behaviors>
+                                                    </Label>
 
-
-                                            <Interaction.Behaviors>
-                                                <EventTriggerBehavior EventName="DoubleTapped">
-                                                    <InvokeCommandAction
-                                                        Command="{Binding $parent[v:PinnedResultsView].DataContext.ShowCommand}"
-                                                        CommandParameter="{Binding}" />
-                                                </EventTriggerBehavior>
-                                            </Interaction.Behaviors>
-                                        </Label>
-
-                                        <TextBox x:Name="EditTextBox"
-                                                 VerticalContentAlignment="Center"
-                                                 Text="{Binding Name,Mode=TwoWay}"
-                                                 IsVisible="{Binding EditLocked,
+                                                    <TextBox x:Name="EditTextBox"
+                                                             VerticalContentAlignment="Center"
+                                                             Text="{Binding Name,Mode=TwoWay}"
+                                                             IsVisible="{Binding EditLocked,
 
 									Converter={StaticResource Negate}}"
-                                                 KeyDown="InputElement_OnKeyDown" />
-                                    </Grid>
+                                                             KeyDown="InputElement_OnKeyDown" />
+                                                </Grid>
+                                                <Label Content="{Binding Description}" FontStyle="Italic" />
+
+                                            </StackPanel>
+
+                                        </Border>
+
+                                    </StackPanel>
+
                                 </DockPanel>
-                                <Label Content="{Binding Description}" />
+
                             </StackPanel>
 
                         </DataTemplate>

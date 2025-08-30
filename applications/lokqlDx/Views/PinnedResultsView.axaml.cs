@@ -46,7 +46,7 @@ public partial class PinnedResultsView : UserControl
     {
         if (e.Key != Key.Enter)
             return;
-        if (DataContext is PinnedResultsViewModel vm && sender is TextBox tb && tb.DataContext is NamedKustoResult res)
+        if (DataContext is PinnedResultsViewModel vm && sender is TextBox tb && tb.DataContext is PinnedKustoResult res)
             vm.FilterEnterCommand.Execute(res);
     }
 }

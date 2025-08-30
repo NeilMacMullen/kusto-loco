@@ -20,16 +20,13 @@ public class DockFactory : Factory
         _toolManager = toolManager;
 
         Messaging.RegisterForValue<InsertTextMessage, string>(this, InsertTextInActiveWindow);
-        Messaging.RegisterForValue<DisplayResultMessage, NamedKustoResult>(this, DisplayResult);
+        Messaging.RegisterForValue<DisplayResultMessage, PinnedKustoResult>(this, DisplayResult);
         Messaging.RegisterForValue<ShowQueryRequestMessage, QueryDocumentViewModel>(this, ShowQuery);
         Messaging.RegisterForValue<ShowToolMessage, string>(this, ShowTool);
         Messaging.RegisterForEvent<ThemeChangedMessage>(this, UpdateBackgrounds);
     }
 
-    private ConsoleDocumentViewModel _console => _toolManager.Console;
-    private QueryLibraryViewModel _library => _toolManager._libraryViewModel;
-    private SchemaViewModel _schema => _toolManager._schemaViewModel;
-
+   
 
     public IRootDock Layout { get; set; } = new RootDock();
 
@@ -42,9 +39,9 @@ public class DockFactory : Factory
     }
 
 
-    private void DisplayResult(NamedKustoResult named)
+    private void DisplayResult(PinnedKustoResult pinned)
     {
-        var model = new ResultDisplayViewModel(named.Name, named.Result);
+        var model = new ResultDisplayViewModel(pinned.Name, pinned.Result);
         AddDockable(new RootDock(), model);
         FloatDockable(model);
     }
@@ -71,7 +68,7 @@ public class DockFactory : Factory
 
     public void RemoveAllDocuments()
     {
-        var allDocs = _library.Queries.ToArray();
+        var allDocs = _toolManager.LibraryViewModel.Queries.ToArray();
         foreach (var d in allDocs) RemoveDockable(d, true);
     }
 
@@ -146,6 +143,7 @@ public class DockFactory : Factory
         };
     }
 
+   
     public override IRootDock CreateLayout()
     {
         var documentDock = new QueryDocumentDock
@@ -157,9 +155,10 @@ public class DockFactory : Factory
         };
 
 
-        var con = Create(_console);
+        var con = Create(_toolManager.Console);
 
-        var rest = Create(_library, _schema, _toolManager._pinnedResults);
+        var rest = Create(_toolManager.LibraryViewModel, _toolManager.SchemaViewModel,
+            _toolManager.PinnedResults);
         con.Proportion = 0.6;
         rest.Proportion = 0.4;
         ToolDock = new ProportionalDock
@@ -276,7 +275,7 @@ public class DockFactory : Factory
     public override void OnDockableClosed(IDockable? dockable)
     {
         if (dockable is QueryDocumentViewModel query)
-            _library.ChangeVisibility(query, false);
+            _toolManager.LibraryViewModel.ChangeVisibility(query, false);
         if (dockable is LokqlTool tool)
             tool.IsVisible = false;
         base.OnDockableClosed(dockable);
@@ -304,16 +303,16 @@ public class DockFactory : Factory
         switch (tool)
         {
             case "console":
-                CreateIfNotVisible(_console);
+                CreateIfNotVisible(_toolManager.Console);
                 break;
             case "queries":
-                CreateIfNotVisible(_toolManager._libraryViewModel);
+                CreateIfNotVisible(_toolManager.LibraryViewModel);
                 break;
             case "results":
-                CreateIfNotVisible(_toolManager._pinnedResults);
+                CreateIfNotVisible(_toolManager.PinnedResults);
                 break;
             case "schema":
-                CreateIfNotVisible(_toolManager._schemaViewModel);
+                CreateIfNotVisible(_toolManager.SchemaViewModel);
                 break;
         }
     }

@@ -63,7 +63,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _windowTitle = "LokqlDX";
     private readonly ToolManager _toolManager;
 
-    private QueryLibraryViewModel QueryLibrary => _toolManager._libraryViewModel;
+    private QueryLibraryViewModel QueryLibrary => _toolManager.LibraryViewModel;
 
     public MainViewModel(
         DialogService dialogService,
@@ -587,13 +587,15 @@ public static class ApplicationHelper
 {
     public static void SetTheme(string theme)
     {
-        if (theme == "Default")
-            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Default;
-        if (theme == "Dark")
-            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
-        if (theme == "Light")
-            Application.Current!.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
-       Messaging.Send(new ThemeChangedMessage(theme));
+        theme = theme.OrWhenBlank("Dark");
+        Application.Current!.RequestedThemeVariant = theme switch
+        {
+            "Default" => Avalonia.Styling.ThemeVariant.Default,
+            "Dark" => Avalonia.Styling.ThemeVariant.Dark,
+            "Light" => Avalonia.Styling.ThemeVariant.Light,
+            _ => Avalonia.Styling.ThemeVariant.Dark
+        };
+        Messaging.Send(new ThemeChangedMessage(theme));
     }
 
     public static string GetTheme()

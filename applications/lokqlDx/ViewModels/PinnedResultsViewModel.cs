@@ -11,7 +11,7 @@ namespace LokqlDx.ViewModels;
 
 public partial class PinnedResultsViewModel : LokqlTool
 {
-    [ObservableProperty] private ObservableCollection<NamedKustoResult> _results = [];
+    [ObservableProperty] private ObservableCollection<PinnedKustoResult> _results = [];
 
     public PinnedResultsViewModel()
     {
@@ -22,7 +22,7 @@ public partial class PinnedResultsViewModel : LokqlTool
 
     private void ReceivePinMesssage(QueryResultWithSender val)
     {
-        var named = new NamedKustoResult(val);
+        var named = new PinnedKustoResult(val);
         Results.Add(named);
         if (val.ImmediateDisplay)
         {
@@ -31,19 +31,19 @@ public partial class PinnedResultsViewModel : LokqlTool
     }
 
     [RelayCommand]
-    public void ToggleEdit(NamedKustoResult result) => result.EditLocked = !result.EditLocked;
+    public void ToggleEdit(PinnedKustoResult result) => result.EditLocked = !result.EditLocked;
 
     [RelayCommand]
-    public void ToggleDelete(NamedKustoResult result) => Results.Remove(result);
+    public void ToggleDelete(PinnedKustoResult result) => Results.Remove(result);
 
     [RelayCommand]
-    public void Show(NamedKustoResult result) =>Messaging.Send(new DisplayResultMessage(result));
+    public void Show(PinnedKustoResult result) =>Messaging.Send(new DisplayResultMessage(result));
 
     [RelayCommand]
-    public void FilterEnter(NamedKustoResult result) => result.EditLocked = true;
+    public void FilterEnter(PinnedKustoResult result) => result.EditLocked = true;
 }
 
-public partial class NamedKustoResult : ObservableObject
+public partial class PinnedKustoResult : ObservableObject
 {
     [ObservableProperty] private DateTime _created = DateTime.MinValue;
     [ObservableProperty] private string _description = string.Empty;
@@ -51,7 +51,7 @@ public partial class NamedKustoResult : ObservableObject
     [ObservableProperty] private string _name = string.Empty;
     [ObservableProperty] private KustoQueryResult _result = KustoQueryResult.Empty;
 
-    public NamedKustoResult(QueryResultWithSender result)
+    public PinnedKustoResult(QueryResultWithSender result)
     {
         Result = result.Result;
         Name = result.Sender + $" - {DateTime.Now:HH:mm:ss}";
