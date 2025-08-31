@@ -20,12 +20,7 @@
     <ApplicationIcon>Assets\kql.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Assets\filter.svg" />
-    <None Remove="Assets\VSDark.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\VSLight.xml" />
-    <AvaloniaResource Include="Assets\VSDark.xml" />
+    <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
     <None CopyToOutputDirectory="Always" Update="appsettings.Development.json" />
