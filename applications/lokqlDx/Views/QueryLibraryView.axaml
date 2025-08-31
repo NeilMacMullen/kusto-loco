@@ -55,18 +55,19 @@
                         <Grid DockPanel.Dock="Right">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="28" />
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="1"
                                         Classes="Glyph"
-                                        Content="&#x1F589;"
+                                        Content="&#x270F;"
                                         DockPanel.Dock="Right"
                                         Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleEditCommand}"
                                         CommandParameter="{Binding}"
                                         Click="EditButton_Click"
-                                        IsVisible="{Binding IsDeleted, Converter={StaticResource Negate}}" />
+                                        IsVisible="{Binding IsDeleted, Converter={StaticResource Negate}}"
+                                        ToolTip.Tip="Change Name"/>
                                 <Button Grid.Column="0"
                                         Classes="Glyph"
                                         Content="{Binding IsDeleted,Converter={StaticResource ChooseString},
@@ -75,8 +76,9 @@
                                         Command="{Binding $parent[v:QueryLibraryView].DataContext.ToggleDeleteCommand}"
                                         CommandParameter="{Binding}"
                                         Click="EditButton_Click"
-                                        IsVisible="{Binding IsVisible,
-												Converter={StaticResource Negate}}" />
+                                        IsVisible="{Binding IsVisible,Converter={StaticResource Negate}}"
+                                        ToolTip.Tip="{Binding IsDeleted,Converter={StaticResource ChooseString},
+                                        ConverterParameter='Undelete|Delete'}"/>
                             </Grid>
                         </Grid>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
@@ -97,7 +99,8 @@
                             <Grid>
                                 <Label
                                     Content="{Binding Title,Mode=TwoWay}"
-                                    IsVisible="{Binding EditLocked}">
+                                    IsVisible="{Binding EditLocked}"
+                                    ToolTip.Tip="Double-click to open">
 
 
                                     <Interaction.Behaviors>

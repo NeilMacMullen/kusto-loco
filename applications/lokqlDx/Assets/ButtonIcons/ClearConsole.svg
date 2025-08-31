@@ -1,0 +1,7 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"
+     stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="square">
+  <!-- ">" -->
+  <polyline points="16,16 32,32 16,48" />
+  <!-- "_" -->
+  <line x1="36" y1="48" x2="52" y2="48" />
+</svg>
