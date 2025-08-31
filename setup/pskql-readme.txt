@@ -1,6 +1,6 @@
 
-Prequisites
-===========
+Prerequisites
+=============
 pskql requires Powershell 7 or above and dotnet 9.0  
 
 Setup
