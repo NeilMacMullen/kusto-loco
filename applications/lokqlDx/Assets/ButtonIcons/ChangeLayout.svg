@@ -1,0 +1,31 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"
+     fill="none" stroke="currentColor" stroke-width="3.5"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Box params: outer 8..56 scaled to 0.8 => 14.4..49.6, radius r=6.4, gaps centered at 32 with 6.4-unit width -->
+
+  <!-- Rounded corners -->
+  <path d="M14.4,19.2 A6.4,6.4 0 0 1 19.2,14.4" />
+  <path d="M44.8,14.4 A6.4,6.4 0 0 1 49.6,19.2" />
+  <path d="M49.6,44.8 A6.4,6.4 0 0 1 44.8,49.6" />
+  <path d="M19.2,49.6 A6.4,6.4 0 0 1 14.4,44.8" />
+
+  <!-- Edges with midpoint gaps -->
+  <path d="M19.2,14.4 H28.8" />
+  <path d="M35.2,14.4 H44.8" />
+  <path d="M49.6,19.2 V28.8" />
+  <path d="M49.6,35.2 V44.8" />
+  <path d="M44.8,49.6 H35.2" />
+  <path d="M28.8,49.6 H19.2" />
+  <path d="M14.4,44.8 V35.2" />
+  <path d="M14.4,28.8 V19.2" />
+
+  <!-- Hollow arrowheads (V shapes), larger and aligned to edge centerlines -->
+  <!-- Top (→) -->
+  <path d="M27.2,7.2 L32,12.8 M27.2,18.4 L32,12.8" />
+  <!-- Right (↓) -->
+  <path d="M44.0,27.2 L49.6,32 M55.2,27.2 L49.6,32" />
+  <!-- Bottom (←) -->
+  <path d="M36.8,44.0 L32,49.6 M36.8,55.2 L32,49.6" />
+  <!-- Left (↑) -->
+  <path d="M8.8,36.8 L14.4,32 M20.0,36.8 L14.4,32" />
+</svg>

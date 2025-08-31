@@ -30,7 +30,9 @@
                 Show Commands
             </CheckBox>
             <TreeDataGrid Source="{Binding SchemaSource}" DoubleTapped="InputElement_OnDoubleTapped"
-                          DockPanel.Dock="Top" />
+                          DockPanel.Dock="Top"
+ToolTip.Tip="Double-click to copy to active query window"
+                          />
         </DockPanel>
 
     </DockPanel>

@@ -12,3 +12,9 @@ public class JsonArrayTableAdaptor(KustoSettingsProvider settings, IKustoConsole
         new JsonObjectArraySerializer(settings, console),
         "JsonObjectArray", "Array of json objects", "json"
     );
+
+public class JsonLTableAdaptor(KustoSettingsProvider settings, IKustoConsole console)
+    : TableAdaptorBase(
+        new JsonLSerializer(settings, console),
+        "JsonL", "Array of json objects in jsonL format", "jsonl"
+    );

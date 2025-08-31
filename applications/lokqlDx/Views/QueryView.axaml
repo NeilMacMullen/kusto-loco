@@ -40,8 +40,8 @@
                 <Button Command="{Binding TearOffCommand}"
                         ToolTip.Tip="Display result in new window"
                         Classes="Glyph">
-                    &#x279A;
-                </Button>
+                    &#x1FA9F;
+				</Button>
             </StackPanel>
 
         </DockPanel>

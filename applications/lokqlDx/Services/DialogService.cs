@@ -42,7 +42,7 @@ public class DialogService
         Patterns = ["*.tsv"]
     };
 
-    public static FilePickerFileType ParquetFiles { get; } = new("Parquet (*.parquet")
+    public static FilePickerFileType ParquetFiles { get; } = new("Parquet (*.parquet)")
     {
         Patterns = ["*.parquet"]
     };
@@ -56,6 +56,10 @@ public class DialogService
     {
         Patterns = ["*.json"]
     };
+    public static FilePickerFileType JsonLFiles { get; } = new("JsonL (*.jsonl)")
+    {
+        Patterns = ["*.jsonl"]
+    };
 
     public static FilePickerFileType TextFiles { get; } = new("Text (*.txt)")
     {
@@ -65,7 +69,7 @@ public class DialogService
     public static FilePickerFileType[] DataTypesForRead { get; } =
     [
         All,
-        TsvFiles, CsvFiles, ParquetFiles, ExcelFiles, JsonFiles, TextFiles
+        TsvFiles, CsvFiles, ParquetFiles, ExcelFiles, JsonFiles,JsonLFiles, TextFiles
     ];
 
     public static FilePickerFileType[] DataTypesForWrite { get; } =

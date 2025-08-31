@@ -26,23 +26,28 @@
                                     <Grid DockPanel.Dock="Right">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40" />
-                                                <ColumnDefinition Width="40" />
+                                                <ColumnDefinition Width="5" />
+                                                <ColumnDefinition Width="28" />
+                                                <ColumnDefinition Width="28" />
                                             </Grid.ColumnDefinitions>
 
-                                            <Button Grid.Column="0"
-                                                    Content="&#x1F589;"
+                                            <Button Grid.Column="1"
+                                                    Content="&#x270F;"
                                                     DockPanel.Dock="Right"
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleEditCommand}"
                                                     CommandParameter="{Binding}"
                                                     Click="EditButton_Click"
-                                                    Classes="Glyph" />
-                                            <Button Grid.Column="1"
+                                                    Classes="Glyph"
+                                                    ToolTip.Tip="Change name"
+                                                    />
+                                            <Button Grid.Column="2"
                                                     Content="🗑️"
                                                     DockPanel.Dock="Right"
                                                     Command="{Binding $parent[v:PinnedResultsView].DataContext.ToggleDeleteCommand}"
                                                     CommandParameter="{Binding}"
-                                                    Click="EditButton_Click" />
+                                                    Click="EditButton_Click"
+                                                    ToolTip.Tip="Delete"
+                                                    Classes="Glyph" />
                                         </Grid>
 
                                     </Grid>
@@ -53,7 +58,8 @@
                                                 <Grid>
                                                     <Label
                                                         Content="{Binding Name,Mode=TwoWay}"
-                                                        IsVisible="{Binding EditLocked}">
+                                                        IsVisible="{Binding EditLocked}"
+                                                        ToolTip.Tip="Double-click to open">
                                                         <Interaction.Behaviors>
                                                             <EventTriggerBehavior EventName="DoubleTapped">
                                                                 <InvokeCommandAction
