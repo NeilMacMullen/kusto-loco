@@ -152,21 +152,26 @@ public class KustoQueryResult
         var rowsToTake = Math.Min(max, RowCount);
         for (var row = 0; row < rowsToTake; row++)
         {
-            var d = new OrderedDictionary();
-
-            for (var col = 0; col < columns.Length; col++)
-            {
-                var dataValue = chunk.Columns[col].GetRawDataValue(row);
-                var columnName = columns[col].Name;
-                d[columnName] = dataValue;
-            }
-
+            var d = RowToDictionary(row);
             items.Add(d);
         }
 
         return items;
     }
 
+    public OrderedDictionary RowToDictionary(int row)
+    {
+        var d = new OrderedDictionary();
+        var columns = ColumnDefinitions();
+        for (var col = 0; col < columns.Length; col++)
+        {
+            var dataValue =Get(col,row);
+            var columnName = columns[col].Name;
+            d[columnName] = dataValue;
+        }
+        return d;
+
+    }
     /// <summary>
     ///     For a particular column enumerate over all cells
     /// </summary>
