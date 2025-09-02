@@ -52,7 +52,10 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         QuerySummary = $"{result.RowCount} rows in {(int)result.QueryDuration.TotalMilliseconds}ms";
 
         await RenderTable(result);
-
+        ActiveTab = result.IsChart
+            ? 1 //show the plot tab
+            : 0; //show the table tab
+        
         if (result.IsChart && result.Visualization.ChartType == "scatterchart"
                            && result.Visualization.PropertyOr("kind", "") == "map")
         {
@@ -60,9 +63,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             return;
         }
         _plotter.RenderToDisplay(result, _kustoSettings);
-        ActiveTab = result.IsChart
-            ? 1 //show the plot tab
-            : 0; //show the table tab
+        
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
