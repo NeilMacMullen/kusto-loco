@@ -14,16 +14,15 @@ namespace LokqlDx.ViewModels;
 public partial class MapViewModel : ObservableObject
 {
     private readonly List<IFeature> _lineFeatures = [];
-    private MemoryLayer _lineLayer = new();
+    private MemoryLayer _lineLayer = new("lines");
     [ObservableProperty] private Map _map;
     private readonly List<IFeature> _pinFeatures = [];
-    private MemoryLayer _pinLayer = new();
+    private MemoryLayer _pinLayer = new("pins");
     private KustoQueryResult _result = KustoQueryResult.Empty;
+    private readonly Dictionary<IFeature, string> _featureLabels = new();
 
     public MapViewModel()
     {
-        Map = new Map();
-
         Map = new Map();
         Map.Layers.Add(OpenStreetMap.CreateTileLayer());
 
@@ -37,33 +36,8 @@ public partial class MapViewModel : ObservableObject
         Map.Layers.Add(_pinLayer);
         Map.Widgets.Clear();
     }
-
-    public void Alt()
-    {
-        Map.Layers.Add(OpenStreetMap.CreateTileLayer());
-
-        _pinLayer = new MemoryLayer { Name = "PinLayer", Enabled = true };
-        _lineLayer = new MemoryLayer { Name = "LineLayer", Enabled = true };
-
-
-        var line = new LineString(new[]
-        {
-            new Coordinate(SphericalMercator.FromLonLat(-1, -1).x, SphericalMercator.FromLonLat(-1, -1).y),
-            new Coordinate(SphericalMercator.FromLonLat(1, 1).x, SphericalMercator.FromLonLat(1, 1).y)
-        });
-
-        var lineFeature = new GeometryFeature { Geometry = line };
-        lineFeature.Styles.Add(new VectorStyle
-        {
-            Line = new Pen(Color.Blue, 4)
-        });
-
-
-        _lineLayer.Features = [lineFeature];
-
-        Map.Layers.Add(_lineLayer);
-        Map.Layers.Add(_pinLayer);
-    }
+    public bool TryGetLabel(IFeature feature, out string label) =>
+        _featureLabels.TryGetValue(feature, out label!);
 
     private void Reset()
     {
@@ -116,7 +90,7 @@ public partial class MapViewModel : ObservableObject
         }
     }
 
-    
+
     private void AddPin(GeoPoint geo)
     {
         var pt = FromGeoPoint(geo);
@@ -130,12 +104,18 @@ public partial class MapViewModel : ObservableObject
                     SymbolType = SymbolType.Ellipse,
                     Fill = new Brush(Color.Red),
                     Outline = new Pen(Color.Black),
-                    SymbolScale = 0.1
+                    SymbolScale = 1
                 }
             ]
         };
+        var label = "TOOLTIP!";
+        var text = label ?? $"{geo.Latitude:F4}, {geo.Longitude:F4}";
+        _featureLabels[pinFeature] = text;
+
         _pinFeatures.Add(pinFeature);
     }
+
+
 
     private MPoint FromGeoPoint(GeoPoint point) =>
         SphericalMercator.FromLonLat(point.Longitude, point.Latitude)
