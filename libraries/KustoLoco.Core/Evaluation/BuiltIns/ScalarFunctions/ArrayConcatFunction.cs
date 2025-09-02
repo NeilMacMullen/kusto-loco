@@ -2,7 +2,7 @@
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
-[KustoImplementation(Keyword = "array_concat")]
+[KustoImplementation(Keyword = "Functions.ArrayConcat")]
 internal partial class ArrayConcatFunction
 {
     public JsonNode? Impl(JsonNode node)
