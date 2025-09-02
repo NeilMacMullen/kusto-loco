@@ -8,13 +8,21 @@ using Mapsui.Projections;
 using Mapsui.Styles;
 using Mapsui.Tiling;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Utilities;
+using Mapsui.Projections;
+using Mapsui.Nts;
 
 namespace LokqlDx.ViewModels;
 
 public partial class MapViewModel : ObservableObject
 {
     private readonly List<IFeature> _lineFeatures = [];
+    private readonly List<IFeature> _ellipsFeatures = [];
     private MemoryLayer _lineLayer = new("lines");
+    private MemoryLayer _ellipseLayer = new("ellipses");
+
     [ObservableProperty] private Map _map;
     private readonly List<IFeature> _pinFeatures = [];
     private MemoryLayer _pinLayer = new("pins");
@@ -32,10 +40,14 @@ public partial class MapViewModel : ObservableObject
         _lineLayer.Enabled = true;
         _pinLayer.Enabled = true;
         _pinLayer.Features = _pinFeatures;
+        _ellipseLayer.Features = _ellipsFeatures;
+
         Map.Layers.Add(_lineLayer);
         Map.Layers.Add(_pinLayer);
+        Map.Layers.Add(_ellipseLayer);
         Map.Widgets.Clear();
     }
+
     public bool TryGetLabel(IFeature feature, out string label) =>
         _featureLabels.TryGetValue(feature, out label!);
 
@@ -45,7 +57,42 @@ public partial class MapViewModel : ObservableObject
         _pinFeatures.Clear();
     }
 
-    public void Render(KustoQueryResult result)
+    private void DrawEllipseMeters(double centerLat, double centerLon, double radiusXmeters, double radiusYmeters,
+        Color? fillColor = null, Color? outlineColor = null)
+    {
+        // 1. Convert center from lat/lon to Web Mercator meters
+        var merc = SphericalMercator.FromLonLat(centerLon, centerLat);
+        var center = new Coordinate(merc.x, merc.y);
+
+        // 2. Create a unit circle around (0,0)
+        var circle = new Point(0, 0).Buffer(1, 64); // 64 segments for smoothness
+
+        // 3. Scale to desired radii in meters
+        var transform = new AffineTransformation();
+        transform.Scale(radiusXmeters, radiusYmeters);
+        transform.Translate(center.X, center.Y);
+        var ellipse = transform.Transform(circle);
+
+        // 4. Create a feature for the ellipse
+        var ellipseFeature = new GeometryFeature { Geometry = ellipse };
+
+        // 5. Style it
+        ellipseFeature.Styles.Add(new VectorStyle
+        {
+            Fill = new Brush(fillColor ?? Color.FromArgb(64, 0, 0, 255)), // semi‑transparent blue by default
+            Outline = new Pen(outlineColor ?? Color.Blue, 2)
+        });
+
+        // 6. Add to a layer (create one if needed)
+
+
+       
+    
+
+    _ellipsFeatures.Add(ellipseFeature);
+}
+
+public void Render(KustoQueryResult result)
 
     {
         _result = result;
@@ -55,6 +102,7 @@ public partial class MapViewModel : ObservableObject
         _lineLayer.Features = _lineFeatures.ToArray();
         _pinLayer.DataHasChanged();
         _lineLayer.DataHasChanged();
+        _ellipseLayer.DataHasChanged();
 
         Map.RefreshGraphics();
         Map.Refresh();
