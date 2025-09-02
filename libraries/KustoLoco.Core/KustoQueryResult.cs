@@ -104,8 +104,9 @@ public class KustoQueryResult
     /// </summary>
     public IEnumerable<object?[]> EnumerateRows()
     {
-        return Enumerable.Range(0, RowCount)
-            .Select(GetRow);
+        var r = Enumerable.Range(0, RowCount)
+            .Select(GetRow).ToArray();
+        return r;
     }
 
     /// <summary>

@@ -21,6 +21,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _kustoSettings;
 
+    [ObservableProperty] private MapViewModel _mapModel;
     [ObservableProperty] private int _activeTab;
 
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
@@ -42,6 +43,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         _displayPreferences = displayPreferences;
         _console = console;
         _name = name;
+        MapModel = new MapViewModel();
     }
 
     public async Task RenderToDisplay(KustoQueryResult result)
@@ -50,6 +52,13 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         QuerySummary = $"{result.RowCount} rows in {(int)result.QueryDuration.TotalMilliseconds}ms";
 
         await RenderTable(result);
+
+        if (result.IsChart && result.Visualization.ChartType == "scatterchart"
+                           && result.Visualization.PropertyOr("kind", "") == "map")
+        {
+            MapModel.Render(result);
+            return;
+        }
         _plotter.RenderToDisplay(result, _kustoSettings);
         ActiveTab = result.IsChart
             ? 1 //show the plot tab

@@ -61,9 +61,16 @@
                     </TreeDataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Chart" Classes="TabHeader">
-                <views:ChartView
-                    x:Name="ChartView" />
+            <TabItem Header="Chart/Map" Classes="TabHeader">
+                <Grid>
+                    <views:ChartView
+                        x:Name="ChartView"
+                        IsVisible="False"/>
+                    <views:MapView
+                        x:Name="MapView" IsVisible="True"
+                        DataContext="{Binding MapModel}"/>
+                </Grid>
+
             </TabItem>
         </TabControl>
     </DockPanel>

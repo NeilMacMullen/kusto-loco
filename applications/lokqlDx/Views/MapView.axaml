@@ -8,5 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MapView"
              x:DataType="viewModels:MapViewModel">
-  <avalonia:MapControl Map="{Binding Map}"/>
+  <avalonia:MapControl x:Name="TheMap"
+                       Map="{Binding Map}"
+                       />
 </UserControl>
