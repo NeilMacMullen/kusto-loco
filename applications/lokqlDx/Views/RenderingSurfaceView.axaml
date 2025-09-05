@@ -61,7 +61,7 @@
                     </TreeDataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Chart/Map" Classes="TabHeader">
+            <TabItem Header="Visual" Classes="TabHeader">
                 <Grid>
                     <views:ChartView
                         x:Name="ChartView"

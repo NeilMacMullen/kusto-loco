@@ -36,7 +36,7 @@ public partial class MapView : UserControl
 
         var label = vm.GetTooltipAtPosition(screen);
         if (label.IsBlank())
-            ToolTip.SetTip(TheMap, label);
+            ToolTip.SetTip(TheMap, null);
         else 
             ToolTip.SetTip(TheMap, label);
     }

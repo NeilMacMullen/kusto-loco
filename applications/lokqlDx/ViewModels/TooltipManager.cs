@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Mapsui;
 using Mapsui.Extensions;
-using Mapsui.Layers;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
@@ -11,7 +11,14 @@ public class TooltipManager
     private readonly List<IFeature> _pins;
 
 
-    private  Dictionary<IFeature, string> _featureLabels = new();
+    private Dictionary<IFeature, string> _featureLabels = new();
+
+    public TooltipManager(Map map, List<IFeature> pins)
+    {
+        _map = map;
+        _pins = pins;
+    }
+
     public bool TryGetLabel(IFeature feature, out string label) =>
         _featureLabels.TryGetValue(feature, out label!);
 
@@ -19,11 +26,7 @@ public class TooltipManager
     {
         _featureLabels = [];
     }
-    public TooltipManager(Map map, List<IFeature> pins)
-    {
-        _map = map;
-        _pins = pins;
-    }
+
     public string GetTooltipAtPosition(Point screen)
     {
         // Screen → world
@@ -51,17 +54,15 @@ public class TooltipManager
             })
             .FirstOrDefault();
 
-        if (hit != null && TryGetLabel(hit, out var label) && !string.IsNullOrWhiteSpace(label))
-        {
-            return label;
-        }
+        if (hit != null && TryGetLabel(hit, out var label) && !string.IsNullOrWhiteSpace(label)) return label;
 
         return string.Empty;
-
     }
 
-    public void Add(PointFeature pinFeature, string label)
+    public void Add(IFeature pinFeature, string label)
     {
+        if (label.IsBlank())
+            return;
         _featureLabels[pinFeature] = label;
     }
 }
