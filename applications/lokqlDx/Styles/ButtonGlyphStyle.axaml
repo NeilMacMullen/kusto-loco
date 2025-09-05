@@ -40,4 +40,31 @@
     <Style Selector="TabItem.TabHeader">
         <Setter Property="FontSize" Value="16" />
     </Style>
+    <Style Selector="Button.overlay">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="#66000000"/>
+        <!-- semi-transparent black -->
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Width" Value="180"/>
+    </Style>
+    <Style Selector="Button.overlayControl">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="#66000000"/>
+        <!-- semi-transparent black -->
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Width" Value="60"/>
+    </Style>
+    
 </Styles>

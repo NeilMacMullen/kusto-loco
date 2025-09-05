@@ -1,7 +1,7 @@
-﻿using BruTile;
-using BruTile.Predefined;
-using BruTile.Web;
+﻿using BruTile.Predefined;
+using BruTile.Wms;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core;
 using Mapsui;
 using Mapsui.Extensions;
@@ -9,10 +9,13 @@ using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Projections;
 using Mapsui.Styles;
-using Mapsui.Tiling.Layers;
+using Mapsui.Tiling;
 using NetTopologySuite.Geometries;
 using NotNullStrings;
+using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using IFeature = Mapsui.IFeature;
+using Point = Avalonia.Point;
 
 namespace LokqlDx.ViewModels;
 
@@ -20,20 +23,23 @@ public partial class MapViewModel : ObservableObject
 {
     private readonly MemoryLayer _ellipseLayer = new("ellipses");
     private readonly List<IFeature> _ellipsFeatures = [];
-    private readonly Dictionary<IFeature, string> _featureLabels = new();
+  
     private readonly List<IFeature> _lineFeatures = [];
     private readonly MemoryLayer _lineLayer = new("lines");
+
     private readonly List<IFeature> _pinFeatures = [];
     private readonly MemoryLayer _pinLayer = new("pins");
+    private readonly LayerManager _layerManager;
+    private readonly TooltipManager _tooltipManager;
+    [ObservableProperty] private ObservableCollection<string> _layerNames = [];
 
     [ObservableProperty] private Map _map;
+    [ObservableProperty] private bool _showLayers;
     private KustoQueryResult _result = KustoQueryResult.Empty;
 
     public MapViewModel()
     {
         Map = new Map();
-        // Map.Layers.Add(OpenStreetMap.CreateTileLayer());
-
         _lineLayer.Features = _lineFeatures;
         _lineLayer.Style = null;
         _pinLayer.Style = null;
@@ -47,86 +53,32 @@ public partial class MapViewModel : ObservableObject
         Map.Layers.Add(_pinLayer);
         Map.Layers.Add(_ellipseLayer);
         Map.Widgets.Clear();
-
-        // Define the tile schema (Web Mercator)
-        var schema = new GlobalSphericalMercator();
-
-        // Create the URL builder
-        var urlBuilder = new BasicUrlBuilder(
-            "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" // optional subdomains array, e.g. new[] { "a", "b", "c" }
-        );
-
-        // Create the tile source
-        var tileSource = new HttpTileSource(
-            schema,
-            urlBuilder,
-            "Esri World Imagery",
-            attribution: new Attribution("Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community")
-        );
-
-        // Wrap in a layer
-        var esriLayer = new TileLayer(tileSource) { Name = "Esri World Imagery" };
-
-        // Add to your map
-        Map.Layers.Insert(0, esriLayer);
+        _layerManager = new LayerManager(Map);
+        LayerNames = new ObservableCollection<string>(_layerManager.GetKnown());
+        _layerManager.InitialLayer(KnownTileSource.OpenStreetMap);
+        _tooltipManager = new TooltipManager(Map, _pinFeatures);
     }
 
-    public bool TryGetLabel(IFeature feature, out string label) =>
-        _featureLabels.TryGetValue(feature, out label!);
+    [RelayCommand]
+    public void ToggleLayers()
+    {
+        ShowLayers = !ShowLayers;
+    }
+
+    [RelayCommand]
+    public void ChangeLayer(string wantedLayer)
+    {
+        _layerManager.FetchLayer(wantedLayer);
+        ShowLayers = false;
+    }
 
     private void Reset()
     {
         _lineFeatures.Clear();
         _pinFeatures.Clear();
-    }
-    
-    /*
-    private void AddCircleMeters(GeoPoint center, double radiusMeters, double minPixelSize = 10, int segments = 64)
-    {
-        var mpp = Map.Navigator.Viewport.Resolution; // meters per pixel
-        var effectiveRadiusMeters = Math.Max(radiusMeters, minPixelSize * mpp);
-
-        // This returns a projected Mapsui.Geometries.Point in Web Mercator
-        var centerProjected = SphericalMercator.FromLonLat(center.Longitude, center.Latitude);
-
-        var polygon = BuildCirclePolygon(centerProjected, effectiveRadiusMeters, segments);
-
-        var feature = new GeometryFeature(polygon)
-        {
-            Styles =
-            {
-                new VectorStyle
-                {
-                    Fill = new Brush(Color.FromArgb(64, 0, 0, 255)),
-                    Outline = new Pen(Color.Blue, 2)
-                }
-            }
-        };
-
-        _ellipsFeatures.Add(feature);
+        _tooltipManager.Clear();
     }
 
-    private Polygon BuildCirclePolygon(
-        Point center,
-        double radiusMeters,
-        int segments)
-    {
-        var coords = new Coordinate[segments + 1];
-
-        for (var i = 0; i < segments; i++)
-        {
-            var angle = i * 2 * Math.PI / segments;
-            var x = center.X + radiusMeters * Math.Cos(angle);
-            var y = center.Y + radiusMeters * Math.Sin(angle);
-            coords[i] = new Coordinate(x, y);
-        }
-
-        coords[segments] = coords[0]; // close ring
-
-        var ring = new LinearRing(coords);
-        return new Polygon(ring);
-    }
-    */
 
     private ColumnResult FindColumn(string names)
     {
@@ -188,24 +140,22 @@ public partial class MapViewModel : ObservableObject
             .ToArray();
 
         foreach (var p in points)
-        {
-         //   if (IsValid(sizeCol))
-           //     DrawEllipseMeters(p.Geo, p.Radius);
-           // else
-                AddPin(p.Geo, p.Tooltip);
-        }
+            //   if (IsValid(sizeCol))
+            //     DrawEllipseMeters(p.Geo, p.Radius);
+            // else
+            AddPin(p.Geo, p.Tooltip);
 
         if (IsValid(indexCol))
         {
             if (IsValid(seriesCol))
             {
                 var groups = points.GroupBy(p => p.Series).ToArray();
-                foreach (var d in groups)
-                {
-                    DrawLine(d.Select(p => p.Geo).ToArray());
-                }
+                foreach (var d in groups) DrawLine(d.Select(p => p.Geo).ToArray());
             }
-            else DrawLine(points.Select(p => p.Geo).ToArray());
+            else
+            {
+                DrawLine(points.Select(p => p.Geo).ToArray());
+            }
         }
     }
 
@@ -239,7 +189,7 @@ public partial class MapViewModel : ObservableObject
         };
 
         if (label.IsNotBlank())
-            _featureLabels[pinFeature] = label;
+            _tooltipManager.Add(pinFeature,label);
 
         _pinFeatures.Add(pinFeature);
     }
@@ -294,24 +244,15 @@ public partial class MapViewModel : ObservableObject
 
         Map.Navigator.ZoomToBox(extent, duration: durationMs);
     }
+
+    public string GetTooltipAtPosition(Point screen)
+    {
+        return _tooltipManager.GetTooltipAtPosition(screen);
+
+    }
 }
 
-public class GeoPoint(double lat, double lon, bool valid)
+public class MapArtist
 {
-    public readonly double Latitude = lat;
-    public readonly double Longitude = lon;
-    public readonly bool Valid = valid;
 
-    public GeoPoint(double latitude, double longitude) : this(latitude, longitude, true)
-    {
-    }
-
-    public GeoPoint LatLon(double lat, double lon) => new(lat, lon, true);
-
-    public static GeoPoint Maybe(object? lat, object? lon)
-    {
-        if (lat is not double dlat || lon is not double dlon)
-            return new GeoPoint(0, 0, false);
-        return new GeoPoint(dlat, dlon, true);
-    }
 }

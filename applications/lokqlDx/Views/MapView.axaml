@@ -2,13 +2,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lokqlDx="clr-namespace:LokqlDx"
              xmlns:avalonia="clr-namespace:Mapsui.UI.Avalonia;assembly=Mapsui.UI.Avalonia"
              xmlns:viewModels="clr-namespace:LokqlDx.ViewModels"
+             xmlns:views="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MapView"
              x:DataType="viewModels:MapViewModel">
-  <avalonia:MapControl x:Name="TheMap"
-                       Map="{Binding Map}"
-                       />
+    <Grid>
+
+		<avalonia:MapControl x:Name="TheMap"
+                             Map="{Binding Map}" />
+
+        <!-- Overlay layer: the toolbar -->
+		<!-- Overlay toolbar -->
+		<Border Background="#66000000"
+                
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="10"
+                Padding="1"
+                CornerRadius="6"
+                Effect="{DynamicResource ThemeOverlayShadow}">
+            <DockPanel>
+                <Grid Background="#66000000" DockPanel.Dock="Top">
+
+                <Button  Classes="overlayControl"
+                        Command="{Binding ToggleLayersCommand}"
+                        HorizontalAlignment="Right"
+                >...</Button>
+                </Grid>
+
+				<ItemsControl
+                    ItemsSource="{Binding LayerNames}"
+                    x:Name="ItemList"
+                    IsVisible="{Binding ShowLayers}">
+                <ItemsControl.ItemTemplate >
+                    <DataTemplate >
+                        <Button Classes="overlay"
+                                Content="{Binding}"
+                                Command="{Binding $parent[views:MapView].DataContext.ChangeLayer}"
+                                CommandParameter="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            </DockPanel>
+
+
+		</Border>
+
+	</Grid>
+
 </UserControl>
