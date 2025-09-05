@@ -104,12 +104,8 @@ public partial class MainViewModel : ObservableObject
     private void ResetLayout()
     {
         var queries = QueryLibrary.Queries.ToArray();
-        var layout = _factory.GetOrResetLayout();
-        if (layout != null)
-        {
-            _factory.InitLayout(layout);
-            Layout = layout;
-        }
+        Layout = _factory.GetOrResetLayout();
+      
 
         foreach (var query in queries.ToArray())
             _factory.AddDocument(query);
@@ -358,7 +354,7 @@ public partial class MainViewModel : ObservableObject
         if (await OfferSaveOfCurrentWorkspace() == YesNoCancel.Cancel)
             return;
 
-
+        RemoveAllDocs();
         //make sure we have the most recent global preferences
         var appPrefs = _preferencesManager.FetchApplicationPreferencesFromDisk();
         if (!_pluginsLoaded)
@@ -400,6 +396,12 @@ public partial class MainViewModel : ObservableObject
         }
 
         Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
+    }
+
+    private void RemoveAllDocs()
+    {
+      _factory.RemoveAllDocuments();
+      QueryLibrary.Clear();
     }
 
     /// <summary>

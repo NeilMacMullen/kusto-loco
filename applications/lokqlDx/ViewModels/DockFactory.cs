@@ -68,57 +68,16 @@ public class DockFactory : Factory
         foreach (var d in allDocs) RemoveDockable(d, true);
     }
 
+    private bool _layoutInit;
     public IRootDock? GetOrResetLayout()
     {
-        IDock[] GetBases(IDock parent)
-        {
-            return parent.VisibleDockables == null
-                ? []
-                : parent.VisibleDockables.OfType<IDock>()
-                    .Select(b => b)
-                    .ToArray();
-        }
-
-        QueryDocumentDock[] FindDocuments(IDock item)
-        {
-            if (item is QueryDocumentDock qd)
-                return [qd];
-            var bases = GetBases(item);
-            return bases.SelectMany(FindDocuments)
-                .ToArray();
-        }
-
-        if (DocumentDock is not null)
-        {
-            RemoveAllDocuments();
-
-            var hostWindows = HostWindows.OfType<HostWindow>().ToArray();
-            foreach (var h in hostWindows)
-                if (h.DataContext is RootDock root)
-                {
-                    var docWindows = FindDocuments(root);
-                    foreach (var queryDocumentDock in docWindows)
-                    {
-                        var docs = queryDocumentDock.VisibleDockables!.OfType<QueryDocumentViewModel>().ToArray();
-                        foreach (var d in docs)
-                            RemoveVisibleDockable(queryDocumentDock, d);
-                        if (queryDocumentDock.VisibleDockables!.Count == 0)
-                        {
-                            //var parent = FindRoot(queryDocumentDock);
-                            //RemoveDockable(queryDocumentDock);
-                        }
-                    }
-
-                    if (root.VisibleDockables!.Count == 0)
-                        h.Close();
-                }
-
-            RemoveAllVisibleDockables(DocumentDock);
-
-            return null;
-        }
-
-        return CreateLayout();
+        if (_layoutInit)
+            return Layout;
+        _layoutInit = true;
+       
+        var layout = CreateLayout();
+        InitLayout(layout);
+        return layout;
     }
 
 
