@@ -3,7 +3,9 @@ using BruTile.Predefined;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core;
+using KustoLoco.Core.Settings;
 using Mapsui;
+using Markdig.Renderers;
 using NotNullStrings;
 using Point = Avalonia.Point;
 
@@ -11,6 +13,7 @@ namespace LokqlDx.ViewModels;
 
 public partial class MapViewModel : ObservableObject
 {
+    private readonly KustoSettingsProvider _settings;
     private readonly LayerManager _layerManager;
     private readonly MapArtist _mapArtist;
     private readonly TooltipManager _tooltipManager;
@@ -20,10 +23,10 @@ public partial class MapViewModel : ObservableObject
     private KustoQueryResult _result = KustoQueryResult.Empty;
     [ObservableProperty] private bool _showLayers;
 
-    public MapViewModel()
+    public MapViewModel(KustoSettingsProvider settings)
     {
+        _settings = settings;
         Map = new Map();
-
         Map.Widgets.Clear();
         _layerManager = new LayerManager(Map);
         LayerNames = new ObservableCollection<string>(_layerManager.GetKnown());
@@ -160,4 +163,11 @@ public partial class MapViewModel : ObservableObject
 
     public string GetTooltipAtPosition(Point screen)
         => _tooltipManager.GetTooltipAtPosition(screen);
+
+    public Action OnCopyToClipboard = () => { };
+
+    public void CopyToClipboard()
+    {
+        OnCopyToClipboard();
+    }
 }

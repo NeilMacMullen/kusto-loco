@@ -28,8 +28,6 @@ public partial class QueryViewModel : ObservableObject
     {
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
-        Messaging.RegisterForEvent<LayoutChangedMessage>(this, FlipArrangement);
-        Messaging.RegisterForEvent<CopyChartMessage>(this, CopyChartHandler);
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
             (_, m) =>
             {
@@ -48,11 +46,6 @@ public partial class QueryViewModel : ObservableObject
 
     public bool IsActive { get; set; }
 
-    private void CopyChartHandler()
-    {
-        if (IsActive)
-            CopyChartToClipboard();
-    }
 
     private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();
 
