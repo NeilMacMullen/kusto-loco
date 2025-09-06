@@ -48,6 +48,7 @@
     <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
     <PackageReference Include="Dock.Model.Mvvm" />
     <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
+    <PackageReference Include="Mapsui.Avalonia" />
     <PackageReference Include="MarkdownViewer.Core" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="ScottPlot.Avalonia" />
@@ -95,6 +96,10 @@
     <Compile Update="Views\QueryEditorView.axaml.cs">
       <DependentUpon>QueryEditorView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\MapView.axaml.cs">
+      <DependentUpon>MapView.axaml</DependentUpon>
+    </Compile>
+
   </ItemGroup>
 
   <ItemGroup>

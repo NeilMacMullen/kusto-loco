@@ -20,11 +20,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 {
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _kustoSettings;
-
     [ObservableProperty] private int _activeTab;
 
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
+
+    [ObservableProperty] private MapViewModel _mapModel;
 
     [ObservableProperty] private string _name = string.Empty;
 
@@ -33,6 +34,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     [ObservableProperty] private string _querySummary = string.Empty;
     [ObservableProperty] private KustoQueryResult _result = KustoQueryResult.Empty;
     [ObservableProperty] private bool _showDataGridSizeWarning;
+    [ObservableProperty] private bool _showMap;
     [ObservableProperty] private ITreeDataGridSource<Row> _treeSource = new MyFlatTreeDataGridSource<Row>([], []);
 
     public RenderingSurfaceViewModel(string name, KustoSettingsProvider kustoSettings,
@@ -42,6 +44,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         _displayPreferences = displayPreferences;
         _console = console;
         _name = name;
+        MapModel = new MapViewModel(kustoSettings);
     }
 
     public async Task RenderToDisplay(KustoQueryResult result)
@@ -50,10 +53,14 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         QuerySummary = $"{result.RowCount} rows in {(int)result.QueryDuration.TotalMilliseconds}ms";
 
         await RenderTable(result);
-        _plotter.RenderToDisplay(result, _kustoSettings);
         ActiveTab = result.IsChart
             ? 1 //show the plot tab
             : 0; //show the table tab
+        ShowMap = result.IsChart && result.Visualization.ChartType == "scatterchart"
+                                 && result.Visualization.PropertyOr("kind", "") == "map";
+        if (ShowMap)
+            MapModel.Render(result);
+        else _plotter.RenderToDisplay(result, _kustoSettings);
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
@@ -139,7 +146,13 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     }
 
 
-    public void CopyToClipboard() => _plotter.CopyToClipboard();
+    public void CopyToClipboard()
+    {
+        if (ShowMap)
+            MapModel.CopyToClipboard();
+        else
+            _plotter.CopyToClipboard();
+    }
 
     private Task RenderTable(KustoQueryResult result)
     {

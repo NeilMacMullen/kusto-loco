@@ -4,12 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
              xmlns:views="clr-namespace:LokqlDx.Views"
+             xmlns:converters="clr-namespace:LokqlDx.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.RenderingSurfaceView"
              x:DataType="vm:RenderingSurfaceViewModel"
              Loaded="Control_OnLoaded"
              DataContextChanged="StyledElement_OnDataContextChanged"
              Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
+    <UserControl.Resources>
+		<converters:NegateBoolConverter x:Key="Negate" />
+    </UserControl.Resources>
     <DockPanel Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8" />
@@ -61,9 +65,19 @@
                     </TreeDataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Chart" Classes="TabHeader">
-                <views:ChartView
-                    x:Name="ChartView" />
+            <TabItem Header="Visual" Classes="TabHeader">
+                <Grid>
+                    <views:ChartView
+                        x:Name="ChartView"
+                        IsVisible="{Binding ShowMap, Converter={StaticResource Negate}}"
+                        />
+                    <views:MapView
+                        x:Name="MapView" 
+                        DataContext="{Binding MapModel}"
+                        IsVisible="{Binding $parent[Grid].DataContext.ShowMap}"
+                        />
+                </Grid>
+
             </TabItem>
         </TabControl>
     </DockPanel>

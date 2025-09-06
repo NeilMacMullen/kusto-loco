@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:Mapsui.UI.Avalonia;assembly=Mapsui.UI.Avalonia"
+             xmlns:viewModels="clr-namespace:LokqlDx.ViewModels"
+             xmlns:views="clr-namespace:LokqlDx.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LokqlDx.Views.MapView"
+             x:DataType="viewModels:MapViewModel">
+    <Grid>
+        <Grid x:Name="MapPanel">
+            <avalonia:MapControl x:Name="TheMap"
+                                 Map="{Binding Map}" />
+
+        </Grid>
+
+        <!-- Overlay layer: the toolbar -->
+        <!-- Overlay toolbar -->
+        <Border Background="#66000000"
+
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="10"
+                Padding="1"
+                CornerRadius="6"
+                Effect="{DynamicResource ThemeOverlayShadow}">
+            <DockPanel>
+                <Grid Background="#66000000" DockPanel.Dock="Top">
+
+                    <Button Classes="overlayControl" Command="{Binding ToggleLayersCommand}"
+                            HorizontalAlignment="Right">
+                        <Viewbox Width="16" Height="16" Stretch="Uniform">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="#99FFFFFF"
+                                      Data="
+        M 4,8  H 20 V 10 H 4 Z
+        M 4,12 H 20 V 14 H 4 Z
+        M 4,16 H 20 V 18 H 4 Z" />
+                            </Canvas>
+                        </Viewbox>
+                        <ToolTip.Tip>Select Layer</ToolTip.Tip>
+                    </Button>
+
+
+                </Grid>
+
+                <ItemsControl
+                    ItemsSource="{Binding LayerNames}"
+                    x:Name="ItemList"
+                    IsVisible="{Binding ShowLayers}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Classes="overlay"
+                                    Content="{Binding}"
+                                    Command="{Binding $parent[views:MapView].DataContext.ChangeLayer}"
+                                    CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </DockPanel>
+
+
+        </Border>
+
+    </Grid>
+
+</UserControl>
