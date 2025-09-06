@@ -6,10 +6,10 @@
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.1.1" />
-    <PackageVersion Include="Avalonia.Headless.XUnit" Version="11.3.4" />
+    <PackageVersion Include="Avalonia.Headless.XUnit" Version="11.3.5" />
     <PackageVersion Include="Avalonia.Labs.Controls" Version="11.3.1" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="11.3.1" />
-    <PackageVersion Include="Avalonia.Skia" Version="11.3.4" />
+    <PackageVersion Include="Avalonia.Skia" Version="11.3.5" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0" />
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="AwesomeAssertions" Version="9.1.0" />
@@ -53,12 +53,12 @@
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NLog" Version="6.0.3" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.10.3" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.10.4" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.4" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.3" />
     <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.4" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
-    <PackageVersion Include="OpenAI" Version="2.3.0" />
+    <PackageVersion Include="OpenAI" Version="2.4.0" />
     <PackageVersion Include="Parquet.Net" Version="5.2.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.0.56" />
@@ -94,14 +94,14 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="geohash-dotnet" Version="2.2.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
-    <PackageVersion Include="Avalonia" Version="11.3.4" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.3.4" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.4" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.4" />
-    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.4" />
+    <PackageVersion Include="Avalonia" Version="11.3.5" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.5" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.5" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.5" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.5" />
     <PackageVersion Include="Jab" Version="0.11.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.4" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.5" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.2.0" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
