@@ -12,8 +12,9 @@ public class GeoPoint(double lat, double lon, bool valid)
 
     public static GeoPoint Maybe(object? lat, object? lon)
     {
-        if (lat is not double dlat || lon is not double dlon)
-            return new GeoPoint(0, 0, false);
-        return new GeoPoint(dlat, dlon, true);
+        if (lat is double dlat && lon is double dlon)
+            return new GeoPoint(dlat, dlon, true);
+     
+        return new GeoPoint(0, 0, false);
     }
 }

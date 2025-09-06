@@ -106,6 +106,9 @@
                     <MenuItem Header="Chart customisation"
                               Command="{Binding NavigateToWikiCommand}"
                               CommandParameter="ScottPlot-Chart-customisation" />
+                    <MenuItem Header="Using Maps"
+                              Command="{Binding NavigateToWikiCommand}"
+                              CommandParameter="Using-maps-in-LoqklDx"/>
                     <Separator />
                     <MenuItem Header="Querying ApplicationInsights"
                               Command="{Binding NavigateToWikiCommand}"

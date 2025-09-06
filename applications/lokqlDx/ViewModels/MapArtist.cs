@@ -1,4 +1,5 @@
-﻿using Mapsui;
+﻿using KustoLoco.Core.Settings;
+using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Styles;
@@ -8,14 +9,16 @@ namespace LokqlDx.ViewModels;
 
 public class MapArtist
 {
+    private readonly KustoSettingsProvider _settings;
     private readonly List<IFeature> _lineFeatures = [];
     private readonly MemoryLayer _lineLayer = new("lines");
 
     private readonly List<IFeature> _pinFeatures = [];
     private readonly MemoryLayer _pinLayer = new("pins");
 
-    public MapArtist(Map Map)
+    public MapArtist(Map Map,KustoSettingsProvider settings)
     {
+        _settings = settings;
         _lineLayer.Features = _lineFeatures;
         _lineLayer.Style = null;
         _pinLayer.Style = null;
@@ -46,7 +49,10 @@ public class MapArtist
         _lineLayer.DataHasChanged();
     }
 
-    public IFeature AddPin(GeoPoint geo)
+    public IFeature AddPin(GeoPoint geo,
+        double scale,
+        SymbolType symbol,
+        Brush pinFill)
     {
         var pt = MapGeometry.FromGeoPoint(geo);
 
@@ -56,10 +62,10 @@ public class MapArtist
             [
                 new SymbolStyle
                 {
-                    SymbolType = SymbolType.Ellipse,
-                    Fill = new Brush(Color.Red),
+                    SymbolType = symbol,
+                    Fill = pinFill,
                     Outline = new Pen(Color.Black),
-                    SymbolScale = 0.3
+                    SymbolScale = scale
                 }
             ]
         };
@@ -69,7 +75,7 @@ public class MapArtist
         return pinFeature;
     }
 
-    public void DrawLine(GeoPoint[] points)
+    public void DrawLine(GeoPoint[] points,Color penColor)
     {
         if (points.Length < 2)
             return;
@@ -82,7 +88,7 @@ public class MapArtist
         // Add style
         lineFeature.Styles.Add(new VectorStyle
         {
-            Line = new Pen(Color.Blue)
+            Line = new Pen(penColor)
         });
 
         _lineFeatures.Add(lineFeature);

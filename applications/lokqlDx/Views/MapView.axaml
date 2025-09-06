@@ -28,39 +28,38 @@
             <DockPanel>
                 <Grid Background="#66000000" DockPanel.Dock="Top">
 
-					<Button Classes="overlayControl" Command="{Binding ToggleLayersCommand}" HorizontalAlignment="Right">
+                    <Button Classes="overlayControl" Command="{Binding ToggleLayersCommand}"
+                            HorizontalAlignment="Right">
                         <Viewbox Width="16" Height="16" Stretch="Uniform">
                             <Canvas Width="24" Height="24">
-                                <Path Fill="#99FFFFFF" Data="
+                                <Path Fill="#99FFFFFF"
+                                      Data="
         M 4,8  H 20 V 10 H 4 Z
         M 4,12 H 20 V 14 H 4 Z
-        M 4,16 H 20 V 18 H 4 Z"/>
+        M 4,16 H 20 V 18 H 4 Z" />
                             </Canvas>
                         </Viewbox>
                         <ToolTip.Tip>Select Layer</ToolTip.Tip>
                     </Button>
 
 
-
-				</Grid>
+                </Grid>
 
                 <ItemsControl
                     ItemsSource="{Binding LayerNames}"
                     x:Name="ItemList"
-                    IsVisible="{Binding ShowLayers}"
-                    >
+                    IsVisible="{Binding ShowLayers}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Classes="overlay"
                                     Content="{Binding}"
                                     Command="{Binding $parent[views:MapView].DataContext.ChangeLayer}"
-                                    CommandParameter="{Binding}"
-                                    />
+                                    CommandParameter="{Binding}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-            </DockPanel >
+            </DockPanel>
 
 
         </Border>

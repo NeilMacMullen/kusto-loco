@@ -42,9 +42,16 @@ public class LayerManager
         _cached.Add(tileSource, layer);
         return layer;
     }
+
+    private static KnownTileSource Parse(string name)
+    {
+        if (Enum.TryParse<KnownTileSource>(name,true,out var known))
+            return known;
+        return KnownTileSource.OpenStreetMap;
+    }
     public void FetchLayer(string name)
     {
-        var enumValue = Enum.Parse<KnownTileSource>(name);
+        var enumValue = Parse(name);
         if (!_cached.TryGetValue(enumValue, out var layer))
         {
             layer = Create(enumValue);
@@ -55,9 +62,10 @@ public class LayerManager
         Map.Layers.Remove(prev);
     }
 
-    public void InitialLayer(KnownTileSource initialLayer)
+    public void InitialLayer(string initialLayer)
     {
-        var layer = Create(initialLayer);
+        var enumValue = Parse(initialLayer);
+        var layer = Create(enumValue);
         Map.Layers.Insert(0, layer);
     }
 }

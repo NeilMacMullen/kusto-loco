@@ -13,7 +13,6 @@ namespace LokqlDx.ViewModels;
 
 public partial class MapViewModel : ObservableObject
 {
-    private readonly KustoSettingsProvider _settings;
     private readonly LayerManager _layerManager;
     private readonly MapArtist _mapArtist;
     private readonly TooltipManager _tooltipManager;
@@ -23,16 +22,18 @@ public partial class MapViewModel : ObservableObject
     private KustoQueryResult _result = KustoQueryResult.Empty;
     [ObservableProperty] private bool _showLayers;
 
+    MapResultRenderer _resultRenderer;
     public MapViewModel(KustoSettingsProvider settings)
     {
-        _settings = settings;
         Map = new Map();
         Map.Widgets.Clear();
         _layerManager = new LayerManager(Map);
         LayerNames = new ObservableCollection<string>(_layerManager.GetKnown());
-        _layerManager.InitialLayer(KnownTileSource.OpenStreetMap);
-        _mapArtist = new MapArtist(Map);
+        
+        _layerManager.InitialLayer(settings.GetOr("map.defaultLayer", $"{KnownTileSource.OpenStreetMap}"));
+        _mapArtist = new MapArtist(Map,settings);
         _tooltipManager = new TooltipManager(Map, _mapArtist.GetPinList());
+        _resultRenderer = new MapResultRenderer(settings, _mapArtist, _tooltipManager);
     }
 
     [RelayCommand]
@@ -72,68 +73,13 @@ public partial class MapViewModel : ObservableObject
     {
         _result = result;
         Reset();
-        Populate();
+        _resultRenderer.Populate(result);
         _mapArtist.UpdateFeatures();
         Map.RefreshGraphics();
         Map.Refresh();
         ZoomToLayers(0.2, 500);
     }
 
-    private static bool IsValid(ColumnResult res)
-        => res.Index >= 0;
-
-    private void Populate()
-    {
-        var latCol = FindColumn("latitude,lat");
-        var lonCol = FindColumn("longitude,lon");
-        var sizeCol = FindColumn("size,radius");
-        var seriesCol = FindColumn("series");
-        var indexCol = FindColumn("index,timestamp");
-        var tooltipCol = FindColumn("tooltip");
-
-        //we need at least latitude and longitude
-        if (!IsValid(latCol) || !IsValid(lonCol))
-            return;
-
-        var points = _result.EnumerateRows()
-            .Select(row => new
-            {
-                Geo = GeoPoint.Maybe(row[latCol.Index],
-                    row[lonCol.Index]),
-                Radius = double.TryParse(ValOr(row, sizeCol, "0"), out var rad) ? rad : 0.0,
-                Tooltip = ValOr(row, tooltipCol, string.Empty),
-                Series = ValOr(row, seriesCol, string.Empty)
-            })
-            .Where(g => g.Geo.Valid)
-            .ToArray();
-
-        foreach (var p in points)
-        {
-            var pin = _mapArtist.AddPin(p.Geo);
-            _tooltipManager.Add(pin, p.Tooltip);
-        }
-
-        if (IsValid(indexCol))
-        {
-            if (IsValid(seriesCol))
-            {
-                var groups = points.GroupBy(p => p.Series).ToArray();
-                foreach (var d in groups)
-                    _mapArtist.DrawLine(d.Select(p => p.Geo).ToArray());
-            }
-            else
-            {
-                _mapArtist.DrawLine(points.Select(p => p.Geo).ToArray());
-            }
-        }
-    }
-
-    private static string ValOr(object?[] row, ColumnResult seriesCol, string fallback)
-    {
-        if (!IsValid(seriesCol))
-            return fallback;
-        return row[seriesCol.Index]?.ToString() ?? fallback;
-    }
 
 
     private void ZoomToLayers(double paddingFraction = 0.10, int durationMs = 400)
