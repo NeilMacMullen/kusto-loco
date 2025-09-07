@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Clowd.Clipboard;
 using KustoLoco.Core;
@@ -111,4 +112,9 @@ public partial class ChartView : UserControl, IScottPlotHost
         });
 
     #endregion
+
+    private void PlotControl_OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
 }

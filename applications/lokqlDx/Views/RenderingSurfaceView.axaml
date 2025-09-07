@@ -3,83 +3,98 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:LokqlDx.ViewModels"
-             xmlns:views="clr-namespace:LokqlDx.Views"
              xmlns:converters="clr-namespace:LokqlDx.Converters"
+             xmlns:views1="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.RenderingSurfaceView"
              x:DataType="vm:RenderingSurfaceViewModel"
-             Loaded="Control_OnLoaded"
-             DataContextChanged="StyledElement_OnDataContextChanged"
              Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
     <UserControl.Resources>
-		<converters:NegateBoolConverter x:Key="Negate" />
+        <converters:NegateBoolConverter x:Key="Negate" />
     </UserControl.Resources>
     <DockPanel Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Label Content="{Binding QuerySummary}" FontSize="8" />
         </StackPanel>
-        <TabControl SelectedIndex="{Binding ActiveTab}" DockPanel.Dock="Top">
-            <TabItem Header="Data" Classes="TabHeader">
-                <Grid RowDefinitions="auto,*">
-                    <TextBlock
-                        Text="{Binding DataGridSizeWarning}"
-                        IsVisible="{Binding ShowDataGridSizeWarning}" />
+        <Grid RowDefinitions="Auto,*">
 
-                    <TreeDataGrid
-                        Grid.Row="1"
-                        x:Name="DataGrid"
-                        Source="{Binding TreeSource}"
-                        FontFamily="{Binding DisplayPreferences.FontFamily}"
-                        FontSize="{Binding DisplayPreferences.FontSize}"
-                        CanUserResizeColumns="True"
-                        CanUserSortColumns="True"
-                        Background="{DynamicResource SystemListHighColor}"
-                        Foreground="{DynamicResource SystemAccentColorLight2}">
-                        <TreeDataGrid.Styles>
-                            <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
-                                <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
-                            </Style>
-                            <Style Selector="TreeDataGridColumnHeader">
-                                <Setter Property="Background"
-                                        Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark3}" />
-                                <Setter Property="FontWeight" Value="Bold" />
-                            </Style>
-                        </TreeDataGrid.Styles>
-                        <TreeDataGrid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}"
-                                          CommandParameter="cell" />
-                                <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}"
-                                          CommandParameter="column" />
-                                <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}"
-                                          CommandParameter="row" />
-                                <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
-                                          CommandParameter="table" />
-                                <Separator />
-                                <MenuItem Header="Copy to clipboard as CSV (without headers)"
-                                          Command="{Binding DataGridCopyCommand}"
-                                          CommandParameter="csv" />
-                            </ContextMenu>
-                        </TreeDataGrid.ContextMenu>
-                    </TreeDataGrid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Visual" Classes="TabHeader">
-                <Grid>
-                    <views:ChartView
-                        x:Name="ChartView"
-                        IsVisible="{Binding ShowMap, Converter={StaticResource Negate}}"
-                        />
-                    <views:MapView
-                        x:Name="MapView" 
-                        DataContext="{Binding MapModel}"
-                        IsVisible="{Binding $parent[Grid].DataContext.ShowMap}"
-                        />
+            <!-- Header row -->
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Classes="TabHeader">
+                <Button Content="Data"
+                        Command="{Binding ChangeTabCommand}"
+                        CommandParameter="data"
+                       />
+                <Button Content="Visual"
+                        Command="{Binding ChangeTabCommand}"
+                        CommandParameter="visual"
+                      />
+            </StackPanel>
+
+            <!-- Content row -->
+            <Grid Grid.Row="1">
+
+                <!-- Data view -->
+                <Grid IsVisible="{Binding ShowData}">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Text="{Binding DataGridSizeWarning}"
+                                   IsVisible="{Binding ShowDataGridSizeWarning}" />
+
+                        <TreeDataGrid Grid.Row="1"
+                                      x:Name="DataGrid"
+                                      Source="{Binding TreeSource}"
+                                      FontFamily="{Binding DisplayPreferences.FontFamily}"
+                                      FontSize="{Binding DisplayPreferences.FontSize}"
+                                      CanUserResizeColumns="True"
+                                      CanUserSortColumns="True"
+                                      Background="{DynamicResource SystemListHighColor}"
+                                      Foreground="{DynamicResource SystemAccentColorLight2}">
+                            <TreeDataGrid.Styles>
+                                <Style Selector="TreeDataGrid TreeDataGridRow:nth-child(2n)">
+                                    <Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
+                                </Style>
+                                <Style Selector="TreeDataGridColumnHeader">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark3}" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </Style>
+                            </TreeDataGrid.Styles>
+                            <TreeDataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}"
+                                              CommandParameter="cell" />
+                                    <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}"
+                                              CommandParameter="column" />
+                                    <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}"
+                                              CommandParameter="row" />
+                                    <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
+                                              CommandParameter="table" />
+                                    <Separator />
+                                    <MenuItem Header="Copy to clipboard as CSV (without headers)"
+                                              Command="{Binding DataGridCopyCommand}"
+                                              CommandParameter="csv" />
+                                </ContextMenu>
+                            </TreeDataGrid.ContextMenu>
+                        </TreeDataGrid>
+                    </Grid>
                 </Grid>
 
-            </TabItem>
-        </TabControl>
+                <!-- Visual view -->
+                <Grid IsVisible="{Binding ShowData, Converter={StaticResource Negate}}">
+                    <views1:ChartView x:Name="ChartView"
+                                      IsVisible="{Binding ShowMap, Converter={StaticResource Negate}}"
+                                      LayoutUpdated="ChartView_OnLayoutUpdated"
+                                      DataContextChanged="ChartView_OnDataContextChanged_OnDataContextChanged"
+
+                                      />
+                    <views1:MapView x:Name="MapView"
+                                    DataContext="{Binding MapModel}"
+                                    IsVisible="{Binding $parent[Grid].DataContext.ShowMap}" />
+                </Grid>
+
+            </Grid>
+        </Grid>
+
     </DockPanel>
 
 </UserControl>
