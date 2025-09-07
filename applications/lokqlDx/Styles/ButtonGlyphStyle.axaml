@@ -90,7 +90,6 @@
     <Style Selector="Button.KqlTabHeader:disabled">
         <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
     </Style>
 
     <!-- Inactive tab (enabled button) -->
