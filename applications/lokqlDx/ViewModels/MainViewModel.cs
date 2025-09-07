@@ -151,7 +151,7 @@ public partial class MainViewModel : ObservableObject
             preQueryText,
             adapter);
 
-        var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel);
+        var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel,_explorer.Settings);
         var doc = new QueryDocumentViewModel(name, queryViewModel) { IsVisible = isVisible };
         return doc;
     }
@@ -387,7 +387,7 @@ public partial class MainViewModel : ObservableObject
         else
             AddQuery("query", CurrentWorkspace.Text, string.Empty, true);
         ResetLayout();
-        UpdateUIFromWorkspace();
+        UpdateUiFromWorkspace();
         if (!appPrefs.HasShownLanding)
         {
             //NavigateToLanding();
@@ -407,7 +407,7 @@ public partial class MainViewModel : ObservableObject
     /// <summary>
     ///     Update the UI because a new workspace has been loaded
     /// </summary>
-    private void UpdateUIFromWorkspace()
+    private void UpdateUiFromWorkspace()
     {
         var version = UpgradeManager.GetCurrentVersion();
         var title = _workspaceManager.Path.IsBlank()
@@ -507,11 +507,10 @@ public partial class MainViewModel : ObservableObject
         });
 
 
-        if (result?.TryGetLocalPath() is string path)
+        if (result?.TryGetLocalPath() is { } path)
         {
             SaveWorkspace(path);
             //make sure we update title bar
-            var version = UpgradeManager.GetCurrentVersion();
             var title =
                 $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
             WindowTitle = title;
@@ -525,18 +524,10 @@ public partial class MainViewModel : ObservableObject
     private void SaveWorkspace(string path)
     {
         var queries = QueryLibrary.Persist();
-        ;
         CurrentWorkspace.Queries = queries;
         _workspaceManager.Save(path, CurrentWorkspace);
         ResetDirty();
         UpdateMostRecentlyUsed(path);
-    }
-
-    private async Task QueryEditorViewModel_ExecutingQuery(object? sender, EventArgs args)
-    {
-        if (!_workspaceManager.IsNewWorkspace &&
-            _preferencesManager.FetchCachedApplicationSettings().AutoSave)
-            await Save();
     }
 
     private void UpdateMostRecentlyUsed(string path)
