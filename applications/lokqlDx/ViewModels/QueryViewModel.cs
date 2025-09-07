@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using KustoLoco.Core.Settings;
 
 namespace LokqlDx.ViewModels;
 
 public partial class QueryViewModel : ObservableObject
 {
+    private readonly KustoSettingsProvider _settings;
     [ObservableProperty] private int _chartColumn = 2;
     [ObservableProperty] private int _chartRow;
     [ObservableProperty] private int _columnSpan = 1;
@@ -24,8 +26,9 @@ public partial class QueryViewModel : ObservableObject
     private int n;
 
     public QueryViewModel(QueryEditorViewModel queryEditorViewModel,
-        RenderingSurfaceViewModel renderingSurfaceViewModel)
+        RenderingSurfaceViewModel renderingSurfaceViewModel,KustoSettingsProvider settings)
     {
+        _settings = settings;
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
@@ -121,14 +124,15 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void PinChart()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, false));
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,_settings,false));
         Messaging.Send(msg);
     }
 
     [RelayCommand]
     public void TearOff()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result, true));
+        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,
+            _settings,true));
         Messaging.Send(msg);
     }
 

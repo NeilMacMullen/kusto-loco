@@ -40,7 +40,7 @@ public class DockFactory : Factory
     private List<IDockable> _spawnedWindows = [];
     private void DisplayResult(PinnedKustoResult pinned)
     {
-        var model = new ResultDisplayViewModel(pinned.Name, pinned.Result);
+        var model = new ResultDisplayViewModel(pinned.Name, pinned.Result,pinned.Settings);
         _spawnedWindows.Add(model);
         AddDockable(new RootDock(), model);
         FloatDockable(model);

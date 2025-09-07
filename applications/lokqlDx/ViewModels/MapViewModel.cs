@@ -5,8 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using Mapsui;
-using Markdig.Renderers;
-using NotNullStrings;
 using Point = Avalonia.Point;
 
 namespace LokqlDx.ViewModels;
@@ -15,37 +13,44 @@ public partial class MapViewModel : ObservableObject
 {
     private readonly LayerManager _layerManager;
     private readonly MapArtist _mapArtist;
+    private const string MapCurrentLayerPreference = "map.currentLayerPreference";
+
+    private readonly MapResultRenderer _resultRenderer;
+    private readonly KustoSettingsProvider _settings;
     private readonly TooltipManager _tooltipManager;
     [ObservableProperty] private ObservableCollection<string> _layerNames = [];
 
     [ObservableProperty] private Map _map;
-    private KustoQueryResult _result = KustoQueryResult.Empty;
     [ObservableProperty] private bool _showLayers;
 
-    MapResultRenderer _resultRenderer;
+    public Action OnCopyToClipboard = () => { };
+
     public MapViewModel(KustoSettingsProvider settings)
     {
+        _settings = settings;
         Map = new Map();
         Map.Widgets.Clear();
         _layerManager = new LayerManager(Map);
         LayerNames = new ObservableCollection<string>(_layerManager.GetKnown());
-        
-        _layerManager.InitialLayer(settings.GetOr("map.defaultLayer", $"{KnownTileSource.OpenStreetMap}"));
-        _mapArtist = new MapArtist(Map,settings);
+
+        if (settings.HasSetting(MapCurrentLayerPreference))
+            _layerManager.InitialLayer(settings.GetOr(MapCurrentLayerPreference,
+                $"{KnownTileSource.OpenStreetMap}"));
+        else
+            _layerManager.InitialLayer(settings.GetOr("map.defaultLayer", $"{KnownTileSource.OpenStreetMap}"));
+        _mapArtist = new MapArtist(Map, settings);
         _tooltipManager = new TooltipManager(Map, _mapArtist.GetPinList());
         _resultRenderer = new MapResultRenderer(settings, _mapArtist, _tooltipManager);
     }
 
     [RelayCommand]
-    public void ToggleLayers()
-    {
-        ShowLayers = !ShowLayers;
-    }
+    public void ToggleLayers() => ShowLayers = !ShowLayers;
 
     [RelayCommand]
     public void ChangeLayer(string wantedLayer)
     {
         _layerManager.FetchLayer(wantedLayer);
+        _settings.Set(MapCurrentLayerPreference, wantedLayer);
         ShowLayers = false;
     }
 
@@ -55,23 +60,10 @@ public partial class MapViewModel : ObservableObject
         _tooltipManager.Clear();
     }
 
-    private ColumnResult FindColumn(string names)
-    {
-        foreach (var name in names.Tokenize(","))
-        {
-            var matches = _result.ColumnDefinitions()
-                .Where(d => d.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToArray();
-            if (matches.Any())
-                return matches.First();
-        }
-
-        return new ColumnResult(string.Empty, -1, typeof(object));
-    }
 
     public void Render(KustoQueryResult result)
 
     {
-        _result = result;
         Reset();
         _resultRenderer.Populate(result);
         _mapArtist.UpdateFeatures();
@@ -79,7 +71,6 @@ public partial class MapViewModel : ObservableObject
         Map.Refresh();
         ZoomToLayers(0.2, 500);
     }
-
 
 
     private void ZoomToLayers(double paddingFraction = 0.10, int durationMs = 400)
@@ -110,10 +101,5 @@ public partial class MapViewModel : ObservableObject
     public string GetTooltipAtPosition(Point screen)
         => _tooltipManager.GetTooltipAtPosition(screen);
 
-    public Action OnCopyToClipboard = () => { };
-
-    public void CopyToClipboard()
-    {
-        OnCopyToClipboard();
-    }
+    public void CopyToClipboard() => OnCopyToClipboard();
 }

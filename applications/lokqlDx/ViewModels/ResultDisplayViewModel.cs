@@ -12,12 +12,12 @@ public partial class ResultDisplayViewModel : Document, INotifyPropertyChanged
     [ObservableProperty] private RenderingSurfaceViewModel _renderingSurface;
     [ObservableProperty] private KustoQueryResult _result;
 
-    public ResultDisplayViewModel(string name, KustoQueryResult result)
+    public ResultDisplayViewModel(string name, KustoQueryResult result,KustoSettingsProvider settings)
     {
         Title = name;
         Result = result;
         RenderingSurface =
-            new RenderingSurfaceViewModel("name", new KustoSettingsProvider(),
+            new RenderingSurfaceViewModel(name, settings.Snapshot(),
                 new DisplayPreferencesViewModel(), new NullConsole())
             {
                 Result = Result
