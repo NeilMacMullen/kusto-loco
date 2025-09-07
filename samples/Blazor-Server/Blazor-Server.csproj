@@ -8,7 +8,7 @@
 
     <RootNamespace>Blazor-Server</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
-    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <PublishSingleFile>true</PublishSingleFile>
-    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

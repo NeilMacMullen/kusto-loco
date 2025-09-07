@@ -11,9 +11,13 @@ public partial class MapView : UserControl
     public MapView()
     {
         InitializeComponent();
-        TheMap.PointerMoved += OnMapPointerMoved;
     }
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        TheMap.PointerMoved += OnMapPointerMoved;
+    }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {

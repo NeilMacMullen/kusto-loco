@@ -13,8 +13,19 @@ namespace LogSetup;
 
 public class LoggerFactoryProvider
 {
+    private const string KustoLocoLog = "kusto-loco.log";
+    private const string KustoLocoStartupLog = "kusto-loco-startup.log";
+
+    public static void DirectLog(string str)
+    {
+        var path = Path.Combine(Path.GetTempPath(), KustoLocoStartupLog);
+        File.AppendAllText(path,$"{DateTime.Now:yyyy-MMM-dd HH:mm:ss}:{str}{Environment.NewLine}");
+    }
+
     public static ILoggerFactory GetFactory(IConfiguration configuration)
     {
+        Console.WriteLine("Dumping configuration");
+        DumpConfig(configuration);
         // callsite: does not work because of logging extension wrapper methods ("LoggingExtensions.Log")
         var firstLine = """
                         ${time}
@@ -41,7 +52,7 @@ public class LoggerFactoryProvider
         var consoleNLogLevel = ToNLogLevel(consoleLevel);
         var debugNLogLevel = ToNLogLevel(debugLevel);
         var fileNLogLevel = ToNLogLevel(fileLevel);
-        var logPath = configuration["File:Path"] ?? Path.Combine(Path.GetTempPath(), "kusto-loco.log");
+        var logPath = configuration["File:Path"] ?? Path.Combine(Path.GetTempPath(), KustoLocoLog);
         Console.WriteLine($"Logging to {logPath}");
 
         var factory = LogManager
@@ -125,8 +136,37 @@ public class LoggerFactoryProvider
         );
     }
 
+    private static void DumpConfig(IConfiguration config)
+    {
+        DumpConfigSection(config, parentPath: string.Empty);
+    }
+
+    private static void DumpConfigSection(IConfiguration config, string parentPath)
+    {
+        foreach (var child in config.GetChildren())
+        {
+            // Build the full key path
+            var key = string.IsNullOrEmpty(parentPath)
+                ? child.Key
+                : $"{parentPath}:{child.Key}";
+
+            if (child.Value == null)
+            {
+                // This is a section with nested children
+                DumpConfigSection(child, key);
+            }
+            else
+            {
+                // This is a leaf value
+                Console.WriteLine($"{key} = {child.Value}");
+            }
+        }
+    }
+
     private static LogLevel GetLogLevel(IConfiguration configuration, string configSection, LogLevel defaultLogLevel)
     {
+
+
         var logLevel = configuration[configSection] ?? "";
         var level = defaultLogLevel;
         if (Enum.TryParse<LogLevel>(logLevel, true, out var level2))
