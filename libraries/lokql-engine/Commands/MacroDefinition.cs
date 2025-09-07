@@ -7,11 +7,13 @@ public class MacroDefinition
 {
     private readonly string[] _blocks;
 
-    public MacroDefinition(string name, IEnumerable<string> parameterNames,  string [] blocks)
+    public MacroDefinition(string name, IEnumerable<string> parameterNames,  string [] blocks,
+        string description)
     {
         Name = name;
         ParameterNames = parameterNames;
         _blocks = blocks;
+        Description = description;
     }
 
     public readonly string Name;

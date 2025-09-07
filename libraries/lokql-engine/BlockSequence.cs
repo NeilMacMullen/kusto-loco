@@ -30,5 +30,10 @@ public class BlockSequence
     {
         return Index < Blocks.Length ? Blocks[Index++] : string.Empty;
     }
+    public string PreviousBlock(int i)
+    {
+        var index = Index - 1 -i;
+        return index < Blocks.Length && index >=0 ? Blocks[index] : string.Empty;
+    }
 }
 

@@ -18,7 +18,7 @@ public class MacroRegistry
     {
         return _macros.TryGetValue(name, out var m)
             ? m
-            : new MacroDefinition(string.Empty, [], []);
+            : new MacroDefinition(string.Empty, [], [],String.Empty);
     }
 
     public IEnumerable<MacroDefinition> List()
