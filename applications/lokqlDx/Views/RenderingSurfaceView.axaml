@@ -19,14 +19,18 @@
         <Grid RowDefinitions="Auto,*">
 
             <!-- Header row -->
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Classes="TabHeader">
+            <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <Button Content="Data"
                         Command="{Binding ChangeTabCommand}"
                         CommandParameter="data"
+                        Classes="KqlTabHeader"
+                        IsEnabled="{Binding ShowData,Converter={StaticResource Negate}}"
                        />
                 <Button Content="Visual"
                         Command="{Binding ChangeTabCommand}"
                         CommandParameter="visual"
+                        Classes="KqlTabHeader"
+                        IsEnabled="{Binding ShowData}"
                       />
             </StackPanel>
 
