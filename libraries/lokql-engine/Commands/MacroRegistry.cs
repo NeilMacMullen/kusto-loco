@@ -20,4 +20,9 @@ public class MacroRegistry
             ? m
             : new MacroDefinition(string.Empty, [], []);
     }
+
+    public IEnumerable<MacroDefinition> List()
+    {
+        return _macros.Values;
+    }
 }

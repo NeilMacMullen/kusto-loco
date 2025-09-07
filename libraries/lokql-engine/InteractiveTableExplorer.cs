@@ -231,6 +231,7 @@ public class InteractiveTableExplorer
     public void PopSettingLayer() => Settings.Pop();
 
     public MacroDefinition GetMacro(string oName) => _macros.GetMacro(oName);
+    public IEnumerable<MacroDefinition> ListMacros() => _macros.List();
 
     public void StartNewReport(IReportTarget report) => ActiveReport = report;
 

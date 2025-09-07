@@ -16,5 +16,7 @@ public class MacroDefinition
 
     public readonly string Name;
     public readonly IEnumerable<string> ParameterNames;
+    public readonly string Description = string.Empty;
+
     public BlockSequence Sequence() => new(_blocks);
 }
