@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

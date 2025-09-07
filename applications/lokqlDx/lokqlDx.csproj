@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'DebugStartup'">
+    <OutputType>Exe</OutputType>
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' != 'DebugStartup'">
     <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -9,7 +15,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>LokqlDx</RootNamespace>
     <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants>
-    <Configurations>Debug;Release;AvaloniaPreviewer</Configurations>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'AvaloniaPreviewer'">
     <DefineConstants>$(DefineConstants);PREVIEWER</DefineConstants>

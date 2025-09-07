@@ -9,6 +9,7 @@ using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using lokqlDxComponents.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NotNullStrings;
 
 namespace LokqlDx;
 
@@ -36,8 +37,28 @@ public static AppBuilder BuildAvaloniaApp()
     [STAThread]
     public static void Main(string[] args)
     {
-        var container = new DiContainer();
-        BuildAvaloniaApp(container).StartWithClassicDesktopLifetime(args);
+        try
+        {
+            Console.WriteLine("starting");
+            var container = new DiContainer();
+            BuildAvaloniaApp(container).StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception ex)
+        {
+            //try the console first
+            while (true)
+            {
+                Console.WriteLine(ex.Message);
+                Console.Write(ex.StackTrace);
+                LoggerFactoryProvider.DirectLog(ex.Message);
+                LoggerFactoryProvider.DirectLog(ex.StackTrace.NullToEmpty());
+                if (ex.InnerException == null)
+                    break;
+                Console.WriteLine("INNER-EXCEPTION");
+                LoggerFactoryProvider.DirectLog("INNER-EXCEPTION");
+                ex = ex.InnerException;
+            }
+        }
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
