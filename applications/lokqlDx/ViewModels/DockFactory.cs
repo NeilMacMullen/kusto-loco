@@ -37,10 +37,11 @@ public class DockFactory : Factory
         foreach (var hostWindow in HostWindows.OfType<HostWindow>()) hostWindow.Background = brush;
     }
 
-
+    private List<IDockable> _spawnedWindows = [];
     private void DisplayResult(PinnedKustoResult pinned)
     {
         var model = new ResultDisplayViewModel(pinned.Name, pinned.Result);
+        _spawnedWindows.Add(model);
         AddDockable(new RootDock(), model);
         FloatDockable(model);
     }
@@ -49,12 +50,6 @@ public class DockFactory : Factory
 
     public override IDocumentDock CreateDocumentDock() => new QueryDocumentDock();
 
-    public void CloseLayout()
-    {
-        if (Layout is not IDock dock) return;
-        if (dock.Close.CanExecute(null))
-            dock.Close.Execute(null);
-    }
 
     public void ResetLayout()
     {
@@ -66,6 +61,11 @@ public class DockFactory : Factory
     {
         var allDocs = _toolManager.LibraryViewModel.Queries.ToArray();
         foreach (var d in allDocs) RemoveDockable(d, true);
+        var allPinned = _spawnedWindows.ToArray();
+        foreach(var p in allPinned)
+            RemoveDockable(p,true);
+        _spawnedWindows.Clear();
+
     }
 
     private bool _layoutInit;
