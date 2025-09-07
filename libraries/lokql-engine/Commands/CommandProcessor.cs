@@ -1,17 +1,13 @@
 ﻿using System.Collections.Immutable;
 using System.CommandLine.Parsing;
-using System.Globalization;
 using System.Reflection;
 using CommandLine;
-using CsvHelper;
-using DocumentFormat.OpenXml.Spreadsheet;
 using KustoLoco.PluginSupport;
-using NLog.LayoutRenderers;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
-public class CommandProcessor :ICommandProcessor
+public class CommandProcessor : ICommandProcessor
 {
     private SchemaLine[] _registeredSchema = [];
 
@@ -22,20 +18,39 @@ public class CommandProcessor :ICommandProcessor
     {
     }
 
+
+    public void RegisterSchema(string command, string schemaText)
+    {
+        command = command.Trim();
+        if (!command.StartsWith("."))
+            command = $".{command}";
+        var schema = schemaText.Tokenize("\r\n")
+            .Select(l => l.Tokenize(","))
+            .Select(pair => new SchemaLine(command, pair[0], pair[1], pair.Length > 2 ? pair[2] : string.Empty))
+            .ToArray();
+        _registeredSchema = _registeredSchema.Concat(schema).ToArray();
+    }
+
+
+    public ICommandProcessor WithAdditionalCommand<T>(Func<ICommandContext, T, Task> registration)
+    {
+        _registrations = _registrations.Add(
+            new RegisteredCommand(typeof(T), (exp, o) => registration(exp, (T)o)));
+        return this;
+    }
+
     public static CommandProcessor Default()
     {
-        var cp = (CommandProcessor) new CommandProcessor()
-                 //loader not exposed 
-                .LegacyWithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync) 
+        var cp = (CommandProcessor)new CommandProcessor()
+                //loader not exposed 
+                .LegacyWithAdditionalCommand<LoadCommand.Options>(LoadCommand.RunAsync)
                 .LegacyWithAdditionalCommand<SaveCommand.Options>(SaveCommand.RunAsync)
-                 //results history not exposed
+                //results history not exposed
                 .LegacyWithAdditionalCommand<ResultsCommand.Options>(ResultsCommand.RunAsync)
                 .LegacyWithAdditionalCommand<FileFormatsCommand.Options>(FileFormatsCommand.RunAsync)
-
                 .LegacyWithAdditionalCommand<StartReportCommand.Options>(StartReportCommand.RunAsync)
                 .LegacyWithAdditionalCommand<AddToReportCommand.Options>(AddToReportCommand.RunAsync)
                 .LegacyWithAdditionalCommand<FinishReportCommand.Options>(FinishReportCommand.RunAsync)
-               
                 .LegacyWithAdditionalCommand<LoadExcel.Options>(LoadExcel.RunAsync)
                 .LegacyWithAdditionalCommand<RenderCommand.Options>(RenderCommand.RunAsync)
                 .LegacyWithAdditionalCommand<FormatCommand.Options>(FormatCommand.RunAsync)
@@ -57,7 +72,7 @@ public class CommandProcessor :ICommandProcessor
                 .WithAdditionalCommand<DropTableCommand.Options>(DropTableCommand.RunAsync)
                 .WithAdditionalCommand<RenameTableCommand.Options>(RenameTableCommand.RunAsync)
                 .WithAdditionalCommand<GetClipboardCommand.Options>(GetClipboardCommand.RunAsync)
-                 .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
+                .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
                 .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
                 .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
@@ -66,40 +81,16 @@ public class CommandProcessor :ICommandProcessor
                 .WithAdditionalCommand<PivotRowsToColumnsCommand.Options>(PivotRowsToColumnsCommand.RunAsync)
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
                 .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
-
-
-
             ;
 
         AppInsightsCommand.RegisterSchema(cp);
         return cp;
     }
 
-    
-    public void RegisterSchema(string command,string schemaText)
-    {
-        command = command.Trim();
-        if (!command.StartsWith("."))
-            command = $".{command}";
-        var schema = schemaText.Tokenize("\r\n")
-            .Select(l=>l.Tokenize(","))
-            .Select(pair=>new SchemaLine(command, pair[0], pair[1],pair.Length>2 ?pair[2]:string.Empty))
-            .ToArray();
-        _registeredSchema = _registeredSchema.Concat(schema).ToArray();
-    }
-
     public CommandProcessor LegacyWithAdditionalCommand<T>(Func<CommandContext, T, Task> registration)
     {
         _registrations = _registrations.Add(
-            new RegisteredCommand(typeof(T), (exp, o) => registration((CommandContext) exp, (T)o)));
-        return this;
-    }
-
-
-    public ICommandProcessor WithAdditionalCommand<T>(Func<ICommandContext, T, Task> registration)
-    {
-        _registrations = _registrations.Add(
-            new RegisteredCommand(typeof(T), (exp, o) => registration(exp, (T)o)));
+            new RegisteredCommand(typeof(T), (exp, o) => registration((CommandContext)exp, (T)o)));
         return this;
     }
 
@@ -115,6 +106,11 @@ public class CommandProcessor :ICommandProcessor
             return;
 
 
+        //try macro first
+        var macro = exp.GetMacro(tokens.First());
+        if (macro.Name != string.Empty)
+            tokens = new[] { "macro" }.Concat(tokens).ToArray();
+
         var textWriter = new StringWriter();
 
         var typeTable = _registrations.Select(r => r.OptionType).ToArray();
@@ -126,12 +122,13 @@ public class CommandProcessor :ICommandProcessor
         var context = new CommandContext(exp, sequence);
         foreach (var registration in _registrations)
         {
+            await parserResult.TryAsync(registration.OptionType, Func);
+            continue;
+
             async Task Func(object o)
             {
                 await registration.TaskGeneratingFunction(context, o);
             }
-
-            await parserResult.TryAsync(registration.OptionType, Func);
         }
 
         var error = textWriter.ToString();
@@ -145,10 +142,11 @@ public class CommandProcessor :ICommandProcessor
         var verbs = _registrations.Select(x =>
             {
                 var attribute = x.OptionType.GetTypeInfo()
-                    .GetCustomAttribute<VerbAttribute>()
-                                ?? throw new InvalidOperationException($"All registered command options should have a {nameof(VerbAttribute)}. {x.OptionType.FullName ?? x.OptionType.Name} does not.");
+                                    .GetCustomAttribute<VerbAttribute>()
+                                ?? throw new InvalidOperationException(
+                                    $"All registered command options should have a {nameof(VerbAttribute)}. {x.OptionType.FullName ?? x.OptionType.Name} does not.");
 
-                // for now we are only expecting one field, if we need to support multiple, we can change this
+                // for now, we are only expecting one field, if we need to support multiple, we can change this
                 var fileAttribute = x.OptionType
                     .GetProperties()
                     .Select(p => p.GetCustomAttribute<FileOptionsAttribute>())
@@ -163,9 +161,7 @@ public class CommandProcessor :ICommandProcessor
                     supportsFiles = true;
                     supportedExtensions = fileAttribute.Extensions;
                     if (fileAttribute.IncludeStandardFormatterExtensions)
-                    {
                         supportedExtensions = supportedExtensions.Concat(extensions).ToList();
-                    }
                 }
 
                 return new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles, supportedExtensions);
@@ -176,7 +172,7 @@ public class CommandProcessor :ICommandProcessor
 
         static VerbEntry CreateHelpEntry()
         {
-            // Help is a default command in CommandLineParser but we still need to provide metadata for it.
+            // Help is a default command in CommandLineParser, but we still need to provide metadata for it.
             const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
