@@ -42,7 +42,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         //catch errors with plugin registration
         try
         {
-            AddInternalCommands(_explorer._commandProcessor.GetVerbs(_explorer._loader));
+            AddInternalCommands();
         }
         catch (Exception e)
         {
@@ -123,6 +123,7 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
 
         SetSchema(_explorer.GetSchema());
         AddSettingsForIntellisense(_explorer.Settings);
+        AddInternalCommands(); //because we might have updated macros
         await Messaging.Send(new RunningQueryMessage(false));
     }
 
@@ -138,8 +139,24 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
         AddSettingsForIntellisense(_explorer.Settings);
     }
 
-    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries) =>
-        _intellisenseClient.AddInternalCommands(verbEntries);
+    public void AddInternalCommands()
+    {
+        var verbEntries = _explorer._commandProcessor.GetVerbs(_explorer._loader);
+        var macros = _explorer.ListMacros()
+            .Select(m => new VerbEntry(m.Name, m.Description, false, []))
+            .ToArray();
+        var special = new[]
+        {
+            new VerbEntry("end", "ends a macro definition", false, [])
+        };
+
+        //add .end for macro definition
+        var all = verbEntries
+                .Concat(macros)
+                .Concat(special)
+                .ToArray();
+        _intellisenseClient.SetInternalCommands(all);
+    }
 
     public string GetText() => Document.Text;
 

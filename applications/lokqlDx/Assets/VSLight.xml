@@ -5,6 +5,7 @@
 	<Color name="String" foreground="#A31515" />
 	<Color name="ScriptComment" foreground="#008000" />
 	<Color name="InternalCommand" foreground="#0000FF" />
+	<Color name="InterpolatedVariable" foreground="#800080" />
 	<Color name="Operator" foreground="#2B91AF" />
 	<Color name="Function" foreground="#000000" />
 	<Color name="Logical" foreground="#000000" />

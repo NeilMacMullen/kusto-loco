@@ -17,7 +17,7 @@ public class IntellisenseClientAdapter(
 
     public IImageProvider _imageProvider => imageProvider;
 
-    public void AddInternalCommands(IEnumerable<VerbEntry> verbEntries)
+    public void SetInternalCommands(IEnumerable<VerbEntry> verbEntries)
     {
         var verbs = verbEntries.ToArray();
         var lookup = CreateLookup(verbs);

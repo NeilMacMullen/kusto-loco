@@ -9,15 +9,6 @@
 		<Span color="ScriptComment" begin="#" />
 		<Span color="InternalCommand" begin="^\." end="\s+|$" />
 
-		<Span color="String">
-			<Begin>"</Begin>
-			<End>"</End>
-		</Span>
-
-		<Span color="String">
-			<Begin>'</Begin>
-			<End>'</End>
-		</Span>
 
 		<Rule color="Number">
 			\b0[xX][0-9a-fA-F]+  # hex number
@@ -27,6 +18,30 @@
 			)
 			([eE][+-]?[0-9]+)? # optional exponent
 		</Rule>
+		<!-- Shared rules for interpolated variables -->
+		<RuleSet name="StringContent">
+			<Rule color="InterpolatedVariable">
+				(?&lt;!\$)\$\(?[a-zA-Z0-9\.]+\)?
+			</Rule>
+		</RuleSet>
+
+		<!-- Default (top-level) ruleset -->
+		<RuleSet>
+			<Import ruleSet="StringContent" />
+			<!-- other top-level rules go here -->
+		</RuleSet>
+
+		<!-- Double-quoted string -->
+		<Span color="String" ruleSet="StringContent">
+			<Begin>"</Begin>
+			<End>"</End>
+		</Span>
+
+		<!-- Single-quoted string -->
+		<Span color="String" ruleSet="StringContent">
+			<Begin>'</Begin>
+			<End>'</End>
+		</Span>
 
 		<Keywords color="Logical">
 			<Word>and</Word>
@@ -201,7 +216,6 @@
 			<Word>arg_max</Word>
 
 		</Keywords>
-		<!-- Digits -->
 
 
 	</RuleSet>

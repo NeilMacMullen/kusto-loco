@@ -13,9 +13,13 @@ public class AutocompletionTest
     [AvaloniaFact]
     public async Task GeneralCompletionBehavior_ObviousNonmatch_ClosesWindow()
     {
-        var f = new AutocompletionTestFixture();
-
-        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                InternalCommands = [new("abc"), new("def")]
+            }
+        };
 
 
         await f.Editor.TextArea.Type(".xyz");
@@ -28,9 +32,13 @@ public class AutocompletionTest
     [InlineData(".de", new[] { "def" })]
     public async Task GeneralCompletionBehavior_PartialMatch_RemovesIrrelevantResults(string input, string[] expected)
     {
-        var f = new AutocompletionTestFixture();
-
-        f.ResourceProvider.InternalCommands = [new("abc"), new("def")];
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                InternalCommands = [new("abc"), new("def")]
+            }
+        };
 
 
         await f.Editor.TextArea.Type(input);
@@ -46,9 +54,13 @@ public class AutocompletionTest
     [AvaloniaFact]
     public async Task Commands_PreservesPrefixOnInsertion()
     {
-        var f = new AutocompletionTestFixture();
-
-        f.ResourceProvider.InternalCommands = [new("abc")];
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                InternalCommands = [new("abc")]
+            }
+        };
 
 
         await f.Editor.TextArea.Type(".ab");
@@ -63,12 +75,16 @@ public class AutocompletionTest
     [AvaloniaFact]
     public async Task KqlOperators_PrependsSpaceOnInsertion()
     {
-        var f = new AutocompletionTestFixture();
-
-        f.ResourceProvider.KqlOperatorEntries =
-        [
-            new("summarize")
-        ];
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                KqlOperatorEntries =
+                [
+                    new("summarize")
+                ]
+            }
+        };
 
 
         await f.Editor.TextArea.Type("traffic |sum");
@@ -84,12 +100,16 @@ public class AutocompletionTest
     [AvaloniaFact]
     public async Task KqlFunctions_RemovesPrefixOnInsertion()
     {
-        var f = new AutocompletionTestFixture();
-
-        f.ResourceProvider.KqlFunctionEntries =
-        [
-            new("setting1")
-        ];
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                KqlFunctionEntries =
+                [
+                    new("setting1")
+                ]
+            }
+        };
 
 
         await f.Editor.TextArea.Type("?sett");
@@ -194,9 +214,13 @@ public class AutocompletionTest
     [AvaloniaFact]
     public async Task Settings_PreservesPrefixOnInsertion()
     {
-        var f = new AutocompletionTestFixture();
-        f.ResourceProvider.SettingNames = [new("abc")];
-
+        var f = new AutocompletionTestFixture
+        {
+            ResourceProvider =
+            {
+                SettingNames = [new("abc")]
+            }
+        };
 
 
         await f.Editor.TextArea.Type("$ab");
@@ -219,7 +243,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.ResourceProvider._intellisenseClient.SetInternalCommands([
                 new()
                 {
                     Name = "load",
@@ -250,7 +274,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.ResourceProvider._intellisenseClient.SetInternalCommands([
                 new()
                 {
                     Name = "load",
@@ -282,7 +306,7 @@ public class AutocompletionTest
         };
         f.SetFileSystemData(data);
 
-        f.ResourceProvider._intellisenseClient.AddInternalCommands([
+        f.ResourceProvider._intellisenseClient.SetInternalCommands([
                 new()
                 {
                     Name = "load",
@@ -321,7 +345,7 @@ public class AutocompletionTest
             var data = new List<string> { "/tmp/rag_s1.json", "/tmp/log_wpf.txt" };
             f.SetFileSystemData(data);
 
-            f.ResourceProvider._intellisenseClient.AddInternalCommands([new() { Name = "load", SupportedExtensions = [], SupportsFiles = true }]);
+            f.ResourceProvider._intellisenseClient.SetInternalCommands([new() { Name = "load", SupportedExtensions = [], SupportsFiles = true }]);
 
             await f.Editor.TextArea.Type(".load /tmp/ra");
             await f.Editor.ShouldEventuallySatisfy(x => x.Text.Should().Be(".load /tmp/ra"));
