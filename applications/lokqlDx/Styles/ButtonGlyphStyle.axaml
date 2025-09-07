@@ -71,7 +71,6 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0,0,0,2" />
         <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
         <Setter Property="Template">
             <ControlTemplate>
                 <ContentPresenter
@@ -79,6 +78,7 @@
                     ContentTemplate="{TemplateBinding ContentTemplate}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    Foreground="{TemplateBinding Foreground}"
                     Margin="4" />
             </ControlTemplate>
         </Setter>
@@ -88,7 +88,7 @@
 
     <!-- Active tab (disabled button) -->
     <Style Selector="Button.KqlTabHeader:disabled">
-        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
     </Style>
 

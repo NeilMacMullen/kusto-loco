@@ -20,12 +20,12 @@
 
             <!-- Header row -->
             <StackPanel Orientation="Horizontal" Grid.Row="0">
-                <Button Content="Data"
+          	<Button Content="Data"
                         Command="{Binding ChangeTabCommand}"
                         CommandParameter="data"
                         Classes="KqlTabHeader"
                         IsEnabled="{Binding ShowData,Converter={StaticResource Negate}}"
-                       />
+                />
                 <Button Content="Visual"
                         Command="{Binding ChangeTabCommand}"
                         CommandParameter="visual"
