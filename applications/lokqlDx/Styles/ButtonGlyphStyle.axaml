@@ -37,9 +37,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource  AccentButtonBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
-    <Style Selector="TabItem.TabHeader">
-        <Setter Property="FontSize" Value="16" />
-    </Style>
+  
     <Style Selector="Button.overlay">
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Background" Value="#66000000"/>
@@ -66,5 +64,40 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Width" Value="24"/>
     </Style>
-    
+	<!-- Base tab header style -->
+    <Style Selector="Button.KqlTabHeader">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter
+                    Content="{TemplateBinding Content}"
+                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="4" />
+            </ControlTemplate>
+        </Setter>
+
+
+	</Style>
+
+    <!-- Active tab (disabled button) -->
+    <Style Selector="Button.KqlTabHeader:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}" />
+    </Style>
+
+    <!-- Inactive tab (enabled button) -->
+    <Style Selector="Button.KqlTabHeader:not(:disabled)">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+        <!-- Muted gray -->
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
 </Styles>

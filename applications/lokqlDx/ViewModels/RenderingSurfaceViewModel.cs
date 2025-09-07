@@ -20,14 +20,15 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 {
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _kustoSettings;
-    [ObservableProperty] private int _activeTab;
 
+    [ObservableProperty] private bool _showData=true;
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
 
     [ObservableProperty] private MapViewModel _mapModel;
 
     [ObservableProperty] private string _name = string.Empty;
+
 
 
     private IScottPlotHost _plotter = new NullScottPlotHost();
@@ -53,9 +54,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         QuerySummary = $"{result.RowCount} rows in {(int)result.QueryDuration.TotalMilliseconds}ms";
 
         await RenderTable(result);
-        ActiveTab = result.IsChart
-            ? 1 //show the plot tab
-            : 0; //show the table tab
+        ShowData = !result.IsChart;
         ShowMap = result.IsChart && result.Visualization.ChartType == "scatterchart"
                                  && result.Visualization.PropertyOr("kind", "") == "map";
         if (ShowMap)
@@ -225,5 +224,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             //just return a dummy value if the binding is temporarily invalid
             get => index >= rowItems.Length ? string.Empty : ObjectToString(rowItems[index]);
         }
+    }
+
+    [RelayCommand]
+    public void ChangeTab(string sender)
+    {
+        //invert
+        ShowData = (sender == "data");
     }
 }

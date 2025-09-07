@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using LokqlDx.ViewModels;
 
 namespace LokqlDx.Views;
@@ -15,17 +15,30 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
     {
     }
 
-
-    private void Control_OnLoaded(object? sender, RoutedEventArgs e) => RegisterHost();
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
 
 
     private RenderingSurfaceViewModel GetContext() => (DataContext as RenderingSurfaceViewModel)!;
 
-    //TODO -bit of a hack to tell viewmodel layer that the inner control can be used for rendering charts
-    private void RegisterHost()
+
+    private void RegisterHost(ChartView chart)
     {
-        if (DataContext is RenderingSurfaceViewModel vm) vm.RegisterHost(ChartView);
+        if (chart.DataContext is RenderingSurfaceViewModel vm)
+            vm.RegisterHost(chart);
     }
 
-    private void StyledElement_OnDataContextChanged(object? sender, EventArgs e) => RegisterHost();
+    private void ChartView_OnLayoutUpdated(object? sender, EventArgs e)
+    {
+        if (sender is ChartView chart)
+            RegisterHost(chart);
+    }
+
+    private void ChartView_OnDataContextChanged_OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is ChartView chart)
+            RegisterHost(chart);
+    }
 }

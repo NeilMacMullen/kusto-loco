@@ -1,7 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using LokqlDx.ViewModels;
+using Mapsui.UI.Avalonia;
 using NotNullStrings;
 
 namespace LokqlDx.Views;
@@ -13,13 +15,7 @@ public partial class MapView : UserControl
         InitializeComponent();
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        TheMap.PointerMoved += OnMapPointerMoved;
-        RegisterIfPossible();
-    }
-
+ 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         RegisterIfPossible();
@@ -55,19 +51,23 @@ public partial class MapView : UserControl
 
     private void OnMapPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (DataContext is not MapViewModel vm) return;
+        if (sender is not MapControl map)
+            return;
+        if (map.DataContext is not MapViewModel vm) return;
 
-        var screen = e.GetPosition(TheMap);
+        var screen = e.GetPosition(map);
 
         var label = vm.GetTooltipAtPosition(screen);
         if (label.IsBlank())
-            ToolTip.SetTip(TheMap, null);
+            ToolTip.SetTip(map, null);
         else
-            ToolTip.SetTip(TheMap, label);
+            ToolTip.SetTip(map, label);
     }
 
-    private void InitializeComponent()
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+    private void TheMap_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        AvaloniaXamlLoader.Load(this);
+        RegisterIfPossible();
     }
 }
