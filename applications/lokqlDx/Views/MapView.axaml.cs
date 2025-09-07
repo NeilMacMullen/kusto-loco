@@ -17,6 +17,7 @@ public partial class MapView : UserControl
     {
         base.OnInitialized();
         TheMap.PointerMoved += OnMapPointerMoved;
+        RegisterIfPossible();
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
