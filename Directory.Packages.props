@@ -27,7 +27,7 @@
     <PackageVersion Include="Dock.Model.Avalonia" Version="11.3.2.2" />
     <PackageVersion Include="Dock.Model.Mvvm" Version="11.3.2.2" />
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
-    <PackageVersion Include="Fastenshtein" Version="1.0.10" />
+    <PackageVersion Include="Fastenshtein" Version="1.0.11" />
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
     <PackageVersion Include="Mapsui.Avalonia" Version="5.0.0-beta.21" />
