@@ -40,7 +40,6 @@
     <PackageReference Include="NLog" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="System.Linq.Async" />
-    <PackageReference Include="System.Text.Json" />
     <PackageReference Include="T-Digest.NET" />
   </ItemGroup>
 
