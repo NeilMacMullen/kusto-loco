@@ -39,7 +39,6 @@
     <PackageReference Include="ExcelDataReader.DataSet" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="Parquet.Net" />
-    <PackageReference Include="System.Text.Encoding.CodePages" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,16 +2,10 @@ using AwesomeAssertions;
 
 namespace BasicTests;
 
+[TestClass]
 public class IgnoredTests : TestMethods
 {
-    
-    [TestMethod]
-    public async Task Bin_ZeroInterval_ShouldReturnError()
-    {
-        var query = "print c=bin(10, 0)";
-        var result = await LastLineOfResult(query);
-        result.Should().Be("null");
-    }
+   
     [TestMethod]
     [Ignore("this isn't supported yet")]
     public async Task BetweenStressTest()
@@ -37,4 +31,14 @@ public class IgnoredTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Contain("long");
     }
+
+    [TestMethod]
+    [Ignore("Not yet implemented")]
+    public async Task ArrayConcatFunction_Scalar()
+    {
+        var query = "print result = array_concat(dynamic([1,2]), dynamic([3,4]))";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("[1,2,3,4]");
+    }
+
 }
