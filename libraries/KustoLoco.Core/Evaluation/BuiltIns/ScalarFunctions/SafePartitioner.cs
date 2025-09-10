@@ -25,6 +25,8 @@ public static class SafePartitioner
     public static OrderablePartitioner<Tuple<int, int>>
         Create(int start, int total, int blockSize)
     {
+        if (total == 0 || blockSize == 0)
+            return new EmptyOrderablePartitioner();
         blockSize = blockSize - (blockSize % Granularity);
         return Partitioner.Create(start, total, blockSize);
     }
