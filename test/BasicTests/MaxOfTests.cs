@@ -78,5 +78,32 @@ public class MaxOfTests : TestMethods
         res.Should().Be("100");
     }
 
+    [TestMethod]
+    public async Task OperationOnEmptyTable()
+    {
+        var query = """
+                    datatable (A: double)
+                    [
+                    ]
+                    | take 0
+                    | project sqrt(A)
+                    """;
+        var res = await ResultAsString(query);
+        res.Should().Be("");
+    }
+    [TestMethod]
+    public async Task OperationOnEmptyTableDoesNotProduceError()
+    {
+        var query = """
+                    datatable (A: double,B:double) [1.0,2.0]
+                    | take 0
+                    | project sqrt(A),B
+                    """;
+        var res = await Result(query);
+        res.Error.Should().Be(string.Empty);
+        res.RowCount.Should().Be(0);
+        res.ColumnCount.Should().Be(2, "because we still want column info");
+    }
+
 
 }
