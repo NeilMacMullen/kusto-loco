@@ -21,7 +21,7 @@
 		<!-- Shared rules for interpolated variables -->
 		<RuleSet name="StringContent">
 			<Rule color="InterpolatedVariable">
-				(?&lt;!\$)\$\(?[a-zA-Z0-9\.]+\)?
+				(?&lt;!\$)\$\(?[a-zA-Z0-9\._]+\)?
 			</Rule>
 		</RuleSet>
 
