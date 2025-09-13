@@ -1,0 +1,61 @@
+{
+  "IsDirty": false,
+  "Queries": [
+    {
+      "Name": "linechart-sin",
+      "Text": "range x from -10 to 10 step 0.05\r\n| extend y = sin(x)\r\n| render linechart\r\n",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "linechart-sin-cos",
+      "Text": "range x from -10 to 10 step 0.05\r\n| extend sin = sin(x)\r\n| extend cos = cos(x)\r\n| render linechart\r\n",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "linechart-series-column",
+      "Text": "let r=range x from -10 to 10 step 0.05;\r\nlet sines=r \r\n| extend y = sin(x)\r\n| extend series=\u0022sine\u0022;\r\nlet coses=r \r\n| extend y = cos(x)\r\n| extend series=\u0022cosine\u0022;\r\nsines \r\n| union coses\r\n| render linechart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "columnchart-sin",
+      "Text": "range x from -4 to 4 step 0.1\r\n| extend y = sin(x)\r\n| render columnchart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "barchart-sin",
+      "Text": "range x from -4 to 4 step 0.3\r\n| extend y = sin(x)\r\n| render barchart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "scatter-series-column",
+      "Text": "let r=range x from -10 to 10 step 0.2;\r\nlet sines=r \r\n| extend y = sin(x)\r\n| extend series=\u0022sine\u0022;\r\nlet coses=r \r\n| extend y = cos(x)\r\n| extend series=\u0022cosine\u0022;\r\nsines \r\n| union coses\r\n| render scatterchart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "query 7",
+      "Text": "range y from 1 to 10 step 1\r\n| extend x1 = datetime(1 jun 2025) \u002B y*1d\r\n| extend x2 = x1 \u002B y*1d\r\n| extend series=strcat(\u0022series - \u0022,tostring(y))\r\n| project x1,x2,y,series\r\n| render ladderchart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "query 8",
+      "Text": "range s from 1 to 5 step 1\r\n| extend Name=tostring(s)\r\n| render piechart",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "query 9",
+      "Text": "let r = range x from -4 to 4 step 0.1;\r\nlet sins = r \r\n| extend s = abs(sin(x)),series=\u0022sine\u0022;\r\nlet coss = r \r\n| extend s = abs(cos(x)),series=\u0022cosine\u0022;\r\nsins | union coss\r\n| render columnchart with (kind=stacked)",
+      "PreQueryText": "",
+      "IsHidden": false
+    }
+  ],
+  "StartupScript": "",
+  "Text": ""
+}

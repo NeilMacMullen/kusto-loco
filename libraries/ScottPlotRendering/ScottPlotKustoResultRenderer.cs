@@ -106,8 +106,9 @@ public static class ScottPlotKustoResultRenderer
     /// <summary>
     ///     Renders various types of charts based on the provided query results and settings.
     /// </summary>
-    public static void RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
+    public static RenderInfo RenderToPlot(Plot plot, KustoQueryResult result, KustoSettingsProvider settings)
     {
+        var ri = new RenderInfoBuilder();
         var accessor = new ResultChartAccessor(result,settings);
         plot.Clear();
         SetInitialUiPreferences(result, plot, settings);
@@ -142,6 +143,7 @@ public static class ScottPlotKustoResultRenderer
                 ordered = AccumulateIfRequired(result, ordered);
 
                 var line = plot.Add.Scatter(ordered.X, ordered.Y);
+                ri.HandleY(ordered.Y);
                 line.LegendText = ordered.Legend;
                 line.LineWidth = (float)settings.GetDoubleOr("scottplot.line.linewidth",
                     line.LineWidth);
@@ -162,6 +164,7 @@ public static class ScottPlotKustoResultRenderer
             foreach (var ser in accessor.CalculateSeries())
             {
                 var line = plot.Add.ScatterPoints(ser.X, ser.Y);
+                ri.HandleY(ser.Y);
                 var markerSize = settings.GetDoubleOr("scottplot.scatter.markersize", line.MarkerSize);
                 line.MarkerSize = (float)markerSize;
                 line.LegendText = ser.Legend;
@@ -177,7 +180,7 @@ public static class ScottPlotKustoResultRenderer
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
-                .Select(ser => CreateBars(plot, acc, ser, false, barWidth))
+                .Select(ser => CreateBars(plot, acc, ser, false, barWidth,ri))
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, false);
@@ -189,7 +192,7 @@ public static class ScottPlotKustoResultRenderer
             var acc = accessor.CreateAccumulatorForStacking();
             var barWidth = accessor.GetSuggestedBarWidth();
             var bars = accessor.CalculateSeries()
-                .Select(ser => CreateBars(plot, acc, ser, true, barWidth))
+                .Select(ser => CreateBars(plot, acc, ser, true, barWidth,ri))
                 .ToArray();
 
             FixupAxisTicks(plot, accessor, true);
@@ -200,12 +203,13 @@ public static class ScottPlotKustoResultRenderer
             StandardAxisAssignment(settings, accessor, "tto|nno", 0, 1, 2);
 
             var bars = accessor.CalculateSeries()
-                .Select(ser => CreateRangeBars(plot, ser, true))
+                .Select(ser => CreateRangeBars(plot, ser, true,ri))
                 .ToArray();
             FixupAxisForLadder(plot, accessor);
         }
 
         FinishUiPreferences(plot, settings);
+        return ri.Build();
     }
 
     private static ResultChartAccessor.ChartSeries AccumulateIfRequired(KustoQueryResult result,
@@ -342,7 +346,7 @@ public static class ScottPlotKustoResultRenderer
 
 
     private static BarPlot CreateBars(Plot plot, Dictionary<double, double> acc,
-        ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth)
+        ResultChartAccessor.ChartSeries series, bool makeHorizontal, double barWidth,RenderInfoBuilder ri)
     {
         var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
@@ -370,14 +374,18 @@ public static class ScottPlotKustoResultRenderer
             }).ToArray();
         var b = plot.Add.Bars(bars);
 
-
+        ri.HandleY(
+            makeHorizontal
+            ? bars.SelectMany(bar => new [] {bar.Position+0.5,bar.Position-0.5}).ToArray()
+            : acc.Values.ToArray()
+            );
         b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
         return b;
     }
 
     private static BarPlot CreateRangeBars(Plot plot,
-        ResultChartAccessor.ChartSeries series, bool makeHorizontal)
+        ResultChartAccessor.ChartSeries series, bool makeHorizontal,RenderInfoBuilder ri)
     {
         var bars = series.X.Zip(series.Y, series.Color)
             .Select(tuple =>
@@ -394,8 +402,8 @@ public static class ScottPlotKustoResultRenderer
                     LineColor = plot.Add.Palette.GetColor(color),
                 };
             }).ToArray();
+        ri.HandleY(bars.SelectMany(bar=>new[] { bar.Position + 0.5, bar.Position - 0.5 }).ToArray());
         var b = plot.Add.Bars(bars);
-
         b.LegendText = series.Legend;
         b.Horizontal = makeHorizontal;
         return b;
