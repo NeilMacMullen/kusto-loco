@@ -8,6 +8,7 @@ using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
 using lokqlDx;
+using LokqlDx.ViewModels;
 using ScottPlot;
 using ScottPlot.AxisRules;
 using ScottPlot.Plottables;
@@ -122,5 +123,36 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     #endregion
 
-   
+    #region registration
+
+
+    private void RegisterHost(ChartView chart)
+    {
+        if (chart.DataContext is ChartViewModel vm)
+        {
+            var newState = new RegistrationState(vm, chart);
+            // if (_registrationState == newState)
+            //return;
+
+            vm.RegisterHost(chart);
+            _registrationState = newState;
+        }
+    }
+    private void ChartView_OnLayoutUpdated(object? sender, EventArgs e)
+    {
+        if (sender is ChartView chart)
+            RegisterHost(chart);
+    }
+
+    private void ChartView_OnDataContextChanged_OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is ChartView chart)
+            RegisterHost(chart);
+    }
+    private RegistrationState _registrationState = new(null, null);
+    private record struct RegistrationState(ChartViewModel? ViewModel, ChartView? ChartView);
+
+    #endregion
+
+
 }

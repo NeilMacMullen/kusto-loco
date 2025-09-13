@@ -86,14 +86,14 @@
                 <!-- Visual view -->
                 <Grid IsVisible="{Binding ShowData, Converter={StaticResource Negate}}">
                     <views1:ChartView x:Name="ChartView"
-                                      IsVisible="{Binding ShowMap, Converter={StaticResource Negate}}"
-                                      LayoutUpdated="ChartView_OnLayoutUpdated"
-                                      DataContextChanged="ChartView_OnDataContextChanged_OnDataContextChanged"
+                                      IsVisible="{Binding Show}"
+                                     
+                                      DataContext="{Binding ChartModel}"
 
                                       />
                     <views1:MapView x:Name="MapView"
                                     DataContext="{Binding MapModel}"
-                                    IsVisible="{Binding $parent[Grid].DataContext.ShowMap}" />
+                                    IsVisible="{Binding Show}" />
                 </Grid>
 
             </Grid>

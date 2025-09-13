@@ -23,6 +23,8 @@ public partial class MapViewModel : ObservableObject
     [ObservableProperty] private Map _map;
     [ObservableProperty] private bool _showLayers;
 
+    [ObservableProperty] private bool _show;
+    public void Activate(bool onOff) => Show = onOff;
     public Action OnCopyToClipboard = () => { };
 
     public MapViewModel(KustoSettingsProvider settings)

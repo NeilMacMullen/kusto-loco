@@ -7,15 +7,13 @@
              xmlns:views="clr-namespace:LokqlDx.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.MapView"
-             x:DataType="viewModels:MapViewModel"
-             >
+             x:DataType="viewModels:MapViewModel">
     <Grid>
         <Grid x:Name="MapPanel">
             <avalonia:MapControl x:Name="TheMap"
                                  Map="{Binding Map}"
                                  Loaded="TheMap_OnLoaded"
-                                 PointerMoved="OnMapPointerMoved"
-                                 />
+                                 PointerMoved="OnMapPointerMoved" />
 
         </Grid>
 
@@ -57,7 +55,7 @@
                         <DataTemplate>
                             <Button Classes="overlay"
                                     Content="{Binding}"
-                                    Command="{Binding $parent[views:MapView].DataContext.ChangeLayer}"
+                                    Command="{Binding $parent[views:MapView].DataContext.(viewModels:MapViewModel).ChangeLayerCommand}"
                                     CommandParameter="{Binding}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

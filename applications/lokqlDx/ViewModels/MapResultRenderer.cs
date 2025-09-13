@@ -81,8 +81,7 @@ public class MapResultRenderer
         var points = result.EnumerateRows()
             .Select(row => new
             {
-                Geo = GeoPoint.Maybe(row[latCol.Index],
-                    row[lonCol.Index]),
+                Geo = GeoPoint.Maybe(ValOr(row,latCol,double.NaN),ValOr(row,lonCol,double.NaN)),
                 Radius = ValOr(row, sizeCol, 0.0),
                 Tooltip = ValOr(row, tooltipCol, string.Empty),
                 Series = ValOr(row, seriesCol, string.Empty),
@@ -131,14 +130,29 @@ public class MapResultRenderer
         return new ColumnResult(string.Empty, -1, typeof(object));
     }
 
-    private static double ValOr(object?[] row, ColumnResult seriesCol, double fallback)
+    protected static double ValOr(object?[] row, ColumnResult seriesCol, double fallback)
     {
         if (!IsValid(seriesCol))
             return fallback;
-        return double.TryParse(row[seriesCol.Index]?.ToString().NullToEmpty(), out var d)
-            ? d
-            : fallback;
+        var obj = row[seriesCol.Index];
+        if (obj is null)
+            return fallback;
+        //these are the only types supported by kql
+        if (seriesCol.UnderlyingType == typeof(double)
+            || seriesCol.UnderlyingType == typeof(float)
+            || seriesCol.UnderlyingType == typeof(long)
+            || seriesCol.UnderlyingType == typeof(int)
+            || seriesCol.UnderlyingType == typeof(decimal)
+           )
+            return Convert.ToDouble(obj);
+
+        if (seriesCol.UnderlyingType == typeof(string)
+            && double.TryParse((string)obj, out var d))
+            return d;
+
+        return fallback;
     }
+
 
     private static string ValOr(object?[] row, ColumnResult seriesCol, string fallback)
     {

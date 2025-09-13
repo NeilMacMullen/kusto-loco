@@ -38,20 +38,62 @@
       "IsHidden": false
     },
     {
-      "Name": "query 7",
+      "Name": "ladderchart",
       "Text": "range y from 1 to 10 step 1\r\n| extend x1 = datetime(1 jun 2025) \u002B y*1d\r\n| extend x2 = x1 \u002B y*1d\r\n| extend series=strcat(\u0022series - \u0022,tostring(y))\r\n| project x1,x2,y,series\r\n| render ladderchart",
       "PreQueryText": "",
       "IsHidden": false
     },
     {
-      "Name": "query 8",
+      "Name": "piechart",
       "Text": "range s from 1 to 5 step 1\r\n| extend Name=tostring(s)\r\n| render piechart",
       "PreQueryText": "",
       "IsHidden": false
     },
     {
-      "Name": "query 9",
-      "Text": "let r = range x from -4 to 4 step 0.1;\r\nlet sins = r \r\n| extend s = abs(sin(x)),series=\u0022sine\u0022;\r\nlet coss = r \r\n| extend s = abs(cos(x)),series=\u0022cosine\u0022;\r\nsins | union coss\r\n| render columnchart with (kind=stacked)",
+      "Name": "column-stacked",
+      "Text": "\r\nlet r = range x from -4 to 4 step 0.1;\r\nlet sins = r \r\n| extend s = sin(x),series=\u0022sine\u0022;\r\nlet coss = r \r\n| extend s = cos(x),series=\u0022cosine\u0022;\r\nsins \r\n| union coss\r\n| extend s =s*s\r\n| render columnchart with (kind=stacked)\r\n",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-points",
+      "Text": "range lon from -10 to 10 step 0.5\r\n| extend lat = sin(lon)\r\n| render scatterchart with (kind=map)\r\n",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-route",
+      "Text": "range lon from -10 to 10 step 0.5\r\n| extend lat = sin(lon)\r\n| extend index=1\r\n| render scatterchart with (kind=map)\r\n",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-symbols",
+      "Text": "range lon from -10 to 10 step 1\r\n| extend lat = sin(lon)\r\n| extend symbolIndex= abs(lon % 3)\r\n| extend pinSymbol = \r\n   case (\r\n       symbolIndex ==0,\u0022triangle\u0022,\r\n       symbolIndex ==1,\u0022ellipse\u0022,\r\n       \u0022rectangle\u0022)\r\n| render scatterchart with (kind=map)",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map colors",
+      "Text": "range lon from -10 to 10 step 1\r\n| extend lat = sin(lon)\r\n| extend symbolIndex= abs(lon % 3)\r\n| extend pinFill = \r\n   case (\r\n       symbolIndex ==0,\u0022FF0000\u0022,\r\n       symbolIndex ==1,\u002200FF00\u0022,\r\n       \u00220000FF\u0022)\r\n| render scatterchart with (kind=map)",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-size",
+      "Text": "range lon from -10 to 10 step 1\r\n| extend lat = sin(lon)\r\n| extend symbolIndex= abs(lon % 3)\r\n| extend pinScale = 0.1*lon\r\n| render scatterchart with (kind=map)",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-tooltip",
+      "Text": "range lon from -10 to 10 step 1\r\n| extend lat = sin(lon)\r\n| extend symbolIndex= abs(lon % 3)\r\n| extend tooltip =strcat(\r\n\t\t\u0022latitude:\u0022,lat,\u0022\\n\u0022,\r\n\t\t\u0022longitude:\u0022,lon)\r\n| render scatterchart with (kind=map)",
+      "PreQueryText": "",
+      "IsHidden": false
+    },
+    {
+      "Name": "map-separate-routes",
+      "Text": "\r\nlet series= datatable(j:long,name:string,offset:real) [ \r\n1,\u0022north\u0022,3,\r\n1,\u0022mid\u0022,0,\r\n1,\u0022south\u0022,-3\r\n];\r\nrange lon from -10 to 10 step 0.5\r\n| extend j=1\r\n| join kind = fullouter series on j\r\n| extend lat = sin(lon) \u002B offset\r\n| extend index=1\r\n| extend series=name\r\n| extend tooltip=name\r\n| render scatterchart with (kind=map)",
       "PreQueryText": "",
       "IsHidden": false
     }
