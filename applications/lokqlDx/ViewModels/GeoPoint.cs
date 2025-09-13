@@ -1,4 +1,6 @@
-﻿namespace LokqlDx.ViewModels;
+﻿using Mapsui.Extensions;
+
+namespace LokqlDx.ViewModels;
 
 public class GeoPoint(double lat, double lon, bool valid)
 {
@@ -10,10 +12,10 @@ public class GeoPoint(double lat, double lon, bool valid)
     {
     }
 
-    public static GeoPoint Maybe(object? lat, object? lon)
+    public static GeoPoint Maybe(double lat, double lon)
     {
-        if (lat is double dlat && lon is double dlon)
-            return new GeoPoint(dlat, dlon, true);
+        if (double.IsFinite(lat) && double.IsFinite(lon))
+            return new GeoPoint(lat, lon, true);
      
         return new GeoPoint(0, 0, false);
     }

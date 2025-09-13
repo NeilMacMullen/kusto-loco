@@ -2,11 +2,30 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using KustoLoco.Core.Settings;
+using System.ComponentModel;
+using Dock.Model.Mvvm.Controls;
 
 namespace LokqlDx.ViewModels;
 
-public partial class QueryViewModel : ObservableObject
+public partial class QueryDocumentViewModel : Document
 {
+    [ObservableProperty] public bool _editLocked = true;
+    [ObservableProperty] private bool _isDeleted;
+
+    [ObservableProperty] private bool _isVisible = true;
+
+
+    private bool _initialized;
+    private bool _titleDirty;
+
+    private void ActiveDocumentChanged(QueryDocumentViewModel model) => IsActive = model == this;
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        if (_initialized && e.PropertyName == nameof(Title))
+            _titleDirty = true;
+        base.OnPropertyChanged(e);
+    }
     private readonly KustoSettingsProvider _settings;
     [ObservableProperty] private int _chartColumn = 2;
     [ObservableProperty] private int _chartRow;
@@ -25,9 +44,12 @@ public partial class QueryViewModel : ObservableObject
     [ObservableProperty] private int _rowSpan = 3;
     private int n;
 
-    public QueryViewModel(QueryEditorViewModel queryEditorViewModel,
+    public QueryDocumentViewModel(string title,QueryEditorViewModel queryEditorViewModel,
         RenderingSurfaceViewModel renderingSurfaceViewModel,KustoSettingsProvider settings)
     {
+        Title = title;
+        Messaging.RegisterForValue<TabChangedMessage, QueryDocumentViewModel>(this, ActiveDocumentChanged);
+        _initialized = true;
         _settings = settings;
         QueryEditorViewModel = queryEditorViewModel;
         RenderingSurfaceViewModel = renderingSurfaceViewModel;
@@ -44,8 +66,6 @@ public partial class QueryViewModel : ObservableObject
                     m.Reply(SaveFile(m));
             });
     }
-
-    public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
 
@@ -97,7 +117,7 @@ public partial class QueryViewModel : ObservableObject
         ChartRow = 0;
     }
 
-    public bool IsDirty() => QueryEditorViewModel.IsDirty();
+    public bool IsDirty() => QueryEditorViewModel.IsDirty() || _titleDirty;
 
     public string GetText() => QueryEditorViewModel.GetText();
 
@@ -116,7 +136,11 @@ public partial class QueryViewModel : ObservableObject
     }
 
 
-    public void Clean() => QueryEditorViewModel.Clean();
+    public void Clean()
+    {
+        QueryEditorViewModel.Clean();
+        _titleDirty=false;
+    }
 
     [RelayCommand]
     public void CopyChart() => CopyChartToClipboard();
@@ -126,14 +150,14 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void PinChart()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,_settings,false));
+        var msg = new PinResultMessage(new QueryResultWithSender(Title, RenderingSurfaceViewModel.Result,_settings,false));
         Messaging.Send(msg);
     }
 
     [RelayCommand]
     public void TearOff()
     {
-        var msg = new PinResultMessage(new QueryResultWithSender(Name, RenderingSurfaceViewModel.Result,
+        var msg = new PinResultMessage(new QueryResultWithSender(Title, RenderingSurfaceViewModel.Result,
             _settings,true));
         Messaging.Send(msg);
     }

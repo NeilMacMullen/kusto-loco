@@ -151,8 +151,7 @@ public partial class MainViewModel : ObservableObject
             preQueryText,
             adapter);
 
-        var queryViewModel = new QueryViewModel(queryEditorViewModel, renderingSurfaceViewModel,_explorer.Settings);
-        var doc = new QueryDocumentViewModel(name, queryViewModel) { IsVisible = isVisible };
+        var doc = new QueryDocumentViewModel(name,queryEditorViewModel, renderingSurfaceViewModel,_explorer.Settings) { IsVisible = isVisible };
         return doc;
     }
 

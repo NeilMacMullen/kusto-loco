@@ -41,7 +41,7 @@ public partial class QueryLibraryViewModel : LokqlTool
 
         var argStr = $"{arg.Title}";
         if (SearchQueryBody)
-            argStr += arg.QueryViewModel.GetText();
+            argStr += arg.GetText();
         return filterTokens.All(t => argStr.Contains(t, StringComparison.InvariantCultureIgnoreCase));
     }
 
@@ -57,17 +57,17 @@ public partial class QueryLibraryViewModel : LokqlTool
         Sort();
     }
 
-    public bool IsDirty() => Queries.Any(q => q.QueryViewModel.IsDirty());
+    public bool IsDirty() => Queries.Any(q => q.IsDirty());
 
     public void ClearDirty()
     {
-        foreach (var queryItemViewModel in Queries) queryItemViewModel.QueryViewModel.Clean();
+        foreach (var queryItemViewModel in Queries) queryItemViewModel.Clean();
     }
 
     public PersistedQuery[] Persist() =>
         Queries
             .Where(q => !q.IsDeleted)
-            .Select(q => new PersistedQuery(q.Title, q.QueryViewModel.GetText(), q.QueryViewModel.GetPreQueryText(),
+            .Select(q => new PersistedQuery(q.Title, q.GetText(), q.GetPreQueryText(),
                 !q.IsVisible))
             .ToArray();
 

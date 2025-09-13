@@ -29,13 +29,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
     [ObservableProperty] private string _name = string.Empty;
 
+    [ObservableProperty] private ChartViewModel _chartModel;
 
-
-    private IScottPlotHost _plotter = new NullScottPlotHost();
+    
     [ObservableProperty] private string _querySummary = string.Empty;
     [ObservableProperty] private KustoQueryResult _result = KustoQueryResult.Empty;
     [ObservableProperty] private bool _showDataGridSizeWarning;
-    [ObservableProperty] private bool _showMap;
     [ObservableProperty] private ITreeDataGridSource<Row> _treeSource = new MyFlatTreeDataGridSource<Row>([], []);
 
     public RenderingSurfaceViewModel(string name, KustoSettingsProvider kustoSettings,
@@ -46,6 +45,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         _console = console;
         _name = name;
         MapModel = new MapViewModel(kustoSettings);
+        ChartModel = new ChartViewModel(kustoSettings);
     }
 
     public async Task RenderToDisplay(KustoQueryResult result)
@@ -55,15 +55,17 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
         await RenderTable(result);
         ShowData = !result.IsChart;
-        ShowMap = result.IsChart && result.Visualization.ChartType == "scatterchart"
+        var ShowMap = result.IsChart && result.Visualization.ChartType == "scatterchart"
                                  && result.Visualization.PropertyOr("kind", "") == "map";
+        ChartModel.Activate(!ShowMap);
+        MapModel.Activate(ShowMap);
         if (ShowMap)
             MapModel.Render(result);
-        else _plotter.RenderToDisplay(result, _kustoSettings);
+        else ChartModel.Render(result);
     }
 
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
-        => _plotter.RenderToImage(result, pWidth, pHeight, _kustoSettings);
+        => ChartModel.RenderToImage(result, pWidth, pHeight);
 
     [RelayCommand]
     private async Task DataGridCopy(string extent)
@@ -147,10 +149,10 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
     public void CopyToClipboard()
     {
-        if (ShowMap)
+        if (MapModel.Show)
             MapModel.CopyToClipboard();
-        else
-            _plotter.CopyToClipboard();
+        if (ChartModel.Show)
+            ChartModel.CopyToClipboard();
     }
 
     private Task RenderTable(KustoQueryResult result)
@@ -198,19 +200,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         //var strings = rowItems.Select(i => i?.ToString() ?? "<null>").ToArray();
         new(rowItems);
 
-    public void RegisterHost(IScottPlotHost plotter)
-    {
-        //we have to rerender every time the view's data context is changed
-        //because in tabbed views, the same Chartview may be
-        //reused with multiple datacontexts and we don't have a way of exposing
-        //the chart as an observable property
-        if (plotter != _plotter)
-        {
-            _plotter = plotter;
-            _plotter.RenderToDisplay(Result, _kustoSettings);
-        }
-    }
-
+   
     private static string ObjectToString(object? item)
         => item?.ToString() ?? "<null>";
 

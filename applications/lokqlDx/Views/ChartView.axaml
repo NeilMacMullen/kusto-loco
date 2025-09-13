@@ -7,9 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LokqlDx.Views.ChartView"
              PointerMoved="InputElement_OnPointerMoved"
-             x:DataType="viewModels:ChartViewModel">
+             x:DataType="viewModels:ChartViewModel"
+             LayoutUpdated="ChartView_OnLayoutUpdated"
+             DataContextChanged="ChartView_OnDataContextChanged_OnDataContextChanged"
+             >
     <Grid>
-        <DockPanel >
+        <DockPanel>
             <DockPanel DockPanel.Dock="Bottom">
                 <StackPanel DockPanel.Dock="Bottom" IsVisible="False">
                     <StackPanel>
@@ -56,14 +59,8 @@
                         </Viewbox>
                         <ToolTip.Tip>Select Layer</ToolTip.Tip>
                     </Button>
-
-
                 </Grid>
-
-
             </DockPanel>
-
-
         </Border>
     </Grid>
 </UserControl>

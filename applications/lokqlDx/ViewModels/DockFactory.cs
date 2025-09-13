@@ -161,7 +161,7 @@ public class DockFactory : Factory
         //do it in the background otherwise the sender reclaims focus
         Dispatcher.UIThread.Post(() =>
         {
-            LastActiveDockable.QueryViewModel.QueryEditorViewModel.Insert(text);
+            LastActiveDockable.QueryEditorViewModel.Insert(text);
             SetActiveDockable(LastActiveDockable);
             SetFocusedDockable(FindRoot(LastActiveDockable)!, LastActiveDockable);
         });
