@@ -121,6 +121,8 @@ public partial class QueryViewModel : ObservableObject
     [RelayCommand]
     public void CopyChart() => CopyChartToClipboard();
 
+   
+
     [RelayCommand]
     public void PinChart()
     {

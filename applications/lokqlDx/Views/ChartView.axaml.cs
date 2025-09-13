@@ -3,11 +3,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Clowd.Clipboard;
+using DocumentFormat.OpenXml.Spreadsheet;
 using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using KustoLoco.Rendering.ScottPlot;
 using lokqlDx;
 using ScottPlot;
+using ScottPlot.AxisRules;
 using ScottPlot.Plottables;
 
 namespace LokqlDx.Views;
@@ -105,16 +107,20 @@ public partial class ChartView : UserControl, IScottPlotHost
             PlotControl.Reset();
             var plot = PlotControl.Plot;
             plot.Clear();
-            ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
-            _crosshair = PlotControl.Plot.Add.Crosshair(0, 0);
+            var renderInfo =ScottPlotKustoResultRenderer.RenderToPlot(plot, result, kustoSettings);
+            _crosshair = plot.Add.Crosshair(0, 0);
             ResetCursor();
+            plot.Axes.Rules.Clear();
+            if (renderInfo.HasYSpan)
+            {
+                renderInfo = renderInfo.InflateY(0.01);
+                plot.Axes.Rules.Add(new LockedVertical(plot.Axes.Left, renderInfo.MinY, renderInfo.MaxY));
+            }
+
             PlotControl.Refresh();
         });
 
     #endregion
 
-    private void PlotControl_OnLoaded(object? sender, RoutedEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
+   
 }

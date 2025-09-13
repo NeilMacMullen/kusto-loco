@@ -204,8 +204,11 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         //because in tabbed views, the same Chartview may be
         //reused with multiple datacontexts and we don't have a way of exposing
         //the chart as an observable property
-        _plotter = plotter;
-        _plotter.RenderToDisplay(Result, _kustoSettings);
+        if (plotter != _plotter)
+        {
+            _plotter = plotter;
+            _plotter.RenderToDisplay(Result, _kustoSettings);
+        }
     }
 
     private static string ObjectToString(object? item)
@@ -232,4 +235,4 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         //invert
         ShowData = (sender == "data");
     }
-}
+  }

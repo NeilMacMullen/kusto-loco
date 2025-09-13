@@ -26,6 +26,7 @@
                         Classes="Glyph">
                     &#x2295;
                 </Button>
+              
                 <Button Command="{Binding CopyChartCommand}"
                         ToolTip.Tip="Copy visual to clipboard"
                         Classes="Glyph">
