@@ -155,7 +155,15 @@ public partial class MainViewModel : ObservableObject
         return doc;
     }
 
-
+    [RelayCommand]
+    private async Task ShowAbout()
+    {
+        await _dialogService.ShowMessageBox($"About", $"""
+                                                  LokqlDX
+                                                  Version: {UpgradeManager.GetCurrentVersion()}
+                                                  (C) 2025 Neil MacMullen
+                                                  """);
+    }
     [RelayCommand]
     private async Task LoadData()
     {
