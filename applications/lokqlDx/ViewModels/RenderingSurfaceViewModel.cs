@@ -178,8 +178,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
             ShowDataGridSizeWarning = result.RowCount > maxRows;
 
-            var rows = result.EnumerateRows()
-                .Take(maxRows)
+            var rows = result.EnumerateRows(maxRows)
                 .Select(CreateRow)
                 .ToArray();
 

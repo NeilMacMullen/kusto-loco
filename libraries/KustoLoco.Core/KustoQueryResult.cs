@@ -102,12 +102,12 @@ public class KustoQueryResult
     /// <summary>
     ///     Enumerate over all rows in the result
     /// </summary>
+    public IEnumerable<object?[]> EnumerateRows(int maxCount)
+    =>  Enumerable.Range(0, Math.Min(RowCount,maxCount))
+            .Select(GetRow);
+
     public IEnumerable<object?[]> EnumerateRows()
-    {
-        var r = Enumerable.Range(0, RowCount)
-            .Select(GetRow).ToArray();
-        return r;
-    }
+        => EnumerateRows(RowCount);
 
     /// <summary>
     ///     Returns the column definitions for the result
