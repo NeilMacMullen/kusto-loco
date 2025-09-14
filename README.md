@@ -62,17 +62,25 @@ The project is still in active development and APIs may change.  However, the co
 
 KustoLoco is a fork of the [BabyKusto](https://github.com/davidnx/baby-kusto-csharp) engine created by [DavidNx](https://github.com/davidnx),[Vicky Li](https://github.com/VickyLi2021) and [David Nissimoff](https://github.com/davidni) who appear to have developed the core engine as part of a Microsoft Hackathon.  
 
-Since then the engine has been heavily extended and optimised by [NeilMacMullen](https://github.com/NeilMacMullen) with additional contributions from [Vartika Gupta](https://github.com/vartika-jain-gupta) and [Kosta Demoore](https://github.com/konvolution). 
+Since then the engine has been heavily extended and optimised by [NeilMacMullen](https://github.com/NeilMacMullen) with additional help from an amazing bunch of contributors.
+
 
 The project leans heavily on a number of open source libraries including:
-- [Benchmark.Net](https://github.com/dotnet/BenchmarkDotNet) used for performance testing
-- [CommandLineParser](https://github.com/commandlineparser/commandline) used for command parsing within LokqlDX
-- [CsvHelper](https://joshclose.github.io/CsvHelper/) used for CSV serialisation
-- [Fashenstein](https://github.com/DanHarltey/Fastenshtein) use for fuzzy string matching
-- [FluentAssertions](https://fluentassertions.com/) used for testing
+- [Avalonia](https://github.com/AvaloniaUI/Avalonia) for UI
+- [Avalonia.MarkdownViewer](https://github.com/LITTOMA/Avalonia.MarkdownViewer) for help viewer
+- [AwesomeAssertions](https://github.com/AwesomeAssertions/AwesomeAssertions) for unit-testing (and before that, [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
+- [Benchmark.Net](https://github.com/dotnet/BenchmarkDotNet) for performance testing
+- [Clowd.Clipboard](https://github.com/clowd/Clowd.Clipboard) clipboard support in Avalonia
+- [CommandLineParser](https://github.com/commandlineparser/commandline) for command parsing within LokqlDX
+- [CsvHelper](https://joshclose.github.io/CsvHelper/) for CSV serialisation
+- [Dock](https://github.com/wieslawsoltes/Dock) to support MDI, tools and docking
+- [ExcelDataReader](https://github.com/ExcelDataReader/ExcelDataReader) for Excel support
+- [Fashenstein](https://github.com/DanHarltey/Fastenshtein) for fuzzy string matching
 - [geohash-dotnet](https://github.com/postlagerkarte/geohash-dotnet) for geohash encoding
+- [MapsUI](https://github.com/Mapsui/Mapsui) for map support
 - [NotNullStrings](https://github.com/NeilMacMullen/NotNullStrings) for basic string extensions
 - [Parquet.Net](https://github.com/aloneguid/parquet-dotnet) for Parquet serialisation
+- [ScottPlot](https://github.com/ScottPlot/ScottPlot) for charting
 - [Spectre.Console](https://github.com/spectreconsole/spectre.console) for nice table rendering
 - [T-Digest.net](https://github.com/ASolomatin/T-Digest.NET) is used internally for some aggregation functions
 - [VegaGenerator](https://github.com/NeilMacMullen/VegaGenerator) is used to simplify rendering of charts
