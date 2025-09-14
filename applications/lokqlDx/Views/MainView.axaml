@@ -91,47 +91,66 @@
 
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
-                              Command="{Binding NavigateToWikiCommand}" />
-                    <MenuItem Header="Quick start"
-                              CommandParameter="LokqlDx-tutorial-‐-quick-start"
-                              Command="{Binding NavigateToWikiCommand}" />
-                    <MenuItem Header="Keyboard shortcuts"
-                              CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
-                              Command="{Binding NavigateToWikiCommand}" />
-                    <MenuItem Header=".Commands"
-                              CommandParameter="LokqlDx-‐-commands"
-                              Command="{Binding NavigateToWikiCommand}" />
-                    <Separator />
-                    <MenuItem Header="Chart customisation"
-                              Command="{Binding NavigateToWikiCommand}"
-                              CommandParameter="ScottPlot-Chart-customisation" />
-                    <MenuItem Header="Using Maps"
-                              Command="{Binding NavigateToWikiCommand}"
-                              CommandParameter="Using-maps-in-LoqklDx"/>
-                    <Separator />
-                    <MenuItem Header="Querying ApplicationInsights"
-                              Command="{Binding NavigateToWikiCommand}"
-                              CommandParameter="Accessing-Application-Insights-data-with-Lokqldx" />
-                    <MenuItem Header="Querying ADX clusters"
-                              Command="{Binding NavigateToWikiCommand}"
-                              CommandParameter="Querying-ADX-clusters-with-lokqldx" />
-                    <Separator />
-                    <MenuItem Header="Kusto-loco Project Page"
-                              Command="{Binding NavigateToUriCommand}"
-                              CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
-                    <MenuItem Header="Github Discussion Forum"
-                              Command="{Binding NavigateToUriCommand}"
-                              CommandParameter="https://github.com/NeilMacMullen/kusto-loco/discussions" />
-                    <Separator />
-                    <MenuItem Header="KQL Introduction"
-                              Command="{Binding NavigateToUriCommand}"
-                              CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
-                    <Separator />
+                    <MenuItem Header="Getting started">
+                        <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
+                                  Command="{Binding NavigateToWikiCommand}" />
+                        <MenuItem Header="Quick start"
+                                  CommandParameter="LokqlDx-tutorial-‐-quick-start"
+                                  Command="{Binding NavigateToWikiCommand}" />
+                        <MenuItem Header="Keyboard shortcuts"
+                                  CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
+                                  Command="{Binding NavigateToWikiCommand}" />
+                        <MenuItem Header="'Dot' Commands"
+                                  CommandParameter="LokqlDx-‐-commands"
+                                  Command="{Binding NavigateToWikiCommand}" />
+                        <MenuItem Header="KQL Introduction"
+                                  Command="{Binding NavigateToUriCommand}"
+                                  CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
+
+                    </MenuItem>
+
+                    <MenuItem Header="Visuals">
+                        <MenuItem Header="Chart customisation"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="ScottPlot-Chart-customisation" />
+                        <MenuItem Header="Using Maps"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Using-maps-in-LoqklDx" />
+                    </MenuItem>
+                    <MenuItem Header="Remote data">
+                        <MenuItem Header="Querying ApplicationInsights"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Accessing-Application-Insights-data-with-Lokqldx" />
+                        <MenuItem Header="Querying ADX clusters"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Querying-ADX-clusters-with-lokqldx" />
+
+                    </MenuItem>
 
 
-                    <MenuItem Header="About" />
-                    <!--Click="AboutBox"-->
+                    <Separator />
+                    <MenuItem Header="Support">
+                        <MenuItem Header="Discord channel"
+                                  Command="{Binding NavigateToUriCommand}"
+                                  CommandParameter="https://discord.com/channels/1409404903260164138/1409404903851294817" />
+                        <MenuItem Header="Github Discussion Forum"
+                                  Command="{Binding NavigateToUriCommand}"
+                                  CommandParameter="https://github.com/NeilMacMullen/kusto-loco/discussions/categories/q-a" />
+
+                    </MenuItem>
+                    <MenuItem Header="More Info">
+                        <MenuItem Header="Kusto-loco Project Page"
+                                  Command="{Binding NavigateToUriCommand}"
+                                  CommandParameter="https://github.com/NeilMacMullen/kusto-loco" />
+
+                        <MenuItem Header="Update"
+                                  Command="{Binding NavigateToUriCommand}"
+                                  CommandParameter="https://github.com/NeilMacMullen/kusto-loco/releases" />
+
+                    </MenuItem>
+                    <Separator />
+
+                    <MenuItem Header="About" Command="{Binding ShowAboutCommand}"/>
 
                 </MenuItem>
             </Menu>
