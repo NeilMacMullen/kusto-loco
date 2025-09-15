@@ -46,6 +46,7 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.8.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.NET.ILLink.Tasks" Version="9.0.9" />
     <PackageVersion Include="Microsoft.NET.Sdk.WebAssembly.Pack" Version="9.0.8" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.2" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
