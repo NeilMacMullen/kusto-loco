@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" />
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
