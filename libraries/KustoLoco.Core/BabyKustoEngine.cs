@@ -80,6 +80,29 @@ public class BabyKustoEngine
             .OrderBy(f => f.Name).ToArray();
     }
 
+
+    public VisualizationState GetVisualizationState(string query)
+    {
+        var allFuncs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
+                .Concat(_additionalfuncs)
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+        //some functions are implicitly implemented so use the existing default
+        //set as a baseline
+        var allSupported = GlobalState.Default.Functions.Concat(allFuncs.Keys)
+            .Distinct().ToArray();
+
+        var state = GlobalState.Default
+            .WithFunctions(allSupported);
+
+        var db = new DatabaseSymbol("tables", []);
+
+        var globals = state.WithDatabase(db);
+
+        var code = KustoCode.ParseAndAnalyze(query, globals);
+        var v = new VGet();
+        v.Walk(code);
+        return v.State;
+    }
     public EvaluationResult Evaluate(
         IReadOnlyCollection<ITableSource> tables,
         string query)
