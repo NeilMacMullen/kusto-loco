@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using KustoLoco.Core.Console;
+﻿using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using System.Data;
 using System.Net.Http.Headers;
@@ -28,19 +26,22 @@ public class KqlClient
     {
         Arg,
         LogAnalytics,
-        Defender
+        Defender,
+        Adx
     }
 
     public async Task<KustoQueryResult> LoadKqlAsync(
         KqlServiceType serviceType,
         string param1,
-        string query
+        string rawQuery
         )
     {
         string url;
         object payload;
-        string sourceType;
         string[] scopes;
+
+        var (visualizationState, query) = KustoQueryContext.GetVisualizationState(rawQuery);
+
 
         switch (serviceType)
         {
@@ -53,14 +54,12 @@ public class KqlClient
                     query = query,
                     options = new { resultFormat = "table" }
                 };
-                sourceType = "arg";
                 break;
 
             case KqlServiceType.LogAnalytics:
                 scopes = new[] { "https://api.loganalytics.io/.default" };
                 url = $"https://api.loganalytics.io/v1/workspaces/{param1}/query";
                 payload = new { query = query };
-                sourceType = "loganalytics";
                 break;
 
 
@@ -68,29 +67,24 @@ public class KqlClient
                 scopes = new[] { "https://api.security.microsoft.com/.default" };
                 url = "https://api.security.microsoft.com/api/advancedhunting/run";
                 payload = new { Query = query };
-                sourceType = "defender";
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(serviceType), serviceType, null);
         }
-
-        // Acquire token
-        var credential = new DefaultAzureCredential();
-        var token = await credential.GetTokenAsync(new TokenRequestContext(scopes));
+        _console.Info("Acquiring token...");
+        var token = await TokenManager.GetToken(scopes);
 
         // Prepare HttpClient
         using var http = new HttpClient();
         http.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token.Token);
-
+        _console.Info("sending request");
         // Send request and normalize
-       return await SendRequest(query,http, url, payload, sourceType);
-       
+       return await SendRequest(query,http, url, payload, serviceType,visualizationState);
     }
 
-
-    private async Task<KustoQueryResult> SendRequest(string query,HttpClient http, string url,object payload,string type)
+    private async Task<KustoQueryResult> SendRequest(string query,HttpClient http, string url,object payload,KqlServiceType type,VisualizationState visual)
     {
         var jsonPayload = JsonSerializer.Serialize(payload);
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -120,7 +114,7 @@ public class KqlClient
         var dt = await KqlResponseNormalizer.Normalize(stream, type);
         var reader = new DataTableReader(dt);
         var table = TableLoaderFromIDataReader.LoadTable("result", reader);
-        return new KustoQueryResult(query, table, VisualizationState.Empty, TimeSpan.Zero, string.Empty);
+        return new KustoQueryResult(query, table,visual, TimeSpan.Zero, string.Empty);
     }
 
 }
@@ -171,14 +165,14 @@ public static class KqlResponseNormalizer
         }
     }
 
-    public static async Task<DataTable> Normalize(Stream stream, string sourceType)
+    public static async Task<DataTable> Normalize(Stream stream, KqlClient.KqlServiceType sourceType)
     {
         var doc = await JsonDocument.ParseAsync(stream);
         var table = new DataTable();
 
-        switch (sourceType.ToLowerInvariant())
+        switch (sourceType)
         {
-            case "arg":
+            case KqlClient.KqlServiceType.Arg:
                 var data = doc.RootElement.GetProperty("data");
                 var argCols = data.GetProperty("columns").EnumerateArray().ToList();
                 var argTypes = argCols.Select(c => MapKqlType(c.GetProperty("type").GetString()!)).ToList();
@@ -190,7 +184,7 @@ public static class KqlResponseNormalizer
                     table.Rows.Add(row.EnumerateArray().Select((v, i) => ConvertValue(v, argTypes[i])).ToArray());
                 break;
 
-            case "loganalytics":
+            case KqlClient.KqlServiceType.LogAnalytics:
                 var laTable = doc.RootElement.GetProperty("tables")[0];
                 var laCols = laTable.GetProperty("columns").EnumerateArray().ToList();
                 var laTypes = laCols.Select(c => MapKqlType(c.GetProperty("type").GetString()!)).ToList();
@@ -202,7 +196,7 @@ public static class KqlResponseNormalizer
                     table.Rows.Add(row.EnumerateArray().Select((v, i) => ConvertValue(v, laTypes[i])).ToArray());
                 break;
 
-            case "adx":
+            case KqlClient.KqlServiceType.Adx:
                 var adxPrimary = doc.RootElement.GetProperty("Tables")
                     .EnumerateArray()
                     .First(t => t.GetProperty("TableName").GetString() == "PrimaryResult");
@@ -217,7 +211,7 @@ public static class KqlResponseNormalizer
                     table.Rows.Add(row.EnumerateArray().Select((v, i) => ConvertValue(v, adxTypes[i])).ToArray());
                 break;
 
-            case "defender":
+            case KqlClient.KqlServiceType.Defender:
                 var schema = doc.RootElement.GetProperty("Schema").EnumerateArray().ToList();
                 var defTypes = schema.Select(c => MapKqlType(c.GetProperty("Type").GetString()!)).ToList();
 

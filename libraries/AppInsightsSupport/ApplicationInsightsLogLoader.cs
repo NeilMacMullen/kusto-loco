@@ -31,14 +31,10 @@ public class ApplicationInsightsLogLoader
         DateTime start, DateTime end
     )
     {
-        var credentialOptions = tenantId.IsBlank()
-            ? new DefaultAzureCredentialOptions()
-            : new DefaultAzureCredentialOptions()
-            {
-                TenantId = tenantId
-            };
-
-        var client = new LogsQueryClient(new DefaultAzureCredential(credentialOptions));
+        _console.Info("Acquiring token...");
+        var credentials = TokenManager.GetCredentials(tenantId);
+        _console.Info("Issuing request...");
+        var client = new LogsQueryClient(credentials);
 
         //try to lookup resource path from settings
         resourcePath = _settings.TrySubstitute(resourcePath);

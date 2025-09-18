@@ -1,20 +1,21 @@
-﻿using System;
+﻿using Kusto.Language;
+using Kusto.Language.Symbols;
+using Kusto.Language.Syntax;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.DataSource;
+using KustoLoco.Core.Diagnostics;
+using KustoLoco.Core.Evaluation;
+using KustoLoco.Core.Evaluation.BuiltIns;
+using KustoLoco.Core.Settings;
+using NLog;
+using NotNullStrings;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Kusto.Language;
-using Kusto.Language.Symbols;
-using Kusto.Language.Syntax;
-using KustoLoco.Core.Console;
-using KustoLoco.Core.DataSource;
-using KustoLoco.Core.Evaluation;
-using KustoLoco.Core.Evaluation.BuiltIns;
-using KustoLoco.Core.Settings;
-using NLog;
-using NotNullStrings;
 
 namespace KustoLoco.Core;
 
@@ -41,6 +42,17 @@ public class KustoQueryContext
     private KustoSettingsProvider _settings=new();
 
     public IEnumerable<string> TableNames => Tables().Select(t => t.Name);
+
+
+    public static (VisualizationState state,string trimmedQuery) GetVisualizationState(string query)
+    {
+        var code = KustoCode.Parse(query).Analyze();
+        var walker = new VisualizationStateWalker();
+        walker.Walk(code);
+        if (walker.State == VisualizationState.Empty)
+            return (VisualizationState.Empty, query);
+        return (walker.State, walker.RemoveRenderFromQuery(query));
+    }
 
     //TODO - ugh - don't like exposing this in this way
     public void AddFunctions(Dictionary<FunctionSymbol, ScalarFunctionInfo> additionalFunctions)
