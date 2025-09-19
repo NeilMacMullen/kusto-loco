@@ -20,13 +20,11 @@ public class IntPromotionTests : TestMethods
                     ];
                     X 
                     | extend x=-A
+                    | project x
                     | getschema  
                     """;
         var result = await LastLineOfResult(query);
-
-        //TODO = actually ADX turns this into a long
-        //but let x=int(1);print -x | getschema gives "int"! 
-        result.Should().Contain("int");
+        result.Should().Contain("long");
     }
 
     [TestMethod]
