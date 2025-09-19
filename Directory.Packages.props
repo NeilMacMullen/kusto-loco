@@ -51,11 +51,11 @@
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="NLog" Version="6.0.3" />
+    <PackageVersion Include="NLog" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.10.4" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.10.4" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.3" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.0.4" />
     <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.4" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.4.0" />
@@ -74,14 +74,14 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
     <PackageVersion Include="Topten.RichTextKit" Version="0.4.167" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.0.15" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.15" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.15" />
-    <PackageVersion Include="Vanara.Core" Version="4.2.0" />
-    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.2.0" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.0.16" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.16" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.16" />
+    <PackageVersion Include="Vanara.Core" Version="4.2.1" />
+    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.2.1" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.6.1" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />
