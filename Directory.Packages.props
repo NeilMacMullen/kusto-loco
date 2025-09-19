@@ -22,10 +22,10 @@
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="Dock.Avalonia" Version="11.3.2.2" />
-    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="11.3.2.2" />
+    <PackageVersion Include="Dock.Avalonia" Version="11.3.6" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="11.3.6" />
     <PackageVersion Include="Dock.Model.Avalonia" Version="11.3.2.2" />
-    <PackageVersion Include="Dock.Model.Mvvm" Version="11.3.2.2" />
+    <PackageVersion Include="Dock.Model.Mvvm" Version="11.3.6" />
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.11" />
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
@@ -67,8 +67,8 @@
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.51.1" />
-    <PackageVersion Include="StaticViewLocator" Version="0.0.1" />
-    <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.0.4" />
+    <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
+    <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.6.2" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
