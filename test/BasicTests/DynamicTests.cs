@@ -292,4 +292,17 @@ public class DynamicTests : TestMethods
 
         res.Should().Be("[[1],[2,3],[4,5]]");
     }
+
+    
+    [TestMethod]
+    public async Task ArraySum()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4]) 
+                    | project arr_sum=array_sum(arr)
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("10");
+    }
 }
