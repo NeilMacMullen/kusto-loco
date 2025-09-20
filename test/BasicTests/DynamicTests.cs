@@ -202,4 +202,36 @@ public class DynamicTests : TestMethods
         var res4 = await LastLineOfResult(query4);
         res4.Should().Be(expected4);
     }
+
+    [TestMethod]
+    public async Task ArrayIndexOfString()
+    {
+        var query = """
+                    let arr=dynamic(["this", "is", "an", "example", "an", "example"]);
+                    print
+                     idx1 = array_index_of(arr,"an") 
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("2");
+    }
+
+    [TestMethod]
+    public async Task ArrayIndexOf()
+    {
+        var query = """
+                    let arr=dynamic(["this", "is", "an", "example", "an", "example"]);
+                    print
+                     idx1 = array_index_of(arr,"an")    // lookup found in input string
+                     , idx2 = array_index_of(arr,"example",1,3) // lookup found in researched range 
+                     , idx3 = array_index_of(arr,"example",1,2) // search starts from index 1, but stops after 2 values, so lookup can't be found
+                     , idx4 = array_index_of(arr,"is",2,4) // search starts after occurrence of lookup
+                     , idx5 = array_index_of(arr,"example",2,-1)  // lookup found
+                     , idx6 = array_index_of(arr, "an", 1, -1, 2)   // second occurrence found in input range
+                     , idx7 = array_index_of(arr, "an", 1, -1, 3)   // no third occurrence in input array
+                     , idx8 = array_index_of(arr, "an", -3)   // negative start index will look at last 3 elements
+                     , idx9 = array_index_of(arr, "is", -4)   // negative start index will look at last 3 elements
+                    """;
+        var res = await LastLineOfResult(query);
+        res.Should().Be("2,3,-1,-1,3,4,-1,4,-1");
+    }
 }
