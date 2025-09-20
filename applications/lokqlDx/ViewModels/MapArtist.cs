@@ -77,6 +77,7 @@ public class MapArtist
 
     public void DrawLine(GeoPoint[] points,Color penColor)
     {
+       
         if (points.Length < 2)
             return;
         var coords = points.Select(MapGeometry.CoordFromGeopoint).ToArray();
@@ -93,6 +94,36 @@ public class MapArtist
 
         _lineFeatures.Add(lineFeature);
     }
+
+    public void DrawPolygon(GeoPoint[] points, Color fillColor, Color? outlineColor = null, float outlineWidth = 1f)
+    {
+        if (points.Length < 3)
+            return; // need at least 3 vertices
+
+        // Convert to coordinates
+        var coords = points.Select(MapGeometry.CoordFromGeopoint).ToList();
+
+        // Ensure first and last are the same (LinearRing requires closure)
+        // Equals2D compares X/Y without Z/M, which is what we want here.
+        if (!coords[0].Equals2D(coords[^1]))
+            coords.Add(coords[0]);
+
+        // LinearRing requires Coordinate[]
+        var ring = new LinearRing(coords.ToArray());
+        var polygon = new Polygon(ring);
+
+        var feature = new GeometryFeature { Geometry = polygon };
+
+        feature.Styles.Add(new VectorStyle
+        {
+            Fill = new Brush(fillColor),                     // e.g. fillColor.WithAlpha(128) for translucency
+            Outline = outlineColor.HasValue ? new Pen(outlineColor.Value, outlineWidth) : null
+        });
+
+        _lineFeatures.Add(feature);
+    }
+
+
 
     public MRect[] GetExtents()
     {

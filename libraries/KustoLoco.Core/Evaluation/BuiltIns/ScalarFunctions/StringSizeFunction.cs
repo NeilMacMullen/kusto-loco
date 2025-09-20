@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 

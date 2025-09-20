@@ -47,6 +47,19 @@ internal static class JsonArrayHelper
     internal static JsonNode?[] ClonedItems(JsonArray array)
         => array.Select(n => n?.DeepClone()).ToArray();
 
+
+    internal static JsonArray Slice(JsonArray array, long start, long end)
+    {
+        var raw = new List<JsonNode?>();
+        if (start < 0) start = array.Count + start;
+        start = Math.Clamp(start, 0, array.Count - 1);
+        if (end < 0) end = array.Count + end;
+        end = Math.Clamp(end, 0, array.Count - 1);
+        for (var i = start; i <= end; i++) raw.Add(array[(int)i]);
+
+        var cloned = raw.Select(r => r?.DeepClone()).ToArray();
+        return new JsonArray(cloned);
+    }
     /// <summary>
     /// Returns a new <see cref="JsonArray"/> with the items in reverse order.
     /// </summary>

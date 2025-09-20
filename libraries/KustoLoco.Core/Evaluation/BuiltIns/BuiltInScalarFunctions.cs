@@ -18,21 +18,33 @@ internal static class BuiltInScalarFunctions
         //not worth auto-generating these because they are short-circuited scalars
         Functions.Add(Kusto.Language.Functions.Now,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new NowFunctionImpl(), ScalarTypes.DateTime)));
+        //not worth auto-generating these because they are short-circuited scalars
+
         Functions.Add(Kusto.Language.Functions.PI,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new PiFunctionImpl(),
                 ScalarTypes.Real)));
 
-        var randHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
+        var forceColumnarHints = EvaluationHints.ForceColumnarEvaluation | EvaluationHints.RequiresTableSerialization;
+
         Functions.Add(Kusto.Language.Functions.Rand,
             new ScalarFunctionInfo(new ScalarOverloadInfo(new RandFunctionImpl(),
-                    randHints,
+                    forceColumnarHints,
                     ScalarTypes.Real),
                 new ScalarOverloadInfo(new RandFunctionImpl(),
-                    randHints,
+                    forceColumnarHints,
                     ScalarTypes.Real,
                     ScalarTypes.Real)
             )
         );
+
+        Functions.Add(Kusto.Language.Functions.NewGuid,
+            new ScalarFunctionInfo(new ScalarOverloadInfo(new NewGuidFunctionImpl(),
+                forceColumnarHints,
+                ScalarTypes.Guid)
+            )
+        );
+
+
         DiagTicksFunction.Register(Functions);
 
         TicksFunction.Register(Functions);
@@ -45,7 +57,6 @@ internal static class BuiltInScalarFunctions
             new StrcatFunctionImpl(), true,
             ScalarTypes.String, ScalarTypes.String)));
 
-        
 
         //can't generate because arbitrary number of arguments
         //add multiple overloads for strcat_delim
@@ -55,10 +66,10 @@ internal static class BuiltInScalarFunctions
                     ScalarTypes.String,
                     Enumerable.Range(0, n).Select(TypeSymbol (_) => ScalarTypes.String).ToArray()))
             .ToArray();
-      
+
         Functions.Add(Kusto.Language.Functions.StrcatDelim, new ScalarFunctionInfo(strcatDelimiterOverrides));
 
-        
+
         ScalarOverloadInfo[] MakePrevNextOverloads(IScalarFunctionImpl func, TypeSymbol type)
         {
             return
@@ -121,8 +132,6 @@ internal static class BuiltInScalarFunctions
             )
         );
 
-       
-      
 
         Functions.Add(
             Kusto.Language.Functions.Split,
@@ -286,7 +295,17 @@ internal static class BuiltInScalarFunctions
         ParTest.Register(Functions);
         DateTimeKindFunction.Register(Functions);
         ArrayIifFunction.Register(Functions);
-
-      
+        ArrayIffFunction.Register(Functions);
+        ArrayIndexOfFunction.Register(Functions);
+        ArraySliceFunction.Register(Functions);
+        ArraySplitFunction.Register(Functions);
+        ArraySumFunction.Register(Functions);
+        UnixTimeSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeMilliSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeMicroSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeNanoSecondsToDateTimeFunction.Register(Functions);
+        UrlEncodeFunction.Register(Functions);
+        RegexQuoteFunction.Register(Functions);
+        RepeatFunction.Register(Functions);
     }
 }
