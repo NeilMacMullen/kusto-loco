@@ -291,5 +291,10 @@ internal static class BuiltInScalarFunctions
         ArraySliceFunction.Register(Functions);
         ArraySplitFunction.Register(Functions);
         ArraySumFunction.Register(Functions);
+        UnixTimeSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeMilliSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeMicroSecondsToDateTimeFunction.Register(Functions);
+        UnixTimeNanoSecondsToDateTimeFunction.Register(Functions);
+
     }
 }

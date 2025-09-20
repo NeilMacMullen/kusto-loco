@@ -246,6 +246,7 @@ public class DynamicTests : TestMethods
 
         res.Should().Be("[2,3]");
     }
+
     [TestMethod]
     public async Task ArraySlice2()
     {
@@ -257,6 +258,7 @@ public class DynamicTests : TestMethods
 
         res.Should().Be("[3,4,5]");
     }
+
     [TestMethod]
     public async Task ArraySlice3()
     {
@@ -293,7 +295,7 @@ public class DynamicTests : TestMethods
         res.Should().Be("[[1],[2,3],[4,5]]");
     }
 
-    
+
     [TestMethod]
     public async Task ArraySum()
     {
