@@ -15,4 +15,7 @@ public class UrlTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Be(@"https%3a%2f%2fwww.bing.com%2fhello+world");
     }
+
+
+
 }
