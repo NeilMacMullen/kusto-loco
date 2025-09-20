@@ -286,7 +286,6 @@ internal static class BuiltInScalarFunctions
         ParTest.Register(Functions);
         DateTimeKindFunction.Register(Functions);
         ArrayIifFunction.Register(Functions);
-
-      
+        ArrayIffFunction.Register(Functions);
     }
 }
