@@ -289,5 +289,6 @@ internal static class BuiltInScalarFunctions
         ArrayIffFunction.Register(Functions);
         ArrayIndexOfFunction.Register(Functions);
         ArraySliceFunction.Register(Functions);
+        ArraySplitFunction.Register(Functions);
     }
 }

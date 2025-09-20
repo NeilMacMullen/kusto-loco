@@ -268,4 +268,28 @@ public class DynamicTests : TestMethods
 
         res.Should().Be("[3,4]");
     }
+
+    [TestMethod]
+    public async Task ArraySplit1()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5]) 
+                    | project arr_split=array_split(arr, 2)
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("[[1,2],[3,4,5]]");
+    }
+
+    [TestMethod]
+    public async Task ArraySplit2()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5]) 
+                    | project arr_split=array_split(arr, dynamic([1,3]))
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("[[1],[2,3],[4,5]]");
+    }
 }
