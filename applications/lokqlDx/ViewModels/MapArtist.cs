@@ -77,9 +77,7 @@ public class MapArtist
 
     public void DrawLine(GeoPoint[] points,Color penColor)
     {
-        DrawPolygon(points,penColor);
-        return;
-        /*
+       
         if (points.Length < 2)
             return;
         var coords = points.Select(MapGeometry.CoordFromGeopoint).ToArray();
@@ -95,12 +93,11 @@ public class MapArtist
         });
 
         _lineFeatures.Add(lineFeature);
-        */
     }
 
     public void DrawPolygon(GeoPoint[] points, Color fillColor, Color? outlineColor = null, float outlineWidth = 1f)
     {
-        if (points == null || points.Length < 3)
+        if (points.Length < 3)
             return; // need at least 3 vertices
 
         // Convert to coordinates
