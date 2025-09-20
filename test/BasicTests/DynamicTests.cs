@@ -234,4 +234,38 @@ public class DynamicTests : TestMethods
         var res = await LastLineOfResult(query);
         res.Should().Be("2,3,-1,-1,3,4,-1,4,-1");
     }
+
+    [TestMethod]
+    public async Task ArraySlice1()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3]) 
+                    | project sliced=array_slice(arr, 1, 2)
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("[2,3]");
+    }
+    [TestMethod]
+    public async Task ArraySlice2()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5]) 
+                    | project sliced=array_slice(arr, 2, -1)
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("[3,4,5]");
+    }
+    [TestMethod]
+    public async Task ArraySlice3()
+    {
+        var query = """
+                    print arr=dynamic([1,2,3,4,5]) 
+                    | project sliced=array_slice(arr, -3, -2)
+                    """;
+        var res = await SquashedLastLineOfResult(query);
+
+        res.Should().Be("[3,4]");
+    }
 }

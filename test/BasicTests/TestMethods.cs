@@ -32,6 +32,14 @@ public abstract class TestMethods
             .Select(KustoFormatter.ObjectToKustoString)
             .JoinString();
     }
+    /// <summary>
+    /// Squashes the line to remove linefeeds and extra spaces - suitable for checking json
+    /// </summary>
+    protected async Task<string> SquashedLastLineOfResult(string query)
+    {
+        var raw = await LastLineOfResult(query);
+        return raw.ReplaceLineEndings("").Replace(" ", "");
+    }
 
     protected  Task<string> ResultAsLines(string query)
         => ResultAsString(query, Environment.NewLine);
