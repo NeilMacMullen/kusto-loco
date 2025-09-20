@@ -297,6 +297,6 @@ internal static class BuiltInScalarFunctions
         UnixTimeNanoSecondsToDateTimeFunction.Register(Functions);
         UrlEncodeFunction.Register(Functions);
         RegexQuoteFunction.Register(Functions);
-
+        RepeatFunction.Register(Functions);
     }
 }
