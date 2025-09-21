@@ -396,16 +396,11 @@ public static class AppInsightsCommand
 
         var query = blocks.ConsumeNextBlock();
         var rid = o.Rid;
-        var tenant = o.TenantId;
         var i = rid.IndexOf(':');
-        if (i >= 0 && i < (rid.Length-1))
-        {
-            tenant = rid[..i];
-            rid = rid[(i + 1)..];
-        }
+    
 
         console.Info("Running application insights query.  This may take a while....");
-        var result = await ai.LoadTable(tenant, rid, query, t, DateTime.UtcNow);
+        var result = await ai.LoadTable(rid, query, t, DateTime.UtcNow);
         await context.InjectResult(result);
     }
 
@@ -415,14 +410,14 @@ public static class AppInsightsCommand
                    The resourceId is the full resourceId of the application insights instance which can be obtained
                    from the JSON View of the Insights resource in the Azure portal.
 
-                   The timespan is a duration string which can be in the format of '7d', '30d', '1h' etc.
-                   If not specified, the default is 24 hours.
-
-                   The TenantId is the tenant-id of the subscription that contains the application insights instance.
+                   The ResourceId can be prefixed with a tenantId and colon.  
                    This is optional but may be required if you have multiple tenants or if the application insights
                    instance is in a different tenant than the one you are currently logged into.
-                   The tenant id can be specified as a prefix to the resourceId separated with a colon.
 
+                   The timespan is a duration string which can be in the format of '7d', '30d', '1h' etc.
+                   If not specified, the default is 24 hours.
+                   
+                   
                    Examples:
                    .set appservice /subscriptions/12a.... 
                    .appinsights $appservice 7d
@@ -447,8 +442,6 @@ public static class AppInsightsCommand
         [Value(1, HelpText = "timespan ")] public string Timespan { get; set; } = "1d";
 
 
-        [Option(HelpText = "The tenant-id of the subscription that contains the application insights instance")]
-        public string TenantId { get; set; } = string.Empty;
     }
 
     public static void RegisterSchema(ICommandProcessor processor)

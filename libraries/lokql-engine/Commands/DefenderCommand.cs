@@ -1,6 +1,7 @@
 ﻿using AppInsightsSupport;
 using CommandLine;
 using KustoLoco.PluginSupport;
+using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
 
@@ -23,6 +24,9 @@ public static class DefenderCommand
 
         console.Info("Running Defender query.  This may take a while....");
         var al = new KqlClient(settings, console);
+        var tenant = o.TenantId;
+        if (tenant.IsNotBlank())
+            tenant = tenant + ":";
         var result = await al.LoadKqlAsync(KqlClient.KqlServiceType.Defender, string.Empty, query);
         await context.InjectResult(result);
     }
@@ -30,6 +34,7 @@ public static class DefenderCommand
     [Verb("defender",
         HelpText = """
                    Runs a query against Defender.
+                   A tenantID can optionally be provided as the first argument
 
                    Examples:
                    .defender 
@@ -38,6 +43,8 @@ public static class DefenderCommand
                    """)]
     internal class Options
     {
+        [Value(0, Required = false)]
+        public string TenantId { get; set; } = string.Empty;
     }
 
 }

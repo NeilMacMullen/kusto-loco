@@ -88,7 +88,6 @@
 
                     <MenuItem Header="Show _Output Window" Command="{Binding ShowToolCommand}"
                               CommandParameter="console" />
-
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Getting started">
@@ -103,7 +102,11 @@
                         <MenuItem Header="'Dot' Commands"
                                   CommandParameter="LokqlDx-‐-commands"
                                   Command="{Binding NavigateToWikiCommand}" />
-                        <MenuItem Header="KQL Introduction"
+                        <MenuItem Header="Settings and macros"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="LokqlDx-‐-Settings,-Variables-and-Macros" />
+
+						<MenuItem Header="KQL Introduction"
                                   Command="{Binding NavigateToUriCommand}"
                                   CommandParameter="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/tutorials/learn-common-operators" />
 
@@ -124,8 +127,18 @@
                         <MenuItem Header="Querying ADX clusters"
                                   Command="{Binding NavigateToWikiCommand}"
                                   CommandParameter="Querying-ADX-clusters-with-lokqldx" />
+                        <MenuItem Header="Querying Azure Defender"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Querying-Azure-Defender-with-lokqlDx" />
+                        <MenuItem Header="Querying Log Analytics workspaces"
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Querying-log‐analytics-with-LokqlDx" />
+                        <MenuItem Header="Querying ARG (Azure Resource Groups) "
+                                  Command="{Binding NavigateToWikiCommand}"
+                                  CommandParameter="Querying-ARG-with-LokqlDx" />
 
-                    </MenuItem>
+
+					</MenuItem>
 
 
                     <Separator />

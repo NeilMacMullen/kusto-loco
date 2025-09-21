@@ -24,14 +24,14 @@ public static class ArgCommand
 
         console.Info("Running ARG query.  This may take a while....");
         var al = new KqlClient(settings, console);
-        var result= await al.LoadKqlAsync(KqlClient.KqlServiceType.Arg,o.SubscriptionId,query);
+        var result= await al.LoadKqlAsync(KqlClient.KqlServiceType.Arg,o.ResourcePath,query);
         await context.InjectResult(result);
     }
 
     [Verb("arg", 
         HelpText = """
                    Runs a query against ARG (Azure Resource Graph).
-                   The subscriptionId is a guid
+                   The subscriptionId is a guid, optionally prefixed a tenandID and colon
 
                    Examples:
                    .set sub 12a.... 
@@ -42,7 +42,7 @@ public static class ArgCommand
     internal class Options
     {
         [Value(0, Required = true)]
-        public string SubscriptionId { get; set; } = string.Empty;
+        public string ResourcePath { get; set; } = string.Empty;
     }
 
 }

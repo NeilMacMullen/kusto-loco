@@ -30,11 +30,11 @@ public static class LogAnalyticsCommand
     [Verb("loganalytics",
         HelpText = """
                    Runs a query against Log Analytics in Azure Monitor.
-                   The WorkspaceId is a guid
+                   The WorkspaceId is a guid and can optionally be prefixed by a tenantID and colon
 
                    Examples:
                    .set wkspc 12a.... 
-                   .loganalytics $wkspc 
+                   .loganalytics $tenantId:$wkspc 
                    AppTraces 
                    | summarize count() by bin(timestamp, 1h)
                    """)]
