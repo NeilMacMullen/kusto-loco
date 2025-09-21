@@ -32,7 +32,7 @@ public class KqlClient
 
     public async Task<KustoQueryResult> LoadKqlAsync(
         KqlServiceType serviceType,
-        string param1,
+        string resourcePath,
         string rawQuery
         )
     {
@@ -41,7 +41,8 @@ public class KqlClient
         string[] scopes;
 
         var (visualizationState, query) = KustoQueryContext.GetVisualizationState(rawQuery);
-
+        resourcePath = _settings.TrySubstitute(resourcePath);
+        var (tenantId, rid) = TokenManager.ExtractTenantFromResourcePath(resourcePath);
 
         switch (serviceType)
         {
@@ -50,7 +51,7 @@ public class KqlClient
                 url = "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2022-10-01";
                 payload = new
                 {
-                    subscriptions = new[] { param1 },
+                    subscriptions = new[] { rid },
                     query = query,
                     options = new { resultFormat = "table" }
                 };
@@ -58,7 +59,7 @@ public class KqlClient
 
             case KqlServiceType.LogAnalytics:
                 scopes = new[] { "https://api.loganalytics.io/.default" };
-                url = $"https://api.loganalytics.io/v1/workspaces/{param1}/query";
+                url = $"https://api.loganalytics.io/v1/workspaces/{rid}/query";
                 payload = new { query = query };
                 break;
 
@@ -72,8 +73,8 @@ public class KqlClient
             default:
                 throw new ArgumentOutOfRangeException(nameof(serviceType), serviceType, null);
         }
-        _console.Info("Acquiring token...");
-        var token = await TokenManager.GetToken(scopes);
+        _console.Info($"Acquiring token from tenant {tenantId} for resource {rid}...");
+        var token = await TokenManager.GetToken(tenantId,scopes);
 
         // Prepare HttpClient
         using var http = new HttpClient();

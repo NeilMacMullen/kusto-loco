@@ -26,21 +26,20 @@ public class ApplicationInsightsLogLoader
         _console = console;
     }
 
-    public async Task<KustoQueryResult> LoadTable(string tenantId,string resourcePath,
+    public async Task<KustoQueryResult> LoadTable(string resourcePath,
         string query,
         DateTime start, DateTime end
     )
     {
+        resourcePath = _settings.TrySubstitute(resourcePath);
         _console.Info("Acquiring token...");
+        var (tenantId, rid) = TokenManager.ExtractTenantFromResourcePath(resourcePath);
         var credentials = TokenManager.GetCredentials(tenantId);
         _console.Info("Issuing request...");
         var client = new LogsQueryClient(credentials);
 
-        //try to lookup resource path from settings
-        resourcePath = _settings.TrySubstitute(resourcePath);
-
         var results = await client.QueryResourceAsync(
-            new ResourceIdentifier(resourcePath),
+            new ResourceIdentifier(rid),
             query,
             new QueryTimeRange(start, end),
             new LogsQueryOptions
