@@ -30,7 +30,7 @@
     <PackageVersion Include="Fastenshtein" Version="1.0.11" />
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
-    <PackageVersion Include="Mapsui.Avalonia" Version="5.0.0-beta.21" />
+    <PackageVersion Include="Mapsui.Avalonia" Version="5.0.0-beta.24" />
     <PackageVersion Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageVersion Include="MarkdownViewer.Core" Version="1.0.5" />
     <PackageVersion Include="McMaster.NETCore.Plugins" Version="2.0.0" />
