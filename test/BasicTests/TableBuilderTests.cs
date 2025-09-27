@@ -12,6 +12,24 @@ namespace BasicTests;
 [TestClass]
 public class TableBuilderTests
 {
+
+    [TestMethod]
+    public void NullableSetBuilder()
+    {
+        var b = new NullableSetBuilderOfstring(10000, true);
+        b.Length.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void ColumnBuilderTest()
+    {
+        var  b = ColumnHelpers.CreateBuilder(typeof(string), string.Empty);
+        b.Add("a");
+        b.PadTo(10);
+        var col = b.ToColumn();
+        col.RowCount.Should().Be(10);
+    }
+
     [TestMethod]
     public void TypeMappingTests()
     {

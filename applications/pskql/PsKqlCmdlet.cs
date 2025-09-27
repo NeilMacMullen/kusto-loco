@@ -55,7 +55,11 @@ public class PsKqlCmdlet : Cmdlet
 
 
         if (badProperties.Contains(pName))
+        {
+            WriteDebug($"Skipping bad property {pName}");
             return;
+        }
+
         try
         {
             switch (p)
@@ -101,7 +105,10 @@ public class PsKqlCmdlet : Cmdlet
             AddValue(pName, pTypeNameOfValue, pValue, rowIndex);
             addedProperties.Add(pName);
             if (timer.Elapsed > PropertyTimeout)
+            {
+                WriteDebug($"Property {pName} took too long to evaluate so skipping");
                 badProperties.Add(pName);
+            }
         }
         catch (Exception e)
         {
@@ -142,9 +149,13 @@ public class PsKqlCmdlet : Cmdlet
         WriteDebug("Creating context...");
         foreach (var name in _columnNames)
         {
+            WriteDebug($"Padding column {name} to {rowIndex} rows");
             var cb = _columnBuilders[name];
             cb.PadTo(rowIndex);
-            builder.WithColumn(name, cb.ToColumn());
+            WriteDebug($"column {name} now has {cb.RowCount} rows");
+            var col = cb.ToColumn();
+            WriteDebug($"created col {col.Name} has {col.RowCount} rows");
+            builder.WithColumn(name, col);
         }
 
         var context = new KustoQueryContext();
@@ -260,6 +271,7 @@ public class PsKqlCmdlet : Cmdlet
 
         //WriteDebug($"Getting builder for {columnName}");
         var colBuilder = GetOrCreateBuilder(columnName, typeName);
+        WriteDebug($"ADDAT {columnName} with type {typeName} val {value} rowIndex {rowIndex}");
         colBuilder.AddAt(value, rowIndex);
     }
 }
