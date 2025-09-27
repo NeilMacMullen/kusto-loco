@@ -19,5 +19,8 @@ import-module .\publish\pskql\pskql.dll
 
 
 #run a couple of sample commands
+
+ls C:\work\open_source\kusto-loco\*.md |  edit-kql "take 1" -debug
+return;
 Get-process  | Edit-Kql "summarize count() by bin(Handles,100) | render linechart"
 Get-NetTCPConnection | edit-kql "where State == 'Established' | summarize count() by RemoteAddress" 

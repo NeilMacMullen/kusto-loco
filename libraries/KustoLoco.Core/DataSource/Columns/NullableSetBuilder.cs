@@ -18,7 +18,6 @@ public sealed class NullableSetBuilder<T> : INullableSetBuilder
     private readonly bool _canResize;
     private readonly BitArray _isNull;
     private T[] _nonnull;
-    private int _occupied;
 
     public NullableSetBuilder(int initialLength, bool canResize)
     {
@@ -27,7 +26,7 @@ public sealed class NullableSetBuilder<T> : INullableSetBuilder
         _nonnull = new T[initialLength];
     }
 
-    public int Length => _nonnull.Length;
+    public int Length { get; private set; }
 
     public object? this[int index]
     {
@@ -56,28 +55,29 @@ public sealed class NullableSetBuilder<T> : INullableSetBuilder
 
     public void Add(T? value)
     {
-        var currentLength = Length;
+        var currentCapacity = _nonnull.Length;
 
-        if (_occupied >= currentLength)
+        if (Length >= currentCapacity)
         {
             //need to expand
-            Array.Resize(ref _nonnull, currentLength * 2);
-            _isNull.Length = currentLength * 2;
+            var newCapacity = currentCapacity * 2;
+            Array.Resize(ref _nonnull, newCapacity);
+            _isNull.Length = newCapacity;
         }
 
         if (value is not T data)
-            _isNull[_occupied] = true;
+            _isNull[Length] = true;
         else
-            _nonnull[_occupied] = data;
-        _occupied++;
+            _nonnull[Length] = data;
+        Length++;
     }
 
     public NullableSet<T> ToNullableSet()
     {
         if (_canResize)
         {
-            Array.Resize(ref _nonnull, _occupied);
-            _isNull.Length = _occupied;
+            Array.Resize(ref _nonnull, Length);
+            _isNull.Length = Length;
         }
 
         return new NullableSet<T>(_isNull, _nonnull);
@@ -93,7 +93,6 @@ public sealed class NullableSetBuilder_ref<T> : INullableSetBuilder
 {
     private readonly bool _canResize;
     private T?[] _nonnull;
-    private int _occupied;
 
     public static NullableSetBuilder_ref<T> CreateFixed(int size) => new(size, false);
 
@@ -109,7 +108,8 @@ public sealed class NullableSetBuilder_ref<T> : INullableSetBuilder
     }
 
 
-    public int Length => _nonnull.Length;
+    public int Length { get; private set; }
+
     private bool _noNulls;
 #if TYPE_STRING
     private StringPool pool = new StringPool(1000);
@@ -118,22 +118,26 @@ public sealed class NullableSetBuilder_ref<T> : INullableSetBuilder
 
     public void Add(T? value)
     {
-        var currentLength = Length;
+        var currentCapacity = _nonnull.Length;
 
-        if (_occupied >= currentLength)
+        if (Length >= currentCapacity)
+        {
             //need to expand
-            Array.Resize(ref _nonnull, currentLength * 2);
-        _nonnull[_occupied] = value;
+            var newCapacity = currentCapacity * 2;
+            Array.Resize(ref _nonnull,newCapacity);
+        }
+
+        _nonnull[Length] = value;
         if (value == null) _noNulls = true;
-        _occupied++;
+        Length++;
     }
 
     public NullableSet<T> ToNullableSet()
     {
         if (_canResize)
-            Array.Resize(ref _nonnull, _occupied);
+            Array.Resize(ref _nonnull, Length);
 #if TYPE_STRING
-        for (var i = 0; i < _occupied; i++)
+        for (var i = 0; i < Length; i++)
         {
             var d = _nonnull[i];
             if (d !=null)
