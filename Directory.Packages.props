@@ -12,7 +12,7 @@
     <PackageVersion Include="Avalonia.Skia" Version="11.3.6" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0" />
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
-    <PackageVersion Include="AwesomeAssertions" Version="9.1.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.2.0" />
     <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.16.0" />
     <PackageVersion Include="Azure.Monitor.Query" Version="1.7.1" />
