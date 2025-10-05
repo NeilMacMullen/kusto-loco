@@ -37,7 +37,7 @@ DefaultGroupName={#MyAppName}
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir="..\{#OutputDir}"
-OutputBaseFilename=pskql-windows-setup-{#Suffix}
+OutputBaseFilename=pskql-POWERSHELL-module-windows-setup-{#Suffix}
 SolidCompression=yes
 WizardStyle=modern
 ; max size 164x314
