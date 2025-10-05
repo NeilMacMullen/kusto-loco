@@ -11,7 +11,7 @@ public static class DragDropManager
     {
         drgevent.Handled = true;
         // Check that the data being dragged is a file
-        drgevent.DragEffects = drgevent.Data.Contains(DataFormats.Files)
+        drgevent.DragEffects = drgevent.DataTransfer.Contains(DataFormat.File)
             ? DragDropEffects.Link
             : DragDropEffects.None;
     }
@@ -20,17 +20,19 @@ public static class DragDropManager
     {
         drgevent.Handled = true;
         // Check that the data being dragged is a file
-        drgevent.DragEffects = drgevent.Data.Contains(DataFormats.Files)
+        drgevent.DragEffects = drgevent.DataTransfer.Contains(DataFormat.File)
             ? DragDropEffects.Link
             : DragDropEffects.None;
     }
 
     public static void Drop(DragEventArgs e, EditorHelper editorHelper)
     {
-        if (e.Data.Contains(DataFormats.Files))
+        if (e.DataTransfer.Contains(DataFormat.File))
         {
-            var newString = e.Data.GetFiles()!
-                .Select(s => s.TryGetLocalPath().NullToEmpty())
+            var items = e.DataTransfer.TryGetFiles() ?? [];
+
+            var newString = items
+                .Select(s => s.TryGetLocalPath().NullToEmpty()!)
                 .Where(s => s.IsNotBlank())
                 .Select(f => $".{VerbFromExtension(f)} \"{f}\"")
                 .JoinAsLines();
