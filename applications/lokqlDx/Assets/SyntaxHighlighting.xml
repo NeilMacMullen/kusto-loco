@@ -198,6 +198,7 @@
 			<Word>string_similarity</Word>
 			<Word>format</Word>
 			<Word>format_interp</Word>
+			<Word>heatmap_color</Word>
 			<Word>datetime_to_iso</Word>
 			<Word>padleft</Word>
 			<Word>padright</Word>

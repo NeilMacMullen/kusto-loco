@@ -34,6 +34,6 @@ internal static class CustomFunctions
         ParseHexFunction.Register(functions);
         FormatFunction.Register(functions);
         FormatInterpFunction.Register(functions);
-        //HeatmapColorFunction.Register(functions);
+        HeatmapColorFunction.Register(functions);
     }
 }
