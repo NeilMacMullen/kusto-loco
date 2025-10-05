@@ -32,5 +32,8 @@ internal static class CustomFunctions
         PadRightFunction.Register(functions);
         ToDateTimeFmtFunction.Register(functions);
         ParseHexFunction.Register(functions);
+        FormatFunction.Register(functions);
+        FormatInterpFunction.Register(functions);
+        //HeatmapColorFunction.Register(functions);
     }
 }

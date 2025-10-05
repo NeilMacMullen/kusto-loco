@@ -22,8 +22,9 @@
         public int ColumnIndex { get; }
 
         public bool IsString => Type.Contains("string");
+        public bool IsObject => Type.Contains("object");
 
-        public bool IsRefType => IsString || Type.Contains("Json");
+        public bool IsRefType => IsString || Type.Contains("Json") || IsObject;
 
         /// <summary>
         ///     Transforms a Param ColumnIndex

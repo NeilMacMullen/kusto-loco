@@ -415,6 +415,16 @@
     "Syntax": "string_similarity(*string*,*string*)"
   },
   {
+    "Name": "format",
+    "Description": "(non-standard) Formats a value using C-Sharp format string.",
+    "Syntax": "format(*value*, *format*)"
+  },
+  {
+    "Name": "format_interp",
+    "Description": "(non-standard) Formats a set of up to 10 values using C-Sharp interpolated format string.",
+    "Syntax": "format(*format*,[*values*])"
+  },
+  {
     "Name": "datetime_to_iso",
     "Description": "(non-standard) Returns the ISO string representation of a datetime",
     "Syntax": "datetime_to_iso(*datetime*)"
