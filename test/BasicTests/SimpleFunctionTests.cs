@@ -1266,7 +1266,51 @@ print toscalar(letters | summarize mx=min(bitmap));";
         result.Should().Be(expected);
     }
 
-   
+    [TestMethod]
+    public async Task Format()
+    {
+        var query = "print format(1234, 'x')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4d2");
+    }
+
+    [TestMethod]
+    public async Task Format1()
+    {
+        var query = "print format(1234, 'X')";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("4D2");
+    }
+
+    [TestMethod]
+    public async Task FormatInterp()
+    {
+        var query = "print format_interp('hi there {0:x}',256)";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("hi there 100");
+    }
+
+    [TestMethod]
+    public async Task FormatInterpColumnar()
+    {
+        var query = """
+
+                    datatable(b:bool, i:int, ) [
+                      false, 0,
+                      true, 1 
+                    ]
+                    | project b=format_interp('bool={0}, int={1}',b,i)
+
+                    """;
+
+        var expected = """
+                       bool=False, int=0
+                       bool=True, int=1
+                       """;
+
+        var result = await ResultAsString(query, Environment.NewLine);
+        result.Should().Be(expected);
+    }
 
 
 }
