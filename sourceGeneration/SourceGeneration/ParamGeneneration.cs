@@ -21,8 +21,10 @@ namespace KustoLoco.SourceGeneration
         public static string GetNullableType(Param p)
             => p.Type.Replace("?", "") + "?";
 
-        public static string MakeTypedColumn(Param p) =>
-            $"var {ColumnName(p)} = (GenericTypedBaseColumnOf{p.Type}) arguments[{p.ColumnIndex}].Column;";
+        public static string MakeTypedColumn(Param p) => p.IsObject
+            ? $"var {ColumnName(p)} = (BaseColumn) arguments[{p.ColumnIndex}].Column;"
+            : $"var {ColumnName(p)} = (GenericTypedBaseColumnOf{p.Type}) arguments[{p.ColumnIndex}].Column;";
+
 
         public static string MakeTypedVariable(Param p) =>
             $"var {VariableName(p)} = ({GetNullableType(p)}) arguments[{p.ColumnIndex}].Value;";
@@ -72,7 +74,7 @@ namespace KustoLoco.SourceGeneration
             dbg.AppendLine("public ColumnarResult InvokeColumnar(ColumnarResult[] arguments)");
             dbg.EnterCodeBlock();
             AddTypedColumns(dbg, parameters);
-            dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
+            dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.{RowCountPropertyFor(parameters[0])}");
             dbg.AppendStatement($"var data = NullableSetBuilderOf{ret.Type}.CreateFixed({RowCount})");
 
             if (attributes.Partition)
@@ -153,6 +155,9 @@ namespace KustoLoco.SourceGeneration
             dbg.ExitCodeBlock();
         }
 
+        //Annoyingly for object parameters the property is Length not RowCount
+        private static string RowCountPropertyFor(Param parameter) => parameter.IsObject ? "RowCount" : "RowCount";
+
         public static void BuildInvokeMethod(CodeEmitter dbg, ImplementationMethod method,
             KustoImplementationAttributeDecoder attributes)
         {
@@ -164,7 +169,7 @@ namespace KustoLoco.SourceGeneration
             dbg.EnterCodeBlock();
             AddTypedColumns(dbg, parameters);
             dbg.AppendStatement($"var {RowCount} = {ColumnName(parameters[0])}.RowCount");
-            
+
             if (attributes.Partition)
             {
                 dbg.AppendStatement($"var contextSet=new ConcurrentBag<{method.ContextArgument.Type}>()");
@@ -184,7 +189,6 @@ namespace KustoLoco.SourceGeneration
                 dbg.ExitCodeBlock();
                 dbg.ExitCodeBlock();
                 dbg.AppendLine(");");
-                
             }
             else
             {
@@ -198,12 +202,13 @@ namespace KustoLoco.SourceGeneration
                 dbg.AppendStatement($"{method.Name}({pvals})");
                 dbg.ExitCodeBlock();
             }
+
             if (attributes.Partition)
-               dbg.AppendStatement($"var result = {method.Name}Finish(contextSet)");
+                dbg.AppendStatement($"var result = {method.Name}Finish(contextSet)");
             else
                 dbg.AppendStatement($"var result = {method.Name}Finish(context)");
 
-                dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
+            dbg.AppendStatement($"var returnType =TypeMapping.SymbolForType(typeof({ret.Type}))");
             dbg.AppendStatement("return new ScalarResult(returnType,result)");
             dbg.ExitCodeBlock();
         }
@@ -247,7 +252,9 @@ namespace KustoLoco.SourceGeneration
             }
         }
 
-        private static string IndexedColumn(Param p) => $"{ColumnName(p)}[{RowIndex}]";
+        private static string IndexedColumn(Param p) => p.IsObject
+            ? $"{ColumnName(p)}.GetRawDataValue({RowIndex})"
+            : $"{ColumnName(p)}[{RowIndex}]";
 
         public static string GetNonNullableType(Param p) => GetNullableType(p).Replace("?", "");
 
@@ -264,8 +271,10 @@ namespace KustoLoco.SourceGeneration
                 case "double": return "Real";
                 case "bool": return "Bool";
                 case "guid": return "Guid";
+                case "decimal": return "Decimal";
                 case "JsonNode": return "Dynamic";
                 case "JsonArray": return "Dynamic";
+                case "object": return "Unknown";
                 default: return t;
             }
         }

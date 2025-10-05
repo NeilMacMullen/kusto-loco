@@ -196,6 +196,8 @@
 			<Word>trimws</Word>
 			<Word>levenshtein</Word>
 			<Word>string_similarity</Word>
+			<Word>format</Word>
+			<Word>format_interp</Word>
 			<Word>datetime_to_iso</Word>
 			<Word>padleft</Word>
 			<Word>padright</Word>

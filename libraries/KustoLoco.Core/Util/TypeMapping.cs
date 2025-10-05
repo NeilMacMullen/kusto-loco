@@ -30,6 +30,7 @@ public static class TypeMapping
         [typeof(ulong)] = new KustoType(ScalarTypes.Long, false),
         [typeof(byte)] = new KustoType(ScalarTypes.Int, false),
         [typeof(sbyte)] = new KustoType(ScalarTypes.Int, false),
+        [typeof(object)] = new KustoType(ScalarTypes.Unknown, false),
 
     };
 

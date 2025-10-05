@@ -67,15 +67,15 @@ internal static class BuiltInsHelper
                 continue;
 
             var argumentsToConsider = Math.Min(arguments.Length, overload.NumParametersToMatch);
-            var arbitraryCOunt = overload.RepeatParams;
-            if (!arbitraryCOunt &&  overload.ParameterTypes.Count != argumentsToConsider) continue;
+            var arbitraryCount = overload.RepeatParams;
+            if (!arbitraryCount &&  overload.ParameterTypes.Count != argumentsToConsider) continue;
 
             var compatible = true;
           
             for (var i = 0; i < argumentsToConsider; i++)
             {
                 var argument = arguments[i];
-                var parameterType = arbitraryCOunt ?
+                var parameterType = arbitraryCount ?
                     overload.ParameterTypes[0]:
                 overload.ParameterTypes[i];
 
@@ -91,6 +91,7 @@ internal static class BuiltInsHelper
                     simplifiedParamType is ScalarSymbol scalarParam &&
                     scalarParam.IsWiderThan(scalarArg);
                 var parameterIsString = simplifiedParamType == ScalarTypes.String;
+                var parameterAcceptsAny = simplifiedParamType == ScalarTypes.Unknown;
                 var argumentTypeIsUnknown = simplifiedArgType == ScalarTypes.Unknown;
                 if (argumentTypeIsUnknown)
                     throw new InvalidOperationException();
@@ -99,6 +100,7 @@ internal static class BuiltInsHelper
                         (isParameterWiderThanArgument && options.HasFlag(OverloadOptions.AllowWideningCast)) ||
                         (parameterIsString && options.HasFlag(OverloadOptions.AllowStringCast))||
                         argumentTypeIsUnknown
+                        || parameterAcceptsAny
                     ;
 
                 if (!thisCompatible)

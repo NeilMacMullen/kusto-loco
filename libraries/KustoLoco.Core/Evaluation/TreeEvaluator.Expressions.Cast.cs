@@ -18,6 +18,7 @@ internal partial class TreeEvaluator
         {
             return node.ResultKind switch
             {
+                EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Unknown => arguments => arguments[0],
                 EvaluatedExpressionKind.Scalar when node.ResultType == ScalarTypes.Int => arguments =>
                 {
                     MyDebug.Assert(arguments.Length == 1);
@@ -58,6 +59,12 @@ internal partial class TreeEvaluator
                 },
                 EvaluatedExpressionKind.Scalar => throw new InvalidOperationException(
                     $"Unexpected target cast type for scalar value: {SchemaDisplay.GetText(node.ResultType)}"),
+                EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Unknown => arguments =>
+                {
+                    var columnResult = (ColumnarResult)arguments[0];
+                    return columnResult;
+                }
+                ,
                 EvaluatedExpressionKind.Columnar when node.ResultType == ScalarTypes.Int => arguments =>
                 {
                     var columnResult = (ColumnarResult)arguments[0];
@@ -100,6 +107,7 @@ internal partial class TreeEvaluator
                         i => i == null ? null : Convert.ToDateTime(i));
                     return new ColumnarResult(convertingColumn);
                 },
+            
                 EvaluatedExpressionKind.Columnar => throw new InvalidOperationException(
                     $"Unexpected target cast type for columnar value: {SchemaDisplay.GetText(node.ResultType)}"),
                 _ => throw new InvalidOperationException($"Unexpected expression result kind {node.ResultKind}")

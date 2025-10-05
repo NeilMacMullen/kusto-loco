@@ -226,7 +226,7 @@ public class DateTimeTests : TestMethods
     {
         //ensure we didn't get any fractional values
         var query = """
-                    print dt=now()
+                    print dt=datetime(2025-07-01 12:00:00)
                     | extend pacific_dt = datetime_utc_to_local(dt, 'US/Pacific'), canberra_dt = datetime_utc_to_local(dt, 'Australia/Canberra')
                     | extend diff = pacific_dt - canberra_dt
                     | project diff
