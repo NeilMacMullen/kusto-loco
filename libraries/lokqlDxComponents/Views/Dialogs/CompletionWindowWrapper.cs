@@ -39,7 +39,7 @@ public class CompletionWindowWrapper(TextArea textArea)
         _completionWindow = new CompletionWindow(textArea)
         {
             CloseWhenCaretAtBeginning = true,
-            MaxWidth = 200
+            MaxWidth = 500
         };
         IList<ICompletionData> data = _completionWindow.CompletionList.CompletionData;
         data.AddRange(options.Completions);
