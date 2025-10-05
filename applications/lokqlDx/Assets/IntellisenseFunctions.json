@@ -425,6 +425,11 @@
     "Syntax": "format(*format*,[*values*])"
   },
   {
+    "Name": "heatmap_color",
+    "Description": "(non-standard) Returns the color for a heatmap cell based on its value",
+    "Syntax": "heatmap_color(*grayscale|gradient|hue*,*min*,*max*,*value*)"
+  },
+  {
     "Name": "datetime_to_iso",
     "Description": "(non-standard) Returns the ISO string representation of a datetime",
     "Syntax": "datetime_to_iso(*datetime*)"
