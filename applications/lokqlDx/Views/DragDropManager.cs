@@ -28,7 +28,7 @@ public static class DragDropManager
     public static void Drop(DragEventArgs e, EditorHelper editorHelper)
     {
         if (e.DataTransfer.Contains(DataFormat.File))
-        {|
+        {
             var items = e.DataTransfer.TryGetFiles() ?? [];
 
             var newString = items
