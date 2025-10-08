@@ -596,6 +596,17 @@ d | project Type='v1',Val=v1
         result.Should().Be("True");
     }
 
+    [TestMethod]
+    public async Task Ipv4IsPrivate()
+    {
+        (await LastLineOfResult("print ipv4_is_private('10.0.0.1')")).Should().Be("True");
+        (await LastLineOfResult("print ipv4_is_private('192.168.0.1')")).Should().Be("True");
+        (await LastLineOfResult("print ipv4_is_private('172.16.0.1')")).Should().Be("True");
+
+        // It should not support loopback and link-local addresses
+        (await LastLineOfResult("print ipv4_is_private('127.0.0.1')")).Should().Be("False");
+        (await LastLineOfResult("print ipv4_is_private('169.254.0.1')")).Should().Be("False");
+    }
 
     [TestMethod]
     public async Task IsAscii()
