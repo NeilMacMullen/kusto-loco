@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" />
     <ProjectReference Include="..\..\libraries\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\..\libraries\LogSetup\LogSetup.csproj" />
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
