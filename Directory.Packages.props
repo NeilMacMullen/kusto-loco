@@ -69,7 +69,7 @@
     <PackageVersion Include="Spectre.Console" Version="0.51.1" />
     <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.6.2" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
