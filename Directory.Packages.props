@@ -36,7 +36,7 @@
     <PackageVersion Include="McMaster.NETCore.Plugins" Version="2.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.9" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.0.1" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.0.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
     <PackageVersion Include="Microsoft.Extensions.AI" Version="9.10.1" />
@@ -66,7 +66,7 @@
     <PackageVersion Include="ScottPlot.WPF" Version="5.0.56" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
-    <PackageVersion Include="Spectre.Console" Version="0.51.1" />
+    <PackageVersion Include="Spectre.Console" Version="0.53.0" />
     <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.6.2" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
