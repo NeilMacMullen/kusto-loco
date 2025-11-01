@@ -1,3 +1,5 @@
+
+
 using AwesomeAssertions;
 using KustoLoco.SourceGeneration;
 

@@ -32,7 +32,7 @@ public class IntellisenseClientAdapter(
 
     public async Task<CompletionResult> GetPathCompletions(string currentLineText)
     {
-        var args = CommandLineStringSplitter.Instance.Split(currentLineText).ToArray();
+        var args = CommandLineParser.SplitCommandLine(currentLineText).ToArray();
 
         if (args.Length < 2)
         {

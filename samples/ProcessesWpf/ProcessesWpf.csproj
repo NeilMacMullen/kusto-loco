@@ -10,7 +10,9 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\wpfui-icon-1024.png" />
     <None Remove="Assets\wpfui-icon-256.png" />
