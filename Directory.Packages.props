@@ -62,8 +62,8 @@
     <PackageVersion Include="Parquet.Net" Version="5.3.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.1.57" />
-    <PackageVersion Include="ScottPlot.Avalonia" Version="5.0.56" />
-    <PackageVersion Include="ScottPlot.WPF" Version="5.0.56" />
+    <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.57" />
+    <PackageVersion Include="ScottPlot.WPF" Version="5.1.57" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.53.0" />
