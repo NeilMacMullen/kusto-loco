@@ -102,8 +102,8 @@ public class CommandProcessor : ICommandProcessor
 
     public async Task RunInternalCommand(InteractiveTableExplorer exp, string currentLine, BlockSequence sequence)
     {
-        var splitter = CommandLineStringSplitter.Instance;
-        var tokens = splitter.Split(currentLine).ToArray();
+       
+        var tokens = CommandLineParser.SplitCommandLine(currentLine).ToArray();
 
         if (!tokens.Any())
             return;
