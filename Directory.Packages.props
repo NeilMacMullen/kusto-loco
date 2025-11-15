@@ -58,7 +58,7 @@
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.0" />
     <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.4" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
-    <PackageVersion Include="OpenAI" Version="2.6.0" />
+    <PackageVersion Include="OpenAI" Version="2.7.0" />
     <PackageVersion Include="Parquet.Net" Version="5.3.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.1.57" />
@@ -66,10 +66,10 @@
     <PackageVersion Include="ScottPlot.WPF" Version="5.1.57" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
     <PackageVersion Include="SimpleExec" Version="12.0.0" />
-    <PackageVersion Include="Spectre.Console" Version="0.53.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.54.0" />
     <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.6.2" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.0" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
@@ -81,7 +81,7 @@
     <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.2.1" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.6.6" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.8.2" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />
