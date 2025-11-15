@@ -1,6 +1,5 @@
 ﻿using Azure.Core;
 using Azure.Identity;
-using Azure.Monitor.Query;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.DataSource;
@@ -11,6 +10,7 @@ using NotNullStrings;
 using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Azure.Monitor.Query.Logs;
 
 
 namespace AppInsightsSupport;
@@ -41,7 +41,7 @@ public class ApplicationInsightsLogLoader
         var results = await client.QueryResourceAsync(
             new ResourceIdentifier(rid),
             query,
-            new QueryTimeRange(start, end),
+            new LogsQueryTimeRange(start, end),
             new LogsQueryOptions
             {
                 IncludeVisualization = true
