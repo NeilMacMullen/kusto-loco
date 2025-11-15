@@ -1,9 +1,10 @@
-using System.Text;
 using AwesomeAssertions;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
+using System;
+using System.Text;
 
 namespace SerializationTests;
 
@@ -104,7 +105,14 @@ public class SerializeTests
         CheckResultEquivalency(roundTripped, result);
     }
 
-
+    [TestMethod]
+    public async Task SerialiseLargeTimeSpan()
+    {
+        var result = await Query("let X = datetime(1 dec 2025) - datetime(1 jan 1970);toscalar(X)");
+        var dto = await _kustoResultSerializer.Serialize(result);
+        var roundTripped = await _kustoResultSerializer.Deserialize(dto);
+        CheckResultEquivalency(roundTripped, result);
+    }
     private void CheckResultEquivalency(KustoQueryResult roundTripped, KustoQueryResult expected)
     {
         roundTripped.ColumnCount.Should().Be(expected.ColumnCount);
@@ -114,6 +122,17 @@ public class SerializeTests
         roundTripped.QueryDuration.Should().BeCloseTo(expected.QueryDuration, TimeSpan.FromMilliseconds(1));
         roundTripped.Visualization.Should().Be(expected.Visualization);
         roundTripped.ColumnDefinitions().Should().BeEquivalentTo(expected.ColumnDefinitions());
+        foreach (var row in Enumerable.Range(0, expected.RowCount))
+        {
+            foreach(var col in Enumerable.Range(0, expected.ColumnCount))
+            {
+                var expectedValue = expected.Get(col, row);
+                var actualValue = roundTripped.Get(col, row);
+                actualValue.Should().BeEquivalentTo(expectedValue,
+                    $"because result value at row:{row} col:{col} should be same");
+            }
+           
+        }
     }
 
     private async Task<KustoQueryResult> Query(string query)
