@@ -53,11 +53,18 @@ public class ParquetSerializer : ITableSerializer
     }
 
     public const int Max_RowGroupSize = 10_000_000;
-    public async Task<TableSaveResult> SaveTable(Stream fileStream, KustoQueryResult result)
+
+
+    private DataField Create(ColumnResult columnDefinition)
+        =>
+            columnDefinition.UnderlyingType == typeof(TimeSpan)
+                ? new TimeSpanDataField(columnDefinition.Name, TimeSpanFormat.MicroSeconds, true)
+                : new DataField(columnDefinition.Name, columnDefinition.UnderlyingType, true);
+
+public async Task<TableSaveResult> SaveTable(Stream fileStream, KustoQueryResult result)
     {
         var dataFields = result.ColumnDefinitions()
-            .Select(columnDefinition =>
-                new DataField(columnDefinition.Name, columnDefinition.UnderlyingType, true))
+            .Select(columnDefinition => Create(columnDefinition))
             .ToArray();
         if (!dataFields.Any())
         {
