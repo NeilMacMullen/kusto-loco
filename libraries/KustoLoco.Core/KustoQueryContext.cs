@@ -7,7 +7,7 @@ using KustoLoco.Core.Diagnostics;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Settings;
-using NLog;
+
 using NotNullStrings;
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace KustoLoco.Core;
 /// </remarks>
 public class KustoQueryContext
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
     private IKustoConsole _debugConsole = new SystemConsole();
 

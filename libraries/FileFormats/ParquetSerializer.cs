@@ -5,7 +5,6 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
-using NLog;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
@@ -20,7 +19,6 @@ namespace KustoLoco.FileFormats;
 /// </remarks>
 public class ParquetSerializer : ITableSerializer
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
 

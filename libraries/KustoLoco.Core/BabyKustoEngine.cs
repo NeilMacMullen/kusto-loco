@@ -13,7 +13,7 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.Settings;
-using NLog;
+
 
 namespace KustoLoco.Core;
 
@@ -22,7 +22,7 @@ public readonly record struct AggregateInfo(string Name, bool Implemented);
 
 public class BabyKustoEngine
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
 
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
     private readonly IKustoConsole _console;
@@ -87,7 +87,6 @@ public class BabyKustoEngine
         var dumpKustoTree = _settings.GetBool(CoreSettings.DumpParseTree);
         var dumpIRTree = _settings.GetBool(CoreSettings.DumpIr);
 
-        Logger.Trace("Evaluate called");
         //combine all available functions
         var allFuncs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
             .Concat(_additionalfuncs)
@@ -139,18 +138,15 @@ public class BabyKustoEngine
         }
 
 
-        Logger.Trace("visiting with IRTranslator...");
         var irVisitor = new IRTranslator(allFuncs);
 
         var ir = code.Syntax.Accept(irVisitor);
 
         visualizer.DumpIRTree(ir, dumpIRTree);
 
-        Logger.Trace("Adding tables to scope...");
         var scope = new LocalScope();
         foreach (var table in tables) scope.AddSymbol(table.Type, TabularResult.CreateUnvisualized(table));
 
-        Logger.Trace("Evaluating in scope...");
         var result = BabyKustoEvaluator.Evaluate(ir, scope);
         return result;
     }

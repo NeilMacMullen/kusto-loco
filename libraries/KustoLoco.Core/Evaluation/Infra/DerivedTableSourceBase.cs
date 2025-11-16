@@ -3,18 +3,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using KustoLoco.Core.Util;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
-using NLog;
+
 
 namespace KustoLoco.Core.Evaluation;
 
 internal abstract class DerivedTableSourceBase<TContext> : ITableSource
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
     private bool _alreadyIterated;
     protected DerivedTableSourceBase(ITableSource source) => Source = source;
     protected ITableSource Source { get; }
@@ -71,7 +72,7 @@ internal abstract class DerivedTableSourceBase<TContext> : ITableSource
     private ITableChunk ProcessLastChunkInternal(TContext context)
     {
         if (_alreadyIterated)
-            Logger.Warn($"Warning - unnecessary extra iteration of {GetType().Name}");
+            Debug.Write($"Warning - unnecessary extra iteration of {GetType().Name}");
         _alreadyIterated = true;
         var newChunk = ProcessLastChunk(context);
         if (newChunk != TableChunk.Empty && newChunk.Table != this)

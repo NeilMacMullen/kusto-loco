@@ -37,7 +37,6 @@
     <PackageReference Include="Fastenshtein" />
     <PackageReference Include="geohash-dotnet" />
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
-    <PackageReference Include="NLog" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="T-Digest.NET" />

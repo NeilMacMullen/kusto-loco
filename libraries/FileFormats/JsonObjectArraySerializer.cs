@@ -4,7 +4,6 @@ using System.Text.Json;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
-using NLog;
 
 namespace KustoLoco.FileFormats;
 

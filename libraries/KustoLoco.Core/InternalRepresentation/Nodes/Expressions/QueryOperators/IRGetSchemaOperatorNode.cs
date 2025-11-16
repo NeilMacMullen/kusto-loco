@@ -1,12 +1,10 @@
 ﻿using Kusto.Language.Symbols;
-using NLog;
+
 
 namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
 
 internal class IRGetSchemaOperatorNode : IRQueryOperatorNode
 {
-    private static Logger Logger = LogManager.GetCurrentClassLogger();
-
     public IRGetSchemaOperatorNode()
         : base(ScalarTypes.Null)
     {
