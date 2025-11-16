@@ -16,6 +16,7 @@
     <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.17.0" />
     <PackageVersion Include="Azure.Monitor.Query" Version="1.7.1" />
+    <PackageVersion Include="Azure.Monitor.Query.Logs" Version="1.0.0" />
     <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageVersion Include="ClosedXML" Version="0.105.0" />
     <PackageVersion Include="Clowd.Clipboard.Avalonia" Version="1.1.4" />

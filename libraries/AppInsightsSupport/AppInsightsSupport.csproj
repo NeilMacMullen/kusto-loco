@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" />
-    <PackageReference Include="Azure.Monitor.Query" />
+    <PackageReference Include="Azure.Monitor.Query.Logs" />
     <PackageReference Include="Microsoft.Azure.Kusto.Data" />
   </ItemGroup>
 

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Immutable;
 using Kusto.Language.Symbols;
-using NLog;
+
 
 namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 
@@ -17,7 +17,7 @@ internal enum EvaluatedExpressionKind
 
 internal abstract class IRExpressionNode : IRNode
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
     private ImmutableDictionary<Type, object> _cache = ImmutableDictionary<Type, object>.Empty;
 
     protected IRExpressionNode(TypeSymbol resultType, EvaluatedExpressionKind resultKind)

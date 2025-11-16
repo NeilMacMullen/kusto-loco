@@ -7,14 +7,14 @@ using System.Text.Json;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
-using NLog;
+
 using NotNullStrings;
 
 namespace KustoLoco.Core;
 
 public class KustoQueryResult
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
 
     public static readonly KustoQueryResult Empty = new(string.Empty,
         InMemoryTableSource.Empty, VisualizationState.Empty, TimeSpan.Zero, string.Empty);

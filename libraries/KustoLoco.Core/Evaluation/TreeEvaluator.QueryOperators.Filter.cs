@@ -13,7 +13,7 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
-using NLog;
+
 
 namespace KustoLoco.Core.Evaluation;
 
@@ -27,7 +27,7 @@ internal partial class TreeEvaluator
 
     private class FilterResultsTable : DerivedTableSourceBase<NoContext>
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        
         private readonly IRExpressionNode _condition;
         private readonly EvaluationContext _context;
         private readonly TreeEvaluator _owner;

@@ -1,7 +1,7 @@
 ﻿using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
-using NLog;
+
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
@@ -10,12 +10,12 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 /// </summary>
 internal class DebugEmitImpl : IScalarFunctionImpl
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
 
     public ScalarResult InvokeScalar(ScalarResult[] arguments)
     {
         var left = (string?)arguments[0].Value;
-        Logger.Warn(left ?? "<null>");
+        //Logger.Warn(left ?? "<null>");
         return new ScalarResult(ScalarTypes.Int, 0);
     }
 
@@ -27,7 +27,7 @@ internal class DebugEmitImpl : IScalarFunctionImpl
         var data = NullableSetBuilderOfint.CreateFixed(left.RowCount);
         for (var i = 0; i < left.RowCount; i++)
         {
-            Logger.Warn(left);
+            //Logger.Warn(left);
             data[i] = i;
         }
 

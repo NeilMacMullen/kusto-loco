@@ -4,7 +4,7 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
-using NLog;
+
 using NotNullStrings;
 using System;
 using System.Collections;
@@ -29,7 +29,7 @@ namespace KustoLoco.Core;
 /// </remarks>
 public class TableBuilder
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
     public readonly int Length;
     public readonly string Name;
 
@@ -272,7 +272,7 @@ public class TableBuilder
         {
             if (header.Type == typeof(JsonElement))
             {
-                Logger.Warn($"IGNORING COLUMN {header.ColumnName} because it seems to be structured data ");
+                //Logger.Warn($"IGNORING COLUMN {header.ColumnName} because it seems to be structured data ");
                 continue;
             }
 

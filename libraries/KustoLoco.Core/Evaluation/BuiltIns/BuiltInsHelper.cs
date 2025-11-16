@@ -9,7 +9,7 @@ using Kusto.Language.Symbols;
 using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions;
 using KustoLoco.Core.Util;
-using NLog;
+
 
 namespace KustoLoco.Core.Evaluation.BuiltIns;
 
@@ -22,7 +22,7 @@ internal static class BuiltInsHelper
         AllowWideningCast=(1<<2),
         AllowStringCast=(1<<3),
     }
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
 
     internal static T? PickOverload<T>(TypeSymbol expectedReturnType, IReadOnlyList<T> overloads,
         IRExpressionNode[] arguments)

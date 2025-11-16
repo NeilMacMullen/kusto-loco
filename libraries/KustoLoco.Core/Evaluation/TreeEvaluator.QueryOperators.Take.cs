@@ -8,13 +8,13 @@ using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Extensions;
 using KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators;
-using NLog;
+
 
 namespace KustoLoco.Core.Evaluation;
 
 internal partial class TreeEvaluator
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    
 
 
     public override EvaluationResult VisitTakeOperator(IRTakeOperatorNode node, EvaluationContext context)
