@@ -4115,8 +4115,8 @@ aaathis is a test";
         var query = @"
 datatable(name:string, tags:dynamic) 
 [
-    'Alice', dynamic(['tag1', 'tag2', 'tag3']),
-    'Bob', dynamic(['tag4', 'tag5'])
+    'Alice', dynamic([""tag1"", ""tag2"", ""tag3""]),
+    'Bob', dynamic([""tag4"", ""tag5""])
 ]
 | mv-expand tags
 ";
@@ -4168,7 +4168,7 @@ id:long; values:dynamic
         var query = @"
 datatable(name:string, tags:dynamic) 
 [
-    'Alice', dynamic(['tag1', 'tag2']),
+    'Alice', dynamic([""tag1"", ""tag2""]),
     'Bob', dynamic(null)
 ]
 | mv-expand tags
@@ -4291,8 +4291,8 @@ Grape
         var query = @"
 datatable(name:string, tags:dynamic) 
 [
-    'Alice', dynamic(['TAG1', 'tag2']),
-    'Bob', dynamic(['TAG3', 'tag4'])
+    'Alice', dynamic([""TAG1"", ""tag2""]),
+    'Bob', dynamic([""TAG3"", ""tag4""])
 ]
 | mv-expand tags
 | where tags =~ 'tag1' or tags =~ 'tag3'
@@ -4316,8 +4316,8 @@ Bob; ""TAG3""
         var query = @"
 datatable(user:string, permissions:dynamic) 
 [
-    'Alice', dynamic(['READ', 'write', 'DELETE']),
-    'Bob', dynamic(['read', 'EXECUTE'])
+    'Alice', dynamic([""READ"", ""write"", ""DELETE""]),
+    'Bob', dynamic([""read"", ""EXECUTE""])
 ]
 | mv-expand permissions
 | where permissions in~ ('read', 'write')
@@ -4343,7 +4343,7 @@ Bob; ""read""
 datatable (a: int, b: dynamic)
 [
     1, dynamic([10, 20]),
-    2, dynamic(['a', 'b'])
+    2, dynamic([""a"", ""b""])
 ]
 | mv-expand b
 ";
