@@ -4107,4 +4107,231 @@ aaathis is a test";
         // Act & Assert
         Test(query, expected);
     }
+
+    [Fact]
+    public void MvExpand_BasicDynamicArray()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string, tags:dynamic) 
+[
+    'Alice', dynamic(['tag1', 'tag2', 'tag3']),
+    'Bob', dynamic(['tag4', 'tag5'])
+]
+| mv-expand tags
+";
+
+        var expected = @"
+name:string; tags:dynamic
+------------------
+Alice; ""tag1""
+Alice; ""tag2""
+Alice; ""tag3""
+Bob; ""tag4""
+Bob; ""tag5""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithNumericArray()
+    {
+        // Arrange
+        var query = @"
+datatable(id:long, values:dynamic) 
+[
+    1, dynamic([10, 20, 30]),
+    2, dynamic([40])
+]
+| mv-expand values
+";
+
+        var expected = @"
+id:long; values:dynamic
+------------------
+1; 10
+1; 20
+1; 30
+2; 40
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithNullValues()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string, tags:dynamic) 
+[
+    'Alice', dynamic(['tag1', 'tag2']),
+    'Bob', dynamic(null)
+]
+| mv-expand tags
+";
+
+        var expected = @"
+name:string; tags:dynamic
+------------------
+Alice; ""tag1""
+Alice; ""tag2""
+Bob; (null)
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void EqualTilde_CaseInsensitiveComparison()
+    {
+        // Arrange
+        var query = @"
+datatable(text:string) 
+[
+    'Hello',
+    'hello',
+    'HELLO',
+    'World'
+]
+| where text =~ 'hello'
+";
+
+        var expected = @"
+text:string
+------------------
+Hello
+hello
+HELLO
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void EqualTilde_WithPrint()
+    {
+        // Arrange
+        var query = @"
+print result1 = 'Hello' =~ 'hello', result2 = 'Hello' =~ 'World'
+";
+
+        var expected = @"
+result1:bool; result2:bool
+------------------
+True; False
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void InTilde_CaseInsensitiveMembership()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string) 
+[
+    'Alice',
+    'Bob',
+    'Charlie',
+    'David'
+]
+| where name in~ ('alice', 'charlie')
+";
+
+        var expected = @"
+name:string
+------------------
+Alice
+Charlie
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void InTilde_WithMultipleValues()
+    {
+        // Arrange
+        var query = @"
+datatable(fruit:string) 
+[
+    'APPLE',
+    'Banana',
+    'orange',
+    'Grape'
+]
+| where fruit in~ ('apple', 'banana', 'grape')
+";
+
+        var expected = @"
+fruit:string
+------------------
+APPLE
+Banana
+Grape
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void CombinedOperators_MvExpandAndEqualTilde()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string, tags:dynamic) 
+[
+    'Alice', dynamic(['TAG1', 'tag2']),
+    'Bob', dynamic(['TAG3', 'tag4'])
+]
+| mv-expand tags
+| where tags =~ 'tag1' or tags =~ 'tag3'
+";
+
+        var expected = @"
+name:string; tags:dynamic
+------------------
+Alice; ""TAG1""
+Bob; ""TAG3""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void CombinedOperators_MvExpandAndInTilde()
+    {
+        // Arrange
+        var query = @"
+datatable(user:string, permissions:dynamic) 
+[
+    'Alice', dynamic(['READ', 'write', 'DELETE']),
+    'Bob', dynamic(['read', 'EXECUTE'])
+]
+| mv-expand permissions
+| where permissions in~ ('read', 'write')
+";
+
+        var expected = @"
+user:string; permissions:dynamic
+------------------
+Alice; ""READ""
+Alice; ""write""
+Bob; ""read""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
 }
