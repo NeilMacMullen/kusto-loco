@@ -4334,4 +4334,80 @@ Bob; ""read""
         // Act & Assert
         Test(query, expected);
     }
+
+    [Fact]
+    public void MvExpand_MixedArrayTypes()
+    {
+        // Arrange - From Microsoft docs: Single column - array expansion with mixed types
+        var query = @"
+datatable (a: int, b: dynamic)
+[
+    1, dynamic([10, 20]),
+    2, dynamic(['a', 'b'])
+]
+| mv-expand b
+";
+
+        var expected = @"
+a:long; b:dynamic
+------------------
+1; 10
+1; 20
+2; ""a""
+2; ""b""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_BagExpansion()
+    {
+        // Arrange - From Microsoft docs: Single column - bag expansion
+        var query = @"
+datatable (a: int, b: dynamic)
+[
+    1, dynamic({'prop1': 'a1', 'prop2': 'b1'}),
+    2, dynamic({'prop1': 'a2', 'prop2': 'b2'})
+]
+| mv-expand b
+";
+
+        var expected = @"
+a:long; b:dynamic
+------------------
+1; {""prop1"":""a1""}
+1; {""prop2"":""b1""}
+2; {""prop1"":""a2""}
+2; {""prop2"":""b2""}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithItemIndex()
+    {
+        // Arrange - From Microsoft docs: Using with_itemindex
+        var query = @"
+range x from 1 to 4 step 1
+| summarize x = make_list(x)
+| mv-expand with_itemindex=Index x
+";
+
+        var expected = @"
+x:dynamic; Index:long
+------------------
+1; 0
+2; 1
+3; 2
+4; 3
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
 }
+
