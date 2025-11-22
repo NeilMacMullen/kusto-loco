@@ -3,47 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Kusto.Language.Symbols;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 /// <summary>
-/// Provides helper methods for working with <see cref="JsonArray"/> objects.
+///     Provides helper methods for working with <see cref="JsonArray" /> objects.
 /// </summary>
 internal static class JsonArrayHelper
 {
     /// <summary>
-    /// Creates a <see cref="JsonArray"/> from a collection of items.
-    /// If an item is a <see cref="JsonNode"/>, it is added directly; otherwise, it is wrapped in a <see cref="JsonValue"/>.
+    ///     Creates a <see cref="JsonArray" /> from a collection of items.
+    ///     If an item is a <see cref="JsonNode" />, it is added directly; otherwise, it is wrapped in a
+    ///     <see cref="JsonValue" />.
     /// </summary>
     /// <typeparam name="T">The type of items in the source collection.</typeparam>
     /// <param name="source">The source collection.</param>
-    /// <returns>A new <see cref="JsonArray"/> containing the items.</returns>
+    /// <returns>A new <see cref="JsonArray" /> containing the items.</returns>
     public static JsonArray From<T>(ICollection<T> source)
     {
         var array = new JsonNode?[source.Count];
         var i = 0;
         foreach (var item in source)
-        {
             // If the item is already a JsonNode, use it directly.
             if (item is JsonNode node)
                 array[i++] = node;
             else
-            {
                 // Otherwise, wrap the item in a JsonValue, or use null if the item is null.
                 array[i++] = item == null
                     ? null
                     : JsonValue.Create(item);
-            }
-        }
 
         return new JsonArray(array);
     }
-    
+
     /// <summary>
-    /// Clones each item in the given <see cref="JsonArray"/> using <see cref="JsonNode.DeepClone"/>.
+    ///     Clones each item in the given <see cref="JsonArray" /> using <see cref="JsonNode.DeepClone" />.
     /// </summary>
     /// <param name="array">The array to clone.</param>
-    /// <returns>An array of cloned <see cref="JsonNode"/> items.</returns>
+    /// <returns>An array of cloned <see cref="JsonNode" /> items.</returns>
     internal static JsonNode?[] ClonedItems(JsonArray array)
         => array.Select(n => n?.DeepClone()).ToArray();
 
@@ -60,19 +58,20 @@ internal static class JsonArrayHelper
         var cloned = raw.Select(r => r?.DeepClone()).ToArray();
         return new JsonArray(cloned);
     }
+
     /// <summary>
-    /// Returns a new <see cref="JsonArray"/> with the items in reverse order.
+    ///     Returns a new <see cref="JsonArray" /> with the items in reverse order.
     /// </summary>
     /// <param name="array">The array to reverse.</param>
-    /// <returns>A reversed <see cref="JsonArray"/>.</returns>
+    /// <returns>A reversed <see cref="JsonArray" />.</returns>
     internal static JsonArray Reverse(JsonArray array) => new(ClonedItems(array).Reverse().ToArray());
 
     /// <summary>
-    /// Rotates the items in the <see cref="JsonArray"/> to the left by the specified shift amount.
+    ///     Rotates the items in the <see cref="JsonArray" /> to the left by the specified shift amount.
     /// </summary>
     /// <param name="array">The array to rotate.</param>
     /// <param name="shift">The number of positions to shift.</param>
-    /// <returns>A rotated <see cref="JsonArray"/>.</returns>
+    /// <returns>A rotated <see cref="JsonArray" />.</returns>
     public static JsonNode RotateLeft(JsonArray array, long shift)
     {
         var count = array.Count;
@@ -98,17 +97,17 @@ internal static class JsonArrayHelper
     }
 
     /// <summary>
-    /// Sorts the items in the <see cref="JsonArray"/> in ascending or descending order.
+    ///     Sorts the items in the <see cref="JsonArray" /> in ascending or descending order.
     /// </summary>
     /// <param name="array">The array to sort.</param>
     /// <param name="ascending">True for ascending order, false for descending.</param>
-    /// <returns>A sorted <see cref="JsonArray"/>.</returns>
+    /// <returns>A sorted <see cref="JsonArray" />.</returns>
     public static JsonArray Sort(JsonArray array, bool ascending)
     {
         var count = array.Count;
         var ordering = Enumerable.Range(0, count).ToList();
         // Sort indices using a custom comparer.
-        ordering.Sort(new JsonArrayComparer(array, ascending: ascending));
+        ordering.Sort(new JsonArrayComparer(array, ascending));
 
         var result = new JsonNode?[count];
         for (var i = 0; i < count; i++)
@@ -122,7 +121,76 @@ internal static class JsonArrayHelper
     }
 
     /// <summary>
-    /// Compares items in a <see cref="JsonArray"/> by their values for sorting.
+    ///     Given a JsonNode and a target type, attempts to convert the JsonNode to the appropriate value for that type.
+    /// </summary>
+    public static object? ConvertJsonNodeToValueOfTargetType(JsonNode? node, TypeSymbol targetType)
+    {
+        if (node == null)
+            return null;
+
+        // Handle different target types
+        if (targetType == ScalarTypes.String)
+            return node.ToString();
+
+        if (targetType == ScalarTypes.Long)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<long>(out var longValue))
+                return longValue;
+
+        if (targetType == ScalarTypes.Int)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<int>(out var intValue))
+                return intValue;
+
+        if (targetType == ScalarTypes.Real)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<double>(out var doubleValue))
+                return doubleValue;
+        if (targetType == ScalarTypes.Decimal)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<decimal>(out var decimalValue))
+                return decimalValue;
+
+        if (targetType == ScalarTypes.Bool)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<bool>(out var boolValue))
+                return boolValue;
+        if (targetType == ScalarTypes.Guid)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<Guid>(out var guidValue))
+                return guidValue;
+
+        if (targetType == ScalarTypes.DateTime)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<DateTime>(out var dateTimeValue))
+                return dateTimeValue;
+
+        if (targetType == ScalarTypes.TimeSpan)
+            if (node is JsonValue jsonValue && jsonValue.TryGetValue<TimeSpan>(out var timespanValue))
+                return timespanValue;
+
+        if (targetType == ScalarTypes.Dynamic) return node;
+
+        // Default: return the node as-is
+        return node;
+    }
+
+    /// <summary>
+    ///     Convert a possible JsonArray to an object array of values of the target type.
+    /// </summary>
+    /// <remarks>
+    ///     If the input is NOT a JsonArray, it is treated as a raw value.
+    ///     This method has been designed to support the mv-expand operator and might be made more generic in the future.
+    /// </remarks>
+    public static object?[] ToObjectArrayOfType(object? cellValue, TypeSymbol targetType)
+    {
+        // Handle dynamic arrays
+        if (cellValue is JsonArray jsonArray)
+            return jsonArray.Select(element => ConvertJsonNodeToValueOfTargetType(element, targetType)).ToArray();
+        // Non-array values (including null) are treated as single-element arrays
+        //note that the semantics are a little fuzzy for non-array stuff - not sure whether non-dynamic values
+        //should return as null (if, indeed, they can ever be passed)
+        if (cellValue is JsonNode node)
+            return [ConvertJsonNodeToValueOfTargetType(node, targetType)];
+        return [cellValue];
+    }
+
+
+    /// <summary>
+    ///     Compares items in a <see cref="JsonArray" /> by their values for sorting.
     /// </summary>
     private class JsonArrayComparer : IComparer<int>
     {
@@ -130,7 +198,7 @@ internal static class JsonArrayHelper
         private readonly bool _ascending;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JsonArrayComparer"/> class.
+        ///     Initializes a new instance of the <see cref="JsonArrayComparer" /> class.
         /// </summary>
         /// <param name="array">The array to compare items from.</param>
         /// <param name="ascending">True for ascending order, false for descending.</param>
@@ -141,7 +209,7 @@ internal static class JsonArrayHelper
         }
 
         /// <summary>
-        /// Compares two items by their index in the array.
+        ///     Compares two items by their index in the array.
         /// </summary>
         public int Compare(int x, int y)
         {
@@ -149,28 +217,19 @@ internal static class JsonArrayHelper
             var b = _array[y];
 
             // If both are JsonValue, compare their values.
-            if (a is JsonValue valueA && b is JsonValue valueB)
-            {
-                return CompareValues(valueA, valueB);
-            }
+            if (a is JsonValue valueA && b is JsonValue valueB) return CompareValues(valueA, valueB);
 
             // JsonValue is considered less than other types.
-            if (a is JsonValue)
-            {
-                return -1;
-            }
+            if (a is JsonValue) return -1;
 
-            if (b is JsonValue)
-            {
-                return 1;
-            }
+            if (b is JsonValue) return 1;
 
             // If neither is JsonValue, treat as equal.
             return 0;
         }
 
         /// <summary>
-        /// Compares two <see cref="JsonValue"/> objects.
+        ///     Compares two <see cref="JsonValue" /> objects.
         /// </summary>
         private int CompareValues(JsonValue a, JsonValue b)
         {
@@ -189,28 +248,16 @@ internal static class JsonArrayHelper
                     return _ascending ? v : -v;
                 }
 
-                if (!double.IsNaN(dA))
-                {
-                    return -1;
-                }
+                if (!double.IsNaN(dA)) return -1;
 
-                if (!double.IsNaN(dB))
-                {
-                    return 1;
-                }
+                if (!double.IsNaN(dB)) return 1;
 
                 return 0;
             }
 
-            if (isDoubleA)
-            {
-                return -1;
-            }
+            if (isDoubleA) return -1;
 
-            if (isDoubleB)
-            {
-                return 1;
-            }
+            if (isDoubleB) return 1;
 
             // Compare as strings if possible.
             var isStringA = vA is string;
@@ -221,15 +268,9 @@ internal static class JsonArrayHelper
                 return _ascending ? v : -v;
             }
 
-            if (isStringA)
-            {
-                return -1;
-            }
+            if (isStringA) return -1;
 
-            if (isStringB)
-            {
-                return 1;
-            }
+            if (isStringB) return 1;
 
             // TODO: Sort guids, but we don't support them now...
             return 0;
@@ -239,7 +280,6 @@ internal static class JsonArrayHelper
             {
                 var result = value.GetValue<object?>();
                 if (result is JsonElement jsonElement)
-                {
                     switch (jsonElement.ValueKind)
                     {
                         case JsonValueKind.Number:
@@ -256,7 +296,6 @@ internal static class JsonArrayHelper
                         case JsonValueKind.Undefined:
                             return null;
                     }
-                }
 
                 return result;
             }
@@ -289,5 +328,3 @@ internal static class JsonArrayHelper
         }
     }
 }
-
-
