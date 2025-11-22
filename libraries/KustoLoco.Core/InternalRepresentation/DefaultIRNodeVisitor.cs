@@ -117,6 +117,16 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
         VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context) =>
         DefaultVisit(node, context);
 
+    public override TResult VisitRangeOperator(IRRangeOperatorNode node, TContext context) =>
+        DefaultVisit(node, context);
 
+    public override TResult VisitStarExpression(IRStarExpression node, TContext context) =>
+        DefaultVisit(node, context);
+
+    public override TResult VisitMemberAccess(IRArrayAccessNode node, TContext context) =>
+        DefaultVisit(node, context);
+
+    public override TResult VisitMvExpandOperator(IRMvExpandOperatorNode node, TContext context) =>
+        DefaultVisit(node, context);
 
 }

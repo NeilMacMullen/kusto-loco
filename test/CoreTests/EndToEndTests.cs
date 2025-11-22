@@ -4107,4 +4107,157 @@ aaathis is a test";
         // Act & Assert
         Test(query, expected);
     }
+
+    [Fact]
+    public void MvExpand_BasicDynamicArray()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string, tags:dynamic) 
+[
+    'Alice', dynamic([""tag1"", ""tag2"", ""tag3""]),
+    'Bob', dynamic([""tag4"", ""tag5""])
+]
+| mv-expand tags
+";
+
+        var expected = @"
+name:string; tags:dynamic
+------------------
+Alice; ""tag1""
+Alice; ""tag2""
+Alice; ""tag3""
+Bob; ""tag4""
+Bob; ""tag5""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithNumericArray()
+    {
+        // Arrange
+        var query = @"
+datatable(id:long, values:dynamic) 
+[
+    1, dynamic([10, 20, 30]),
+    2, dynamic([40])
+]
+| mv-expand values
+";
+
+        var expected = @"
+id:long; values:dynamic
+------------------
+1; 10
+1; 20
+1; 30
+2; 40
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithNullValues()
+    {
+        // Arrange
+        var query = @"
+datatable(name:string, tags:dynamic) 
+[
+    'Alice', dynamic([""tag1"", ""tag2""]),
+    'Bob', dynamic(null)
+]
+| mv-expand tags
+";
+
+        var expected = @"
+name:string; tags:dynamic
+------------------
+Alice; ""tag1""
+Alice; ""tag2""
+Bob; (null)
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_MixedArrayTypes()
+    {
+        // Arrange - From Microsoft docs: Single column - array expansion with mixed types
+        var query = @"
+datatable (a: int, b: dynamic)
+[
+    1, dynamic([10, 20]),
+    2, dynamic([""a"", ""b""])
+]
+| mv-expand b
+";
+
+        var expected = @"
+a:long; b:dynamic
+------------------
+1; 10
+1; 20
+2; ""a""
+2; ""b""
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_BagExpansion()
+    {
+        // Arrange - From Microsoft docs: Single column - bag expansion
+        var query = @"
+datatable (a: int, b: dynamic)
+[
+    1, dynamic({'prop1': 'a1', 'prop2': 'b1'}),
+    2, dynamic({'prop1': 'a2', 'prop2': 'b2'})
+]
+| mv-expand b
+";
+
+        var expected = @"
+a:long; b:dynamic
+------------------
+1; {""prop1"":""a1""}
+1; {""prop2"":""b1""}
+2; {""prop1"":""a2""}
+2; {""prop2"":""b2""}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MvExpand_WithItemIndex()
+    {
+        // Arrange - From Microsoft docs: Using with_itemindex
+        var query = @"
+range x from 1 to 4 step 1
+| summarize x = make_list(x)
+| mv-expand with_itemindex=Index x
+";
+
+        var expected = @"
+x:dynamic; Index:long
+------------------
+1; 0
+2; 1
+3; 2
+4; 3
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
 }

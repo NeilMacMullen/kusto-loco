@@ -48,5 +48,6 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node, TContext context);
     public abstract TResult VisitRangeOperator(IRRangeOperatorNode node, TContext context);
     public abstract TResult VisitStarExpression(IRStarExpression node, TContext context);
+    public abstract TResult VisitMvExpandOperator(IRMvExpandOperatorNode node, TContext context);
 
 }
