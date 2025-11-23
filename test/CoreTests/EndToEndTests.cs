@@ -627,6 +627,107 @@ a:dynamic; b:dynamic
     }
 
     [Fact]
+    public void MakeListWithNulls_BasicExample()
+    {
+        // Arrange - From Microsoft docs: make_list_with_nulls example
+        var query = @"
+datatable(Fruit:string, Color:string, Quantity:int)
+[
+    'Apple', 'Red', 5,
+    'Banana', '', 3,
+    'Cherry', 'Red', int(null),
+]
+| summarize Colors = make_list_with_nulls(Color), Quantities = make_list_with_nulls(Quantity)
+";
+
+        var expected = @"
+Colors:dynamic; Quantities:dynamic
+------------------
+[""Red"","""",""Red""]; [5,3,null]
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeList_WithDynamic()
+    {
+        // Arrange - Test make_list with dynamic values
+        var query = @"
+datatable(value:dynamic)
+[
+    dynamic({'a':1}),
+    dynamic({'b':2}),
+    dynamic([1,2,3]),
+]
+| summarize result = make_list(value)
+";
+
+        var expected = @"
+result:dynamic
+------------------
+[{""a"":1},{""b"":2},[1,2,3]]
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeSet_FromMicrosoftDocs()
+    {
+        // Arrange - From Microsoft docs: make_set example
+        var query = @"
+datatable(Region:string, Sales:int)
+[
+    'North', 150,
+    'North', 200,
+    'South', 100,
+    'West', 150,
+    'South', 100,
+]
+| summarize UniqueSalesAmounts = make_set(Sales)
+| project UniqueSalesAmounts = array_sort_asc(UniqueSalesAmounts)
+";
+
+        var expected = @"
+UniqueSalesAmounts:dynamic
+------------------
+[100,150,200]
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeSetIf_FromMicrosoftDocs()
+    {
+        // Arrange - From Microsoft docs: make_set_if example
+        var query = @"
+datatable(Region:string, Sales:int)
+[
+    'North', 150,
+    'North', 200,
+    'South', 100,
+    'West', 150,
+]
+| summarize HighSales = make_set_if(Sales, Sales > 100)
+| project HighSales = array_sort_asc(HighSales)
+";
+
+        var expected = @"
+HighSales:dynamic
+------------------
+[150,200]
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
     public void BuiltInAggregates_dcount_Int()
     {
         // Arrange
@@ -4255,6 +4356,134 @@ x:dynamic; Index:long
 2; 1
 3; 2
 4; 3
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void BuildSchema_BasicExample()
+    {
+        // Arrange - From Microsoft docs: buildschema basic example
+        var query = @"
+datatable(value: dynamic)
+[
+    dynamic({'x':1, 'y':3.5}),
+    dynamic({'x':'somevalue', 'z':[1, 2, 3]}),
+    dynamic({'y':{'w':'zzz'}, 't':['aa', 'bb'], 'z':['foo']})
+]
+| summarize schema_value = buildschema(value)
+";
+
+        // Note: The exact schema format might vary, but should contain the merged schema
+        // This test may need to be marked as skipped if the exact output format differs
+        var expected = @"
+schema_value:dynamic
+------------------
+{""x"":[""long"",""string""],""y"":[""double"",{""w"":""string""}],""z"":{""indexer"":[""long"",""string""]},""t"":{""indexer"":""string""}}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeBag_BasicExample()
+    {
+        // Arrange - From Microsoft docs: make_bag basic example
+        var query = @"
+datatable(prop:string, value:string)
+[
+    'prop01', 'val_a',
+    'prop02', 'val_b',
+    'prop03', 'val_c',
+]
+| extend p = bag_pack(prop, value)
+| summarize dict = make_bag(p)
+";
+
+        var expected = @"
+dict:dynamic
+------------------
+{""prop01"":""val_a"",""prop02"":""val_b"",""prop03"":""val_c""}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeBag_WithMaxSize()
+    {
+        // Arrange - Test make_bag with maxSize parameter
+        var query = @"
+datatable(prop:string, value:string)
+[
+    'prop01', 'val_a',
+    'prop02', 'val_b',
+    'prop03', 'val_c',
+]
+| extend p = bag_pack(prop, value)
+| summarize dict = make_bag(p, 2)
+";
+
+        // Note: Exact keys included depend on which ones are encountered first
+        // This test verifies that maxSize is respected (only 2 keys)
+        var expected = @"
+dict:dynamic
+------------------
+{""prop01"":""val_a"",""prop02"":""val_b""}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeBagIf_BasicExample()
+    {
+        // Arrange - From Microsoft docs: make_bag_if basic example
+        var query = @"
+datatable(prop:string, value:string, predicate:bool)
+[
+    'prop01', 'val_a', true,
+    'prop02', 'val_b', false,
+    'prop03', 'val_c', true
+]
+| extend p = bag_pack(prop, value)
+| summarize dict = make_bag_if(p, predicate)
+";
+
+        var expected = @"
+dict:dynamic
+------------------
+{""prop01"":""val_a"",""prop03"":""val_c""}
+";
+
+        // Act & Assert
+        Test(query, expected);
+    }
+
+    [Fact]
+    public void MakeBagIf_WithMaxSize()
+    {
+        // Arrange - Test make_bag_if with maxSize parameter
+        var query = @"
+datatable(prop:string, value:string, predicate:bool)
+[
+    'prop01', 'val_a', true,
+    'prop02', 'val_b', true,
+    'prop03', 'val_c', true,
+]
+| extend p = bag_pack(prop, value)
+| summarize dict = make_bag_if(p, predicate, 2)
+";
+
+        var expected = @"
+dict:dynamic
+------------------
+{""prop01"":""val_a"",""prop02"":""val_b""}
 ";
 
         // Act & Assert
