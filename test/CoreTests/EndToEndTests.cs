@@ -657,8 +657,8 @@ Colors:dynamic; Quantities:dynamic
         var query = @"
 datatable(value:dynamic)
 [
-    dynamic({'a':1}),
-    dynamic({'b':2}),
+    dynamic({""a"":1}),
+    dynamic({""b"":2}),
     dynamic([1,2,3]),
 ]
 | summarize result = make_list(value)
@@ -4369,9 +4369,9 @@ x:dynamic; Index:long
         var query = @"
 datatable(value: dynamic)
 [
-    dynamic({'x':1, 'y':3.5}),
-    dynamic({'x':'somevalue', 'z':[1, 2, 3]}),
-    dynamic({'y':{'w':'zzz'}, 't':['aa', 'bb'], 'z':['foo']})
+    dynamic({""x"":1, ""y"":3.5}),
+    dynamic({""x"":""somevalue"", ""z"":[1, 2, 3]}),
+    dynamic({""y"":{""w"":""zzz""}, ""t"":[""aa"", ""bb""], ""z"":[""foo""]})
 ]
 | summarize schema_value = buildschema(value)
 ";

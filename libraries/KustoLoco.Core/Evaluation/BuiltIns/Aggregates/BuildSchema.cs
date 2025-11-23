@@ -63,7 +63,7 @@ internal class BuildSchemaFunctionImpl : IAggregateImpl
     private static object InferType(JsonNode? value)
     {
         if (value == null)
-            return "object"; // null is considered as generic object
+            return "object"; // null values are treated as generic object type in schema
 
         return value switch
         {
@@ -220,7 +220,7 @@ internal class BuildSchemaFunctionImpl : IAggregateImpl
         return typeObj switch
         {
             string str => JsonValue.Create(str),
-            List<string> list => new JsonArray(list.Select(s => JsonValue.Create(s)).ToArray()),
+            List<string> list => new JsonArray(list.Select(s => JsonValue.Create(s)).ToArray<JsonNode>()),
             Dictionary<string, object> dict => ConvertSchemaToJsonNode(dict),
             _ => JsonValue.Create("object")
         };
