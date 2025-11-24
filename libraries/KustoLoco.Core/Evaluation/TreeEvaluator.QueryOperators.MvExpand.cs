@@ -91,13 +91,17 @@ internal partial class TreeEvaluator
             var outputColumns = new BaseColumn[chunk.Columns.Length];
 
             for (var colIndex = 0; colIndex < chunk.Columns.Length; colIndex++)
+            {
+                var colName = Type.Columns[colIndex].Name;
+                var currentColumn = chunk.Columns[colIndex];
                 // Check if this is the expanded column
-                if (outputColSymbol.Name == expandColumn.ColumnSymbol.Name)
+                if (colName == expandColumn.ColumnSymbol.Name)
                     // Create column with expanded values
                     outputColumns[colIndex] = ColumnFactory.CreateFromDataSet(builder.ToINullableSet());
                 else
                     // For other columns, duplicate the values from the source rows
-                    outputColumns[colIndex] = ColumnHelpers.MapColumn(sourceColumn, finalIndices);
+                    outputColumns[colIndex] = ColumnHelpers.MapColumn(currentColumn, finalIndices);
+            }
 
             return (default, new TableChunk(this, outputColumns), false);
         }
