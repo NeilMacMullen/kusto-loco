@@ -38,11 +38,14 @@ public abstract class TestMethods
     protected async Task<string> SquashedLastLineOfResult(string query)
     {
         var raw = await LastLineOfResult(query);
-        return raw.ReplaceLineEndings("").Replace(" ", "");
+        return Squash(raw);
     }
 
+    protected static string Squash(string raw) => raw.ReplaceLineEndings("").Replace(" ", "");
     protected  Task<string> ResultAsLines(string query)
         => ResultAsString(query, Environment.NewLine);
+
+
     protected async Task<string> ResultAsString(string query,string lineSeparator=",")
     {
         var result = await Result(query);
