@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>12</LangVersion>
@@ -38,8 +38,11 @@
     <PackageReference Include="geohash-dotnet" />
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
     <PackageReference Include="NotNullStrings" />
-    <PackageReference Include="System.Linq.AsyncEnumerable" />
     <PackageReference Include="T-Digest.NET" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="System.Linq.Async" />
   </ItemGroup>
 
   <ItemGroup>

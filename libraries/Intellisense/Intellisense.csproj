@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -15,12 +15,15 @@
       <PackageReference Include="Microsoft.Extensions.Logging" />
       <PackageReference Include="NotNullStrings" />
       <PackageReference Include="System.CommandLine" />
-      <PackageReference Include="System.Linq.AsyncEnumerable" />
       <PackageReference Include="TestableIO.System.IO.Abstractions" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
       <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
       <PackageReference Include="Vanara.Core" />
       <PackageReference Include="Vanara.PInvoke.NetApi32" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+      <PackageReference Include="System.Linq.Async" />
     </ItemGroup>
 
 </Project>

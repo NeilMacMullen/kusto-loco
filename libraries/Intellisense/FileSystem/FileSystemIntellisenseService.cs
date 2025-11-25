@@ -31,7 +31,11 @@ public class FileSystemIntellisenseService(
 
         return await Task
             .WhenEach(tasks)
+#if NET10_0_OR_GREATER
             .Select(async (Task<CompletionResult> x, CancellationToken _) => await x)
+#else
+            .SelectAwait(async x => await x)
+#endif
             .Where(x => !x.IsEmpty())
             .FirstOrDefaultAsync() ?? CompletionResult.Empty;
     }
