@@ -38,7 +38,7 @@
     <PackageReference Include="geohash-dotnet" />
     <PackageReference Include="Microsoft.Azure.Kusto.Language" />
     <PackageReference Include="NotNullStrings" />
-    <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Linq.AsyncEnumerable" />
     <PackageReference Include="T-Digest.NET" />
   </ItemGroup>
 
