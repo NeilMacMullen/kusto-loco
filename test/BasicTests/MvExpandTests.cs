@@ -228,4 +228,27 @@ public class MvExpandTests : TestMethods
         var result = await ResultAsLines(query);
         Squash(result).Should().Be(expected);
     }
+
+    [TestMethod]
+    public async Task MvExpand_WithAlias()
+    {
+        // Test mv-expand with alias syntax: mv-expand alias = column
+        // When using an alias, the original column is preserved and a new column with the alias is created
+        var query = """
+                    datatable(id: long, values: dynamic)
+                    [
+                        1, dynamic([10, 20, 30])
+                    ]
+                    | mv-expand expandedValue = values
+                    """;
+
+        var expected = Squash("""
+                       1,[10,20,30],10
+                       1,[10,20,30],20
+                       1,[10,20,30],30
+                       """);
+
+        var result = await ResultAsLines(query);
+        Squash(result).Should().Be(expected);
+    }
 }

@@ -22,8 +22,15 @@ internal partial class IRTranslator
             
             if (expression is MvExpandExpression mvExpandExpr)
             {
+                // Get the actual expression being expanded (unwrap SimpleNamedExpression if present)
+                var actualExpression = mvExpandExpr.Expression;
+                if (actualExpression is SimpleNamedExpression namedExpr)
+                {
+                    actualExpression = namedExpr.Expression;
+                }
+                
                 // Get the column being expanded
-                var irExpression = (IRExpressionNode)mvExpandExpr.Expression.Accept(this);
+                var irExpression = (IRExpressionNode)actualExpression.Accept(this);
                 
                 // Find the corresponding column in the result type
                 // The expanded column will be in the result type
@@ -31,6 +38,7 @@ internal partial class IRTranslator
                 ColumnSymbol? expandedColumn = null;
                 
                 // Build the expected column name based on the expression type
+                // For aliased expressions (alias = column), use the alias name
                 var expectedColName = GetExpandedColumnName(mvExpandExpr.Expression);
                 
                 // Look for the column in the result type that corresponds to this expansion
@@ -58,11 +66,18 @@ internal partial class IRTranslator
 
     /// <summary>
     /// Gets the expected column name for an mv-expand expression.
+    /// For aliased expressions (alias = column), returns the alias name.
     /// For simple columns, this is the column name.
     /// For path expressions (e.g., properties.ipConfigurations), this is the path with dots replaced by underscores.
     /// </summary>
     private static string GetExpandedColumnName(Expression expression)
     {
+        // Handle aliased expressions: alias = column
+        if (expression is SimpleNamedExpression namedExpr)
+        {
+            return namedExpr.Name.SimpleName;
+        }
+        
         if (expression is NameReference nameRef)
         {
             return nameRef.SimpleName;
