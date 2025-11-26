@@ -205,4 +205,27 @@ public class MvExpandTests : TestMethods
         var result = await ResultAsLines(query);
         result.Should().Be(expected);
     }
+
+    [TestMethod]
+    public async Task MvExpand_NestedDynamic()
+    {
+        // Test mv-expand on a nested dynamic property (e.g. properties.ipConfigurations)
+        var query = """
+                    datatable(id: long, properties: dynamic)
+                    [
+                        1, dynamic({"ipConfigurations": [{"name": "config1"}, {"name": "config2"}]}),
+                        2, dynamic({"ipConfigurations": [{"name": "config3"}]})
+                    ]
+                    | mv-expand properties.ipConfigurations
+                    """;
+
+        var expected = Squash("""
+                       1,{"ipConfigurations":[{"name":"config1"},{"name":"config2"}]},{"name":"config1"}
+                       1,{"ipConfigurations":[{"name":"config1"},{"name":"config2"}]},{"name":"config2"}
+                       2,{"ipConfigurations":[{"name":"config3"}]},{"name":"config3"}
+                       """);
+
+        var result = await ResultAsLines(query);
+        Squash(result).Should().Be(expected);
+    }
 }

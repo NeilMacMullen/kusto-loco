@@ -102,8 +102,9 @@ internal partial class TreeEvaluator
             var finalIndices = expandedIndices.ToImmutableArray();
 
             // Build output columns
-            // The output schema should match the input schema (same columns, same order)
-            var outputColumns = new BaseColumn[chunk.Columns.Length];
+            // The output schema may have more columns than the input (e.g., when expanding nested paths
+            // like properties.ipConfigurations creates a new column properties_ipConfigurations)
+            var outputColumns = new BaseColumn[Type.Columns.Count];
 
             // Build a map of expanded column names to their builders
             var expandedColumnBuilders = new Dictionary<string, INullableSetBuilder>();
@@ -112,18 +113,35 @@ internal partial class TreeEvaluator
                 expandedColumnBuilders[expandedColumnData[i].Column.ColumnSymbol.Name] = builders[i];
             }
 
-            for (var colIndex = 0; colIndex < chunk.Columns.Length; colIndex++)
+            // Build a map from input chunk column names to column indices
+            var inputColumnMap = new Dictionary<string, int>();
+            for (var i = 0; i < chunk.Columns.Length; i++)
+            {
+                // Get the column name from the input table schema
+                var inputColName = Source.Type.Columns[i].Name;
+                inputColumnMap[inputColName] = i;
+            }
+
+            for (var colIndex = 0; colIndex < Type.Columns.Count; colIndex++)
             {
                 var colName = Type.Columns[colIndex].Name;
-                var currentColumn = chunk.Columns[colIndex];
                 
                 // Check if this is one of the expanded columns
                 if (expandedColumnBuilders.TryGetValue(colName, out var builder))
+                {
                     // Create column with expanded values
                     outputColumns[colIndex] = ColumnFactory.CreateFromDataSet(builder.ToINullableSet());
+                }
+                else if (inputColumnMap.TryGetValue(colName, out var inputColIndex))
+                {
+                    // For columns from the input, duplicate the values from the source rows
+                    outputColumns[colIndex] = ColumnHelpers.MapColumn(chunk.Columns[inputColIndex], finalIndices);
+                }
                 else
-                    // For other columns, duplicate the values from the source rows
-                    outputColumns[colIndex] = ColumnHelpers.MapColumn(currentColumn, finalIndices);
+                {
+                    // This shouldn't happen - the column should either be expanded or from input
+                    throw new InvalidOperationException($"Column '{colName}' not found in input or expanded columns");
+                }
             }
 
             return (default, new TableChunk(this, outputColumns), false);

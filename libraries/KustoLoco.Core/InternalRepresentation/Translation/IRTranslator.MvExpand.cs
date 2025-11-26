@@ -30,20 +30,18 @@ internal partial class IRTranslator
                 var resultType = (TableSymbol)node.ResultType;
                 ColumnSymbol? expandedColumn = null;
                 
+                // Build the expected column name based on the expression type
+                var expectedColName = GetExpandedColumnName(mvExpandExpr.Expression);
+                
                 // Look for the column in the result type that corresponds to this expansion
                 foreach (var member in resultType.Members)
                 {
                     if (member is ColumnSymbol colSymbol)
                     {
-                        // The expanded column typically has the same name as the expression
-                        // or is specified in the MvExpandExpression
-                        if (mvExpandExpr.Expression is NameReference nameRef)
+                        if (colSymbol.Name == expectedColName)
                         {
-                            if (colSymbol.Name == nameRef.SimpleName)
-                            {
-                                expandedColumn = colSymbol;
-                                break;
-                            }
+                            expandedColumn = colSymbol;
+                            break;
                         }
                     }
                 }
@@ -56,5 +54,47 @@ internal partial class IRTranslator
         }
         
         return new IRMvExpandOperatorNode(columns, node.ResultType);
+    }
+
+    /// <summary>
+    /// Gets the expected column name for an mv-expand expression.
+    /// For simple columns, this is the column name.
+    /// For path expressions (e.g., properties.ipConfigurations), this is the path with dots replaced by underscores.
+    /// </summary>
+    private static string GetExpandedColumnName(Expression expression)
+    {
+        if (expression is NameReference nameRef)
+        {
+            return nameRef.SimpleName;
+        }
+        else if (expression is PathExpression pathExpr)
+        {
+            // Build the full path name by collecting all parts
+            var parts = new List<string>();
+            CollectPathParts(pathExpr, parts);
+            return string.Join("_", parts);
+        }
+        
+        // Fallback to the expression text
+        return expression.ToString();
+    }
+
+    /// <summary>
+    /// Recursively collects the parts of a path expression.
+    /// </summary>
+    private static void CollectPathParts(Expression expression, List<string> parts)
+    {
+        if (expression is PathExpression pathExpr)
+        {
+            CollectPathParts(pathExpr.Expression, parts);
+            if (pathExpr.Selector is NameReference nameRef)
+            {
+                parts.Add(nameRef.SimpleName);
+            }
+        }
+        else if (expression is NameReference nameRef)
+        {
+            parts.Add(nameRef.SimpleName);
+        }
     }
 }
