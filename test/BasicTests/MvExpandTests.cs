@@ -232,20 +232,21 @@ public class MvExpandTests : TestMethods
     [TestMethod]
     public async Task MvExpand_WithAlias()
     {
-        // Test mv-expand with alias syntax: mv-expand alias = column
-        // When using an alias, the original column is preserved and a new column with the alias is created
+        // Test mv-expand with alias on a nested dynamic property
+        // Using an alias creates only one new column (the alias), not a properties_ipConfigurations column
         var query = """
-                    datatable(id: long, values: dynamic)
+                    datatable(id: long, properties: dynamic)
                     [
-                        1, dynamic([10, 20, 30])
+                        1, dynamic({"ipConfigurations": [{"name": "config1"}, {"name": "config2"}]}),
+                        2, dynamic({"ipConfigurations": [{"name": "config3"}]})
                     ]
-                    | mv-expand expandedValue = values
+                    | mv-expand ipConfig = properties.ipConfigurations
                     """;
 
         var expected = Squash("""
-                       1,[10,20,30],10
-                       1,[10,20,30],20
-                       1,[10,20,30],30
+                       1,{"ipConfigurations":[{"name":"config1"},{"name":"config2"}]},{"name":"config1"}
+                       1,{"ipConfigurations":[{"name":"config1"},{"name":"config2"}]},{"name":"config2"}
+                       2,{"ipConfigurations":[{"name":"config3"}]},{"name":"config3"}
                        """);
 
         var result = await ResultAsLines(query);
