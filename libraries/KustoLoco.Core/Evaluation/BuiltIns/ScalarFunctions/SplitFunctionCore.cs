@@ -99,7 +99,15 @@ internal class SplitWithIndexFunctionImpl : IScalarFunctionImpl
         if (requestedIndex is null) return null;
 
         var toks = source.Split(delimiter);
-        var index = (int)requestedIndex.Value;
+        var indexValue = requestedIndex.Value;
+
+        // Handle overflow - if index is too large/small, it will be out of range anyway
+        if (indexValue > int.MaxValue || indexValue < int.MinValue)
+        {
+            return string.Empty;
+        }
+
+        var index = (int)indexValue;
 
         // Handle negative indices (from the end of the array)
         if (index < 0)
