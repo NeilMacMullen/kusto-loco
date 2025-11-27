@@ -110,6 +110,14 @@ datatable(Size:int) [50]
         result.Should().Be("part");
     }
 
+    [TestMethod]
+    public async Task SplitWithRequestedIndex()
+    {
+        var query = """print split("aaa_bbb_ccc", "_", 1)""";
+        var result = await LastLineOfResult(query);
+        result.Should().Be("bbb");
+    }
+
 
     [TestMethod]
     public async Task ToLower()
