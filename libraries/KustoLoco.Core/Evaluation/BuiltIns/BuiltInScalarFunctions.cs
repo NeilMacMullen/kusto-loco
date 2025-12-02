@@ -308,5 +308,8 @@ internal static class BuiltInScalarFunctions
         UrlEncodeFunction.Register(Functions);
         RegexQuoteFunction.Register(Functions);
         RepeatFunction.Register(Functions);
+
+        BagPackFunction.Register(Functions);
+        Functions.Add(Kusto.Language.Functions.Pack, BagPackFunction.S); // pack() is an alias for bag_pack()
     }
 }
