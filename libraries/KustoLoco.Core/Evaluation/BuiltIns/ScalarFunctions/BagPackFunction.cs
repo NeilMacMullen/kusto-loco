@@ -7,9 +7,10 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 /// <summary>
 /// Implements the bag_pack (also known as pack) function.
-/// Creates a dynamic object (property bag) from a list of keys and values.
-/// Syntax: bag_pack(key1, value1, key2, value2, ...)
-/// Note: pack() and pack_dictionary() are deprecated aliases of bag_pack()
+/// Creates a dynamic object (property bag) from a key-value pair.
+/// Note: The full Kusto bag_pack supports multiple key-value pairs (bag_pack(key1, value1, key2, value2, ...)),
+/// but this implementation currently supports a single key-value pair which is sufficient for common use cases.
+/// pack() and pack_dictionary() are deprecated aliases of bag_pack()
 /// </summary>
 [KustoImplementation(Keyword = "Functions.BagPack")]
 internal partial class BagPackFunction
