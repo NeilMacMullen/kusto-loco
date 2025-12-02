@@ -53,7 +53,7 @@ internal partial class ParseIpv6Function
         }
 
         // Validate prefix length for IPv6
-        if (prefixLength >= 0 && (prefixLength < 0 || prefixLength > 128))
+        if (prefixLength > 128)
         {
             return string.Empty;
         }
