@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Kusto.Language.Symbols;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
@@ -180,6 +181,16 @@ internal static class JsonArrayHelper
         // Handle dynamic arrays
         if (cellValue is JsonArray jsonArray)
             return jsonArray.Select(element => ConvertJsonNodeToValueOfTargetType(element, targetType)).ToArray();
+
+        // Handle dictionary objects (JsonObject)
+        if (cellValue is JsonObject jsonObject)
+            return jsonObject
+                .Select(kvp => (object?) new JsonObject
+                {
+                    [kvp.Key] = kvp.Value?.DeepClone()
+                        })
+                .ToArray();
+
         // Non-array values (including null) are treated as single-element arrays
         //note that the semantics are a little fuzzy for non-array stuff - not sure whether non-dynamic values
         //should return as null (if, indeed, they can ever be passed)

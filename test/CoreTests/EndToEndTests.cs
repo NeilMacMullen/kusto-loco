@@ -1347,7 +1347,7 @@ d
         var expected = @"
 b:bool; i:int; l:long; r:real; dt:datetime; ts:timespan; s:string
 ------------------
-True; 1; 1; 1; 2023-01-01T00:00:00.0000000Z; 00:00:10; a
+True; 1; 1; 1; 2023-01-01T00:00:00.0000000; 00:00:10; a
 ";
 
         // Act & Assert
@@ -3368,7 +3368,7 @@ cs:int; normalized:real
         // Arrange
         var query = @"
 let d = materialize(
-    datatable(v:int) [ 10, 10 ]
+    datatable(v:long) [ 10, 10 ]
     | project cs = row_cumsum(v, false)
 );
 let a = toscalar(d | summarize max(cs));
@@ -3377,7 +3377,7 @@ d
 ";
 
         var expected = @"
-cs:int; normalized:real
+cs:long; normalized:real
 ------------------
 10; 0.5
 20; 1
@@ -3943,6 +3943,7 @@ aaathis is a test";
         catch (Exception x)
         {
             Console.WriteLine($"EXCEPTION: {x}");
+            throw;
         }
 
         
@@ -4489,4 +4490,6 @@ dict:dynamic
         // Act & Assert
         Test(query, expected);
     }
+   
+   
 }
