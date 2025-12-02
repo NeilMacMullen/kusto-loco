@@ -189,6 +189,8 @@ internal static class BuiltInScalarFunctions
         IsEmptyFunction.Register(Functions);
         IsNotEmptyFunction.Register(Functions);
         Ipv4IsPrivateFunction.Register(Functions);
+        ParseIpv4Function.Register(Functions);
+        ParseIpv6Function.Register(Functions);
         IsAsciiFunction.Register(Functions);
         IsFiniteFunction.Register(Functions);
         IsInfFunction.Register(Functions);
