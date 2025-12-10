@@ -609,6 +609,34 @@ d | project Type='v1',Val=v1
     }
 
     [TestMethod]
+    public async Task ParseIpv4()
+    {
+        // Examples from Microsoft docs: https://learn.microsoft.com/en-us/kusto/query/parse-ipv4-function
+        (await LastLineOfResult("print parse_ipv4('192.168.1.1')")).Should().Be("3232235777");
+        (await LastLineOfResult("print parse_ipv4('192.168.1.1/24')")).Should().Be("3232235776");
+        (await LastLineOfResult("print parse_ipv4('255.255.255.255/31')")).Should().Be("4294967294");
+
+        // Invalid input should return null
+        (await LastLineOfResult("print parse_ipv4('invalid')")).Should().Contain("null");
+    }
+
+    [TestMethod]
+    public async Task ParseIpv6()
+    {
+        // Examples from Microsoft docs: https://learn.microsoft.com/en-us/kusto/query/parse-ipv6-function
+        // IPv4 addresses are converted to IPv6-mapped format
+        (await LastLineOfResult("print parse_ipv6('192.168.255.255')")).Should().Be("0000:0000:0000:0000:0000:ffff:c0a8:ffff");
+        (await LastLineOfResult("print parse_ipv6('192.168.255.255/24')")).Should().Be("0000:0000:0000:0000:0000:ffff:c0a8:ff00");
+        (await LastLineOfResult("print parse_ipv6('255.255.255.255')")).Should().Be("0000:0000:0000:0000:0000:ffff:ffff:ffff");
+
+        // IPv6 address
+        (await LastLineOfResult("print parse_ipv6('fe80::85d:e82c:9446:7994')")).Should().Be("fe80:0000:0000:0000:085d:e82c:9446:7994");
+
+        // Invalid input should return empty string
+        (await LastLineOfResult("print parse_ipv6('invalid')")).Should().Be("");
+    }
+
+    [TestMethod]
     public async Task IsAscii()
     {
         var query = "print isascii('blahhh')";
