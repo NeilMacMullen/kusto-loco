@@ -139,7 +139,17 @@ internal static class BuiltInScalarFunctions
                 new ScalarOverloadInfo(new SplitFunctionImpl(),
                     ScalarTypes.DynamicArrayOfString,
                     ScalarTypes.String,
-                    ScalarTypes.String)));
+                    ScalarTypes.String),
+                new ScalarOverloadInfo(new SplitWithIndexFunctionImpl(),
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.String,
+                    ScalarTypes.String,
+                    ScalarTypes.Long),
+                new ScalarOverloadInfo(new SplitWithIndexFunctionImpl(),
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.String,
+                    ScalarTypes.Dynamic)));
 
         ScalarOverloadInfo[] BuildOverloads(IScalarFunctionImpl func, TypeSymbol t)
         {
