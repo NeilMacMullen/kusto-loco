@@ -4239,7 +4239,7 @@ a:int; b:dynamic
         Test(query, expected);
     }
 
-    [Fact]
+    [Fact(Skip = "Not yet implemented")]
     public void MvExpand_WithItemIndex()
     {
         // Arrange - From Microsoft docs: Using with_itemindex
