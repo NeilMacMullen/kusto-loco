@@ -113,6 +113,16 @@ public class SerializeTests
         var roundTripped = await _kustoResultSerializer.Deserialize(dto);
         CheckResultEquivalency(roundTripped, result);
     }
+    [TestMethod]
+    public async Task SerialiseNull()
+    {
+        var result = await Query("print int(null)");
+        var dto = await _kustoResultSerializer.Serialize(result);
+        var roundTripped = await _kustoResultSerializer.Deserialize(dto);
+        CheckResultEquivalency(roundTripped, result);
+    }
+
+
     private void CheckResultEquivalency(KustoQueryResult roundTripped, KustoQueryResult expected)
     {
         roundTripped.ColumnCount.Should().Be(expected.ColumnCount);
