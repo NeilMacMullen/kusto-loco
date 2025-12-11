@@ -361,6 +361,31 @@ internal static class BuiltInAggregates
                 new AggregateOverloadInfo(new MakeListWithNullsStringFunctionImpl(),
                     ScalarTypes.Dynamic,
                     ScalarTypes.String)));
+
+        Aggregates.Add(
+            Kusto.Language.Aggregates.BuildSchema,
+            new AggregateInfo(
+                new AggregateOverloadInfo(new BuildSchemaFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic)));
+
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeBag,
+            new AggregateInfo(
+                new AggregateOverloadInfo(new MakeBagFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic),
+                new AggregateOverloadInfo(new MakeBagFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.Long)));
+
+        Aggregates.Add(
+            Kusto.Language.Aggregates.MakeBagIf,
+            new AggregateInfo(
+                new AggregateOverloadInfo(new MakeBagIfFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.Bool),
+                new AggregateOverloadInfo(new MakeBagIfFunctionImpl(), ScalarTypes.Dynamic,
+                    ScalarTypes.Dynamic,
+                    ScalarTypes.Bool, ScalarTypes.Long)));
     }
 
     public static AggregateOverloadInfo GetOverload(FunctionSymbol symbol,
