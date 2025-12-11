@@ -4220,14 +4220,14 @@ a:int; b:dynamic
         var query = @"
 datatable (a: int, b: dynamic)
 [
-    1, dynamic({'prop1': 'a1', 'prop2': 'b1'}),
-    2, dynamic({'prop1': 'a2', 'prop2': 'b2'})
+    1, dynamic({""prop1"": ""a1"", ""prop2"": ""b1""}),
+    2, dynamic({""prop1"": ""a2"", ""prop2"": ""b2""})
 ]
 | mv-expand b
 ";
 
         var expected = @"
-a:long; b:dynamic
+a:int; b:dynamic
 ------------------
 1; {""prop1"":""a1""}
 1; {""prop2"":""b1""}
