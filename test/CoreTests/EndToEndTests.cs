@@ -4201,7 +4201,7 @@ datatable (a: int, b: dynamic)
 ";
 
         var expected = @"
-a:long; b:dynamic
+a:int; b:dynamic
 ------------------
 1; 10
 1; 20
