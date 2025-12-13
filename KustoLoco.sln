@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31717.71
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11304.161 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KustoLoco.Core", "libraries\KustoLoco.Core\KustoLoco.Core.csproj", "{1AF6D7B2-15C5-417B-9B72-ECC725B6FFD7}"
 EndProject
@@ -47,8 +47,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sourceGeneration", "sourceGeneration", "{2C2AC26F-C74F-4ECE-B955-D51754F93459}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneration", "sourceGeneration\SourceGeneration\SourceGeneration.csproj", "{BC823CE7-0264-4681-B378-2E2AEC5D9D7E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGenDependencies", "sourceGeneration\SourceGenDependencies\SourceGenDependencies.csproj", "{55CBE732-000B-4A05-BFE5-1A21702F929A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pskql", "applications\pskql\pskql.csproj", "{D92E8AAC-8EFB-45F8-BDE2-AC446776360C}"
 EndProject
@@ -202,14 +200,6 @@ Global
 		{BC823CE7-0264-4681-B378-2E2AEC5D9D7E}.DebugStartup|Any CPU.Build.0 = DebugStartup|Any CPU
 		{BC823CE7-0264-4681-B378-2E2AEC5D9D7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC823CE7-0264-4681-B378-2E2AEC5D9D7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.AvaloniaPreviewer|Any CPU.ActiveCfg = AvaloniaPreviewer|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.AvaloniaPreviewer|Any CPU.Build.0 = AvaloniaPreviewer|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.DebugStartup|Any CPU.ActiveCfg = DebugStartup|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.DebugStartup|Any CPU.Build.0 = DebugStartup|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55CBE732-000B-4A05-BFE5-1A21702F929A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D92E8AAC-8EFB-45F8-BDE2-AC446776360C}.AvaloniaPreviewer|Any CPU.ActiveCfg = AvaloniaPreviewer|Any CPU
 		{D92E8AAC-8EFB-45F8-BDE2-AC446776360C}.AvaloniaPreviewer|Any CPU.Build.0 = AvaloniaPreviewer|Any CPU
 		{D92E8AAC-8EFB-45F8-BDE2-AC446776360C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -457,7 +447,6 @@ Global
 		{5F7812C3-8678-49DB-B533-128EB3A92040} = {B891952E-5D41-45F7-ABB2-B512A8200656}
 		{299DD655-6953-446A-A33D-46E92CD48E2D} = {B891952E-5D41-45F7-ABB2-B512A8200656}
 		{BC823CE7-0264-4681-B378-2E2AEC5D9D7E} = {2C2AC26F-C74F-4ECE-B955-D51754F93459}
-		{55CBE732-000B-4A05-BFE5-1A21702F929A} = {2C2AC26F-C74F-4ECE-B955-D51754F93459}
 		{D92E8AAC-8EFB-45F8-BDE2-AC446776360C} = {B891952E-5D41-45F7-ABB2-B512A8200656}
 		{FF24597A-D663-468D-BDF4-E04802EDAEB7} = {48CD2752-9462-473A-8699-7AD8B146742F}
 		{17B8AD04-D972-4D41-9E2F-DDD4796103A7} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
