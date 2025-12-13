@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
+using AvaloniaEdit.Document;
 using Clowd.Clipboard;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,7 +11,6 @@ using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
 using Lokql.Engine.Commands;
-using lokqlDx;
 using LokqlDx.Views;
 using NotNullStrings;
 
@@ -21,7 +21,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _kustoSettings;
 
-    [ObservableProperty] private bool _showData=true;
+    [ObservableProperty] private ChartViewModel _chartModel;
     [ObservableProperty] private string _dataGridSizeWarning = string.Empty;
     [ObservableProperty] private DisplayPreferencesViewModel _displayPreferences;
 
@@ -29,11 +29,11 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
 
     [ObservableProperty] private string _name = string.Empty;
 
-    [ObservableProperty] private ChartViewModel _chartModel;
 
-    
     [ObservableProperty] private string _querySummary = string.Empty;
     [ObservableProperty] private KustoQueryResult _result = KustoQueryResult.Empty;
+
+    [ObservableProperty] private bool _showData = true;
     [ObservableProperty] private bool _showDataGridSizeWarning;
     [ObservableProperty] private ITreeDataGridSource<Row> _treeSource = new MyFlatTreeDataGridSource<Row>([], []);
 
@@ -56,7 +56,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         await RenderTable(result);
         ShowData = !result.IsChart;
         var ShowMap = result.IsChart && result.Visualization.ChartType == "scatterchart"
-                                 && result.Visualization.PropertyOr("kind", "") == "map";
+                                     && result.Visualization.PropertyOr("kind", "") == "map";
         ChartModel.Activate(!ShowMap);
         MapModel.Activate(ShowMap);
         if (ShowMap)
@@ -67,8 +67,12 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
     public byte[] RenderToImage(KustoQueryResult result, double pWidth, double pHeight)
         => ChartModel.RenderToImage(result, pWidth, pHeight);
 
+
+
+
     [RelayCommand]
-    private async Task DataGridCopy(string extent)
+    private async Task DataGridCopy(string extent) => await DoCopy(extent);
+    private async Task DoCopy(string extent)
     {
         if (OperatingSystem.IsWindows())
         {
@@ -199,9 +203,14 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
         //var strings = rowItems.Select(i => i?.ToString() ?? "<null>").ToArray();
         new(rowItems);
 
-   
+
     private static string ObjectToString(object? item)
         => item?.ToString() ?? "<null>";
+
+    [RelayCommand]
+    public void ChangeTab(string sender) =>
+        //invert
+        ShowData = sender == "data";
 
     /// <summary>
     ///     Avalonia's DataGrid doesn't support binding to a DataTable so
@@ -217,11 +226,4 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             get => index >= rowItems.Length ? string.Empty : ObjectToString(rowItems[index]);
         }
     }
-
-    [RelayCommand]
-    public void ChangeTab(string sender)
-    {
-        //invert
-        ShowData = (sender == "data");
-    }
-  }
+}

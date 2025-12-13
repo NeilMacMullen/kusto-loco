@@ -66,13 +66,13 @@
                             <TreeDataGrid.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}"
-                                              CommandParameter="cell" />
+                                              CommandParameter="cell" InputGesture="CTRL+C"/>
                                     <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}"
-                                              CommandParameter="column" />
+                                              CommandParameter="column" InputGesture="CTRL+L" />
                                     <MenuItem Header="Copy row" Command="{Binding DataGridCopyCommand}"
-                                              CommandParameter="row" />
+                                              CommandParameter="row" InputGesture="CTRL+R"/>
                                     <MenuItem Header="Copy table" Command="{Binding DataGridCopyCommand}"
-                                              CommandParameter="table" />
+                                              CommandParameter="table" InputGesture="CTRL+A"/>
                                     <Separator />
                                     <MenuItem Header="Copy to clipboard as CSV (without headers)"
                                               Command="{Binding DataGridCopyCommand}"
