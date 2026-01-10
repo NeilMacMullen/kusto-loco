@@ -52,21 +52,21 @@
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="NLog" Version="6.0.6" />
+    <PackageVersion Include="NLog" Version="6.0.7" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="4.0.2" />
     <PackageVersion Include="MSTest.TestAdapter" Version="4.0.2" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.0" />
-    <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.4" />
+    <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.5" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
-    <PackageVersion Include="OpenAI" Version="2.7.0" />
+    <PackageVersion Include="OpenAI" Version="2.8.0" />
     <PackageVersion Include="Parquet.Net" Version="5.4.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
     <PackageVersion Include="ScottPlot" Version="5.1.57" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.57" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.1.57" />
     <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
-    <PackageVersion Include="SimpleExec" Version="12.0.0" />
+    <PackageVersion Include="SimpleExec" Version="13.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.54.0" />
     <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.9.1" />
