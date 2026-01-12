@@ -13,7 +13,14 @@
             <avalonia:MapControl x:Name="TheMap"
                                  Map="{Binding Map}"
                                  Loaded="TheMap_OnLoaded"
-                                 PointerMoved="OnMapPointerMoved" />
+                                 PointerMoved="OnMapPointerMoved">
+                <avalonia:MapControl.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open in Google Maps" Click="OpenInGoogleMaps_Click" />
+                        <MenuItem Header="Copy Lat/Long to Clipboard" Click="CopyLatLongToClipboard_Click" />
+                    </ContextMenu>
+                </avalonia:MapControl.ContextMenu>
+            </avalonia:MapControl>
 
         </Grid>
 
