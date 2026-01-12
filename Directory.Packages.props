@@ -78,11 +78,11 @@
     <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.1.0" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.1.0" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.1.0" />
-    <PackageVersion Include="Vanara.Core" Version="4.2.1" />
-    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="4.2.1" />
+    <PackageVersion Include="Vanara.Core" Version="5.0.0" />
+    <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="5.0.0" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
-    <PackageVersion Include="WPF-UI" Version="4.1.0" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.9" />
+    <PackageVersion Include="WPF-UI" Version="4.2.0" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.9.2" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />
