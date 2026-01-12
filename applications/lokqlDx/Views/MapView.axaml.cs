@@ -1,8 +1,13 @@
-﻿using Avalonia.Controls;
+﻿using System.Diagnostics;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Clowd.Clipboard;
 using LokqlDx.ViewModels;
+using Mapsui.Extensions;
+using Mapsui.Projections;
 using Mapsui.UI.Avalonia;
 using NotNullStrings;
 
@@ -10,12 +15,14 @@ namespace LokqlDx.Views;
 
 public partial class MapView : UserControl
 {
+    private Point _lastPointerPosition;
+
     public MapView()
     {
         InitializeComponent();
     }
 
- 
+
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         RegisterIfPossible();
@@ -44,10 +51,7 @@ public partial class MapView : UserControl
         base.OnDataContextChanged(e);
     }
 
-    private void CopyMapToClipboard()
-    {
-        ControlRenderer.SaveControlToClipboard(this);
-    }
+    private void CopyMapToClipboard() => ControlRenderer.SaveControlToClipboard(this);
 
     private void OnMapPointerMoved(object? sender, PointerEventArgs e)
     {
@@ -56,18 +60,51 @@ public partial class MapView : UserControl
         if (map.DataContext is not MapViewModel vm) return;
 
         var screen = e.GetPosition(map);
+        _lastPointerPosition = screen;
 
         var label = vm.GetTooltipAtPosition(screen);
-        if (label.IsBlank())
-            ToolTip.SetTip(map, null);
-        else
-            ToolTip.SetTip(map, label);
+        ToolTip.SetTip(map, label.IsBlank() ? null : label);
+    }
+
+    private (double lon, double lat)? GetLatLongAtLastPointerPosition()
+    {
+        if (DataContext is not MapViewModel vm)
+            return null;
+
+        var vp = vm.Map.Navigator.Viewport;
+        var world = vp.ScreenToWorld(_lastPointerPosition.X, _lastPointerPosition.Y);
+        return SphericalMercator.ToLonLat(world.X, world.Y);
+    }
+
+    private void OpenInGoogleMaps_Click(object? sender, RoutedEventArgs e)
+    {
+        var lonLat = GetLatLongAtLastPointerPosition();
+        if (lonLat is null)
+            return;
+
+        var url = $"https://www.google.com/maps?q={lonLat.Value.lat:F6},{lonLat.Value.lon:F6}";
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private void CopyLatLongToClipboard_Click(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var lonLat = GetLatLongAtLastPointerPosition();
+            if (lonLat is null)
+                return;
+
+            var text = $"{lonLat.Value.lat:F6}, {lonLat.Value.lon:F6}";
+            if (OperatingSystem.IsWindows())
+                ClipboardAvalonia.SetText(text);
+        }
+        catch
+        {
+            // Silently ignore clipboard errors
+        }
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
-    private void TheMap_OnLoaded(object? sender, RoutedEventArgs e)
-    {
-        RegisterIfPossible();
-    }
+    private void TheMap_OnLoaded(object? sender, RoutedEventArgs e) => RegisterIfPossible();
 }
