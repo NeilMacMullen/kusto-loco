@@ -43,18 +43,28 @@ public readonly struct ResourceLock(SemaphoreSlim semaphore, Action<int> onDispo
 public class Win32ApiService(
     ILogger<Win32ApiService> logger,
     CancellationTokenSource cts,
-    IPathFactory pathFactory,
-    ResourceManager resourceManager
-)
-    : IShareService
-{
-    private const int MaxItemCount = 1000;
-    private static readonly TimeSpan PingTimeout = TimeSpan.FromSeconds(5);
-    private static readonly TimeSpan ShareRetrievalWarningTime = TimeSpan.FromSeconds(3);
-
-    public async Task<IEnumerable<string>> GetSharesAsync(string host)
+        IPathFactory pathFactory,
+        ResourceManager resourceManager
+    )
+        : IShareService
     {
-        if (!await PingHost(host))
+        private const int MaxItemCount = 1000;
+        private static readonly TimeSpan PingTimeout = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan ShareRetrievalWarningTime = TimeSpan.FromSeconds(3);
+
+        // Vanara's NetApi32 methods cause stack overflow on GitHub Actions runners
+        private static bool IsRunningInGitHubActions => 
+            Environment.GetEnvironmentVariable("GITHUB_ACTIONS") is "true";
+
+        public async Task<IEnumerable<string>> GetSharesAsync(string host)
+        {
+            if (IsRunningInGitHubActions)
+            {
+                logger.LogDebug("Skipping share enumeration in GitHub Actions environment");
+                return [];
+            }
+
+            if (!await PingHost(host))
         {
             return [];
         }
@@ -105,6 +115,12 @@ public class Win32ApiService(
 
     public async Task<IEnumerable<string>> GetHostsAsync()
     {
+        if (IsRunningInGitHubActions)
+        {
+            logger.LogDebug("Skipping host enumeration in GitHub Actions environment");
+            return [];
+        }
+
         await Task.CompletedTask;
 
         logger.LogDebug("Fetching hosts");
