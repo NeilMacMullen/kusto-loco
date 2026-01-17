@@ -52,13 +52,13 @@ public class Win32ApiService(
         private static readonly TimeSpan PingTimeout = TimeSpan.FromSeconds(5);
         private static readonly TimeSpan ShareRetrievalWarningTime = TimeSpan.FromSeconds(3);
 
-        // Vanara's NetApi32 methods cause stack overflow on GitHub Actions runners
-        private static bool IsRunningInGitHubActions => 
-            Environment.GetEnvironmentVariable("GITHUB_ACTIONS") is "true";
+        // Vanara's NetApi32 methods cause stack overflow on net 10
+        // TODO investigate
+        private static bool SkipShareOperationsBecauseNet10Broken => true;
 
         public async Task<IEnumerable<string>> GetSharesAsync(string host)
         {
-            if (IsRunningInGitHubActions)
+            if (SkipShareOperationsBecauseNet10Broken)
             {
                 logger.LogDebug("Skipping share enumeration in GitHub Actions environment");
                 return [];
@@ -115,7 +115,7 @@ public class Win32ApiService(
 
     public async Task<IEnumerable<string>> GetHostsAsync()
     {
-        if (IsRunningInGitHubActions)
+        if (SkipShareOperationsBecauseNet10Broken)
         {
             logger.LogDebug("Skipping host enumeration in GitHub Actions environment");
             return [];
