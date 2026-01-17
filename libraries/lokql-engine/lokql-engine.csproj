@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Lokql.Engine</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -15,7 +15,9 @@
     <PackageReference Include="McMaster.NETCore.Plugins" />
     <PackageReference Include="ShapeCrawler" />
     <PackageReference Include="System.CommandLine" />
-  </ItemGroup>
+      <!-- Override transitive dependency to fix security vulnerability -->
+      <PackageReference Include="Magick.NET-Q16-AnyCPU" />
+    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
