@@ -102,7 +102,7 @@
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.11" />
     <PackageVersion Include="Jab" Version="0.12.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.10" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.11" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.3.1.1" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
