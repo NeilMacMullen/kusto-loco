@@ -9,6 +9,8 @@ namespace LokqlDx.Views;
 
 public partial class RenderingSurfaceView : UserControl, IDisposable
 {
+    private TreeDataGrid? _dataGrid;
+    
     public RenderingSurfaceView()
     {
         InitializeComponent();
@@ -21,12 +23,16 @@ public partial class RenderingSurfaceView : UserControl, IDisposable
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        DataGrid.KeyDown += DataGrid_KeyDown;
+        _dataGrid = this.FindControl<TreeDataGrid>("DataGrid");
+        if (_dataGrid != null)
+        {
+            _dataGrid.KeyDown += DataGrid_KeyDown;
+        }
     }
 
     private async void DataGrid_KeyDown(object? sender, KeyEventArgs e)
     {
-        var vm = DataGrid.DataContext as RenderingSurfaceViewModel;
+        var vm = _dataGrid?.DataContext as RenderingSurfaceViewModel;
         if (vm != null)
             if ((e.KeyModifiers & KeyModifiers.Control) != 0)
             {

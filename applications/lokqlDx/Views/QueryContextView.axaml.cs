@@ -25,6 +25,6 @@ public partial class QueryContextView : UserControl
                 IsExpanded: true
             })
             // Ensure focus is set on the UI thread
-            Dispatcher.UIThread.Post(() => ParametersTextBox.Focus());
+            Dispatcher.UIThread.Post(() => this.FindControl<TextBox>("ParametersTextBox")?.Focus());
     }
 }

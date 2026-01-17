@@ -159,7 +159,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             ChartModel.CopyToClipboard();
     }
 
-    private Task RenderTable(KustoQueryResult result)
+    private async Task RenderTable(KustoQueryResult result)
     {
         //ensure that if there are no results we clear the data grid
         if (result.Error.IsNotBlank())
@@ -167,10 +167,10 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             var errorRows = new[] { new Row([result.Error]) };
             var columnList = new ColumnList<Row> { new TextColumn<Row, object?>("Error", r => r[0]) };
             TreeSource = new MyFlatTreeDataGridSource<Row>(errorRows, columnList);
-            return Task.CompletedTask;
+            return;
         }
 
-        DispatcherHelper.SafeInvoke(() =>
+        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
         {
             const int defaultMax = 10000;
             const string settingName = "datagrid.maxrows";
@@ -195,8 +195,6 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             source.Selection = new TreeDataGridCellSelectionModel<Row>(source);
             TreeSource = source;
         });
-
-        return Task.CompletedTask;
     }
 
     private static Row CreateRow(object?[] rowItems) =>
