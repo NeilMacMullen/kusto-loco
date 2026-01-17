@@ -94,7 +94,12 @@ public class AssetFolderImageProvider(
         {
             var stream = assetService.Open(path);
             logger.LogTrace("Loaded asset");
-            var res = Dispatcher.UIThread.Invoke(() => CreateImage(path, stream));
+            // Check if already on UI thread to avoid deadlock
+            IImage res;
+            if (Dispatcher.UIThread.CheckAccess())
+                res = CreateImage(path, stream);
+            else
+                res = Dispatcher.UIThread.Invoke(() => CreateImage(path, stream));
             logger.LogTrace("Created image");
             _imageCache[path] = res;
             return res;

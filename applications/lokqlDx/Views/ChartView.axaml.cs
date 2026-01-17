@@ -103,7 +103,8 @@ public partial class ChartView : UserControl, IScottPlotHost
 
     public void RenderToDisplay(KustoQueryResult result, KustoSettingsProvider kustoSettings) =>
         //important - this can be called from inside the engine so we need to dispatch it to the UI thread
-        DispatcherHelper.SafeInvoke(() =>
+        //use Post instead of Invoke to avoid deadlock if already on UI thread
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             PlotControl.Reset();
             var plot = PlotControl.Plot;

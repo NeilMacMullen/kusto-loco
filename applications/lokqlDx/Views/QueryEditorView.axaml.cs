@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using AvaloniaEdit;
 using LokqlDx.ViewModels;
 using lokqlDxComponents;
 using lokqlDxComponents.Views.Dialogs;
@@ -12,18 +13,26 @@ namespace LokqlDx.Views;
 
 public partial class QueryEditorView : UserControl
 {
-    private readonly EditorHelper _editorHelper;
+    private EditorHelper? _editorHelper;
     private CompletionManager? _completionManager;
-
+    private TextEditor? _textEditor;
 
     public QueryEditorView()
     {
         InitializeComponent();
-        _editorHelper = new EditorHelper(TextEditor);
+        _textEditor = this.FindControl<TextEditor>("TextEditor");
+        if (_textEditor != null)
+        {
+            _editorHelper = new EditorHelper(_textEditor);
+        }
         Messaging.RegisterForEvent<ThemeChangedMessage>(this, OnThemeChanged);
     }
 
-    private void OnThemeChanged() => HighlightHelper.ApplySyntaxHighlighting(TextEditor);
+    private void OnThemeChanged()
+    {
+        if (_textEditor != null)
+            HighlightHelper.ApplySyntaxHighlighting(_textEditor);
+    }
 
     private QueryEditorViewModel? GetVm() =>
         (DataContext as QueryEditorViewModel)!;
@@ -31,15 +40,17 @@ public partial class QueryEditorView : UserControl
 
     private void UserControl_Loaded(object? sender, RoutedEventArgs e)
     {
-        HighlightHelper.ApplySyntaxHighlighting(TextEditor);
+        if (_textEditor == null) return;
+        
+        HighlightHelper.ApplySyntaxHighlighting(_textEditor);
         //Ensure we can intercept ENTER key
-        TextEditor.AddHandler(KeyDownEvent, InternalEditor_OnKeyDown, RoutingStrategies.Tunnel);
-        TextEditor.AddHandler(DragDrop.DragEnterEvent, DragEnter);
-        TextEditor.AddHandler(DragDrop.DragOverEvent, DragOver);
-        TextEditor.AddHandler(DragDrop.DropEvent, Drop);
-        TextEditor.TextArea.TextEntered += TextArea_TextEntered;
-        TextEditor.TextArea.TextView.LinkTextUnderline = true;
-        TextEditor.TextArea.TextView.LinkTextForegroundBrush = Brushes.LightGreen;
+        _textEditor.AddHandler(KeyDownEvent, InternalEditor_OnKeyDown, RoutingStrategies.Tunnel);
+        _textEditor.AddHandler(DragDrop.DragEnterEvent, DragEnter);
+        _textEditor.AddHandler(DragDrop.DragOverEvent, DragOver);
+        _textEditor.AddHandler(DragDrop.DropEvent, Drop);
+        _textEditor.TextArea.TextEntered += TextArea_TextEntered;
+        _textEditor.TextArea.TextView.LinkTextUnderline = true;
+        _textEditor.TextArea.TextView.LinkTextForegroundBrush = Brushes.LightGreen;
     }
 
     private async void TextArea_TextEntered(object? sender, TextInputEventArgs e)
@@ -54,12 +65,15 @@ public partial class QueryEditorView : UserControl
         => DragDropManager.DragEnter(drgevent);
 
     private void Drop(object? sender, DragEventArgs e)
-        => DragDropManager.Drop(e, _editorHelper);
+    {
+        if (_editorHelper != null)
+            DragDropManager.Drop(e, _editorHelper);
+    }
 
 
     private async void InternalEditor_OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (GetVm() is not { } vm)
+        if (GetVm() is not { } vm || _editorHelper == null)
             return;
         await QueryExecutionHelper.HandleKeyCombo(e, _editorHelper, vm);
         vm.EditorOffset = _editorHelper.CurrentOffset();
@@ -68,12 +82,12 @@ public partial class QueryEditorView : UserControl
 
     private void TextEditor_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (GetVm() is not { } vm)
+        if (GetVm() is not { } vm || _textEditor == null || _editorHelper == null)
             return;
-        _completionManager = new CompletionManager(TextEditor, _editorHelper, vm,
-            new CompletionWindowWrapper(TextEditor.TextArea));
-        TextEditor.TextArea.Focus();
+        _completionManager = new CompletionManager(_textEditor, _editorHelper, vm,
+            new CompletionWindowWrapper(_textEditor.TextArea));
+        _textEditor.TextArea.Focus();
     }
 
-    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e) => TextEditor.Focus();
+    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e) => _textEditor?.Focus();
 }
