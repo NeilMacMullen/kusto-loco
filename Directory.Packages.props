@@ -108,5 +108,6 @@
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-  </ItemGroup>
-</Project>
+        <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.10.1" />
+      </ItemGroup>
+    </Project>
