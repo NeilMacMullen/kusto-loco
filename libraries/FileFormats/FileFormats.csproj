@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -17,8 +17,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/releases</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <IncludeSymbols>True</IncludeSymbols>
-    <AssemblyName>KustoLoco.FileFormats</AssemblyName>
+    <IncludeSymbols>True</IncludeSymbols>    <AssemblyName>KustoLoco.FileFormats</AssemblyName>
     <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
 

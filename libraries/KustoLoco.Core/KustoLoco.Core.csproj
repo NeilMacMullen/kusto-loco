@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>12</LangVersion>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>KustoLoco Core functionality</Title>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>    <Title>KustoLoco Core functionality</Title>
     <Version>1.0.0</Version>
     <Authors>Neil MacMullen</Authors>
     <Description>KQL querying against local data</Description>
