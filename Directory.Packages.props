@@ -65,7 +65,7 @@
     <PackageVersion Include="ScottPlot" Version="5.1.57" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.57" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.1.57" />
-    <PackageVersion Include="ShapeCrawler" Version="0.71.1" />
+    <PackageVersion Include="ShapeCrawler" Version="0.78.2" />
     <PackageVersion Include="SimpleExec" Version="13.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.54.0" />
     <PackageVersion Include="StaticViewLocator" Version="0.1.0" />
@@ -108,6 +108,6 @@
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.10.1" />
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.10.2" />
   </ItemGroup>
 </Project>
