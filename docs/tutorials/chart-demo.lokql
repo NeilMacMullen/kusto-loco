@@ -96,6 +96,12 @@
       "Text": "\r\nlet series= datatable(j:long,name:string,offset:real) [ \r\n1,\u0022north\u0022,3,\r\n1,\u0022mid\u0022,0,\r\n1,\u0022south\u0022,-3\r\n];\r\nrange lon from -10 to 10 step 0.5\r\n| extend j=1\r\n| join kind = fullouter series on j\r\n| extend lat = sin(lon) \u002B offset\r\n| extend index=1\r\n| extend series=name\r\n| extend tooltip=name\r\n| render scatterchart with (kind=map)",
       "PreQueryText": "",
       "IsHidden": false
+    },
+    {
+      "Name": "map-labels",
+      "Text": "datatable(latitude:real, longitude:real, label:string)\r\n[\r\n    51.5074, -0.1278, \u0022London\\nhere\u0022,\r\n    48.8566, 2.3522, \u0022Paris\u0022,\r\n    40.4168, -3.7038, \u0022Madrid\u0022\r\n]\r\n| render scatterchart with (kind=map)",
+      "PreQueryText": "",
+      "IsHidden": false
     }
   ],
   "StartupScript": "",
