@@ -4,6 +4,7 @@ using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Styles;
 using NetTopologySuite.Geometries;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
@@ -68,7 +69,7 @@ public class MapArtist
             }
         };
 
-        if (!string.IsNullOrWhiteSpace(label))
+        if (label.IsNotBlank())
         {
             styles.Add(new LabelStyle
             {
@@ -79,7 +80,6 @@ public class MapArtist
                 HorizontalAlignment = LabelStyle.HorizontalAlignmentEnum.Left,
                 VerticalAlignment = LabelStyle.VerticalAlignmentEnum.Center,
                 Offset = new Offset(15, 0),
-                Padding = new MRect(4, 2, 4, 2)
             });
         }
 
