@@ -40,14 +40,15 @@ public class PptReportTarget : IReportTarget
             return;
 
 
-        var matchingTables = FindMatches<ITable>(name);
+        var matchingTables = FindShapesWithTable(name);
 
         if (matchingTables.Any())
         {
             var requiredRows = AllowableRowCount(res.RowCount + 1); //add 1 for header
             var requiredColumns = AllowableColumnCount(res.ColumnCount);
-            foreach (var existingTable in matchingTables)
+            foreach (var shape in matchingTables)
             {
+                var existingTable = shape.Table!;
                 while (existingTable.Rows.Count > requiredRows) existingTable.Rows.RemoveAt(0);
                 while (existingTable.Rows.Count < requiredRows) existingTable.Rows.Add();
                 while (existingTable.Columns.Count > requiredColumns) existingTable.Columns.RemoveAt(0);
@@ -61,9 +62,9 @@ public class PptReportTarget : IReportTarget
             var shapeCollection = slide.Shapes;
 
             shapeCollection.AddTable(10, 10, res.ColumnCount, res.RowCount + 1);
-            var newTable = (ITable)shapeCollection.Last();
-            newTable.Name = name;
-            FillTable(newTable);
+            var newShape = shapeCollection.Last();
+            newShape.Name = name;
+            FillTable(newShape.Table!);
         }
 
         return;
@@ -102,13 +103,13 @@ public class PptReportTarget : IReportTarget
     {
         if (_isDisposed)
             return;
-        var matchingPictures = FindMatches<IPicture>(name);
+        var matchingPictures = FindShapesWithPicture(name);
         if (matchingPictures.Any())
         {
-            foreach (var p in matchingPictures)
+            foreach (var shape in matchingPictures)
             {
-                var data = surface.RenderToImage(result, (double)p.Width, (double)p.Height);
-                p.Image!.Update(new MemoryStream(data));
+                var data = surface.RenderToImage(result, (double)shape.Width, (double)shape.Height);
+                shape.Picture!.Image!.Update(new MemoryStream(data));
             }
         }
         else
@@ -124,9 +125,9 @@ public class PptReportTarget : IReportTarget
 
     private int AllowableRowCount(int wanted) => Math.Min(wanted, 100);
 
-    private ISlide AddSlide()
+    private IUserSlide AddSlide()
     {
-        var layout = _pres.SlideMasters[0].SlideLayouts[0];
+        var layout = _pres.MasterSlides[0].LayoutSlides[0];
         _pres.Slides.Add(layout.Number);
         return _pres.Slides.Last();
     }
@@ -137,6 +138,20 @@ public class PptReportTarget : IReportTarget
             ? []
             : _pres.Slides.SelectMany(s => s.Shapes.OfType<T>())
                 .Where(p => p.Name == name)
+                .ToArray();
+
+    private IShape[] FindShapesWithPicture(string name) =>
+        name.IsBlank()
+            ? []
+            : _pres.Slides.SelectMany(s => s.Shapes)
+                .Where(p => p.Name == name && p.Picture != null)
+                .ToArray();
+
+    private IShape[] FindShapesWithTable(string name) =>
+        name.IsBlank()
+            ? []
+            : _pres.Slides.SelectMany(s => s.Shapes)
+                .Where(p => p.Name == name && p.Table != null)
                 .ToArray();
 
     public static PptReportTarget Create(string filename)
