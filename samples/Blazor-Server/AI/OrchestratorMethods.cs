@@ -47,7 +47,8 @@ namespace KustoLoco.AI
 
                 return new OpenAIClient(
                     apiKeyCredential, options)
-                    .AsChatClient(AIModel);
+                    .GetChatClient(AIModel)
+                    .AsIChatClient();
             }
             else if (objSettings.AIType == "Azure OpenAI") 
             {
@@ -59,7 +60,8 @@ namespace KustoLoco.AI
                 return new AzureOpenAIClient(
                     new Uri(Endpoint),
                     apiKeyCredential, options)
-                    .AsChatClient(AIModel);
+                    .GetChatClient(AIModel)
+                    .AsIChatClient();
             }
             else // Local LLM
             {

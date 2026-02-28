@@ -18,7 +18,7 @@ public partial class QueryDocumentViewModel : Document
     private bool _initialized;
     private bool _titleDirty;
 
-    private void ActiveDocumentChanged(QueryDocumentViewModel model) => IsActive = model == this;
+    private void ActiveDocumentChanged(QueryDocumentViewModel model) => IsThisModelActive = model == this;
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
@@ -56,18 +56,18 @@ public partial class QueryDocumentViewModel : Document
         WeakReferenceMessenger.Default.Register<LoadFileMessage>(this,
             (_, m) =>
             {
-                if (IsActive)
+                if (IsThisModelActive)
                     m.Reply(LoadFile(m));
             });
         WeakReferenceMessenger.Default.Register<SaveFileMessage>(this,
             (_, m) =>
             {
-                if (IsActive)
+                if (IsThisModelActive)
                     m.Reply(SaveFile(m));
             });
     }
 
-    public bool IsActive { get; set; }
+    public bool IsThisModelActive { get; set; }
 
 
     private void CopyChartToClipboard() => RenderingSurfaceViewModel.CopyToClipboard();

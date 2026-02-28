@@ -35,13 +35,15 @@ public class OrchestratorMethods
         if (objSettings.AIType == "OpenAI")
             return new OpenAIClient(
                     apiKeyCredential)
-                .AsChatClient(AIModel);
+                .GetChatClient(AIModel)
+                .AsIChatClient();
 
         // Azure OpenAI
         return new AzureOpenAIClient(
                 new Uri(Endpoint),
                 apiKeyCredential)
-            .AsChatClient(AIModel);
+            .GetChatClient(AIModel)
+            .AsIChatClient();
     }
 
     #endregion
