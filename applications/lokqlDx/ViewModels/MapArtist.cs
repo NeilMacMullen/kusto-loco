@@ -4,6 +4,7 @@ using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Styles;
 using NetTopologySuite.Geometries;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
@@ -52,24 +53,40 @@ public class MapArtist
     public IFeature AddPin(GeoPoint geo,
         double scale,
         SymbolType symbol,
-        Brush pinFill)
+        Brush pinFill,
+        string label = "")
     {
         var pt = MapGeometry.FromGeoPoint(geo);
 
-        var pinFeature = new PointFeature(pt)
+        var styles = new List<IStyle>
         {
-            Styles =
-            [
-                new SymbolStyle
-                {
-                    SymbolType = symbol,
-                    Fill = pinFill,
-                    Outline = new Pen(Color.Black),
-                    SymbolScale = scale
-                }
-            ]
+            new SymbolStyle
+            {
+                SymbolType = symbol,
+                Fill = pinFill,
+                Outline = new Pen(Color.Black),
+                SymbolScale = scale
+            }
         };
 
+        if (label.IsNotBlank())
+        {
+            styles.Add(new LabelStyle
+            {
+                Text = label,
+                ForeColor = Color.Black,
+                BackColor = new Brush(Color.White),
+                Halo = new Pen(Color.White, 2),
+                HorizontalAlignment = LabelStyle.HorizontalAlignmentEnum.Left,
+                VerticalAlignment = LabelStyle.VerticalAlignmentEnum.Center,
+                Offset = new Offset(15, 0),
+            });
+        }
+
+        var pinFeature = new PointFeature(pt)
+        {
+            Styles = styles
+        };
 
         _pinFeatures.Add(pinFeature);
         return pinFeature;

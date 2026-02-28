@@ -61,6 +61,7 @@ public class MapResultRenderer
         var symbolCol = FindColumn(result, "pinSymbol");
         var indexCol = FindColumn(result, "index,timestamp");
         var tooltipCol = FindColumn(result, "tooltip");
+        var labelCol = FindColumn(result, "label");
 
         var defaultScale = _settings.GetDoubleOr("map.pin.scale", 0.3);
 
@@ -84,6 +85,7 @@ public class MapResultRenderer
                 Geo = GeoPoint.Maybe(ValOr(row,latCol,double.NaN),ValOr(row,lonCol,double.NaN)),
                 Radius = ValOr(row, sizeCol, 0.0),
                 Tooltip = ValOr(row, tooltipCol, string.Empty),
+                Label = ValOr(row, labelCol, string.Empty),
                 Series = ValOr(row, seriesCol, string.Empty),
                 Scale = ValOr(row, scaleCol, defaultScale),
                 Symbol = ValOrSymbol(row, symbolCol, defaultSymbol),
@@ -95,7 +97,7 @@ public class MapResultRenderer
 
         foreach (var p in points)
         {
-            var pin = _mapArtist.AddPin(p.Geo, p.Scale, p.Symbol, p.PinFill);
+            var pin = _mapArtist.AddPin(p.Geo, p.Scale, p.Symbol, p.PinFill, p.Label);
             _tooltipManager.Add(pin, p.Tooltip);
         }
 
