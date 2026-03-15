@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using Intellisense.FileSystem.Paths;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;
@@ -54,7 +55,7 @@ public class Win32ApiService(
 
         // Vanara's NetApi32 methods cause stack overflow on net 10
         // TODO investigate
-        private static bool SkipShareOperationsBecauseNet10Broken => true;
+        private static bool SkipShareOperationsBecauseNet10Broken => false;
 
         public async Task<IEnumerable<string>> GetSharesAsync(string host)
         {
@@ -78,10 +79,9 @@ public class Win32ApiService(
         {
             // NetShareEnum can potentially block thread for a while (~11 seconds) when host exists but port isn't open
             // smb client can use another port besides 445 in newer Windows versions
-            var results = NetApi32
-                .NetShareEnum<NetApi32.SHARE_INFO_1>(host)
+            // Direct P/Invoke to avoid Vanara stack overflow issue on .NET 10
+            var results = NetShareEnumDirect(host)
                 .Take(MaxItemCount)
-                .Select(x => x.shi1_netname)
                 .ToList();
 
             logger.LogTrace("Fetched shares: {@Shares}", results);
@@ -125,18 +125,19 @@ public class Win32ApiService(
 
         logger.LogDebug("Fetching hosts");
 
-        return NetApi32
-            .NetUseEnum<NetApi32.USE_INFO_0>()
+        // Direct P/Invoke to avoid Vanara stack overflow issue on .NET 10
+        var nets = NetUseEnumDirect()
             .Take(MaxItemCount)
-            .Select(useInfo0 =>
+            .ToArray();
+
+            return nets
+            .Select(remote =>
                 {
-                    var remote = useInfo0.ui0_remote;
                     var path = pathFactory.Create(remote);
                     if (path is UncPath p) return p;
                     logger.LogWarning(
-                        "Failed to parse host {@FileSystemPath} {PathInfo} {Remote}",
+                        "Failed to parse host {@FileSystemPath} {Remote}",
                         path,
-                        useInfo0,
                         remote
                     );
                     return null;
@@ -144,5 +145,93 @@ public class Win32ApiService(
             )
             .OfType<UncPath>()
             .Select(x => x.OriginalHost);
+    }
+
+    private static IEnumerable<string> NetUseEnumDirect()
+    {
+        const int NERR_Success = 0;
+        var result = NetUseEnum(null, 0, out var bufPtr, unchecked((uint)-1), out var entriesRead, out _, out _);
+        if (result != NERR_Success)
+            yield break;
+
+        try
+        {
+            var structSize = Marshal.SizeOf<USE_INFO_0>();
+            var currentPtr = bufPtr;
+            for (var i = 0; i < entriesRead; i++)
+            {
+                var info = Marshal.PtrToStructure<USE_INFO_0>(currentPtr);
+                if (info.ui0_remote != null)
+                    yield return info.ui0_remote;
+                currentPtr = IntPtr.Add(currentPtr, structSize);
+            }
+        }
+        finally
+        {
+            NetApiBufferFree(bufPtr);
+        }
+    }
+
+    private static IEnumerable<string> NetShareEnumDirect(string host)
+    {
+        const int NERR_Success = 0;
+        var result = NetShareEnum(host, 1, out var bufPtr, unchecked((uint)-1), out var entriesRead, out _, out _);
+        if (result != NERR_Success)
+            yield break;
+
+        try
+        {
+            var structSize = Marshal.SizeOf<SHARE_INFO_1>();
+            var currentPtr = bufPtr;
+            for (var i = 0; i < entriesRead; i++)
+            {
+                var info = Marshal.PtrToStructure<SHARE_INFO_1>(currentPtr);
+                if (info.shi1_netname != null)
+                    yield return info.shi1_netname;
+                currentPtr = IntPtr.Add(currentPtr, structSize);
+            }
+        }
+        finally
+        {
+            NetApiBufferFree(bufPtr);
+        }
+    }
+
+    [DllImport("netapi32.dll", CharSet = CharSet.Unicode)]
+    private static extern uint NetUseEnum(
+        string? serverName,
+        uint level,
+        out IntPtr bufPtr,
+        uint prefMaxLen,
+        out uint entriesRead,
+        out uint totalEntries,
+        out IntPtr resumeHandle);
+
+    [DllImport("netapi32.dll", CharSet = CharSet.Unicode)]
+    private static extern uint NetShareEnum(
+        string serverName,
+        uint level,
+        out IntPtr bufPtr,
+        uint prefMaxLen,
+        out uint entriesRead,
+        out uint totalEntries,
+        out IntPtr resumeHandle);
+
+    [DllImport("netapi32.dll")]
+    private static extern uint NetApiBufferFree(IntPtr buffer);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct USE_INFO_0
+    {
+        public string? ui0_local;
+        public string? ui0_remote;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct SHARE_INFO_1
+    {
+        public string? shi1_netname;
+        public uint shi1_type;
+        public string? shi1_remark;
     }
 }
