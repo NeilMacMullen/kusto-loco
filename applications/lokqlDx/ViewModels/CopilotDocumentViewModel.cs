@@ -73,7 +73,7 @@ public partial class CopilotDocumentViewModel : Document
     private double _fontSize = 14;
 
     [ObservableProperty] 
-    private bool _showResults;
+    private bool _showResults = true;  // Start with results pane visible
 
     public CopilotDocumentViewModel(
         InteractiveTableExplorer explorer,

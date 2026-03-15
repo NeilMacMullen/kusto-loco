@@ -47,7 +47,7 @@
                         <TextBox Grid.Column="0"
                                  Name="InputTextBox"
                                  Text="{Binding UserInput}"
-                                 Watermark="Ask Copilot about your data... (Ctrl+Enter to send)"
+                                 Watermark="Ask Copilot about your data... (Shift+Enter to send)"
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  MinHeight="60"
@@ -60,7 +60,7 @@
                                 IsEnabled="{Binding !IsProcessing}"
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Bottom"
-                                ToolTip.Tip="Send (Ctrl+Enter)">
+                                ToolTip.Tip="Send (Shift+Enter)">
                             <TextBlock Text="&#x27A4;" FontSize="16" />
                         </Button>
                     </Grid>
@@ -116,7 +116,7 @@
                     <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,auto" Margin="8">
                         <TextBox Grid.Column="0"
                                  Text="{Binding UserInput}"
-                                 Watermark="Ask Copilot about your data... (Ctrl+Enter to send)"
+                                 Watermark="Ask Copilot about your data... (Shift+Enter to send)"
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  MinHeight="60"
@@ -129,7 +129,7 @@
                                 IsEnabled="{Binding !IsProcessing}"
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Bottom"
-                                ToolTip.Tip="Send (Ctrl+Enter)">
+                                ToolTip.Tip="Send (Shift+Enter)">
                             <TextBlock Text="&#x27A4;" FontSize="16" />
                         </Button>
                     </Grid>

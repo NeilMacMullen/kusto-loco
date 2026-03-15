@@ -5,6 +5,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using LokqlDx.ViewModels;
 
 namespace LokqlDx.Views;
@@ -20,18 +21,51 @@ public partial class CopilotDocumentView : UserControl
     {
         base.OnLoaded(e);
 
-        // Set up Enter key handler for the input text box
-        var inputTextBox = this.FindControl<TextBox>("InputTextBox");
-        if (inputTextBox != null)
+        // Set up key handler for all TextBoxes in this view
+        // Using AddHandler with tunneling to catch the event before the TextBox processes it
+        AddHandler(KeyDownEvent, OnPreviewKeyDown, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+
+        // Subscribe to chat message changes for auto-scroll
+        if (DataContext is CopilotDocumentViewModel vm)
         {
-            inputTextBox.KeyDown += InputTextBox_KeyDown;
+            vm.Messages.CollectionChanged += (_, __) => ScrollChatToBottom();
         }
     }
 
-    private void InputTextBox_KeyDown(object? sender, KeyEventArgs e)
+    private void ScrollChatToBottom()
     {
-        // Ctrl+Enter to send message (since Enter now creates a new line)
-        if (e.Key == Key.Enter && e.KeyModifiers.HasFlag(KeyModifiers.Control) && DataContext is CopilotDocumentViewModel vm)
+        // Try both scroll viewers (one for each pane)
+        var scroll1 = this.FindControl<ScrollViewer>("MessagesScrollViewer");
+        scroll1?.ScrollToEnd();
+
+        // The second scroll viewer has no name, so find by type
+        foreach (var sv in GetScrollViewers(this))
+        {
+            if (sv != scroll1 && sv.Parent is DockPanel)
+            {
+                sv.ScrollToEnd();
+            }
+        }
+    }
+
+    private static IEnumerable<ScrollViewer> GetScrollViewers(Control root)
+    {
+        if (root is ScrollViewer sv)
+            yield return sv;
+        foreach (var child in root.GetVisualChildren())
+        {
+            if (child is Control ctrl)
+            {
+                foreach (var descendant in GetScrollViewers(ctrl))
+                    yield return descendant;
+            }
+        }
+    }
+
+    private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
+    {
+        // Shift+Enter to send message (consistent with standard query panes)
+        if (e.Key == Key.Enter && e.KeyModifiers.HasFlag(KeyModifiers.Shift) && DataContext is CopilotDocumentViewModel vm)
         {
             if (vm.SendMessageCommand.CanExecute(null))
             {
