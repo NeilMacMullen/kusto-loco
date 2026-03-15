@@ -1,4 +1,7 @@
 using System.ClientModel;
+using Anthropic.SDK;
+using Anthropic.SDK.Constants;
+using Anthropic.SDK.Messaging;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.AI;
 using NotNullStrings;
@@ -10,7 +13,7 @@ public class AISettings
 {
     public string ApiKey { get; set; } = string.Empty;
     public string AIModel { get; set; } = string.Empty;
-    public string AIType { get; set; } = "OpenAI"; // Default value
+    public string AIType { get; set; } = "OpenAI"; // Default value: "OpenAI", "AzureOpenAI", or "Anthropic"
     public string Endpoint { get; set; } = string.Empty;
 }
 
@@ -32,18 +35,32 @@ public class OrchestratorMethods
 
         var apiKeyCredential = new ApiKeyCredential(ApiKey);
 
-        if (objSettings.AIType == "OpenAI")
-            return new OpenAIClient(
-                    apiKeyCredential)
-                .GetChatClient(AIModel)
-                .AsIChatClient();
+        switch (objSettings.AIType.ToLowerInvariant())
+        {
+            case "openai":
+                return new OpenAIClient(apiKeyCredential)
+                    .GetChatClient(AIModel)
+                    .AsIChatClient();
 
-        // Azure OpenAI
-        return new AzureOpenAIClient(
-                new Uri(Endpoint),
-                apiKeyCredential)
-            .GetChatClient(AIModel)
-            .AsIChatClient();
+            case "azureopenai":
+            case "azure":
+                return new AzureOpenAIClient(
+                        new Uri(Endpoint),
+                        apiKeyCredential)
+                    .GetChatClient(AIModel)
+                    .AsIChatClient();
+
+            case "anthropic":
+            case "claude":
+                // Return a wrapper that implements IChatClient for Anthropic
+                return new AnthropicChatClient(ApiKey, AIModel);
+
+            default:
+                // Default to OpenAI
+                return new OpenAIClient(apiKeyCredential)
+                    .GetChatClient(AIModel)
+                    .AsIChatClient();
+        }
     }
 
     #endregion
@@ -55,7 +72,7 @@ public class OrchestratorMethods
         var chatClient = CreateAIChatClient(objSettings);
         var SystemMessage =
             "Please return the following as json: \"This is successful\" in this format {\r\n  'message': message\r\n}";
-        
+
         var response = await chatClient.GetResponseAsync(SystemMessage);
 
         return response.Messages.Count != 0;
@@ -70,13 +87,13 @@ public class OrchestratorMethods
 
     #region public async Task<AIResponse> CallOpenAI(SettingsService objSettings, string AIQuery)
 
-   
+
 
     public static async Task<ModelResponse> CallOpenAI(IChatClient chatClient, List<ChatMessage> history)
     {
         try
         {
-          
+
             // Send the system message to the AI chat client
             var response = await chatClient.GetResponseAsync(history);
 

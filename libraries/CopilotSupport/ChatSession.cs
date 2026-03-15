@@ -16,13 +16,13 @@ public class ChatSession
     {
         var chatClient = OrchestratorMethods.CreateAIChatClient(settings);
         var session = new ChatSession(chatClient);
-     
+
         session.AddMessage(ChatRole.System, systemInstructions);
         return session;
     }
-    public void AddMessage(ChatRole role,string message)
+    public void AddMessage(ChatRole role, string message)
     {
-        _history.Add(new ChatMessage(role,message));
+        _history.Add(new ChatMessage(role, message));
     }
 
     public async Task<ModelResponse> SendUserRequest(string message)
@@ -32,7 +32,7 @@ public class ChatSession
         if (resp.Error.IsBlank())
         {
             AddMessage(ChatRole.Assistant,resp.Response);
-          
+
         }
 
         return resp;

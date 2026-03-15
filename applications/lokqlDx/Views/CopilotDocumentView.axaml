@@ -1,0 +1,192 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:LokqlDx.ViewModels"
+             xmlns:views="clr-namespace:LokqlDx.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="LokqlDx.Views.CopilotDocumentView"
+             x:DataType="vm:CopilotDocumentViewModel"
+             Background="{DynamicResource SystemControlPageBackgroundChromeLowBrush}">
+
+    <UserControl.Styles>
+        <Style Selector="Border.chatBubble">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="8,4" />
+        </Style>
+    </UserControl.Styles>
+
+    <DockPanel>
+        <!-- Top toolbar -->
+        <DockPanel DockPanel.Dock="Top" Margin="4">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding ToggleResultsPaneCommand}"
+                        ToolTip.Tip="Toggle Results Pane"
+                        Classes="Glyph"
+                        Content="&#x1F4CA;" />
+                <Button Command="{Binding ClearChatCommand}"
+                        ToolTip.Tip="Clear Chat"
+                        Classes="Glyph"
+                        Content="&#x1F5D1;" />
+            </StackPanel>
+            <TextBlock Text="Copilot" FontWeight="Bold" VerticalAlignment="Center" Margin="8,0" />
+        </DockPanel>
+
+        <!-- Main content area -->
+        <Grid ColumnDefinitions="*,auto,*" RowDefinitions="*">
+            <!-- Chat panel -->
+            <Border Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    BorderBrush="{DynamicResource SystemAltMediumColor}"
+                    BorderThickness="1"
+                    IsVisible="{Binding !ShowResults}">
+                <DockPanel>
+                    <!-- Input area at bottom -->
+                    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,auto" Margin="8">
+                        <TextBox Grid.Column="0"
+                                 Name="InputTextBox"
+                                 Text="{Binding UserInput}"
+                                 Watermark="Ask Copilot about your data... (Ctrl+Enter to send)"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="60"
+                                 MaxHeight="150"
+                                 FontSize="{Binding FontSize}"
+                                 IsEnabled="{Binding !IsProcessing}"
+                                 VerticalContentAlignment="Top" />
+                        <Button Grid.Column="1"
+                                Command="{Binding SendMessageCommand}"
+                                IsEnabled="{Binding !IsProcessing}"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Bottom"
+                                ToolTip.Tip="Send (Ctrl+Enter)">
+                            <TextBlock Text="&#x27A4;" FontSize="16" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Processing indicator -->
+                    <ProgressBar DockPanel.Dock="Bottom"
+                                 IsIndeterminate="True"
+                                 IsVisible="{Binding IsProcessing}"
+                                 Margin="8,4" />
+
+                    <!-- Messages list -->
+                    <ScrollViewer Name="MessagesScrollViewer"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:CopilotChatMessage">
+                                    <Border Classes="chatBubble"
+                                            Background="{Binding Role, Converter={x:Static views:CopilotDocumentView.RoleToBackgroundConverter}}"
+                                            HorizontalAlignment="{Binding Role, Converter={x:Static views:CopilotDocumentView.RoleToAlignmentConverter}}">
+                                        <StackPanel MaxWidth="600">
+                                            <SelectableTextBlock Text="{Binding Content}"
+                                                                 TextWrapping="Wrap"
+                                                                 FontSize="13" />
+                                            <SelectableTextBlock Text="{Binding QueryText}"
+                                                                 TextWrapping="Wrap"
+                                                                 FontFamily="Consolas"
+                                                                 FontSize="12"
+                                                                 IsVisible="{Binding IsQuery}"
+                                                                 Margin="0,4,0,0"
+                                                                 Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}"
+                                                       FontSize="10"
+                                                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                                                       HorizontalAlignment="Right"
+                                                       Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- Chat panel when results are shown -->
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource SystemAltMediumColor}"
+                    BorderThickness="1"
+                    IsVisible="{Binding ShowResults}">
+                <DockPanel>
+                    <!-- Input area at bottom -->
+                    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,auto" Margin="8">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding UserInput}"
+                                 Watermark="Ask Copilot about your data... (Ctrl+Enter to send)"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="60"
+                                 MaxHeight="150"
+                                 FontSize="{Binding FontSize}"
+                                 IsEnabled="{Binding !IsProcessing}"
+                                 VerticalContentAlignment="Top" />
+                        <Button Grid.Column="1"
+                                Command="{Binding SendMessageCommand}"
+                                IsEnabled="{Binding !IsProcessing}"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Bottom"
+                                ToolTip.Tip="Send (Ctrl+Enter)">
+                            <TextBlock Text="&#x27A4;" FontSize="16" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Processing indicator -->
+                    <ProgressBar DockPanel.Dock="Bottom"
+                                 IsIndeterminate="True"
+                                 IsVisible="{Binding IsProcessing}"
+                                 Margin="8,4" />
+
+                    <!-- Messages list -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:CopilotChatMessage">
+                                    <Border Classes="chatBubble"
+                                            Background="{Binding Role, Converter={x:Static views:CopilotDocumentView.RoleToBackgroundConverter}}"
+                                            HorizontalAlignment="{Binding Role, Converter={x:Static views:CopilotDocumentView.RoleToAlignmentConverter}}">
+                                        <StackPanel MaxWidth="400">
+                                            <SelectableTextBlock Text="{Binding Content}"
+                                                                 TextWrapping="Wrap"
+                                                                 FontSize="13" />
+                                            <SelectableTextBlock Text="{Binding QueryText}"
+                                                                 TextWrapping="Wrap"
+                                                                 FontFamily="Consolas"
+                                                                 FontSize="12"
+                                                                 IsVisible="{Binding IsQuery}"
+                                                                 Margin="0,4,0,0"
+                                                                 Foreground="{DynamicResource SystemBaseMediumColor}" />
+                                            <TextBlock Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}"
+                                                       FontSize="10"
+                                                       Foreground="{DynamicResource SystemBaseMediumColor}"
+                                                       HorizontalAlignment="Right"
+                                                       Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- Grid splitter -->
+            <GridSplitter Grid.Column="1"
+                          Width="5"
+                          IsVisible="{Binding ShowResults}"
+                          Background="{DynamicResource AccentButtonBackgroundDisabled}" />
+
+            <!-- Results panel -->
+            <Border Grid.Column="2"
+                    BorderBrush="{DynamicResource SystemAltMediumColor}"
+                    BorderThickness="1"
+                    IsVisible="{Binding ShowResults}">
+                <views:RenderingSurfaceView DataContext="{Binding RenderingSurfaceViewModel}" />
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

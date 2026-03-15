@@ -10,13 +10,16 @@
 
   <ItemGroup>
     <None Remove="Templates\AITemplate.txt" />
+    <None Remove="Templates\CopilotSystemPrompt.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\AITemplate.txt" />
+    <EmbeddedResource Include="Templates\CopilotSystemPrompt.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anthropic.SDK" />
     <PackageReference Include="Azure.AI.OpenAI" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />

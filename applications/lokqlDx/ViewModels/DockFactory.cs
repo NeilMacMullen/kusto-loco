@@ -276,4 +276,14 @@ public class DockFactory : Factory
                 break;
         }
     }
+
+    public void AddCopilotDocument(CopilotDocumentViewModel copilotDoc)
+    {
+        if (DocumentDock == null)
+            return;
+
+        AddDockable(DocumentDock, copilotDoc);
+        SetActiveDockable(copilotDoc);
+        SetFocusedDockable(DocumentDock, copilotDoc);
+    }
 }
