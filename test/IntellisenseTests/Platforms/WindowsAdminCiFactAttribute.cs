@@ -24,5 +24,11 @@ public sealed class WindowsAdminCiFactAttribute : FactAttribute
         {
             throw new InvalidOperationException("Windows CI should not skip admin tests");
         }
+
+        if (!PlatformHelper.IsSmbServerAvailable())
+        {
+            Skip = PlatformHelper.SmbSkipMessage;
+            return;
+        }
     }
 }
