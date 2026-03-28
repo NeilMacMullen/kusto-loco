@@ -84,6 +84,10 @@ public class CopilotOrchestrator
         // Send to model
         var modelResponse = await _session.SendUserRequest(userMessage);
 
+        // Track token usage
+        result.InputTokens += modelResponse.InputTokens;
+        result.OutputTokens += modelResponse.OutputTokens;
+
         if (modelResponse.Error.IsNotBlank())
         {
             result.Error = modelResponse.Error;
@@ -130,6 +134,9 @@ public class CopilotOrchestrator
 
                 // Send feedback and process any follow-up actions
                 var followUpResponse = await _session.SendUserRequest(feedbackMessage);
+                result.InputTokens += followUpResponse.InputTokens;
+                result.OutputTokens += followUpResponse.OutputTokens;
+
                 if (followUpResponse.Error.IsBlank())
                 {
                     _displayRawResponse?.Invoke(followUpResponse.Response);
@@ -153,6 +160,9 @@ public class CopilotOrchestrator
 
                 // Send feedback and process any follow-up actions
                 var followUpResponse = await _session.SendUserRequest(feedbackMessage);
+                result.InputTokens += followUpResponse.InputTokens;
+                result.OutputTokens += followUpResponse.OutputTokens;
+
                 if (followUpResponse.Error.IsBlank())
                 {
                     _displayRawResponse?.Invoke(followUpResponse.Response);
@@ -174,6 +184,9 @@ public class CopilotOrchestrator
                 _displayStatus?.Invoke($"Informing model about query error...");
 
                 var retryResponse = await _session.SendUserRequest(errorMessage);
+                result.InputTokens += retryResponse.InputTokens;
+                result.OutputTokens += retryResponse.OutputTokens;
+
                 if (retryResponse.Error.IsBlank())
                 {
                     _displayRawResponse?.Invoke(retryResponse.Response);
@@ -280,6 +293,11 @@ public class ConversationResult
     public string Error { get; set; } = string.Empty;
     public List<ExecutedAction> ExecutedActions { get; } = [];
     public bool HasError => !string.IsNullOrEmpty(Error);
+
+    // Token usage tracking
+    public int InputTokens { get; set; }
+    public int OutputTokens { get; set; }
+    public int TotalTokens => InputTokens + OutputTokens;
 }
 
 /// <summary>

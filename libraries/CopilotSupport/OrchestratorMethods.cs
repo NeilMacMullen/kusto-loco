@@ -17,7 +17,10 @@ public class AISettings
     public string Endpoint { get; set; } = string.Empty;
 }
 
-public readonly record struct ModelResponse(string Error, string Response);
+public readonly record struct ModelResponse(string Error, string Response, int InputTokens = 0, int OutputTokens = 0)
+{
+    public int TotalTokens => InputTokens + OutputTokens;
+}
 
 public class OrchestratorMethods
 {
@@ -102,8 +105,17 @@ public class OrchestratorMethods
                 // Optionally, log the absence of choices or handle it as needed
                 return new ModelResponse() { Error = "No choices returned in the AI response." };
 
-            var returnedText= response.Text.NullToEmpty();
-            return new ModelResponse{Response =returnedText};
+            var returnedText = response.Text.NullToEmpty();
+
+            // Extract token usage if available
+            var inputTokens = (int)(response.Usage?.InputTokenCount ?? 0);
+            var outputTokens = (int)(response.Usage?.OutputTokenCount ?? 0);
+
+            return new ModelResponse(
+                Error: string.Empty, 
+                Response: returnedText,
+                InputTokens: inputTokens,
+                OutputTokens: outputTokens);
         }
         catch (Exception ex)
         {

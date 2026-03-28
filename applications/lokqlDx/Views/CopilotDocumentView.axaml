@@ -21,6 +21,12 @@
         <!-- Top toolbar -->
         <DockPanel DockPanel.Dock="Top" Margin="4">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="{Binding EstimatedCost}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0"
+                           FontSize="11"
+                           Foreground="{DynamicResource SystemBaseMediumColor}"
+                           ToolTip.Tip="{Binding SessionInputTokens, StringFormat='Input: {0:N0} tokens'}" />
                 <CheckBox Content="Debug Mode"
                           IsChecked="{Binding DebugMode}"
                           ToolTip.Tip="Show detailed information about what Copilot is doing"

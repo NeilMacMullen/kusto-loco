@@ -78,6 +78,82 @@ public partial class CopilotDocumentViewModel : Document
     [ObservableProperty]
     private bool _debugMode = false;
 
+    // Token usage tracking for the session
+    [ObservableProperty]
+    private int _sessionInputTokens;
+
+    [ObservableProperty]
+    private int _sessionOutputTokens;
+
+    public int SessionTotalTokens => SessionInputTokens + SessionOutputTokens;
+
+    /// <summary>
+    /// Estimated cost in USD based on model pricing
+    /// </summary>
+    public string EstimatedCost => CalculateEstimatedCost();
+
+    // Pricing per million tokens (as of 2025)
+    private static readonly Dictionary<string, (decimal InputPer1M, decimal OutputPer1M)> ModelPricing = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Anthropic Claude models
+        ["claude-sonnet-4-20250514"] = (3.00m, 15.00m),
+        ["claude-3-5-sonnet-20241022"] = (3.00m, 15.00m),
+        ["claude-3-5-sonnet"] = (3.00m, 15.00m),
+        ["claude-3-opus"] = (15.00m, 75.00m),
+        ["claude-3-haiku"] = (0.25m, 1.25m),
+
+        // OpenAI GPT models
+        ["gpt-4o"] = (2.50m, 10.00m),
+        ["gpt-4o-mini"] = (0.15m, 0.60m),
+        ["gpt-4-turbo"] = (10.00m, 30.00m),
+        ["gpt-4"] = (30.00m, 60.00m),
+        ["gpt-3.5-turbo"] = (0.50m, 1.50m),
+
+        // Azure OpenAI (same as OpenAI)
+        ["gpt-4o-2024-05-13"] = (2.50m, 10.00m),
+    };
+
+    private string CalculateEstimatedCost()
+    {
+        var model = _settings.GetOr("copilot.model", string.Empty);
+
+        // Find matching pricing (try exact match first, then prefix match)
+        (decimal inputRate, decimal outputRate) = (0m, 0m);
+
+        if (ModelPricing.TryGetValue(model, out var exactMatch))
+        {
+            (inputRate, outputRate) = exactMatch;
+        }
+        else
+        {
+            // Try prefix matching for versioned model names
+            foreach (var (key, value) in ModelPricing)
+            {
+                if (model.StartsWith(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    (inputRate, outputRate) = value;
+                    break;
+                }
+            }
+        }
+
+        if (inputRate == 0 && outputRate == 0)
+        {
+            return $"{SessionTotalTokens:N0} tokens";
+        }
+
+        // Calculate cost: (tokens / 1,000,000) * rate
+        var inputCost = (SessionInputTokens / 1_000_000m) * inputRate;
+        var outputCost = (SessionOutputTokens / 1_000_000m) * outputRate;
+        var totalCost = inputCost + outputCost;
+
+        if (totalCost < 0.01m)
+        {
+            return $"{SessionTotalTokens:N0} tokens (~${totalCost:F4})";
+        }
+        return $"{SessionTotalTokens:N0} tokens (~${totalCost:F2})";
+    }
+
     public CopilotDocumentViewModel(
         InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel,
@@ -449,6 +525,19 @@ public partial class CopilotDocumentViewModel : Document
         {
             var result = await _orchestrator!.ProcessUserMessage(userMessage);
 
+            // Update session token counts
+            SessionInputTokens += result.InputTokens;
+            SessionOutputTokens += result.OutputTokens;
+            OnPropertyChanged(nameof(SessionTotalTokens));
+            OnPropertyChanged(nameof(EstimatedCost));
+
+            // Show token usage in debug mode
+            if (DebugMode && (result.InputTokens > 0 || result.OutputTokens > 0))
+            {
+                Messages.Add(CopilotChatMessage.SystemMessage(
+                    $"[DEBUG] Tokens used: {result.InputTokens} in / {result.OutputTokens} out (Total this turn: {result.TotalTokens}, Session: {EstimatedCost})"));
+            }
+
             if (result.HasError)
             {
                 Messages.Add(CopilotChatMessage.ErrorMessage(result.Error));
@@ -470,6 +559,12 @@ public partial class CopilotDocumentViewModel : Document
         Messages.Clear();
         _isInitialized = false;
         _orchestrator = null;
+
+        // Reset token counters
+        SessionInputTokens = 0;
+        SessionOutputTokens = 0;
+        OnPropertyChanged(nameof(SessionTotalTokens));
+        OnPropertyChanged(nameof(EstimatedCost));
 
         Messages.Add(CopilotChatMessage.SystemMessage(
             "Chat cleared. Starting a new conversation."));
