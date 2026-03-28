@@ -92,7 +92,7 @@
                     <ScrollViewer Name="MessagesScrollViewer"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8">
+                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8,0,80">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:CopilotChatMessage">
                                     <Border Classes="chatBubble"
@@ -158,9 +158,10 @@
                                  Margin="8,4" />
 
                     <!-- Messages list -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                    <ScrollViewer Name="MessagesScrollViewer2"
+                                  VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8">
+                        <ItemsControl ItemsSource="{Binding Messages}" Margin="0,8,0,80">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:CopilotChatMessage">
                                     <Border Classes="chatBubble"

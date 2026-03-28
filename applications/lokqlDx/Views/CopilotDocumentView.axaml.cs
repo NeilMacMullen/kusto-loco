@@ -1,10 +1,12 @@
 using System;
 using System.Globalization;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using LokqlDx.ViewModels;
 
@@ -12,6 +14,9 @@ namespace LokqlDx.Views;
 
 public partial class CopilotDocumentView : UserControl
 {
+    private double _lastScrollOffset1;
+    private double _lastScrollOffset2;
+
     public CopilotDocumentView()
     {
         InitializeComponent();
@@ -28,38 +33,75 @@ public partial class CopilotDocumentView : UserControl
         // Subscribe to chat message changes for auto-scroll
         if (DataContext is CopilotDocumentViewModel vm)
         {
-            vm.Messages.CollectionChanged += (_, __) => ScrollChatToBottom();
+            vm.Messages.CollectionChanged += (_, __) => ScrollChatToBottomDelayed();
         }
     }
 
-    private void ScrollChatToBottom()
+    protected override void OnGotFocus(GotFocusEventArgs e)
     {
-        // Try both scroll viewers (one for each pane)
+        base.OnGotFocus(e);
+        // Restore scroll position when view regains focus
+        RestoreScrollPositions();
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        // When the control becomes visible again, restore scroll position
+        if (change.Property == IsVisibleProperty && change.NewValue is true)
+        {
+            RestoreScrollPositions();
+        }
+    }
+
+    private void RestoreScrollPositions()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var scroll1 = this.FindControl<ScrollViewer>("MessagesScrollViewer");
+            var scroll2 = this.FindControl<ScrollViewer>("MessagesScrollViewer2");
+
+            if (scroll1 != null && _lastScrollOffset1 > 0)
+            {
+                scroll1.Offset = new Vector(0, _lastScrollOffset1);
+            }
+            if (scroll2 != null && _lastScrollOffset2 > 0)
+            {
+                scroll2.Offset = new Vector(0, _lastScrollOffset2);
+            }
+        }, DispatcherPriority.Loaded);
+    }
+
+    private void SaveScrollPositions()
+    {
         var scroll1 = this.FindControl<ScrollViewer>("MessagesScrollViewer");
-        scroll1?.ScrollToEnd();
+        var scroll2 = this.FindControl<ScrollViewer>("MessagesScrollViewer2");
 
-        // The second scroll viewer has no name, so find by type
-        foreach (var sv in GetScrollViewers(this))
+        if (scroll1 != null)
         {
-            if (sv != scroll1 && sv.Parent is DockPanel)
-            {
-                sv.ScrollToEnd();
-            }
+            _lastScrollOffset1 = scroll1.Offset.Y;
+        }
+        if (scroll2 != null)
+        {
+            _lastScrollOffset2 = scroll2.Offset.Y;
         }
     }
 
-    private static IEnumerable<ScrollViewer> GetScrollViewers(Control root)
+    private void ScrollChatToBottomDelayed()
     {
-        if (root is ScrollViewer sv)
-            yield return sv;
-        foreach (var child in root.GetVisualChildren())
+        // Use a slight delay to ensure layout is complete before scrolling
+        Dispatcher.UIThread.Post(() =>
         {
-            if (child is Control ctrl)
-            {
-                foreach (var descendant in GetScrollViewers(ctrl))
-                    yield return descendant;
-            }
-        }
+            var scroll1 = this.FindControl<ScrollViewer>("MessagesScrollViewer");
+            var scroll2 = this.FindControl<ScrollViewer>("MessagesScrollViewer2");
+
+            scroll1?.ScrollToEnd();
+            scroll2?.ScrollToEnd();
+
+            // Save these positions as the new "last known good" positions
+            SaveScrollPositions();
+        }, DispatcherPriority.Loaded);
     }
 
     private void OnPreviewKeyDown(object? sender, KeyEventArgs e)

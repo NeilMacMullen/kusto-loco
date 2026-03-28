@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace KustoLoco.CopilotSupport;
 
@@ -15,11 +16,8 @@ public static class CopilotResponseParser
         if (string.IsNullOrWhiteSpace(modelResponse))
             return CopilotParseResult.Error("Empty response from model");
 
-        // Remove markdown code blocks if present
-        var jsonResponse = modelResponse
-            .Replace("```json", "")
-            .Replace("```", "")
-            .Trim();
+        // Try to extract JSON from the response
+        var jsonResponse = ExtractJson(modelResponse);
 
         try
         {
@@ -41,6 +39,42 @@ public static class CopilotResponseParser
                 Actions = [new CopilotAction { Type = "explanation", Text = modelResponse }]
             });
         }
+    }
+
+    /// <summary>
+    /// Extracts JSON from model response, handling various formats
+    /// </summary>
+    private static string ExtractJson(string modelResponse)
+    {
+        // First, try to find JSON in a markdown code block
+        // Pattern: ```json ... ``` or ``` ... ```
+        var codeBlockMatch = Regex.Match(modelResponse, @"```(?:json)?\s*(\{[\s\S]*?\})\s*```", RegexOptions.Singleline);
+        if (codeBlockMatch.Success)
+        {
+            return codeBlockMatch.Groups[1].Value.Trim();
+        }
+
+        // If no code block, try to find a JSON object directly
+        // Look for the first { and last } that form a valid JSON structure
+        var firstBrace = modelResponse.IndexOf('{');
+        var lastBrace = modelResponse.LastIndexOf('}');
+
+        if (firstBrace >= 0 && lastBrace > firstBrace)
+        {
+            var potentialJson = modelResponse.Substring(firstBrace, lastBrace - firstBrace + 1);
+
+            // Quick validation: check if it looks like our expected format
+            if (potentialJson.Contains("\"actions\""))
+            {
+                return potentialJson.Trim();
+            }
+        }
+
+        // Fallback: just strip markdown markers and return
+        return modelResponse
+            .Replace("```json", "")
+            .Replace("```", "")
+            .Trim();
     }
 }
 
