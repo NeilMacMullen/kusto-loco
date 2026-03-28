@@ -253,6 +253,20 @@ public partial class CopilotDocumentViewModel : Document
             var newRowCount = newResult?.RowCount ?? 0;
             var hasError = newResult?.Error.IsNotBlank() ?? false;
 
+            // Check if there's an error in the result
+            if (hasError && newResult != previousResult)
+            {
+                if (DebugMode)
+                {
+                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Query error: {newResult?.Error}"));
+                }
+                return new ActionExecutionResult
+                {
+                    Success = false,
+                    Error = newResult!.Error
+                };
+            }
+
             // Compare by reference AND by checking if row counts changed (for cases where same object is mutated)
             var hasNewResult = (newResult != previousResult || newRowCount != previousRowCount) 
                                && newResult != null 
@@ -264,6 +278,15 @@ public partial class CopilotDocumentViewModel : Document
                 .Select(ct => ct.Text)
                 .ToList();
 
+            // Check for error messages in console output (they're typically in red/error format)
+            var errorLines = newOutput.Where(line => 
+                line.Contains("error", StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("failed", StringComparison.OrdinalIgnoreCase) ||
+                line.Contains("exception", StringComparison.OrdinalIgnoreCase) ||
+                line.StartsWith("Syntax error", StringComparison.OrdinalIgnoreCase) ||
+                line.StartsWith("Unknown", StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+
             if (DebugMode)
             {
                 Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] After command: MostRecent has {newRowCount} rows, hasNewResult={hasNewResult}, sameRef={ReferenceEquals(newResult, previousResult)}, hasError={hasError}"));
@@ -271,10 +294,6 @@ public partial class CopilotDocumentViewModel : Document
                 if (newOutput.Any())
                 {
                     Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Console output:\n{string.Join("\n", newOutput)}"));
-                }
-                if (hasError)
-                {
-                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Result error: {newResult?.Error}"));
                 }
             }
 
@@ -297,6 +316,16 @@ public partial class CopilotDocumentViewModel : Document
             {
                 // Command produced console output
                 output = string.Join(Environment.NewLine, newOutput);
+
+                // If there are error lines, report as failure so model can retry
+                if (errorLines.Any())
+                {
+                    return new ActionExecutionResult
+                    {
+                        Success = false,
+                        Error = string.Join(Environment.NewLine, errorLines)
+                    };
+                }
             }
             else
             {

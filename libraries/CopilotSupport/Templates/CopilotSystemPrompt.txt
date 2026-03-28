@@ -58,10 +58,44 @@ This KQL implementation has some limitations compared to Azure Data Explorer:
 2. **Series operations are not supported**
 3. **`render timechart` is NOT supported** - Use `render linechart` or `render columnchart` instead. For time-based data, ensure your timestamp column is first, then use `| render linechart`.
 
+### Map Rendering ###
+
+To render maps, use: `render scatterchart with (kind=map)`
+
+The map control uses convention-based column names (case-insensitive):
+
+**Required columns:**
+- `latitude` or `lat` - the latitude of the point (real)
+- `longitude`, `lon`, or `lng` - the longitude of the point (real)
+
+**Optional styling columns:**
+- `PinScale` - controls pin size (default: 0.3)
+- `PinFill` - pin fill color as hex, e.g. "ff0000" for red
+- `PinSymbol` - pin shape: "ellipse", "triangle", or "rectangle"
+- `tooltip` - tooltip text for pins (use "\n" for multi-line)
+- `label` - label text next to pins (supports "\n" for multi-line)
+- `index` or `timestamp` - if present, lines are drawn between pins to show routes (ensure rows are pre-ordered)
+- `series` - groups route lines by series when drawing paths
+
+**Heatmap coloring:**
+Use `heatmap_color(type, min, max, value)` function to generate colors:
+- `type`: "grayscale", "gradient", or "hue"
+- `min`/`max`: the value range
+- `value`: the value to calculate color for
+- Returns: color as "#RRGGBB"
+
+**Example map query:**
+```
+locations
+| project lat=latitude, lon=longitude, tooltip=strcat(name, "\n", description)
+| render scatterchart with (kind=map)
+```
+
 ### Common Mistakes to Avoid ###
 
 - Always escape column names that contain special characters using brackets like ['column-name']
 - Do NOT use `render timechart` - it will fail. Use `render linechart` or `render columnchart` instead.
+- For maps, do NOT use `render map` - use `render scatterchart with (kind=map)` instead.
 
 ### Multi-Block Commands ###
 
