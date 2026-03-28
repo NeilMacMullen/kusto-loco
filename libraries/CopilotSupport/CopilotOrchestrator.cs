@@ -34,6 +34,7 @@ public class CopilotOrchestrator
     private readonly Action<string> _displayExplanation;
     private readonly Action<string, string> _displayQueryResult;
     private readonly Action<string>? _displayStatus;
+    private readonly Action<string>? _displayRawResponse;
 
     private CopilotOrchestrator(
         ChatSession session,
@@ -41,7 +42,8 @@ public class CopilotOrchestrator
         Func<string, Task<ActionExecutionResult>> executeCommand,
         Action<string> displayExplanation,
         Action<string, string> displayQueryResult,
-        Action<string>? displayStatus = null)
+        Action<string>? displayStatus = null,
+        Action<string>? displayRawResponse = null)
     {
         _session = session;
         _executeKql = executeKql;
@@ -49,6 +51,7 @@ public class CopilotOrchestrator
         _displayExplanation = displayExplanation;
         _displayQueryResult = displayQueryResult;
         _displayStatus = displayStatus;
+        _displayRawResponse = displayRawResponse;
     }
 
     /// <summary>
@@ -62,12 +65,13 @@ public class CopilotOrchestrator
         Func<string, Task<ActionExecutionResult>> executeCommand,
         Action<string> displayExplanation,
         Action<string, string> displayQueryResult,
-        Action<string>? displayStatus = null)
+        Action<string>? displayStatus = null,
+        Action<string>? displayRawResponse = null)
     {
         var systemPrompt = CopilotPromptBuilder.CreateSystemPrompt(getAvailableCommands, getSchemaInfo);
         var session = ChatSession.Create(settings, systemPrompt);
 
-        return new CopilotOrchestrator(session, executeKql, executeCommand, displayExplanation, displayQueryResult, displayStatus);
+        return new CopilotOrchestrator(session, executeKql, executeCommand, displayExplanation, displayQueryResult, displayStatus, displayRawResponse);
     }
 
     /// <summary>
@@ -85,6 +89,9 @@ public class CopilotOrchestrator
             result.Error = modelResponse.Error;
             return result;
         }
+
+        // Show raw response in debug mode
+        _displayRawResponse?.Invoke(modelResponse.Response);
 
         // Parse the response
         var parseResult = CopilotResponseParser.Parse(modelResponse.Response);
@@ -119,10 +126,36 @@ public class CopilotOrchestrator
                     actionResult.Success ? actionResult.Output : actionResult.Error,
                     !actionResult.Success);
 
+                _displayStatus?.Invoke($"Feeding inspect results back to model...");
+
                 // Send feedback and process any follow-up actions
                 var followUpResponse = await _session.SendUserRequest(feedbackMessage);
                 if (followUpResponse.Error.IsBlank())
                 {
+                    _displayRawResponse?.Invoke(followUpResponse.Response);
+                    var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
+                    if (followUpParse.IsSuccess)
+                    {
+                        await ExecuteActions(followUpParse.Response.Actions, result);
+                    }
+                }
+            }
+
+            // If this was a command action, feed results back to model
+            if (action.Type == "command" && actionResult.ShouldFeedbackToModel)
+            {
+                var feedbackMessage = CopilotPromptBuilder.CreateCommandResultMessage(
+                    action.Command,
+                    actionResult.Success ? actionResult.Output : actionResult.Error,
+                    !actionResult.Success);
+
+                _displayStatus?.Invoke($"Feeding command results back to model...");
+
+                // Send feedback and process any follow-up actions
+                var followUpResponse = await _session.SendUserRequest(feedbackMessage);
+                if (followUpResponse.Error.IsBlank())
+                {
+                    _displayRawResponse?.Invoke(followUpResponse.Response);
                     var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
                     if (followUpParse.IsSuccess)
                     {
@@ -138,9 +171,12 @@ public class CopilotOrchestrator
                     action.Query,
                     actionResult.Error);
 
+                _displayStatus?.Invoke($"Informing model about query error...");
+
                 var retryResponse = await _session.SendUserRequest(errorMessage);
                 if (retryResponse.Error.IsBlank())
                 {
+                    _displayRawResponse?.Invoke(retryResponse.Response);
                     var retryParse = CopilotResponseParser.Parse(retryResponse.Response);
                     if (retryParse.IsSuccess)
                     {
@@ -180,11 +216,37 @@ public class CopilotOrchestrator
             case "command":
                 _displayStatus?.Invoke($"Executing command: {action.Command}");
                 var cmdResult = await _executeCommand(action.Command);
+
+                // Show command results in debug mode
+                if (cmdResult.Success && !string.IsNullOrEmpty(cmdResult.Output))
+                {
+                    _displayStatus?.Invoke($"Command output:\n{cmdResult.Output}");
+                }
+                else if (!cmdResult.Success)
+                {
+                    _displayStatus?.Invoke($"Command failed: {cmdResult.Error}");
+                }
+
+                // Feed command results back to model so it can see the output
+                cmdResult.ShouldFeedbackToModel = true;
                 return cmdResult;
 
             case "inspect":
                 _displayStatus?.Invoke($"Inspecting: {action.Query}");
-                var inspectResult = await _executeKql(action.Query);
+
+                // Inspect can handle both KQL queries and commands (starting with .)
+                ActionExecutionResult inspectResult;
+                if (action.Query.TrimStart().StartsWith("."))
+                {
+                    // It's a command
+                    inspectResult = await _executeCommand(action.Query);
+                }
+                else
+                {
+                    // It's a KQL query
+                    inspectResult = await _executeKql(action.Query);
+                }
+
                 inspectResult.ShouldFeedbackToModel = true;
 
                 // Show a brief status about what was found

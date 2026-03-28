@@ -107,4 +107,30 @@ public static class CopilotPromptBuilder
             Please analyze the error and provide a corrected query. Remember the KQL engine limitations mentioned in your instructions.
             """;
     }
+
+    /// <summary>
+    /// Creates a follow-up message containing command execution results
+    /// </summary>
+    public static string CreateCommandResultMessage(string command, string result, bool isError)
+    {
+        if (isError)
+        {
+            return $"""
+                The command failed:
+                Command: {command}
+                Error: {result}
+
+                Please adjust your approach and try again.
+                """;
+        }
+
+        return $"""
+            Results from your command:
+            Command: {command}
+            Output:
+            {result}
+
+            Continue with your analysis based on this information.
+            """;
+    }
 }

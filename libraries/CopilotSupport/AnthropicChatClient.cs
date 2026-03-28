@@ -26,9 +26,8 @@ public class AnthropicChatClient : IChatClient
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var messageList = messages.ToList();
 
-        // Extract system message if present
+        var messageList = messages.ToList();
         string? systemPrompt = null;
         var conversationMessages = new List<Message>();
 
@@ -54,9 +53,14 @@ public class AnthropicChatClient : IChatClient
         {
             Model = _model,
             MaxTokens = options?.MaxOutputTokens ?? 4096,
-            Messages = conversationMessages,
-            SystemMessage = systemPrompt
+            Messages = conversationMessages
         };
+
+        // Anthropic v5: system prompt is set via the System property as a list of SystemMessage
+        if (!string.IsNullOrEmpty(systemPrompt))
+        {
+            parameters.System = new List<SystemMessage> { new SystemMessage(systemPrompt) };
+        }
 
         // Call Anthropic API
         var response = await _client.Messages.GetClaudeMessageAsync(parameters);

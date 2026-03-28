@@ -17,8 +17,10 @@ public class BlockBreaker
     public BlockBreaker(string block)
     {
         var blocks = new List<string>();
+        //normalize line endings and split
         //make the processing easier by adding an empty line at the end to act as a terminator
-        var lines = block.Split(Environment.NewLine)
+        var normalizedBlock = block.Replace("\r\n", "\n").Replace("\r", "\n");
+        var lines = normalizedBlock.Split('\n')
             .Append(string.Empty)
             .ToArray();
 

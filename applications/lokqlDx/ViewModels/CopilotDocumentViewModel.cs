@@ -75,6 +75,9 @@ public partial class CopilotDocumentViewModel : Document
     [ObservableProperty] 
     private bool _showResults = true;  // Start with results pane visible
 
+    [ObservableProperty]
+    private bool _debugMode = false;
+
     public CopilotDocumentViewModel(
         InteractiveTableExplorer explorer,
         ConsoleViewModel consoleViewModel,
@@ -164,7 +167,8 @@ public partial class CopilotDocumentViewModel : Document
             ExecuteCommand,
             DisplayExplanation,
             DisplayQueryResult,
-            DisplayStatus);
+            DisplayStatus,
+            DisplayRawResponse);
 
         _isInitialized = true;
     }
@@ -228,17 +232,89 @@ public partial class CopilotDocumentViewModel : Document
     {
         try
         {
+            // Capture console output
+            var previousCount = _consoleViewModel.ConsoleContent.Count;
             _consoleViewModel.PrepareForOutput();
+
+            // Track the previous result to see if command generated new data
+            var previousResult = _explorer._resultHistory.MostRecent;
+            var previousRowCount = previousResult?.RowCount ?? 0;
+
+            if (DebugMode)
+            {
+                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Before command: MostRecent has {previousRowCount} rows"));
+                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Running command (length={command.Length}):\n{command}"));
+            }
+
             await _explorer.RunInput(command);
+
+            // Check if a new result was generated (like .appinsights does)
+            var newResult = _explorer._resultHistory.MostRecent;
+            var newRowCount = newResult?.RowCount ?? 0;
+            var hasError = newResult?.Error.IsNotBlank() ?? false;
+
+            // Compare by reference AND by checking if row counts changed (for cases where same object is mutated)
+            var hasNewResult = (newResult != previousResult || newRowCount != previousRowCount) 
+                               && newResult != null 
+                               && newResult.Error.IsBlank();
+
+            // Collect new console output
+            var newOutput = _consoleViewModel.ConsoleContent
+                .Skip(previousCount)
+                .Select(ct => ct.Text)
+                .ToList();
+
+            if (DebugMode)
+            {
+                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] After command: MostRecent has {newRowCount} rows, hasNewResult={hasNewResult}, sameRef={ReferenceEquals(newResult, previousResult)}, hasError={hasError}"));
+                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Console lines captured: {newOutput.Count}"));
+                if (newOutput.Any())
+                {
+                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Console output:\n{string.Join("\n", newOutput)}"));
+                }
+                if (hasError)
+                {
+                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Result error: {newResult?.Error}"));
+                }
+            }
+
+            string output;
+            if (hasNewResult && newResult!.RowCount > 0)
+            {
+                // Command generated query results - format them
+                output = FormatResultForModel(newResult);
+
+                if (DebugMode)
+                {
+                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Formatted result:\n{output}"));
+                }
+
+                // Also show in results pane
+                ShowResults = true;
+                _ = RenderingSurfaceViewModel.RenderToDisplay(newResult);
+            }
+            else if (newOutput.Any())
+            {
+                // Command produced console output
+                output = string.Join(Environment.NewLine, newOutput);
+            }
+            else
+            {
+                output = "Command executed successfully";
+            }
 
             return new ActionExecutionResult
             {
                 Success = true,
-                Output = "Command executed successfully"
+                Output = output
             };
         }
         catch (Exception ex)
         {
+            if (DebugMode)
+            {
+                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Exception: {ex}"));
+            }
             return new ActionExecutionResult
             {
                 Success = false,
@@ -249,7 +325,18 @@ public partial class CopilotDocumentViewModel : Document
 
     private void DisplayStatus(string status)
     {
-        Messages.Add(CopilotChatMessage.SystemMessage(status));
+        if (DebugMode)
+        {
+            Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] {status}"));
+        }
+    }
+
+    private void DisplayRawResponse(string rawResponse)
+    {
+        if (DebugMode)
+        {
+            Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Model Response:\n{rawResponse}"));
+        }
     }
 
     private void DisplayExplanation(string text)
@@ -365,6 +452,41 @@ public partial class CopilotDocumentViewModel : Document
     private void ToggleResultsPane()
     {
         ShowResults = !ShowResults;
+    }
+
+    [RelayCommand]
+    private async Task CopyDebugToClipboard()
+    {
+        // Collect all debug messages from the chat
+        var debugMessages = Messages
+            .Where(m => m.Content.StartsWith("[DEBUG]") || m.Role == "system")
+            .Select(m => $"[{m.Timestamp:HH:mm:ss}] {m.Content}")
+            .ToList();
+
+        if (!debugMessages.Any())
+        {
+            Messages.Add(CopilotChatMessage.SystemMessage("No debug messages to copy."));
+            return;
+        }
+
+        var debugText = string.Join(Environment.NewLine + Environment.NewLine, debugMessages);
+
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                await Clowd.Clipboard.ClipboardAvalonia.SetTextAsync(debugText);
+                Messages.Add(CopilotChatMessage.SystemMessage($"Copied {debugMessages.Count} debug messages to clipboard."));
+            }
+            else
+            {
+                Messages.Add(CopilotChatMessage.SystemMessage("Clipboard copy is only supported on Windows."));
+            }
+        }
+        catch (Exception ex)
+        {
+            Messages.Add(CopilotChatMessage.ErrorMessage($"Failed to copy to clipboard: {ex.Message}"));
+        }
     }
 
     public void ApplyDisplayPreferences(DisplayPreferencesViewModel prefs)

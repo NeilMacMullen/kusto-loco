@@ -21,6 +21,17 @@
         <!-- Top toolbar -->
         <DockPanel DockPanel.Dock="Top" Margin="4">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                <CheckBox Content="Debug Mode"
+                          IsChecked="{Binding DebugMode}"
+                          ToolTip.Tip="Show detailed information about what Copilot is doing"
+                          Margin="0,0,8,0"
+                          VerticalAlignment="Center" />
+                <Button Command="{Binding CopyDebugToClipboardCommand}"
+                        ToolTip.Tip="Copy Debug Trace to Clipboard"
+                        Classes="Glyph"
+                        Content="&#x1F4CB;"
+                        IsVisible="{Binding DebugMode}"
+                        Margin="0,0,4,0" />
                 <Button Command="{Binding ToggleResultsPaneCommand}"
                         ToolTip.Tip="Toggle Results Pane"
                         Classes="Glyph"
