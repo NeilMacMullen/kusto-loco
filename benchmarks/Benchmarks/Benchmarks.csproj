@@ -14,6 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <ProjectReference Include="..\..\libraries\FileFormats\FileFormats.csproj" />
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
   </ItemGroup>
