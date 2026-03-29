@@ -88,6 +88,8 @@
 
                     <MenuItem Header="Show _Output Window" Command="{Binding ShowToolCommand}"
                               CommandParameter="console" />
+                    <Separator />
+                    <MenuItem Header="Open _Copilot" Command="{Binding OpenCopilotCommand}" />
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Getting started">

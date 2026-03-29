@@ -79,6 +79,7 @@
     <ProjectReference Include="..\..\libraries\lokql-engine\lokql-engine.csproj" />
     <ProjectReference Include="..\..\libraries\lokqlDxComponents\lokqlDxComponents.csproj" />
     <ProjectReference Include="..\..\libraries\ScottPlotRendering\ScottPlotRendering.csproj" />
+    <ProjectReference Include="..\..\libraries\CopilotSupport\CopilotSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

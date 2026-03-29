@@ -569,6 +569,18 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void ShowTool(string toolName) => Messaging.Send(new ShowToolMessage(toolName));
+
+    [RelayCommand]
+    private void OpenCopilot()
+    {
+        var copilotDoc = new CopilotDocumentViewModel(
+            _explorer,
+            ConsoleViewModel,
+            _displayPreferences,
+            _explorer.Settings);
+
+        _factory.AddCopilotDocument(copilotDoc);
+    }
 }
 
 public static class ApplicationHelper
