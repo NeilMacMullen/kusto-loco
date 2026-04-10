@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="NLog" />
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />

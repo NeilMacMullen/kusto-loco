@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" />
     <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
   </ItemGroup>
 
