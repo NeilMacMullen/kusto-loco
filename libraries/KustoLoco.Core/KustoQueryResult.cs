@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Util;
@@ -182,19 +185,103 @@ public class KustoQueryResult
     }
 
     /// <summary>
-    ///     Deserialises a Dictionary-based result to objects
+    ///     Cache for property mappings to avoid repeated reflection
     /// </summary>
-    public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue)
+    private static readonly ConcurrentDictionary<Type, PropertyInfo[]> PropertyCache = new();
+
+    /// <summary>
+    ///     Efficiently maps query results to records using reflection
+    /// </summary>
+    /// <remarks>
+    ///     This method directly maps column data to object properties without
+    ///     going through JSON serialization, providing better performance.
+    ///     Property matching is case-insensitive and also respects JsonPropertyName attributes.
+    /// </remarks>
+    public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue) where T : new()
     {
-        return ToRecords<T>(AsOrderedDictionarySet(max));
+        var results = new List<T>();
+        var columns = ColumnDefinitions();
+        var rowsToTake = Math.Min(max, RowCount);
+
+        if (rowsToTake == 0)
+            return results;
+
+        // Get writable properties with caching
+        var properties = PropertyCache.GetOrAdd(typeof(T), t =>
+            t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanWrite)
+                .ToArray());
+
+        // Build a mapping from column names to properties
+        // Supports both property names and JsonPropertyName attributes
+        var propertyLookup = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+        foreach (var prop in properties)
+        {
+            // Add by property name
+            propertyLookup[prop.Name] = prop;
+
+            // Also check for JsonPropertyName attribute
+            var jsonAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
+            if (jsonAttr != null)
+            {
+                propertyLookup[jsonAttr.Name] = prop;
+            }
+        }
+
+        // Create column-to-property mapping
+        var columnMappings = columns
+            .Select((col, index) => (
+                Index: index,
+                Column: col,
+                Property: propertyLookup.GetValueOrDefault(col.Name)
+            ))
+            .Where(x => x.Property != null)
+            .ToArray();
+
+        for (var row = 0; row < rowsToTake; row++)
+        {
+            var record = new T();
+            foreach (var (colIndex, column, property) in columnMappings)
+            {
+                var value = Get(colIndex, row);
+                if (value != null)
+                {
+                    var convertedValue = ConvertValue(value, property!.PropertyType);
+                    property!.SetValue(record, convertedValue);
+                }
+            }
+            results.Add(record);
+        }
+
+        return results;
     }
 
-    public static IReadOnlyCollection<T> ToRecords<T>(IEnumerable<OrderedDictionary> dictionaries)
+    /// <summary>
+    ///     Converts a value to the target type, handling nullable types and common conversions
+    /// </summary>
+    private static object? ConvertValue(object value, Type targetType)
     {
-        //this is horrible but I don't have time to research how to do it ourselves and the bottom line
-        //is that we are expecting results sets to be small to running through the JsonSerializer is
-        //"good enough" for now...
+        var underlyingType = TypeMapping.UnderlyingType(targetType);
 
+        // Direct assignment if types match
+        if (value.GetType() == underlyingType || underlyingType.IsAssignableFrom(value.GetType()))
+            return value;
+
+        // Handle enum conversion from string or numeric types
+        if (underlyingType.IsEnum)
+        {
+            if (value is string stringValue)
+                return Enum.Parse(underlyingType, stringValue, ignoreCase: true);
+            return Enum.ToObject(underlyingType, value);
+        }
+
+        // Use Convert.ChangeType for compatible type conversions
+        return Convert.ChangeType(value, underlyingType);
+    }
+
+    [Obsolete("Use ToRecords<T>() instead. This method will be removed in a future version.")]
+    public static IReadOnlyCollection<T> ToRecordsViaJson<T>(IEnumerable<OrderedDictionary> dictionaries)
+    {
         var json = ToJsonString(dictionaries);
         try
         {

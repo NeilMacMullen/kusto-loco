@@ -10,6 +10,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Suppress Tmds.DBus.Protocol vulnerability - transitive dependency from Avalonia for Linux -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -33,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Security vulnerability fix -->
+    <PackageReference Include="Tmds.DBus.Protocol" />
+
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
     <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
