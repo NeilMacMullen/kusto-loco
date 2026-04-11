@@ -75,6 +75,7 @@ public class CommandProcessor : ICommandProcessor
                 .WithAdditionalCommand<GetClipboardCommand.Options>(GetClipboardCommand.RunAsync)
                 .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
                 .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
+                .WithAdditionalCommand<ListFilesCommand.Options>(ListFilesCommand.RunAsync)
                 .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)

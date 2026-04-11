@@ -33,7 +33,12 @@ public static class SettingsCommand
         return Task.CompletedTask;
     }
 
-    [Verb("settings", HelpText = "shows all entries in the settings table")]
+    [Verb("settings", HelpText = @"displays all current settings and their values
+Returns results as a table named '_settings' for further querying.
+Settings control engine behavior and can be used as variables.
+Examples:
+  .settings              # Show all settings
+  .settings csv          # Show only settings containing 'csv'")]
     internal class Options
     {
         [Value(0, HelpText = "match substring", Required = false)]

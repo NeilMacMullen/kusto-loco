@@ -19,7 +19,11 @@ public static class FileFormatsCommand
         return Task.CompletedTask;
     }
 
-    [Verb("fileFormats", aliases: ["fmts"], HelpText = "list supported file formats for save/load")]
+    [Verb("fileFormats", aliases: ["fmts"], HelpText = @"lists all supported file formats for loading and saving data
+Displays format name, description, and supported file extensions.
+Examples:
+  .fileformats       # Show all supported formats
+  .fmts              # Same using alias")]
     internal class Options
     {
     }

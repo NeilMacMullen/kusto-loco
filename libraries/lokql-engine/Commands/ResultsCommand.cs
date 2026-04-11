@@ -17,7 +17,11 @@ public static class ResultsCommand
         return Task.CompletedTask;
     }
 
-    [Verb("results", HelpText = "shows the list of stored results")]
+    [Verb("results", HelpText = @"displays a list of all stored query results
+Shows result name, timestamp, row count, and column count.
+Use with .materialize to convert a stored result back to a table.
+Example:
+  .results           # List all stored query results")]
     internal class Options
     {
        

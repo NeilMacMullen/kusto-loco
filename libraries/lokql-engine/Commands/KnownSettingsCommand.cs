@@ -27,10 +27,13 @@ public static class KnownSettingsCommand
         console.Info($"Known settings now available as table {settingDefsTableName}");
     }
 
-    [Verb("knownsettings", HelpText = @"lists all setting definitions known to the engine
+    [Verb("knownsettings", HelpText = @"displays all registered setting definitions with descriptions
+Shows setting name, description, default value, and type.
+Returns results as table '_knownSettings' for further querying.
 Examples:
-  .knownsettings         #show all known settings
-  .knownsettings csv     #show known settings that related to csv processing")]
+  .knownsettings         # Show all known settings
+  .knownsettings csv     # Show CSV-related settings only
+  .knownsettings kusto   # Show kusto.* settings")]
     internal class Options
     {
         [Value(0, HelpText = "match substring", Required = false)]
