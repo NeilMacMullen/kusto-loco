@@ -210,4 +210,53 @@ public class IntPromotionTests : TestMethods
         result.Should().Contain("System.Int32");
         result.Should().Contain("System.Double");
     }
+
+    [TestMethod]
+    public async Task PercentileShouldPromoteIntToLong()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize Percentile50 = percentile(Temperature, 50)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
+
+    [TestMethod]
+    public async Task AbsShouldPromoteIntToLong()
+    {
+        var query = """
+                    print AbsOfInt = abs(int(-5))
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
+
+    [TestMethod]
+    public async Task ModuloShouldPromoteIntToLong()
+    {
+        var query = """
+                    print ModuloOfInt = int(10) % int(3)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
+
+    [TestMethod]
+    public async Task DivideShouldPromoteIntToLong()
+    {
+        var query = """
+                    print DivideOfInt = int(10) / int(3)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
 }
