@@ -9,17 +9,17 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Aggregates.Min")]
 internal partial class MinAggregate
 {
-    internal static long IntImpl(NumericAggregate context, int n)
+    internal static int IntImpl(NumericAggregate context, int n)
     {
         context.LongValue = context.Count == 0 ? n : Math.Min(context.LongValue, n);
         context.Count++;
         return 0;
     }
 
-    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contextSet)
+    internal static int? IntImplFinish(ConcurrentBag<NumericAggregate> contextSet)
     {
         var valid = contextSet.Where(c => c.Count > 0).ToList();
-        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+        return valid.Any() ? (int) valid.Select(c => c.LongValue).Min() : null;
     }
 
     internal static long LongImpl(NumericAggregate context, long n)

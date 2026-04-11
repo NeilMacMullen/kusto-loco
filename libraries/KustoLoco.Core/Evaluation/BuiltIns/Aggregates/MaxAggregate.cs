@@ -9,17 +9,17 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Aggregates.Max")]
 internal partial class MaxAggregate
 {
-    internal static long IntImpl(NumericAggregate context, int n)
+    internal static int IntImpl(NumericAggregate context, int n)
     {
         context.LongValue = context.Count == 0 ? n : Math.Max(context.LongValue, n);
         context.Count++;
         return 0;
     }
 
-    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    internal static int? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
     {
         var valid = contexts.Where(c => c.Count > 0).ToList();
-        return valid.Any() ? valid.Select(c => c.LongValue).Max() : null;
+        return valid.Any() ? (int) valid.Select(c => c.LongValue).Max() : null;
     }
 
     internal static long LongImpl(NumericAggregate context, long n)
