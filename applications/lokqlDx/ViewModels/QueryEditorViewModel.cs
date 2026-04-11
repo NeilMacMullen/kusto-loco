@@ -143,11 +143,11 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
     {
         var verbEntries = _explorer._commandProcessor.GetVerbs(_explorer._loader);
         var macros = _explorer.ListMacros()
-            .Select(m => new VerbEntry(m.Name, m.Description, false, []))
+            .Select(m => new VerbEntry(m.Name, m.Description, false, [], false))
             .ToArray();
         var special = new[]
         {
-            new VerbEntry("end", "ends a macro definition", false, [])
+            new VerbEntry("end", "ends a macro definition", false, [], false)
         };
 
         //add .end for macro definition

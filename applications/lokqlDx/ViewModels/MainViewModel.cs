@@ -57,6 +57,7 @@ public partial class MainViewModel : ObservableObject
 
     private bool _trueClose;
     [ObservableProperty] private string _updateInfo = string.Empty;
+    [ObservableProperty] private string _kustoDataPath = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
@@ -123,7 +124,11 @@ public partial class MainViewModel : ObservableObject
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
         if (message.IsRunning) await SaveBeforeQuery();
-        else Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
+        else
+        {
+            Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
+            UpdateKustoDataPath();
+        }
         return false;
     }
 
@@ -403,6 +408,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
+        UpdateKustoDataPath();
     }
 
     private void RemoveAllDocs()
@@ -580,6 +586,11 @@ public partial class MainViewModel : ObservableObject
             _explorer.Settings);
 
         _factory.AddCopilotDocument(copilotDoc);
+    }
+
+    private void UpdateKustoDataPath()
+    {
+        KustoDataPath = _explorer.Settings.Get(StandardFormatAdaptor.Settings.KustoDataPath);
     }
 }
 

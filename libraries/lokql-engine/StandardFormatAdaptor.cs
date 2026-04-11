@@ -84,10 +84,6 @@ public class StandardFormatAdaptor : ITableAdaptor
         return _loaders.Select(l => l.GetDescription()).ToArray();
     }
 
-    public void SetDataPaths(string path)
-    {
-        _settings.Set(Settings.KustoDataPath.Name, path);
-    }
 
     public async Task<bool> LoadTable(KustoQueryContext context, string path, string tableName)
     {
