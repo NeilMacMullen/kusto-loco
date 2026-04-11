@@ -34,32 +34,47 @@ public static class CopilotPromptBuilder
     {
         var template = GetCopilotTemplate();
 
-        // Build commands section
+        // Build commands section - only include key commands, not every verb
         var commandsBuilder = new StringBuilder();
         var commands = getAvailableCommands();
-        foreach (var command in commands)
+        // Limit to most useful commands to reduce prompt size
+        var keyCommands = commands.Take(20).ToArray();
+        foreach (var command in keyCommands)
         {
             commandsBuilder.AppendLine($"- {command}");
         }
+        if (commands.Length > keyCommands.Length)
+        {
+            commandsBuilder.AppendLine($"- ... and {commands.Length - keyCommands.Length} more commands (use .help for full list)");
+        }
 
-        // Build schema section
+        // Build schema section - keep it compact
         var schemaBuilder = new StringBuilder();
         var schemaInfo = getSchemaInfo();
-        var tableGroups = schemaInfo.GroupBy(s => s.TableName);
+        var tableGroups = schemaInfo.GroupBy(s => s.TableName).ToArray();
 
         foreach (var table in tableGroups)
         {
-            schemaBuilder.AppendLine($"Table '{table.Key}':");
-            foreach (var col in table)
+            var columns = table.ToArray();
+            var columnCount = columns.Length;
+
+            // Show first 8 columns, then summarize the rest
+            const int maxColumnsToShow = 8;
+            var columnsToShow = columns.Take(maxColumnsToShow)
+                .Select(c => $"{c.ColumnName}({c.ColumnType})");
+
+            var columnList = string.Join(", ", columnsToShow);
+            if (columnCount > maxColumnsToShow)
             {
-                schemaBuilder.AppendLine($"  - {col.ColumnName}: {col.ColumnType}");
+                columnList += $", ... +{columnCount - maxColumnsToShow} more";
             }
-            schemaBuilder.AppendLine();
+
+            schemaBuilder.AppendLine($"Table '{table.Key}' ({columnCount} columns): {columnList}");
         }
 
         if (schemaInfo.Length == 0)
         {
-            schemaBuilder.AppendLine("No tables are currently loaded. The user may load data using .load commands or by dragging files into the application.");
+            schemaBuilder.AppendLine("No tables are currently loaded. Use .load commands to load data.");
         }
 
         template = template.Replace("## AVAILABLE_COMMANDS ##", commandsBuilder.ToString());
@@ -73,24 +88,26 @@ public static class CopilotPromptBuilder
     /// </summary>
     public static string CreateInspectResultMessage(string query, string result, bool isError)
     {
+        var truncatedResult = TruncateIfNeeded(result, 2000);
+
         if (isError)
         {
             return $"""
                 The inspect query failed:
                 Query: {query}
-                Error: {result}
+                Error: {truncatedResult}
 
-                Please adjust your approach and try again.
+                Please adjust your approach and try again. You MUST respond with a JSON actions block.
                 """;
         }
 
         return $"""
-            Results from your inspect query:
+            Inspect results:
             Query: {query}
             Results:
-            {result}
+            {truncatedResult}
 
-            Continue with your analysis based on this information.
+            IMPORTANT: Continue with your analysis. You MUST respond with a JSON actions block that progresses toward answering the user's question. Do NOT stop here.
             """;
     }
 
@@ -102,7 +119,7 @@ public static class CopilotPromptBuilder
         return $"""
             The KQL query failed to execute:
             Query: {query}
-            Error: {error}
+            Error: {TruncateIfNeeded(error, 500)}
 
             Please analyze the error and provide a corrected query. Remember the KQL engine limitations mentioned in your instructions.
             """;
@@ -113,24 +130,37 @@ public static class CopilotPromptBuilder
     /// </summary>
     public static string CreateCommandResultMessage(string command, string result, bool isError)
     {
+        var truncatedResult = TruncateIfNeeded(result, 2000);
+
         if (isError)
         {
             return $"""
                 The command failed:
                 Command: {command}
-                Error: {result}
+                Error: {truncatedResult}
 
                 Please adjust your approach and try again.
                 """;
         }
 
         return $"""
-            Results from your command:
+            Command executed successfully:
             Command: {command}
             Output:
-            {result}
+            {truncatedResult}
 
-            Continue with your analysis based on this information.
+            Continue with your task.
             """;
+    }
+
+    /// <summary>
+    /// Truncates a string if it exceeds the maximum length to reduce token usage
+    /// </summary>
+    private static string TruncateIfNeeded(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+            return text;
+
+        return text[..maxLength] + $"\n... (truncated, {text.Length - maxLength} more characters)";
     }
 }
