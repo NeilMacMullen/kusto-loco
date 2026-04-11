@@ -381,7 +381,7 @@ public class KustoQueryContext
         }
     }
 
-    public async Task<IReadOnlyCollection<T>> RunQueryToRecordSet<T>(string query)
+    public async Task<IReadOnlyCollection<T>> RunQueryToRecordSet<T>(string query) where T : new()
     {
         var result = await RunQuery(query);
         if (result.Error.IsNotBlank())
@@ -428,7 +428,7 @@ public class KustoQueryContext
     ///     to deserialize the results back into the original type.
     /// </remarks>
     public static IReadOnlyCollection<T> FilterRecords<T>(ImmutableArray<T> rows,
-        string query)
+        string query) where T : new()
     {
         var result = QueryRecords(rows, query);
         return result.ToRecords<T>();
