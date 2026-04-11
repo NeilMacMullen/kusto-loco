@@ -28,6 +28,8 @@ public class CopilotChatHistoryItem
 /// </summary>
 public class CopilotOrchestrator
 {
+    private const int MaxErrorRetryAttempts = 3;
+
     private readonly ChatSession _session;
     private readonly Func<string, Task<ActionExecutionResult>> _executeKql;
     private readonly Func<string, Task<ActionExecutionResult>> _executeCommand;
@@ -35,6 +37,7 @@ public class CopilotOrchestrator
     private readonly Action<string, string> _displayQueryResult;
     private readonly Action<string>? _displayStatus;
     private readonly Action<string>? _displayRawResponse;
+    private readonly Action<string>? _displayError;
 
     private CopilotOrchestrator(
         ChatSession session,
@@ -43,7 +46,8 @@ public class CopilotOrchestrator
         Action<string> displayExplanation,
         Action<string, string> displayQueryResult,
         Action<string>? displayStatus = null,
-        Action<string>? displayRawResponse = null)
+        Action<string>? displayRawResponse = null,
+        Action<string>? displayError = null)
     {
         _session = session;
         _executeKql = executeKql;
@@ -52,6 +56,7 @@ public class CopilotOrchestrator
         _displayQueryResult = displayQueryResult;
         _displayStatus = displayStatus;
         _displayRawResponse = displayRawResponse;
+        _displayError = displayError;
     }
 
     /// <summary>
@@ -66,12 +71,13 @@ public class CopilotOrchestrator
         Action<string> displayExplanation,
         Action<string, string> displayQueryResult,
         Action<string>? displayStatus = null,
-        Action<string>? displayRawResponse = null)
+        Action<string>? displayRawResponse = null,
+        Action<string>? displayError = null)
     {
         var systemPrompt = CopilotPromptBuilder.CreateSystemPrompt(getAvailableCommands, getSchemaInfo);
         var session = ChatSession.Create(settings, systemPrompt);
 
-        return new CopilotOrchestrator(session, executeKql, executeCommand, displayExplanation, displayQueryResult, displayStatus, displayRawResponse);
+        return new CopilotOrchestrator(session, executeKql, executeCommand, displayExplanation, displayQueryResult, displayStatus, displayRawResponse, displayError);
     }
 
     /// <summary>
@@ -105,13 +111,13 @@ public class CopilotOrchestrator
             return result;
         }
 
-        // Execute actions
-        await ExecuteActions(parseResult.Response.Actions, result);
+        // Execute actions with error retry tracking
+        await ExecuteActions(parseResult.Response.Actions, result, errorRetryCount: 0);
 
         return result;
     }
 
-    private async Task ExecuteActions(List<CopilotAction> actions, ConversationResult result)
+    private async Task ExecuteActions(List<CopilotAction> actions, ConversationResult result, int errorRetryCount)
     {
         foreach (var action in actions)
         {
@@ -119,93 +125,147 @@ public class CopilotOrchestrator
             result.ExecutedActions.Add(new ExecutedAction
             {
                 Action = action,
-                Result = actionResult
+                Result = actionResult,
+                IsRetry = errorRetryCount > 0
             });
+
+            // Handle failed actions that need retry
+            if (!actionResult.Success && ShouldRetryOnError(action.Type))
+            {
+                await HandleActionError(action, actionResult, result, errorRetryCount);
+                continue;
+            }
 
             // If this was an inspect action, feed results back to model
             if (action.Type == "inspect" && actionResult.ShouldFeedbackToModel)
             {
-                var feedbackMessage = CopilotPromptBuilder.CreateInspectResultMessage(
-                    action.Query,
-                    actionResult.Success ? actionResult.Output : actionResult.Error,
-                    !actionResult.Success);
-
-                _displayStatus?.Invoke($"Feeding inspect results back to model...");
-
-                // Send feedback and process any follow-up actions
-                var followUpResponse = await _session.SendUserRequest(feedbackMessage);
-                result.InputTokens += followUpResponse.InputTokens;
-                result.OutputTokens += followUpResponse.OutputTokens;
-
-                if (followUpResponse.Error.IsBlank())
-                {
-                    _displayRawResponse?.Invoke(followUpResponse.Response);
-                    var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
-                    if (followUpParse.IsSuccess)
-                    {
-                        await ExecuteActions(followUpParse.Response.Actions, result);
-                    }
-                }
+                await HandleInspectFeedback(action, actionResult, result, errorRetryCount);
             }
 
             // If this was a command action, feed results back to model
-            if (action.Type == "command" && actionResult.ShouldFeedbackToModel)
+            if (action.Type == "command" && actionResult.ShouldFeedbackToModel && actionResult.Success)
             {
-                var feedbackMessage = CopilotPromptBuilder.CreateCommandResultMessage(
-                    action.Command,
-                    actionResult.Success ? actionResult.Output : actionResult.Error,
-                    !actionResult.Success);
-
-                _displayStatus?.Invoke($"Feeding command results back to model...");
-
-                // Send feedback and process any follow-up actions
-                var followUpResponse = await _session.SendUserRequest(feedbackMessage);
-                result.InputTokens += followUpResponse.InputTokens;
-                result.OutputTokens += followUpResponse.OutputTokens;
-
-                if (followUpResponse.Error.IsBlank())
-                {
-                    _displayRawResponse?.Invoke(followUpResponse.Response);
-                    var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
-                    if (followUpParse.IsSuccess)
-                    {
-                        await ExecuteActions(followUpParse.Response.Actions, result);
-                    }
-                }
+                await HandleCommandFeedback(action, actionResult, result, errorRetryCount);
             }
+        }
+    }
 
-            // If a KQL query failed, inform the model so it can retry
-            if (action.Type == "kql" && !actionResult.Success)
+    private static bool ShouldRetryOnError(string actionType)
+    {
+        return actionType.ToLowerInvariant() switch
+        {
+            "kql" => true,
+            "command" => true,
+            "inspect" => true,
+            _ => false
+        };
+    }
+
+    private async Task HandleActionError(CopilotAction action, ActionExecutionResult actionResult, ConversationResult result, int errorRetryCount)
+    {
+        if (errorRetryCount >= MaxErrorRetryAttempts)
+        {
+            // Max retries reached - inform user
+            var errorMessage = $"I've tried {MaxErrorRetryAttempts} times to fix this error but haven't been able to resolve it. " +
+                              $"The last error was:\n\n{actionResult.Error}\n\n" +
+                              "You may need to provide more guidance or try a different approach.";
+            _displayError?.Invoke(errorMessage);
+            _displayStatus?.Invoke($"Max retry attempts ({MaxErrorRetryAttempts}) reached. Giving up on this action.");
+            return;
+        }
+
+        // Create appropriate error message based on action type
+        string feedbackMessage;
+        string actionDescription;
+
+        switch (action.Type.ToLowerInvariant())
+        {
+            case "kql":
+                feedbackMessage = CopilotPromptBuilder.CreateQueryErrorMessage(action.Query, actionResult.Error);
+                actionDescription = "query";
+                break;
+            case "command":
+                feedbackMessage = CopilotPromptBuilder.CreateCommandResultMessage(action.Command, actionResult.Error, isError: true);
+                actionDescription = "command";
+                break;
+            case "inspect":
+                var query = action.Query;
+                feedbackMessage = query.TrimStart().StartsWith(".")
+                    ? CopilotPromptBuilder.CreateCommandResultMessage(query, actionResult.Error, isError: true)
+                    : CopilotPromptBuilder.CreateInspectResultMessage(query, actionResult.Error, isError: true);
+                actionDescription = "inspect";
+                break;
+            default:
+                return;
+        }
+
+        _displayStatus?.Invoke($"Error in {actionDescription} (attempt {errorRetryCount + 1}/{MaxErrorRetryAttempts}). Asking model to retry...");
+
+        // Send error to model and get retry response
+        var retryResponse = await _session.SendUserRequest(feedbackMessage);
+        result.InputTokens += retryResponse.InputTokens;
+        result.OutputTokens += retryResponse.OutputTokens;
+
+        if (retryResponse.Error.IsNotBlank())
+        {
+            _displayStatus?.Invoke($"Model error during retry: {retryResponse.Error}");
+            return;
+        }
+
+        _displayRawResponse?.Invoke(retryResponse.Response);
+        var retryParse = CopilotResponseParser.Parse(retryResponse.Response);
+
+        if (retryParse.IsSuccess)
+        {
+            // Recursively execute the retry actions with incremented retry count
+            await ExecuteActions(retryParse.Response.Actions, result, errorRetryCount + 1);
+        }
+    }
+
+    private async Task HandleInspectFeedback(CopilotAction action, ActionExecutionResult actionResult, ConversationResult result, int errorRetryCount)
+    {
+        var feedbackMessage = CopilotPromptBuilder.CreateInspectResultMessage(
+            action.Query,
+            actionResult.Success ? actionResult.Output : actionResult.Error,
+            !actionResult.Success);
+
+        _displayStatus?.Invoke($"Feeding inspect results back to model...");
+
+        var followUpResponse = await _session.SendUserRequest(feedbackMessage);
+        result.InputTokens += followUpResponse.InputTokens;
+        result.OutputTokens += followUpResponse.OutputTokens;
+
+        if (followUpResponse.Error.IsBlank())
+        {
+            _displayRawResponse?.Invoke(followUpResponse.Response);
+            var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
+            if (followUpParse.IsSuccess)
             {
-                var errorMessage = CopilotPromptBuilder.CreateQueryErrorMessage(
-                    action.Query,
-                    actionResult.Error);
+                await ExecuteActions(followUpParse.Response.Actions, result, errorRetryCount);
+            }
+        }
+    }
 
-                _displayStatus?.Invoke($"Informing model about query error...");
+    private async Task HandleCommandFeedback(CopilotAction action, ActionExecutionResult actionResult, ConversationResult result, int errorRetryCount)
+    {
+        var feedbackMessage = CopilotPromptBuilder.CreateCommandResultMessage(
+            action.Command,
+            actionResult.Output,
+            isError: false);
 
-                var retryResponse = await _session.SendUserRequest(errorMessage);
-                result.InputTokens += retryResponse.InputTokens;
-                result.OutputTokens += retryResponse.OutputTokens;
+        _displayStatus?.Invoke($"Feeding command results back to model...");
 
-                if (retryResponse.Error.IsBlank())
-                {
-                    _displayRawResponse?.Invoke(retryResponse.Response);
-                    var retryParse = CopilotResponseParser.Parse(retryResponse.Response);
-                    if (retryParse.IsSuccess)
-                    {
-                        // Only retry once to avoid infinite loops
-                        foreach (var retryAction in retryParse.Response.Actions)
-                        {
-                            var retryResult = await ExecuteAction(retryAction);
-                            result.ExecutedActions.Add(new ExecutedAction
-                            {
-                                Action = retryAction,
-                                Result = retryResult,
-                                IsRetry = true
-                            });
-                        }
-                    }
-                }
+        var followUpResponse = await _session.SendUserRequest(feedbackMessage);
+        result.InputTokens += followUpResponse.InputTokens;
+        result.OutputTokens += followUpResponse.OutputTokens;
+
+        if (followUpResponse.Error.IsBlank())
+        {
+            _displayRawResponse?.Invoke(followUpResponse.Response);
+            var followUpParse = CopilotResponseParser.Parse(followUpResponse.Response);
+            if (followUpParse.IsSuccess)
+            {
+                await ExecuteActions(followUpParse.Response.Actions, result, errorRetryCount);
             }
         }
     }

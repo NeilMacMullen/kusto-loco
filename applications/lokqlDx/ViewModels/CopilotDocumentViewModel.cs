@@ -13,14 +13,22 @@ namespace LokqlDx.ViewModels;
 /// <summary>
 /// Represents a single message in the Copilot chat
 /// </summary>
-public class CopilotChatMessage
+public class CopilotChatMessage : ObservableObject
 {
-    public string Role { get; set; } = string.Empty; // "user", "assistant", "system", "error"
+    public string Role { get; set; } = string.Empty; // "user", "assistant", "system", "error", "debug"
     public string Content { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; } = DateTime.Now;
     public bool IsQuery { get; set; }
     public string QueryText { get; set; } = string.Empty;
     public bool HasError { get; set; }
+    public bool IsDebugMessage { get; set; }
+
+    private bool _isVisible = true;
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => SetProperty(ref _isVisible, value);
+    }
 
     public static CopilotChatMessage UserMessage(string content) =>
         new() { Role = "user", Content = content };
@@ -36,6 +44,9 @@ public class CopilotChatMessage
 
     public static CopilotChatMessage SystemMessage(string content) =>
         new() { Role = "system", Content = content };
+
+    public static CopilotChatMessage DebugMessage(string content) =>
+        new() { Role = "debug", Content = content, IsDebugMessage = true, IsVisible = false };
 }
 
 /// <summary>
@@ -75,8 +86,25 @@ public partial class CopilotDocumentViewModel : Document
     [ObservableProperty] 
     private bool _showResults = true;  // Start with results pane visible
 
-    [ObservableProperty]
     private bool _debugMode = false;
+    public bool DebugMode
+    {
+        get => _debugMode;
+        set
+        {
+            if (SetProperty(ref _debugMode, value))
+            {
+                // Update visibility of all debug messages when toggle changes
+                foreach (var message in Messages)
+                {
+                    if (message.IsDebugMessage)
+                    {
+                        message.IsVisible = value;
+                    }
+                }
+            }
+        }
+    }
 
     // Token usage tracking for the session
     [ObservableProperty]
@@ -244,9 +272,15 @@ public partial class CopilotDocumentViewModel : Document
             DisplayExplanation,
             DisplayQueryResult,
             DisplayStatus,
-            DisplayRawResponse);
+            DisplayRawResponse,
+            DisplayRetryLimitError);
 
         _isInitialized = true;
+    }
+
+    private void DisplayRetryLimitError(string errorMessage)
+    {
+        Messages.Add(CopilotChatMessage.ErrorMessage(errorMessage));
     }
 
     private string[] GetAvailableCommands()
@@ -316,11 +350,8 @@ public partial class CopilotDocumentViewModel : Document
             var previousResult = _explorer._resultHistory.MostRecent;
             var previousRowCount = previousResult?.RowCount ?? 0;
 
-            if (DebugMode)
-            {
-                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Before command: MostRecent has {previousRowCount} rows"));
-                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Running command (length={command.Length}):\n{command}"));
-            }
+            AddDebugMessage($"[DEBUG] Before command: MostRecent has {previousRowCount} rows");
+            AddDebugMessage($"[DEBUG] Running command (length={command.Length}):\n{command}");
 
             await _explorer.RunInput(command);
 
@@ -332,10 +363,7 @@ public partial class CopilotDocumentViewModel : Document
             // Check if there's an error in the result
             if (hasError && newResult != previousResult)
             {
-                if (DebugMode)
-                {
-                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Query error: {newResult?.Error}"));
-                }
+                AddDebugMessage($"[DEBUG] Query error: {newResult?.Error}");
                 return new ActionExecutionResult
                 {
                     Success = false,
@@ -363,14 +391,11 @@ public partial class CopilotDocumentViewModel : Document
                 line.StartsWith("Unknown", StringComparison.OrdinalIgnoreCase)
             ).ToList();
 
-            if (DebugMode)
+            AddDebugMessage($"[DEBUG] After command: MostRecent has {newRowCount} rows, hasNewResult={hasNewResult}, sameRef={ReferenceEquals(newResult, previousResult)}, hasError={hasError}");
+            AddDebugMessage($"[DEBUG] Console lines captured: {newOutput.Count}");
+            if (newOutput.Any())
             {
-                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] After command: MostRecent has {newRowCount} rows, hasNewResult={hasNewResult}, sameRef={ReferenceEquals(newResult, previousResult)}, hasError={hasError}"));
-                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Console lines captured: {newOutput.Count}"));
-                if (newOutput.Any())
-                {
-                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Console output:\n{string.Join("\n", newOutput)}"));
-                }
+                AddDebugMessage($"[DEBUG] Console output:\n{string.Join("\n", newOutput)}");
             }
 
             string output;
@@ -379,10 +404,7 @@ public partial class CopilotDocumentViewModel : Document
                 // Command generated query results - format them
                 output = FormatResultForModel(newResult);
 
-                if (DebugMode)
-                {
-                    Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Formatted result:\n{output}"));
-                }
+                AddDebugMessage($"[DEBUG] Formatted result:\n{output}");
 
                 // Also show in results pane
                 ShowResults = true;
@@ -416,10 +438,7 @@ public partial class CopilotDocumentViewModel : Document
         }
         catch (Exception ex)
         {
-            if (DebugMode)
-            {
-                Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Exception: {ex}"));
-            }
+            AddDebugMessage($"[DEBUG] Exception: {ex}");
             return new ActionExecutionResult
             {
                 Success = false,
@@ -430,18 +449,22 @@ public partial class CopilotDocumentViewModel : Document
 
     private void DisplayStatus(string status)
     {
-        if (DebugMode)
-        {
-            Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] {status}"));
-        }
+        AddDebugMessage($"[DEBUG] {status}");
     }
 
     private void DisplayRawResponse(string rawResponse)
     {
-        if (DebugMode)
-        {
-            Messages.Add(CopilotChatMessage.SystemMessage($"[DEBUG] Model Response:\n{rawResponse}"));
-        }
+        AddDebugMessage($"[DEBUG] Model Response:\n{rawResponse}");
+    }
+
+    /// <summary>
+    /// Adds a debug message that is always logged but only visible when DebugMode is enabled
+    /// </summary>
+    private void AddDebugMessage(string content)
+    {
+        var message = CopilotChatMessage.DebugMessage(content);
+        message.IsVisible = DebugMode; // Set initial visibility based on current mode
+        Messages.Add(message);
     }
 
     private void DisplayExplanation(string text)
@@ -531,11 +554,11 @@ public partial class CopilotDocumentViewModel : Document
             OnPropertyChanged(nameof(SessionTotalTokens));
             OnPropertyChanged(nameof(EstimatedCost));
 
-            // Show token usage in debug mode
-            if (DebugMode && (result.InputTokens > 0 || result.OutputTokens > 0))
+            // Always log token usage (visible only in debug mode)
+            if (result.InputTokens > 0 || result.OutputTokens > 0)
             {
-                Messages.Add(CopilotChatMessage.SystemMessage(
-                    $"[DEBUG] Tokens used: {result.InputTokens} in / {result.OutputTokens} out (Total this turn: {result.TotalTokens}, Session: {EstimatedCost})"));
+                AddDebugMessage(
+                    $"[DEBUG] Tokens used: {result.InputTokens} in / {result.OutputTokens} out (Total this turn: {result.TotalTokens}, Session: {EstimatedCost})");
             }
 
             if (result.HasError)
