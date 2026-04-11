@@ -9,7 +9,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 [KustoImplementation(Keyword = "Aggregates.MinIf")]
 internal partial class MinIfAggregate
 {
-    internal static long IntImpl(NumericAggregate context, int n, bool t)
+    internal static int IntImpl(NumericAggregate context, int n, bool t)
     {
         if (!t)
             return 0;
@@ -18,10 +18,10 @@ internal partial class MinIfAggregate
         return 0;
     }
 
-    internal static long? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
+    internal static int? IntImplFinish(ConcurrentBag<NumericAggregate> contexts)
     {
         var valid = contexts.Where(c => c.Count > 0).ToList();
-        return valid.Any() ? valid.Select(c => c.LongValue).Min() : null;
+        return valid.Any() ? (int) valid.Select(c => c.LongValue).Min() : null;
     }
 
     internal static long LongImpl(NumericAggregate context, long n, bool t)
