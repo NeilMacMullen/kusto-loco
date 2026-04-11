@@ -176,11 +176,16 @@
                 x:Name="StatusBar"
                 Background="{DynamicResource SystemAltMediumColor}"
                 Grid.Row="1"
-                Grid.ColumnSpan="3">
+                Grid.ColumnSpan="3"
+                Orientation="Horizontal">
                 <TextBlock
                     FontSize="12"
                     Text="{Binding UpdateInfo}"
                     IsVisible="{Binding ShowUpdateInfo}"
+                    Margin="2" />
+                <TextBlock
+                    FontSize="12"
+                    Text="{Binding KustoDataPath, StringFormat='Data Path: {0}'}"
                     Margin="2" />
             </StackPanel>
         </Grid>

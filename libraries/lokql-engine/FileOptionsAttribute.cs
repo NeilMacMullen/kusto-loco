@@ -20,4 +20,9 @@ public class FileOptionsAttribute : Attribute
     /// Enable to concatenate existing allowed extensions with those sourced from <see cref="StandardFormatAdaptor"/>
     /// </summary>
     public bool IncludeStandardFormatterExtensions { get; init; }
+
+    /// <summary>
+    /// When true, only folders/directories will be shown in intellisense, not files.
+    /// </summary>
+    public bool FoldersOnly { get; init; }
 }

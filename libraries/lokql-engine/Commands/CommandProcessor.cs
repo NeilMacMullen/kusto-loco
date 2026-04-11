@@ -65,6 +65,7 @@ public class CommandProcessor : ICommandProcessor
                 .WithAdditionalCommand<AdxCommand.Options>(AdxCommand.RunAsync)
                 .WithAdditionalCommand<PivotColumnsToRowsCommand.Options>(PivotColumnsToRowsCommand.RunAsync)
                 .WithAdditionalCommand<SetCommand.Options>(SetCommand.RunAsync)
+                .WithAdditionalCommand<ChangeDirectoryCommand.Options>(ChangeDirectoryCommand.RunAsync)
                 .WithAdditionalCommand<SettingsCommand.Options>(SettingsCommand.RunAsync)
                 .WithAdditionalCommand<KnownSettingsCommand.Options>(KnownSettingsCommand.RunAsync)
                 .WithAdditionalCommand<PushCommand.Options>(PushCommand.RunAsync)
@@ -74,6 +75,7 @@ public class CommandProcessor : ICommandProcessor
                 .WithAdditionalCommand<GetClipboardCommand.Options>(GetClipboardCommand.RunAsync)
                 .WithAdditionalCommand<AddTableCommand.Options>(AddTableCommand.RunAsync)
                 .WithAdditionalCommand<ListTablesCommand.Options>(ListTablesCommand.RunAsync)
+                .WithAdditionalCommand<ListFilesCommand.Options>(ListFilesCommand.RunAsync)
                 .WithAdditionalCommand<MaterializeCommand.Options>(MaterializeCommand.RunAsync)
                 .WithAdditionalCommand<SynTableCommand.Options>(SynTableCommand.RunAsync)
                 .WithAdditionalCommand<AppInsightsCommand.Options>(AppInsightsCommand.RunAsync)
@@ -157,17 +159,19 @@ public class CommandProcessor : ICommandProcessor
                     .SingleOrDefault();
 
                 var supportsFiles = false;
+                var foldersOnly = false;
 
                 IReadOnlyList<string> supportedExtensions = [];
                 if (fileAttribute is not null)
                 {
                     supportsFiles = true;
+                    foldersOnly = fileAttribute.FoldersOnly;
                     supportedExtensions = fileAttribute.Extensions;
                     if (fileAttribute.IncludeStandardFormatterExtensions)
                         supportedExtensions = supportedExtensions.Concat(extensions).ToList();
                 }
 
-                return new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles, supportedExtensions);
+                return new VerbEntry(attribute.Name, attribute.HelpText, supportsFiles, supportedExtensions, foldersOnly);
             }
         );
 
@@ -179,7 +183,7 @@ public class CommandProcessor : ICommandProcessor
             const string helpText = @"Shows a list of available commands or help for a specific command
 .help            for a summary of all commands
 .help *command*  for details of a specific command";
-            return new VerbEntry("help", helpText, false, []);
+            return new VerbEntry("help", helpText, false, [], false);
         }
     }
 

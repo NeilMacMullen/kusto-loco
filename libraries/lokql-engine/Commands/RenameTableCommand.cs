@@ -14,9 +14,10 @@ public static class RenameTableCommand
     }
 
     [Verb("rename",
-        HelpText = """
-                   Renames the named table 
-                   """
+        HelpText = @"renames an existing table in the query context
+Examples:
+  .rename oldName newName    # Rename table 'oldName' to 'newName'
+  .rename ['old name'] t     # Rename table with spaces to simple name"
     )]
     internal class Options
     {

@@ -16,10 +16,12 @@ public static class MaterializeCommand
     }
 
     [Verb("materialize", aliases: ["materialise", "mat"],
-        HelpText = @"saves a result back into the context as a table
+        HelpText = @"converts a query result into a permanent table in the context
+Allows you to reuse query results in subsequent queries.
 Examples:
-  .materialize t                # materializes the last result as a table called 't'
-  .materialize t storedResult   # materializes a stored result as a table called 't'
+  .materialize newTable              # Create table from last result
+  .materialize t myStoredResult      # Create table from named result
+  .mat summary                       # Same using alias
   ")]
     internal class Options
     {

@@ -12,7 +12,7 @@ public class IntellisenseClientAdapter(
     IImageProvider imageProvider
     )
 {
-    private Dictionary<string, HashSet<string>> AllowedCommandsAndExtensions { get; set; } = [];
+    private Dictionary<string, FileCommandInfo> AllowedCommandsAndExtensions { get; set; } = [];
     public IntellisenseEntry[] InternalCommands { get; private set; } = [];
 
     public IImageProvider _imageProvider => imageProvider;
@@ -43,7 +43,7 @@ public class IntellisenseClientAdapter(
         var command = args[0];
 
         // check if it starts with a valid file IO command like ".save"
-        if (!AllowedCommandsAndExtensions.TryGetValue(command, out var extensions))
+        if (!AllowedCommandsAndExtensions.TryGetValue(command, out var fileCommandInfo))
         {
             return CompletionResult.Empty;
         }
@@ -65,34 +65,45 @@ public class IntellisenseClientAdapter(
             logger.LogDebug(exc, "Intellisense request cancelled");
         }
 
-        if (extensions.Count > 0 && !result.IsEmpty())
+        if (!result.IsEmpty())
         {
-            return result with
+            var entries = result.Entries;
+
+            // Filter out files if FoldersOnly is true
+            if (fileCommandInfo.FoldersOnly)
             {
-                Entries = result
-                    .Entries
+                entries = entries.Where(x => x.Hint == IntellisenseHint.Folder).ToList();
+            }
+            // Filter by extensions if specified
+            else if (fileCommandInfo.Extensions.Count > 0)
+            {
+                entries = entries
                     .Where(x =>
                         {
                             // permit folders (which do not have extensions). note that files without extensions will still be allowed
                             var ext = Path.GetExtension(x.Name);
-                            return ext == string.Empty || extensions.Contains(ext);
+                            return ext == string.Empty || fileCommandInfo.Extensions.Contains(ext);
                         }
                     )
-                    .ToList()
-            };
+                    .ToList();
+            }
+
+            return result with { Entries = entries };
         }
 
         return result;
     }
 
-    private static Dictionary<string, HashSet<string>> CreateLookup(IEnumerable<VerbEntry> verbs)
+    private static Dictionary<string, FileCommandInfo> CreateLookup(IEnumerable<VerbEntry> verbs)
     {
         var fileIoCommands = verbs.Where(x => x.SupportsFiles);
         var comparer = StringComparer.OrdinalIgnoreCase;
         return fileIoCommands.ToDictionary(
             x => "." + x.Name,
-            x => x.SupportedExtensions.ToHashSet(comparer),
+            x => new FileCommandInfo(x.SupportedExtensions.ToHashSet(comparer), x.FoldersOnly),
             comparer
         );
     }
+
+    private readonly record struct FileCommandInfo(HashSet<string> Extensions, bool FoldersOnly);
 }

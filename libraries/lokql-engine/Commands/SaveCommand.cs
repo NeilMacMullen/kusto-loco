@@ -23,14 +23,14 @@ public static class SaveCommand
         exp.Settings.Pop();
     }
 
-    [Verb("save", aliases: ["sv"], HelpText = @"save results to file.
-Supported formats are csv,tsv,parquet.json,text
-If the path is not rooted, the file is stored in kusto.datapath
-If the name of the result is not specified, the most recent result is saved.
+    [Verb("save", aliases: ["sv"], HelpText = @"saves query results to a file
+Supported formats: csv, tsv, parquet, json, text
+If the path is not absolute, the file is stored in kusto.datapath.
+If no result name is specified, the most recent result is saved.
 Examples:
-  .save c:\temp\data.csv #saves the most recent result to a csv file
-  .save d.parquet abc    #saves a named result called 'abc' to a parquet file
-")]
+  .save c:\temp\data.csv           # Save most recent result to CSV
+  .save data.parquet myResult      # Save named result 'myResult' to parquet
+  .save output.csv --no-header     # Save without column headers")]
     internal class Options
     {
         [Value(0, HelpText = "Name of file", Required = true)]

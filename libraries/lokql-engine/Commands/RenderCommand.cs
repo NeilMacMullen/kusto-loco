@@ -21,7 +21,12 @@ public static class RenderCommand
         return Task.CompletedTask;
     }
 
-    [Verb("render", aliases: ["ren"], HelpText = "render last results as html and opens with browser")]
+    [Verb("render", aliases: ["ren"], HelpText = @"renders the last query result as HTML and opens in browser
+Generates an interactive HTML visualization of your data.
+Examples:
+  .render                        # Render to temp file and open in browser
+  .render output.html            # Render to specific file and open
+  .render report.html --saveOnly # Save without opening browser")]
     internal class Options
     {
         [Value(0, HelpText = "Name of file")]

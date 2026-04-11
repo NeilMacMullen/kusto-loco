@@ -7,5 +7,4 @@ public interface ITableAdaptor : IKustoQueryContextTableLoader
     Task<bool> SaveResult(KustoQueryResult result, string path);
     IEnumerable<TableAdaptorDescription> GetSupportedAdaptors();
 
-    void SetDataPaths(string path);
 }

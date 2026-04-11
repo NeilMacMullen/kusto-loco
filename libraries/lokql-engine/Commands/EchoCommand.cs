@@ -17,11 +17,11 @@ public static class EchoCommand
     }
 
     [Verb("echo", HelpText =
-        @"writes the supplied text to the output window.  This can be useful when executing a series of
-long-running operations.
-
+        @"writes text to the output console
+Useful for logging progress in scripts or during long-running operations.
 Examples:
-  echo ""starting long-running query""
+  .echo Starting data analysis
+  .echo Loading tables...  
 ")]
     internal class Options
     {
