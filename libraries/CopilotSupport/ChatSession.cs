@@ -12,6 +12,17 @@ public class ChatSession
         _chatClient = chatClient;
     }
     private readonly List<ChatMessage> _history = [];
+
+    /// <summary>
+    /// Gets the current message count in the conversation history
+    /// </summary>
+    public int MessageCount => _history.Count;
+
+    /// <summary>
+    /// Gets the approximate total character count of all messages in history
+    /// </summary>
+    public int TotalCharacterCount => _history.Sum(m => m.Text?.Length ?? 0);
+
     public static ChatSession Create(AISettings settings,string systemInstructions)
     {
         var chatClient = OrchestratorMethods.CreateAIChatClient(settings);

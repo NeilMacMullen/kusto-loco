@@ -399,16 +399,31 @@ public partial class CopilotDocumentViewModel : Document
             }
 
             string output;
+
+            // Check if this is a data-loading command (like .load) - we don't need to send
+            // the full result data back to the model, just a summary
+            var isLoadCommand = command.TrimStart().StartsWith(".load", StringComparison.OrdinalIgnoreCase);
+
             if (hasNewResult && newResult!.RowCount > 0)
             {
-                // Command generated query results - format them
-                output = FormatResultForModel(newResult);
-
-                AddDebugMessage($"[DEBUG] Formatted result:\n{output}");
-
-                // Also show in results pane
+                // Show in results pane regardless
                 ShowResults = true;
                 _ = RenderingSurfaceViewModel.RenderToDisplay(newResult);
+
+                if (isLoadCommand)
+                {
+                    // For .load commands, just provide a brief summary - the console output
+                    // already tells us the file was loaded successfully
+                    var columnNames = newResult.ColumnNames();
+                    output = $"Table loaded successfully with {newResult.RowCount} rows and {columnNames.Length} columns: {string.Join(", ", columnNames.Take(10))}{(columnNames.Length > 10 ? "..." : "")}";
+                }
+                else
+                {
+                    // For other commands that generate results, format a limited sample
+                    output = FormatResultForModel(newResult);
+                }
+
+                AddDebugMessage($"[DEBUG] Formatted result:\n{output}");
             }
             else if (newOutput.Any())
             {
@@ -491,23 +506,35 @@ public partial class CopilotDocumentViewModel : Document
         if (result.RowCount == 0)
             return "No results returned.";
 
-        // Limit to first 20 rows to avoid token overflow
-        var maxRows = Math.Min(result.RowCount, 20);
+        // Limit rows to avoid token overflow - 10 rows is usually enough for the model to understand
+        var maxRows = Math.Min(result.RowCount, 10);
+
+        // Also limit columns for very wide tables
+        var columns = result.ColumnNames();
+        var maxColumns = Math.Min(columns.Length, 12);
+        var hasMoreColumns = columns.Length > maxColumns;
+
         var lines = new List<string>();
 
-        // Add header
-        var columns = result.ColumnNames();
-        lines.Add(string.Join(" | ", columns));
-        lines.Add(new string('-', lines[0].Length));
+        // Add header with limited columns
+        var headerCols = columns.Take(maxColumns).ToArray();
+        lines.Add(string.Join(" | ", headerCols) + (hasMoreColumns ? $" | ... +{columns.Length - maxColumns} more columns" : ""));
+        lines.Add(new string('-', Math.Min(lines[0].Length, 100)));
 
-        // Add data rows
+        // Add data rows with truncated values
         var columnDefs = result.ColumnDefinitions();
         for (var i = 0; i < maxRows; i++)
         {
             var rowValues = new List<string>();
-            for (var colIndex = 0; colIndex < columnDefs.Length; colIndex++)
+            for (var colIndex = 0; colIndex < maxColumns; colIndex++)
             {
-                rowValues.Add(result.Get(colIndex, i)?.ToString() ?? "null");
+                var value = result.Get(colIndex, i)?.ToString() ?? "null";
+                // Truncate long values to save tokens
+                if (value.Length > 50)
+                {
+                    value = value[..47] + "...";
+                }
+                rowValues.Add(value);
             }
             lines.Add(string.Join(" | ", rowValues));
         }

@@ -60,6 +60,87 @@ public class CopilotOrchestrator
     }
 
     /// <summary>
+    /// Formats an API error into a user-friendly message
+    /// </summary>
+    private string FormatApiError(string error)
+    {
+        // Check for common API error patterns and provide helpful messages
+        if (error.Contains("rate_limit", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("rate limit", StringComparison.OrdinalIgnoreCase))
+        {
+            return "⚠️ **Rate Limit Reached**\n\n" +
+                   "The AI service has temporarily limited requests. This usually happens when:\n" +
+                   "• Too many requests were made in a short time\n" +
+                   "• The conversation context has grown very large\n\n" +
+                   "**What you can do:**\n" +
+                   "• Wait a minute and try again\n" +
+                   "• Clear the chat to reduce context size\n" +
+                   "• Try a shorter, more specific question";
+        }
+
+        if (error.Contains("authentication", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("unauthorized", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("invalid_api_key", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("api key", StringComparison.OrdinalIgnoreCase))
+        {
+            return "🔑 **Authentication Error**\n\n" +
+                   "There's a problem with the API key. Please check:\n" +
+                   "• The API key is correctly set using `.set copilot.apikey YOUR_KEY`\n" +
+                   "• The key hasn't expired or been revoked\n" +
+                   "• You're using the correct API key for the selected provider";
+        }
+
+        if (error.Contains("quota", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("insufficient", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("billing", StringComparison.OrdinalIgnoreCase))
+        {
+            return "💳 **Quota/Billing Issue**\n\n" +
+                   "Your API account may have reached its limit or have a billing issue.\n" +
+                   "Please check your account status with your AI provider.";
+        }
+
+        if (error.Contains("timeout", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("timed out", StringComparison.OrdinalIgnoreCase))
+        {
+            return "⏱️ **Request Timeout**\n\n" +
+                   "The AI service took too long to respond. This can happen with complex queries.\n" +
+                   "Please try again, or try a simpler question.";
+        }
+
+        if (error.Contains("overloaded", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("capacity", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("503", StringComparison.OrdinalIgnoreCase))
+        {
+            return "🔄 **Service Busy**\n\n" +
+                   "The AI service is currently overloaded. Please wait a moment and try again.";
+        }
+
+        if (error.Contains("context", StringComparison.OrdinalIgnoreCase) &&
+            error.Contains("length", StringComparison.OrdinalIgnoreCase))
+        {
+            return "📝 **Context Too Long**\n\n" +
+                   "The conversation has grown too long for the model to process.\n" +
+                   "Please clear the chat and start a new conversation.";
+        }
+
+        // For other errors, provide a generic message with the error details
+        return $"❌ **API Error**\n\n" +
+               $"An error occurred while communicating with the AI service:\n\n{error}\n\n" +
+               "You can try again or clear the chat to start fresh.";
+    }
+
+    /// <summary>
+    /// Displays an API error to the user in a friendly format
+    /// </summary>
+    private void DisplayApiError(string error)
+    {
+        _displayStatus?.Invoke($"Error getting model follow-up: {error}");
+
+        var formattedError = FormatApiError(error);
+        _displayError?.Invoke(formattedError);
+    }
+
+    /// <summary>
     /// Creates a new CopilotOrchestrator with the specified configuration
     /// </summary>
     public static CopilotOrchestrator Create(
@@ -86,6 +167,9 @@ public class CopilotOrchestrator
     public async Task<ConversationResult> ProcessUserMessage(string userMessage)
     {
         var result = new ConversationResult();
+
+        // Log conversation context size for debugging
+        _displayStatus?.Invoke($"Conversation context: {_session.MessageCount} messages, ~{_session.TotalCharacterCount / 4} tokens (estimated)");
 
         // Send to model
         var modelResponse = await _session.SendUserRequest(userMessage);
@@ -208,7 +292,7 @@ public class CopilotOrchestrator
 
         if (retryResponse.Error.IsNotBlank())
         {
-            _displayStatus?.Invoke($"Model error during retry: {retryResponse.Error}");
+            DisplayApiError(retryResponse.Error);
             return;
         }
 
@@ -243,6 +327,27 @@ public class CopilotOrchestrator
             {
                 await ExecuteActions(followUpParse.Response.Actions, result, errorRetryCount);
             }
+            else
+            {
+                // Model returned an unparseable response after inspect feedback - this shouldn't happen
+                _displayStatus?.Invoke($"Warning: Model response after inspect could not be parsed: {followUpParse.ErrorMessage}");
+
+                // If the response has no actions, the model may have just sent an explanation as plain text
+                // Try to recover by displaying any text content
+                if (!string.IsNullOrWhiteSpace(followUpResponse.Response))
+                {
+                    var trimmed = followUpResponse.Response.Trim();
+                    // If it looks like plain text (not JSON), display it as an explanation
+                    if (!trimmed.StartsWith("{") && !trimmed.StartsWith("["))
+                    {
+                        _displayExplanation(trimmed);
+                    }
+                }
+            }
+        }
+        else
+        {
+            DisplayApiError(followUpResponse.Error);
         }
     }
 
@@ -267,6 +372,25 @@ public class CopilotOrchestrator
             {
                 await ExecuteActions(followUpParse.Response.Actions, result, errorRetryCount);
             }
+            else
+            {
+                // Model returned an unparseable response after command feedback
+                _displayStatus?.Invoke($"Warning: Model response after command could not be parsed: {followUpParse.ErrorMessage}");
+
+                // If the response has no actions, try to display any plain text
+                if (!string.IsNullOrWhiteSpace(followUpResponse.Response))
+                {
+                    var trimmed = followUpResponse.Response.Trim();
+                    if (!trimmed.StartsWith("{") && !trimmed.StartsWith("["))
+                    {
+                        _displayExplanation(trimmed);
+                    }
+                }
+            }
+        }
+        else
+        {
+            DisplayApiError(followUpResponse.Error);
         }
     }
 
@@ -300,8 +424,13 @@ public class CopilotOrchestrator
                     _displayStatus?.Invoke($"Command failed: {cmdResult.Error}");
                 }
 
-                // Feed command results back to model so it can see the output
-                cmdResult.ShouldFeedbackToModel = true;
+                // Only feed back results for commands that might need model response.
+                // Simple .load commands don't need feedback - the model can continue its plan.
+                var commandText = action.Command.TrimStart().ToLowerInvariant();
+                var isSimpleCommand = commandText.StartsWith(".load ") ||
+                                      commandText.StartsWith(".cd ") ||
+                                      commandText.StartsWith(".save ");
+                cmdResult.ShouldFeedbackToModel = !isSimpleCommand;
                 return cmdResult;
 
             case "inspect":
