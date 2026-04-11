@@ -91,7 +91,7 @@ public class IntPromotionTests : TestMethods
     }
 
     [TestMethod]
-    public async Task SummarizeLongByInt()
+    public async Task SummarizeIntByInt()
     {
         var query = """
                     let data =datatable(c1:int, c2:int)
@@ -99,20 +99,22 @@ public class IntPromotionTests : TestMethods
                      3,4];
                     data | summarize p=max(c1) by c2
                     | getschema
+                    | where
                     """;
         var result = await LastLineOfResult(query);
-            result.Should().Contain("long");
+            result.Should().NotContain("long");
     }
     [TestMethod]
-    public async Task SummarizeLongByIntExample()
+    public async Task SummarizeMaxIntExample()
     {
         var query = """
                     datatable(n:int)[1]
                     | summarize max(n)
                     | getschema
+                    | project ColumnType
                     """;
         var result = await LastLineOfResult(query);
-        result.Should().Contain("long");
+        result.Should().Contain("int");
     }
 
     [TestMethod]
@@ -138,5 +140,74 @@ public class IntPromotionTests : TestMethods
         result.Should().Contain("int");
     }
 
-   
+    [TestMethod]
+    public async Task MinShouldPreserveIntType()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize MinTemp = min(Temperature)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("int");
+    }
+
+    [TestMethod]
+    public async Task MaxShouldPreserveIntType()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize MaxTemp = max(Temperature)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("int");
+    }
+
+    [TestMethod]
+    public async Task CountShouldReturnLong()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize TotalReadings = count()
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("long");
+    }
+
+    [TestMethod]
+    public async Task AvgShouldReturnReal()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize AvgTemp = avg(Temperature)
+                    | getschema
+                    | project ColumnType
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("real");
+    }
+
+    [TestMethod]
+    public async Task GetSchemaDataTypeShouldShowClrType()
+    {
+        var query = """
+                    datatable(Temperature: int)[15, 22, 18, 25, 12]
+                    | summarize 
+                        TotalReadings = count(),
+                        MinTemp = min(Temperature),
+                        MaxTemp = max(Temperature),
+                        AvgTemp = avg(Temperature)
+                    | getschema 
+                    | project DataType
+                    """;
+        var result = await ResultAsLines(query);
+        result.Should().Contain("System.Int64");
+        result.Should().Contain("System.Int32");
+        result.Should().Contain("System.Double");
+    }
 }

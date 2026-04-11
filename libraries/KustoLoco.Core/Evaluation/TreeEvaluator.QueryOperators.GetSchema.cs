@@ -35,7 +35,8 @@ internal partial class TreeEvaluator
         {
             builders[0].Add(col.Name);
             builders[1].Add(i);
-            builders[2].Add(col.Type.Name);
+            var clrType = TypeMapping.UnderlyingTypeForSymbol(col.Type);
+            builders[2].Add(clrType.FullName ?? clrType.Name);
             builders[3].Add(col.Type.Name);
             i++;
         }
