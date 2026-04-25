@@ -87,6 +87,7 @@
 			<Word>summarize</Word>
 			<Word>extend</Word>
 			<Word>count</Word>
+			<Word>dcount</Word>
 			<Word>render</Word>
 			<Word>join</Word>
 			<Word>union</Word>
