@@ -32,12 +32,7 @@ public class ToRecordsTests
         public double Score { get; set; }
     }
 
-    public class RecordWithNullableTypes
-    {
-        public string? Name { get; set; }
-        public long? Age { get; set; }
-        public double? Score { get; set; }
-    }
+    private readonly record struct ImmutableRecord(string Name,int Age,double Score);
 
     public class RecordWithJsonPropertyName
     {
@@ -131,6 +126,68 @@ public class ToRecordsTests
         recordList[2].Name.Should().Be("Charlie");
         recordList[2].Age.Should().Be(35);
         recordList[2].Score.Should().Be(92.3);
+    }
+
+    [Fact]
+    public void ToImmutableRecords_MapsCorrectly()
+    {
+        // Arrange
+        var context = new KustoQueryContext();
+        var query = """
+                    datatable(Name:string, Age:long, Score:real)
+                    [
+                        'Alice', 30, 95.5,
+                        'Bob', 25, 88.0,
+                        'Charlie', 35, 92.3
+                    ]
+                    """;
+
+        // Act
+        var result = context.RunQueryWithoutDemandBasedTableLoading(query);
+        var records = result.ToRecords<ImmutableRecord>();
+
+        // Assert
+        records.Count.Should().Be(3);
+
+        var recordList = new List<ImmutableRecord>(records);
+        recordList[0].Name.Should().Be("Alice");
+        recordList[0].Age.Should().Be(30);
+        recordList[0].Score.Should().Be(95.5);
+
+        recordList[1].Name.Should().Be("Bob");
+        recordList[1].Age.Should().Be(25);
+        recordList[1].Score.Should().Be(88.0);
+
+        recordList[2].Name.Should().Be("Charlie");
+        recordList[2].Age.Should().Be(35);
+        recordList[2].Score.Should().Be(92.3);
+    }
+
+    [Fact]
+    public void ToImmutableRecords_MapsCorrectly_WhenExtraColumn()
+    {
+        // Arrange
+        var context = new KustoQueryContext();
+        var query = """
+                    datatable(Name:string, Age:long, Score:real, ExtraColumn:string)
+                    [
+                        'Alice', 30, 95.5, 'Extra1',
+                        'Bob', 25, 88.0, 'Extra2',
+                        'Charlie', 35, 92.3, 'Extra3'
+                    ]
+                    """;
+
+        // Act
+        var result = context.RunQueryWithoutDemandBasedTableLoading(query);
+        var records = result.ToRecords<ImmutableRecord>();
+
+        // Assert
+        records.Count.Should().Be(3);
+
+        var recordList = new List<ImmutableRecord>(records);
+        recordList[0].Name.Should().Be("Alice");
+        recordList[0].Age.Should().Be(30);
+        recordList[0].Score.Should().Be(95.5);
     }
 
     [Fact]

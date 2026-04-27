@@ -190,14 +190,20 @@ public class KustoQueryResult
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> PropertyCache = new();
 
     /// <summary>
+    ///     Cache for constructor parameter mappings for record types
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, ConstructorInfo?> ConstructorCache = new();
+
+    /// <summary>
     ///     Efficiently maps query results to records using reflection
     /// </summary>
     /// <remarks>
     ///     This method directly maps column data to object properties without
     ///     going through JSON serialization, providing better performance.
     ///     Property matching is case-insensitive and also respects JsonPropertyName attributes.
+    ///     Supports both mutable classes and immutable record structs.
     /// </remarks>
-    public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue) where T : new()
+    public IReadOnlyCollection<T> ToRecords<T>(int max = int.MaxValue)
     {
         var results = new List<T>();
         var columns = ColumnDefinitions();
@@ -206,54 +212,204 @@ public class KustoQueryResult
         if (rowsToTake == 0)
             return results;
 
-        // Get writable properties with caching
-        var properties = PropertyCache.GetOrAdd(typeof(T), t =>
-            t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.CanWrite)
-                .ToArray());
+        var type = typeof(T);
 
-        // Build a mapping from column names to properties
-        // Supports both property names and JsonPropertyName attributes
-        var propertyLookup = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
-        foreach (var prop in properties)
+        // Check if this is a record type with a primary constructor
+        var primaryConstructor = ConstructorCache.GetOrAdd(type, t => GetPrimaryConstructor(t));
+
+        if (primaryConstructor != null)
         {
-            // Add by property name
-            propertyLookup[prop.Name] = prop;
+            // Handle record types with primary constructors
+            var parameters = primaryConstructor.GetParameters();
+            var properties = PropertyCache.GetOrAdd(type, t =>
+                t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .ToArray());
 
-            // Also check for JsonPropertyName attribute
-            var jsonAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
-            if (jsonAttr != null)
+            // Build a mapping from column names to properties
+            var propertyLookup = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            foreach (var prop in properties)
             {
-                propertyLookup[jsonAttr.Name] = prop;
-            }
-        }
+                propertyLookup[prop.Name] = prop;
 
-        // Create column-to-property mapping
-        var columnMappings = columns
-            .Select((col, index) => (
-                Index: index,
-                Column: col,
-                Property: propertyLookup.GetValueOrDefault(col.Name)
-            ))
-            .Where(x => x.Property != null)
-            .ToArray();
-
-        for (var row = 0; row < rowsToTake; row++)
-        {
-            var record = new T();
-            foreach (var (colIndex, column, property) in columnMappings)
-            {
-                var value = Get(colIndex, row);
-                if (value != null)
+                var jsonAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
+                if (jsonAttr != null)
                 {
-                    var convertedValue = ConvertValue(value, property!.PropertyType);
-                    property!.SetValue(record, convertedValue);
+                    propertyLookup[jsonAttr.Name] = prop;
                 }
             }
-            results.Add(record);
+
+            // Create column-to-parameter mapping
+            var parameterMappings = parameters
+                .Select(param =>
+                {
+                    // Find the column index for this parameter by matching with properties
+                    var columnIndex = -1;
+
+                    // Try to find matching property for this parameter (case-insensitive)
+                    var matchingProperty = properties.FirstOrDefault(p =>
+                        string.Equals(p.Name, param.Name, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchingProperty != null)
+                    {
+                        // Find column by property name
+                        for (var i = 0; i < columns.Length; i++)
+                        {
+                            if (string.Equals(columns[i].Name, matchingProperty.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                columnIndex = i;
+                                break;
+                            }
+                        }
+
+                        // If not found, check JsonPropertyName attribute
+                        if (columnIndex == -1)
+                        {
+                            var jsonAttr = matchingProperty.GetCustomAttribute<JsonPropertyNameAttribute>();
+                            if (jsonAttr != null)
+                            {
+                                for (var i = 0; i < columns.Length; i++)
+                                {
+                                    if (string.Equals(columns[i].Name, jsonAttr.Name, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        columnIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return (Parameter: param, ColumnIndex: columnIndex);
+                })
+                .ToArray();
+
+            for (var row = 0; row < rowsToTake; row++)
+            {
+                var args = new object?[parameters.Length];
+                for (var i = 0; i < parameterMappings.Length; i++)
+                {
+                    var (param, colIndex) = parameterMappings[i];
+                    if (colIndex >= 0)
+                    {
+                        var value = Get(colIndex, row);
+                        args[i] = value != null ? ConvertValue(value, param.ParameterType) : null;
+                    }
+                    else
+                    {
+                        // Use default value if column not found
+                        args[i] = param.HasDefaultValue ? param.DefaultValue : GetDefaultValue(param.ParameterType);
+                    }
+                }
+                var record = (T)primaryConstructor.Invoke(args);
+                results.Add(record);
+            }
+        }
+        else
+        {
+            // Handle traditional mutable classes
+            // Get writable properties with caching
+            var properties = PropertyCache.GetOrAdd(type, t =>
+                t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.CanWrite)
+                    .ToArray());
+
+            // Build a mapping from column names to properties
+            // Supports both property names and JsonPropertyName attributes
+            var propertyLookup = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            foreach (var prop in properties)
+            {
+                // Add by property name
+                propertyLookup[prop.Name] = prop;
+
+                // Also check for JsonPropertyName attribute
+                var jsonAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
+                if (jsonAttr != null)
+                {
+                    propertyLookup[jsonAttr.Name] = prop;
+                }
+            }
+
+            // Create column-to-property mapping
+            var columnMappings = columns
+                .Select((col, index) => (
+                    Index: index,
+                    Column: col,
+                    Property: propertyLookup.GetValueOrDefault(col.Name)
+                ))
+                .Where(x => x.Property != null)
+                .ToArray();
+
+            for (var row = 0; row < rowsToTake; row++)
+            {
+                var record = Activator.CreateInstance<T>();
+                foreach (var (colIndex, column, property) in columnMappings)
+                {
+                    var value = Get(colIndex, row);
+                    if (value != null)
+                    {
+                        var convertedValue = ConvertValue(value, property!.PropertyType);
+                        property!.SetValue(record, convertedValue);
+                    }
+                }
+                results.Add(record);
+            }
         }
 
         return results;
+    }
+
+    /// <summary>
+    ///     Gets the primary constructor for a record type, or null if not a record or no suitable constructor
+    /// </summary>
+    private static ConstructorInfo? GetPrimaryConstructor(Type type)
+    {
+        // Get all public constructors
+        var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+
+        if (constructors.Length == 0)
+            return null;
+
+        // Get public properties
+        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        // Look for a constructor where all parameters have matching properties
+        // This works for both record classes and record structs
+        var primaryConstructor = constructors
+            .OrderByDescending(c => c.GetParameters().Length)
+            .FirstOrDefault(c =>
+            {
+                var parameters = c.GetParameters();
+                if (parameters.Length == 0)
+                    return false;
+
+                // Check if all parameters have matching properties (case-insensitive name match)
+                // and all parameters map to read-only or init-only properties (typical for records)
+                var allMatch = parameters.All(p =>
+                    properties.Any(prop =>
+                        string.Equals(prop.Name, p.Name, StringComparison.OrdinalIgnoreCase)));
+
+                if (!allMatch)
+                    return false;
+
+                // Additional check: if all properties are read-only (no public setter),
+                // or if the type has no parameterless constructor, this is likely a record type
+                var hasParameterlessConstructor = constructors.Any(c => c.GetParameters().Length == 0);
+                var allPropertiesReadOnly = properties.All(p => !p.CanWrite || 
+                    p.SetMethod?.ReturnParameter?.GetRequiredCustomModifiers()
+                        .Any(t => t.Name == "IsExternalInit") == true);
+
+                return !hasParameterlessConstructor || allPropertiesReadOnly;
+            });
+
+        return primaryConstructor;
+    }
+
+    /// <summary>
+    ///     Gets the default value for a type
+    /// </summary>
+    private static object? GetDefaultValue(Type type)
+    {
+        return type.IsValueType ? Activator.CreateInstance(type) : null;
     }
 
     /// <summary>
