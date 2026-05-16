@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Security vulnerability fix - override vulnerable transitive dependency -->
-    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.92.0" />
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.93.0" />
     <PackageVersion Include="SkiaSharp.HarfBuzz" Version="3.116.1" />
     <!-- use 'PackageVersion' rather than 'PackageReference' -->
     <PackageVersion Include="Anthropic.SDK" Version="5.10.0" />
@@ -39,28 +39,28 @@
     <PackageVersion Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageVersion Include="MarkdownViewer.Core" Version="1.0.5" />
     <PackageVersion Include="McMaster.NETCore.Plugins" Version="2.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.1.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.1.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
-    <PackageVersion Include="Microsoft.Extensions.AI" Version="10.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Extensions.AI.Ollama" Version="9.1.0-preview.1.25064.3" />
-    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.NET.Sdk.WebAssembly.Pack" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.NET.Sdk.WebAssembly.Pack" Version="10.0.8" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.6.1" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="NLog" Version="6.1.2" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.2.1" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.2.1" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.2" />
+    <PackageVersion Include="NLog" Version="6.1.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.2.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.2.3" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.3" />
     <PackageVersion Include="NLog.Layouts.ClefJsonLayout" Version="1.0.5" />
     <PackageVersion Include="NotNullStrings" Version="1.0.1" />
     <PackageVersion Include="OpenAI" Version="2.10.0" />
@@ -69,14 +69,14 @@
     <PackageVersion Include="ScottPlot" Version="5.1.58" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.58" />
     <PackageVersion Include="ScottPlot.WPF" Version="5.1.58" />
-    <PackageVersion Include="ShapeCrawler" Version="0.79.1" />
+    <PackageVersion Include="ShapeCrawler" Version="0.79.2" />
     <PackageVersion Include="SimpleExec" Version="13.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.55.2" />
     <PackageVersion Include="StaticViewLocator" Version="0.4.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.9.5" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.7" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.8" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
-    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.7" />
+    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.8" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
     <PackageVersion Include="Topten.RichTextKit" Version="0.4.167" />
@@ -86,7 +86,7 @@
     <PackageVersion Include="Vanara.Core" Version="5.0.4" />
     <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="5.0.4" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
-    <PackageVersion Include="WPF-UI" Version="4.2.1" />
+    <PackageVersion Include="WPF-UI" Version="4.3.0" />
     <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.9.5" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="11.3.0.10" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.10" />
@@ -94,7 +94,7 @@
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="12.3.2" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Language" Version="12.4.0" />
     <PackageVersion Include="System.Linq.Async" Version="7.0.1" />
     <PackageVersion Include="System.Text.Json" Version="9.0.8" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
@@ -106,7 +106,7 @@
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.13" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.13" />
     <PackageVersion Include="Jab" Version="0.12.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.3.1.1" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
