@@ -35,5 +35,7 @@ internal static class CustomFunctions
         FormatFunction.Register(functions);
         FormatInterpFunction.Register(functions);
         HeatmapColorFunction.Register(functions);
+        UnixTimeFunction.Register(functions);
+        NetTimeFunction.Register(functions);
     }
 }

@@ -90,6 +90,7 @@
 			<Word>dcount</Word>
 			<Word>render</Word>
 			<Word>join</Word>
+			<Word>lookup</Word>
 			<Word>union</Word>
 			<Word>getschema</Word>
 			<Word>datatable</Word>
@@ -97,6 +98,7 @@
 		</Keywords>
 
 		<Keywords color="Function">
+			<Word>distinct</Word>
 			<Word>print</Word>
 			<Word>datetime</Word>
 			<Word>$left.</Word>
@@ -196,6 +198,8 @@
 			<Word>dcountif (aggregation function)</Word>
 			<Word>trimws</Word>
 			<Word>levenshtein</Word>
+			<Word>net_time</Word>
+			<Word>unix_time</Word>
 			<Word>string_similarity</Word>
 			<Word>format</Word>
 			<Word>format_interp</Word>
