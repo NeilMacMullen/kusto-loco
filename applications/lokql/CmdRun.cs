@@ -23,6 +23,7 @@ internal class CmdRun
         var explorer = new InteractiveTableExplorer(console, settings, processor, renderer, []);
         var block = options.File.IsBlank() ? options.Command : File.ReadAllText(options.File);
         await explorer.RunInput(block);
+        console.RestoreColors();
     }
 
 

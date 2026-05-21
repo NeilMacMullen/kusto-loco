@@ -25,6 +25,7 @@ internal class CmdExplore
         var renderer = new SixelRenderingSurface(settings);
         var explorer = new InteractiveTableExplorer(console, settings, processor, renderer, []);
         await RunInteractive(console, explorer);
+        console.RestoreColors();
     }
 
 

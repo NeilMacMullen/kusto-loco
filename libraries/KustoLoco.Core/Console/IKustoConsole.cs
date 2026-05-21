@@ -70,4 +70,6 @@ public interface IKustoConsole
     {
         Progress(s);
     }
+
+    void RestoreColors();
 }
