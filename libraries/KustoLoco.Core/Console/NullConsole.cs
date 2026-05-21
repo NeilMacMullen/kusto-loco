@@ -18,4 +18,8 @@ public class NullConsole : IKustoConsole
     {
         return string.Empty;
     }
+
+    public void RestoreColors() {
+       
+        }
 }

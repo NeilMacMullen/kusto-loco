@@ -24,4 +24,12 @@ public class SystemConsole : IKustoConsole
     {
         return System.Console.ReadLine() ?? string.Empty;
     }
+
+    public void RestoreColors() => ForegroundColor=_originalColor;
+
+    private readonly ConsoleColor _originalColor;
+    public SystemConsole()
+    {
+        _originalColor = ForegroundColor;
+    }
 }

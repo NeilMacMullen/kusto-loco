@@ -31,6 +31,11 @@ public partial class ConsoleViewModel : ObservableObject, IKustoConsole
     public ConsoleColor ForegroundColor { get; set; }
 
     public string ReadLine() => string.Empty;
+    public void RestoreColors()
+    {
+        //Console view is not persistent so no point in trying to restore colors
+    }
+
 
     public void Write(string text)
     {
