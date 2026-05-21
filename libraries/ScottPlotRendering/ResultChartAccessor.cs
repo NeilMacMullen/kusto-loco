@@ -176,26 +176,35 @@ public class ResultChartAccessor
             return 1.0;
         if (XisDateTime)
         {
-            var smallestGap = _result
+            var distinctXValues = _result
                 .EnumerateColumnData(_xColumn)
                 .OfType<DateTime>()
                 .Distinct()
                 .OrderBy(d => d)
-                .Pairwise((a, b) => (b - a).TotalDays)
-                .Min();
+                .ToArray();
+            var smallestGap = distinctXValues.Length >= 2
+                ?
+                distinctXValues.Pairwise((a, b) => (b - a).TotalDays)
+                .Min()
+                :1.0;
             return smallestGap * 0.9;
         }
 
         if (IsNumeric(_xColumn))
         {
-            var smallestGap = _result
+            var distinctXValues = _result
                 .EnumerateColumnData(_xColumn)
                 .Select(d => Convert.ChangeType(d, typeof(double)))
                 .OfType<double>()
                 .Distinct()
                 .OrderBy(d => d)
-                .Pairwise((a, b) => b - a)
-                .Min();
+                .ToArray();
+                var smallestGap = distinctXValues.Length>=2
+                    ?
+                    distinctXValues.Pairwise((a, b) => b - a)
+                .Min()
+                    : 1.0
+                    ;
             return smallestGap * 0.9;
         }
 
