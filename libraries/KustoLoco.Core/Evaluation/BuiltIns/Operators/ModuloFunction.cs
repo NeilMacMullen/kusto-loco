@@ -10,7 +10,10 @@ internal partial class ModuloFunction
 
     private static double? DoubleImpl(double a, double b) => b == 0 ? null : a % b;
     private static decimal? DecimalImpl(decimal a, decimal b) => b == 0 ? null : a % b;
-
+    private static TimeSpan? DtTsImpl(DateTime a, TimeSpan b) =>
+        b == TimeSpan.Zero ? null : new TimeSpan(a.Ticks % b.Ticks);
     private static TimeSpan? TsImpl(TimeSpan a, TimeSpan b) =>
-        b == TimeSpan.Zero ? null : new TimeSpan(b.Ticks % a.Ticks);
+        b == TimeSpan.Zero ? null : new TimeSpan(a.Ticks % b.Ticks);
+
+  
 }
