@@ -17,43 +17,11 @@ internal class CmdExplore
 
     public static async Task RunAsync(Options options)
     {
-        var console = new SystemConsole();
-        var settings = new KustoSettingsProvider();
-        settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, options.Data);
-
-        var processor = CommandProcessorProvider.GetCommandProcessor();
-        var renderer = new SixelRenderingSurface(settings);
-        var explorer = new InteractiveTableExplorer(console, settings, processor, renderer, []);
-        await RunInteractive(console, explorer);
-        console.RestoreColors();
+        var explorer = new Explorer(options.Data, options.Args);
+        await explorer.RunInteractive();
+        explorer.Close();
     }
-
-
-    public static async Task RunInteractive(IKustoConsole _outputConsole, InteractiveTableExplorer exp)
-    {
-        exp.Warn("Use '.help' to list commands");
-
-        var isContinuation = false;
-        var query = new StringBuilder();
-        while (true)
-        {
-            _outputConsole.ForegroundColor = ConsoleColor.Blue;
-            var prompt = isContinuation ? "   > " : "KQL> ";
-            _outputConsole.Write(prompt);
-            var queryPart = _outputConsole.ReadLine().Trim();
-            var isSlashContinuation = queryPart.EndsWith(@"\");
-            isContinuation = isSlashContinuation
-                             || queryPart.EndsWith("|");
-            if (isSlashContinuation)
-                queryPart = queryPart.Substring(0, queryPart.Length - 1);
-            query.Append(queryPart);
-            if (!isContinuation)
-            {
-                await exp.RunInput(query.ToString());
-                query.Clear();
-            }
-        }
-    }
+    
 
     [Verb("explore", HelpText = "explore data source(s)")]
     public class Options
@@ -73,5 +41,8 @@ internal class CmdExplore
 
         [Option(HelpText = "Runs a script at startup")]
         public string Run { get; set; } = string.Empty;
+
+        [Option("args", HelpText = "Passes arguments to the script as arg0, arg1 etc")]
+        public IEnumerable<string> Args { get; set; } = [];
     }
 }
