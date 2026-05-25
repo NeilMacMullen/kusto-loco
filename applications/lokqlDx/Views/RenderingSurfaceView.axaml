@@ -65,7 +65,7 @@
                             </TreeDataGrid.Styles>
                             <TreeDataGrid.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Copy cell" Command="{Binding DataGridCopyCommand}"
+                                    <MenuItem Header="Copy selected cells" Command="{Binding DataGridCopyCommand}"
                                               CommandParameter="cell" InputGesture="CTRL+C"/>
                                     <MenuItem Header="Copy column" Command="{Binding DataGridCopyCommand}"
                                               CommandParameter="column" InputGesture="CTRL+L" />
