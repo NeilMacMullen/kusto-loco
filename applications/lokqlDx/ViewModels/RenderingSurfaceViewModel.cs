@@ -103,8 +103,26 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
             {
                 case "cell":
                 {
-                    var txt = ObjectToString(Result.Get(columnIndex, rowIndex));
-                    await ClipboardAvalonia.SetTextAsync(txt);
+                    if (cellSelection.SelectedIndexes.Count == 1)
+                    {
+                        var txt = ObjectToString(Result.Get(columnIndex, rowIndex));
+                        await ClipboardAvalonia.SetTextAsync(txt);
+                    }
+                    else
+                    {
+                        // multi-select
+                        var lines = new List<string>();
+                        foreach (var row in cellSelection.SelectedIndexes.GroupBy(si => si.RowIndex[0]).OrderBy(g => g.Key))
+                        {
+                            var selectedRowIndex = row.Key;
+                            var line = row.OrderBy(r => r.ColumnIndex)
+                                .Select(r => ObjectToString(Result.Get(r.ColumnIndex, selectedRowIndex)))
+                                .JoinString();
+                            lines.Add(line);
+                        }
+                        var txt = lines.JoinAsLines();
+                        await ClipboardAvalonia.SetTextAsync(txt);
+                    }
                 }
                     break;
 
@@ -192,7 +210,7 @@ public partial class RenderingSurfaceViewModel : ObservableObject, IResultRender
                     .Select(col => new TextColumn<Row, object?>(col.Name, r => r[col.Index]))
             );
             var source = new MyFlatTreeDataGridSource<Row>(rows, columnList);
-            source.Selection = new TreeDataGridCellSelectionModel<Row>(source);
+            source.Selection = new TreeDataGridCellSelectionModel<Row>(source) { SingleSelect = false };
             TreeSource = source;
         });
     }
