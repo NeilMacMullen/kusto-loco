@@ -8,16 +8,43 @@ public class Explorer
     private readonly IKustoConsole _console;
     private readonly InteractiveTableExplorer _explorer;
 
-    public Explorer(string dataFolder, IEnumerable<string> args)
+    private Explorer(string dataFolder, IEnumerable<string> args)
     {
         _console = new SystemConsole();
         var settings = new KustoSettingsProvider();
+       
         settings.Set(StandardFormatAdaptor.Settings.KustoDataPath.Name, dataFolder);
         foreach (var (i, a) in args.Index()) settings.Set($"arg{i}", a);
 
         var processor = CommandProcessorProvider.GetCommandProcessor();
         var renderer = new SixelRenderingSurface(settings);
         _explorer = new InteractiveTableExplorer(_console, settings, processor, renderer, []);
+      
+    }
+
+    public static async Task<Explorer> Create(string dataFolder, IEnumerable<string> args,
+        IEnumerable<string> dataFiles,
+        IEnumerable<string> commands,
+        IEnumerable<string> scripts)
+    {
+        var r = new Explorer(dataFolder, args);
+        foreach (var datafile in dataFiles)
+        {
+            await r.RunInput($".load \"{datafile}\"");
+        }
+        foreach (var block in commands)
+            await r.RunInput(block);
+        foreach (var f in scripts)
+            try
+            {
+                var block = await File.ReadAllTextAsync(f);
+                await r.RunInput(block);
+            }
+            catch (IOException)
+            {
+                r.Error("Unable to load script '{f}'");
+            }
+        return r;
     }
 
     public void Close() => _console.RestoreColors();

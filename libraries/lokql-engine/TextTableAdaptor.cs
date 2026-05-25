@@ -1,8 +1,9 @@
-﻿using System.Collections.Immutable;
-using KustoLoco.Core;
+﻿using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.FileFormats;
+using System.Collections.Immutable;
+using static KustoLoco.Core.KustoFormatter;
 
 
 namespace Lokql.Engine;
@@ -23,7 +24,9 @@ public class TextTableAdaptor : IFileBasedTableAccess
     {
         try
         {
-            var text = KustoFormatter.Tabulate(result);
+            var skipHeader = _settings.GetBool("txt.skipheader");
+            var prefs = new DisplayPreferences(int.MaxValue, 0, int.MaxValue, skipHeader);
+            var text = KustoFormatter.Tabulate(result,prefs);
             File.WriteAllText(path, text);
             return Task.FromResult(true);
         }

@@ -99,7 +99,7 @@ public class InteractiveTableExplorer
         _outputConsole.ForegroundColor = ConsoleColor.Green;
 
 
-        var prefs = new KustoFormatter.DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay);
+        var prefs = new KustoFormatter.DisplayPreferences(_outputConsole.WindowWidth, start, maxToDisplay,false);
         _outputConsole.WriteLine(KustoFormatter.Tabulate(result, prefs));
 
         if (maxToDisplay < result.RowCount)

@@ -39,7 +39,7 @@ public static class KustoFormatter
     }
 
     public static string Tabulate(KustoQueryResult result, int max = int.MaxValue)
-        => Tabulate(result, new DisplayPreferences(int.MaxValue, 0, max));
+        => Tabulate(result, new DisplayPreferences(int.MaxValue, 0, max,false));
 
     public static string Tabulate(KustoQueryResult result, DisplayPreferences preferences)
     {
@@ -55,8 +55,10 @@ public static class KustoFormatter
         var screenWidth = Math.Max(10, preferences.ScreenWidth);
 
 
+        string[] ColumnHeader(ColumnResult c) => preferences.HideColumnHeaders ? [] : [c.Name];
+
         string[] MakeStringColumn(ColumnResult c)
-            => new[] { c.Name }
+            => ColumnHeader(c)
                 .Concat(result.EnumerateColumnData(c)
                     .Skip(preferences.StartOffset)
                     .Take(max))
@@ -77,12 +79,12 @@ public static class KustoFormatter
             .Select(PadToMax)
             .ToArray();
 
-
-        for (var r = 0; r <= displayHeight; r++)
+        var displayRows = preferences.HideColumnHeaders ? displayHeight : displayHeight + 1;
+        for (var r = 0; r < displayRows; r++)
         {
             var line = cells.Select(c => c[r]).ToArray();
             sb.AppendLine(JoinToLine(line));
-            if (r == 0)
+            if (!preferences.HideColumnHeaders && r == 0)
             {
                 var dividerLine = line.Select(c => "".PadRight(c.Length, '-'));
                 sb.AppendLine(JoinToLine(dividerLine));
@@ -104,5 +106,5 @@ public static class KustoFormatter
         }
     }
 
-    public readonly record struct DisplayPreferences(int ScreenWidth, int StartOffset, int Length);
+    public readonly record struct DisplayPreferences(int ScreenWidth, int StartOffset, int Length,bool HideColumnHeaders);
 }

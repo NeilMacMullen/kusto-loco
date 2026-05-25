@@ -187,6 +187,10 @@ public class KustoSettingsProvider
         var s = Get(setting).ToLowerInvariant();
         return trueValues.Contains(s);
     }
+    public bool GetBool(string settingName)
+    {
+        return GetBool(new KustoSettingDefinition(settingName, string.Empty, "0", "bool"));
+    }
 
     /// <summary>
     /// Enumerates all current settings as <see cref="RawKustoSetting"/> values.
