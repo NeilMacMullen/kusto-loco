@@ -447,6 +447,16 @@ public static class ScottPlotKustoResultRenderer
         int linesAtEnd)
     {
         var (width, height) = TerminalHelper.GetScreenDimension(linesAtEnd);
+        var widthFactor=  settings.GetDoubleOr("sixel.width",0.9);
+        var heightFactor = settings.GetDoubleOr("sixel.height", 0.9);
+        width = widthFactor > 10.0
+            ? (int) widthFactor
+            : (int) (width * widthFactor);
+
+        height = heightFactor > 10.0
+            ? (int)heightFactor
+            : (int)(height * heightFactor);
+
         return RenderToSixel(result, settings, width, height);
     }
 

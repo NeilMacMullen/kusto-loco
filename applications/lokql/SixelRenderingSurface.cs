@@ -8,7 +8,7 @@ using Spectre.Console;
 internal class SixelRenderingSurface(KustoSettingsProvider settings)
     : IResultRenderingSurface
 {
-    private const string SettingName = "table.maxrows";
+    private const string MaxRowsSetting = "table.maxrows";
     private const int DefaultRows = 100;
 
     public async Task RenderToDisplay(KustoQueryResult result)
@@ -40,7 +40,7 @@ internal class SixelRenderingSurface(KustoSettingsProvider settings)
 
         // Add columns with header names
         foreach (var column in queryResult.ColumnDefinitions()) table.AddColumn(column.Name);
-        var maxRows = settings.GetIntOr(SettingName, DefaultRows);
+        var maxRows = settings.GetIntOr(MaxRowsSetting, DefaultRows);
         // Add rows.  Note that cells could contain nulls in the general case
         foreach (var row in queryResult.EnumerateRows().Take(maxRows))
         {
@@ -52,8 +52,7 @@ internal class SixelRenderingSurface(KustoSettingsProvider settings)
         if (maxRows < queryResult.RowCount)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            AnsiConsole.WriteLine($"Only {maxRows} of {queryResult.RowCount} shown.");
-            AnsiConsole.WriteLine($"Set {SettingName} to see more");
+            AnsiConsole.WriteLine($"Only {maxRows} of {queryResult.RowCount} shown.  Set {MaxRowsSetting} to see more");
         }
 
         return;

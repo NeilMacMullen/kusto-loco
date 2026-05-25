@@ -15,6 +15,7 @@ public static class SaveCommand
         {
             newLayer.Set("csv.skipheader", "true");
             newLayer.Set("tsv.skipheader", "true");
+            newLayer.Set("txt.skipheader", "true");
         }
         var exp = context.Explorer;
         exp.Settings.AddLayer(newLayer);
@@ -38,7 +39,7 @@ Examples:
         public string File { get; set; } = string.Empty;
         [Value(1, HelpText = "Name of result (or most recent result if left blank)")]
         public string ResultName { get; set; } = string.Empty;
-        [Option(HelpText = "Avoid writing headers for csv and text files")]
+        [Option('n',HelpText = "Avoid writing headers for csv and text files")]
         public bool NoHeader { get; set; }
     }
 }
