@@ -37,6 +37,77 @@ public class AggregationFunctionTests : TestMethods
         result.Should().Contain("\"key1\":\"value1\"");
     }
 
+    [TestMethod]
+    public async Task BagPack_MultipleStringPairs()
+    {
+        var query = "print bag_pack('a', 'one', 'b', 'two', 'c', 'three')";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":\"one\",\"b\":\"two\",\"c\":\"three\"}");
+    }
+
+    [TestMethod]
+    public async Task BagPack_MixedValueTypes()
+    {
+        var query = "print bag_pack('name', 'kusto', 'count', 42, 'ratio', 0.5, 'active', true)";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("\"name\":\"kusto\"");
+        result.Should().Contain("\"count\":42");
+        result.Should().Contain("\"ratio\":0.5");
+        result.Should().Contain("\"active\":true");
+    }
+
+    [TestMethod]
+    public async Task BagPack_FromColumnsBuildsListOfBags()
+    {
+        // matches the make_list / bag_pack composition described in the issue:
+        // each row is packed into a dynamic bag and then aggregated via make_list.
+        var query = @"
+datatable(Name:string, Value:int, Status:string)
+[
+    'alpha', 1, 'ok',
+    'beta',  2, 'fail',
+]
+| extend Item = bag_pack('name', Name, 'value', Value, 'status', Status)
+| summarize Items = make_list(Item)
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("{\"name\":\"alpha\",\"value\":1,\"status\":\"ok\"}");
+        result.Should().Contain("{\"name\":\"beta\",\"value\":2,\"status\":\"fail\"}");
+    }
+
+    [TestMethod]
+    public async Task BagPack_EmptyKeyPairIsSkipped()
+    {
+        var query = "print bag_pack('', 'ignored', 'kept', 'yes')";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"kept\":\"yes\"}");
+    }
+
+    [TestMethod]
+    public async Task BagPack_NestedDynamicValueIsPreserved()
+    {
+        var query = "print bag_pack('outer', bag_pack('inner', 1))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"outer\":{\"inner\":1}}");
+    }
+
+    [TestMethod]
+    public async Task BagPack_NullValueIsSerializedAsNull()
+    {
+        var query = "print bag_pack('missing', dynamic(null), 'present', 1)";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"missing\":null,\"present\":1}");
+    }
+
+    [TestMethod]
+    public async Task BagPack_DateTimeAndTimeSpanValues()
+    {
+        var query = "print bag_pack('ts', datetime(2024-01-02T03:04:05Z), 'dur', 5m)";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("\"ts\":\"2024-01-02T");
+        result.Should().Contain("\"dur\":\"00:05:00\"");
+    }
+
     #endregion
 
     #region make_bag tests
