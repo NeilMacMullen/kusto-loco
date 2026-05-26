@@ -321,7 +321,7 @@ internal static class BuiltInScalarFunctions
         RegexQuoteFunction.Register(Functions);
         RepeatFunction.Register(Functions);
 
-        BagPackFunction.Register(Functions);
-        Functions.Add(Kusto.Language.Functions.Pack, BagPackFunction.S); // pack() is an alias for bag_pack()
+        //can't generate because arbitrary number of arguments
+        BagPackFunctionImpl.Register(Functions);
     }
 }
