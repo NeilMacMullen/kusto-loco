@@ -10,6 +10,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal partial class ToDateTimeFunction
 {
     private static DateTime? Impl(string input) =>
-        DateTime.TryParse(input,CultureInfo.GetCultureInfo("en-GB"),
-            out var result) ? result.ToUniversalTime() : null;
+        DateTime.TryParse(input, CultureInfo.GetCultureInfo("en-GB"),
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+            out var result) ? result : null;
 }
