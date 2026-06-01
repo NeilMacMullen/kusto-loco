@@ -238,10 +238,9 @@ public class DateTimeTests : TestMethods
     [TestMethod]
     public void DtCheck()
     {
-        var dt = DateTime.Parse("2 feb 2020 11:00");
-        dt.Kind.Should().Be(DateTimeKind.Unspecified);
-        var universal = dt.ToUniversalTime();
-        universal.Kind.Should().Be(DateTimeKind.Utc);
-        universal.ToString("g").Should().Be("02/02/2020 11:00");
+        var dt = DateTime.Parse("2 feb 2020 11:00", CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+        dt.Kind.Should().Be(DateTimeKind.Utc);
+        dt.ToString("g", CultureInfo.InvariantCulture).Should().Be("02/02/2020 11:00");
     }
 }

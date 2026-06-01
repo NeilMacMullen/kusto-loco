@@ -323,5 +323,7 @@ internal static class BuiltInScalarFunctions
 
         //can't generate because arbitrary number of arguments
         BagPackFunctionImpl.Register(Functions);
+        BagMergeFunctionImpl.Register(Functions);
+        PackAllFunctionImpl.Register(Functions);
     }
 }

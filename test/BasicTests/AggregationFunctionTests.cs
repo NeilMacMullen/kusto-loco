@@ -110,6 +110,217 @@ datatable(Name:string, Value:int, Status:string)
 
     #endregion
 
+    #region bag_merge tests
+
+    [TestMethod]
+    public async Task BagMerge_TwoDisjointBags()
+    {
+        var query = "print bag_merge(bag_pack('a', 1), bag_pack('b', 2))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1,\"b\":2}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_LeftmostArgWinsOnConflict()
+    {
+        var query = "print bag_merge(bag_pack('k', 'first'), bag_pack('k', 'last'))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"k\":\"first\"}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_ThreeBags()
+    {
+        var query = "print bag_merge(bag_pack('a', 1), bag_pack('b', 2), bag_pack('c', 3))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1,\"b\":2,\"c\":3}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_LeftmostWinsAcrossThreeBags()
+    {
+        var query = "print bag_merge(bag_pack('k', 1), bag_pack('k', 2), bag_pack('k', 3))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"k\":1}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_EmptyBag()
+    {
+        var query = "print bag_merge(dynamic({}), bag_pack('a', 1))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_NullBagIsSkipped()
+    {
+        var query = "print bag_merge(dynamic(null), bag_pack('a', 1))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_NonObjectArgIsSkipped()
+    {
+        // Non-object dynamic values flow through dynamic-typed columns; the impl skips them.
+        var query = @"
+datatable(b:dynamic)
+[
+    dynamic([1,2,3]),
+]
+| summarize merged = bag_merge(dynamic({""kept"":1}), take_any(b))
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"kept\":1}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_NestedBagsArePreserved()
+    {
+        var query = "print bag_merge(bag_pack('outer', bag_pack('inner', 1)), bag_pack('other', 2))";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"outer\":{\"inner\":1},\"other\":2}");
+    }
+
+    [TestMethod]
+    public async Task BagMerge_FromColumns()
+    {
+        var query = @"
+datatable(b1:dynamic, b2:dynamic)
+[
+    dynamic({""a"":1}), dynamic({""b"":2}),
+    dynamic({""x"":10}), dynamic({""x"":20, ""y"":30}),
+]
+| extend Merged = bag_merge(b1, b2)
+| project Merged
+";
+        var result = Squash(await ResultAsString(query, "|"));
+        result.Should().Be("{\"a\":1,\"b\":2}|{\"x\":10,\"y\":30}");
+    }
+
+    #endregion
+
+    #region pack_all tests
+
+    [TestMethod]
+    public async Task PackAll_NoArgs_PacksAllColumns()
+    {
+        var query = @"
+datatable(a:int, b:string) [1, 'x']
+| extend bag = pack_all()
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1,\"b\":\"x\"}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_PacksEachRowIndependently()
+    {
+        var query = @"
+datatable(a:int, b:string) [1, 'x', 2, 'y']
+| extend bag = pack_all()
+| project bag
+";
+        var result = Squash(await ResultAsString(query, "|"));
+        result.Should().Be("{\"a\":1,\"b\":\"x\"}|{\"a\":2,\"b\":\"y\"}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_IgnoreNullEmpty_True_SkipsNullsAndEmpty()
+    {
+        var query = @"
+datatable(a:int, b:string, c:string)
+[
+    int(null), '', 'kept',
+]
+| extend bag = pack_all(true)
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"c\":\"kept\"}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_IgnoreNullEmpty_False_KeepsNulls()
+    {
+        var query = @"
+datatable(a:int, b:string)
+[
+    int(null), 'hi',
+]
+| extend bag = pack_all(false)
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":null,\"b\":\"hi\"}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_NoRowScope_ReturnsEmptyBag()
+    {
+        var query = "print pack_all()";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_DoesNotIncludeTargetExtendColumn()
+    {
+        var query = @"
+datatable(a:int, b:string) [1, 'x']
+| extend bag = pack_all()
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().NotContain("\"bag\"");
+    }
+
+    [TestMethod]
+    public async Task PackAll_IgnoreNullEmpty_True_SkipsEmptyDynamic()
+    {
+        var query = @"
+datatable(a:dynamic, b:dynamic)
+[
+    dynamic({}), dynamic({""x"":1}),
+]
+| extend bag = pack_all(true)
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("\"b\":{\"x\":1}");
+        result.Should().NotContain("\"a\":{}");
+    }
+
+    [TestMethod]
+    public async Task PackAll_EmptyTableDoesNotThrow()
+    {
+        var query = @"
+datatable(a:int, b:string) []
+| extend bag = pack_all(true)
+| project bag
+| count
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("0");
+    }
+
+    [TestMethod]
+    public async Task PackAll_AfterProjectChangesRowScope()
+    {
+        var query = @"
+datatable(a:int, b:string, c:long) [1, 'x', 100]
+| project a, renamed=b
+| extend bag = pack_all()
+| project bag
+";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Be("{\"a\":1,\"renamed\":\"x\"}");
+    }
+
+    #endregion
+
     #region make_bag tests
 
     [TestMethod]

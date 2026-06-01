@@ -319,6 +319,12 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
         }
 
         var functionSymbol = (FunctionSymbol)signature.Symbol;
+        if (functionSymbol == Functions.PackAll)
+        {
+            irArguments = ExpandPackAllArguments(irArguments);
+            parameters = BuildPackAllParameters(irArguments.Length);
+        }
+
         if (FunctionFinder.TryGetOverload(_functions, functionSymbol, returnType, irArguments, parameters,
                 out var functionOverload))
         {
@@ -402,5 +408,34 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
     {
         var irExpression = (IRExpressionNode)node.Expression.Accept(this);
         return new IRToScalarExpressionNode(irExpression, node.ResultType);
+    }
+
+    // pack_all's source signature is (ignore_null_empty?: bool); the IR expansion appends
+    // one (name, value) pair per row-scope column so a registered overload can resolve it.
+    private IRExpressionNode[] ExpandPackAllArguments(IRExpressionNode[] irArguments)
+    {
+        var flag = irArguments.Length == 0
+            ? new IRLiteralExpressionNode(false, ScalarTypes.Bool)
+            : irArguments[0];
+
+        var expanded = new List<IRExpressionNode>(1 + _rowScope.Members.Count * 2) { flag };
+        for (var i = 0; i < _rowScope.Members.Count; i++)
+        {
+            if (_rowScope.Members[i] is not ColumnSymbol column) continue;
+            expanded.Add(new IRLiteralExpressionNode(column.Name, ScalarTypes.String));
+            expanded.Add(new IRRowScopeNameReferenceNode(column, column.Type, i));
+        }
+        return expanded.ToArray();
+    }
+
+    private static List<Parameter> BuildPackAllParameters(int argumentCount)
+    {
+        var parameters = new List<Parameter>(argumentCount) { new("ignore_null_empty", ScalarTypes.Bool) };
+        for (var i = 1; i + 1 < argumentCount; i += 2)
+        {
+            parameters.Add(new Parameter("key", ScalarTypes.String));
+            parameters.Add(new Parameter("value", ScalarTypes.Unknown));
+        }
+        return parameters;
     }
 }
