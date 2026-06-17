@@ -243,4 +243,69 @@ public class DateTimeTests : TestMethods
         dt.Kind.Should().Be(DateTimeKind.Utc);
         dt.ToString("g", CultureInfo.InvariantCulture).Should().Be("02/02/2020 11:00");
     }
+
+    [TestMethod]
+    public async Task StartOfWeek()
+    {
+        var query = "print startofweek(datetime(2025, 6, 14))";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("06-08");
+    }
+
+    [TestMethod]
+    public async Task StartOfWeekWithOffset()
+    {
+        var query = "print startofweek(datetime(2025, 6, 14),3)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("06-29");
+    }
+
+    [TestMethod]
+    public async Task StartOfDay()
+    {
+        var query = "print startofday(todatetime('10:00 14 jun 2025'))";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2025-06-14 00:00:00");
+    }
+
+    [TestMethod]
+    public async Task StartOfDayWithOffset()
+    {
+        var query = "print startofday(todatetime('10:00 14 jun 2025'), 2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2025-06-16 00:00:00");
+    }
+
+    [TestMethod]
+    public async Task StartOfMonth()
+    {
+        var query = "print startofmonth(datetime(2025, 6, 14))";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2025-06-01 00:00:00");
+    }
+
+    [TestMethod]
+    public async Task StartOfMonthWithOffset()
+    {
+        var query = "print startofmonth(datetime(2025, 6, 14), -2)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2025-04-01 00:00:00");
+    }
+
+    [TestMethod]
+    public async Task StartOfYear()
+    {
+        var query = "print startofyear(datetime(2025, 6, 14))";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2025-01-01 00:00:00");
+    }
+
+    [TestMethod]
+    public async Task StartOfYearWithOffset()
+    {
+        var query = "print startofyear(datetime(2025, 6, 14), -1)";
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("2024-01-01 00:00:00");
+    }
+
 }
