@@ -86,6 +86,7 @@ The project leans heavily on a number of open source libraries including:
 - [Spectre.Console](https://github.com/spectreconsole/spectre.console) for nice table rendering
 - [T-Digest.net](https://github.com/ASolomatin/T-Digest.NET) is used internally for some aggregation functions
 - [VegaGenerator](https://github.com/NeilMacMullen/VegaGenerator) is used to simplify rendering of charts
+- [Trackd/Sixel](https://github.com/trackd/Sixel/blob/main/src/Sixel/Protocols/Sixel.cs) for terminal rendering of charts
 
 ## Contributing
 
