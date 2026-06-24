@@ -259,4 +259,17 @@ public class IntPromotionTests : TestMethods
         var result = await LastLineOfResult(query);
         result.Should().Contain("long");
     }
+
+
+    [TestMethod]
+    public async Task UnaryMinusColumn()
+    {
+        var query = """
+                    range i from 1 to 10 step 1
+                    | extend j = toint(i)
+                    | summarize a=avg(-j)
+                    """;
+        var result = await LastLineOfResult(query);
+        result.Should().Contain("5");
+    }
 }
