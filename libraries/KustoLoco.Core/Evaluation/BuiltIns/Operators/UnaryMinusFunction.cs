@@ -7,6 +7,7 @@ namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 internal partial class UnaryMinusFunction
 {
     private static int IntImpl(int a) => -a;
+    private static long IntRetLongImpl(int a) => -a;
     private static long LongImpl(long a) => -a;
     private static double DoubleImpl(double a) => -a;
     private static decimal DecimalImpl(decimal a) => -a;
