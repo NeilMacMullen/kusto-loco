@@ -87,7 +87,6 @@
 			<Word>summarize</Word>
 			<Word>extend</Word>
 			<Word>count</Word>
-			<Word>dcount</Word>
 			<Word>render</Word>
 			<Word>join</Word>
 			<Word>lookup</Word>
@@ -95,6 +94,10 @@
 			<Word>getschema</Word>
 			<Word>datatable</Word>
 			<Word>dynamic</Word>
+			<Word>range</Word>
+			<Word>from</Word>
+			<Word>to</Word>
+			<Word>step</Word>
 		</Keywords>
 
 		<Keywords color="Function">
@@ -172,6 +175,8 @@
 			<Word>strcat</Word>
 			<Word>strlen</Word>
 			<Word>substring</Word>
+			<Word>startswith</Word>
+			<Word>endswith</Word>
 			<Word>tan</Word>
 			<Word>tobool</Word>
 			<Word>todatetime</Word>
@@ -194,8 +199,6 @@
 			<Word>!contains</Word>
 			<Word>between</Word>
 			<Word>!between</Word>
-			<Word>dcount (aggregation function)</Word>
-			<Word>dcountif (aggregation function)</Word>
 			<Word>trimws</Word>
 			<Word>levenshtein</Word>
 			<Word>net_time</Word>
@@ -222,7 +225,8 @@
 			<Word>make_listif</Word>
 			<Word>arg_min</Word>
 			<Word>arg_max</Word>
-
+			<Word>dcount</Word>
+			<Word>count_distinct</Word>
 		</Keywords>
 
 
