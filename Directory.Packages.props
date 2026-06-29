@@ -100,11 +100,11 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="geohash-dotnet" Version="2.3.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
-    <PackageVersion Include="Avalonia" Version="11.3.13" />
+    <PackageVersion Include="Avalonia" Version="11.3.18" />
     <PackageVersion Include="Avalonia.Desktop" Version="11.3.13" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.13" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.13" />
-    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.13" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="11.3.18" />
     <PackageVersion Include="Jab" Version="0.12.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
