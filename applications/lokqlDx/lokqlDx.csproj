@@ -40,7 +40,7 @@
 
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
-    <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
+    <PackageReference Include="TreeDataGrid" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Labs.Controls" />
     <PackageReference Include="Avalonia.Labs.Panels" />
@@ -48,18 +48,14 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="AvaloniaEdit.TextMate" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="Clowd.Clipboard.Avalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
 
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
-    <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)'=='AvaloniaPreviewer'" />
     <PackageReference Include="Dock.Avalonia" />
     <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
     <PackageReference Include="Dock.Model.Mvvm" />
     <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
-    <PackageReference Include="Mapsui.Avalonia" />
+    <PackageReference Include="Mapsui.Avalonia12" />
     <PackageReference Include="MarkdownViewer.Core" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="ScottPlot.Avalonia" />

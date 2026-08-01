@@ -196,12 +196,6 @@ public class DialogService
                     = new DynamicResourceExtension("SystemControlBackgroundAltMediumHighBrush");
             else
                 dialog.Background = Brushes.Transparent;
-#if DEBUG
-#if !NCRUNCH
-            dialog.AttachDevTools();
-#endif
-#endif
-
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
             if (!options.Modal)
             {

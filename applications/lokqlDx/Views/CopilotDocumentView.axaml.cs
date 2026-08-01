@@ -20,6 +20,7 @@ public partial class CopilotDocumentView : UserControl
     public CopilotDocumentView()
     {
         InitializeComponent();
+        GotFocus += CopilotDocumentView_OnGotFocus;
     }
 
     protected override void OnLoaded(Avalonia.Interactivity.RoutedEventArgs e)
@@ -37,9 +38,8 @@ public partial class CopilotDocumentView : UserControl
         }
     }
 
-    protected override void OnGotFocus(GotFocusEventArgs e)
+    private void CopilotDocumentView_OnGotFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        base.OnGotFocus(e);
         // Restore scroll position when view regains focus
         RestoreScrollPositions();
     }

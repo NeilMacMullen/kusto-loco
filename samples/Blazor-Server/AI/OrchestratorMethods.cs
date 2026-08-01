@@ -50,7 +50,7 @@ namespace KustoLoco.AI
                     .GetChatClient(AIModel)
                     .AsIChatClient();
             }
-            else if (objSettings.AIType == "Azure OpenAI") 
+            else if (objSettings.AIType == "Azure OpenAI")
             {
                 var options = new AzureOpenAIClientOptions
                 {
@@ -58,17 +58,12 @@ namespace KustoLoco.AI
                 };
 
                 return new AzureOpenAIClient(
-                    new Uri(Endpoint),
-                    apiKeyCredential, options)
+                        new Uri(Endpoint),
+                        apiKeyCredential, options)
                     .GetChatClient(AIModel)
                     .AsIChatClient();
             }
-            else // Local LLM
-            {
-                return new OllamaChatClient(
-                    new Uri(Endpoint),
-                    AIModel);
-            }
+            else throw new InvalidOperationException($"{objSettings.AIType} not supported");
         }
         #endregion
 
