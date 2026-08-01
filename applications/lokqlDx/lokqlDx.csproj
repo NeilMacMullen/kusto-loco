@@ -55,7 +55,7 @@
     <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
     <PackageReference Include="Dock.Model.Mvvm" />
     <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
-    <PackageReference Include="Mapsui.Avalonia" />
+    <PackageReference Include="Mapsui.Avalonia12" />
     <PackageReference Include="MarkdownViewer.Core" />
     <PackageReference Include="NotNullStrings" />
     <PackageReference Include="ScottPlot.Avalonia" />
