@@ -11,6 +11,7 @@
   <ItemGroup>
   
     <PackageReference Include="Microsoft.PowerShell.SDK" />
+    <PackageReference Include="System.Security.Cryptography.Xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\KustoLoco.Core\KustoLoco.Core.csproj" />
