@@ -24,7 +24,7 @@ public static class ControlRenderer
             rtb.Render(control);
             // Encode to PNG in memory
             using var memoryStream = new MemoryStream();
-            rtb.Save(memoryStream);
+            rtb.Save(memoryStream, PngBitmapEncoderOptions.Default);
             memoryStream.Seek(0, SeekOrigin.Begin);
 
             var bitmap = new Bitmap(memoryStream);

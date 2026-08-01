@@ -15,7 +15,7 @@ public partial class QueryDocumentView : UserControl
     {
     }
 
-    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e)
+    private void InputElement_OnGotFocus(object? sender, RoutedEventArgs e)
     {
         TheQueryEditor.Focus();
     }

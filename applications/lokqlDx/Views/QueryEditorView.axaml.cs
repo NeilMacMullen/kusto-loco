@@ -89,5 +89,5 @@ public partial class QueryEditorView : UserControl
         _textEditor.TextArea.Focus();
     }
 
-    private void InputElement_OnGotFocus(object? sender, GotFocusEventArgs e) => _textEditor?.Focus();
+    private void InputElement_OnGotFocus(object? sender, RoutedEventArgs e) => _textEditor?.Focus();
 }
