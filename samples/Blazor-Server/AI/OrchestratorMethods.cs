@@ -63,12 +63,6 @@ namespace KustoLoco.AI
                     .GetChatClient(AIModel)
                     .AsIChatClient();
             }
-            else // Local LLM
-            {
-                return new OllamaChatClient(
-                    new Uri(Endpoint),
-                    AIModel);
-            }
         }
         #endregion
 
