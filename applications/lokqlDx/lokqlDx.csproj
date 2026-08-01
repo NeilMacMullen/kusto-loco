@@ -72,7 +72,10 @@
     <PackageReference Include="Jab" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="MessageBox.Avalonia" />
-    <PackageReference Include="DependencyPropertyGenerator" />
+    <PackageReference Include="DependencyPropertyGenerator">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="Xaml.Behaviors.Avalonia" />
   </ItemGroup>

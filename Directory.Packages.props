@@ -109,7 +109,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.3.1.1" />
-    <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
+    <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="18.7.23" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
