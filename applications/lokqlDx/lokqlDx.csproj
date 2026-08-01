@@ -48,7 +48,6 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="AvaloniaEdit.TextMate" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="Clowd.Clipboard.Avalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
 
