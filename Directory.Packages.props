@@ -22,7 +22,7 @@
     <PackageVersion Include="Azure.Monitor.Query" Version="1.7.1" />
     <PackageVersion Include="Azure.Monitor.Query.Logs" Version="1.0.0" />
     <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageVersion Include="ClosedXML" Version="0.105.0" />
+    <PackageVersion Include="ClosedXML" Version="0.105.1" />
     <PackageVersion Include="Clowd.Clipboard.Avalonia" Version="1.1.4" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.4.2" />
@@ -31,7 +31,7 @@
     <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="11.3.12" />
     <PackageVersion Include="Dock.Model.Avalonia" Version="11.3.2.2" />
     <PackageVersion Include="Dock.Model.Mvvm" Version="11.3.12" />
-    <PackageVersion Include="ExcelDataReader.DataSet" Version="3.8.0" />
+    <PackageVersion Include="ExcelDataReader.DataSet" Version="3.9.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.12" />
     <PackageVersion Include="HotAvalonia" Version="3.1.0" />
     <PackageVersion Include="JPoke" Version="1.0.0" />
@@ -66,23 +66,23 @@
     <PackageVersion Include="OpenAI" Version="2.10.0" />
     <PackageVersion Include="Parquet.Net" Version="5.6.0" />
     <PackageVersion Include="PowerShellStandard.Library" Version="5.1.1" />
-    <PackageVersion Include="ScottPlot" Version="5.1.58" />
+    <PackageVersion Include="ScottPlot" Version="5.1.59" />
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.58" />
-    <PackageVersion Include="ScottPlot.WPF" Version="5.1.58" />
+    <PackageVersion Include="ScottPlot.WPF" Version="5.1.59" />
     <PackageVersion Include="ShapeCrawler" Version="0.79.2" />
     <PackageVersion Include="SimpleExec" Version="13.0.0" />
-    <PackageVersion Include="Spectre.Console" Version="0.56.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.57.2" />
     <PackageVersion Include="StaticViewLocator" Version="0.4.0" />
     <PackageVersion Include="Svg.Controls.Avalonia" Version="11.3.9.5" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.8" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.10" />
     <PackageVersion Include="System.Management.Automation" Version="7.4.1" />
-    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.8" />
+    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.10" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
     <PackageVersion Include="T-Digest.NET" Version="1.0.3" />
     <PackageVersion Include="Topten.RichTextKit" Version="0.4.167" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.1.1" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.1.1" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.1.1" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="22.2.0" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.2.0" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.2.0" />
     <PackageVersion Include="Vanara.Core" Version="5.0.5" />
     <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="5.0.5" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
@@ -112,7 +112,7 @@
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="18.7.23" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.7" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.16.0" />
   </ItemGroup>
 </Project>
