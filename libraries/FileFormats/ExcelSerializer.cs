@@ -96,8 +96,7 @@ public class ExcelSerializer : ITableSerializer
 
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
 
-        var inferColumnNames = _settings.GetBool(ExcelSerializerSettings.InferColumnNames);
-
+        var skipTypeInference = _settings.GetBool(ExcelSerializerSettings.SkipTypeInference);
         for (var columnIndex = 0; columnIndex < dr.ColumnCount; columnIndex++)
         {
             var columnType = dr.GetColumnType(columnIndex);
@@ -109,9 +108,9 @@ public class ExcelSerializer : ITableSerializer
                 //convert to string and then infer the type
                 var colBuilder = new GenericColumnBuilderOfstring();
                 foreach (var item in colData) colBuilder.Add(item?.ToString().NullToEmpty());
-                column = inferColumnNames
-                    ? ColumnTypeInferrer.AutoInfer(colBuilder.ToColumn())
-                    : colBuilder.ToColumn();
+                column = skipTypeInference
+                    ? colBuilder.ToColumn()
+                    : ColumnTypeInferrer.AutoInfer(colBuilder.ToColumn());
             }
             else
             {
@@ -165,9 +164,7 @@ public static class ExcelSerializerSettings
         Setting("SkipTypeInference"), "prevents conversion of string columns to types",
         "off",
         nameof(Boolean));
-
-
-    
+   
     private static string Setting(string setting)
     {
         return $"{Prefix}.{setting}";
