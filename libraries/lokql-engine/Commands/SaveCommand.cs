@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using KustoLoco.Core.Settings;
+using KustoLoco.FileFormats;
 
 namespace Lokql.Engine.Commands;
 
@@ -11,12 +12,9 @@ public static class SaveCommand
     internal static async Task RunAsync(CommandContext context, Options o)
     {
         var newLayer = new KustoSettingsProvider();
-        if (o.NoHeader)
-        {
-            newLayer.Set("csv.skipheader", "true");
-            newLayer.Set("tsv.skipheader", "true");
-            newLayer.Set("txt.skipheader", "true");
-        }
+            newLayer.Set(CsvSerializer.CsvSerializerSettings.SkipHeaderOnSave.Name, o.NoHeader);
+            newLayer.Set("txt.skipheader", o.NoHeader);
+        newLayer.Set(CsvSerializer.CsvSerializerSettings.Separator.Name,o.Separator);
         var exp = context.Explorer;
         exp.Settings.AddLayer(newLayer);
        
@@ -39,7 +37,10 @@ Examples:
         public string File { get; set; } = string.Empty;
         [Value(1, HelpText = "Name of result (or most recent result if left blank)")]
         public string ResultName { get; set; } = string.Empty;
-        [Option('n',HelpText = "Avoid writing headers for csv and text files")]
+        [Option('n',"noheader",HelpText = "Avoid writing headers")]
         public bool NoHeader { get; set; }
+
+        [Option('s',"separator", HelpText = "Separator character")]
+        public string Separator { get; set; } = ",";
     }
 }

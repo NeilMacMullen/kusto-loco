@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Text;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using ExcelDataReader;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
@@ -8,6 +6,9 @@ using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
 using NotNullStrings;
+using System.Data;
+using System.Text;
+using static KustoLoco.FileFormats.CsvSerializer;
 
 namespace KustoLoco.FileFormats;
 
@@ -22,6 +23,8 @@ public class ExcelSerializer : ITableSerializer
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         _settings = settings;
         _console = console;
+        settings.Register(ExcelSerializerSettings.SkipTypeInference);
+
     }
 
     public async Task<TableSaveResult> SaveTable(string path, KustoQueryResult result)
@@ -92,6 +95,8 @@ public class ExcelSerializer : ITableSerializer
         var keys = dr.GetRowItems(dr.GetRow(0)).Select(o => o?.ToString().NullToEmpty()).ToArray();
 
         var tableBuilder = TableBuilder.CreateEmpty(tableName, rowCount);
+
+        var skipTypeInference = _settings.GetBool(ExcelSerializerSettings.SkipTypeInference);
         for (var columnIndex = 0; columnIndex < dr.ColumnCount; columnIndex++)
         {
             var columnType = dr.GetColumnType(columnIndex);
@@ -103,7 +108,9 @@ public class ExcelSerializer : ITableSerializer
                 //convert to string and then infer the type
                 var colBuilder = new GenericColumnBuilderOfstring();
                 foreach (var item in colData) colBuilder.Add(item?.ToString().NullToEmpty());
-                column = ColumnTypeInferrer.AutoInfer(colBuilder.ToColumn());
+                column = skipTypeInference
+                    ? colBuilder.ToColumn()
+                    : ColumnTypeInferrer.AutoInfer(colBuilder.ToColumn());
             }
             else
             {
@@ -145,5 +152,21 @@ public class ExcelSerializer : ITableSerializer
                 message += " Is the file open in Excel or another program?";
             return [TableLoadResult.Failure(message)];
         }
+    }
+}
+
+
+public static class ExcelSerializerSettings
+{
+    private const string Prefix = "excel";
+
+    public static readonly KustoSettingDefinition SkipTypeInference = new(
+        Setting("SkipTypeInference"), "prevents conversion of string columns to types",
+        "off",
+        nameof(Boolean));
+   
+    private static string Setting(string setting)
+    {
+        return $"{Prefix}.{setting}";
     }
 }
