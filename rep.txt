@@ -1,0 +1,185 @@
+commit 202622144c8c1ceb87405aa8bc2d400765f6c017
+Merge: ab948d6e be9c0095
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 18:15:59 2026 +0100
+
+    Merge pull request #626 from NeilMacMullen/avalonia12
+    
+    Port lokqldx to Avalonia 12
+
+commit be9c0095e9341e25113f382c1191e7a48b8a8ba8
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 18:09:59 2026 +0100
+
+    Force reference to updated cryptography.xml
+
+commit 4b768b98d5c394721240de8c4956fefda4e8a4bb
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 17:50:28 2026 +0100
+
+    Fix tests
+
+commit 93935bc72c0327352f20dc44b83b8d066f84a0ef
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 17:28:08 2026 +0100
+
+    Fix up compile error
+
+commit 3e9cdf30b3ddbe75ec299e4a76b6b49b6da1b305
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 17:24:21 2026 +0100
+
+    Remove redundant popup
+
+commit 7daffed6c903edfa45eaf5b7dfd770beda58bb9f
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 17:18:54 2026 +0100
+
+    Fix up tests
+
+commit f9537df387697dfaa6512ddf5205d38dca3252f3
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 17:01:13 2026 +0100
+
+    Switch to correct mapsui version
+
+commit 8715c57bf8ec2b4764f31a690351492ec4e90dfa
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 16:30:30 2026 +0100
+
+    Working except for map
+
+commit 3c37879ff366661a31b05e8231861003514e2ace
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 16:09:17 2026 +0100
+
+    Drop Datagrid dependency
+
+commit ab948d6e4345ed1e5c9394034c723abc7cc78860
+Merge: 3e44c209 fba4b3cf
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 16:02:56 2026 +0100
+
+    Merge pull request #625 from NeilMacMullen/nuget_20260801
+    
+    Nuget 20260801
+
+commit fba4b3cf79b03f927e4afda0d14177be0fc47125
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:54:04 2026 +0100
+
+    dep gen
+
+commit 236427f03e74942d532a678b0d80fe96adad98cf
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:50:55 2026 +0100
+
+    ai
+
+commit 9b5adef1690499e8db5b9c73af1c4df670c4ddc9
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:48:16 2026 +0100
+
+    awesomeassertions
+
+commit cc7c98461d4e7f58612ae603c9d1ff33240aeea2
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:47:01 2026 +0100
+
+    More updates
+
+commit 4e42ca429f3443862c42604b6b886be671f07328
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:41:22 2026 +0100
+
+    More udpates
+
+commit 0da9b7c10e7883e891c04fd5f2cd0095ce608281
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:38:55 2026 +0100
+
+    Geohash
+
+commit ebd1c77aed09fba3cc442fa236d07dffa3d23c2d
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:34:26 2026 +0100
+
+    More updates, fix up test deps
+
+commit 5ae3c1210b45c615f7d183e248bc9018489f4661
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:27:23 2026 +0100
+
+    more updates
+
+commit 8830ebf6e505f7fbbd6fed1d0d032d564cf02db3
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Sat Aug 1 14:13:18 2026 +0100
+
+    Update1
+
+commit 3e44c209be3d22b0baa4842761b746d2eb9f7ad3
+Merge: 9c4c5659 b01195ec
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Thu Jul 16 13:01:12 2026 +0100
+
+    Merge pull request #624 from NeilMacMullen/tzfix
+    
+    Fixes an issue where DateTimes imported from CSV or sources that requ…
+
+commit b01195ec949fd655351ec1df1271d357b6b9d9c3
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Thu Jul 16 11:33:59 2026 +0100
+
+    Fixes an issue where DateTimes imported from CSV or sources that required type-inference, did not correctly use UTC timezone
+
+commit 9c4c5659b705b97403543796c7274503b92d9e6d
+Merge: afe641ba 13904eb1
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 24 22:48:03 2026 +0100
+
+    Merge pull request #616 from NeilMacMullen/issue_610_syntaxhighlighting
+    
+    Catch a few more unhighlighted keywords
+
+commit 13904eb121192f8e6bf8e3a02b469d5a0267ce96
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 24 22:42:47 2026 +0100
+
+    Catch a few more unhighlighted keywords
+
+commit afe641badb8afa2c1b63d5fd47e771f554b41865
+Merge: 97803018 6e654a29
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 24 22:38:57 2026 +0100
+
+    Merge pull request #615 from NeilMacMullen/issue_614_unaryminus
+    
+    Add additional unary minus overload for int promoted to long
+
+commit 6e654a29d0a248da815a15d850cfa51be524ec0a
+Author: NeilMacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 24 22:28:50 2026 +0100
+
+    Add additional unary minus overload for int promoted to long
+
+commit 97803018fa2d951a624e265782873deec24cd8c5
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Mon Jun 22 21:15:39 2026 +0100
+
+    Update README.md
+
+commit 9e54b8af948aac5165986bcf6de3067159c422c8
+Merge: 70611509 8b233f89
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 17 16:24:49 2026 +0100
+
+    Merge pull request #609 from NeilMacMullen/startof
+    
+    Add 'offset' implementations for startofX datetime functions
+
+commit 8b233f8904bf034d8f8a0957be98441d8e2bdd21
+Author: Neil MacMullen <neil.macmullen@outlook.com>
+Date:   Wed Jun 17 15:57:34 2026 +0100
+
+    Add 'offset' implementations for startofX datetime functions

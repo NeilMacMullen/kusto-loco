@@ -1,4 +1,6 @@
 ﻿using CommandLine;
+using KustoLoco.Core.Settings;
+using KustoLoco.FileFormats;
 using NotNullStrings;
 
 namespace Lokql.Engine.Commands;
@@ -26,7 +28,16 @@ public static class LoadCommand
             }
         }
 
+        var newLayer = new KustoSettingsProvider();
+        newLayer.Set(CsvSerializer.CsvSerializerSettings.TrimCells.Name, !o.NoTrim);
+        newLayer.Set(CsvSerializer.CsvSerializerSettings.InferColumnNames.Name, o.NoHeader);
+        newLayer.Set(CsvSerializer.CsvSerializerSettings.Separator.Name, o.Separator);
+        newLayer.Set(CsvSerializer.CsvSerializerSettings.SkipTypeInference.Name, o.NoInfer);
+        newLayer.Set(ExcelSerializerSettings.SkipTypeInference.Name, o.NoInfer);
+
+        exp.Settings.AddLayer(newLayer);
         var success = await exp._loader.LoadTable(exp.GetCurrentContext(), o.File, tableName);
+        exp.Settings.Pop();
         if (!success)
         {
             exp.Warn($"Unable to load '{o.File}'");
@@ -60,5 +71,17 @@ Examples:
 
         [Option('f', "force", HelpText = "Force reload")]
         public bool Force { get; set; }
+
+        [Option('n', "noheader", HelpText = "Assume no header row when loading csv/tsv files")]
+        public bool NoHeader { get; set; }
+
+        [Option('s', "separator", HelpText = "Separator character for csv files")]
+        public string Separator { get; set; } = ",";
+
+        [Option('t', "notrim", HelpText = "Skip trim of cells for csv and tsv")]
+        public bool NoTrim { get; set; }
+
+        [Option("noInfer", HelpText = "leave all columns as strings for csv/tsv")]
+        public bool NoInfer { get; set; }
     }
 }
