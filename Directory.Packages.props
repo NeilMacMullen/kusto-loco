@@ -31,7 +31,7 @@
     <PackageVersion Include="Dock.Avalonia" Version="12.1.0.4" />
     <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.4" />
     <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0" />
-    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.0.1" />
+    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.0.4" />
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.9.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.12" />
     <PackageVersion Include="HotAvalonia" Version="3.1.4" />
