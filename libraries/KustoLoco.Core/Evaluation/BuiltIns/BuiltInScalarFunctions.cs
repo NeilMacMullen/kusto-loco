@@ -203,6 +203,10 @@ internal static class BuiltInScalarFunctions
         Ipv4IsInAnyRangeFunction.Register(Functions);
         Ipv4IsMatchFunction.Register(Functions);
         Ipv4CompareFunction.Register(Functions);
+        FormatIpv4Function.Register(Functions);
+        FormatIpv4MaskFunction.Register(Functions);
+        Ipv4NetmaskSuffixFunction.Register(Functions);
+        ParseIpv4MaskFunction.Register(Functions);
         ParseIpv4Function.Register(Functions);
         ParseIpv6Function.Register(Functions);
         IsAsciiFunction.Register(Functions);

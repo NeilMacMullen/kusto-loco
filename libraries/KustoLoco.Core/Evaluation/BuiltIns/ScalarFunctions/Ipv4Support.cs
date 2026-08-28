@@ -37,6 +37,54 @@ internal static class Ipv4Support
         return (ipv & mask) == (basev & mask);
     }
 
+    public static string UintToDotted(uint v) =>
+        $"{(v >> 24) & 0xFF}.{(v >> 16) & 0xFF}.{(v >> 8) & 0xFF}.{v & 0xFF}";
+
+    // The network address of 'ip' masked to the smaller of its own /suffix and 'prefix' (default 32), as a uint.
+    // Null when the address is unparseable or the effective prefix is out of range.
+    public static uint? MaskedValue(string ip, long? prefix)
+    {
+        if (string.IsNullOrEmpty(ip)) return null;
+        var p = SplitPrefix(ip, out var addr);
+        if (!TryParse(addr, out var v)) return null;
+        var bits = (int)System.Math.Min(p, prefix ?? 32);
+        if (bits < 0 || bits > 32) return null;
+        var mask = bits == 0 ? 0u : 0xFFFFFFFFu << (32 - bits);
+        return v & mask;
+    }
+
+    // format_ipv4: the masked network address as dotted-quad.
+    public static string? FormatV4(string ip, long? prefix)
+    {
+        var v = MaskedValue(ip, prefix);
+        return v is null ? null : UintToDotted(v.Value);
+    }
+
+    // format_ipv4_mask: the masked network address in CIDR notation, using the effective prefix.
+    public static string? FormatV4Mask(string ip, long prefix)
+    {
+        if (prefix < 0 || prefix > 32) return null;
+        var p = SplitPrefix(ip, out _);
+        var bits = System.Math.Min(p, (int)prefix);
+        var v = MaskedValue(ip, prefix);
+        return v is null ? null : $"{UintToDotted(v.Value)}/{bits}";
+    }
+
+    // ipv4_netmask_suffix: the /suffix of a CIDR (32 when none present); null when the address is unparseable.
+    public static long? NetmaskSuffix(string ipRange)
+    {
+        if (string.IsNullOrEmpty(ipRange)) return null;
+        var p = SplitPrefix(ipRange, out var addr);
+        return TryParse(addr, out _) ? p : null;
+    }
+
+    // parse_ipv4_mask: the masked network address as a long.
+    public static long? ParseV4Mask(string ip, long prefix)
+    {
+        var v = MaskedValue(ip, prefix);
+        return v is null ? null : (long)v.Value;
+    }
+
     public static bool? MaskedEqual(string a, string b, long? prefixArg)
     {
         var m = Masked(a, b, prefixArg, out var av, out var bv);
