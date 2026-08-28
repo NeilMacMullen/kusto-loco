@@ -42,3 +42,27 @@ public sealed record GeoIpInfo(
     string? City = null,
     double? Latitude = null,
     double? Longitude = null);
+
+// parse_user_agent data provider. The engine ships no user-agent database; a faithful implementation (e.g. one backed
+// by the uap-core dataset) lives in a companion package and is registered by the host.
+public interface IUserAgentParser
+{
+    UserAgentInfo Parse(string userAgent);
+}
+
+public sealed record UserAgentInfo(
+    UserAgentSoftware Browser,
+    UserAgentSoftware OperatingSystem,
+    UserAgentDevice Device);
+
+public sealed record UserAgentSoftware(
+    string? Family = null,
+    string? Major = null,
+    string? Minor = null,
+    string? Patch = null,
+    string? PatchMinor = null);
+
+public sealed record UserAgentDevice(
+    string? Family = null,
+    string? Brand = null,
+    string? Model = null);
