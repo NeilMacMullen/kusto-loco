@@ -51,7 +51,7 @@ internal partial class TreeEvaluator
 
         public IEnumerable<ITableChunk> GetData()
         {
-            var rightContext = new EvaluationContext(_context.Scope);
+            var rightContext = new EvaluationContext(_context.Scope) { Providers = _context.Providers };
             var rightResult = _rightExpression.Accept(_owner, rightContext);
             if (rightResult == EvaluationResult.Null || !rightResult.IsTabular)
                 throw new InvalidOperationException(
@@ -83,7 +83,7 @@ internal partial class TreeEvaluator
 
             var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
 
-            var chunkContext = new EvaluationContext(_context.Scope, chunk);
+            var chunkContext = new EvaluationContext(_context.Scope, chunk) { Providers = _context.Providers };
             foreach (var onExpression in onExpressions)
             {
                 var onExpressionResult = (ColumnarResult?)onExpression.Accept(_owner, chunkContext);

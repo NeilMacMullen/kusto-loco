@@ -27,6 +27,7 @@ public class BabyKustoEngine
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalfuncs = new();
     private readonly IKustoConsole _console;
     private readonly KustoSettingsProvider _settings;
+    private ProviderRegistry _providers = new();
 
     public BabyKustoEngine(IKustoConsole console,KustoSettingsProvider settings)
     {
@@ -54,6 +55,17 @@ public class BabyKustoEngine
     {
         _additionalfuncs = funcs;
     }
+
+    // Register a host-supplied provider (for example an IGeoIpProvider) that context-aware scalar functions read at
+    // evaluation time. Absent providers leave their functions returning null (inert), so queries still run.
+    public BabyKustoEngine AddProvider<T>(T provider) where T : class
+    {
+        _providers.Set(provider);
+        return this;
+    }
+
+    // Use a caller-owned provider registry (e.g. one held by KustoQueryContext across query runs).
+    internal void UseProviders(ProviderRegistry providers) => _providers = providers;
 
     public IReadOnlyCollection<AggregateInfo> GetImplementedAggregateList()
     {
@@ -147,7 +159,7 @@ public class BabyKustoEngine
         var scope = new LocalScope();
         foreach (var table in tables) scope.AddSymbol(table.Type, TabularResult.CreateUnvisualized(table));
 
-        var result = BabyKustoEvaluator.Evaluate(ir, scope);
+        var result = BabyKustoEvaluator.Evaluate(ir, scope, _providers);
         return result;
     }
 

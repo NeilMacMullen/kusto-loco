@@ -351,5 +351,6 @@ internal static class BuiltInScalarFunctions
         SetUnionFunctionImpl.Register(Functions);
         SetIntersectFunctionImpl.Register(Functions);
         SetDifferenceFunctionImpl.Register(Functions);
+        GeoInfoFromIpFunctionImpl.Register(Functions);
     }
 }

@@ -7,9 +7,9 @@ namespace KustoLoco.Core.Evaluation;
 
 internal static class BabyKustoEvaluator
 {
-    internal static EvaluationResult Evaluate(IRNode root, LocalScope scope)
+    internal static EvaluationResult Evaluate(IRNode root, LocalScope scope, IProviderRegistry? providers = null)
     {
         var evaluator = new TreeEvaluator();
-        return root.Accept(evaluator, new EvaluationContext(scope));
+        return root.Accept(evaluator, new EvaluationContext(scope) { Providers = providers });
     }
 }

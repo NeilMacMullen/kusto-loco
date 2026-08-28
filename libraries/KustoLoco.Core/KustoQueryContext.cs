@@ -34,6 +34,7 @@ public class KustoQueryContext
 {
     
     private Dictionary<FunctionSymbol, ScalarFunctionInfo> _additionalFunctions = [];
+    private readonly ProviderRegistry _providers = new();
     private IKustoConsole _debugConsole = new SystemConsole();
 
     private IKustoQueryContextTableLoader _lazyTableLoader = new NullTableLoader();
@@ -162,11 +163,22 @@ public class KustoQueryContext
     }
 
     /// <summary>
+    ///     Registers a host-supplied provider (for example an IGeoIpProvider) that context-aware scalar functions read
+    ///     at evaluation time. Absent providers leave their functions returning null.
+    /// </summary>
+    public KustoQueryContext AddProvider<T>(T provider) where T : class
+    {
+        _providers.Set(provider);
+        return this;
+    }
+
+    /// <summary>
     ///     Runs a query and evaluates the result in order to get an accurate benchmark
     /// </summary>
     public int BenchmarkQuery(string query)
     {
         var engine = new BabyKustoEngine(new SystemConsole(),_settings);
+        engine.UseProviders(_providers);
         var res = engine.Evaluate(_tables, query);
         return res.RowCount;
     }
@@ -183,6 +195,7 @@ public class KustoQueryContext
         var watch = Stopwatch.StartNew();
         var engine = new BabyKustoEngine(_debugConsole,_settings);
         engine.AddAdditionalFunctions(_additionalFunctions);
+        engine.UseProviders(_providers);
         //handling for "special" commands
         if (query.Trim() == ".tables")
             return CreateTableList(query, false);
