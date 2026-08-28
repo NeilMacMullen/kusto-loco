@@ -199,6 +199,10 @@ internal static class BuiltInScalarFunctions
         IsEmptyFunction.Register(Functions);
         IsNotEmptyFunction.Register(Functions);
         Ipv4IsPrivateFunction.Register(Functions);
+        Ipv4IsInRangeFunction.Register(Functions);
+        Ipv4IsInAnyRangeFunction.Register(Functions);
+        Ipv4IsMatchFunction.Register(Functions);
+        Ipv4CompareFunction.Register(Functions);
         ParseIpv4Function.Register(Functions);
         ParseIpv6Function.Register(Functions);
         IsAsciiFunction.Register(Functions);
@@ -320,6 +324,10 @@ internal static class BuiltInScalarFunctions
         UrlEncodeFunction.Register(Functions);
         RegexQuoteFunction.Register(Functions);
         RepeatFunction.Register(Functions);
+
+        SetHasElementFunction.Register(Functions);
+        BagKeysFunction.Register(Functions);
+        ExtractAllFunction.Register(Functions);
 
         //can't generate because arbitrary number of arguments
         BagPackFunctionImpl.Register(Functions);
