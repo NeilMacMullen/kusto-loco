@@ -30,9 +30,33 @@ internal partial class TreeEvaluator
         var fromVal = ((ScalarResult)node.From.Accept(this, chunkContext)).Value;
         var toVal = ((ScalarResult)node.To.Accept(this, chunkContext)).Value;
         var stepVal = ((ScalarResult)node.Step.Accept(this, chunkContext)).Value;
-        var from = ToDouble(fromVal);
-        var step = ToDouble(stepVal);
-        var binCount = step != 0 ? (int)Math.Floor((ToDouble(toVal) - from) / step) : 0;
+
+        // KQL make-series bins the axis into [from, to) buckets of width step (bin_at semantics): 'to' is
+        // NON-inclusive and the number of points is the count of start + i*step values strictly below 'to'. Temporal
+        // axes are computed in exact integer ticks — datetime ticks (~6.3e17) exceed double's 2^53 exact-integer
+        // range, so doing the arithmetic in double would drift the axis and mis-bin rows.
+        var axisIsDateTime = fromVal is DateTime;
+        var axisIsTimeSpan = fromVal is TimeSpan;
+        var temporal = axisIsDateTime || axisIsTimeSpan;
+
+        long fromTicks = 0, stepTicks = 0;
+        double fromD = 0, stepD = 0;
+        int binCount;
+        if (temporal)
+        {
+            fromTicks = ToTicks(fromVal);
+            stepTicks = ToTicks(stepVal);
+            var span = ToTicks(toVal) - fromTicks;
+            binCount = stepTicks > 0 && span > 0 ? (int)((span + stepTicks - 1) / stepTicks) : 0; // ceil, exclusive end
+        }
+        else
+        {
+            fromD = ToDouble(fromVal);
+            stepD = ToDouble(stepVal);
+            var span = ToDouble(toVal) - fromD;
+            // Subtract a tiny epsilon so an exact multiple isn't rounded up by floating-point error.
+            binCount = stepD > 0 && span > 0 ? (int)Math.Ceiling(span / stepD - 1e-9) : 0;
+        }
         if (binCount < 0) binCount = 0;
 
         // Axis + by-columns evaluated columnar over the whole chunk.
@@ -54,16 +78,23 @@ internal partial class TreeEvaluator
                 groupOrder.Add(key);
             }
 
-            var axisD = ToDouble(axisColumn.GetRawDataValue(r));
-            if (step == 0) continue;
-            var bin = (int)Math.Floor((axisD - from) / step);
+            int bin;
+            if (temporal)
+            {
+                var t = ToTicks(axisColumn.GetRawDataValue(r));
+                bin = stepTicks > 0 && t >= fromTicks ? (int)((t - fromTicks) / stepTicks) : -1;
+            }
+            else
+            {
+                var axisD = ToDouble(axisColumn.GetRawDataValue(r));
+                bin = stepD > 0 ? (int)Math.Floor((axisD - fromD) / stepD) : -1;
+            }
             if (bin >= 0 && bin < binCount) state.BinRows[bin].Add(r);
         }
 
         var outBuilders = ColumnHelpers.CreateBuildersForTable(resultSchema);
-        // Column layout of the result: [by columns..., axis series, aggregate series...].
+        // Column layout of the result: [by columns..., aggregate series..., axis series].
         var byCount = node.ByColumns.Count;
-        var axisIsDateTime = fromVal is DateTime;
 
         foreach (var key in groupOrder)
         {
@@ -73,27 +104,19 @@ internal partial class TreeEvaluator
             // by columns
             for (var b = 0; b < byCount; b++) outBuilders[outCol++].Add(key.Values[b]);
 
-            // axis series: from + i*step for each bin
-            var axisArray = new JsonArray();
-            for (var i = 0; i < binCount; i++)
-            {
-                var pointTicks = from + i * step;
-                axisArray.Add(axisIsDateTime
-                    ? JsonValue.Create(new DateTime((long)pointTicks, DateTimeKind.Utc).ToString("o"))
-                    : JsonValue.Create(pointTicks));
-            }
-            outBuilders[outCol++].Add(axisArray);
-
-            // one series per aggregate: aggregate the rows in each bin, gap-fill empties with the default.
+            // one series per aggregate: aggregate the rows in each bin, gap-fill empty bins with the default.
             for (var a = 0; a < node.Aggregations.Count; a++)
             {
+                // ADX fills empty bins with the per-aggregate default; when no 'default=' clause is written the default
+                // is 0 (typed to the aggregate's result), not null. An explicit 'default=<null>' still fills with null.
+                var fill = node.DefaultProvided[a] ? node.Defaults[a] : DefaultZero(node.Aggregations[a].ResultType);
                 var series = new JsonArray();
                 for (var i = 0; i < binCount; i++)
                 {
                     var rows = state.BinRows[i];
                     if (rows.Count == 0)
                     {
-                        series.Add(ToJson(node.Defaults[a]));
+                        series.Add(ToJson(fill));
                         continue;
                     }
 
@@ -105,11 +128,42 @@ internal partial class TreeEvaluator
                 }
                 outBuilders[outCol++].Add(series);
             }
+
+            // axis series: from + i*step for each bin (exact in the axis's native type).
+            var axisArray = new JsonArray();
+            for (var i = 0; i < binCount; i++)
+            {
+                if (axisIsDateTime)
+                    axisArray.Add(JsonValue.Create(
+                        new DateTime(fromTicks + (long)i * stepTicks, DateTimeKind.Utc).ToString("o")));
+                else if (axisIsTimeSpan)
+                    axisArray.Add(JsonValue.Create(fromTicks + (long)i * stepTicks));
+                else
+                    axisArray.Add(JsonValue.Create(fromD + i * stepD));
+            }
+            outBuilders[outCol++].Add(axisArray);
         }
 
         var outColumns = outBuilders.Select(b => b.ToColumn()).ToArray();
         return TabularResult.CreateUnvisualized(new InMemoryTableSource(resultSchema, outColumns));
     }
+
+    private static long ToTicks(object? v) => v switch
+    {
+        DateTime dt => dt.Ticks,
+        TimeSpan ts => ts.Ticks,
+        long l => l,
+        int i => i,
+        double d => (long)d,
+        decimal m => (long)m,
+        _ => 0
+    };
+
+    private static object DefaultZero(TypeSymbol t) =>
+        t == ScalarTypes.Real ? 0.0 :
+        t == ScalarTypes.Decimal ? 0m :
+        t == ScalarTypes.Int ? 0 :
+        0L;
 
     private static double ToDouble(object? v) => v switch
     {

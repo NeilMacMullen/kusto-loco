@@ -15,6 +15,7 @@ internal class IRMakeSeriesOperatorNode : IRQueryOperatorNode
     public IRMakeSeriesOperatorNode(
         List<IRExpressionNode> aggregations,
         List<object?> defaults,
+        List<bool> defaultProvided,
         IRExpressionNode axis,
         IRExpressionNode from,
         IRExpressionNode to,
@@ -25,6 +26,7 @@ internal class IRMakeSeriesOperatorNode : IRQueryOperatorNode
     {
         Aggregations = aggregations ?? throw new ArgumentNullException(nameof(aggregations));
         Defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
+        DefaultProvided = defaultProvided ?? throw new ArgumentNullException(nameof(defaultProvided));
         Axis = axis ?? throw new ArgumentNullException(nameof(axis));
         From = from ?? throw new ArgumentNullException(nameof(from));
         To = to ?? throw new ArgumentNullException(nameof(to));
@@ -44,6 +46,9 @@ internal class IRMakeSeriesOperatorNode : IRQueryOperatorNode
 
     public List<IRExpressionNode> Aggregations { get; }
     public List<object?> Defaults { get; }
+    // Whether a 'default=' clause was written for each aggregate. Distinguishes "no default" (ADX fills gaps with a
+    // typed 0) from an explicit 'default=<null>' (fills with null, e.g. for the series_fill_* interpolation functions).
+    public List<bool> DefaultProvided { get; }
     public IRExpressionNode Axis { get; }
     public IRExpressionNode From { get; }
     public IRExpressionNode To { get; }

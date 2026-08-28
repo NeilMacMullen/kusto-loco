@@ -15,14 +15,16 @@ internal partial class IRTranslator
     {
         var aggregations = new List<IRExpressionNode>();
         var defaults = new List<object?>();
+        var defaultProvided = new List<bool>();
         foreach (var aggElement in node.Aggregates)
         {
             if (aggElement.Element is not MakeSeriesExpression mse) continue;
             aggregations.Add((IRExpressionNode)mse.Expression.Accept(this));
             object? def = null;
-            if (mse.DefaultExpression?.Expression.Accept(this) is IRLiteralExpressionNode { Value: { } v })
-                def = v;
+            if (mse.DefaultExpression?.Expression.Accept(this) is IRLiteralExpressionNode lit)
+                def = lit.Value;
             defaults.Add(def);
+            defaultProvided.Add(mse.DefaultExpression is not null);
         }
 
         var axis = (IRExpressionNode)node.OnClause.Expression.Accept(this);
@@ -54,6 +56,7 @@ internal partial class IRTranslator
             foreach (var byElement in node.ByClause.Expressions)
                 byColumns.Add((IRExpressionNode)byElement.Element.Accept(this));
 
-        return new IRMakeSeriesOperatorNode(aggregations, defaults, axis, from, to, step, byColumns, node.ResultType);
+        return new IRMakeSeriesOperatorNode(aggregations, defaults, defaultProvided, axis, from, to, step, byColumns,
+            node.ResultType);
     }
 }
