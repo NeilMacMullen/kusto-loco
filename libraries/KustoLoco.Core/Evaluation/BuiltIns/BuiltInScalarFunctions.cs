@@ -337,5 +337,8 @@ internal static class BuiltInScalarFunctions
         BagPackFunctionImpl.Register(Functions);
         BagMergeFunctionImpl.Register(Functions);
         PackAllFunctionImpl.Register(Functions);
+        SetUnionFunctionImpl.Register(Functions);
+        SetIntersectFunctionImpl.Register(Functions);
+        SetDifferenceFunctionImpl.Register(Functions);
     }
 }
