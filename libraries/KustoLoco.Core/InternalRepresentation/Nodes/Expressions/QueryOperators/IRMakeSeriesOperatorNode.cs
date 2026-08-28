@@ -21,12 +21,14 @@ internal class IRMakeSeriesOperatorNode : IRQueryOperatorNode
         IRExpressionNode to,
         IRExpressionNode step,
         List<IRExpressionNode> byColumns,
+        bool stopInclusive,
         TypeSymbol resultType)
         : base(resultType)
     {
         Aggregations = aggregations ?? throw new ArgumentNullException(nameof(aggregations));
         Defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
         DefaultProvided = defaultProvided ?? throw new ArgumentNullException(nameof(defaultProvided));
+        StopInclusive = stopInclusive;
         Axis = axis ?? throw new ArgumentNullException(nameof(axis));
         From = from ?? throw new ArgumentNullException(nameof(from));
         To = to ?? throw new ArgumentNullException(nameof(to));
@@ -54,6 +56,10 @@ internal class IRMakeSeriesOperatorNode : IRQueryOperatorNode
     public IRExpressionNode To { get; }
     public IRExpressionNode Step { get; }
     public List<IRExpressionNode> ByColumns { get; }
+    // The alternate 'in range(start, stop, step)' syntax has an INCLUSIVE stop (unlike 'from .. to ..' where 'to' is
+    // non-inclusive), so the last axis point can equal stop. (range() also bins with bin() rather than bin_at(); for the
+    // usual step-aligned start the two coincide.)
+    public bool StopInclusive { get; }
 
     public override int ChildCount => _children.Count;
 

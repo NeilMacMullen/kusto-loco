@@ -39,6 +39,8 @@ internal partial class TreeEvaluator
         var axisIsTimeSpan = fromVal is TimeSpan;
         var temporal = axisIsDateTime || axisIsTimeSpan;
 
+        // An inclusive stop (the 'in range(..)' syntax) admits the point at 'to': count = floor(span/step)+1. A
+        // non-inclusive end ('from .. to ..') stops strictly below 'to': count = ceil(span/step).
         long fromTicks = 0, stepTicks = 0;
         double fromD = 0, stepD = 0;
         int binCount;
@@ -47,15 +49,19 @@ internal partial class TreeEvaluator
             fromTicks = ToTicks(fromVal);
             stepTicks = ToTicks(stepVal);
             var span = ToTicks(toVal) - fromTicks;
-            binCount = stepTicks > 0 && span > 0 ? (int)((span + stepTicks - 1) / stepTicks) : 0; // ceil, exclusive end
+            if (stepTicks <= 0) binCount = 0;
+            else if (node.StopInclusive) binCount = span >= 0 ? (int)(span / stepTicks) + 1 : 0;
+            else binCount = span > 0 ? (int)((span + stepTicks - 1) / stepTicks) : 0;
         }
         else
         {
             fromD = ToDouble(fromVal);
             stepD = ToDouble(stepVal);
             var span = ToDouble(toVal) - fromD;
-            // Subtract a tiny epsilon so an exact multiple isn't rounded up by floating-point error.
-            binCount = stepD > 0 && span > 0 ? (int)Math.Ceiling(span / stepD - 1e-9) : 0;
+            // The +/-1e-9 keeps an exact multiple from being mis-rounded by floating-point error.
+            if (stepD <= 0) binCount = 0;
+            else if (node.StopInclusive) binCount = span >= 0 ? (int)Math.Floor(span / stepD + 1e-9) + 1 : 0;
+            else binCount = span > 0 ? (int)Math.Ceiling(span / stepD - 1e-9) : 0;
         }
         if (binCount < 0) binCount = 0;
 

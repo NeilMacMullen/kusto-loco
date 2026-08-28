@@ -42,6 +42,16 @@ public class MakeSeriesOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task MakeSeries_InRange_StopIsInclusive()
+    {
+        // The 'in range(start, stop, step)' syntax has an INCLUSIVE stop, so range(0,10,2) -> 0,2,4,6,8,10 = 6 points
+        // (whereas 'from 0 to 10 step 2' would be 5). Exercises the StopInclusive path.
+        var q = "datatable(x:long)[0,2,4,6,8,10] | make-series c=count() on x in range(0, 10, 2)";
+        var result = await SquashedLastLineOfResult(q);
+        result.Should().Contain("[1,1,1,1,1,1]");
+    }
+
+    [TestMethod]
     public async Task MakeSeries_SumOverNumericAxis()
     {
         var query = "datatable(x:long, val:long)[1,10, 2,20, 3,30] " +

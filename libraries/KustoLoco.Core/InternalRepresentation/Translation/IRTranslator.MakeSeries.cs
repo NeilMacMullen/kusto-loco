@@ -56,7 +56,10 @@ internal partial class IRTranslator
             foreach (var byElement in node.ByClause.Expressions)
                 byColumns.Add((IRExpressionNode)byElement.Element.Accept(this));
 
+        // The 'in range(start, stop, step)' alternate syntax has an inclusive stop; 'from .. to ..' does not.
+        var stopInclusive = node.RangeClause is MakeSeriesInRangeClause;
+
         return new IRMakeSeriesOperatorNode(aggregations, defaults, defaultProvided, axis, from, to, step, byColumns,
-            node.ResultType);
+            stopInclusive, node.ResultType);
     }
 }
