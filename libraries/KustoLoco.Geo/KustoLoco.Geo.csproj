@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>KustoLoco.Geo</RootNamespace>
+    <AssemblyName>KustoLoco.Geo</AssemblyName>
+    <Title>KustoLoco geo-IP provider</Title>
+    <Version>1.0.0</Version>
+    <Authors>Neil MacMullen</Authors>
+    <Description>Optional IGeoIpProvider for KustoLoco's geo_info_from_ip_address, backed by a DB-IP "IP to City Lite" CSV export (CC-BY-4.0). Core carries no geo dependency; register this provider on the host.</Description>
+    <Copyright>(C) 2024</Copyright>
+    <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/releases</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="NOTICE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

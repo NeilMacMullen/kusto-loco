@@ -1,0 +1,19 @@
+KustoLoco.Geo
+=============
+
+This package contains no geo database. It reads a geo-IP dataset that you supply
+at runtime. The intended dataset is the DB-IP "IP to City Lite" database.
+
+The DB-IP Lite databases are made available by DB-IP (https://db-ip.com) under the
+Creative Commons Attribution 4.0 International License (CC-BY-4.0).
+
+If you distribute an application that uses a DB-IP Lite dataset with this provider,
+you must attribute DB-IP, for example:
+
+    IP Geolocation by DB-IP (https://db-ip.com)
+
+See https://db-ip.com/db/lite.php for the current license terms.
+
+This provider is also compatible with any CSV export using the same column layout
+(ip_start, ip_end, continent, country, stateprov, city, latitude, longitude); if you
+use a different source, follow that source's own attribution requirements.
