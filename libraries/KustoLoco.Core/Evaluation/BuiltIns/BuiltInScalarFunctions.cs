@@ -332,6 +332,8 @@ internal static class BuiltInScalarFunctions
         BagSetKeyFunction.Register(Functions);
         BagZipFunction.Register(Functions);
         ExtractAllFunction.Register(Functions);
+        ParseUrlFunction.Register(Functions);
+        ParseUrlQueryFunction.Register(Functions);
 
         //can't generate because arbitrary number of arguments
         BagPackFunctionImpl.Register(Functions);
