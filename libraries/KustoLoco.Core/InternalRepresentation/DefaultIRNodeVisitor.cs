@@ -135,4 +135,7 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
     public override TResult VisitExternalDataExpression(IRExternalDataExpression node, TContext context) =>
         DefaultVisit(node, context);
 
+    public override TResult VisitMakeSeriesOperator(IRMakeSeriesOperatorNode node, TContext context) =>
+        DefaultVisit(node, context);
+
 }

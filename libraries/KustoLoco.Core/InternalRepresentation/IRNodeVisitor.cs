@@ -51,5 +51,6 @@ internal abstract class IRNodeVisitor<TResult, TContext>
     public abstract TResult VisitMvExpandOperator(IRMvExpandOperatorNode node, TContext context);
     public abstract TResult VisitMvApplyOperator(IRMvApplyOperatorNode node, TContext context);
     public abstract TResult VisitExternalDataExpression(IRExternalDataExpression node, TContext context);
+    public abstract TResult VisitMakeSeriesOperator(IRMakeSeriesOperatorNode node, TContext context);
 
 }
