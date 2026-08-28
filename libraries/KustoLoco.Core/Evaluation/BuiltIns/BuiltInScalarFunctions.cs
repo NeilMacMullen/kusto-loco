@@ -327,6 +327,10 @@ internal static class BuiltInScalarFunctions
 
         SetHasElementFunction.Register(Functions);
         BagKeysFunction.Register(Functions);
+        BagHasKeyFunction.Register(Functions);
+        BagRemoveKeysFunction.Register(Functions);
+        BagSetKeyFunction.Register(Functions);
+        BagZipFunction.Register(Functions);
         ExtractAllFunction.Register(Functions);
 
         //can't generate because arbitrary number of arguments
