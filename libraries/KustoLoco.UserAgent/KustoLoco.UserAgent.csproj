@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>KustoLoco.UserAgent</RootNamespace>
+    <AssemblyName>KustoLoco.UserAgent</AssemblyName>
+    <Title>KustoLoco user-agent parser</Title>
+    <Version>1.0.0</Version>
+    <Authors>Neil MacMullen</Authors>
+    <Description>Optional IUserAgentParser for KustoLoco's parse_user_agent, backed by the canonical ua-parser/uap-core dataset (Apache-2.0). Core carries no user-agent dependency; register this provider on the host.</Description>
+    <Copyright>(C) 2024</Copyright>
+    <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/NeilMacMullen/kusto-loco</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/NeilMacMullen/kusto-loco/releases</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The canonical ua-parser/uap-core dataset (Apache-2.0), embedded so parsing is self-contained. -->
+    <EmbeddedResource Include="regexes.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="NOTICE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
