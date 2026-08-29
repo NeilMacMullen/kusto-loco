@@ -24,15 +24,30 @@ internal partial class TreeEvaluator
         // the input). The subquery is bound against this schema.
         var expandNames = new HashSet<string>(node.Columns.Select(c => c.ColumnSymbol.Name));
         var expandByName = node.Columns.ToDictionary(c => c.ColumnSymbol.Name, c => c.ColumnSymbol);
+        // Input columns, with any expanded one retyped to its element type, PLUS any expanded column that is NOT an
+        // input column at all — an aliased expression (`p = parse_json(Col)`) introduces a new name the subquery
+        // must be able to bind.
         var intermediateColumns = inputSchema.Columns
             .Select(c => expandByName.TryGetValue(c.Name, out var ec) ? ec : c)
+            .Concat(node.Columns
+                .Select(c => c.ColumnSymbol)
+                .Where(cs => IndexOf(inputSchema, cs.Name) < 0))
             .ToArray();
         var intermediateSchema = new TableSymbol(intermediateColumns);
 
         var outBuilders = ColumnHelpers.CreateBuildersForTable(resultSchema);
 
-        foreach (var chunk in input.GetData())
+        // Materialize the input once so both the expanded expressions and the per-row reads below see the same data
+        // (chunk columns are single-pass), then evaluate each expanded expression COLUMNAR over that chunk. The
+        // expanded item is an expression, not necessarily a source column — `mv-apply p = parse_json(Col) on (...)`
+        // aliases a computed value that is absent from the input schema — so it must be evaluated, never looked up.
         {
+            var chunk = ChunkHelpers.Reassemble(input.GetData().ToArray());
+            var chunkContext = context with { Chunk = chunk };
+            var expandedColumns = node.Columns
+                .Select(c => ((ColumnarResult)c.Expression.Accept(this, chunkContext)).Column)
+                .ToArray();
+
             for (var row = 0; row < chunk.RowCount; row++)
             {
                 // Read this source row once (input columns are single-pass).
@@ -40,8 +55,13 @@ internal partial class TreeEvaluator
                 for (var i = 0; i < inputSchema.Columns.Count; i++)
                     sourceRow[i] = chunk.Columns[i].GetRawDataValue(row);
 
-                var subtable = BuildExpandedSubtable(sourceRow, inputSchema, intermediateSchema, intermediateColumns,
-                    expandNames, node);
+                // The value to expand per expanded column, taken from the evaluated expression for this row.
+                var expandedValues = new object?[expandedColumns.Length];
+                for (var i = 0; i < expandedColumns.Length; i++)
+                    expandedValues[i] = expandedColumns[i].GetRawDataValue(row);
+
+                var subtable = BuildExpandedSubtable(sourceRow, expandedValues, inputSchema, intermediateSchema,
+                    intermediateColumns, expandNames, node);
                 var subContext = context with { Left = TabularResult.CreateUnvisualized(subtable) };
                 var subResult = (TabularResult)node.Subquery.Accept(this, subContext);
                 var subSchema = subResult.Value.Type;
@@ -73,17 +93,19 @@ internal partial class TreeEvaluator
         return TabularResult.CreateUnvisualized(new InMemoryTableSource(resultSchema, outputColumns));
     }
 
-    private static InMemoryTableSource BuildExpandedSubtable(object?[] sourceRow, TableSymbol inputSchema,
-        TableSymbol intermediateSchema, ColumnSymbol[] intermediateColumns, HashSet<string> expandNames,
-        IRMvApplyOperatorNode node)
+    private static InMemoryTableSource BuildExpandedSubtable(object?[] sourceRow, object?[] expandedValues,
+        TableSymbol inputSchema, TableSymbol intermediateSchema, ColumnSymbol[] intermediateColumns,
+        HashSet<string> expandNames, IRMvApplyOperatorNode node)
     {
         // Expand each expanded column's array for this source row; the subtable has as many rows as the longest array.
+        // The value comes from the EVALUATED expression (expandedValues), not from a name lookup against the input —
+        // the expanded item may be an alias for a computed expression that is absent from the input schema.
         var elementArrays = new Dictionary<string, object?[]>();
         var maxLen = 0;
-        foreach (var expandCol in node.Columns)
+        for (var c = 0; c < node.Columns.Count; c++)
         {
-            var srcIdx = IndexOf(inputSchema, expandCol.ColumnSymbol.Name);
-            var arr = JsonArrayHelper.ToObjectArrayOfType(sourceRow[srcIdx], expandCol.ColumnSymbol.Type);
+            var expandCol = node.Columns[c];
+            var arr = JsonArrayHelper.ToObjectArrayOfType(expandedValues[c], expandCol.ColumnSymbol.Type);
             elementArrays[expandCol.ColumnSymbol.Name] = arr;
             if (arr.Length > maxLen) maxLen = arr.Length;
         }

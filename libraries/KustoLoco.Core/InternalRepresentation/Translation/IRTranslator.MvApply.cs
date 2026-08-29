@@ -1,6 +1,7 @@
 //
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Kusto.Language.Symbols;
@@ -40,9 +41,14 @@ internal partial class IRTranslator
 
         // Translate the subquery with the intermediate schema (input columns, with expanded columns retyped to their
         // element type) as the row scope, so the subquery's column references resolve against the expanded rows.
+        // An ALIASED expression (`mv-apply p = parse_json(Col) on (...)`) introduces a name that is not an input
+        // column, so the intermediate scope is the input columns (expanded ones retyped) PLUS those new names —
+        // otherwise the subquery cannot bind them.
         var expandByName = columns.ToDictionary(c => c.ColumnSymbol.Name, c => c.ColumnSymbol);
+        var inputNames = inputScope.Columns.Select(c => c.Name).ToHashSet(StringComparer.Ordinal);
         var interColumns = inputScope.Columns
             .Select(c => expandByName.TryGetValue(c.Name, out var ec) ? ec : c)
+            .Concat(columns.Select(c => c.ColumnSymbol).Where(cs => !inputNames.Contains(cs.Name)))
             .ToArray();
 
         var oldRowScope = _rowScope;

@@ -30,6 +30,31 @@ public class MvApplyOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task MvApply_ExpandsAnAliasedExpression()
+    {
+        // The expanded item may be an ALIASED EXPRESSION rather than an existing column — the common real-world
+        // form, e.g. mv-apply p = parse_json(Col) on (...). 'p' is not in the input schema, so the operator must
+        // evaluate the expression rather than resolve the name against the source row.
+        var query =
+            "datatable(id:long, payload:string)[1, '[1,2,3]'] " +
+            "| mv-apply p = parse_json(payload) to typeof(long) on (summarize s=sum(p))";
+        var result = await ResultAsString(query, ";");
+        result.Should().Contain("6");
+    }
+
+    [TestMethod]
+    public async Task MvApply_AliasedExpression_NameValuePairsIntoABag()
+    {
+        // The name/value-pair idiom: expand a dynamic array of {Name,Value} objects and fold it into one bag per
+        // source row. Exercises an aliased expression + dynamic member access + an aggregate over the expansion.
+        var query =
+            "datatable(id:long, Parameters:string)[1, '[{\"Name\":\"Alpha\",\"Value\":\"1\"},{\"Name\":\"Beta\",\"Value\":\"2\"}]'] " +
+            "| mv-apply p = parse_json(Parameters) on ( summarize P = make_bag(bag_pack(tolower(tostring(p.Name)), p.Value)) )";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("alpha").And.Contain("beta");
+    }
+
+    [TestMethod]
     public async Task MvApply_SourceColumnSurvives()
     {
         // The source 'id' survives the subquery and is associated with each output row.
