@@ -62,6 +62,13 @@ internal partial class TreeEvaluator
 
                 var subtable = BuildExpandedSubtable(sourceRow, expandedValues, inputSchema, intermediateSchema,
                     intermediateColumns, expandNames, node);
+
+                // An expansion that yields nothing contributes nothing: mv-apply is a lateral join, so a source row
+                // whose arrays are all empty produces no output rows (unlike mv-expand, which keeps the row with a
+                // null). Running the subquery anyway would resurrect it, because an aggregate over an empty table
+                // still emits a row.
+                if (subtable.GetData().Sum(c => c.RowCount) == 0) continue;
+
                 var subContext = context with { Left = TabularResult.CreateUnvisualized(subtable) };
                 var subResult = (TabularResult)node.Subquery.Accept(this, subContext);
                 var subSchema = subResult.Value.Type;

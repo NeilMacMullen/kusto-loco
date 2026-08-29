@@ -55,6 +55,22 @@ public class MvApplyOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task MvApply_EmptyArrayProducesNoRowsForThatRecord()
+    {
+        // mv-apply is a lateral join: a record whose array is empty contributes nothing. (mv-expand differs — it
+        // keeps the record with a null.) Running the subquery over an empty expansion would resurrect the record,
+        // because an aggregate over an empty table still emits a row.
+        var query =
+            "datatable(id:long, payload:string)[1, '[]', 2, '[1,2]'] " +
+            "| mv-apply p = parse_json(payload) to typeof(long) on (summarize s=sum(p)) " +
+            "| project id";
+        var result = await CreateContext().RunQuery(query);
+        result.RowCount.Should().Be(1);            // only id=2 survives
+        var rendered = await ResultAsString(query, ";");
+        rendered.Should().Contain("2").And.NotContain("1;");
+    }
+
+    [TestMethod]
     public async Task MvApply_BagThenReadBackAField()
     {
         // The full real-world round trip: fold name/value pairs into a bag, then read a field back out of it —
