@@ -121,6 +121,30 @@ public class DbIpGeoProviderTests
         info.Longitude.Should().BeNull();
     }
 
+    // The whole point of embedding a default dataset: a host registers ONE line and geo_info_from_ip_address
+    // resolves — no file, no path, no config (the same contract UapUserAgentParser.Default gives parse_user_agent).
+    [TestMethod]
+    public void Default_ResolvesFromTheEmbeddedDataset_WithNoHostFile()
+    {
+        var provider = DbIpGeoProvider.Default;
+        provider.RangeCount.Should().BeGreaterThan(100_000); // the real DB-IP country set, not a stub
+        var info = provider.Lookup(IPAddress.Parse("8.8.8.8"));
+        info.Should().NotBeNull();
+        info!.Country.Should().Be("United States"); // ADX shape: English name, not the ISO code
+        info.Latitude.Should().NotBeNull();
+        info.Longitude.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public async Task EndToEnd_DefaultProvider_ResolvesGeoWithZeroConfiguration()
+    {
+        var context = new KustoQueryContext();
+        context.AddProvider<IGeoIpProvider>(DbIpGeoProvider.Default);
+        var result = await context.RunQuery(
+            "print c = tostring(geo_info_from_ip_address('8.8.8.8').country)");
+        result.GetRow(0).First()?.ToString().Should().Be("United States");
+    }
+
     [TestMethod]
     public void ExplicitLayout_OverridesDetection()
     {

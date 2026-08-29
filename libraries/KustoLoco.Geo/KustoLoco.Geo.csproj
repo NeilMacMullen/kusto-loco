@@ -10,7 +10,7 @@
     <Title>KustoLoco geo-IP provider</Title>
     <Version>1.0.0</Version>
     <Authors>Neil MacMullen</Authors>
-    <Description>Optional IGeoIpProvider for KustoLoco's geo_info_from_ip_address, backed by a DB-IP "IP to City Lite" CSV export (CC-BY-4.0). Core carries no geo dependency; register this provider on the host.</Description>
+    <Description>IGeoIpProvider for KustoLoco's geo_info_from_ip_address, with a DB-IP IP-to-Country Lite database EMBEDDED so geo lookups work out of the box (DbIpGeoProvider.Default) — no host-supplied file. Reads any DB-IP Lite layout (City / Country / country+centroid) via FromFile when city-level precision is wanted. Datasets are CC-BY-4.0; see NOTICE for the required attribution. Core carries no geo dependency.</Description>
     <Copyright>(C) 2024</Copyright>
     <PackageProjectUrl>https://github.com/NeilMacMullen/kusto-loco</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -20,6 +20,14 @@
     <IncludeSymbols>True</IncludeSymbols>
     <Configurations>Debug;Release;AvaloniaPreviewer;DebugStartup</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The DEFAULT geo database, EMBEDDED so geo_info_from_ip_address works out of the box (mirrors
+         KustoLoco.UserAgent embedding uap-core's regexes.yaml). DB-IP IP-to-Country Lite joined with Google
+         canonical country centroids — both CC-BY-4.0, redistributable with attribution (see NOTICE). A host
+         wanting city-level precision still supplies its own export via FromFile(). -->
+    <EmbeddedResource Include="dbip-country-lite.csv.gz" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KustoLoco.Core\KustoLoco.Core.csproj" />

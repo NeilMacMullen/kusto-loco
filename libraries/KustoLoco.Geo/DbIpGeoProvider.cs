@@ -60,6 +60,20 @@ public sealed class DbIpGeoProvider : IGeoIpProvider
         _v6 = v6;
     }
 
+    /// <summary>
+    /// A shared provider built from the geo database EMBEDDED in this package, so
+    /// <c>geo_info_from_ip_address</c> resolves out of the box with no host-supplied file:
+    /// <c>context.AddProvider&lt;IGeoIpProvider&gt;(DbIpGeoProvider.Default)</c>. The embedded set is DB-IP
+    /// IP-to-Country Lite joined with Google canonical country centroids (both CC-BY-4.0 — attribution
+    /// required, see NOTICE): country + per-country coordinates for IPv4, which answers country-scale
+    /// questions (which country, geo-distance between two addresses). Supply a City-Lite export via
+    /// <see cref="FromFile(string)"/> when city/state precision or IPv6 coverage is needed.
+    /// </summary>
+    public static DbIpGeoProvider Default { get; } = FromEmbedded();
+
+    /// <summary>Build from the geo database embedded in this package (see <see cref="Default"/>).</summary>
+    public static DbIpGeoProvider FromEmbedded() => FromLines(ReadEmbeddedLines(), DbIpLayout.CountryCentroid);
+
     /// <summary>Total number of parsed ranges. 0 for a present-but-unparseable dataset (wrong delimiter/format).</summary>
     public int RangeCount => _v4.Count + _v6.Count;
 
@@ -185,6 +199,21 @@ public sealed class DbIpGeoProvider : IGeoIpProvider
         foreach (var octet in b)
             value = (value << 8) | octet;
         return value;
+    }
+
+    // Stream the gzipped dataset embedded by the .csproj (EmbeddedResource). Same shape as
+    // KustoLoco.UserAgent's embedded uap-core read, decompressed on the fly so the package carries the
+    // compressed asset rather than an expanded copy.
+    private static IEnumerable<string> ReadEmbeddedLines()
+    {
+        var asm = typeof(DbIpGeoProvider).Assembly;
+        var name = asm.GetManifestResourceNames()
+            .First(n => n.EndsWith("dbip-country-lite.csv.gz", StringComparison.Ordinal));
+        using var stream = asm.GetManifestResourceStream(name)!;
+        using var gz = new GZipStream(stream, CompressionMode.Decompress);
+        using var reader = new StreamReader(gz);
+        for (var line = reader.ReadLine(); line is not null; line = reader.ReadLine())
+            yield return line;
     }
 
     private static IEnumerable<string> ReadLines(string path)
