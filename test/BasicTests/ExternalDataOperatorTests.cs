@@ -58,6 +58,43 @@ public class ExternalDataOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task ExternalData_IgnoreFirstRecord_DropsTheHeaderRow()
+    {
+        // ADX's ignoreFirstRecord: the declared schema names the columns, so a file's header row is not data.
+        // Silently keeping it would type the header text into the first row and quietly change the result.
+        var context = CreateContext().SetExternalDataResolver(new StubResolver("name,age\nalice,30\nbob,40\n"));
+        var result = await context.RunQuery(
+            "externaldata(name:string, age:long)['https://example.com/data.csv'] with(format='csv', ignoreFirstRecord=true)");
+        result.Error.Should().BeNullOrEmpty();
+        result.RowCount.Should().Be(2);
+        LastLine(result).Should().Contain("bob");
+    }
+
+    [TestMethod]
+    public async Task ExternalData_IgnoreFirstRecord_DropsTheHeaderOfEveryUri()
+    {
+        // Each file in the list carries its own header, so the drop is per-URI — not once for the whole set.
+        var context = CreateContext().SetExternalDataResolver(new StubResolver("name\nalice\n"));
+        var result = await context.RunQuery(
+            "externaldata(name:string)['https://example.com/a.csv','https://example.com/b.csv'] " +
+            "with(format='csv', ignoreFirstRecord=true)");
+        result.Error.Should().BeNullOrEmpty();
+        result.RowCount.Should().Be(2); // one data row from each of the two URIs, both headers dropped
+    }
+
+    [TestMethod]
+    public async Task ExternalData_AnUnsupportedProperty_IsRefusedNotIgnored()
+    {
+        // Silently dropping a property the author wrote returns a DIFFERENT result than they asked for, with
+        // nothing to indicate it — so an unsupported property must fail the query.
+        var context = CreateContext().SetExternalDataResolver(new StubResolver(Csv));
+        var result = await context.RunQuery(
+            "externaldata(name:string, age:long)['https://example.com/data.csv'] with(format='csv', encoding='UTF8')");
+        result.Error.Should().NotBeEmpty();
+        result.Error.Should().Contain("encoding");
+    }
+
+    [TestMethod]
     public async Task ExternalData_NoHostResolver_UsesTheEngineDefault_WhichRefusesNonHttps()
     {
         // With no host resolver the ENGINE's own resolver runs (externaldata works out of the box, as in ADX)

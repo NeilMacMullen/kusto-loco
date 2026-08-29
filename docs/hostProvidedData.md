@@ -99,6 +99,21 @@ public IReadOnlyList<IReadOnlyList<string>> ResolveRows(string uri, string forma
 `DelimiterFor` maps the KQL delimited formats — `csv`, `tsv`/`tsve`, `scsv`, `sohsv`, `psv` — and
 `Parse` handles RFC4180 quoting.
 
+### How close this is to ADX
+
+Faithful: the `externaldata (schema) [uris] with(...)` shape, the delimited formats, RFC4180 quoting, unioning
+multiple URIs, typing each cell per the declared schema, `ignoreFirstRecord` (dropping the header of **every** URI,
+not just the first), and failing the query when a fetch fails.
+
+Deliberately different:
+
+- **No authenticated storage.** ADX reads blob/ADLS/S3 with connection strings and SAS tokens; the built-in resolver
+  fetches only public HTTPS. Register your own `IExternalDataResolver` to add credentials.
+- **Non-public addresses are refused.** ADX is a managed service; an engine embedded in someone else's process must
+  not become an SSRF vector, so loopback, link-local, unique-local and RFC1918 targets are blocked.
+- **An unsupported `with(...)` property fails the query** rather than being ignored, because silently dropping a
+  property returns a different result than the author asked for with nothing to indicate it.
+
 ### Supported formats, and a note on JSON
 
 Only the **delimited** family is supported today. ADX additionally accepts `json`, `multijson`,

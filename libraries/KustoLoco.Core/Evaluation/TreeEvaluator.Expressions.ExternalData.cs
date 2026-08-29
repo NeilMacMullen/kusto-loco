@@ -38,9 +38,14 @@ internal partial class TreeEvaluator
         var resolver = context.Providers?.Get<IExternalDataResolver>() ?? DefaultExternalDataResolver.Value;
 
         // The resolver fetches and splits each URI; the engine types the cells per the declared schema.
+        // ignoreFirstRecord drops the header of EACH uri (not just the first), matching ADX: every file in the
+        // list carries its own header, and the declared schema — not that row — names the columns.
         var cells = new List<IReadOnlyList<string>>();
         foreach (var uri in node.Uris)
-            cells.AddRange(resolver.ResolveRows(uri, node.Format));
+        {
+            var rows = resolver.ResolveRows(uri, node.Format);
+            cells.AddRange(node.IgnoreFirstRecord ? rows.Skip(1) : rows);
+        }
 
         var columns = new BaseColumn[schema.Columns.Count];
         for (var j = 0; j < schema.Columns.Count; j++)
