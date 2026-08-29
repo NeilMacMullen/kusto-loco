@@ -64,10 +64,20 @@ public interface IExternalDataResolver
 context.SetExternalDataResolver(myResolver);
 ```
 
-The engine performs **no network or file access of its own** and registers **no default resolver**,
-so `externaldata` reports an error until a host opts in. That is deliberate: the host is the only
-place that can decide which URI schemes are acceptable, what size and time bounds apply, and how to
-authenticate.
+`externaldata` works **out of the box**: with no host resolver registered the engine uses its built-in
+`HttpExternalDataResolver`, so the operator behaves as it does in ADX rather than being inert. Its
+defaults are deliberately conservative, because a URI inside a query directs the process to make a
+request: **HTTPS only**, the resolved address must be **public** (loopback, link-local — including the
+`169.254.169.254` instance-metadata endpoint — unique-local and RFC1918 ranges are refused), redirects
+are **re-validated at every hop**, and both a request timeout and a streamed byte cap bound a single
+fetch. `gzip` is decompressed and a UTF-8 BOM is stripped.
+
+Register your own resolver to **tighten** that policy (an allow-list of hosts, smaller bounds),
+**widen** it (other schemes, authenticated storage), or serve fixtures offline in tests:
+
+```csharp
+context.SetExternalDataResolver(new HttpExternalDataResolver(allowedHosts: ["feeds.contoso.com"]));
+```
 
 Two rules matter when implementing one:
 

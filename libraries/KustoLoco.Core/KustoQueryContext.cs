@@ -173,10 +173,10 @@ public class KustoQueryContext
     }
 
     /// <summary>
-    ///     Injects the resolver used to materialize <c>externaldata (...) [uris]</c>. The engine performs no network
-    ///     or file access of its own and registers no default, so <c>externaldata</c> fails loudly until a host opts
-    ///     in with a bounded, allow-listed implementation. Equivalent to
-    ///     <see cref="AddProvider{T}"/> for <see cref="IExternalDataResolver"/>.
+    ///     Injects the resolver used to materialize <c>externaldata (...) [uris]</c>, REPLACING the engine's
+    ///     built-in <see cref="HttpExternalDataResolver"/> (HTTPS, public addresses only, bounded time and size).
+    ///     Register your own to tighten it (an allow-list), widen it (other schemes, authenticated storage), or
+    ///     serve fixtures offline. Equivalent to <see cref="AddProvider{T}"/> for <see cref="IExternalDataResolver"/>.
     /// </summary>
     public KustoQueryContext SetExternalDataResolver(IExternalDataResolver resolver)
     {
