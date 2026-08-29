@@ -88,3 +88,18 @@ public IReadOnlyList<IReadOnlyList<string>> ResolveRows(string uri, string forma
 
 `DelimiterFor` maps the KQL delimited formats — `csv`, `tsv`/`tsve`, `scsv`, `sohsv`, `psv` — and
 `Parse` handles RFC4180 quoting.
+
+### Supported formats, and a note on JSON
+
+Only the **delimited** family is supported today. ADX additionally accepts `json`, `multijson`,
+`parquet`, `avro` and others.
+
+Delimited formats fit this contract naturally because cells are **positional** — the *n*th cell is
+the *n*th declared column. JSON is not positional: its properties map to columns **by name**, and
+the resolver is given the format but not the declared column names, so it cannot do that mapping.
+Supporting JSON therefore needs a deliberate decision rather than an incremental patch — either the
+contract grows to carry the declared column names, or the engine takes raw content and parses it
+itself (which would move format handling out of the host, away from the `LoadTablesAsync`
+convention this seam follows).
+
+That trade-off is left open on purpose rather than settled by whichever option was easiest to add.
