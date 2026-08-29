@@ -6,7 +6,8 @@ KustoLoco's core engine implements `geo_info_from_ip_address()` natively but shi
 geo database — geolocation datasets are large and their licences vary, and not every
 consumer wants the dependency. Instead, the function reads from an `IGeoIpProvider` that
 the host registers. This package is one such provider, backed by a
-[DB-IP "IP to City Lite"](https://db-ip.com/db/download/ip-to-city-lite) CSV export.
+[DB-IP "Lite"](https://db-ip.com/db/lite.php) CSV export — City Lite, Country Lite, or a
+compact country+centroid derivation, all read by the same provider.
 
 This mirrors real Azure Data Explorer, whose `geo_info_from_ip_address()` is likewise
 built on a downloadable geo database (GeoLite2).
@@ -46,11 +47,18 @@ via `System.Globalization.RegionInfo`).
 
 ## Dataset format
 
-Any CSV using the DB-IP City Lite column layout works:
+Any of the three DB-IP Lite layouts works; `FromFile`/`FromLines` **auto-detect** by the
+first data row's column count (pass a `DbIpLayout` to force one). `country` is a 2-letter
+ISO code in every layout, surfaced as the English country name. A single file is one layout.
 
-```
-ip_start,ip_end,continent,country,stateprov,city,latitude,longitude
-```
+| Layout | Columns | Coordinates |
+|---|---|---|
+| **City Lite** (`DbIpLayout.CityLite`) | `ip_start,ip_end,continent,country,stateprov,city,latitude,longitude` | city-level |
+| **Country + centroid** (`DbIpLayout.CountryCentroid`) | `ip_start,ip_end,country,latitude,longitude` | per-country centroid |
+| **Country Lite** (`DbIpLayout.CountryLite`) | `ip_start,ip_end,country` | none (null) |
+
+City Lite gives full fidelity; the compact country+centroid layout keeps a much smaller
+file while still answering country-scale geo-distance; Country Lite is country-only.
 
 ## Attribution
 

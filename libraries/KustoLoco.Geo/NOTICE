@@ -14,6 +14,8 @@ you must attribute DB-IP, for example:
 
 See https://db-ip.com/db/lite.php for the current license terms.
 
-This provider is also compatible with any CSV export using the same column layout
-(ip_start, ip_end, continent, country, stateprov, city, latitude, longitude); if you
-use a different source, follow that source's own attribution requirements.
+This provider reads any of the DB-IP Lite layouts — City Lite
+(ip_start, ip_end, continent, country, stateprov, city, latitude, longitude), Country
+Lite (ip_start, ip_end, country), or a compact country+centroid derivation
+(ip_start, ip_end, country, latitude, longitude) — and any CSV using one of those column
+layouts; if you use a different source, follow that source's own attribution requirements.
