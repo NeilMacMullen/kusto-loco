@@ -24,6 +24,21 @@ public class MakeSeriesOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task MakeSeries_DateTimeAxis_BinsOnTheUtcInstant()
+    {
+        // The axis values and the from/to literals must be compared as the same instant. If a datetime is taken at
+        // face value rather than as UTC, a host in a non-UTC zone shifts one side against the other and every row
+        // lands outside the range — a dense series of zeros that looks like "no data" rather than an error.
+        var q = "datatable(t:datetime, u:string)" +
+                "[datetime(2026-07-29T00:00:00Z),'a', datetime(2026-07-29T00:30:00Z),'a', datetime(2026-07-29T02:00:00Z),'a']" +
+                "| make-series c=count() default=0 on t " +
+                "from datetime(2026-07-29T00:00:00Z) to datetime(2026-07-29T03:00:00Z) step 1h by u";
+        var result = await SquashedLastLineOfResult(q);
+        result.Should().Contain("[2,0,1]");                       // two in the first hour, none in the second, one in the third
+        result.Should().Contain("2026-07-29T00:00:00.0000000Z");  // and the axis starts where the range says it does
+    }
+
+    [TestMethod]
     public async Task MakeSeries_NonMultipleRange_HasCorrectPointCount()
     {
         // from 0 to 11 step 2 -> 0,2,4,6,8,10 (11 non-inclusive) = 6 points. A floor() count would give only 5.

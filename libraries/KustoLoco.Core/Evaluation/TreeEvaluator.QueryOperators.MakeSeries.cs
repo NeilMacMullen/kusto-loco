@@ -156,7 +156,9 @@ internal partial class TreeEvaluator
 
     private static long ToTicks(object? v) => v switch
     {
-        DateTime dt => dt.Ticks,
+        // A datetime is compared and binned on the UTC instant it denotes: a local-kind value carries an offset
+        // that would otherwise shift it against UTC axis data and drop every row into no bin at all.
+        DateTime dt => (dt.Kind == DateTimeKind.Local ? dt.ToUniversalTime() : dt).Ticks,
         TimeSpan ts => ts.Ticks,
         long l => l,
         int i => i,
@@ -173,7 +175,9 @@ internal partial class TreeEvaluator
 
     private static double ToDouble(object? v) => v switch
     {
-        DateTime dt => dt.Ticks,
+        // A datetime is compared and binned on the UTC instant it denotes: a local-kind value carries an offset
+        // that would otherwise shift it against UTC axis data and drop every row into no bin at all.
+        DateTime dt => (dt.Kind == DateTimeKind.Local ? dt.ToUniversalTime() : dt).Ticks,
         TimeSpan ts => ts.Ticks,
         long l => l,
         int i => i,
