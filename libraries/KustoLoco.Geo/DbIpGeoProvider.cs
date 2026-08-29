@@ -166,23 +166,11 @@ public sealed class DbIpGeoProvider : IGeoIpProvider
     private static double? ParseCoordinate(string? s) =>
         s is not null && double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : null;
 
-    // DB-IP stores the country as a 2-letter ISO 3166 code; ADX returns the country *name*. RegionInfo maps the
-    // code to its English name with no data table of our own, falling back to the raw value for non-ISO codes.
-    private static string? CountryName(string? code)
-    {
-        if (string.IsNullOrEmpty(code))
-            return null;
-        if (code.Length != 2)
-            return code;
-        try
-        {
-            return new RegionInfo(code).EnglishName;
-        }
-        catch (ArgumentException)
-        {
-            return code;
-        }
-    }
+    // DB-IP stores the country as a 2-letter ISO 3166 code; ADX returns the country *name*. The embedded
+    // CountryNames table maps the code to its English name (== .NET RegionInfo.EnglishName), so the mapping works
+    // under InvariantGlobalization too — where RegionInfo throws and the country would silently degrade to its raw
+    // code. An unmapped/non-ISO code passes through unchanged, exactly as ADX does.
+    private static string? CountryName(string? code) => CountryNames.EnglishName(code);
 
     private static uint ToUInt32(IPAddress address)
     {
