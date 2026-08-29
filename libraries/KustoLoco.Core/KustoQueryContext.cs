@@ -353,6 +353,17 @@ public class KustoQueryContext
                 if (op is Expression { RawResultType: TableSymbol } e &&
                     op.Kind.ToString() == "NameReference")
                     tables.Add(e.RawResultType.Name);
+
+                // The lookup table named as the first argument of `evaluate ipv4_lookup(<Table>, ...)` is not caught
+                // by the walk above: when it is demand-loaded its name is still unresolved at analyze time — the
+                // loader supplies the schema only AFTER this list is computed — so its RawResultType is an error
+                // symbol rather than a TableSymbol. Discover it syntactically by identifier, otherwise the loader is
+                // never asked for it and the query fails to bind.
+                if (op is EvaluateOperator { FunctionCall: { } call } &&
+                    string.Equals(call.Name?.SimpleName, "ipv4_lookup", StringComparison.OrdinalIgnoreCase) &&
+                    call.ArgumentList?.Expressions is { Count: > 0 } callArgs &&
+                    callArgs[0].Element is NameReference lookupTableName)
+                    tables.Add(lookupTableName.SimpleName);
             });
         //special case handling for when query is _only_ a table name without any operators
         if (!tables.Any() && query.Tokenize().Length == 1) tables.Add(query.Trim());

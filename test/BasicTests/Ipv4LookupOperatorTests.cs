@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using KustoLoco.Core;
 using AwesomeAssertions;
 
 namespace BasicTests;
@@ -53,6 +57,37 @@ public class Ipv4LookupOperatorTests : TestMethods
             "| evaluate ipv4_lookup(LookupTable, SourceIP, Network, return_unmatched = true)";
         var result = await CreateContext().RunQuery(query);
         result.RowCount.Should().Be(2);
+    }
+
+    /// <summary>Serves the lookup table on demand, the way a host supplies reference data.</summary>
+    private sealed class OnDemandRanges : IKustoQueryContextTableLoader
+    {
+        public Task LoadTablesAsync(KustoQueryContext context, IReadOnlyCollection<string> tableNames)
+        {
+            if (tableNames.Contains("Ranges"))
+            {
+                var t = new System.Data.DataTable("Ranges");
+                t.Columns.Add("Cidr", typeof(string));
+                t.Columns.Add("Label", typeof(string));
+                t.Rows.Add("10.0.0.0/8", "corp");
+                context.AddTableFromDataTable(t, "Ranges");
+            }
+            return Task.CompletedTask;
+        }
+    }
+
+    [TestMethod]
+    public async Task Ipv4Lookup_ResolvesADemandLoadedLookupTable()
+    {
+        // The lookup table is supplied by a table loader, so at analyze time its name is UNRESOLVED — the schema
+        // arrives only after the engine has decided which tables to ask for. The plugin's table argument must
+        // therefore be discovered syntactically, or the query never gets its table and fails to bind.
+        var context = new KustoQueryContext();
+        context.SetTableLoader(new OnDemandRanges());
+        var result = await context.RunQuery(
+            "datatable(SourceIP:string)['10.1.2.3'] | evaluate ipv4_lookup(Ranges, SourceIP, Cidr)");
+        result.Error.Should().BeEmpty();
+        result.RowCount.Should().Be(1);
     }
 
     [TestMethod]
