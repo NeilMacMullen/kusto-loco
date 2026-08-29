@@ -56,6 +56,24 @@ public class Ipv4LookupOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task Ipv4Lookup_ThenFilterAndSummarizeIntoSets()
+    {
+        // The shape a reputation rule actually forms: enrich by CIDR, filter on an appended column, then aggregate
+        // both source and appended columns into sets per actor.
+        var query =
+            "let Ranges = datatable(Cidr:string, NetworkTrust:string)" +
+            "['10.0.0.0/8','tor', '192.168.0.0/16','vpn', '172.16.0.0/12','hosting'];" +
+            "datatable(Actor:string, IPAddress:string)" +
+            "['a@x','10.1.1.1', 'a@x','192.168.5.5', 'b@x','8.8.8.8'] " +
+            "| evaluate ipv4_lookup(Ranges, IPAddress, Cidr) " +
+            "| where NetworkTrust in ('tor','vpn','hosting') " +
+            "| summarize Ips = make_set(IPAddress), Trusts = make_set(NetworkTrust) by Actor";
+        var result = await SquashedLastLineOfResult(query);
+        // 'a@x' matched two different anonymizer classes; 'b@x' matched nothing and is absent.
+        result.Should().Contain("tor").And.Contain("vpn");
+    }
+
+    [TestMethod]
     public async Task Ipv4Lookup_ExtraKeysNarrowTheMatch()
     {
         // ExtraKeys are columns in BOTH tables that must also match by equality, so an IP inside the CIDR whose

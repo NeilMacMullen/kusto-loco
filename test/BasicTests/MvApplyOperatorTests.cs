@@ -55,6 +55,32 @@ public class MvApplyOperatorTests : TestMethods
     }
 
     [TestMethod]
+    public async Task MvApply_BagThenReadBackAField()
+    {
+        // The full real-world round trip: fold name/value pairs into a bag, then read a field back out of it —
+        // which is what makes the idiom worth using at all.
+        var query =
+            "datatable(id:long, Parameters:string)" +
+            "[1, '[{\"Name\":\"ForwardTo\",\"Value\":\"evil@x.com\"},{\"Name\":\"Enabled\",\"Value\":\"True\"}]'] " +
+            "| mv-apply p = parse_json(Parameters) on ( summarize P = make_bag(bag_pack(tolower(tostring(p.Name)), p.Value)) ) " +
+            "| extend Target = tostring(P['forwardto']) " +
+            "| project Target";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("evil@x.com");
+    }
+
+    [TestMethod]
+    public async Task MvApply_ExpansionFeedsMakeSet()
+    {
+        // mv-apply feeding make_set — the aggregate most used by real rules.
+        var query =
+            "datatable(id:long, payload:string)[1, '[\"a\",\"b\",\"a\"]'] " +
+            "| mv-apply p = parse_json(payload) on ( summarize S = make_set(tostring(p)) )";
+        var result = await SquashedLastLineOfResult(query);
+        result.Should().Contain("a").And.Contain("b");
+    }
+
+    [TestMethod]
     public async Task MvApply_SourceColumnSurvives()
     {
         // The source 'id' survives the subquery and is associated with each output row.
