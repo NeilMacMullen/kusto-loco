@@ -29,6 +29,12 @@ internal partial class TreeEvaluator
 
         var outBuilders = ColumnHelpers.CreateBuildersForTable(resultSchema);
 
+        // ExtraKeys must exist in BOTH tables and match by equality, narrowing the IPv4 match (like extra join keys).
+        var extraKeyIndices = node.ExtraKeys
+            .Select(name => (Source: IndexOf(sourceSchema, name), Lookup: IndexOf(lookupSchema, name)))
+            .Where(pair => pair.Source >= 0 && pair.Lookup >= 0)
+            .ToArray();
+
         for (var sr = 0; sr < srcChunk.RowCount; sr++)
         {
             var ip = sourceIpColumn.GetRawDataValue(sr)?.ToString();
@@ -37,11 +43,12 @@ internal partial class TreeEvaluator
                 for (var lr = 0; lr < lookupChunk.RowCount; lr++)
                 {
                     var cidr = lookupChunk.Columns[lookupIpIdx].GetRawDataValue(lr)?.ToString();
-                    if (cidr != null && Ipv4Support.InRange(ip, cidr) == true)
-                    {
-                        AppendJoinedRow(outBuilders, resultSchema, sourceSchema, lookupSchema, srcChunk, sr, lookupChunk, lr);
-                        matched = true;
-                    }
+                    if (cidr == null || Ipv4Support.InRange(ip, cidr) != true)
+                        continue;
+                    if (!ExtraKeysMatch(extraKeyIndices, srcChunk, sr, lookupChunk, lr))
+                        continue;
+                    AppendJoinedRow(outBuilders, resultSchema, sourceSchema, lookupSchema, srcChunk, sr, lookupChunk, lr);
+                    matched = true;
                 }
 
             if (!matched && node.ReturnUnmatched)
@@ -50,6 +57,16 @@ internal partial class TreeEvaluator
 
         var columns = outBuilders.Select(b => b.ToColumn()).ToArray();
         return TabularResult.CreateUnvisualized(new InMemoryTableSource(resultSchema, columns));
+    }
+
+    private static bool ExtraKeysMatch((int Source, int Lookup)[] keys, ITableChunk srcChunk, int sourceRow,
+        ITableChunk lookupChunk, int lookupRow)
+    {
+        foreach (var (source, lookup) in keys)
+            if (!Equals(srcChunk.Columns[source].GetRawDataValue(sourceRow),
+                        lookupChunk.Columns[lookup].GetRawDataValue(lookupRow)))
+                return false;
+        return true;
     }
 
     private static void AppendJoinedRow(
