@@ -43,23 +43,23 @@ public sealed record GeoIpInfo(
     double? Latitude = null,
     double? Longitude = null);
 
-// externaldata resolver. The engine never performs network access itself: it hands the declared schema, the requested
-// URIs and the format to a host-registered resolver, which fetches and returns the rows. No resolver registered means
-// externaldata is unavailable (fail-closed) - the host must opt in, and is where URL-allowlisting / SSRF protection /
-// authentication live. Returning the rows column-major matches how the engine builds a table.
+/// <summary>
+/// Resolves an <c>externaldata</c> URI to delimited rows (already split into string cells). The engine calls this
+/// once per URI in an <c>externaldata (schema) [ "uri", ... ] with (format=...)</c> expression, then types each cell
+/// per the declared schema and materializes a table — the same path a <c>datatable</c> literal takes.
+/// </summary>
+/// <remarks>
+/// The implementation owns ALL fetch policy: which URI schemes are allowed, size and time bounds, authentication and
+/// caching. This mirrors <see cref="IKustoQueryContextTableLoader"/>, where the host likewise supplies the data and
+/// owns the policy; the engine supplies <see cref="DelimitedTextParser"/> so the declared format need not be
+/// reimplemented. It MUST throw on a fetch or parse failure so the query fails loudly — returning an empty set would
+/// silently turn a broken feed into a no-match. The engine performs NO network access of its own and registers no
+/// default resolver, so <c>externaldata</c> is unavailable until a host opts in.
+/// </remarks>
 public interface IExternalDataResolver
 {
-    // Resolve the data for one externaldata expression. 'columnTypes' are the declared column .NET types (in schema
-    // order); the implementation returns one object?[] per column, all of equal length. Return null to yield an empty
-    // table. Throw to fail the query (e.g. a disallowed URI).
-    IReadOnlyList<object?[]>? Resolve(ExternalDataRequest request);
+    IReadOnlyList<IReadOnlyList<string>> ResolveRows(string uri, string format);
 }
-
-public sealed record ExternalDataRequest(
-    IReadOnlyList<string> Uris,
-    string Format,
-    IReadOnlyList<string> ColumnNames,
-    IReadOnlyList<System.Type> ColumnTypes);
 
 // parse_user_agent data provider. The engine ships no user-agent database; a faithful implementation (e.g. one backed
 // by the uap-core dataset) lives in a companion package and is registered by the host.
