@@ -40,7 +40,7 @@ public static class LoadGeoCommand
         return Task.CompletedTask;
     }
 
-    [Verb("loadgeo", HelpText =
+    [Verb("loadgeoip", HelpText =
         """
         Loads a geo-ip database to allow the geo_info_from_ip_address to return valid info.
         If no filename is supplied, the in-built country-level data is used.
@@ -48,9 +48,9 @@ public static class LoadGeoCommand
         under the Creative Commons Attribution 4.0 International License (CC-BY-4.0).
 
         Examples:
-           .loadgeo
-           .loadgeo default
-           .loadgeo "C:\Users\User\Downloads\dbip-city-lite-2026-08.csv.gz"
+           .loadgeoip
+           .loadgeoip default
+           .loadgeoip "C:\Users\User\Downloads\dbip-city-lite-2026-08.csv.gz"
         """)]
     internal class Options
     {
