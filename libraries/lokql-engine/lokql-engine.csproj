@@ -24,6 +24,7 @@
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
+    <ProjectReference Include="..\KustoLoco.Geo\KustoLoco.Geo.csproj" />
     <ProjectReference Include="..\PluginSupport\PluginSupport.csproj" />
     <ProjectReference Include="..\Rendering\Rendering.csproj" />
   </ItemGroup>
