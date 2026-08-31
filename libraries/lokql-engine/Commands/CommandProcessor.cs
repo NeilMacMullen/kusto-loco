@@ -86,6 +86,7 @@ public class CommandProcessor : ICommandProcessor
                 .WithAdditionalCommand<PivotRowsToColumnsCommand.Options>(PivotRowsToColumnsCommand.RunAsync)
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
                 .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
+                .WithAdditionalCommand<LoadGeoCommand.Options>(LoadGeoCommand.RunAsync)
             ;
 
         AppInsightsCommand.RegisterSchema(cp);

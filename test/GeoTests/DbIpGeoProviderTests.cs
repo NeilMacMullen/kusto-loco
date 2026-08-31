@@ -123,7 +123,9 @@ public class DbIpGeoProviderTests
 
     // The whole point of embedding a default dataset: a host registers ONE line and geo_info_from_ip_address
     // resolves — no file, no path, no config (the same contract UapUserAgentParser.Default gives parse_user_agent).
+    // NOTE - "ignored" in NCrunch due to performance issues
     [TestMethod]
+    [NCrunch.Framework.Category("NoNCrunch")]
     public void Default_ResolvesFromTheEmbeddedDataset_WithNoHostFile()
     {
         var provider = DbIpGeoProvider.Default;
@@ -135,7 +137,9 @@ public class DbIpGeoProviderTests
         info.Longitude.Should().NotBeNull();
     }
 
+    // NOTE - "ignored" in NCrunch due to performance issues
     [TestMethod]
+    [NCrunch.Framework.Category("NoNCrunch")]
     public async Task EndToEnd_DefaultProvider_ResolvesGeoWithZeroConfiguration()
     {
         var context = new KustoQueryContext();
