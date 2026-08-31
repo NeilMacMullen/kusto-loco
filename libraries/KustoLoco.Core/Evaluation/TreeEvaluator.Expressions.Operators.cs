@@ -17,7 +17,7 @@ internal partial class TreeEvaluator
 
         var val = node.Expression.Accept(this, context);
         var arguments = new[] { val };
-        return impl(arguments);
+        return impl(arguments, context);
     }
 
     public override EvaluationResult VisitBinaryExpression(IRBinaryExpressionNode node, EvaluationContext context)
@@ -34,6 +34,6 @@ internal partial class TreeEvaluator
         var leftVal = node.Left.Accept(this, context);
         var rightVal = node.Right.Accept(this, context);
         var arguments = new[] { leftVal, rightVal };
-        return impl(arguments);
+        return impl(arguments, context);
     }
 }

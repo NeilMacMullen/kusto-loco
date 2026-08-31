@@ -29,4 +29,8 @@ internal readonly record struct EvaluationContext
     public ITableChunk Chunk { get; init; }
 
     public TabularResult Left { get; init; }
+
+    // Host-registered providers for data-backed scalar functions, threaded from the engine. Null when none are
+    // registered; functions treat that as "no data" and return null.
+    public IProviderRegistry? Providers { get; init; }
 }

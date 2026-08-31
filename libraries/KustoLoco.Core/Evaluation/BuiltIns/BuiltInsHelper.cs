@@ -120,11 +120,19 @@ internal static class BuiltInsHelper
         return false;
     }
 
+    // A context-aware scalar function receives the EvaluationContext (e.g. to reach a registered provider); every other
+    // function uses the existing context-free path unchanged.
+    private static ScalarResult InvokeScalarCtx(IScalarFunctionImpl impl, ScalarResult[] args, EvaluationContext ctx) =>
+        impl is IContextualScalarFunctionImpl c ? c.InvokeScalar(args, ctx) : impl.InvokeScalar(args);
+
+    private static ColumnarResult InvokeColumnarCtx(IScalarFunctionImpl impl, ColumnarResult[] args, EvaluationContext ctx) =>
+        impl is IContextualScalarFunctionImpl c ? c.InvokeColumnar(args, ctx) : impl.InvokeColumnar(args);
+
     private static EvaluationResult CreateResultForScalarInvocation(IScalarFunctionImpl impl,
-        EvaluationResult[] arguments, TypeSymbol expectedResultType)
+        EvaluationResult[] arguments, TypeSymbol expectedResultType, EvaluationContext context)
     {
         var scalarArgs = arguments.Cast<ScalarResult>().ToArray();
-        var result = impl.InvokeScalar(scalarArgs);
+        var result = InvokeScalarCtx(impl, scalarArgs, context);
         MyDebug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
         return result;
@@ -167,7 +175,7 @@ internal static class BuiltInsHelper
 
 
     private static EvaluationResult CreateResultForColumnarInvocation(IScalarFunctionImpl impl,
-        EvaluationResult[] arguments, TypeSymbol expectedResultType, EvaluationHints hints)
+        EvaluationResult[] arguments, TypeSymbol expectedResultType, EvaluationHints hints, EvaluationContext context)
     {
         var columnarArgs = CreateResultArray(arguments);
 
@@ -188,26 +196,29 @@ internal static class BuiltInsHelper
         {
             var logicalRowCount = columnarArgs.Max(c => c.RowCount);
             columnarArgs = columnarArgs.Select(c => c.SliceToTopRow()).ToArray();
-            var topRowResult = impl.InvokeColumnar(columnarArgs);
+            var topRowResult = InvokeColumnarCtx(impl, columnarArgs, context);
             return topRowResult.Inflate(logicalRowCount);
         }
 
-        var result = impl.InvokeColumnar(columnarArgs);
+        var result = InvokeColumnarCtx(impl, columnarArgs, context);
         MyDebug.Assert(result.Type.Simplify() == expectedResultType.Simplify(),
             $"Evaluation produced wrong type {SchemaDisplay.GetText(result.Type)}, expected {SchemaDisplay.GetText(expectedResultType)}");
         return result;
     }
 
     // TODO: Support named parameters
-    public static Func<EvaluationResult[], EvaluationResult> GetScalarImplementation(IScalarFunctionImpl impl,
+    // The invocation now receives the EvaluationContext so a context-aware function can reach per-query state
+    // (e.g. a registered provider); context-free functions ignore it.
+    public static Func<EvaluationResult[], EvaluationContext, EvaluationResult> GetScalarImplementation(
+        IScalarFunctionImpl impl,
         EvaluatedExpressionKind resultKind,
         TypeSymbol expectedResultType, EvaluationHints hints) =>
         resultKind switch
         {
-            EvaluatedExpressionKind.Scalar => arguments =>
-                CreateResultForScalarInvocation(impl, arguments, expectedResultType),
-            EvaluatedExpressionKind.Columnar => arguments =>
-                CreateResultForColumnarInvocation(impl, arguments, expectedResultType, hints),
+            EvaluatedExpressionKind.Scalar => (arguments, context) =>
+                CreateResultForScalarInvocation(impl, arguments, expectedResultType, context),
+            EvaluatedExpressionKind.Columnar => (arguments, context) =>
+                CreateResultForColumnarInvocation(impl, arguments, expectedResultType, hints, context),
             _ => throw new InvalidOperationException($"Unexpected result kind {resultKind}")
         };
 

@@ -56,7 +56,7 @@ internal partial class TreeEvaluator
             arguments = new[] { dummy }.Concat(arguments).ToArray();
         }
 
-        return impl(arguments);
+        return impl(arguments, context);
     }
 
     public override EvaluationResult VisitBuiltInWindowFunctionCall(IRBuiltInWindowFunctionCallNode node,
@@ -134,7 +134,7 @@ internal partial class TreeEvaluator
             functionCallScope.AddSymbol(node.ParamSymbols[i], argValue);
         }
 
-        return node.ExpandedBody.Accept(this, new EvaluationContext(functionCallScope));
+        return node.ExpandedBody.Accept(this, new EvaluationContext(functionCallScope) { Providers = context.Providers });
     }
 
     public override EvaluationResult VisitFunctionBody(IRFunctionBodyNode node, EvaluationContext context)
