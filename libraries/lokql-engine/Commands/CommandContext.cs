@@ -1,4 +1,5 @@
-﻿using KustoLoco.Core;
+﻿using CsvHelper.Configuration.Attributes;
+using KustoLoco.Core;
 using KustoLoco.Core.Console;
 using KustoLoco.Core.Settings;
 using KustoLoco.PluginSupport;
@@ -31,4 +32,5 @@ public readonly record struct InputProcessor(BlockSequence Sequence,InteractiveT
 {
     public bool IsComplete => Sequence.Complete;
     public string ConsumeNextBlock() =>Explorer.Interpolate(Sequence.Next());
+    public string FirstLine => Sequence.FirstLine();
 }
