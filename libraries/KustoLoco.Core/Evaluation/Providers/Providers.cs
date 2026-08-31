@@ -53,8 +53,9 @@ public sealed record GeoIpInfo(
 /// caching. This mirrors <see cref="IKustoQueryContextTableLoader"/>, where the host likewise supplies the data and
 /// owns the policy; the engine supplies <see cref="DelimitedTextParser"/> so the declared format need not be
 /// reimplemented. It MUST throw on a fetch or parse failure so the query fails loudly — returning an empty set would
-/// silently turn a broken feed into a no-match. The engine performs NO network access of its own and registers no
-/// default resolver, so <c>externaldata</c> is unavailable until a host opts in.
+/// silently turn a broken feed into a no-match. When no host resolver is registered the engine falls back to
+/// <see cref="HttpExternalDataResolver"/>, so <c>externaldata</c> resolves out of the box (HTTPS, public
+/// addresses only, bounded time and size); register your own to tighten, widen or replace that policy.
 /// </remarks>
 public interface IExternalDataResolver
 {

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.DataSource;
 using KustoLoco.Core.DataSource.Columns;
@@ -14,22 +15,37 @@ using KustoLoco.Core.Util;
 
 namespace KustoLoco.Core.Evaluation;
 
+// The engine's fallback externaldata resolver, created on first use so a query that never mentions
+// externaldata pays nothing (and no HttpClient is constructed). Shared and thread-safe, matching the
+// lifetime of a long-lived HttpClient.
+internal static class DefaultExternalDataResolver
+{
+    private static readonly Lazy<IExternalDataResolver> Instance =
+        new(() => new HttpExternalDataResolver(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+    public static IExternalDataResolver Value => Instance.Value;
+}
+
 internal partial class TreeEvaluator
 {
     public override EvaluationResult VisitExternalDataExpression(IRExternalDataExpression node, EvaluationContext context)
     {
         var schema = (TableSymbol)node.ResultType;
-        var resolver = context.Providers?.Get<IExternalDataResolver>()
-            // The engine performs no I/O of its own, so there is nothing sane to default to: fail LOUD rather than
-            // yield an empty table, which would silently turn an unreachable list into a no-match.
-            ?? throw new InvalidOperationException(
-                "externaldata requires a host-provided IExternalDataResolver (register one with " +
-                "KustoQueryContext.SetExternalDataResolver); the engine performs no network or file access itself.");
+        // A host-registered resolver wins; otherwise the engine's own HTTPS resolver runs, so externaldata
+        // resolves out of the box as it does in ADX instead of requiring every host to write a fetcher. Its
+        // defaults are deliberately conservative (HTTPS, public addresses only, bounded time and size) — see
+        // HttpExternalDataResolver; register your own to tighten, widen or replace that policy.
+        var resolver = context.Providers?.Get<IExternalDataResolver>() ?? DefaultExternalDataResolver.Value;
 
-        // The host resolves and splits each URI; the engine types the cells per the declared schema.
+        // The resolver fetches and splits each URI; the engine types the cells per the declared schema.
+        // ignoreFirstRecord drops the header of EACH uri (not just the first), matching ADX: every file in the
+        // list carries its own header, and the declared schema — not that row — names the columns.
         var cells = new List<IReadOnlyList<string>>();
         foreach (var uri in node.Uris)
-            cells.AddRange(resolver.ResolveRows(uri, node.Format));
+        {
+            var rows = resolver.ResolveRows(uri, node.Format);
+            cells.AddRange(node.IgnoreFirstRecord ? rows.Skip(1) : rows);
+        }
 
         var columns = new BaseColumn[schema.Columns.Count];
         for (var j = 0; j < schema.Columns.Count; j++)

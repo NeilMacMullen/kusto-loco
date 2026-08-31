@@ -1,8 +1,10 @@
 KustoLoco.Geo
 =============
 
-This package contains no geo database. It reads a geo-IP dataset that you supply
-at runtime. The intended dataset is the DB-IP "IP to City Lite" database.
+This package EMBEDS a default geo database so geo_info_from_ip_address() works out of
+the box: DB-IP "IP to Country Lite" joined with Google canonical country centroids.
+It can also read a geo-IP dataset you supply at runtime (e.g. the DB-IP "IP to City
+Lite" database) when city/state precision or IPv6 coverage is needed.
 
 The DB-IP Lite databases are made available by DB-IP (https://db-ip.com) under the
 Creative Commons Attribution 4.0 International License (CC-BY-4.0).
@@ -14,6 +16,20 @@ you must attribute DB-IP, for example:
 
 See https://db-ip.com/db/lite.php for the current license terms.
 
-This provider is also compatible with any CSV export using the same column layout
-(ip_start, ip_end, continent, country, stateprov, city, latitude, longitude); if you
-use a different source, follow that source's own attribution requirements.
+The per-country coordinates in the embedded dataset are the Google canonical country
+centroids (https://github.com/google/dspl/blob/master/samples/google/canonical/countries.csv),
+(C) Google, likewise licensed CC-BY-4.0. Redistributing the embedded dataset therefore
+carries BOTH attributions:
+
+    IP Geolocation by DB-IP (https://db-ip.com)
+    Country centroids (C) Google (https://github.com/google/dspl), CC-BY-4.0
+
+Because this package ships that dataset inside the assembly, an application that merely
+depends on the package is redistributing it — carry the two lines above in your own
+third-party notices.
+
+This provider reads any of the DB-IP Lite layouts — City Lite
+(ip_start, ip_end, continent, country, stateprov, city, latitude, longitude), Country
+Lite (ip_start, ip_end, country), or a compact country+centroid derivation
+(ip_start, ip_end, country, latitude, longitude) — and any CSV using one of those column
+layouts; if you use a different source, follow that source's own attribution requirements.
