@@ -43,6 +43,24 @@ public sealed record GeoIpInfo(
     double? Latitude = null,
     double? Longitude = null);
 
+/// <summary>
+/// Resolves an <c>externaldata</c> URI to delimited rows (already split into string cells). The engine calls this
+/// once per URI in an <c>externaldata (schema) [ "uri", ... ] with (format=...)</c> expression, then types each cell
+/// per the declared schema and materializes a table — the same path a <c>datatable</c> literal takes.
+/// </summary>
+/// <remarks>
+/// The implementation owns ALL fetch policy: which URI schemes are allowed, size and time bounds, authentication and
+/// caching. This mirrors <see cref="IKustoQueryContextTableLoader"/>, where the host likewise supplies the data and
+/// owns the policy; the engine supplies <see cref="DelimitedTextParser"/> so the declared format need not be
+/// reimplemented. It MUST throw on a fetch or parse failure so the query fails loudly — returning an empty set would
+/// silently turn a broken feed into a no-match. The engine performs NO network access of its own and registers no
+/// default resolver, so <c>externaldata</c> is unavailable until a host opts in.
+/// </remarks>
+public interface IExternalDataResolver
+{
+    IReadOnlyList<IReadOnlyList<string>> ResolveRows(string uri, string format);
+}
+
 // parse_user_agent data provider. The engine ships no user-agent database; a faithful implementation (e.g. one backed
 // by the uap-core dataset) lives in a companion package and is registered by the host.
 public interface IUserAgentParser
