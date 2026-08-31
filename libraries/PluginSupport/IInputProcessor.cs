@@ -19,4 +19,6 @@ public interface IInputProcessor
     /// </summary>
     /// <returns>The next input block as a string.</returns>
     public string ConsumeNextBlock();
+
+    public string FirstLine { get; }
 }

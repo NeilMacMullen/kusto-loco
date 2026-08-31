@@ -35,5 +35,10 @@ public class BlockSequence
         var index = Index - 1 -i;
         return index < Blocks.Length && index >=0 ? Blocks[index] : string.Empty;
     }
+
+    public string FirstLine()
+    {
+        return Blocks.Any() ? Blocks[0] : string.Empty;
+    }
 }
 
