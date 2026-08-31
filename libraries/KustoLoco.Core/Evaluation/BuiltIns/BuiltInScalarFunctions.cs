@@ -199,6 +199,19 @@ internal static class BuiltInScalarFunctions
         IsEmptyFunction.Register(Functions);
         IsNotEmptyFunction.Register(Functions);
         Ipv4IsPrivateFunction.Register(Functions);
+        Ipv4IsInRangeFunction.Register(Functions);
+        Ipv4IsInAnyRangeFunction.Register(Functions);
+        Ipv4IsMatchFunction.Register(Functions);
+        Ipv4CompareFunction.Register(Functions);
+        FormatIpv4Function.Register(Functions);
+        FormatIpv4MaskFunction.Register(Functions);
+        Ipv4NetmaskSuffixFunction.Register(Functions);
+        ParseIpv4MaskFunction.Register(Functions);
+        Ipv4RangeToCidrListFunction.Register(Functions);
+        HasIpv4Function.Register(Functions);
+        HasIpv4PrefixFunction.Register(Functions);
+        HasAnyIpv4Function.Register(Functions);
+        HasAnyIpv4PrefixFunction.Register(Functions);
         ParseIpv4Function.Register(Functions);
         ParseIpv6Function.Register(Functions);
         IsAsciiFunction.Register(Functions);
@@ -321,9 +334,22 @@ internal static class BuiltInScalarFunctions
         RegexQuoteFunction.Register(Functions);
         RepeatFunction.Register(Functions);
 
+        SetHasElementFunction.Register(Functions);
+        BagKeysFunction.Register(Functions);
+        BagHasKeyFunction.Register(Functions);
+        BagRemoveKeysFunction.Register(Functions);
+        BagSetKeyFunction.Register(Functions);
+        BagZipFunction.Register(Functions);
+        ExtractAllFunction.Register(Functions);
+        ParseUrlFunction.Register(Functions);
+        ParseUrlQueryFunction.Register(Functions);
+
         //can't generate because arbitrary number of arguments
         BagPackFunctionImpl.Register(Functions);
         BagMergeFunctionImpl.Register(Functions);
         PackAllFunctionImpl.Register(Functions);
+        SetUnionFunctionImpl.Register(Functions);
+        SetIntersectFunctionImpl.Register(Functions);
+        SetDifferenceFunctionImpl.Register(Functions);
     }
 }
