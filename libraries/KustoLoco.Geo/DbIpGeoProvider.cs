@@ -109,6 +109,13 @@ public sealed class DbIpGeoProvider : IGeoIpProvider
         var v6 = new List<(UInt128 Start, UInt128 End, GeoIpInfo Info)>();
         LayoutMap? map = layout == DbIpLayout.Auto ? null : LayoutMap.For(layout);
 
+        // Intern the GeoIpInfo values: a country-scale dataset holds hundreds of thousands of ranges but only a few
+        // hundred distinct (country, lat, lon) triples — the embedded country default is 357,918 ranges over ~240
+        // countries. GeoIpInfo is a record (structural equality), so one instance per distinct value is shared across
+        // every range that resolves to it, turning ~25 MB of duplicate objects into a few hundred. Range entries stay
+        // distinct; only the payload is shared.
+        var interned = new Dictionary<GeoIpInfo, GeoIpInfo>();
+
         foreach (var raw in lines)
         {
             if (string.IsNullOrWhiteSpace(raw) || raw[0] == '#')
@@ -132,6 +139,11 @@ public sealed class DbIpGeoProvider : IGeoIpProvider
                 City: m.City >= 0 ? Field(f, m.City) : null,
                 Latitude: m.Lat >= 0 ? ParseCoordinate(Field(f, m.Lat)) : null,
                 Longitude: m.Lon >= 0 ? ParseCoordinate(Field(f, m.Lon)) : null);
+
+            if (interned.TryGetValue(info, out var canonical))
+                info = canonical;
+            else
+                interned[info] = info;
 
             if (start.AddressFamily == AddressFamily.InterNetwork)
             {

@@ -152,4 +152,23 @@ public class DbIpGeoProviderTests
         var provider = DbIpGeoProvider.FromLines(CountryCentroidCsv, DbIpLayout.CountryCentroid);
         provider.Lookup(IPAddress.Parse("1.0.0.1"))!.Latitude.Should().BeApproximately(-25.0, 0.001);
     }
+
+    [TestMethod]
+    public void EqualGeoInfo_IsInterned_ToOneSharedInstance()
+    {
+        // A country-scale dataset repeats the same (country, lat, lon) across many ranges. Those must share ONE
+        // GeoIpInfo instance rather than allocating a duplicate per range — that is what keeps the embedded default
+        // (357,918 ranges over ~240 countries) from carrying ~25 MB of identical objects.
+        var twoRangesSameCountry = new[]
+        {
+            "1.0.0.0,1.0.0.255,US,39.0,-98.0",
+            "8.8.8.0,8.8.8.255,US,39.0,-98.0",
+        };
+        var provider = DbIpGeoProvider.FromLines(twoRangesSameCountry);
+        var a = provider.Lookup(IPAddress.Parse("1.0.0.1"));
+        var b = provider.Lookup(IPAddress.Parse("8.8.8.8"));
+        a.Should().NotBeNull();
+        b.Should().NotBeNull();
+        ReferenceEquals(a, b).Should().BeTrue(); // same object, not merely equal
+    }
 }
