@@ -1,0 +1,12 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <IgnoredTests>
+      <NamedTestSelector>
+        <TestName>GeoTests.DbIpGeoProviderTests.EndToEnd_DefaultProvider_ResolvesGeoWithZeroConfiguration</TestName>
+      </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>GeoTests.DbIpGeoProviderTests.Default_ResolvesFromTheEmbeddedDataset_WithNoHostFile</TestName>
+      </NamedTestSelector>
+    </IgnoredTests>
+  </Settings>
+</ProjectConfiguration>
