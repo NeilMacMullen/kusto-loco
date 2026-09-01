@@ -24,8 +24,9 @@ $packages = @( ("KustoLoco.Core", "KustoLoco.Core"),
     ("Rendering", "KustoLoco.Rendering"),
     ("ScottPlotRendering", "KustoLoco.Rendering.ScottPlot"), 
     ("SixelSupport", "KustoLoco.Rendering.SixelSupport"),
-    ("PluginSupport", "KustoLoco.PluginSupport")
-
+    ("PluginSupport", "KustoLoco.PluginSupport"),
+    ("KustoLoco.Geo", "KustoLoco.Geo"),
+    ("KustoLoco.UserAgent", "KustoLoco.UserAgent")
 )
 
 
