@@ -33,10 +33,19 @@ public sealed class UapUserAgentParser : IUserAgentParser
     /// <summary>A shared instance built from the embedded uap-core dataset.</summary>
     public static UapUserAgentParser Default { get; } = new();
 
+    public static UapUserAgentParser FromFile(string path)
+    {
+        using var strm = File.OpenRead(path);
+        var parser = new UapUserAgentParser(strm);
+        return parser;
+    }
+
     /// <summary>Build from the embedded uap-core <c>regexes.yaml</c>.</summary>
     public UapUserAgentParser() : this(ReadEmbeddedRegexes())
     {
     }
+
+
 
     /// <summary>Build from a caller-supplied uap-core <c>regexes.yaml</c> stream (e.g. a newer dataset).</summary>
     public UapUserAgentParser(Stream regexesYaml) : this(new StreamReader(regexesYaml).ReadToEnd())

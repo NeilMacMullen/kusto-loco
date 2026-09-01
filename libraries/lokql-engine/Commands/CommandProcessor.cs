@@ -87,6 +87,7 @@ public class CommandProcessor : ICommandProcessor
                 .WithAdditionalCommand<SetScalarCommand.Options>(SetScalarCommand.RunAsync)
                 .WithAdditionalCommand<ExitCommand.Options>(ExitCommand.RunAsync)
                 .WithAdditionalCommand<LoadGeoCommand.Options>(LoadGeoCommand.RunAsync)
+                .WithAdditionalCommand<LoadUserAgentCommand.Options>(LoadUserAgentCommand.RunAsync)
                 .WithAdditionalCommand<ExecCommand.Options>(ExecCommand.RunAsync)
             ;
 

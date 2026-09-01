@@ -42,7 +42,7 @@ public static class LoadGeoCommand
 
     [Verb("loadgeoip", HelpText =
         """
-        Loads a geo-ip database to allow the geo_info_from_ip_address to return valid info.
+        Loads a geo-ip database to allow the geo_info_from_ip_address command to return valid info.
         If no filename is supplied, the in-built country-level data is used.
         Files may be csv or csv.gz and are provided by https://db-ip.com
         under the Creative Commons Attribution 4.0 International License (CC-BY-4.0).
@@ -54,7 +54,7 @@ public static class LoadGeoCommand
         """)]
     internal class Options
     {
-        [Value(0, HelpText = "table name", Required = false)]
+        [Value(0, HelpText = "Name of file (should have extension .csv or .csv.gz)", Required = false)]
         public string FileName { get; set; } = string.Empty;
         [Option(HelpText = "force reload", Required = false)]
         public bool Force { get; set; } 
