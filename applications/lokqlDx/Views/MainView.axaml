@@ -53,26 +53,26 @@
                         </MenuItem.ItemTemplate>
                     </MenuItem>
 
-                    <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" />
-                    <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" />
+                    <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" InputGesture="Ctrl+S" />
+                    <MenuItem Header="Save _As" Command="{Binding SaveWorkspaceAsCommand}" InputGesture="Ctrl+Shift+S" />
 
                 </MenuItem>
                 <MenuItem Header="_Preferences">
                     <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
                     <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
                     <Separator />
-                    <MenuItem Header="Decrease FontSize" Command="{Binding ChangeFontSizeCommand}">
+                    <MenuItem Header="Decrease FontSize" Command="{Binding ChangeFontSizeCommand}" InputGesture="Ctrl+D9">
                         <MenuItem.CommandParameter>
                             <system:Int32>-1</system:Int32>
                         </MenuItem.CommandParameter>
                     </MenuItem>
-                    <MenuItem Header="Increase FontSize" Command="{Binding ChangeFontSizeCommand}">
+                    <MenuItem Header="Increase FontSize" Command="{Binding ChangeFontSizeCommand}" InputGesture="Ctrl+D0">
                         <MenuItem.CommandParameter>
                             <system:Int32>1</system:Int32>
                         </MenuItem.CommandParameter>
                     </MenuItem>
-                    <MenuItem Header="Toggle _word-wrap" Command="{Binding ToggleWordWrapCommand}" />
-                    <MenuItem Header="Toggle line-_numbers" Command="{Binding ToggleLineNumbersCommand}" />
+                    <MenuItem Header="Toggle _word-wrap" Command="{Binding ToggleWordWrapCommand}" InputGesture="Alt+Z" />
+                    <MenuItem Header="Toggle line-_numbers" Command="{Binding ToggleLineNumbersCommand}" InputGesture="Alt+N" />
                 </MenuItem>
                 <MenuItem Header="_Data">
                     <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
