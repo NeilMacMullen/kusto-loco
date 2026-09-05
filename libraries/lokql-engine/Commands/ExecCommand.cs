@@ -56,10 +56,6 @@ public static class ExecCommand
             }
             else
             {
-                // Capture output mode (existing behavior)
-                var outputBuilder = new StringBuilder();
-                var errorBuilder = new StringBuilder();
-
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = shell, //fileName,
@@ -76,13 +72,13 @@ public static class ExecCommand
                 process.OutputDataReceived += (sender, e) =>
                 {
                     if (e.Data != null)
-                        outputBuilder.AppendLine(e.Data);
+                        console.Write(e.Data+Environment.NewLine);
                 };
 
                 process.ErrorDataReceived += (sender, e) =>
                 {
                     if (e.Data != null)
-                        errorBuilder.AppendLine(e.Data);
+                        console.Error(e.Data + Environment.NewLine);
                 };
 
                 process.Start();
@@ -92,12 +88,6 @@ public static class ExecCommand
                 await process.WaitForExitAsync();
 
                 var exitCode = process.ExitCode;
-
-                // Display output
-                if (outputBuilder.Length > 0) console.Write(outputBuilder.ToString());
-
-                // Display errors if any
-                if (errorBuilder.Length > 0) console.Error(errorBuilder.ToString());
 
                 if (exitCode != 0)
                     console.Warn($"Process exited with code: {exitCode}");
