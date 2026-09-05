@@ -446,11 +446,15 @@ public partial class MainViewModel : ObservableObject
 
     private bool RecheckDirty()
     {
-        IsDirty = QueryLibrary.IsDirty();
+        IsDirty = QueryLibrary.IsDirty() || CurrentWorkspace.IsDirty;
         return IsDirty;
     }
 
-    private void ResetDirty() => QueryLibrary.ClearDirty();
+    private void ResetDirty()
+    {
+        QueryLibrary.ClearDirty();
+        CurrentWorkspace.IsDirty = false;
+    }
 
 
     /// <summary>
