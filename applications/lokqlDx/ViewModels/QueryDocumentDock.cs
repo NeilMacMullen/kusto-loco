@@ -14,13 +14,18 @@ public class QueryDocumentDock : DocumentDock
     {
         if (!CanCreateDocument) return;
 
-        var index = VisibleDockables?.Count + 1;
-        var title = $"query {index}";
+        var title = GetNameForNewQuery();
         var msg = Messaging.Send(new CreateDocumentRequest(title));
 
         var document = msg.Model!;
         Factory?.AddDockable(this, document);
         Factory?.SetActiveDockable(document);
         Factory?.SetFocusedDockable(this, document);
+    }
+
+    public string GetNameForNewQuery()
+    {
+        var index = VisibleDockables?.Count + 1;
+        return $"query {index}";
     }
 }

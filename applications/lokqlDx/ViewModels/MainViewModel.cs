@@ -120,6 +120,24 @@ public partial class MainViewModel : ObservableObject
         return q;
     }
 
+   
+    [RelayCommand]
+    private void NewQueryPane()
+    {
+        var doc = AddQuery(_factory.GetNameForNewQueryPane(), string.Empty, string.Empty, true);
+        _factory.AddDocument(doc);
+    }
+
+    [RelayCommand]
+    private void DuplicateCurrentQueryPane()
+    {
+        var active = _factory.GetActive();
+        if (active is null)
+            return;
+        var doc = AddQuery($"Copy of {active.Title}", active.GetText(), active.GetPreQueryText(), true);
+        _factory.AddDocument(doc);
+    }
+
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
