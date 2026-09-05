@@ -165,6 +165,27 @@ public class DialogService
                 _modalNonResizable)
             .ConfigureAwait(false);
 
+    public async Task<string> ShowSearchRecentWorkspaces(PreferencesManager preferencesManager)
+    {
+        var model = new SearchRecentWorkspacesViewModel(preferencesManager);
+        await ShowDialog(
+                "LokqlDX - Search Recent Workspaces",
+                new SearchRecentWorkspacesDialog(),
+                model,
+                new ShowOptions(true, new Size(700, 500), true))
+            .ConfigureAwait(false);
+        return model.SelectedPath;
+    }
+
+    public async Task ShowEditWorkspaceDescription(Workspace workspace) =>
+        await ShowDialog(
+                "LokqlDX - Workspace Description",
+                new EditWorkspaceDescriptionDialog(),
+                new EditWorkspaceDescriptionViewModel(workspace),
+                _modalNonResizable)
+            .ConfigureAwait(false);
+
+
     private async Task ShowDialog(string title, Control content, IDialogViewModel dataContext, ShowOptions options)
     {
         if (_topLevel is Window window)

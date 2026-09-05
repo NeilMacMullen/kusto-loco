@@ -8,10 +8,13 @@ namespace LokqlDx;
 /// </summary>
 public partial class Workspace : ObservableObject
 {
+    [ObservableProperty] private string _description = "";
     [ObservableProperty] private bool _isDirty;
     [ObservableProperty] private PersistedQuery[] _queries = [];
     [ObservableProperty] private string _startupScript = "";
     [ObservableProperty] private string _text = "";
 
     partial void OnStartupScriptChanged(string value) => IsDirty = true;
+
+    partial void OnDescriptionChanged(string value) => IsDirty = true;
 }

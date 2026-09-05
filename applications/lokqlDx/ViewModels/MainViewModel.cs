@@ -291,6 +291,19 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task SearchRecentWorkspaces()
+    {
+        var path = await _dialogService.ShowSearchRecentWorkspaces(_preferencesManager);
+        if (path.IsNotBlank())
+            await LoadWorkspace(path);
+        RebuildRecentFilesList();
+    }
+
+    [RelayCommand]
+    private async Task EditWorkspaceDescription() =>
+        await _dialogService.ShowEditWorkspaceDescription(CurrentWorkspace);
+
+    [RelayCommand]
     private async Task SaveWorkspace() => await Save();
 
     [RelayCommand]
@@ -409,6 +422,7 @@ public partial class MainViewModel : ObservableObject
 
         Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
         UpdateKustoDataPath();
+        UpdateMostRecentlyUsed(_workspaceManager.Path);
     }
 
     private void RemoveAllDocs()
@@ -432,11 +446,15 @@ public partial class MainViewModel : ObservableObject
 
     private bool RecheckDirty()
     {
-        IsDirty = QueryLibrary.IsDirty();
+        IsDirty = QueryLibrary.IsDirty() || CurrentWorkspace.IsDirty;
         return IsDirty;
     }
 
-    private void ResetDirty() => QueryLibrary.ClearDirty();
+    private void ResetDirty()
+    {
+        QueryLibrary.ClearDirty();
+        CurrentWorkspace.IsDirty = false;
+    }
 
 
     /// <summary>
@@ -547,7 +565,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (path.IsBlank())
             return;
-        _preferencesManager.BringToTopOfMruList(path);
+        _preferencesManager.BringToTopOfMruList(path, CurrentWorkspace.Description);
 
         //JumpList.AddToRecentCategory(path);
 
@@ -557,10 +575,10 @@ public partial class MainViewModel : ObservableObject
     private void RebuildRecentFilesList()
     {
         RecentWorkspaces.Clear();
-        foreach (var path in _preferencesManager.GetMruItems().Take(10))
+        foreach (var entry in _preferencesManager.GetMruEntries().Take(10))
             RecentWorkspaces.Add(new RecentWorkspace(
-                $"{Path.GetFileName(path)} ({Path.GetDirectoryName(path)})",
-                path));
+                $"{Path.GetFileName(entry.Path)} ({Path.GetDirectoryName(entry.Path)})",
+                entry.Path));
     }
 
     private void PersistUiPreferencesToDisk()
