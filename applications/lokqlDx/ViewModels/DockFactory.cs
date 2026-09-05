@@ -4,6 +4,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
+using NotNullStrings;
 
 namespace LokqlDx.ViewModels;
 
@@ -201,6 +202,7 @@ public class DockFactory : Factory
             DocumentDock?.AddDocument(query);
     }
 
+    public string GetNameForNewQueryPane() =>DocumentDock?.GetNameForNewQuery().NullToEmpty()!;
     public IRootDock? GetActiveRoot() =>
         Find(d => d is IRootDock { IsActive: true })
             .OfType<IRootDock>()

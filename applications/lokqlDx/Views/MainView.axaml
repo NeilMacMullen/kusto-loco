@@ -80,6 +80,10 @@
                     <MenuItem Header="_Load Data" Command="{Binding LoadDataCommand}" />
                     <MenuItem Header="Save Last _Result" Command="{Binding SaveDataCommand}" />
                 </MenuItem>
+                <MenuItem Header="_Query">
+                    <MenuItem Header="_New Query Pane" Command="{Binding NewQueryPaneCommand}" />
+                    <MenuItem Header="_Duplicate Current Query Pane" Command="{Binding DuplicateCurrentQueryPaneCommand}" />
+                </MenuItem>
                 <MenuItem Header="_View">
                     <MenuItem Header="Show _Query Manager" Command="{Binding ShowToolCommand}"
                               CommandParameter="queries" />
