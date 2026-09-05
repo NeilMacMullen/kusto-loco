@@ -1,0 +1,21 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:LokqlDx.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+             x:Class="LokqlDx.Views.Dialogs.EditWorkspaceDescriptionDialog"
+             x:DataType="vm:EditWorkspaceDescriptionViewModel"
+             Loaded="UserControl_Loaded"
+             MinWidth="400">
+    <StackPanel Margin="10">
+        <TextBlock Text="Description of this workspace" Margin="0,0,0,5" />
+        <TextBox Name="DescriptionBox" AcceptsReturn="True" TextWrapping="Wrap" Height="120" Text="{Binding Description}" />
+        <Rectangle Height="20" />
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Content="Cancel" Command="{Binding CancelCommand}" />
+            <Rectangle Width="20" />
+            <Button Content="Save" Command="{Binding SaveCommand}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

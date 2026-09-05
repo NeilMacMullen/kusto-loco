@@ -100,22 +100,62 @@ public class PreferencesManager
 
     public string[] GetMruItems()
     {
-        var mru = Load(MruFileName, new PersistedMruList());
-        return mru.RecentProjects.OrderByDescending(i => i.LastAccessed)
+        return GetMruEntries()
             .Select(p => p.Path)
             .ToArray();
     }
 
-    public void BringToTopOfMruList(string path)
+    /// <summary>
+    ///     Returns the recently used workspaces with pinned items first, then most-recently accessed
+    /// </summary>
+    public MruEntry[] GetMruEntries()
     {
         var mru = Load(MruFileName, new PersistedMruList());
-        var resorted = mru.RecentProjects
-            .Where(i => i.Path != path)
-            .Concat([new MruEntry { Path = path, LastAccessed = DateTime.Now }])
-            .OrderByDescending(i => i.LastAccessed)
+        return SortEntries(mru.RecentProjects);
+    }
+
+    private static MruEntry[] SortEntries(IEnumerable<MruEntry> entries) =>
+        entries.OrderByDescending(i => i.IsPinned)
+            .ThenByDescending(i => i.LastAccessed)
+            .ToArray();
+
+    public void BringToTopOfMruList(string path) => BringToTopOfMruList(path, string.Empty);
+
+    public void BringToTopOfMruList(string path, string description)
+    {
+        var mru = Load(MruFileName, new PersistedMruList());
+        var existing = mru.RecentProjects.FirstOrDefault(i => i.Path == path);
+        var entry = new MruEntry
+        {
+            Path = path,
+            Name = Path.GetFileNameWithoutExtension(path),
+            Description = description,
+            IsPinned = existing?.IsPinned ?? false,
+            LastAccessed = DateTime.Now
+        };
+        var resorted = SortEntries(mru.RecentProjects
+                .Where(i => i.Path != path)
+                .Concat([entry]))
             .Take(100)
             .ToArray();
         Save(MruFileName, new PersistedMruList { RecentProjects = resorted });
+    }
+
+    public void RemoveFromMruList(string path)
+    {
+        var mru = Load(MruFileName, new PersistedMruList());
+        var remaining = mru.RecentProjects
+            .Where(i => i.Path != path)
+            .ToArray();
+        Save(MruFileName, new PersistedMruList { RecentProjects = remaining });
+    }
+
+    public void SetPinned(string path, bool pinned)
+    {
+        var mru = Load(MruFileName, new PersistedMruList());
+        foreach (var entry in mru.RecentProjects.Where(i => i.Path == path))
+            entry.IsPinned = pinned;
+        Save(MruFileName, new PersistedMruList { RecentProjects = SortEntries(mru.RecentProjects) });
     }
 
     /// <summary>

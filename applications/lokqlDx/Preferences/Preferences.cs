@@ -3,6 +3,9 @@
 public class MruEntry
 {
     public string Path { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool IsPinned { get; set; }
     public DateTime LastAccessed { get; set; } = DateTime.MinValue;
 }
 
