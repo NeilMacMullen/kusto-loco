@@ -508,7 +508,161 @@
         "Name": "net_time",
         "Description": "(non-standard) Calculates a datetime which is an offset from the .Net epoch ",
         "Syntax": "net_time(*seconds*) or net_time(*timespan*)"
+    },
+    {
+        "Name": "bag_keys",
+        "Description": "Enumerates the names of the top-level properties in a dynamic property bag.",
+        "Syntax": "bag_keys(*bag*)"
+    },
+    {
+        "Name": "bag_has_key",
+        "Description": "Returns true if the input dynamic property bag has the specified key.",
+        "Syntax": "bag_has_key(*bag*, *key*)"
+    },
+    {
+        "Name": "bag_remove_keys",
+        "Description": "Removes keys from a dynamic property bag, based on regular expression, and returns the updated bag.",
+        "Syntax": "bag_remove_keys(*bag*, *keys*)"
+    },
+    {
+        "Name": "bag_set_key",
+        "Description": "Sets the key of a dynamic property bag to a given value, and returns the updated bag.",
+        "Syntax": "bag_set_key(*bag*, *key*, *value*)"
+    },
+    {
+        "Name": "bag_zip",
+        "Description": "Creates a dynamic property bag from two dynamic arrays: one containing the keys, and the other containing the values.",
+        "Syntax": "bag_zip(*keys*, *values*)"
+    },
+    {
+        "Name": "set_union",
+        "Description": "Returns a dynamic array of the set of distinct values that are members of at least one of the input arrays.",
+        "Syntax": "set_union(*arr1*, *arr2* [, *arr3*, ...])"
+    },
+    {
+        "Name": "set_intersect",
+        "Description": "Returns a dynamic array of the set of distinct values that are members of both input arrays.",
+        "Syntax": "set_intersect(*arr1*, *arr2* [, *arr3*, ...])"
+    },
+    {
+        "Name": "set_difference",
+        "Description": "Returns a dynamic array of the set of distinct values that are in the first array but not in any of the other arrays.",
+        "Syntax": "set_difference(*arr1*, *arr2* [, *arr3*, ...])"
+    },
+    {
+        "Name": "set_has_element",
+        "Description": "Returns true if the input array contains the specified element.",
+        "Syntax": "set_has_element(*arr*, *element*)"
+    },
+    {
+        "Name": "ipv4_is_in_range",
+        "Description": "Checks if IPv4 string address is in IPv4-prefix notation range.",
+        "Syntax": "ipv4_is_in_range(*Ipv4Address*, *Ipv4Range*)"
+    },
+    {
+        "Name": "ipv4_is_in_any_range",
+        "Description": "Checks if IPv4 string address is in any of the given IPv4-prefix notation ranges.",
+        "Syntax": "ipv4_is_in_any_range(*Ipv4Address*, *Ipv4Range*)"
+    },
+    {
+        "Name": "ipv4_is_match",
+        "Description": "Checks if IPv4 string address matches an IPv4 or IPv4-prefix notation string.",
+        "Syntax": "ipv4_is_match(*Ipv4Address*, *Ipv4Pattern* [, *PrefixLength*])"
+    },
+    {
+        "Name": "ipv4_compare",
+        "Description": "Compares two IPv4 or IPv4-prefix notation strings.",
+        "Syntax": "ipv4_compare(*Ipv4Address1*, *Ipv4Address2* [, *PrefixLength*])"
+    },
+    {
+        "Name": "ipv4_lookup",
+        "Description": "Performs a lookup of an IPv4 address against a table of IPv4 addresses or ranges.",
+        "Syntax": "ipv4_lookup(*Source*, *Ipv4Address*, *IpRangeColumnName* [, *ReturnUnmatched*])"
+    },
+    {
+        "Name": "format_ipv4",
+        "Description": "Returns a string representation of an IPv4 address.",
+        "Syntax": "format_ipv4(*Expr* [, *PrefixLength*])"
+    },
+    {
+        "Name": "format_ipv4_mask",
+        "Description": "Returns a string representation of an IPv4 address in CIDR notation, applying a netmask.",
+        "Syntax": "format_ipv4_mask(*Expr* [, *PrefixLength*])"
+    },
+    {
+        "Name": "ipv4_netmask_suffix",
+        "Description": "Returns the IPv4 netmask suffix from a given IPv4-prefix notation string.",
+        "Syntax": "ipv4_netmask_suffix(*Ipv4Address*)"
+    },
+    {
+        "Name": "parse_ipv4_mask",
+        "Description": "Converts input string to long (uint64) number representing IP address, and matches the value with the input netmask.",
+        "Syntax": "parse_ipv4_mask(*IpV4Address*, *PrefixLength*)"
+    },
+    {
+        "Name": "ipv4_range_to_cidr_list",
+        "Description": "Transforms an IPv4 address range specified by a start address and end address to a list of CIDR ranges.",
+        "Syntax": "ipv4_range_to_cidr_list(*StartAddress*, *EndAddress*)"
+    },
+    {
+        "Name": "has_ipv4",
+        "Description": "Checks if the given text has an IPv4 address that matches a given IPv4 address.",
+        "Syntax": "has_ipv4(*Source*, *Ipv4Address*)"
+    },
+    {
+        "Name": "has_ipv4_prefix",
+        "Description": "Checks if the given text has an IPv4 address that matches a given IPv4-prefix notation.",
+        "Syntax": "has_ipv4_prefix(*Source*, *Ipv4Prefix*)"
+    },
+    {
+        "Name": "has_any_ipv4",
+        "Description": "Checks if the given text has an IPv4 address that matches any of the given IPv4 addresses.",
+        "Syntax": "has_any_ipv4(*Source*, *Ipv4Addresses*)"
+    },
+    {
+        "Name": "has_any_ipv4_prefix",
+        "Description": "Checks if the given text has an IPv4 address that matches any of the given IPv4-prefix notations.",
+        "Syntax": "has_any_ipv4_prefix(*Source*, *Ipv4Prefixes*)"
+    },
+    {
+        "Name": "parse_url",
+        "Description": "Parses an absolute URL string and returns a dynamic object containing the URL parts.",
+        "Syntax": "parse_url(*url*)"
+    },
+    {
+        "Name": "parse_urlquery",
+        "Description": "Parses a URL query string and returns a dynamic object containing the query parameters.",
+        "Syntax": "parse_urlquery(*query*)"
+    },
+    {
+        "Name": "extract_all",
+        "Description": "Finds all matches of a [regular expression](./re2.md) in a string and returns the set of matches.",
+        "Syntax": "extract_all(*regex* [, *captureGroups*], *text*)"
+    },
+    {
+        "Name": "geo_info_from_ip_address",
+        "Description": "Returns geolocation information for a given IPv4 or IPv6 address.",
+        "Syntax": "geo_info_from_ip_address(*IpAddress* [, *Modifiers*])"
+    },
+    {
+        "Name": "parse_user_agent",
+        "Description": "Parses a user agent string and returns a dynamic object with the browser, operating system and device details.",
+        "Syntax": "parse_user_agent(*UserAgent*, *Modifiers*)"
+    },
+    {
+        "Name": "mv-apply",
+        "Description": "Applies a subquery to every record of the input, in order to expand dynamic-typed arrays or property bags into multiple records, and invoke subquery for each record.",
+        "Syntax": "*T* | mv-apply *Column* [to typeof(*Typename*)] on (*subquery*)"
+    },
+    {
+        "Name": "externaldata",
+        "Description": "Returns a table whose schema is defined in the query itself, and whose data is read from an external storage artifact, such as a blob in Azure Blob Storage.",
+        "Syntax": "externaldata (*ColumnName*:*ColumnType* [, ...]) [*ConnectionStringOrList*] [with (*PropertyName* = *PropertyValue* [, ...])]"
+    },
+    {
+        "Name": "make-series",
+        "Description": "Creates series of specified aggregated values along a specified axis.",
+        "Syntax": "*T* | make-series [*MakeSeriesParameters*] [*Column* =] *Aggregation* [default = *DefaultValue*] [, ...] on *AxisColumn* [from *start*] [to *end*] step *step* [by [*Column* =] *GroupExpression* [, ...]]"
     }
-
 
 ]

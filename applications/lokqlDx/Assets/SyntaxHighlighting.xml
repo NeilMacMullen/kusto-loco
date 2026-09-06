@@ -98,6 +98,9 @@
 			<Word>from</Word>
 			<Word>to</Word>
 			<Word>step</Word>
+			<Word>mv-apply</Word>
+			<Word>externaldata</Word>
+			<Word>make-series</Word>
 		</Keywords>
 
 		<Keywords color="Function">
@@ -227,6 +230,34 @@
 			<Word>arg_max</Word>
 			<Word>dcount</Word>
 			<Word>count_distinct</Word>
+			<Word>bag_keys</Word>
+			<Word>bag_has_key</Word>
+			<Word>bag_remove_keys</Word>
+			<Word>bag_set_key</Word>
+			<Word>bag_zip</Word>
+			<Word>set_union</Word>
+			<Word>set_intersect</Word>
+			<Word>set_difference</Word>
+			<Word>set_has_element</Word>
+			<Word>ipv4_is_in_range</Word>
+			<Word>ipv4_is_in_any_range</Word>
+			<Word>ipv4_is_match</Word>
+			<Word>ipv4_compare</Word>
+			<Word>ipv4_lookup</Word>
+			<Word>format_ipv4</Word>
+			<Word>format_ipv4_mask</Word>
+			<Word>ipv4_netmask_suffix</Word>
+			<Word>parse_ipv4_mask</Word>
+			<Word>ipv4_range_to_cidr_list</Word>
+			<Word>has_ipv4</Word>
+			<Word>has_ipv4_prefix</Word>
+			<Word>has_any_ipv4</Word>
+			<Word>has_any_ipv4_prefix</Word>
+			<Word>parse_url</Word>
+			<Word>parse_urlquery</Word>
+			<Word>extract_all</Word>
+			<Word>geo_info_from_ip_address</Word>
+			<Word>parse_user_agent</Word>
 		</Keywords>
 
 
