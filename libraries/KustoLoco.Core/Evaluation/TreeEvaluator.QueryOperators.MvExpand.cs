@@ -18,7 +18,7 @@ internal partial class TreeEvaluator
     public override EvaluationResult VisitMvExpandOperator(IRMvExpandOperatorNode node, EvaluationContext context)
     {
         var result = new MvExpandResultTable(this, context.Left.Value, context, node.Columns,
-            (TableSymbol)node.ResultType);
+            node.WithItemIndexColumn, (TableSymbol)node.ResultType);
         return TabularResult.CreateWithVisualisation(result, context.Left.VisualizationState);
     }
 
@@ -26,15 +26,17 @@ internal partial class TreeEvaluator
     {
         private readonly EvaluationContext _context;
         private readonly List<IRMvExpandColumnNode> _expandColumns;
+        private readonly ColumnSymbol? _withItemIndexColumn;
         private readonly TreeEvaluator _owner;
 
         public MvExpandResultTable(TreeEvaluator owner, ITableSource input, EvaluationContext context,
-            List<IRMvExpandColumnNode> expandColumns, TableSymbol resultType)
+            List<IRMvExpandColumnNode> expandColumns, ColumnSymbol? withItemIndexColumn, TableSymbol resultType)
             : base(input)
         {
             _owner = owner;
             _context = context;
             _expandColumns = expandColumns;
+            _withItemIndexColumn = withItemIndexColumn;
             Type = resultType;
         }
 
@@ -52,7 +54,7 @@ internal partial class TreeEvaluator
                 var evaluated = expandColumn.Expression.Accept(_owner, chunkContext);
                 if (evaluated is not ColumnarResult columnar)
                     throw new InvalidOperationException("mv-expand requires a columnar result");
-                
+
                 expandedColumnData.Add((expandColumn, columnar.Column, expandColumn.ColumnSymbol.Type));
             }
 
@@ -65,6 +67,13 @@ internal partial class TreeEvaluator
                 var builder = NullableSetBuilderLocator.GetExpandableNullableSetBuilderForType(
                     TypeMapping.UnderlyingTypeForSymbol(outputType), rowCount);
                 builders.Add(builder);
+            }
+
+            INullableSetBuilder? itemIndexBuilder = null;
+            if (_withItemIndexColumn != null)
+            {
+                itemIndexBuilder = NullableSetBuilderLocator.GetExpandableNullableSetBuilderForType(
+                    TypeMapping.UnderlyingTypeForSymbol(_withItemIndexColumn.Type), rowCount);
             }
 
             // Build the expanded rows
@@ -95,6 +104,8 @@ internal partial class TreeEvaluator
                         var value = expandIndex < expandedValues.Length ? expandedValues[expandIndex] : null;
                         builders[colIdx].Add(value);
                     }
+
+                    itemIndexBuilder?.Add((long)expandIndex);
                     expandedIndices.Add(rowIndex);
                 }
             }
@@ -131,6 +142,11 @@ internal partial class TreeEvaluator
                 {
                     // Create column with expanded values
                     outputColumns[colIndex] = ColumnFactory.CreateFromDataSet(builder.ToINullableSet());
+                }
+                else if (itemIndexBuilder != null && _withItemIndexColumn != null &&
+                         colName == _withItemIndexColumn.Name)
+                {
+                    outputColumns[colIndex] = ColumnFactory.CreateFromDataSet(itemIndexBuilder.ToINullableSet());
                 }
                 else if (inputColumnMap.TryGetValue(colName, out var inputColIndex))
                 {
