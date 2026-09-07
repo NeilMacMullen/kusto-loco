@@ -69,6 +69,7 @@
 			<Word>table</Word>
 			<Word>timechart</Word>
 			<Word>with</Word>
+			<Word>with_itemindex</Word>
 			<Word>title</Word>
 			<Word>legend</Word>
 			<Word>hidden</Word>
@@ -99,6 +100,7 @@
 			<Word>to</Word>
 			<Word>step</Word>
 			<Word>mv-apply</Word>
+			<Word>mv-expand</Word>
 			<Word>externaldata</Word>
 			<Word>make-series</Word>
 		</Keywords>

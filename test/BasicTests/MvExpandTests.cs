@@ -77,7 +77,6 @@ public class MvExpandTests : TestMethods
 
 
     [TestMethod]
-    [Ignore]
     public async Task MvExpand_WithItemIndex()
     {
         // Arrange - From Microsoft docs: Using with_itemindex
@@ -94,6 +93,32 @@ public class MvExpandTests : TestMethods
             2,1
             3,2
             4,3
+            """;
+
+        var result = await ResultAsLines(query);
+        result.Should().Be(expected);
+    }
+
+
+    [TestMethod]
+    public async Task MvExpand_WithTypeof()
+    {
+        // Arrange - From Microsoft docs: 
+        var query =
+            """
+            datatable (a: string, b: dynamic, c: dynamic)[
+                "Constant", dynamic([1, 2, 3, 4]), dynamic([6, 7, 8, 9])
+            ]
+            | mv-expand b, c to typeof(int)
+            | getschema
+            | project ColumnName,ColumnType
+            """;
+
+        var expected =
+            """
+            a,string
+            b,dynamic
+            c,int
             """;
 
         var result = await ResultAsLines(query);

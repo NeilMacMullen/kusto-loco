@@ -9,13 +9,17 @@ namespace KustoLoco.Core.InternalRepresentation.Nodes.Expressions.QueryOperators
 
 internal class IRMvExpandOperatorNode : IRQueryOperatorNode
 {
-    public IRMvExpandOperatorNode(List<IRMvExpandColumnNode> columns, TypeSymbol resultType)
+    public IRMvExpandOperatorNode(List<IRMvExpandColumnNode> columns, ColumnSymbol? withItemIndexColumn,
+        TypeSymbol resultType)
         : base(resultType)
     {
         Columns = columns ?? throw new ArgumentNullException(nameof(columns));
+        WithItemIndexColumn = withItemIndexColumn;
     }
 
     public List<IRMvExpandColumnNode> Columns { get; }
+
+    public ColumnSymbol? WithItemIndexColumn { get; }
 
     public override int ChildCount => Columns.Count;
 

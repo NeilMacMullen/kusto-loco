@@ -1,6 +1,7 @@
 ﻿//
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using Kusto.Language.Symbols;
 using Kusto.Language.Syntax;
@@ -14,6 +15,8 @@ internal partial class IRTranslator
     public override IRNode VisitMvExpandOperator(MvExpandOperator node)
     {
         var columns = new List<IRMvExpandColumnNode>();
+        var resultType = (TableSymbol)node.ResultType;
+        var withItemIndexColumn = GetWithItemIndexColumn(node.Parameters, resultType);
         
         // Process each mv-expand expression
         for (var i = 0; i < node.Expressions.Count; i++)
@@ -34,7 +37,6 @@ internal partial class IRTranslator
                 
                 // Find the corresponding column in the result type
                 // The expanded column will be in the result type
-                var resultType = (TableSymbol)node.ResultType;
                 ColumnSymbol? expandedColumn = null;
                 
                 // Build the expected column name based on the expression type
@@ -42,26 +44,60 @@ internal partial class IRTranslator
                 var expectedColName = GetExpandedColumnName(mvExpandExpr.Expression);
                 
                 // Look for the column in the result type that corresponds to this expansion
-                foreach (var member in resultType.Members)
-                {
-                    if (member is ColumnSymbol colSymbol)
+                foreach (var colSymbol in resultType.Columns)
+                    if (colSymbol.Name == expectedColName)
                     {
-                        if (colSymbol.Name == expectedColName)
-                        {
-                            expandedColumn = colSymbol;
-                            break;
-                        }
+                        expandedColumn = colSymbol;
+                        break;
                     }
-                }
                 
                 if (expandedColumn != null)
                 {
-                    columns.Add(new IRMvExpandColumnNode(expandedColumn, irExpression));
+                    var outputType = GetMvExpandOutputType(mvExpandExpr);
+                    columns.Add(new IRMvExpandColumnNode(new ColumnSymbol(expandedColumn.Name, outputType),
+                        irExpression));
                 }
             }
         }
         
-        return new IRMvExpandOperatorNode(columns, node.ResultType);
+        return new IRMvExpandOperatorNode(columns, withItemIndexColumn, node.ResultType);
+    }
+
+    private static TypeSymbol GetMvExpandOutputType(MvExpandExpression mvExpandExpression)
+    {
+        TypeSymbol? elementType = null;
+        var typeArgs = mvExpandExpression.ToTypeOf?.TypeOf?.Types;
+        if (typeArgs is { Count: > 0 } && typeArgs[0].Element is { } typeExpr)
+            elementType = typeExpr.ReferencedSymbol as TypeSymbol;
+
+        return elementType ?? ScalarTypes.Dynamic;
+    }
+
+    private static ColumnSymbol? GetWithItemIndexColumn(SyntaxList<NamedParameter> parameters, TableSymbol resultType)
+    {
+        foreach (var parameter in parameters)
+        {
+            if (!string.Equals(parameter.Name.SimpleName, "with_itemindex", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var itemIndexColumnName = parameter.Expression switch
+            {
+                NameDeclaration nameDeclaration => nameDeclaration.SimpleName,
+                NameReference nameReference => nameReference.SimpleName,
+                LiteralExpression { LiteralValue: string literalName } => literalName,
+                _ => throw new InvalidOperationException(
+                    $"Expected with_itemindex to specify a column name, found {parameter.Expression}")
+            };
+
+            foreach (var colSymbol in resultType.Columns)
+                if (colSymbol.Name == itemIndexColumnName)
+                    return colSymbol;
+
+            throw new InvalidOperationException(
+                $"Could not find mv-expand with_itemindex column '{itemIndexColumnName}' in result schema.");
+        }
+
+        return null;
     }
 
     /// <summary>
