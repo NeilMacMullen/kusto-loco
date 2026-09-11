@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -54,6 +55,24 @@ public partial class SearchRecentWorkspacesViewModel : ObservableObject, IDialog
         IEnumerable<RecentWorkspaceItemViewModel> items) =>
         items.OrderByDescending(i => i.IsPinned)
             .ThenByDescending(i => i.LastAccessed);
+
+    public void SelectNext()
+    {
+        if (Items.Count == 0)
+            return;
+        var index = SelectedItem is null ? -1 : Items.IndexOf(SelectedItem);
+        index = Math.Min(index + 1, Items.Count - 1);
+        SelectedItem = Items[index];
+    }
+
+    public void SelectPrevious()
+    {
+        if (Items.Count == 0)
+            return;
+        var index = SelectedItem is null ? 0 : Items.IndexOf(SelectedItem);
+        index = Math.Max(index - 1, 0);
+        SelectedItem = Items[index];
+    }
 
     private bool CanLoad() => SelectedItem is not null;
 
