@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+﻿using System.Globalization;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation(Keyword = "Functions.ToBool")]
 internal partial class ToBoolFunction
@@ -12,7 +14,7 @@ internal partial class ToBoolFunction
     private static bool? StringImpl(string input) =>
         bool.TryParse(input, out var parsedResult)
             ? parsedResult
-            : long.TryParse(input, out var parsedLong)
+            : long.TryParse(input, CultureInfo.InvariantCulture, out var parsedLong)
                 ? parsedLong != 0
                 : null;
 }

@@ -25,7 +25,7 @@ internal partial class ToIntFunction
 
         return int.TryParse(input, out var parsedResult)
             ? parsedResult
-            : double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) &&
+            : double.TryParse(input, CultureInfo.InvariantCulture,out var parsedDouble) && !double.IsNaN(parsedDouble) &&
               !double.IsInfinity(parsedDouble)
                 ? (int)parsedDouble
                 : null;

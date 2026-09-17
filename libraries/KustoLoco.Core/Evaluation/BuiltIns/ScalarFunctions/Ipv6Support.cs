@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -52,7 +53,7 @@ internal static class Ipv6Support
 
         var slash = cidr.IndexOf('/');
         if (slash < 0) return null;
-        if (!int.TryParse(cidr.Substring(slash + 1), out var bits) || bits < 0) return null;
+        if (!int.TryParse(cidr.Substring(slash + 1), CultureInfo.InvariantCulture, out var bits) || bits < 0) return null;
 
         if (!TryParse(ip, out var ipv, out _)) return null;
         if (!TryParse(cidr.Substring(0, slash), out var basev, out var baseWasIpv4)) return null;

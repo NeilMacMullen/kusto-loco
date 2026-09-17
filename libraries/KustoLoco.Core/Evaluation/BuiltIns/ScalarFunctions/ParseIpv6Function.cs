@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -21,7 +22,7 @@ internal partial class ParseIpv6Function
         if (slashIndex >= 0)
         {
             var prefixPart = ipString.Substring(slashIndex + 1);
-            if (!int.TryParse(prefixPart, out prefixLength))
+            if (!int.TryParse(prefixPart, CultureInfo.InvariantCulture, out prefixLength))
             {
                 return string.Empty;
             }

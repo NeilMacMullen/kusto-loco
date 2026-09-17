@@ -1,10 +1,6 @@
 ﻿//
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Kusto.Language;
 using Kusto.Language.Symbols;
 using KustoLoco.Core.Console;
@@ -13,6 +9,11 @@ using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.InternalRepresentation;
 using KustoLoco.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 
 
 namespace KustoLoco.Core;
@@ -114,6 +115,12 @@ public class BabyKustoEngine
         var db = new DatabaseSymbol("tables", tables.Select(table => table.Type).Cast<Symbol>().ToArray());
 
         var globals = state.WithDatabase(db);
+
+
+        //lets see what we can break !
+        var culture = new CultureInfo("el-GR");
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
 
         var code = KustoCode.ParseAndAnalyze(query, globals);
 

@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
+﻿using System.Globalization;
+
+namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
 
 [KustoImplementation(Keyword = "Functions.ToReal")]
 internal partial class ToRealFunction
@@ -9,5 +11,5 @@ internal partial class ToRealFunction
     private static double DoubleImpl(double input) => input;
 
     private static double? Impl(string input) =>
-        double.TryParse(input, out var parsedResult) ? parsedResult : null;
+        double.TryParse(input, CultureInfo.InvariantCulture, out var parsedResult) ? parsedResult : null;
 }

@@ -23,9 +23,9 @@ internal partial class ToLongFunction
                 : null;
         }
 
-        return long.TryParse(input, out var parsedResult)
+        return long.TryParse(input, CultureInfo.InvariantCulture, out var parsedResult)
             ? parsedResult
-            : double.TryParse(input, out var parsedDouble) && !double.IsNaN(parsedDouble) &&
+            : double.TryParse(input, CultureInfo.InvariantCulture, out var parsedDouble) && !double.IsNaN(parsedDouble) &&
               !double.IsInfinity(parsedDouble)
                 ? (long)parsedDouble
                 : null;

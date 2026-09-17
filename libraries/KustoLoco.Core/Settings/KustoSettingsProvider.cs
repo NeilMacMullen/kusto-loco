@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using NotNullStrings;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
-using NotNullStrings;
 
 namespace KustoLoco.Core.Settings;
 
@@ -168,7 +169,7 @@ public class KustoSettingsProvider
     public int GetIntOr(string setting, int fallback)
     {
         var s = GetOr(setting, fallback.ToString());
-        return int.TryParse(s, out var v) ? v : fallback;
+        return int.TryParse(s, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
 
     /// <summary>
@@ -230,7 +231,7 @@ public class KustoSettingsProvider
     public double GetDoubleOr(string settingName, double p1)
     {
         var s = GetOr(settingName, "");
-        return double.TryParse(s, out var v) ? v : p1;
+        return double.TryParse(s, CultureInfo.InvariantCulture, out var v) ? v : p1;
     }
 
     /// <summary>

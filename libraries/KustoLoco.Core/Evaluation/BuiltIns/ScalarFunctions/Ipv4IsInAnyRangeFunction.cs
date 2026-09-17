@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Nodes;
 
 namespace KustoLoco.Core.Evaluation.BuiltIns.Impl;
@@ -27,7 +28,7 @@ internal partial class Ipv4IsInAnyRangeFunction
             else
             {
                 if (!Ipv4Support.TryParse(cidr.Substring(0, slash), out basev)) continue;
-                if (!int.TryParse(cidr.Substring(slash + 1), out bits) || bits < 0 || bits > 32) continue;
+                if (!int.TryParse(cidr.Substring(slash + 1), CultureInfo.InvariantCulture, out bits) || bits < 0 || bits > 32) continue;
             }
             var mask = bits == 0 ? 0u : 0xFFFFFFFFu << (32 - bits);
             if ((ipv & mask) == (basev & mask)) return true;

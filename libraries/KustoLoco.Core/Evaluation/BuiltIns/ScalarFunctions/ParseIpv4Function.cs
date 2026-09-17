@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -20,7 +21,7 @@ internal partial class ParseIpv4Function
         if (slashIndex >= 0)
         {
             var prefixPart = ipString.Substring(slashIndex + 1);
-            if (!int.TryParse(prefixPart, out prefixLength) || prefixLength < 0 || prefixLength > 32)
+            if (!int.TryParse(prefixPart, CultureInfo.InvariantCulture, out prefixLength) || prefixLength < 0 || prefixLength > 32)
             {
                 return null;
             }
