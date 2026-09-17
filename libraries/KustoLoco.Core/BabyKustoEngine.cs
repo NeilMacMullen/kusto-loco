@@ -116,12 +116,6 @@ public class BabyKustoEngine
 
         var globals = state.WithDatabase(db);
 
-
-        //lets see what we can break !
-        var culture = new CultureInfo("el-GR");
-        CultureInfo.CurrentCulture = culture;
-        CultureInfo.CurrentUICulture = culture;
-
         var code = KustoCode.ParseAndAnalyze(query, globals);
 
         var visualizer = new IrNodeVisualizer(_console);
