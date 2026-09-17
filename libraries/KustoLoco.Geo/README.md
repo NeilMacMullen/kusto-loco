@@ -13,9 +13,9 @@ joined with Google canonical country centroids, both CC-BY-4.0) so geo lookups w
 context.AddProvider<IGeoIpProvider>(DbIpGeoProvider.Default);
 ```
 
-Point it at your own [DB-IP "Lite"](https://db-ip.com/db/lite.php) export — City Lite,
-Country Lite, or a compact country+centroid derivation — when you want city-level
-precision or IPv6 coverage.
+The embedded database covers **both IPv4 and IPv6** at country scale. Point it at your own
+[DB-IP "Lite"](https://db-ip.com/db/lite.php) export — City Lite, Country Lite, or a compact
+country+centroid derivation — when you want **city-level precision** or a newer data release.
 
 This mirrors real Azure Data Explorer, whose `geo_info_from_ip_address()` is likewise
 built on a downloadable geo database (GeoLite2).
@@ -39,8 +39,9 @@ var result = await context.RunQuery(
 
 ### Bringing your own database
 
-For city/state precision or IPv6 coverage, download a **DB-IP Lite** database in **CSV**
-form (`.csv` or `.csv.gz`) and build the provider from it instead:
+For city/state precision, or to track a newer DB-IP release than the embedded one, download a
+**DB-IP Lite** database in **CSV** form (`.csv` or `.csv.gz`) and build the provider from it
+instead:
 
 ```csharp
 context.AddProvider<IGeoIpProvider>(DbIpGeoProvider.FromFile("dbip-city-lite.csv.gz"));

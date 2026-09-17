@@ -137,6 +137,29 @@ public class DbIpGeoProviderTests
         info.Longitude.Should().NotBeNull();
     }
 
+    // The embedded default must cover BOTH address families, and this is the assertion that was missing.
+    // DbIpGeoProvider has always SUPPORTED IPv6 (RangeTable<UInt128>, ToUInt128, both families parsed in the
+    // loader) and ResolvesIpv6() passed — but that test feeds a SYNTHETIC csv, so it proves the CODE path and can
+    // never prove the SHIPPED DATA. The embedded dataset contained only DB-IP's IPv4 half, so
+    // DbIpGeoProvider.Default silently returned null for EVERY IPv6 address while advertising IPv6 support: a
+    // consumer on an IPv6-heavy network got no geo at all, with no error to notice. IPv6 is over half of DB-IP's
+    // Country-Lite rows, so this was the majority of the dataset, not an edge case.
+    // The country is asserted only as NON-EMPTY: which country a given anycast range maps to is DB-IP's call and
+    // changes between monthly releases (2001:4860:4860::8888 currently maps to Canada), so pinning a value here
+    // would make the suite fail on a routine data refresh rather than on a real regression.
+    // NOTE - "ignored" in NCrunch due to performance issues
+    [TestMethod]
+    [NCrunch.Framework.Category("NoNCrunch")]
+    public void Default_ResolvesIPv6FromTheEmbeddedDataset()
+    {
+        var provider = DbIpGeoProvider.Default;
+        var info = provider.Lookup(IPAddress.Parse("2001:4860:4860::8888"));
+        info.Should().NotBeNull();
+        info!.Country.Should().NotBeNullOrEmpty();
+        info.Latitude.Should().NotBeNull();
+        info.Longitude.Should().NotBeNull();
+    }
+
     // NOTE - "ignored" in NCrunch due to performance issues
     [TestMethod]
     [NCrunch.Framework.Category("NoNCrunch")]

@@ -2,9 +2,10 @@ KustoLoco.Geo
 =============
 
 This package EMBEDS a default geo database so geo_info_from_ip_address() works out of
-the box: DB-IP "IP to Country Lite" joined with Google canonical country centroids.
-It can also read a geo-IP dataset you supply at runtime (e.g. the DB-IP "IP to City
-Lite" database) when city/state precision or IPv6 coverage is needed.
+the box: DB-IP "IP to Country Lite" (both IPv4 and IPv6 ranges) joined with Google
+canonical country centroids. It can also read a geo-IP dataset you supply at runtime
+(e.g. the DB-IP "IP to City Lite" database) when city/state precision, or a newer data
+release than the embedded one, is needed.
 
 The DB-IP Lite databases are made available by DB-IP (https://db-ip.com) under the
 Creative Commons Attribution 4.0 International License (CC-BY-4.0).
