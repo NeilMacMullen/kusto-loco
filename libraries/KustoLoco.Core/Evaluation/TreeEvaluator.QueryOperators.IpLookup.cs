@@ -12,7 +12,7 @@ namespace KustoLoco.Core.Evaluation;
 
 internal partial class TreeEvaluator
 {
-    public override EvaluationResult VisitIpv4LookupOperator(IRIpv4LookupOperatorNode node, EvaluationContext context)
+    public override EvaluationResult VisitIpLookupOperator(IRIpLookupOperatorNode node, EvaluationContext context)
     {
         var source = context.Left.Value;
         var sourceSchema = source.Type;
@@ -29,7 +29,13 @@ internal partial class TreeEvaluator
 
         var outBuilders = ColumnHelpers.CreateBuildersForTable(resultSchema);
 
-        // ExtraKeys must exist in BOTH tables and match by equality, narrowing the IPv4 match (like extra join keys).
+        // The only family-specific part of the operator: ipv6_lookup accepts BOTH families (ADX maps IPv4 into
+        // IPv6-mapped space), so this selects the range predicate rather than restricting the data.
+        var inRange = node.IsIpv6
+            ? (System.Func<string, string, bool?>)Ipv6Support.InRange
+            : Ipv4Support.InRange;
+
+        // ExtraKeys must exist in BOTH tables and match by equality, narrowing the IP match (like extra join keys).
         var extraKeyIndices = node.ExtraKeys
             .Select(name => (Source: IndexOf(sourceSchema, name), Lookup: IndexOf(lookupSchema, name)))
             .Where(pair => pair.Source >= 0 && pair.Lookup >= 0)
@@ -43,7 +49,7 @@ internal partial class TreeEvaluator
                 for (var lr = 0; lr < lookupChunk.RowCount; lr++)
                 {
                     var cidr = lookupChunk.Columns[lookupIpIdx].GetRawDataValue(lr)?.ToString();
-                    if (cidr == null || Ipv4Support.InRange(ip, cidr) != true)
+                    if (cidr == null || inRange(ip, cidr) != true)
                         continue;
                     if (!ExtraKeysMatch(extraKeyIndices, srcChunk, sr, lookupChunk, lr))
                         continue;

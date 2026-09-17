@@ -138,7 +138,7 @@ internal abstract class DefaultIRNodeVisitor<TResult, TContext> : IRNodeVisitor<
     public override TResult VisitMakeSeriesOperator(IRMakeSeriesOperatorNode node, TContext context) =>
         DefaultVisit(node, context);
 
-    public override TResult VisitIpv4LookupOperator(IRIpv4LookupOperatorNode node, TContext context) =>
+    public override TResult VisitIpLookupOperator(IRIpLookupOperatorNode node, TContext context) =>
         DefaultVisit(node, context);
 
 }
