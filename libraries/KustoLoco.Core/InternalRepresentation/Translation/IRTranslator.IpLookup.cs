@@ -14,13 +14,15 @@ internal partial class IRTranslator
     public override IRNode VisitEvaluateOperator(EvaluateOperator node)
     {
         var pluginName = node.FunctionCall.Name.SimpleName;
-        if (!string.Equals(pluginName, "ipv4_lookup", StringComparison.OrdinalIgnoreCase))
+        var isIpv6 = string.Equals(pluginName, "ipv6_lookup", StringComparison.OrdinalIgnoreCase);
+        if (!isIpv6 && !string.Equals(pluginName, "ipv4_lookup", StringComparison.OrdinalIgnoreCase))
             throw new NotImplementedException($"evaluate plugin '{pluginName}' is not supported.");
 
-        // ipv4_lookup(LookupTable, SourceIPv4Key, IPv4LookupKey [, ExtraKey1 .. ExtraKeyN] [, return_unmatched])
+        // ipv4_lookup / ipv6_lookup (LookupTable, SourceIpKey, IpLookupKey [, ExtraKey1 .. ExtraKeyN]
+        // [, return_unmatched]) — identical argument shapes, so one translation serves both.
         var args = node.FunctionCall.ArgumentList.Expressions;
         if (args.Count < 3)
-            throw new NotImplementedException("ipv4_lookup requires (LookupTable, SourceIpKey, IpLookupKey).");
+            throw new NotImplementedException($"{pluginName} requires (LookupTable, SourceIpKey, IpLookupKey).");
 
         // LookupTable resolves as a tabular reference; SourceIpKey is a source-row expression; IpLookupKey is the name
         // of the CIDR column in the lookup table, taken as a bareword (it is not a source column).
@@ -44,8 +46,8 @@ internal partial class IRTranslator
             extraKeys.Add(NameOf(element));
         }
 
-        return new IRIpv4LookupOperatorNode(lookupTable, sourceIp, lookupIpColumn, extraKeys, returnUnmatched,
-            node.ResultType);
+        return new IRIpLookupOperatorNode(lookupTable, sourceIp, lookupIpColumn, extraKeys, returnUnmatched,
+            isIpv6, node.ResultType);
     }
 
     private static string NameOf(Expression expression) =>

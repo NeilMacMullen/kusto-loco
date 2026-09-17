@@ -354,13 +354,16 @@ public class KustoQueryContext
                     op.Kind.ToString() == "NameReference")
                     tables.Add(e.RawResultType.Name);
 
-                // The lookup table named as the first argument of `evaluate ipv4_lookup(<Table>, ...)` is not caught
-                // by the walk above: when it is demand-loaded its name is still unresolved at analyze time — the
-                // loader supplies the schema only AFTER this list is computed — so its RawResultType is an error
-                // symbol rather than a TableSymbol. Discover it syntactically by identifier, otherwise the loader is
-                // never asked for it and the query fails to bind.
+                // The lookup table named as the first argument of `evaluate ipv4_lookup(<Table>, ...)` (and its
+                // ipv6_lookup counterpart) is not caught by the walk above: when it is demand-loaded its name is
+                // still unresolved at analyze time — the loader supplies the schema only AFTER this list is
+                // computed — so its RawResultType is an error symbol rather than a TableSymbol. Discover it
+                // syntactically by identifier, otherwise the loader is never asked for it and the query fails to
+                // bind. Both plugins must be listed here: a demand-loaded ipv6_lookup table would otherwise never
+                // be requested, and the failure would surface as an unbindable query rather than as a missing table.
                 if (op is EvaluateOperator { FunctionCall: { } call } &&
-                    string.Equals(call.Name?.SimpleName, "ipv4_lookup", StringComparison.OrdinalIgnoreCase) &&
+                    (string.Equals(call.Name?.SimpleName, "ipv4_lookup", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(call.Name?.SimpleName, "ipv6_lookup", StringComparison.OrdinalIgnoreCase)) &&
                     call.ArgumentList?.Expressions is { Count: > 0 } callArgs &&
                     callArgs[0].Element is NameReference lookupTableName)
                     tables.Add(lookupTableName.SimpleName);
