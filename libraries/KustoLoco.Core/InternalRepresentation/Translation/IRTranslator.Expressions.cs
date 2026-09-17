@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -135,8 +136,17 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
                 : new IRNameReferenceNode(node.ReferencedSymbol, node.ResultType);
     }
 
-    public override IRNode VisitLiteralExpression(LiteralExpression node) =>
-        new IRLiteralExpressionNode(node.LiteralValue, node.ResultType);
+    public override IRNode VisitLiteralExpression(LiteralExpression node)
+    {
+        //There appears to be a bug in KustoLanguage where the LiteralValue is parsed using the current culture for the real type
+        if (node.ResultType == ScalarTypes.Real)
+            return new IRLiteralExpressionNode(double.TryParse(node.LiteralValueInfo.ValueText,CultureInfo.InvariantCulture,out var f ) ?f :null, node.ResultType);
+
+        if (node.ResultType == ScalarTypes.Decimal)
+            return new IRLiteralExpressionNode(decimal.TryParse(node.LiteralValueInfo.ValueText, CultureInfo.InvariantCulture, out var f) ? f : null, node.ResultType);
+
+        return new IRLiteralExpressionNode(node.LiteralValue, node.ResultType);
+    }
 
     public override IRNode VisitDynamicExpression(DynamicExpression node)
     {

@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using System.Globalization;
 
 namespace BasicTests;
 
@@ -32,7 +33,7 @@ public class RandTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         //check good distribution
-        double.Parse(result).Should().BeInRange(25, 75);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeInRange(25, 75);
     }
 
     [TestMethod]
@@ -47,7 +48,7 @@ public class RandTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         //check good distribution
-        double.Parse(result).Should().BeInRange(0.45, 0.55);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeInRange(0.45, 0.55);
     }
 
     [TestMethod]
@@ -79,7 +80,7 @@ public class RandTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         //check good distribution
-        double.Parse(result).Should().BeInRange(90, 100);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeInRange(90, 100);
     }
 
     [TestMethod]
@@ -87,7 +88,7 @@ public class RandTests : TestMethods
     {
         var query = "print c=rand(-5)";
         var result = await LastLineOfResult(query);
-        var r = double.Parse(result);
+        var r = double.Parse(result, CultureInfo.InvariantCulture);
         r.Should().BeInRange(0, 1);
     }
 
@@ -112,6 +113,6 @@ public class RandTests : TestMethods
                     """;
         var result = await LastLineOfResult(query);
         //check good distribution
-        double.Parse(result).Should().BeInRange(500, 1000);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeInRange(500, 1000);
     }
 }

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using AwesomeAssertions;
 using AwesomeAssertions.Extensions;
 using Intellisense;
@@ -9,6 +6,10 @@ using Intellisense.FileSystem.Shares;
 using IntellisenseTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using System;
+using System.Collections.Concurrent;
+using System.Globalization;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace IntellisenseTests;
@@ -28,7 +29,7 @@ public class IntellisenseClientTests
                 .Setup(x => x.GetSharesAsync(It.IsAny<string>()))
                 .Returns(async (string delayMs) =>
                     {
-                        var delay = int.Parse(delayMs);
+                        var delay = int.Parse(delayMs, CultureInfo.InvariantCulture);
                         await Task.Delay(delay.Milliseconds(), cts.Token);
                         return [delayMs];
                     }

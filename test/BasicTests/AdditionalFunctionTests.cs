@@ -1,3 +1,4 @@
+using System.Globalization;
 using AwesomeAssertions;
 using NotNullStrings;
 
@@ -27,7 +28,7 @@ public class AdditionalFunctionTests : TestMethods
     {
         var query = "print result = exp(1)";
         var result = await LastLineOfResult(query);
-        double.Parse(result).Should().BeApproximately(2.718, 0.01);
+        double.Parse(result,CultureInfo.InvariantCulture).Should().BeApproximately(2.718, 0.01);
     }
 
     [TestMethod]
@@ -184,7 +185,7 @@ public class AdditionalFunctionTests : TestMethods
     {
         var query = "print result = log(100)";
         var result = await LastLineOfResult(query);
-        double.Parse(result).Should().BeApproximately(4.605, 0.01);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeApproximately(4.605, 0.01);
     }
 
     [TestMethod]
@@ -331,7 +332,7 @@ public class AdditionalFunctionTests : TestMethods
     {
         var query = "print result = geo_distance_2points(0,0,1,1)";
         var result = await LastLineOfResult(query);
-        double.Parse(result).Should().BeInRange(157000, 158000);
+        double.Parse(result, CultureInfo.InvariantCulture).Should().BeInRange(157000, 158000);
     }
 
     [TestMethod]

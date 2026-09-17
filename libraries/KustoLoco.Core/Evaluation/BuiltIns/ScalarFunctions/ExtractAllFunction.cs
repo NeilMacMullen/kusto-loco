@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
@@ -40,7 +41,7 @@ internal static class ExtractAllSupport
             foreach (var el in wantedArr)
             {
                 if (el is JsonValue v && v.TryGetValue<long>(out var l)) wanted.Add((int)l);
-                else if (el is JsonValue vs && vs.TryGetValue<string>(out var s) && int.TryParse(s, out var pi)) wanted.Add(pi);
+                else if (el is JsonValue vs && vs.TryGetValue<string>(out var s) && int.TryParse(s, CultureInfo.InvariantCulture, out var pi)) wanted.Add(pi);
                 else return null;
             }
             var outer = new JsonArray();

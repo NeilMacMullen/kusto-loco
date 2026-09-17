@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
@@ -35,7 +36,7 @@ internal static class Ipv4Support
         var slash = cidr.IndexOf('/');
         if (slash < 0) return null;
         if (!TryParse(ip, out var ipv) || !TryParse(cidr.Substring(0, slash), out var basev)) return null;
-        if (!int.TryParse(cidr.Substring(slash + 1), out var bits) || bits < 0 || bits > 32) return null;
+        if (!int.TryParse(cidr.Substring(slash + 1), CultureInfo.InvariantCulture, out var bits) || bits < 0 || bits > 32) return null;
         var mask = bits == 0 ? 0u : 0xFFFFFFFFu << (32 - bits);
         return (ipv & mask) == (basev & mask);
     }
@@ -128,14 +129,14 @@ internal static class Ipv4Support
         if (parts.Length is 0 or > 4) return null;
         var octets = new int[parts.Length];
         for (var i = 0; i < parts.Length; i++)
-            if (!int.TryParse(parts[i], out octets[i]) || octets[i] < 0 || octets[i] > 255) return null;
+            if (!int.TryParse(parts[i], CultureInfo.InvariantCulture, out octets[i]) || octets[i] < 0 || octets[i] > 255) return null;
         foreach (Match m in Ipv4Term.Matches(source))
         {
             var cand = m.Value.Split('.');
             if (cand.Length != 4) continue;
             var ok = true;
             for (var i = 0; i < octets.Length; i++)
-                if (!int.TryParse(cand[i], out var o) || o != octets[i]) { ok = false; break; }
+                if (!int.TryParse(cand[i], CultureInfo.InvariantCulture, out var o) || o != octets[i]) { ok = false; break; }
             if (ok) return true;
         }
         return false;

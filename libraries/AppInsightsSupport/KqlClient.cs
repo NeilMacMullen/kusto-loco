@@ -1,12 +1,13 @@
-﻿using KustoLoco.Core.Console;
+﻿using KustoLoco.Core;
+using KustoLoco.Core.Console;
+using KustoLoco.Core.Evaluation;
 using KustoLoco.Core.Settings;
 using System.Data;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
-using KustoLoco.Core;
-using KustoLoco.Core.Evaluation;
 using static System.Net.WebRequestMethods;
 
 namespace AppInsightsSupport;
@@ -151,7 +152,7 @@ public static class KqlResponseNormalizer
             if (targetType == typeof(string)) return element.ToString();
             if (targetType == typeof(Guid)) return element.GetGuid();
             if (targetType == typeof(DateTime)) return element.GetDateTime();
-            if (targetType == typeof(TimeSpan)) return TimeSpan.Parse(element.GetString() ?? "0");
+            if (targetType == typeof(TimeSpan)) return TimeSpan.Parse(element.GetString() ?? "0", CultureInfo.InvariantCulture);
             if (targetType == typeof(bool)) return element.GetBoolean();
             if (targetType == typeof(int)) return element.GetInt32();
             if (targetType == typeof(long)) return element.GetInt64();

@@ -1,4 +1,6 @@
-﻿namespace KustoLoco.Rendering.SixelSupport;
+﻿using System.Globalization;
+
+namespace KustoLoco.Rendering.SixelSupport;
 
 /// <summary>
 /// Helper class to get current terminal dimensions
@@ -16,8 +18,8 @@ public static class TerminalHelper
         try
         {
             var parts = response.Split(';', 't');
-            var pixelWidth = int.Parse(parts[2]);
-            var pixelHeight = int.Parse(parts[1]);
+            var pixelWidth = int.Parse(parts[2], CultureInfo.InvariantCulture);
+            var pixelHeight = int.Parse(parts[1], CultureInfo.InvariantCulture);
             return (pixelWidth, pixelHeight);
         }
         catch

@@ -22,7 +22,7 @@ internal partial class ToDecimalFunction
                 : null;
         }
 
-        return decimal.TryParse(input, out var parsedResult)
+        return decimal.TryParse(input, CultureInfo.InvariantCulture,out var parsedResult)
             ? parsedResult
             : null;
     }

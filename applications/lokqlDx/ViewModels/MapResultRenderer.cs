@@ -32,7 +32,7 @@ public class MapResultRenderer
 
             int Get(int index)
             {
-                return int.Parse(elements[index], NumberStyles.AllowHexSpecifier);
+                return int.Parse(elements[index], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
             }
 
             var color = (elements.Length == 4)
@@ -149,7 +149,7 @@ public class MapResultRenderer
             return Convert.ToDouble(obj);
 
         if (seriesCol.UnderlyingType == typeof(string)
-            && double.TryParse((string)obj, out var d))
+            && double.TryParse((string)obj, CultureInfo.InvariantCulture, out var d))
             return d;
 
         return fallback;

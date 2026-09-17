@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using KustoLoco.Core.DataSource;
@@ -20,7 +21,9 @@ public static class KustoFormatter
             DateTime d => d.Kind == DateTimeKind.Local
                 ? d.ToString("yyyy-MM-dd HH:mm:ss.ffff")
                 : d.ToString("u"),
-            _ => o.ToString()!
+            _ => o is IFormattable f
+            ? f.ToString(null, CultureInfo.InvariantCulture)
+            : o.ToString()!
         };
     }
 
