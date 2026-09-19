@@ -9,7 +9,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Dock.Model.Controls;
+using Kusto.Language.Editor;
 using Kusto.Language.Symbols;
+using KustoLoco.Core;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using Lokql.Engine;
 using Lokql.Engine.Commands;
@@ -46,6 +48,7 @@ public partial class MainViewModel : ObservableObject
     private string _initWorkspacePath = string.Empty;
 
     [ObservableProperty] private bool _isDirty;
+    [ObservableProperty] private string _kustoDataPath = string.Empty;
 
     [ObservableProperty] private IRootDock? _layout;
 
@@ -57,7 +60,6 @@ public partial class MainViewModel : ObservableObject
 
     private bool _trueClose;
     [ObservableProperty] private string _updateInfo = string.Empty;
-    [ObservableProperty] private string _kustoDataPath = string.Empty;
     [ObservableProperty] private Point _windowPosition;
     [ObservableProperty] private Size _windowSize;
     [ObservableProperty] private string _windowTitle = "LokqlDX";
@@ -106,7 +108,7 @@ public partial class MainViewModel : ObservableObject
     {
         var queries = QueryLibrary.Queries.ToArray();
         Layout = _factory.GetOrResetLayout();
-      
+
 
         foreach (var query in queries.ToArray())
             _factory.AddDocument(query);
@@ -120,7 +122,7 @@ public partial class MainViewModel : ObservableObject
         return q;
     }
 
-   
+
     [RelayCommand]
     private void NewQueryPane()
     {
@@ -141,12 +143,16 @@ public partial class MainViewModel : ObservableObject
 
     private async Task<bool> HandleQueryRunning(RunningQueryMessage message)
     {
-        if (message.IsRunning) await SaveBeforeQuery();
+        if (message.IsRunning)
+        {
+            await SaveBeforeQuery();
+        }
         else
         {
             Messaging.Send(new SchemaUpdateMessage(_explorer.GetSchema()));
             UpdateKustoDataPath();
         }
+
         return false;
     }
 
@@ -174,19 +180,21 @@ public partial class MainViewModel : ObservableObject
             preQueryText,
             adapter);
 
-        var doc = new QueryDocumentViewModel(name,queryEditorViewModel, renderingSurfaceViewModel,_explorer.Settings) { IsVisible = isVisible };
+        var doc = new QueryDocumentViewModel(name, queryEditorViewModel, renderingSurfaceViewModel, _explorer.Settings)
+            { IsVisible = isVisible };
         return doc;
     }
 
     [RelayCommand]
     private async Task ShowAbout()
     {
-        await _dialogService.ShowMessageBox($"About", $"""
-                                                  LokqlDX
-                                                  Version: {UpgradeManager.GetCurrentVersion()}
-                                                  (C) 2025 Neil MacMullen
-                                                  """);
+        await _dialogService.ShowMessageBox("About", $"""
+                                                      LokqlDX
+                                                      Version: {UpgradeManager.GetCurrentVersion()}
+                                                      (C) 2025 Neil MacMullen
+                                                      """);
     }
+
     [RelayCommand]
     private async Task LoadData()
     {
@@ -335,6 +343,10 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task OpenKqlFormattingPreferences() =>
+        await _dialogService.ShowKqlFormattingPreferences(_preferencesManager);
+
+    [RelayCommand]
     private async Task OpenWorkspacePreferences() =>
         await _dialogService.ShowWorkspacePreferences(_workspaceManager, _preferencesManager.UIPreferences);
 
@@ -384,13 +396,17 @@ public partial class MainViewModel : ObservableObject
         ApplicationHelper.SetTheme(theme);
     }
 
-    private InteractiveTableExplorer CreateExplorer() =>
-        new(
+    private InteractiveTableExplorer CreateExplorer()
+    {
+        var exp = new InteractiveTableExplorer(
             ConsoleViewModel,
             _workspaceManager.Settings,
             _commandProcessor,
             new NullResultRenderingSurface(),
             _additionalFunctions);
+        exp.SetFormatter(new KqlFormatter(_preferencesManager));
+        return exp;
+    }
 
     private async Task LoadWorkspace(string path)
     {
@@ -445,8 +461,8 @@ public partial class MainViewModel : ObservableObject
 
     private void RemoveAllDocs()
     {
-      _factory.RemoveAllDocuments();
-      QueryLibrary.Clear();
+        _factory.RemoveAllDocuments();
+        QueryLibrary.Clear();
     }
 
     /// <summary>
@@ -653,5 +669,24 @@ public static class ApplicationHelper
         if (theme.ToLower() == "dark")
             return Brushes.Black;
         return Brushes.White;
+    }
+}
+
+internal class KqlFormatter : IKqlFormattingService
+{
+    private readonly PreferencesManager _preferencesManager;
+
+    public KqlFormatter(PreferencesManager preferencesManager)
+    {
+        _preferencesManager = preferencesManager;
+    }
+
+    public string Format(string text)
+    {
+        var options = _preferencesManager.FetchCachedApplicationSettings().Formatting.ToFormattingOptions();
+
+        var kustoCode = new KustoQueryContext().GetParseTree(text);
+        var kustoCodeService = new KustoCodeService(kustoCode);
+        return kustoCodeService.GetFormattedText(options).Text;
     }
 }

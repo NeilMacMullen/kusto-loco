@@ -60,6 +60,7 @@
                 </MenuItem>
                 <MenuItem Header="_Preferences">
                     <MenuItem Header="Application Options" Command="{Binding OpenAppPreferencesCommand}" />
+                    <MenuItem Header="KQL Formatting..." Command="{Binding OpenKqlFormattingPreferencesCommand}" />
                     <MenuItem Header="Workspace Options" Command="{Binding OpenWorkspacePreferencesCommand}" />
                     <MenuItem Header="Workspace Description..." Command="{Binding EditWorkspaceDescriptionCommand}" />
                     <Separator />
@@ -102,17 +103,17 @@
                         <MenuItem Header="LokqlDx intro" CommandParameter="LokqlDX"
                                   Command="{Binding NavigateToWikiCommand}" />
                         <MenuItem Header="Quick start"
-                                  CommandParameter="LokqlDx-tutorial-â€-quick-start"
+                                  CommandParameter="LokqlDx-tutorial-‐-quick-start"
                                   Command="{Binding NavigateToWikiCommand}" />
                         <MenuItem Header="Keyboard shortcuts"
-                                  CommandParameter="LokqlDx-â€-Keyboard-shortcuts"
+                                  CommandParameter="LokqlDx-‐-Keyboard-shortcuts"
                                   Command="{Binding NavigateToWikiCommand}" />
                         <MenuItem Header="'Dot' Commands"
-                                  CommandParameter="LokqlDx-â€-commands"
+                                  CommandParameter="LokqlDx-‐-commands"
                                   Command="{Binding NavigateToWikiCommand}" />
                         <MenuItem Header="Settings and macros"
                                   Command="{Binding NavigateToWikiCommand}"
-                                  CommandParameter="LokqlDx-â€-Settings,-Variables-and-Macros" />
+                                  CommandParameter="LokqlDx-‐-Settings,-Variables-and-Macros" />
 
 						<MenuItem Header="KQL Introduction"
                                   Command="{Binding NavigateToUriCommand}"

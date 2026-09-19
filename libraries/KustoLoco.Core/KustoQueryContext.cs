@@ -195,6 +195,13 @@ public class KustoQueryContext
         return res.RowCount;
     }
 
+
+    public KustoCode GetParseTree(string query)
+    {
+        var engine = new BabyKustoEngine(new NullConsole(), new KustoSettingsProvider());
+        return engine.Parse([],query);
+    }
+
     /// <summary>
     ///     Runs a query against the context without attempting to load tables mentioned in the query
     /// </summary>

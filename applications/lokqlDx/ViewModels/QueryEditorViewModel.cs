@@ -3,6 +3,8 @@ using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Intellisense;
+using Kusto.Language.Editor;
+using KustoLoco.Core;
 using KustoLoco.Core.Settings;
 using Lokql.Engine;
 using lokqlDxComponents.Services;
@@ -104,6 +106,21 @@ public partial class QueryEditorViewModel : ObservableObject, IDisposable, IInte
             query = QueryContextViewModel.Text + Environment.NewLine + query;
         await RunQueryString(query);
     }
+
+    [RelayCommand(AllowConcurrentExecutions = false)]
+    private async Task RunFormat(string query)
+    {
+        if (query.IsBlank())
+            return;
+        await Messaging.Send(new RunningQueryMessage(true));
+
+        var formatted = _explorer.Format(query);
+
+     
+        SetText(formatted);
+        await Messaging.Send(new RunningQueryMessage(false));
+    }
+
 
     public async Task RunQueryString(string query)
     {
