@@ -7,9 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
              x:Class="LokqlDx.Views.Dialogs.KqlFormattingPreferencesView"
              x:DataType="vm:KqlFormattingPreferencesViewModel"
-             Loaded="UserControl_Loaded"
-             MaxWidth="1200"
-             MaxHeight="800">
+             Loaded="UserControl_Loaded">
     <UserControl.Styles>
         <Style Selector="TextBlock.SettingLabel">
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -200,7 +198,8 @@
                     Background="{DynamicResource SystemListLowColor}"
                     Padding="10"
                     CornerRadius="10">
-                    <avaloniaEdit:TextEditor Height="600" HorizontalAlignment="Stretch"
+                    <avaloniaEdit:TextEditor HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Stretch"
                                              x:Name="TextEditor"
                                              FontFamily="Consolas"
                                              FontSize="13"
