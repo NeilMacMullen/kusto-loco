@@ -1,6 +1,9 @@
-﻿using Kusto.Language.Symbols;
+﻿using System.Text;
+using Kusto.Language.Editor;
+using Kusto.Language.Symbols;
 using KustoLoco.Core;
 using KustoLoco.Core.Console;
+using KustoLoco.Core.DataSource.Columns;
 using KustoLoco.Core.Evaluation.BuiltIns;
 using KustoLoco.Core.Settings;
 using KustoLoco.Core.Util;
@@ -30,6 +33,7 @@ public class InteractiveTableExplorer
     private readonly MacroRegistry _macros;
     public readonly IKustoConsole _outputConsole;
     public readonly IResultRenderingSurface _renderingSurface;
+    private IKqlFormattingService _formatter;
     public readonly ResultHistory _resultHistory;
     public readonly KustoSettingsProvider Settings;
 
@@ -42,6 +46,7 @@ public class InteractiveTableExplorer
         Settings = settings;
         _commandProcessor = commandProcessor;
         _renderingSurface = renderingSurface;
+        _formatter = new NullFormatter();
         _context = KustoQueryContext.CreateWithDebug(outputConsole, settings);
         _context.AddFunctions(additionalFunctions);
         _loader = new StandardFormatAdaptor(settings, _outputConsole);
@@ -50,7 +55,8 @@ public class InteractiveTableExplorer
         _macros = new MacroRegistry();
         LokqlSettings.Register(Settings);
     }
-
+    public void SetFormatter(IKqlFormattingService formatter)
+    => _formatter=formatter;
 
     /// <summary>
     ///     Used to create a clone
@@ -58,8 +64,9 @@ public class InteractiveTableExplorer
     private InteractiveTableExplorer(IKustoConsole outputConsole, KustoSettingsProvider settings,
         CommandProcessor commandProcessor, IResultRenderingSurface renderingSurface, ResultHistory history,
         MacroRegistry macros,
-        ITableAdaptor loader, KustoQueryContext context)
+        ITableAdaptor loader, KustoQueryContext context,IKqlFormattingService formatter)
     {
+        _formatter = formatter;
         _outputConsole = outputConsole;
         Settings = settings;
         _loader = new StandardFormatAdaptor(settings, _outputConsole);
@@ -136,7 +143,28 @@ public class InteractiveTableExplorer
         var sequence = new BlockSequence(breaker.Blocks);
         await RunSequence(sequence);
     }
+    public string Format(string query)
+    {
 
+        var sb = new StringBuilder();
+        var breaker = new BlockBreaker(query,true);
+
+        foreach (var block in breaker.Blocks)
+        {
+
+            //we want to be careful not to format commands, or comments or remove blank lines
+            if (block.StartsWith("#") || block.IsBlank() || block.StartsWith("."))
+            {
+                sb.AppendLine(block);
+                continue;
+            }
+
+            var formatted = _formatter.Format(block);
+            sb.AppendLine(formatted);
+        }
+
+        return sb.ToString();
+    }
     public async Task RunSequence(BlockSequence sequence)
     {
         while (!sequence.Complete)
@@ -241,7 +269,7 @@ public class InteractiveTableExplorer
 
     public InteractiveTableExplorer ShareWithNewSurface(IResultRenderingSurface renderingSurface) =>
         new(_outputConsole, Settings, _commandProcessor, renderingSurface,
-            _resultHistory, _macros, _loader, _context);
+            _resultHistory, _macros, _loader, _context,_formatter);
 
     /// <summary>
     ///     Interpolates settings in the supplied text
@@ -250,4 +278,17 @@ public class InteractiveTableExplorer
     ///     a query such as "project $col" can be transformed into "project Id"
     /// </remarks>
     public string Interpolate(string query) => BlockInterpolator.Interpolate(query, Settings);
+
+  
 }
+
+public interface IKqlFormattingService
+{
+    string Format(string text);
+}
+
+public class NullFormatter : IKqlFormattingService
+{
+    public string Format(string text) => text;
+}
+

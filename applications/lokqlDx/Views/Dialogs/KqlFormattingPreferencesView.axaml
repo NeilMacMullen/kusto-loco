@@ -1,0 +1,214 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:LokqlDx.ViewModels.Dialogs"
+             xmlns:avaloniaEdit="using:AvaloniaEdit"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
+             x:Class="LokqlDx.Views.Dialogs.KqlFormattingPreferencesView"
+             x:DataType="vm:KqlFormattingPreferencesViewModel"
+             Loaded="UserControl_Loaded"
+             MaxWidth="1200"
+             MaxHeight="800">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.SettingLabel">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Width" Value="220" />
+        </Style>
+        <Style Selector="DockPanel.SettingRow">
+            <Setter Property="Margin" Value="0,2,0,2" />
+        </Style>
+        <Style Selector="ComboBox.SettingCombo">
+            <Setter Property="Width" Value="160" />
+        </Style>
+    </UserControl.Styles>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Margin="10" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10">
+            <Button Classes="SmallButton" Content="Restore Defaults" Command="{Binding RestoreDefaultsCommand}" />
+            <Button Classes="SmallButton" Content="Cancel" Command="{Binding CancelCommand}" />
+            <Button Classes="SmallButton" Content="Save" Command="{Binding SaveCommand}" />
+        </StackPanel>
+
+        <Grid Margin="10" ColumnDefinitions="420,*">
+            <ScrollViewer Grid.Column="0">
+                <StackPanel Spacing="2">
+                    <TextBlock Text="General" FontWeight="Bold" Margin="0,0,0,4" />
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Indentation size" />
+                        <NumericUpDown Width="160" Minimum="0" Maximum="16" FormatString="0" Value="{Binding IndentationSize}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Insert missing tokens" />
+                        <CheckBox IsChecked="{Binding InsertMissingTokens}" />
+                    </DockPanel>
+
+                    <TextBlock Text="Bracketting" FontWeight="Bold" Margin="0,8,0,4" />
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Bracketting style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding BrackettingStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Schema style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding SchemaStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Data table value style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding DataTableValueStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Function body style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding FunctionBodyStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Function parameter style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding FunctionParameterStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Function argument style" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.BrackettingStyles}" SelectedItem="{Binding FunctionArgumentStyle}" />
+                    </DockPanel>
+
+                    <TextBlock Text="Placement" FontWeight="Bold" Margin="0,8,0,4" />
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Pipe operator placement" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.PlacementStyles}" SelectedItem="{Binding PipeOperatorStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Expression placement" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.PlacementStyles}" SelectedItem="{Binding ExpressionStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Statement placement" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.PlacementStyles}" SelectedItem="{Binding StatementStyle}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Semicolon placement" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.PlacementStyles}" SelectedItem="{Binding SemicolonStyle}" />
+                    </DockPanel>
+
+                    <TextBlock Text="Spacing" FontWeight="Bold" Margin="0,8,0,4" />
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="General spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding GeneralSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Prefix operator spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding PrefixOperatorSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Infix operator spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding InfixOperatorSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Pipe operator spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding PipeOperatorSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Comma spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding CommaSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Colon spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding ColonSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Assignment spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding AssignmentSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Range operator spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding RangeOperatorSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Semicolon spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.DualSpacingStyles}" SelectedItem="{Binding SemicolonSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Parenthesized expr. spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding ParenthesizedExpressionSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Argument list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding ArgumentListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty argument list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyArgumentListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Parameter list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding ParameterListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty parameter list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyParameterListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Json array spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding JsonArraySpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty json array spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyJsonArraySpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Json object spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding JsonObjectSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty json object spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyJsonObjectSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Data table value spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding DataTableValueSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty data table value spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyDataTableValueSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Function body spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding FunctionBodySpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Empty function body spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding EmptyFunctionBodySpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Before function body spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding BeforeFunctionBodySpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Before parameter list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding BeforeParameterListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Before argument list spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding BeforeArgumentListSpacing}" />
+                    </DockPanel>
+                    <DockPanel Classes="SettingRow">
+                        <TextBlock Classes="SettingLabel" Text="Before data table value spacing" />
+                        <ComboBox Classes="SettingCombo" ItemsSource="{x:Static vm:KqlFormattingPreferencesViewModel.SpacingStyles}" SelectedItem="{Binding BeforeDataTableValueSpacing}" />
+                    </DockPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <DockPanel Grid.Column="1" Margin="10,0,0,0">
+                <TextBlock DockPanel.Dock="Top" Text="Preview (updates live as settings change)" Margin="0,0,0,10" />
+                <Border
+                    Background="{DynamicResource SystemListLowColor}"
+                    Padding="10"
+                    CornerRadius="10">
+                    <avaloniaEdit:TextEditor Height="600" HorizontalAlignment="Stretch"
+                                             x:Name="TextEditor"
+                                             FontFamily="Consolas"
+                                             FontSize="13"
+                                             ShowLineNumbers="True"
+                                             Document="{Binding Document}"
+                                             Background="{DynamicResource SystemAltLowColor}" />
+                </Border>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>

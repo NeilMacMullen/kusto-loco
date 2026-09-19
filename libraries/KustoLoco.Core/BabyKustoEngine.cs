@@ -93,20 +93,19 @@ public class BabyKustoEngine
             .OrderBy(f => f.Name).ToArray();
     }
 
-    public EvaluationResult Evaluate(
-        IReadOnlyCollection<ITableSource> tables,
-        string query)
+    private Dictionary<FunctionSymbol, ScalarFunctionInfo> GetAllFunctions()
     {
-        var dumpKustoTree = _settings.GetBool(CoreSettings.DumpParseTree);
-        var dumpIRTree = _settings.GetBool(CoreSettings.DumpIr);
-
         //combine all available functions
-        var allFuncs = BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
+       return BuiltInScalarFunctions.Functions.Concat(CustomFunctions.functions)
             .Concat(_additionalfuncs)
             .ToDictionary(kv => kv.Key, kv => kv.Value);
+    }
+    public KustoCode Parse(IReadOnlyCollection<ITableSource> tables, string query)
+    {
+      
         //some functions are implicitly implemented so use the existing default
         //set as a baseline
-        var allSupported = GlobalState.Default.Functions.Concat(allFuncs.Keys)
+        var allSupported = GlobalState.Default.Functions.Concat(GetAllFunctions().Keys)
             .Distinct().ToArray();
 
         var state = GlobalState.Default
@@ -116,7 +115,17 @@ public class BabyKustoEngine
 
         var globals = state.WithDatabase(db);
 
-        var code = KustoCode.ParseAndAnalyze(query, globals);
+        return KustoCode.ParseAndAnalyze(query, globals);
+    }
+
+    public EvaluationResult Evaluate(
+        IReadOnlyCollection<ITableSource> tables,
+        string query)
+    {
+        var dumpKustoTree = _settings.GetBool(CoreSettings.DumpParseTree);
+        var dumpIRTree = _settings.GetBool(CoreSettings.DumpIr);
+
+        var code = Parse(tables, query);
 
         var visualizer = new IrNodeVisualizer(_console);
         visualizer.DumpKustoTree(code, dumpKustoTree);
@@ -151,7 +160,7 @@ public class BabyKustoEngine
         }
 
 
-        var irVisitor = new IRTranslator(allFuncs);
+        var irVisitor = new IRTranslator(GetAllFunctions());
 
         var ir = code.Syntax.Accept(irVisitor);
 
@@ -181,4 +190,6 @@ public class BabyKustoEngine
             return $"{prefix}.{setting}";
         }
     }
+
+  
 }

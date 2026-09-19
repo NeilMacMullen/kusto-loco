@@ -12,10 +12,17 @@ namespace Lokql.Engine;
 /// </remarks>
 public class BlockBreaker
 {
+    private readonly bool _preserveBlankLines;
     public string[] Blocks;
 
-    public BlockBreaker(string block)
+    public BlockBreaker(string block) : this(block, false)
     {
+
+    }
+
+    public BlockBreaker(string block,bool preserveBlankLines)
+    {
+        _preserveBlankLines = preserveBlankLines;
         var blocks = new List<string>();
         //normalize line endings and split
         //make the processing easier by adding an empty line at the end to act as a terminator
@@ -33,6 +40,11 @@ public class BlockBreaker
             if (trimmedLine.IsBlank())
             {
                 CompleteBlock();
+                if (_preserveBlankLines)
+                {
+                    blocks.Add(string.Empty);
+                }
+
                 continue;
             }
 
@@ -51,8 +63,9 @@ public class BlockBreaker
 
             sb.AppendLine(line);
         }
-
-        Blocks = blocks.ToArray();
+        //If we are preserving blank lines we need to remove the last artificially-added one
+        Blocks = _preserveBlankLines ? [.. blocks[..^1]]
+            : [.. blocks];
 
         void CompleteBlock()
         {

@@ -40,8 +40,10 @@ public class BlockBreakerTests
     [TestMethod]
     public void SingleQueryIsAsExpected()
     {
-        var query = @"table
-| where column = 'value'";
+        var query = """
+                    table
+                    | where column = 'value'
+                    """;
         var blockBreaker = new BlockBreaker(query);
         CheckSimilar(blockBreaker.Blocks,[query]);
     }
@@ -51,12 +53,16 @@ public class BlockBreakerTests
     public void BlockIsBrokenAtBlankLine()
     {
         var block1 = "table";
-        var block2 = @"table 2
-| where column = 'value'
-";
-        var query = $@"{block1}
+        var block2 = """
+                     table 2
+                     | where column = 'value'
 
-{block2}";
+                     """;
+        var query = $"""
+                     {block1}
+
+                     {block2}
+                     """;
         var blockBreaker = new BlockBreaker(query);
         CheckSimilar(blockBreaker.Blocks,[block1,block2]);
     }
@@ -66,12 +72,16 @@ public class BlockBreakerTests
     public void BlockIsBrokenAtDotCommand()
     {
         var block1 = " .set abc 123";
-        var block2 = @"table
-| where a>5";
+        var block2 = """
+                     table
+                     | where a>5
+                     """;
         var block3 = ".set xyz def";
-        var query = $@"{block1}
-{block2}
-{block3}";
+        var query = $"""
+                     {block1}
+                     {block2}
+                     {block3}
+                     """;
         var blockBreaker = new BlockBreaker(query);
         blockBreaker.Blocks.Length.Should().Be(3);
         CheckSimilar(blockBreaker.Blocks, [block1, block2,block3]);
@@ -81,14 +91,18 @@ public class BlockBreakerTests
     public void BlockIsBrokenAtComments()
     {
         var block1 = " # this is a query";
-        var block2 = @"table
-| where a>5
-// this is a kusto comment
-| where A > 3";
+        var block2 = """
+                     table
+                     | where a>5
+                     // this is a kusto comment
+                     | where A > 3
+                     """;
         var block3 = ".set xyz def";
-        var query = $@"{block1}
-{block2}
-{block3}";
+        var query = $"""
+                     {block1}
+                     {block2}
+                     {block3}
+                     """;
         var blockBreaker = new BlockBreaker(query);
         blockBreaker.Blocks.Length.Should().Be(3);
         CheckSimilar(blockBreaker.Blocks, [block1, block2, block3]);
@@ -97,14 +111,45 @@ public class BlockBreakerTests
     [TestMethod]
     public void BlockIsNotBrokenAtKustoComments()
     {
-        var block1 = @"table
-| where a>5";
+        var block1 = """
+                     table
+                     | where a>5
+                     """;
         var block2 = " // this is also comment";
         var block3 = "| where a > 3";
-        var query = $@"{block1}
-{block2}
-{block3}";
+        var query = $"""
+                     {block1}
+                     {block2}
+                     {block3}
+                     """;
         var blockBreaker = new BlockBreaker(query);
         blockBreaker.Blocks.Length.Should().Be(1);
     }
+
+    [TestMethod]
+    public void BlockMaintainsWhitespaceBlocksWhenRequested()
+    {
+        var block1 = """
+                     table
+                     """;
+
+        var block2 = """
+                     
+                     
+                     """;
+        var block3 = "end";
+        var query = $"""
+                     {block1}
+                     {block2}
+                     {block3}
+                     """;
+        var blockBreaker = new BlockBreaker(query,true);
+        var blocks= blockBreaker.Blocks;
+        blocks.Length.Should().Be(4);
+        blocks[0].Should().Be(block1);
+        blocks[1].Should().Be(string.Empty);
+        blocks.Last().Should().Be(block3);
+
+    }
+
 }

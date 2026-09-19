@@ -147,6 +147,15 @@ public class DialogService
             )
             .ConfigureAwait(false);
 
+    public async Task ShowKqlFormattingPreferences(PreferencesManager preferencesManager) =>
+        await ShowDialog(
+                "LokqlDX - KQL Formatting",
+                new KqlFormattingPreferencesView(),
+                new KqlFormattingPreferencesViewModel(preferencesManager),
+                new ShowOptions(true, new Size(1100, 700), true)
+            )
+            .ConfigureAwait(false);
+
 
     public async Task ShowRenameDialogs(RenamableText initialText) =>
         await ShowDialog(

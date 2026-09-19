@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <!-- Security vulnerability fix -->
+    <PackageReference Include="Snappier" />
     <PackageReference Include="Tmds.DBus.Protocol" />
 
     <PackageReference Include="Avalonia" />
