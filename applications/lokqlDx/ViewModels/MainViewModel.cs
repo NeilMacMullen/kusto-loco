@@ -470,14 +470,19 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private void UpdateUiFromWorkspace()
     {
+       SetWindowTitle();
+       
+    }
+
+    private void SetWindowTitle()
+    {
         var version = UpgradeManager.GetCurrentVersion();
         var title = _workspaceManager.Path.IsBlank()
             ? $"LokqlDX {version} - new workspace"
-            : $"LokqlDX {version} - {Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
+            : $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
 
         WindowTitle = title;
     }
-
     private bool RecheckDirty()
     {
         IsDirty = QueryLibrary.IsDirty() || CurrentWorkspace.IsDirty;
@@ -575,10 +580,7 @@ public partial class MainViewModel : ObservableObject
         if (result?.TryGetLocalPath() is { } path)
         {
             SaveWorkspace(path);
-            //make sure we update title bar
-            var title =
-                $"{Path.GetFileNameWithoutExtension(_workspaceManager.Path)} ({Path.GetDirectoryName(_workspaceManager.Path)})";
-            WindowTitle = title;
+            SetWindowTitle();
             return YesNoCancel.Complete;
         }
 
