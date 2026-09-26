@@ -38,13 +38,33 @@ internal partial class IRTranslator : DefaultSyntaxVisitor<IRNode>
 
         //between used after datetime range thinks type is unknown...
         var irArguments = new[] { parameterExpression!, leftRange, rightRange };
+        ApplyTypeCoercionsForBetween(irArguments);
+
         var overloadInfo = BuiltInOperators.GetOverload((OperatorSymbol)signature.Symbol,
             node.ResultType, irArguments);
 
-        //ApplyTypeCoercions(irArguments, overloadInfo);
 
         return new IRBuiltInScalarFunctionCallNode(signature,
             overloadInfo, new List<Parameter>(), IRListNode.From(irArguments), ScalarTypes.Bool);
+    }
+
+    /// <summary>
+    /// For a "between" operator, we need to case all parameters to the type of thing we are considering
+    /// which is expressed as the first argument 
+    /// </summary>
+    /// <param name="irArguments"></param>
+    private static void ApplyTypeCoercionsForBetween(IRExpressionNode[] irArguments)
+
+    {
+        var desiredTargetType = irArguments[0].ResultType;
+        //between has a "special" mode where you can supply a between (datetime, timespan) expression
+        if (!desiredTargetType.IsNumeric())
+            return;
+        for (var i = 1; i < irArguments.Length; i++)
+        {
+            if (desiredTargetType.Simplify() != irArguments[i].ResultType.Simplify())
+                irArguments[i] = new IRCastExpressionNode(irArguments[i], desiredTargetType);
+        }
     }
 
     public IRNode VisitExpressionWithArray(Expression node, Expression left, ExpressionList right)
