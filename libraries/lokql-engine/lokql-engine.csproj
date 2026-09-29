@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
     <ProjectReference Include="..\AppInsightsSupport\AppInsightsSupport.csproj" />
     <ProjectReference Include="..\CopilotSupport\CopilotSupport.csproj" />
     <ProjectReference Include="..\FileFormats\FileFormats.csproj" />
