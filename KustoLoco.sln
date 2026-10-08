@@ -122,6 +122,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserAgentTests", "test\User
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geo_ip", "samples\geo_ip\geo_ip.csproj", "{8EFCB3DE-670F-4D96-BF2A-F6F398D3171C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lokqlmcp", "applications\lokqlmcp\lokqlmcp.csproj", "{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AvaloniaPreviewer|Any CPU = AvaloniaPreviewer|Any CPU
@@ -1194,6 +1196,30 @@ Global
 		{8EFCB3DE-670F-4D96-BF2A-F6F398D3171C}.Release|x64.Build.0 = Release|Any CPU
 		{8EFCB3DE-670F-4D96-BF2A-F6F398D3171C}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EFCB3DE-670F-4D96-BF2A-F6F398D3171C}.Release|x86.Build.0 = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|Any CPU.ActiveCfg = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|Any CPU.Build.0 = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|x64.ActiveCfg = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|x64.Build.0 = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|x86.ActiveCfg = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.AvaloniaPreviewer|x86.Build.0 = AvaloniaPreviewer|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|x64.Build.0 = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Debug|x86.Build.0 = Debug|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|Any CPU.ActiveCfg = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|Any CPU.Build.0 = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|x64.ActiveCfg = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|x64.Build.0 = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|x86.ActiveCfg = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.DebugStartup|x86.Build.0 = DebugStartup|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|x64.ActiveCfg = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|x64.Build.0 = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|x86.ActiveCfg = Release|Any CPU
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1244,6 +1270,7 @@ Global
 		{0C277582-5C76-4812-A2CE-E8F2EC8E7090} = {E515B24C-26F5-4DB4-893F-B581B23891E2}
 		{C8881828-E2B8-402F-8F1D-1FCF281B06D4} = {932C804C-F6B7-4361-8360-E5238938E464}
 		{8EFCB3DE-670F-4D96-BF2A-F6F398D3171C} = {48CD2752-9462-473A-8699-7AD8B146742F}
+		{95F3AAE8-6E81-49D9-AA29-E68FDA82D3D8} = {B891952E-5D41-45F7-ABB2-B512A8200656}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5C9CC8-3EB2-4272-BBE5-637753D5E739}
