@@ -10,9 +10,11 @@ using ModelContextProtocol.Server;
 namespace LokqlMcp;
 
 [McpServerToolType]
-[Description("This tool allows you to query information about your data")]
-public sealed class KqlTools(TableStore store, RequestLog log)
+[Description(Boilerplate)]
+public sealed class KqlTools(TableStore store, RequestLog log, ServerConfig config)
 {
+    public const string Boilerplate = "This tool allows you to query information about your data";
+
     [McpServerTool(Name = "ListTables")]
     [Description("Lists all tables available for querying, with their row and column counts.")]
     public string ListTables()
@@ -45,6 +47,12 @@ public sealed class KqlTools(TableStore store, RequestLog log)
 
         var sb = new StringBuilder();
         sb.AppendLine($"Table: {table.Name}");
+        if (config.TableDescriptions.TryGetValue(table.Name, out var description) &&
+            !string.IsNullOrWhiteSpace(description))
+        {
+            sb.AppendLine("Description:");
+            sb.AppendLine(description);
+        }
         sb.AppendLine($"Rows: {RowCount(table)}");
         sb.AppendLine("Schema:");
         foreach (var c in table.Type.Columns)
