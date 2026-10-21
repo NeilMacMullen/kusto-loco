@@ -171,6 +171,8 @@
 
                     </MenuItem>
                     <Separator />
+                    <MenuItem Header="Open _crashlog" Command="{Binding OpenCrashLogCommand}" />
+                    <Separator />
 
                     <MenuItem Header="About" Command="{Binding ShowAboutCommand}"/>
 

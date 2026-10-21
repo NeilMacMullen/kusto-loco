@@ -2,6 +2,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using LokqlDx.Services;
 using LokqlDx.ViewModels;
 using LokqlDx.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +48,13 @@ public class App : Application
             var viewModel = _serviceProvider.GetRequiredService<MainViewModel>();
 
             mainWindow.DataContext = viewModel;
+
+            Dispatcher.UIThread.UnhandledException += (_, e) =>
+            {
+                CrashLogger.Log("UIThread", e.Exception);
+                e.Handled = true;
+                viewModel.ReportUnhandledException(e.Exception);
+            };
 
             if (desktop.Args is not null)
                 viewModel.SetInitWorkspacePath(desktop.Args?.FirstOrDefault() ?? "");
