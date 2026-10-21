@@ -333,4 +333,187 @@ public class JoinLookupTests : TestMethods
                        """;
         result.Should().Be(expected);
     }
+
+    [TestMethod]
+    public async Task CheckThatRightTableColumnIndicesAreCorrectlyUsed()
+    {
+        var query = """
+                    datatable(Site:string, 
+                    SiteId:guid,
+                    SiteCode:string)
+                    [
+                        "Place 1", 
+                        guid(0803cff9-b16b-4d5f-a7b9-05f03c8d38a2), 
+                        "75256"
+                    ]
+                    | join kind = rightanti datatable(Line:string, SiteCode:string)
+                    [
+                        "Place2", "61930"
+                    ]  on SiteCode
+                    """;
+        var result = await LastLineOfResult(query);
+        var expected = """
+                       Place2,61930
+                       """;
+        result.Should().Be(expected);
+    }
+
+    //left key is at index 2, right key is at index 0
+    private const string DifferentIndexTables = """
+                    let L = datatable(A:string, B:long, Key:string)
+                    [
+                        'p',1,'a',
+                        'q',2,'b',
+                        'r',3,'c'
+                    ];
+                    let R = datatable(Key:string, C:long)
+                    [
+                        'b',10,
+                        'c',20,
+                        'd',30
+                    ];
+
+                    """;
+
+    private async Task CheckDifferentIndices(string operation, string expected)
+    {
+        var result = await ResultAsString(DifferentIndexTables + operation, Environment.NewLine);
+        result.Should().Be(expected);
+    }
+
+    [TestMethod]
+    public async Task RightSemiJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=rightsemi R on Key", """
+                                                                           b,10
+                                                                           c,20
+                                                                           """);
+
+    [TestMethod]
+    public async Task RightAntiJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=rightanti R on Key", """
+                                                                           d,30
+                                                                           """);
+
+    [TestMethod]
+    public async Task LeftSemiJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=leftsemi R on Key", """
+                                                                          q,2,b
+                                                                          r,3,c
+                                                                          """);
+
+    [TestMethod]
+    public async Task LeftAntiJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=leftanti R on Key", """
+                                                                          p,1,a
+                                                                          """);
+
+    [TestMethod]
+    public async Task InnerJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=inner R on Key", """
+                                                                      q,2,b,b,10
+                                                                      r,3,c,c,20
+                                                                      """);
+
+    [TestMethod]
+    public async Task LeftOuterJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=leftouter R on Key", """
+                                                                          p,1,a,,<null>
+                                                                          q,2,b,b,10
+                                                                          r,3,c,c,20
+                                                                          """);
+
+    [TestMethod]
+    public async Task RightOuterJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=rightouter R on Key", """
+                                                                           q,2,b,b,10
+                                                                           r,3,c,c,20
+                                                                           ,<null>,,d,30
+                                                                           """);
+
+    [TestMethod]
+    public async Task FullOuterJoinWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | join kind=fullouter R on Key", """
+                                                                           p,1,a,,<null>
+                                                                           q,2,b,b,10
+                                                                           r,3,c,c,20
+                                                                           ,<null>,,d,30
+                                                                           """);
+
+    [TestMethod]
+    public async Task LookupWithDifferentKeyIndices()
+        => await CheckDifferentIndices("L | lookup R on Key", """
+                                                                p,1,a,<null>
+                                                                q,2,b,10
+                                                                r,3,c,20
+                                                                """);
+
+    private const string MultiKeyTables = """
+                    let L = datatable(A:string, K2:string, K1:string)
+                    [
+                        'p','x','a',
+                        'q','y','b'
+                    ];
+                    let R = datatable(K1:string, V:long, K2:string)
+                    [
+                        'a',1,'x',
+                        'b',2,'x',
+                        'b',3,'y',
+                        'c',4,'y'
+                    ];
+
+                    """;
+
+    [TestMethod]
+    public async Task RightSemiJoinMultipleKeysDifferentIndices()
+    {
+        var result = await ResultAsString(MultiKeyTables + "L | join kind=rightsemi R on K1, K2",
+            Environment.NewLine);
+        var expected = """
+                       a,1,x
+                       b,3,y
+                       """;
+        result.Should().Be(expected);
+    }
+
+    [TestMethod]
+    public async Task RightAntiJoinMultipleKeysDifferentIndices()
+    {
+        var result = await ResultAsString(MultiKeyTables + "L | join kind=rightanti R on K1, K2",
+            Environment.NewLine);
+        var expected = """
+                       b,2,x
+                       c,4,y
+                       """;
+        result.Should().Be(expected);
+    }
+
+    private const string WideRightTables = """
+                    let L = datatable(A:string, Key:string)
+                    [
+                        'p','a',
+                        'q','b'
+                    ];
+                    let R = datatable(P:long, Q:long, S:long, Key:string)
+                    [
+                        1,2,3,'b',
+                        4,5,6,'z'
+                    ];
+
+                    """;
+
+    [TestMethod]
+    public async Task RightSemiJoinWithRightKeyIndexBeyondLeftColumnCount()
+    {
+        var result = await ResultAsString(WideRightTables + "L | join kind=rightsemi R on Key",
+            Environment.NewLine);
+        result.Should().Be("1,2,3,b");
+    }
+
+    [TestMethod]
+    public async Task RightAntiJoinWithRightKeyIndexBeyondLeftColumnCount()
+    {
+        var result = await ResultAsString(WideRightTables + "L | join kind=rightanti R on Key",
+            Environment.NewLine);
+        result.Should().Be("4,5,6,z");
+    }
 }

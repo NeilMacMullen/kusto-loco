@@ -1,4 +1,4 @@
-﻿//
+//
 // Licensed under the MIT License.
 
 using System;
@@ -76,9 +76,11 @@ internal partial class TreeEvaluator
             };
         }
 
-        private BaseColumn[] CalculateOnValues(IMaterializedTableSource table, bool isLeft)
+        private enum TablePosition { Left, Right }
+
+        private BaseColumn[] CalculateOnValues(IMaterializedTableSource table, TablePosition position)
         {
-            var onExpressions = _onClauses.Select(c => isLeft ? c.Left : c.Right).ToArray();
+            var onExpressions = _onClauses.Select(c => position == TablePosition.Left ? c.Left : c.Right).ToArray();
             var chunk = table.Chunks[0];
 
             var onValuesColumns = new List<BaseColumn>(_onClauses.Count);
@@ -99,12 +101,12 @@ internal partial class TreeEvaluator
             return new SummaryKey(onValues);
         }
 
-        private BucketedRows Bucketize(IMaterializedTableSource table, bool isLeft)
+        private BucketedRows Bucketize(IMaterializedTableSource table, TablePosition position)
         {
             var result = new BucketedRows(table);
             var chunk = table.Chunks[0];
 
-            var onValuesColumns = CalculateOnValues(table, isLeft);
+            var onValuesColumns = CalculateOnValues(table, position);
 
             var numRows = chunk.RowCount;
             for (var i = 0; i < numRows; i++)
@@ -125,8 +127,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> InnerLookup(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var onValuesColumns = CalculateOnValues(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
@@ -146,8 +148,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> InnerJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable, bool dedupeLeft)
         {
-            var onValuesColumns = CalculateOnValues(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var onValuesColumns = CalculateOnValues(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             var seenLeft = new HashSet<SummaryKey>();
@@ -218,8 +220,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> LeftSemiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var onValuesColumns = CalculateOnValues(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
             {
@@ -236,8 +238,8 @@ internal partial class TreeEvaluator
             IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var onValuesColumns = CalculateOnValues(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
 
             for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
@@ -261,8 +263,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> LeftOuterJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var onValuesColumns = CalculateOnValues(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
             for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
@@ -289,10 +291,10 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> LeftOuterLookup(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var right = Bucketize(rightTable, false);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
-            var onValues = CalculateOnValues(leftTable, true);
+            var onValues = CalculateOnValues(leftTable, TablePosition.Left);
             for (var lRow = 0; lRow < leftTable.RowCount; lRow++)
             {
                 var key = KeyFromOnValues(onValues, lRow);
@@ -330,8 +332,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(rightTable, true);
-            var left = Bucketize(leftTable, false);
+            var onValuesColumns = CalculateOnValues(rightTable, TablePosition.Right);
+            var left = Bucketize(leftTable, TablePosition.Left);
             var rightIndices = new List<int>();
             for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
@@ -347,8 +349,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(rightTable, true);
-            var left = Bucketize(leftTable, false);
+            var onValuesColumns = CalculateOnValues(rightTable, TablePosition.Right);
+            var left = Bucketize(leftTable, TablePosition.Left);
             var rightIndices = new List<int>();
             for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
@@ -364,10 +366,10 @@ internal partial class TreeEvaluator
             IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var left = Bucketize(leftTable, true);
+            var left = Bucketize(leftTable, TablePosition.Left);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
-            var onValues = CalculateOnValues(rightTable, false);
+            var onValues = CalculateOnValues(rightTable, TablePosition.Right);
             for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
                 var key = KeyFromOnValues(onValues, rRow);
@@ -392,8 +394,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> FullOuterJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var left = Bucketize(leftTable, true);
-            var right = Bucketize(rightTable, false);
+            var left = Bucketize(leftTable, TablePosition.Left);
+            var right = Bucketize(rightTable, TablePosition.Right);
             var leftIndices = new List<int>();
             var rightIndices = new List<int>();
 
