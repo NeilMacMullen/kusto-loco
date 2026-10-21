@@ -37,6 +37,13 @@ public static AppBuilder BuildAvaloniaApp()
     [STAThread]
     public static void Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            CrashLogger.Log($"AppDomain (terminating={e.IsTerminating})", e.ExceptionObject as Exception);
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            CrashLogger.Log("UnobservedTask", e.Exception);
+            e.SetObserved();
+        };
         try
         {
             Console.WriteLine("starting");
@@ -45,6 +52,7 @@ public static AppBuilder BuildAvaloniaApp()
         }
         catch (Exception ex)
         {
+            CrashLogger.Log("Main", ex);
             //try the console first
             while (true)
             {

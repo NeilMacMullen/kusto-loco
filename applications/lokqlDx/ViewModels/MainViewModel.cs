@@ -385,6 +385,73 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task NavigateToUri(string path) => await _launcher.LaunchUriAsync(new Uri(path));
 
+    private bool _crashDialogShowing;
+
+    public void ReportUnhandledException(Exception ex)
+    {
+        try
+        {
+            ConsoleViewModel.Write($"{Environment.NewLine}Unexpected error: {ex.Message}{Environment.NewLine}");
+        }
+        catch
+        {
+            // ignore - console may be in a bad state
+        }
+
+        if (_crashDialogShowing)
+            return;
+        _crashDialogShowing = true;
+        Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = ShowCrashDialog(ex));
+    }
+
+    private async Task ShowCrashDialog(Exception ex)
+    {
+            try
+            {
+                await _dialogService.ShowMessageBox("Unexpected error",
+                    $"""
+                     LokqlDx encountered an unexpected error and may now be unstable:
+
+                     {ex.Message}
+
+                     Please restart the application, then use Help -> Open crashlog and paste
+                     the contents into a new issue at https://github.com/NeilMacMullen/kusto-loco/issues
+                     """);
+            }
+            catch (Exception dialogEx)
+            {
+                CrashLogger.Log("CrashDialog", dialogEx);
+            }
+            finally
+            {
+                _crashDialogShowing = false;
+            }
+    }
+
+    [RelayCommand]
+    private async Task OpenCrashLog()
+    {
+        var path = CrashLogger.CrashLogPath;
+        if (!File.Exists(path))
+        {
+            await _dialogService.ShowMessageBox("Crashlog", "No crashes recorded");
+            return;
+        }
+
+        var launched = false;
+        try
+        {
+            launched = await _launcher.LaunchFileInfoAsync(new FileInfo(path));
+        }
+        catch
+        {
+            // fall through to alternative
+        }
+
+        if (!launched && OperatingSystem.IsWindows())
+            System.Diagnostics.Process.Start("notepad.exe", $"\"{path}\"");
+    }
+
     private void ApplyUiPreferences()
     {
         var uiPreferences = _preferencesManager.UIPreferences;
