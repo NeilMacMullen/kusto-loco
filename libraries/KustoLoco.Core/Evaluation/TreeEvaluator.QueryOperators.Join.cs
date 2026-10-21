@@ -330,8 +330,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightSemiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(rightTable, true);
-            var left = Bucketize(leftTable, false);
+            var onValuesColumns = CalculateOnValues(rightTable, false);
+            var left = Bucketize(leftTable, true);
             var rightIndices = new List<int>();
             for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
@@ -347,8 +347,8 @@ internal partial class TreeEvaluator
         private IEnumerable<ITableChunk> RightAntiJoin(IMaterializedTableSource leftTable,
             IMaterializedTableSource rightTable)
         {
-            var onValuesColumns = CalculateOnValues(rightTable, true);
-            var left = Bucketize(leftTable, false);
+            var onValuesColumns = CalculateOnValues(rightTable, false);
+            var left = Bucketize(leftTable, true);
             var rightIndices = new List<int>();
             for (var rRow = 0; rRow < rightTable.RowCount; rRow++)
             {
