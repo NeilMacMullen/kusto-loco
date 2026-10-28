@@ -194,6 +194,14 @@ internal static class BuiltInScalarFunctions
         IffFunction.Register(Functions);
         Functions.Add(Kusto.Language.Functions.Iif, IffFunction.S); //synonym for Iff
         TrimFunction.Register(Functions);
+        ConvertAngleFunction.Register(Functions);
+        ConvertEnergyFunction.Register(Functions);
+        ConvertForceFunction.Register(Functions);
+        ConvertLengthFunction.Register(Functions);
+        ConvertMassFunction.Register(Functions);
+        ConvertSpeedFunction.Register(Functions);
+        ConvertTemperatureFunction.Register(Functions);
+        ConvertVolumeFunction.Register(Functions);
         TrimStartFunction.Register(Functions);
         TrimEndFunction.Register(Functions);
         IsEmptyFunction.Register(Functions);
