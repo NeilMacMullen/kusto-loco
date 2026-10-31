@@ -14,7 +14,7 @@
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
     <PackageVersion Include="TreeDataGrid" Version="12.0.0.7" />
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.4" />
-    <PackageVersion Include="Avalonia.Labs.Controls" Version="12.0.2" />
+    <PackageVersion Include="Avalonia.Labs.Controls" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Skia" Version="12.1.4" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="12.0.0" />
