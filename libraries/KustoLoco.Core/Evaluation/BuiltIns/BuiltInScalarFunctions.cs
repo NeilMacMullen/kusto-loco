@@ -153,7 +153,7 @@ internal static class BuiltInScalarFunctions
 
         ScalarOverloadInfo[] BuildOverloads(IScalarFunctionImpl func, TypeSymbol t)
         {
-            return Enumerable.Range(1, 10)
+            return Enumerable.Range(1, 64)
                 .Select(i =>
                 {
                     var pairs = Enumerable.Range(0, i)
