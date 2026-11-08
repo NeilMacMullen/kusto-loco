@@ -90,7 +90,7 @@
     <PackageVersion Include="Vanara.PInvoke.NetApi32" Version="5.0.8" />
     <PackageVersion Include="VegaGenerator" Version="1.0.8" />
     <PackageVersion Include="WPF-UI" Version="4.3.0" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="12.0.7" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="12.1.5" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.5" />
     <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="12.0.5" />
     <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="12.0.5" />
