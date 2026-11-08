@@ -1,6 +1,6 @@
 # NuGet Package Upgrade Progress
 
-**Progress**: 4/9 tasks complete <progress value="44" max="100"></progress> 44%
+**Progress**: 5/9 tasks complete <progress value="56" max="100"></progress> 56%
 **Status**: Not Started
 Upgrading all outdated NuGet packages across KustoLoco.sln (CPM via Directory.Packages.props) in category batches, skipping CsvHelper and Parquet.Net due to major breaking changes.
 
@@ -9,7 +9,7 @@ Upgrading all outdated NuGet packages across KustoLoco.sln (CPM via Directory.Pa
 - ✅ 02-core-runtime-packages: core-runtime-packages ([Content](tasks/02-core-runtime-packages/task.md), [Progress](tasks/02-core-runtime-packages/progress-details.md))
 - ✅ 03-ai-packages: ai-packages ([Content](tasks/03-ai-packages/task.md), [Progress](tasks/03-ai-packages/progress-details.md))
 - ✅ 04-data-parsing-packages: data-parsing-packages ([Content](tasks/04-data-parsing-packages/task.md), [Progress](tasks/04-data-parsing-packages/progress-details.md))
-- 🔲 02-core-runtime-packages: Update core .NET/Microsoft.Extensions packages
+- ✅ 05-avalonia-ui-packages: avalonia-ui-packages ([Content](tasks/05-avalonia-ui-packages/task.md), [Progress](tasks/05-avalonia-ui-packages/progress-details.md))
 - 🔲 03-ai-packages: Update AI-related packages
 - 🔲 04-data-parsing-packages: Update data/parsing packages (skip CsvHelper, Parquet.Net)
 - 🔲 05-avalonia-ui-packages: Update Avalonia UI packages
