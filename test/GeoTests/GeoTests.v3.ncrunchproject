@@ -7,6 +7,9 @@
       <NamedTestSelector>
         <TestName>GeoTests.DbIpGeoProviderTests.Default_ResolvesFromTheEmbeddedDataset_WithNoHostFile</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>GeoTests.DbIpGeoProviderTests.Default_ResolvesIPv6FromTheEmbeddedDataset</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

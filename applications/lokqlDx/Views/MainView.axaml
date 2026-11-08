@@ -42,16 +42,7 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Workspace" Command="{Binding NewWorkspaceCommand}" />
                     <MenuItem Header="_Open Workspace" Command="{Binding OpenWorkspaceCommand}" />
-                    <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed"
-                              ItemsSource="{Binding RecentWorkspaces}"
-                              Command="{Binding OpenRecentWorkspaceCommand}"
-                              CommandParameter="{Binding SelectedItem, ElementName=RecentlyUsed}">
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                    </MenuItem>
+                    <MenuItem Header="_Recent Workspaces" Name="RecentlyUsed" />
                     <MenuItem Header="Searc_h Recent Workspaces..." Command="{Binding SearchRecentWorkspacesCommand}" />
 
                     <MenuItem Header="_Save" Command="{Binding SaveWorkspaceCommand}" InputGesture="Ctrl+S" />
