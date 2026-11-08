@@ -53,9 +53,9 @@ internal partial class TreeEvaluator
             var chunkContext = _context with { Chunk = chunk };
             var results =
                 _columns.Select(c => c.Expression.Accept(_owner, chunkContext)).ToArray();
+            //size scalars to the chunk, not to one row: a projection of only constants over no rows has no rows
             var outputColumns =
-                BuiltInsHelper.CreateResultArray(results)
-                    .Select(cr => cr.Column).ToArray();
+                results.Select(r => BuiltInsHelper.ToColumnar(r, chunk.RowCount).Column).ToArray();
             return (default, new TableChunk(this, outputColumns), false);
         }
     }
