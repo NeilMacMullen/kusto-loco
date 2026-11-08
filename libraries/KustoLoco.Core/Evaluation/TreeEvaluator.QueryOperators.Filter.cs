@@ -55,8 +55,12 @@ internal partial class TreeEvaluator
                 // Scalar will evaluate to the same value for any chunk, so we can process the entire chunk at once
                 case ScalarResult scalar when (bool?)scalar.Value == true:
                     return (default, chunk.ReParent(this), false);
+                // An empty chunk that keeps its columns: TableChunk.Empty is dropped, and a table with no chunks can't be
+                // put together.
                 case ScalarResult:
-                    return (default, TableChunk.Empty, false);
+                    return (default, new TableChunk(this, chunk.Columns
+                        .Select(c => ColumnHelpers.MapColumn(c, ImmutableArray<int>.Empty))
+                        .ToArray()), false);
                 case ColumnarResult columnar:
                 {
                     var predicateColumn = (GenericTypedBaseColumnOfbool)columnar.Column;
