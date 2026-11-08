@@ -1,6 +1,6 @@
 # NuGet Package Upgrade Progress
 
-**Progress**: 3/9 tasks complete <progress value="33" max="100"></progress> 33%
+**Progress**: 4/9 tasks complete <progress value="44" max="100"></progress> 44%
 **Status**: Not Started
 Upgrading all outdated NuGet packages across KustoLoco.sln (CPM via Directory.Packages.props) in category batches, skipping CsvHelper and Parquet.Net due to major breaking changes.
 
@@ -8,7 +8,7 @@ Upgrading all outdated NuGet packages across KustoLoco.sln (CPM via Directory.Pa
 - ✅ 01-test-infra-packages: test-infra-packages ([Content](tasks/01-test-infra-packages/task.md), [Progress](tasks/01-test-infra-packages/progress-details.md))
 - ✅ 02-core-runtime-packages: core-runtime-packages ([Content](tasks/02-core-runtime-packages/task.md), [Progress](tasks/02-core-runtime-packages/progress-details.md))
 - ✅ 03-ai-packages: ai-packages ([Content](tasks/03-ai-packages/task.md), [Progress](tasks/03-ai-packages/progress-details.md))
-- 🔲 01-test-infra-packages: Update test infrastructure packages
+- ✅ 04-data-parsing-packages: data-parsing-packages ([Content](tasks/04-data-parsing-packages/task.md), [Progress](tasks/04-data-parsing-packages/progress-details.md))
 - 🔲 02-core-runtime-packages: Update core .NET/Microsoft.Extensions packages
 - 🔲 03-ai-packages: Update AI-related packages
 - 🔲 04-data-parsing-packages: Update data/parsing packages (skip CsvHelper, Parquet.Net)
