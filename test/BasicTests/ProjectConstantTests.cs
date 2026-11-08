@@ -10,7 +10,17 @@ public class ProjectConstantTests : TestMethods
     {
         var result = await Result("datatable(a:long)[1] | where a == 0 | project x = 'none'");
         result.RowCount.Should().Be(0);
+        result.ColumnNames().Should().BeEquivalentTo(["x"]);
     }
+
+    [TestMethod]
+    public async Task EmptyResultsPreserveColumns()
+    {
+        var result = await Result("datatable(a:long,b:long)[1,0] | where a == b");
+        result.RowCount.Should().Be(0);
+        result.ColumnNames().Should().BeEquivalentTo(["a","b"]);
+    }
+
 
     [TestMethod]
     public async Task ConstantsOverNoRowsAddNothingToAUnion()
