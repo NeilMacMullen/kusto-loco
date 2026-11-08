@@ -13,10 +13,10 @@
     <PackageVersion Include="Anthropic.SDK" Version="5.10.0" />
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
     <PackageVersion Include="TreeDataGrid" Version="12.0.0.7" />
-    <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.4" />
+    <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.5" />
     <PackageVersion Include="Avalonia.Labs.Controls" Version="12.1.0" />
     <PackageVersion Include="Avalonia.Labs.Panels" Version="12.1.0" />
-    <PackageVersion Include="Avalonia.Skia" Version="12.1.4" />
+    <PackageVersion Include="Avalonia.Skia" Version="12.1.5" />
     <PackageVersion Include="AvaloniaEdit.TextMate" Version="12.0.0" />
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
@@ -30,10 +30,10 @@
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.4.2" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageVersion Include="Dock.Avalonia" Version="12.1.0.13" />
-    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.13" />
+    <PackageVersion Include="Dock.Avalonia" Version="12.1.5" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.5" />
     <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0" />
-    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.0.13" />
+    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.5" />
     <PackageVersion Include="ExcelDataReader.DataSet" Version="3.9.0" />
     <PackageVersion Include="Fastenshtein" Version="1.0.12" />
     <PackageVersion Include="HotAvalonia" Version="3.1.5" />
@@ -42,9 +42,9 @@
     <PackageVersion Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageVersion Include="MarkdownViewer.Core" Version="1.0.5" />
     <PackageVersion Include="McMaster.NETCore.Plugins" Version="2.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.2.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Azure.Kusto.Data" Version="14.2.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageVersion Include="Microsoft.Extensions.AI" Version="10.10.0" />
@@ -104,17 +104,17 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="geohash-dotnet" Version="3.0.0" />
     <PackageVersion Include="FluentAssertions" Version="8.1.1" />
-    <PackageVersion Include="Avalonia" Version="12.1.4" />
-    <PackageVersion Include="Avalonia.Desktop" Version="12.1.4" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.4" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+    <PackageVersion Include="Avalonia" Version="12.1.5" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.5" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.5" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.5" />
     <PackageVersion Include="Jab" Version="0.12.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
-    <PackageVersion Include="MessageBox.Avalonia" Version="12.0.0" />
+    <PackageVersion Include="MessageBox.Avalonia" Version="12.1.0" />
     <PackageVersion Include="DependencyPropertyGenerator" Version="1.5.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="18.7.23" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
-    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="15.0.0" />
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="15.1.0" />
   </ItemGroup>
 </Project>
