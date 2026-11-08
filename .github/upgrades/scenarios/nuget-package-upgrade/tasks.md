@@ -1,12 +1,12 @@
 # NuGet Package Upgrade Progress
 
-**Progress**: 1/9 tasks complete <progress value="11" max="100"></progress> 11%
+**Progress**: 2/9 tasks complete <progress value="22" max="100"></progress> 22%
 **Status**: Not Started
 Upgrading all outdated NuGet packages across KustoLoco.sln (CPM via Directory.Packages.props) in category batches, skipping CsvHelper and Parquet.Net due to major breaking changes.
 
 **Progress**: 0/9 tasks complete <progress value="0" max="100"></progress> 0%
 - ✅ 01-test-infra-packages: test-infra-packages ([Content](tasks/01-test-infra-packages/task.md), [Progress](tasks/01-test-infra-packages/progress-details.md))
-## Tasks
+- ✅ 02-core-runtime-packages: core-runtime-packages ([Content](tasks/02-core-runtime-packages/task.md), [Progress](tasks/02-core-runtime-packages/progress-details.md))
 
 - 🔲 01-test-infra-packages: Update test infrastructure packages
 - 🔲 02-core-runtime-packages: Update core .NET/Microsoft.Extensions packages
