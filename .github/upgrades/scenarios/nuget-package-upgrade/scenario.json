@@ -3,7 +3,7 @@
   "operationId": "0114a031-2289-404e-b32e-94431833c6d3",
   "description": "Upgrade one or more NuGet packages from their current version to a target version across a project, several projects, a folder, a solution, or the whole repository. Use when the user wants to bump, update, or upgrade a specific NuGet package (or packages) to a given version or to the latest supported version, detect breaking API changes introduced by the new version, and fix the resulting code. User-initiated \u2014 match the user\u0027s stated package(s) and version intent.\n",
   "startTime": "2026-11-08T11:15:33.5205799Z",
-  "lastUpdateTime": "2026-11-08T11:34:00.3307013Z",
+  "lastUpdateTime": "2026-11-08T11:35:34.0296493Z",
   "properties": {
     "taskStates": {
       "01-test-infra-packages": "Completed",
@@ -11,7 +11,8 @@
       "03-ai-packages": "Completed",
       "04-data-parsing-packages": "Completed",
       "05-avalonia-ui-packages": "Completed",
-      "06-wpf-and-misc-ui-packages": "Completed"
+      "06-wpf-and-misc-ui-packages": "Completed",
+      "07-azure-cloud-packages": "Completed"
     }
   },
   "folderPath": ""
